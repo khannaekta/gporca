@@ -517,6 +517,8 @@ add_library(gpopt
             src/operators/CScalarAggFunc.cpp
             include/gpopt/operators/CScalarArray.h
             src/operators/CScalarArray.cpp
+	    include/gpopt/operators/CScalarConstArray.h
+	    src/operators/CScalarConstArray.cpp
             include/gpopt/operators/CScalarArrayCmp.h
             src/operators/CScalarArrayCmp.cpp
             include/gpopt/operators/CScalarArrayRef.h

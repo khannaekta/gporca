@@ -1728,6 +1728,69 @@ CExpressionPreprocessor::PexprPruneEmptySubtrees
 	return GPOS_NEW(pmp) CExpression(pmp, pop, pdrgpexpr);
 }
 
+CExpression *
+CExpressionPreprocessor::PexprCollapseLargeArray
+(
+	IMemoryPool *pmp,
+	CExpression *pexpr
+)
+{
+	GPOS_ASSERT(NULL != pexpr);
+
+	COperator *pop = pexpr->Pop();
+	
+	// process children
+	DrgPexpr *pdrgpexpr = GPOS_NEW(pmp) DrgPexpr(pmp);
+	
+
+	ULONG ulChildren = pexpr->UlArity();
+	
+	// if it's a scalar array of all CScalarConst, we will collapse it into an CScalarConstArray
+	if (COperator::EopScalarArray == pop->Eopid())
+	{
+		// cast the operator
+		CScalarArray *oldArray = CScalarArray::PopConvert(pop);
+
+		// process children
+		DrgPexpr *scalarConsts = GPOS_NEW(pmp) DrgPexpr(pmp);
+
+		for (ULONG ul = 0; ul < ulChildren; ul++)
+		{
+			CExpression *pexprChild = PexprCollapseLargeArray(pmp, (*pexpr)[ul]);
+			COperator *popChild = pexprChild ->Pop();
+
+			// if it's a const, remember it
+			if(COperator::EopScalarConst == popChild->Eopid())
+			{
+				// copy the child
+				CExpression *pexprCopy = PexprCollapseLargeArray(pmp, pexprChild);
+
+				// append to the output
+				scalarConsts->Append(pexprCopy);
+			} else
+			{
+				// NOT all children is CScalarConst, abort this collapsing
+				scalarConsts->Release();
+				popChild->Release();
+				pexprChild->Release();
+				break;
+			}
+		}
+
+		CScalarConstArray *newArrayOp = GPOS_NEW(pmp) CScalarConstArray(pmp, oldArray, scalarConsts);
+		
+		return GPOS_NEW(pmp) CExpression(pmp, newArrayOp, pdrgpexpr);
+	}
+
+	for (ULONG ul = 0; ul < ulChildren; ul++)
+	{
+		CExpression *pexprChild = PexprCollapseLargeArray(pmp, (*pexpr)[ul]);
+		pdrgpexpr->Append(pexprChild);
+	}
+	
+	pop->AddRef();
+	return GPOS_NEW(pmp) CExpression(pmp, pop, pdrgpexpr);
+}
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -2228,9 +2291,14 @@ CExpressionPreprocessor::PexprPreprocess
 
 	CAutoTimer at("\n[OPT]: Expression Preprocessing Time", GPOS_FTRACE(EopttracePrintOptStats));
 
-	// (1) remove unused CTE anchors
-	CExpression *pexprNoUnusedCTEs = PexprRemoveUnusedCTEs(pmp, pexpr);
+	// collapse large CScalarArray
+	CExpression *pexprLargeArray = PexprCollapseLargeArray(pmp, pexpr);
 	GPOS_CHECK_ABORT;
+	
+	// (1) remove unused CTE anchors
+	CExpression *pexprNoUnusedCTEs = PexprRemoveUnusedCTEs(pmp, pexprLargeArray);
+	GPOS_CHECK_ABORT;
+	pexprLargeArray->Release();
 
 	// (2) remove intermediate superfluous limit
 	CExpression *pexprSimplified = PexprRemoveSuperfluousLimit(pmp, pexprNoUnusedCTEs);
