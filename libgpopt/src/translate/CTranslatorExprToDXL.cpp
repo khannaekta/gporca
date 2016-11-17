@@ -157,6 +157,7 @@ CTranslatorExprToDXL::InitScalarTranslators()
 			{COperator::EopScalarCoerceViaIO, &gpopt::CTranslatorExprToDXL::PdxlnScCoerceViaIO},
 			{COperator::EopScalarArrayCoerceExpr, &gpopt::CTranslatorExprToDXL::PdxlnScArrayCoerceExpr},
 			{COperator::EopScalarArray, &gpopt::CTranslatorExprToDXL::PdxlnArray},
+			{COperator::EopScalarConstArray, &gpopt::CTranslatorExprToDXL::PdxlnConstArray},
 			{COperator::EopScalarArrayCmp, &gpopt::CTranslatorExprToDXL::PdxlnArrayCmp},
 			{COperator::EopScalarArrayRef, &gpopt::CTranslatorExprToDXL::PdxlnArrayRef},
 			{COperator::EopScalarArrayRefIndexList, &gpopt::CTranslatorExprToDXL::PdxlnArrayRefIndexList},
@@ -6701,6 +6702,54 @@ CTranslatorExprToDXL::PdxlnArray
 	TranslateScalarChildren(pexpr, pdxlnArray);
 
 	return pdxlnArray;
+}
+
+//---------------------------------------------------------------------------
+//	@function:
+//		CTranslatorExprToDXL::PdxlnConstArray
+//
+//	@doc:
+//		Create a DXL const array node from an optimizer const array expression
+//
+//---------------------------------------------------------------------------
+CDXLNode *
+CTranslatorExprToDXL::PdxlnConstArray
+	(
+	CExpression *pexpr
+	)
+{
+	GPOS_ASSERT(NULL != pexpr);
+	CScalarConstArray *pop = CScalarConstArray::PopConvert(pexpr->Pop());
+
+	IMDId *pmdidElem = pop->PmdidElem();
+	pmdidElem->AddRef();
+
+	IMDId *pmdidArray = pop->PmdidArray();
+	pmdidArray->AddRef();
+
+	CDXLNode *pdxlnConstArray =
+			GPOS_NEW(m_pmp) CDXLNode
+						(
+						m_pmp,
+						GPOS_NEW(m_pmp) CDXLScalarArray
+									(
+									m_pmp,
+									pmdidElem,
+									pmdidArray,
+									pop->FMultiDimensional()
+									)
+						);
+
+	DrgPexpr *pConstValues = pop->PDrgPexpr();
+	const ULONG ulArity = pConstValues->UlLength();
+	for (ULONG ul = 0; ul < ulArity; ul++)
+	{
+		CExpression *pexprChild = (*pConstValues)[ul];
+		CDXLNode *pdxlnChild = PdxlnScalar(pexprChild);
+		pdxlnConstArray->AddChild(pdxlnChild);
+	}
+
+	return pdxlnConstArray;
 }
 
 //---------------------------------------------------------------------------
