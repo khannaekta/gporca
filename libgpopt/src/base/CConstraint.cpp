@@ -539,7 +539,8 @@ CConstraint::PdrgpcnstrOnColumn
 	IMemoryPool *pmp,
 	DrgPcnstr *pdrgpcnstr,
 	CColRef *pcr,
-	BOOL fExclusive		// returned constraints must reference ONLY the given col
+	BOOL fExclusive,		// returned constraints must reference ONLY the given col
+	int *stupid_array
 	)
 {
 	DrgPcnstr *pdrgpcnstrSubset = GPOS_NEW(pmp) DrgPcnstr(pmp);
@@ -548,6 +549,8 @@ CConstraint::PdrgpcnstrOnColumn
 
 	for (ULONG ul = 0; ul < ulLen; ul++)
 	{
+		if(stupid_array[ul] == 1)
+			continue;
 		CConstraint *pcnstr = (*pdrgpcnstr)[ul];
 		CColRefSet *pcrs = pcnstr->PcrsUsed();
 
@@ -556,6 +559,9 @@ CConstraint::PdrgpcnstrOnColumn
 		{
 			pcnstr->AddRef();
 			pdrgpcnstrSubset->Append(pcnstr);
+			stupid_array[ul] = 1;
+		} else if(1!=pcrs->CElements()) {
+			stupid_array[ul] = 1;
 		}
 	}
 
@@ -665,11 +671,24 @@ CConstraint::PdrgpcnstrDeduplicate
 	)
 	const
 {
+	if(pdrgpcnstr->UlLength() == 0)
+		return pdrgpcnstr;
+
 	DrgPcnstr *pdrgpcnstrNew = GPOS_NEW(pmp) DrgPcnstr(pmp);
 
 	CColRefSet *pcrsDeduped = GPOS_NEW(pmp) CColRefSet(pmp);
 
+	HMColConstr *phmcolconstr = Phmcolconstr2(pmp, pdrgpcnstr);
+
 	const ULONG ulLen = pdrgpcnstr->UlLength();
+
+	CAutoTrace at(m_pmp);
+
+
+//	int *stupid_array;
+//	stupid_array = (int *) malloc(sizeof(int)*ulLen);
+//	memset(stupid_array, 0, sizeof(int) * ulLen);
+
 	for (ULONG ul = 0; ul < ulLen; ul++)
 	{
 		CConstraint *pcnstrChild = (*pdrgpcnstr)[ul];
@@ -681,18 +700,24 @@ CConstraint::PdrgpcnstrDeduplicate
 		{
 			pcnstrChild->AddRef();
 			pdrgpcnstrNew->Append(pcnstrChild);
+//			stupid_array[ul] = 1;
 			continue;
 		}
+
+//		if(stupid_array[ul] == 1)
+//			continue;
 
 		CColRef *pcr = pcrs->PcrFirst();
 		if (pcrsDeduped->FMember(pcr))
 		{
 			// current constraint has already been combined with a previous one
+//			stupid_array[ul] = 1;
 			continue;
 		}
 
 		// get all constraints from the input array that reference this column
-		DrgPcnstr *pdrgpcnstrCol = PdrgpcnstrOnColumn(pmp, pdrgpcnstr, pcr, true /*fExclusive*/);
+		DrgPcnstr *pdrgpcnstrCol = phmcolconstr->PtLookup(pcr);//PdrgpcnstrOnColumn(pmp, pdrgpcnstr, pcr, true /*fExclusive*/, stupid_array);
+
 		if (1 == pdrgpcnstrCol->UlLength())
 		{
 			// if there is only one such constraint, then no simplification
@@ -700,6 +725,7 @@ CConstraint::PdrgpcnstrDeduplicate
 			pdrgpcnstrCol->Release();
 			pcnstrChild->AddRef();
 			pdrgpcnstrNew->Append(pcnstrChild);
+//			stupid_array[ul] = 1;
 			continue;
 		}
 
@@ -721,11 +747,16 @@ CConstraint::PdrgpcnstrDeduplicate
 		GPOS_ASSERT(NULL != pcnstrNew);
 		pexpr->Release();
 		pdrgpcnstrNew->Append(pcnstrNew);
+//		stupid_array[ul] = 1;
 		pcrsDeduped->Include(pcr);
+
 	}
+
+	at.Os() << ulLen <<" "<< phmcolconstr->UlEntries();
 
 	pcrsDeduped->Release();
 	pdrgpcnstr->Release();
+//	free(stupid_array);
 	return pdrgpcnstrNew;
 }
 
@@ -749,18 +780,64 @@ CConstraint::Phmcolconstr
 	GPOS_ASSERT(NULL != m_pcrsUsed);
 
 	HMColConstr *phmcolconstr = GPOS_NEW(pmp) HMColConstr(pmp);
+	int *stupid_array;
+	stupid_array = (int *) malloc(sizeof(int)*pdrgpcnstr->UlLength());
+	memset(stupid_array, 0, sizeof(int) * pdrgpcnstr->UlLength());
 
 	CColRefSetIter crsi(*pcrs);
 	while (crsi.FAdvance())
 	{
 		CColRef *pcr = crsi.Pcr();
-		DrgPcnstr *pdrgpcnstrCol = PdrgpcnstrOnColumn(pmp, pdrgpcnstr, pcr, false /*fExclusive*/);
+		DrgPcnstr *pdrgpcnstrCol = PdrgpcnstrOnColumn(pmp, pdrgpcnstr, pcr, false /*fExclusive*/,stupid_array);
 
 #ifdef GPOS_DEBUG
 		BOOL fres =
 #endif //GPOS_DEBUG
 		phmcolconstr->FInsert(pcr, pdrgpcnstrCol);
 		GPOS_ASSERT(fres);
+	}
+	free(stupid_array);
+	return phmcolconstr;
+}
+
+//---------------------------------------------------------------------------
+//	@function:
+//		CConstraint::Phmcolconstr
+//
+//	@doc:
+//		Construct mapping between columns and arrays of constraints
+//
+//---------------------------------------------------------------------------
+HMColConstr *
+CConstraint::Phmcolconstr2
+	(
+	IMemoryPool *pmp,
+	DrgPcnstr *pdrgpcnstr
+	)
+	const
+{
+	HMColConstr *phmcolconstr = GPOS_NEW(pmp) HMColConstr(pmp);
+
+	const ULONG ulLen = pdrgpcnstr->UlLength();
+
+	for (ULONG ul = 0; ul < ulLen; ul++)
+	{
+		CConstraint *pcnstrChild = (*pdrgpcnstr)[ul];
+		CColRefSet *pcrs = pcnstrChild->PcrsUsed();
+
+		CColRefSetIter crsi(*pcrs);
+		while (crsi.FAdvance() && pcrs->CElements() == 1)
+		{
+			CColRef *pcr = crsi.Pcr();
+			DrgPcnstr *stupid_list = phmcolconstr->PtLookup(pcr);
+			if(NULL == stupid_list)
+			{
+				stupid_list = GPOS_NEW(pmp) DrgPcnstr(pmp);
+				phmcolconstr->FInsert(pcr, stupid_list);
+			}
+			pcnstrChild->AddRef();
+			stupid_list->Append(pcnstrChild);
+		}
 	}
 
 	return phmcolconstr;

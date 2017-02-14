@@ -36,6 +36,7 @@ CConstraintConjunction::CConstraintConjunction
 	m_pdrgpcnstr(NULL)
 {
 	GPOS_ASSERT(NULL != pdrgpcnstr);
+
 	m_pdrgpcnstr = PdrgpcnstrFlatten(pmp, pdrgpcnstr, EctConjunction);
 
 	const ULONG ulLen = m_pdrgpcnstr->UlLength();
