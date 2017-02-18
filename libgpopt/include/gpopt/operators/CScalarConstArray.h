@@ -71,6 +71,12 @@ namespace gpopt
 				return m_consts;
 			}
 			
+			// return the number of elements in the const array
+			ULONG UlSize() const;
+
+			// return the const element at the given position in the const array
+			CScalarConst *PopConstAt(ULONG ul);
+
 			// sensitivity to order of inputs
 			BOOL FInputOrderSensitive() const
 			{

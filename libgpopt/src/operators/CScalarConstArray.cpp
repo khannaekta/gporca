@@ -27,10 +27,29 @@ CScalarConstArray::~CScalarConstArray()
 	m_consts->Release();
 }
 
+// return the number of elements in the const array
+ULONG
+CScalarConstArray::UlSize() const
+{
+	if (m_consts)
+	{
+		return m_consts->UlLength();
+	}
+
+	return 0;
+}
+
+// return the const element at the given position in the const array
+CScalarConst *
+CScalarConstArray::PopConstAt(ULONG ul)
+{
+	GPOS_ASSERT(ul < UlSize());
+	return (*m_consts)[ul];
+}
+
 IOstream &
 CScalarConstArray::OsPrint(IOstream &os) const
 {
-	// TODO: output constant values in array
 	os << "CScalarConstArray: {eleMDId: ";
 	PmdidElem()->OsPrint(os);
 	os << ", arrayMDId: ";
@@ -39,6 +58,17 @@ CScalarConstArray::OsPrint(IOstream &os) const
 	{
 		os << ", multidimensional";
 	}
-	os << "}";
+	os << ", elements: [";
+	ULONG ulSize = UlSize();
+	for (ULONG ul = 0; ul < ulSize; ul++)
+	{
+		const CScalarConst *popConst = (*m_consts)[ul];
+		popConst->Pdatum()->OsPrint(os);
+		if (ul < ulSize - 1)
+		{
+			os << ", ";
+		}
+	}
+	os << "]}";
 	return os;
 }
