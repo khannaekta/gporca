@@ -6719,37 +6719,41 @@ CTranslatorExprToDXL::PdxlnConstArray
 	)
 {
 	GPOS_ASSERT(NULL != pexpr);
-	CScalarConstArray *pop = CScalarConstArray::PopConvert(pexpr->Pop());
+	CScalarConstArray *pConstArray = CScalarConstArray::PopConvert(pexpr->Pop());
 
-	IMDId *pmdidElem = pop->PmdidElem();
+	IMDId *pmdidElem = pConstArray->PmdidElem();
 	pmdidElem->AddRef();
 
-	IMDId *pmdidArray = pop->PmdidArray();
+	IMDId *pmdidArray = pConstArray->PmdidArray();
 	pmdidArray->AddRef();
 
-	CDXLNode *pdxlnConstArray =
+	CDXLNode *pdxlnArray =
 			GPOS_NEW(m_pmp) CDXLNode
 						(
 						m_pmp,
 						GPOS_NEW(m_pmp) CDXLScalarArray
-									(
-									m_pmp,
-									pmdidElem,
-									pmdidArray,
-									pop->FMultiDimensional()
-									)
+										(
+										m_pmp,
+										pmdidElem,
+										pmdidArray,
+										pConstArray->FMultiDimensional()
+										)
 						);
 
-	DrgPexpr *pConstValues = pop->PDrgPexpr();
-	const ULONG ulArity = pConstValues->UlLength();
+	DrgPconst *pConsts = pConstArray->PConsts();
+	const ULONG ulArity = pConsts->UlLength();
 	for (ULONG ul = 0; ul < ulArity; ul++)
 	{
-		CExpression *pexprChild = (*pConstValues)[ul];
-		CDXLNode *pdxlnChild = PdxlnScalar(pexprChild);
-		pdxlnConstArray->AddChild(pdxlnChild);
+		CScalarConst *popScConst = (*pConsts)[ul];
+		IDatum *pdatum = popScConst->Pdatum();
+		CMDAccessor *pmda = COptCtxt::PoctxtFromTLS()->Pmda();
+		const IMDType *pmdtype = pmda->Pmdtype(pdatum->Pmdid());
+
+		CDXLNode *pdxlnConst = GPOS_NEW(m_pmp) CDXLNode(m_pmp, pmdtype->PdxlopScConst(m_pmp, pdatum));
+		pdxlnArray->AddChild(pdxlnConst);
 	}
 
-	return pdxlnConstArray;
+	return pdxlnArray;
 }
 
 //---------------------------------------------------------------------------

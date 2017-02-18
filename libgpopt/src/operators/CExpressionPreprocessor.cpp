@@ -1728,6 +1728,15 @@ CExpressionPreprocessor::PexprPruneEmptySubtrees
 	return GPOS_NEW(pmp) CExpression(pmp, pop, pdrgpexpr);
 }
 
+//---------------------------------------------------------------------------
+//	@function:
+//		CExpressionPreprocessor::PexprCollapseLargeArray
+//
+//	@doc:
+// 		If it's a scalar array of all CScalarConst, collapse it into an
+//		CScalarConstArray to reduce MEMO groups.
+//
+//---------------------------------------------------------------------------
 CExpression *
 CExpressionPreprocessor::PexprCollapseLargeArray
 (
@@ -1737,57 +1746,52 @@ CExpressionPreprocessor::PexprCollapseLargeArray
 {
 	GPOS_ASSERT(NULL != pexpr);
 
-	COperator *pop = pexpr->Pop();
-	
-	// process children
-	DrgPexpr *pdrgpexpr = GPOS_NEW(pmp) DrgPexpr(pmp);
-	
+	const ULONG ulArity = pexpr->UlArity();
 
-	ULONG ulChildren = pexpr->UlArity();
-	
-	// if it's a scalar array of all CScalarConst, we will collapse it into an CScalarConstArray
-	if (COperator::EopScalarArray == pop->Eopid())
+	// TODO: Add a GUC to control the threshold to transform
+	if (CUtils::FScalarArray(pexpr))
 	{
-		// cast the operator
-		CScalarArray *oldArray = CScalarArray::PopConvert(pop);
+		BOOL fAllConsts = true;
 
-		// process children
-		DrgPexpr *scalarConsts = GPOS_NEW(pmp) DrgPexpr(pmp);
-
-		for (ULONG ul = 0; ul < ulChildren; ul++)
+		for (ULONG ul = 0; fAllConsts && ul < ulArity; ul++)
 		{
-			CExpression *pexprChild = PexprCollapseLargeArray(pmp, (*pexpr)[ul]);
-			COperator *popChild = pexprChild ->Pop();
-
-			// if it's a const, remember it
-			if(COperator::EopScalarConst == popChild->Eopid())
-			{
-				// copy the child
-				CExpression *pexprCopy = PexprCollapseLargeArray(pmp, pexprChild);
-
-				// append to the output
-				scalarConsts->Append(pexprCopy);
-			} else
-			{
-				// NOT all children is CScalarConst, abort this collapsing
-				scalarConsts->Release();
-				popChild->Release();
-				pexprChild->Release();
-				break;
-			}
+			fAllConsts = CUtils::FScalarConst((*pexpr)[ul]);
 		}
 
-		CScalarConstArray *newArrayOp = GPOS_NEW(pmp) CScalarConstArray(pmp, oldArray, scalarConsts);
-		
-		return GPOS_NEW(pmp) CExpression(pmp, newArrayOp, pdrgpexpr);
+		// It is possible that the array element can be a scalar subquery,
+		// and in that subquery there may be const array or large IN list.
+		// But for now, we don't bother to consider such a rare special case.
+		if (fAllConsts)
+		{
+			DrgPconst *pdrgpconst = GPOS_NEW(pmp) DrgPconst(pmp);
+			for (ULONG ul = 0; ul < ulArity; ul++)
+			{
+				CScalarConst *popConst = CScalarConst::PopConvert((*pexpr)[ul]->Pop());
+				popConst->AddRef();
+				pdrgpconst->Append(popConst);
+			}
+
+			CScalarArray *psArray = CScalarArray::PopConvert(pexpr->Pop());
+			IMDId *pmdidElem = psArray->PmdidElem();
+			IMDId *pmdidArray = psArray->PmdidArray();
+			pmdidElem->AddRef();
+			pmdidArray->AddRef();
+
+			CScalarConstArray *pConstArray = GPOS_NEW(pmp) CScalarConstArray(pmp, pmdidElem, pmdidArray, psArray->FMultiDimensional(), pdrgpconst);
+			return GPOS_NEW(pmp) CExpression(pmp, pConstArray);
+		}
 	}
 
-	for (ULONG ul = 0; ul < ulChildren; ul++)
+	// process children
+	DrgPexpr *pdrgpexpr = GPOS_NEW(pmp) DrgPexpr(pmp);
+
+	for (ULONG ul = 0; ul < ulArity; ul++)
 	{
 		CExpression *pexprChild = PexprCollapseLargeArray(pmp, (*pexpr)[ul]);
 		pdrgpexpr->Append(pexprChild);
 	}
-	
+
+	COperator *pop = pexpr->Pop();
 	pop->AddRef();
 	return GPOS_NEW(pmp) CExpression(pmp, pop, pdrgpexpr);
 }

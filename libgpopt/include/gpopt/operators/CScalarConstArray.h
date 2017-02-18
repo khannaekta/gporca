@@ -13,12 +13,11 @@
 #define GPOPT_CScalarConstArray_H
 
 #include "gpos/base.h"
+#include "gpos/common/CRefCount.h"
+#include "gpos/common/CDynamicPtrArray.h"
 #include "naucrates/md/IMDId.h"
-
-#include "gpopt/operators/CScalar.h"
+#include "gpopt/operators/CScalarConst.h"
 #include "gpopt/operators/CScalarArray.h"
-
-#include "gpopt/operators/CExpression.h"
 
 namespace gpopt
 {
@@ -26,6 +25,8 @@ namespace gpopt
 	using namespace gpos;
 	using namespace gpmd;
 	
+	typedef CDynamicPtrArray<CScalarConst, CleanupRelease> DrgPconst;
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CScalarConstArray
@@ -37,7 +38,7 @@ namespace gpopt
 	class CScalarConstArray : public CScalarArray
 	{
 		private:
-			DrgPexpr * m_constExpressions;
+			DrgPconst *m_consts;
 
 			// private copy ctor
 			CScalarConstArray(const CScalarConstArray &);
@@ -45,7 +46,7 @@ namespace gpopt
 		public:
 		
 			// ctor
-			CScalarConstArray(IMemoryPool *pmp, CScalarArray *pArray, DrgPexpr *pExpressions);
+			CScalarConstArray(IMemoryPool *pmp, IMDId *pmdidElem, IMDId *pmdidArray, BOOL fMultiDimensional, DrgPconst *pConsts);
 			
 			// dtor
 			virtual 
@@ -65,9 +66,9 @@ namespace gpopt
 				return "CScalarConstArray";
 			}
 
-			DrgPexpr * PDrgPexpr() const
+			DrgPconst *PConsts() const
 			{
-				return m_constExpressions;
+				return m_consts;
 			}
 			
 			// sensitivity to order of inputs
