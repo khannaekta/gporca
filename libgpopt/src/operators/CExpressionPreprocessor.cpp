@@ -1730,7 +1730,7 @@ CExpressionPreprocessor::PexprPruneEmptySubtrees
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CExpressionPreprocessor::PexprCollapseLargeArray
+//		CExpressionPreprocessor::PexprCollapseConstArray
 //
 //	@doc:
 // 		If it's a scalar array of all CScalarConst, collapse it into an
@@ -1738,7 +1738,7 @@ CExpressionPreprocessor::PexprPruneEmptySubtrees
 //
 //---------------------------------------------------------------------------
 CExpression *
-CExpressionPreprocessor::PexprCollapseLargeArray
+CExpressionPreprocessor::PexprCollapseConstArray
 (
 	IMemoryPool *pmp,
 	CExpression *pexpr
@@ -1748,7 +1748,6 @@ CExpressionPreprocessor::PexprCollapseLargeArray
 
 	const ULONG ulArity = pexpr->UlArity();
 
-	// TODO: Add a GUC to control the threshold to transform
 	if (CUtils::FScalarArray(pexpr))
 	{
 		BOOL fAllConsts = true;
@@ -1787,7 +1786,7 @@ CExpressionPreprocessor::PexprCollapseLargeArray
 
 	for (ULONG ul = 0; ul < ulArity; ul++)
 	{
-		CExpression *pexprChild = PexprCollapseLargeArray(pmp, (*pexpr)[ul]);
+		CExpression *pexprChild = PexprCollapseConstArray(pmp, (*pexpr)[ul]);
 		pdrgpexpr->Append(pexprChild);
 	}
 
@@ -2295,14 +2294,14 @@ CExpressionPreprocessor::PexprPreprocess
 
 	CAutoTimer at("\n[OPT]: Expression Preprocessing Time", GPOS_FTRACE(EopttracePrintOptStats));
 
-	// collapse large CScalarArray
-	CExpression *pexprLargeArray = PexprCollapseLargeArray(pmp, pexpr);
+	// (0) collapse CScalarArray with constant values to CScalarConstArray
+	CExpression *pexprConstArray = PexprCollapseConstArray(pmp, pexpr);
 	GPOS_CHECK_ABORT;
 	
 	// (1) remove unused CTE anchors
-	CExpression *pexprNoUnusedCTEs = PexprRemoveUnusedCTEs(pmp, pexprLargeArray);
+	CExpression *pexprNoUnusedCTEs = PexprRemoveUnusedCTEs(pmp, pexprConstArray);
 	GPOS_CHECK_ABORT;
-	pexprLargeArray->Release();
+	pexprConstArray->Release();
 
 	// (2) remove intermediate superfluous limit
 	CExpression *pexprSimplified = PexprRemoveSuperfluousLimit(pmp, pexprNoUnusedCTEs);
