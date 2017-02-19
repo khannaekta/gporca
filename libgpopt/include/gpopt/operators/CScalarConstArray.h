@@ -70,7 +70,13 @@ namespace gpopt
 			{
 				return m_consts;
 			}
-			
+
+			// operator specific hash function
+			ULONG UlHash() const;
+
+			// match function
+			BOOL FMatch(COperator *pop) const;
+
 			// return the number of elements in the const array
 			ULONG UlSize() const;
 

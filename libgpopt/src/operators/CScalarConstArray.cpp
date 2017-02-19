@@ -27,6 +27,71 @@ CScalarConstArray::~CScalarConstArray()
 	m_consts->Release();
 }
 
+//---------------------------------------------------------------------------
+//	@function:
+//		CScalaCScalarConstArrayrArray::UlHash
+//
+//	@doc:
+//		Operator specific hash function
+//
+//---------------------------------------------------------------------------
+ULONG
+CScalarConstArray::UlHash() const
+{
+	BOOL fMultiDimensional = FMultiDimensional();
+	ULONG ulHash = gpos::UlCombineHashes
+					(
+					UlCombineHashes(PmdidElem()->UlHash(), PmdidArray()->UlHash()),
+					gpos::UlHash<BOOL>(&fMultiDimensional)
+					);
+	for (ULONG ul = 0; ul < UlSize(); ul++)
+	{
+		ulHash = gpos::UlCombineHashes(ulHash, (*m_consts)[ul]->UlHash());
+	}
+	return ulHash;
+}
+
+//---------------------------------------------------------------------------
+//	@function:
+//		CScalarConstArray::FMatch
+//
+//	@doc:
+//		Match function on operator level
+//
+//---------------------------------------------------------------------------
+BOOL
+CScalarConstArray::FMatch
+	(
+	COperator *pop
+	)
+	const
+{
+	if (pop->Eopid() == Eopid())
+	{
+		CScalarConstArray *popArray = CScalarConstArray::PopConvert(pop);
+
+		// match if components are identical
+		if (popArray->FMultiDimensional() == FMultiDimensional() &&
+				PmdidElem()->FEquals(popArray->PmdidElem()) &&
+				PmdidArray()->FEquals(popArray->PmdidArray()) &&
+				UlSize() == popArray->UlSize())
+		{
+			for (ULONG ul = 0; ul < UlSize(); ul++)
+			{
+				CScalarConst *popConst1 = (*m_consts)[ul];
+				CScalarConst *popConst2 = popArray->PopConstAt(ul);
+				if (!popConst1->FMatch(popConst2))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+	}
+
+	return false;
+}
+
 // return the number of elements in the const array
 ULONG
 CScalarConstArray::UlSize() const
