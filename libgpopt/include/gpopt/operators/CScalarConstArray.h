@@ -1,13 +1,13 @@
 //---------------------------------------------------------------------------
 //	Greenplum Database
-//	Copyright (C) 2012 EMC Corp.
+//	Copyright (C) 2017 Pivotal Software, Inc.
 //
 //	@filename:
 //		CScalarConstArray.h
 //
 //	@doc:
-//		Class for scalar arrays of const.
-//		This class is to reduce the optization time for large IN list.
+//		Class for scalar array of constant values.
+//		This class is used to reduce the optimization time for large IN list.
 //---------------------------------------------------------------------------
 #ifndef GPOPT_CScalarConstArray_H
 #define GPOPT_CScalarConstArray_H
@@ -24,7 +24,7 @@ namespace gpopt
 
 	using namespace gpos;
 	using namespace gpmd;
-	
+
 	typedef CDynamicPtrArray<CScalarConst, CleanupRelease> DrgPconst;
 
 	//---------------------------------------------------------------------------
@@ -38,16 +38,17 @@ namespace gpopt
 	class CScalarConstArray : public CScalarArray
 	{
 		private:
+			// constant values
 			DrgPconst *m_consts;
 
 			// private copy ctor
 			CScalarConstArray(const CScalarConstArray &);
-		
+
 		public:
-		
+
 			// ctor
 			CScalarConstArray(IMemoryPool *pmp, IMDId *pmdidElem, IMDId *pmdidArray, BOOL fMultiDimensional, DrgPconst *pConsts);
-			
+
 			// dtor
 			virtual 
 			~CScalarConstArray();
@@ -58,7 +59,7 @@ namespace gpopt
 			{
 				return EopScalarConstArray;
 			}
-			
+
 			// return a string for aggregate function
 			virtual 
 			const CHAR *SzId() const
@@ -66,6 +67,7 @@ namespace gpopt
 				return "CScalarConstArray";
 			}
 
+			// constant values
 			DrgPconst *PConsts() const
 			{
 				return m_consts;
@@ -88,7 +90,7 @@ namespace gpopt
 			{
 				return true;
 			}
-			
+
 			// return a copy of the operator with remapped columns
 			virtual
 			COperator *PopCopyWithRemappedColumns
@@ -110,10 +112,10 @@ namespace gpopt
 			{
 				GPOS_ASSERT(NULL != pop);
 				GPOS_ASSERT(EopScalarConstArray == pop->Eopid());
-				
+
 				return reinterpret_cast<CScalarConstArray*>(pop);
 			}
-			
+
 			// print
 			IOstream &OsPrint(IOstream &os) const;
 

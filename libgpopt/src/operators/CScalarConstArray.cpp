@@ -1,5 +1,5 @@
 //	Greenplum Database
-//	Copyright (C) 2016 Pivotal Software, Inc.
+//	Copyright (C) 2017 Pivotal Software, Inc.
 
 #include "gpopt/operators/CScalarConstArray.h"
 #include "gpopt/operators/CExpression.h"
@@ -7,6 +7,14 @@
 using namespace gpopt;
 using namespace gpmd;
 
+//---------------------------------------------------------------------------
+//	@function:
+//		CScalarConstArray::CScalarConstArray
+//
+//	@doc:
+//		Ctor
+//
+//---------------------------------------------------------------------------
 CScalarConstArray::CScalarConstArray
 	(
 	IMemoryPool *pmp,
@@ -22,6 +30,14 @@ CScalarConstArray::CScalarConstArray
 	GPOS_ASSERT(pConsts);
 }
 
+//---------------------------------------------------------------------------
+//	@function:
+//		CScalarConstArray::~CScalarConstArray
+//
+//	@doc:
+//		Dtor
+//
+//---------------------------------------------------------------------------
 CScalarConstArray::~CScalarConstArray()
 {
 	m_consts->Release();
@@ -29,7 +45,7 @@ CScalarConstArray::~CScalarConstArray()
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CScalaCScalarConstArrayrArray::UlHash
+//		CScalarConstArray::UlHash
 //
 //	@doc:
 //		Operator specific hash function
