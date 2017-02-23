@@ -3,18 +3,12 @@
 
 #include "gpopt/operators/CScalarConstArray.h"
 #include "gpopt/operators/CExpression.h"
+#include "gpopt/operators/CScalarArray.h"
 
 using namespace gpopt;
 using namespace gpmd;
 
-//---------------------------------------------------------------------------
-//	@function:
-//		CScalarConstArray::CScalarConstArray
-//
-//	@doc:
-//		Ctor
-//
-//---------------------------------------------------------------------------
+// Ctor
 CScalarConstArray::CScalarConstArray
 	(
 	IMemoryPool *pmp,
@@ -30,27 +24,35 @@ CScalarConstArray::CScalarConstArray
 	GPOS_ASSERT(pConsts);
 }
 
-//---------------------------------------------------------------------------
-//	@function:
-//		CScalarConstArray::~CScalarConstArray
-//
-//	@doc:
-//		Dtor
-//
-//---------------------------------------------------------------------------
+
+// Dtor
 CScalarConstArray::~CScalarConstArray()
 {
 	m_consts->Release();
 }
 
-//---------------------------------------------------------------------------
-//	@function:
-//		CScalarConstArray::UlHash
-//
-//	@doc:
-//		Operator specific hash function
-//
-//---------------------------------------------------------------------------
+// ident accessors
+CScalar::EOperatorId
+CScalarConstArray::Eopid() const
+{
+	return EopScalarConstArray;
+}
+
+// return a string for aggregate function
+const CHAR *
+CScalarConstArray::SzId() const
+{
+	return "CScalarConstArray";
+}
+
+// constant values
+DrgPconst *
+CScalarConstArray::PConsts() const
+{
+	return m_consts;
+}
+
+// Operator specific hash function
 ULONG
 CScalarConstArray::UlHash() const
 {
@@ -67,14 +69,7 @@ CScalarConstArray::UlHash() const
 	return ulHash;
 }
 
-//---------------------------------------------------------------------------
-//	@function:
-//		CScalarConstArray::FMatch
-//
-//	@doc:
-//		Match function on operator level
-//
-//---------------------------------------------------------------------------
+// Match function on operator level
 BOOL
 CScalarConstArray::FMatch
 	(
@@ -126,6 +121,35 @@ CScalarConstArray::PopConstAt(ULONG ul)
 {
 	GPOS_ASSERT(ul < UlSize());
 	return (*m_consts)[ul];
+}
+
+// sensitivity to order of inputs
+BOOL
+CScalarConstArray::FInputOrderSensitive() const
+{
+	return true;
+}
+
+// return a copy of the operator with remapped columns
+COperator *
+CScalarConstArray::PopCopyWithRemappedColumns
+	(
+	IMemoryPool *, //pmp,
+	HMUlCr *, //phmulcr,
+	BOOL //fMustExist
+	)
+{
+	return PopCopyDefault();
+}
+
+// conversion function
+CScalarConstArray *
+CScalarConstArray::PopConvert(COperator *pop)
+{
+	GPOS_ASSERT(NULL != pop);
+	GPOS_ASSERT(EopScalarConstArray == pop->Eopid());
+
+	return reinterpret_cast<CScalarConstArray*>(pop);
 }
 
 IOstream &

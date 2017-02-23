@@ -55,23 +55,14 @@ namespace gpopt
 
 			// ident accessors
 			virtual 
-			EOperatorId Eopid() const
-			{
-				return EopScalarConstArray;
-			}
+			EOperatorId Eopid() const;
 
 			// return a string for aggregate function
 			virtual 
-			const CHAR *SzId() const
-			{
-				return "CScalarConstArray";
-			}
+			const CHAR *SzId() const;
 
 			// constant values
-			DrgPconst *PConsts() const
-			{
-				return m_consts;
-			}
+			DrgPconst *PConsts() const;
 
 			// operator specific hash function
 			ULONG UlHash() const;
@@ -86,35 +77,19 @@ namespace gpopt
 			CScalarConst *PopConstAt(ULONG ul);
 
 			// sensitivity to order of inputs
-			BOOL FInputOrderSensitive() const
-			{
-				return true;
-			}
+			BOOL FInputOrderSensitive() const;
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns
-						(
+			COperator *PopCopyWithRemappedColumns(
 						IMemoryPool *, //pmp,
 						HMUlCr *, //phmulcr,
 						BOOL //fMustExist
-						)
-			{
-				return PopCopyDefault();
-			}
+						);
 
 			// conversion function
 			static
-			CScalarConstArray *PopConvert
-				(
-				COperator *pop
-				)
-			{
-				GPOS_ASSERT(NULL != pop);
-				GPOS_ASSERT(EopScalarConstArray == pop->Eopid());
-
-				return reinterpret_cast<CScalarConstArray*>(pop);
-			}
+			CScalarConstArray *PopConvert(COperator *pop);
 
 			// print
 			IOstream &OsPrint(IOstream &os) const;
