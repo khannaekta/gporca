@@ -115,8 +115,11 @@ namespace gpos
 			DrgHashChain **m_ppdrgchain;
 
 			// array for keys
+			// We use CleanupNULL because the keys are owned by the hash table
 			typedef CDynamicPtrArray<K, CleanupNULL> DrgKeys;
 			DrgKeys *m_pdrgKeys;
+
+			DrgPi *m_pdrgPiFilledBuckets;
 
 			// private copy ctor
 			CHashMap(const CHashMap<K, T, pfnHash, pfnEq, pfnDestroyK, pfnDestroyT> &);

@@ -117,7 +117,8 @@ namespace gpos
 		: 
 		m_pmp(pmp), 
 		m_ulSize(ulSize),
-		m_ulEntries(0)
+		m_ulEntries(0),
+		m_pdrgPiFilledBuckets(GPOS_NEW(pmp) DrgPi(pmp))
 	{
 		GPOS_ASSERT(ulSize > 0);
 		
@@ -147,6 +148,7 @@ namespace gpos
 		
 		GPOS_DELETE_ARRAY(m_ppdrgchain);
 		m_pdrgKeys->Release();
+		m_pdrgPiFilledBuckets->Release();
 	}
 
 
@@ -166,12 +168,13 @@ namespace gpos
 	void
 	CHashMap<K, T,pfnHash, pfnEq, pfnDestroyK, pfnDestroyT>::Clear()
 	{
-		for (ULONG i = 0; i < m_ulSize; i++)
+		for (ULONG i = 0; i < m_pdrgPiFilledBuckets->UlLength(); i++)
 		{
 			// release each hash chain
-			CRefCount::SafeRelease(m_ppdrgchain[i]);
+			m_ppdrgchain[*(*m_pdrgPiFilledBuckets)[i]]->Release();
 		}
 		m_ulEntries = 0;
+		m_pdrgPiFilledBuckets->Clear();
 	}
 
 
@@ -205,6 +208,8 @@ namespace gpos
 		if (NULL == *ppdrgchain)
 		{
 			*ppdrgchain = GPOS_NEW(m_pmp) DrgHashChain(m_pmp);
+			INT iBucket = pfnHash(pk) % m_ulSize;
+			m_pdrgPiFilledBuckets->Append(GPOS_NEW(m_pmp) INT(iBucket));
 		}
 
 		CHashMapElem *phme = GPOS_NEW(m_pmp) CHashMapElem(pk, pt, true /*fOwn*/);
@@ -213,6 +218,7 @@ namespace gpos
 		m_ulEntries++;
 
 		m_pdrgKeys->Append(pk);
+
 		return true;
 	}
 	
