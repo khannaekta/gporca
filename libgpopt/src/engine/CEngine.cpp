@@ -2162,7 +2162,12 @@ CEngine::FCheckEnfdProps
 		CAutoTrace at(m_pmp);
 		at.Os() << "CEngine::FCheckEnfdProps (Group ID: " << pgexpr->Pgroup()->UlId() <<
 				" Expression ID: " <<  pgexpr->UlId() << ")"<< std::endl;
-		m_pmemo->OsPrint(at.Os());
+		at.Os() << "Group Details: FCheckEnfdProps : " << std::endl;
+		at.Os() << "------------------" << std::endl;
+		pgexpr->Pgroup()->OsPrint(at.Os());
+		at.Os() << "Group Expression Evaluated : ";
+		pgexpr->OsPrint(at.Os());
+		at.Os() << "------------------" << std::endl;
 	}
 
 	// check if all children could be successfully optimized
@@ -2401,8 +2406,13 @@ CEngine::FCheckReqdProps
 	{
 		CAutoTrace at(m_pmp);
 		at.Os() << "CEngine::FCheckReqdProps (Group ID: " << exprhdl.Pgexpr()->Pgroup()->UlId() <<
-				" Expression ID: " <<  exprhdl.Pgexpr()->UlId() << ")" << std::endl;
-		m_pmemo->OsPrint(at.Os());
+				" Expression ID: " <<  exprhdl.Pgexpr()->UlId() << ")";
+		at.Os() << "Group Details: FCheckReqdProps : " << std::endl;
+		at.Os() << "------------------" << std::endl;
+		exprhdl.Pgexpr()->Pgroup()->OsPrint(at.Os());
+		at.Os() << "Group Expression Evaluated : ";
+		exprhdl.Pgexpr()->OsPrint(at.Os());
+		at.Os() << "------------------" << std::endl;
 	}
 
 	// check if operator provides required columns
@@ -2413,6 +2423,10 @@ CEngine::FCheckReqdProps
 
 	CPhysical *popPhysical = CPhysical::PopConvert(exprhdl.Pop());
 	COperator::EOperatorId eopid = popPhysical->Eopid();
+
+//	CAutoTrace at(m_pmp);
+//	at.Os() << "CEngine::FCheckReqdProps (Group ID: " << exprhdl.Pgexpr()->Pgroup()->UlId() <<
+//	" Expression ID: " <<  exprhdl.Pgexpr()->UlId() << ")" << std::endl << " Operator:" << ;
 
 	// check if sort operator is passed an empty order spec;
 	// this check is required to avoid self-deadlocks, i.e.
