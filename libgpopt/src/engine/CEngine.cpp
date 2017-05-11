@@ -2162,12 +2162,12 @@ CEngine::FCheckEnfdProps
 		CAutoTrace at(m_pmp);
 		at.Os() << "CEngine::FCheckEnfdProps (Group ID: " << pgexpr->Pgroup()->UlId() <<
 				" Expression ID: " <<  pgexpr->UlId() << ")"<< std::endl;
-		at.Os() << "Group Details: FCheckEnfdProps : " << std::endl;
-		at.Os() << "------------------" << std::endl;
+//		at.Os() << "Group Details: FCheckEnfdProps : " << std::endl;
+//		at.Os() << "------------------" << std::endl;
 		pgexpr->Pgroup()->OsPrint(at.Os());
-		at.Os() << "Group Expression Evaluated : ";
-		pgexpr->OsPrint(at.Os());
-		at.Os() << "------------------" << std::endl;
+//		at.Os() << "Group Expression Evaluated : ";
+//		pgexpr->OsPrint(at.Os());
+//		at.Os() << "------------------" << std::endl;
 	}
 
 	// check if all children could be successfully optimized
@@ -2251,6 +2251,12 @@ CEngine::FCheckEnfdProps
 	if (0 < pdrgpexprEnforcers->UlLength())
 	{
 		AddEnforcers(exprhdl.Pgexpr(), pdrgpexprEnforcers);
+		if (GPOS_FTRACE(EopttracePrintMemoEnforcement))
+		{
+			GPOS_TRACE_FORMAT("Inserted enforcers maybe. (Group ID: %d Expression ID: %d)", pgexpr->Pgroup()->UlId(), pgexpr->UlId());
+			CAutoTrace at(m_pmp);
+			pgexpr->Pgroup()->OsPrint(at.Os());
+		}
 	}
 	pdrgpexprEnforcers->Release();
 	pexpr->Release();
@@ -2407,12 +2413,12 @@ CEngine::FCheckReqdProps
 		CAutoTrace at(m_pmp);
 		at.Os() << "CEngine::FCheckReqdProps (Group ID: " << exprhdl.Pgexpr()->Pgroup()->UlId() <<
 				" Expression ID: " <<  exprhdl.Pgexpr()->UlId() << ")";
-		at.Os() << "Group Details: FCheckReqdProps : " << std::endl;
-		at.Os() << "------------------" << std::endl;
+//		at.Os() << "Group Details: FCheckReqdProps : " << std::endl;
+//		at.Os() << "------------------" << std::endl;
 		exprhdl.Pgexpr()->Pgroup()->OsPrint(at.Os());
-		at.Os() << "Group Expression Evaluated : ";
-		exprhdl.Pgexpr()->OsPrint(at.Os());
-		at.Os() << "------------------" << std::endl;
+//		at.Os() << "Group Expression Evaluated : ";
+//		exprhdl.Pgexpr()->OsPrint(at.Os());
+//		at.Os() << "------------------" << std::endl;
 	}
 
 	// check if operator provides required columns
