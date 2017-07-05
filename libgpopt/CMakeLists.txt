@@ -414,6 +414,8 @@ add_library(gpopt
             src/operators/CPhysicalComputeScalar.cpp
             include/gpopt/operators/CPhysicalConstTableGet.h
             src/operators/CPhysicalConstTableGet.cpp
+            include/gpopt/operators/CPhysicalValuesGet.h
+            src/operators/CPhysicalValuesGet.cpp
             include/gpopt/operators/CPhysicalCTEConsumer.h
             src/operators/CPhysicalCTEConsumer.cpp
             include/gpopt/operators/CPhysicalCTEProducer.h

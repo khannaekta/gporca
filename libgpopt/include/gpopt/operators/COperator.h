@@ -261,6 +261,7 @@ namespace gpopt
 				EopPhysicalPartitionSelectorDML,
 				
 				EopPhysicalConstTableGet,
+				EopPhysicalValuesGet,
 				
 				EopPhysicalDML,
 				EopPhysicalSplit,
