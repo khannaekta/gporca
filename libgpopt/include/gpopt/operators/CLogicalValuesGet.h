@@ -211,7 +211,7 @@ namespace gpopt
 				)
 			{
 				GPOS_ASSERT(NULL != pop);
-				GPOS_ASSERT(EopLogicalConstTableGet == pop->Eopid());
+				GPOS_ASSERT(EopLogicalValuesGet == pop->Eopid());
 				
 				return dynamic_cast<CLogicalValuesGet*>(pop);
 			}

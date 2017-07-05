@@ -154,6 +154,7 @@ CXformFactory::Instantiate()
 	Add(GPOS_NEW(m_pmp) CXformDynamicIndexGet2DynamicIndexScan(m_pmp));
 	Add(GPOS_NEW(m_pmp) CXformImplementSequence(m_pmp));
 	Add(GPOS_NEW(m_pmp) CXformImplementConstTableGet(m_pmp));
+	Add(GPOS_NEW(m_pmp) CXformImplementValuesGet(m_pmp));
 	Add(GPOS_NEW(m_pmp) CXformUnnestTVF(m_pmp));
 	Add(GPOS_NEW(m_pmp) CXformImplementTVF(m_pmp));
 	Add(GPOS_NEW(m_pmp) CXformImplementTVFNoArgs(m_pmp));

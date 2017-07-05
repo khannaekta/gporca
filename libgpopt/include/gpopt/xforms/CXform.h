@@ -80,6 +80,7 @@ namespace gpopt
 				ExfDynamicIndexGet2DynamicIndexScan,
 				ExfImplementSequence,
 				ExfImplementConstTableGet,
+				ExfImplementValuesGet,
 				ExfUnnestTVF,
 				ExfImplementTVF,
 				ExfImplementTVFNoArgs,

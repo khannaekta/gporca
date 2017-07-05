@@ -169,6 +169,7 @@
 #include "gpopt/operators/CPhysicalSplit.h"
 #include "gpopt/operators/CPhysicalRowTrigger.h"
 #include "gpopt/operators/CPhysicalAssert.h"
+#include "gpopt/operators/CPhysicalValuesGet.h"
 
 // pattern ops
 #include "gpopt/operators/CPatternLeaf.h"

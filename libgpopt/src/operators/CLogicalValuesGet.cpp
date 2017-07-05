@@ -202,7 +202,7 @@ CLogicalValuesGet::PxfsCandidates
 	const
 {
 	CXformSet *pxfs = GPOS_NEW(pmp) CXformSet(pmp);
-	(void) pxfs->FExchangeSet(CXform::ExfImplementConstTableGet);
+	(void) pxfs->FExchangeSet(CXform::ExfImplementValuesGet);
 	return pxfs;
 }
 

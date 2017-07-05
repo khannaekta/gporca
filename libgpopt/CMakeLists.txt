@@ -716,6 +716,8 @@ add_library(gpopt
             src/xforms/CXformImplementBitmapTableGet.cpp
             include/gpopt/xforms/CXformImplementConstTableGet.h
             src/xforms/CXformImplementConstTableGet.cpp
+            include/gpopt/xforms/CXformImplementValuesGet.h
+            src/xforms/CXformImplementValuesGet.cpp
             include/gpopt/xforms/CXformImplementCTEConsumer.h
             src/xforms/CXformImplementCTEConsumer.cpp
             include/gpopt/xforms/CXformImplementCTEProducer.h
