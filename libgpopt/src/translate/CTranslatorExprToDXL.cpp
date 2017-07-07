@@ -236,7 +236,7 @@ CTranslatorExprToDXL::InitPhysicalTranslators()
 			{COperator::EopPhysicalDynamicIndexScan, &gpopt::CTranslatorExprToDXL::PdxlnDynamicIndexScan},
 			{COperator::EopPhysicalPartitionSelector, &gpopt::CTranslatorExprToDXL::PdxlnPartitionSelector},
 			{COperator::EopPhysicalPartitionSelectorDML, &gpopt::CTranslatorExprToDXL::PdxlnPartitionSelectorDML},
-			{COperator::EopPhysicalConstTableGet, &gpopt::CTranslatorExprToDXL::PdxlnResultFromConstTableGet},
+			{COperator::EopPhysicalConstTableGet, &gpopt::CTranslatorExprToDXL::PdxlnConstTableGet},
 			{COperator::EopPhysicalTVF, &gpopt::CTranslatorExprToDXL::PdxlnTVF},
 			{COperator::EopPhysicalSerialUnionAll, &gpopt::CTranslatorExprToDXL::PdxlnAppend},
 			{COperator::EopPhysicalParallelUnionAll, &gpopt::CTranslatorExprToDXL::PdxlnAppend},
@@ -2051,13 +2051,13 @@ CTranslatorExprToDXL::PdxlnTVF
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CTranslatorExprToDXL::PdxlnResultFromConstTableGet
+//		CTranslatorExprToDXL::PdxlnConstTableGet
 //
 //	@doc:
-//		Create a DXL result node from an optimizer const table get node
+//		Create a DXL result node or value scan from an optimizer const table get node
 //---------------------------------------------------------------------------
 CDXLNode *
-CTranslatorExprToDXL::PdxlnResultFromConstTableGet
+CTranslatorExprToDXL::PdxlnConstTableGet
 	(
 	CExpression *pexprCTG,
 	DrgPcr *pdrgpcr,
@@ -2091,7 +2091,7 @@ CTranslatorExprToDXL::PdxlnResultFromConstTableGet
 	else
 	{
 		// TODO:  - Feb 29, 2012; add support for CTGs with multiple rows
-		GPOS_ASSERT(1 == ulRows);
+		GPOS_ASSERT(1 <= ulRows);
 		pdrgpdatum = (*pdrgpdrgdatum)[0];
 		pdrgpdatum->AddRef();
 		CDXLNode *pdxlnCond = NULL;
@@ -2099,6 +2099,40 @@ CTranslatorExprToDXL::PdxlnResultFromConstTableGet
 		{
 			pdxlnCond = PdxlnScalar(pexprScalar);
 			pdxlnOneTimeFilter->AddChild(pdxlnCond);
+		}
+		// Createing Values Scan Node
+		if (ulRows > 1)
+		{
+			DrgPdrgPdxldatum *pdrgpdrgpdxldatumValues = GPOS_NEW(m_pmp) DrgPdrgPdxldatum(m_pmp);
+			const ULONG ulTuples = pdrgpdrgdatum->UlLength();
+			for (ULONG ulTuplePos = 0; ulTuplePos < ulTuples; ulTuplePos++)
+			{
+				// serialize a const tuple
+				DrgPdxldatum *pdrgpdxldatum = GPOS_NEW(m_pmp) DrgPdxldatum(m_pmp);
+				pdrgpdatum = (*pdrgpdrgdatum)[ulTuplePos];
+
+
+				const ULONG ulCols = pdrgpdatum->UlLength();
+				for (ULONG ulColPos = 0; ulColPos < ulCols; ulColPos++)
+				{
+					CDXLDatum *pdxldatum = (*pdrgpdxldatum)[ulColPos];
+					pdrgpdxldatum->Append(pdxldatum);
+				}
+				pdrgpdrgpdxldatumValues->Append(pdrgpdxldatum);
+			}
+			CDXLPhysicalValuesScan *pdxlop = GPOS_NEW(m_pmp) CDXLPhysicalValuesScan(m_pmp, pdrgpdrgpdxldatumValues);
+			CDXLPhysicalProperties *pdxlprop = Pdxlprop(pexprCTG);
+			//CColRefSet *pcrsOutput = popCTG->PcrsOutput();
+
+			CDXLNode *pdxlnValuesScan = GPOS_NEW(m_pmp) CDXLNode(m_pmp, pdxlop);
+			pdxlnValuesScan->SetProperties(pdxlprop);
+
+			CDXLNode *pdxlnPrL = PdxlnProjList(NULL, pdrgpcrCTGOutput /*pdrgpcr*/);
+			pdxlnValuesScan->AddChild(pdxlnPrL); 		// project list
+
+						TranslateScalarChildren(pexprCTG, pdxlnValuesScan);
+
+			return pdxlnValuesScan;
 		}
 	}
 
@@ -2118,22 +2152,22 @@ CTranslatorExprToDXL::PdxlnResultFromConstTableGet
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CTranslatorExprToDXL::PdxlnResultFromConstTableGet
+//		CTranslatorExprToDXL::PdxlnConstTableGet
 //
 //	@doc:
-//		Create a DXL result node from an optimizer const table get node
+//		Create a DXL result node or Values Scan from an optimizer const table get node
 //---------------------------------------------------------------------------
 CDXLNode *
-CTranslatorExprToDXL::PdxlnResultFromConstTableGet
+CTranslatorExprToDXL::PdxlnConstTableGet
 	(
 	CExpression *pexprCTG,
 	DrgPcr *pdrgpcr,
-	DrgPds *, // pdrgpdsBaseTables, 
+	DrgPds *, // pdrgpdsBaseTables,
 	ULONG *, // pulNonGatherMotions,
 	BOOL * // pfDML
 	)
 {
-	return PdxlnResultFromConstTableGet(pexprCTG, pdrgpcr, NULL /*pexprScalarCond*/);
+	return PdxlnConstTableGet(pexprCTG, pdrgpcr, NULL /*pexprScalarCond*/);
 }
 
 //---------------------------------------------------------------------------

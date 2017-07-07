@@ -125,6 +125,7 @@ namespace gpdxl
 		EdxlopScalarPartListNullTest,
 
 		EdxlopPhysicalResult,
+		EdxlopPhysicalValuesScan,
 		EdxlopPhysicalProjection,
 		EdxlopPhysicalTableScan,
 		EdxlopPhysicalBitmapTableScan,

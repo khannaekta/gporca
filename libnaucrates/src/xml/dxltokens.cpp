@@ -125,6 +125,7 @@ CDXLTokens::Init
 			{EdxltokenPhysicalDynamicTableScan, GPOS_WSZ_LIT("DynamicTableScan")},
 			{EdxltokenPhysicalDynamicIndexScan, GPOS_WSZ_LIT("DynamicIndexScan")},
 			{EdxltokenPhysicalTVF, GPOS_WSZ_LIT("TableValuedFunction")},
+			{EdxltokenPhysicalValuesScan, GPOS_WSZ_LIT("ValuesScan")},
 			{EdxltokenPhysicalWindow, GPOS_WSZ_LIT("Window")},
 			{EdxltokenPhysicalDMLInsert, GPOS_WSZ_LIT("DMLInsert")},
 			{EdxltokenPhysicalDMLDelete, GPOS_WSZ_LIT("DMLDelete")},

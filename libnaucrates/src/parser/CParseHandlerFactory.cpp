@@ -132,6 +132,7 @@ CParseHandlerFactory::Init
 			{EdxltokenPhysicalIndexOnlyScan, &PphIndexOnlyScan},
 			{EdxltokenScalarBitmapIndexProbe, &PphBitmapIndexProbe},
 			{EdxltokenIndexDescr, &PphIndexDescr},
+            {EdxltokenPhysicalValuesScan, &PphValuesScan},
 
 			{EdxltokenPhysicalWindow, &PphWindow},
 			{EdxltokenScalarWindowref, &PphWindowRef},

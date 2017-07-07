@@ -120,6 +120,19 @@ CDXLOperatorFactory::PdxlopResult
 	return GPOS_NEW(pmp) CDXLPhysicalResult(pmp);
 }
 
+//		Construct a Values scan
+CDXLPhysical*
+CDXLOperatorFactory::PdxlopValuesScan
+(
+	CDXLMemoryManager *pmm
+	)
+{
+    // get the memory pool from the memory manager
+    IMemoryPool *pmp = pmm->Pmp();
+    
+    return GPOS_NEW(pmp) CDXLPhysicalValuesScan(pmp);
+}
+
 //---------------------------------------------------------------------------
 //	@function:
 //		CDXLOperatorFactory::PdxlopHashJoin

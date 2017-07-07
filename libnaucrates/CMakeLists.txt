@@ -308,6 +308,8 @@ add_library(naucrates
             src/operators/CDXLPhysicalTVF.cpp
             include/naucrates/dxl/operators/CDXLPhysicalWindow.h
             src/operators/CDXLPhysicalWindow.cpp
+	        include/naucrates/dxl/operators/CDXLPhysicalValuesScan.h
+	        src/operators/CDXLPhysicalValuesScan.cpp
             include/naucrates/dxl/operators/CDXLProperties.h
             src/operators/CDXLProperties.cpp
             include/naucrates/dxl/operators/CDXLScalar.h
@@ -638,6 +640,8 @@ add_library(naucrates
             src/parser/CParseHandlerPhysicalSplit.cpp
             include/naucrates/dxl/parser/CParseHandlerPhysicalTVF.h
             src/parser/CParseHandlerPhysicalTVF.cpp
+            include/naucrates/dxl/parser/CParseHandlerPhysicalValuesScan.h
+            src/parser/CParseHandlerPhysicalValuesScan.cpp
             include/naucrates/dxl/parser/CParseHandlerPhysicalWindow.h
             src/parser/CParseHandlerPhysicalWindow.cpp
             include/naucrates/dxl/parser/CParseHandlerPlan.h
