@@ -119,6 +119,7 @@ CDXLTokens::Init
 			{EdxltokenPhysicalAggregate, GPOS_WSZ_LIT("Aggregate")},
 			{EdxltokenPhysicalSubqueryScan, GPOS_WSZ_LIT("SubqueryScan")},
 			{EdxltokenPhysicalResult, GPOS_WSZ_LIT("Result")},
+			{EdxltokenPhysicalValuesScan, GPOS_WSZ_LIT("ValuesScan")},
 			{EdxltokenPhysicalAppend, GPOS_WSZ_LIT("Append")},
 			{EdxltokenPhysicalMaterialize, GPOS_WSZ_LIT("Materialize")},
 			{EdxltokenPhysicalSequence, GPOS_WSZ_LIT("Sequence")},

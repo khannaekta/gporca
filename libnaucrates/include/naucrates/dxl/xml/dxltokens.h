@@ -105,6 +105,7 @@ namespace gpdxl
 		EdxltokenPhysicalPartitionSelector,
 		EdxltokenPhysicalPartitionSelectorLevels,
 		EdxltokenPhysicalPartitionSelectorScanId,
+		EdxltokenPhysicalValuesScan,
 
 		EdxltokenPhysicalCTEProducer,
 		EdxltokenPhysicalCTEConsumer,

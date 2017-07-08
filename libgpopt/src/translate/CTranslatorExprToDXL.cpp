@@ -1968,6 +1968,13 @@ CTranslatorExprToDXL::PdxlnRemapOutputColumns
 
 	// get project list
 	CDXLNode *pdxlnPrL = (*pdxln)[0];
+	
+	CAutoTrace trace(m_pmp);
+	IOstream &os(trace.Os());
+	os << "DXL PrPL" << pdxlnPrL;
+	
+	std::cerr <<"DXL PrPL" << pdxlnPrL->PdrgpdxlnChildren() ;
+	
 
 	DrgPcr *pdrgpcrOrderedReqdCols = PdrgpcrMerge(m_pmp, pdrgpcrOrder, pdrgpcrRequired);
 	
@@ -2066,7 +2073,7 @@ CTranslatorExprToDXL::PdxlnResultFromConstTableGet
 {
 	GPOS_ASSERT(NULL != pexprCTG);
 	
-	CPhysicalConstTableGet *popCTG = CPhysicalConstTableGet::PopConvert(pexprCTG->Pop()); 
+	CPhysicalConstTableGet *popCTG = CPhysicalConstTableGet::PopConvert(pexprCTG->Pop());
 	
 	// construct project list from the const table get values
 	DrgPcr *pdrgpcrCTGOutput = popCTG->PdrgpcrOutput();
@@ -2091,7 +2098,7 @@ CTranslatorExprToDXL::PdxlnResultFromConstTableGet
 	else
 	{
 		// TODO:  - Feb 29, 2012; add support for CTGs with multiple rows
-		GPOS_ASSERT(1 == ulRows);
+		GPOS_ASSERT(1 <= ulRows);
 		pdrgpdatum = (*pdrgpdrgdatum)[0];
 		pdrgpdatum->AddRef();
 		CDXLNode *pdxlnCond = NULL;
@@ -2100,10 +2107,68 @@ CTranslatorExprToDXL::PdxlnResultFromConstTableGet
 			pdxlnCond = PdxlnScalar(pexprScalar);
 			pdxlnOneTimeFilter->AddChild(pdxlnCond);
 		}
+		// Create DXL Node for ValueList
 	}
 
-	pdxlnPrL = PdxlnProjListFromConstTableGet(pdrgpcr, pdrgpcrCTGOutput, pdrgpdatum);
-	pdrgpdatum->Release();
+	if(ulRows > 1)
+	{
+//		ULONG valCount = pdrgpdrgdatum->UlLength();
+//		for (ULONG ul=0 ; ul < valCount; ul++)
+//		{
+//			pdrgpdatum = (*pdrgpdrgdatum)[ul];
+//			if (pdxlnPrL == NULL)
+//				pdxlnPrL = PdxlnProjListFromConstTableGet(pdrgpcr, pdrgpcrCTGOutput, pdrgpdatum);
+//			else
+//				pdxlnPrL->AddChild(PdxlnProjListFromConstTableGet(pdrgpcr, pdrgpcrCTGOutput, pdrgpdatum));
+//			pdrgpdatum->Release();
+//		}
+//		
+//		return CTranslatorExprToDXLUtils::PdxlnValuesScan
+//											(
+//											m_pmp,
+//											Pdxlprop(pexprCTG),
+//											pdxlnPrL,
+//											NULL //pdxlnChild
+//											);
+		DrgPdrgPdxldatum *pdrgpdrgpdxldatumValues = GPOS_NEW(m_pmp) DrgPdrgPdxldatum(m_pmp);
+		const ULONG ulTuples = pdrgpdrgdatum->UlLength();
+		CDXLNode *pdxlnPrL = NULL;
+		for (ULONG ulTuplePos = 0; ulTuplePos < ulTuples; ulTuplePos++)
+		{
+			// serialize a const tuple
+			DrgPdxldatum *pdrgpdxldatum = GPOS_NEW(m_pmp) DrgPdxldatum(m_pmp);
+			pdrgpdatum = (*pdrgpdrgdatum)[ulTuplePos];
+			const ULONG ulCols = pdrgpdatum->UlLength();
+			for (ULONG ulColPos = 0; ulColPos < ulCols; ulColPos++)
+			{
+				CDXLDatum *pdxldatum = (CDXLDatum *)(*pdrgpdatum)[ulColPos];
+				pdrgpdxldatum->Append(pdxldatum);
+			}
+			pdrgpdatum->Release();
+			pdxlnPrL = PdxlnProjListFromConstTableGet(pdrgpcr, pdrgpcrCTGOutput, pdrgpdatum);
+			pdrgpdrgpdxldatumValues->Append(pdrgpdxldatum);
+		}
+		CDXLPhysicalValuesScan *pdxlop = GPOS_NEW(m_pmp) CDXLPhysicalValuesScan(m_pmp, pdrgpdrgpdxldatumValues);
+		CDXLPhysicalProperties *pdxlprop = Pdxlprop(pexprCTG);
+		//CColRefSet *pcrsOutput = popCTG->PcrsOutput();
+		
+		CDXLNode *pdxlnValuesScan = GPOS_NEW(m_pmp) CDXLNode(m_pmp, pdxlop);
+		pdxlnValuesScan->SetProperties(pdxlprop);
+		
+		
+		pdxlnValuesScan->AddChild(pdxlnPrL); 		// project list
+//		
+//		TranslateScalarChildren(pexprCTG, pdxlnValuesScan);
+		
+		pdrgpdrgpdxldatumValues->Release();
+		
+		return pdxlnValuesScan;
+	}
+	else
+	{
+		pdxlnPrL = PdxlnProjListFromConstTableGet(pdrgpcr, pdrgpcrCTGOutput, pdrgpdatum);
+		pdrgpdatum->Release();
+	}
 
 	return CTranslatorExprToDXLUtils::PdxlnResult
 										(
@@ -2114,6 +2179,7 @@ CTranslatorExprToDXL::PdxlnResultFromConstTableGet
 										pdxlnOneTimeFilter,
 										NULL //pdxlnChild
 										);
+	// Return the
 }
 
 //---------------------------------------------------------------------------

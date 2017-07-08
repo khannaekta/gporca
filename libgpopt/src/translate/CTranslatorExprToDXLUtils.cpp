@@ -1704,6 +1704,33 @@ CTranslatorExprToDXLUtils::PdxlnResult
 	return pdxlnResult;
 }
 
+//CDXLNode *
+//CTranslatorExprToDXLUtils::PdxlnValuesScan
+//(
+//	IMemoryPool *pmp,
+//	CDXLPhysicalProperties *pdxlprop,
+//	CDXLNode *pdxlnPrL,
+//	CDXLNode *pdxlnChild
+//	)
+//{
+//	CDXLPhysicalValuesScan *pdxlop = GPOS_NEW(pmp) CDXLPhysicalValuesScan(pmp);
+//	CDXLNode *pdxlnValuesScan = GPOS_NEW(pmp) CDXLNode(pmp, pdxlop);
+//	pdxlnValuesScan->SetProperties(pdxlprop);
+//	
+//	pdxlnValuesScan->AddChild(pdxlnPrL);
+//
+//	if (NULL != pdxlnChild)
+//	{
+//		pdxlnValuesScan->AddChild(pdxlnChild);
+//	}
+//	
+//#ifdef GPOS_DEBUG
+//	pdxlop->AssertValid(pdxlnValuesScan, false /* fValidateChildren */);
+//#endif
+//	
+//	return pdxlnValuesScan;
+//}
+
 //---------------------------------------------------------------------------
 //	@function:
 //		CTranslatorExprToDXLUtils::PdxlnPartitionSelector

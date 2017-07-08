@@ -488,6 +488,16 @@ namespace gpopt
 				CDXLNode *pdxlnChild
 				);
 
+			// create a DXL ValuesScan node
+//			static
+//			CDXLNode *PdxlnValuesScan
+//			(
+//			 IMemoryPool *pmp,
+//			 CDXLPhysicalProperties *pdxlprop,
+//			 CDXLNode *pdxlnPrL,
+//			 CDXLNode *pdxlnChild
+//			 );
+
 			// build hashmap based on a column array, where the key is the column
 			// and the value is the index of that column in the array
 			static
