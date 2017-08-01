@@ -23,18 +23,18 @@ using namespace gpdxl;
 // ctor
 CMDArrayCoerceCastGPDB::CMDArrayCoerceCastGPDB
 	(
-	 IMemoryPool *pmp,
-	 IMDId *pmdid,
-	 CMDName *pmdname,
-	 IMDId *pmdidSrc,
-	 IMDId *pmdidDest,
-	 BOOL fBinaryCoercible,
-	 IMDId *pmdidCastFunc,
-	 EmdCoercepathType emdPathType,
-	 INT iMod,
-	 BOOL fIsExplicit,
-	 EdxlCoercionForm edxlcf,
-	 INT iLoc
+	IMemoryPool *pmp,
+	IMDId *pmdid,
+	CMDName *pmdname,
+	IMDId *pmdidSrc,
+	IMDId *pmdidDest,
+	BOOL fBinaryCoercible,
+	IMDId *pmdidCastFunc,
+	EmdCoercepathType emdPathType,
+	INT iMod,
+	BOOL fIsExplicit,
+	EdxlCoercionForm edxlcf,
+	INT iLoc
 	)
 	:
 	CMDCastGPDB(pmp, pmdid, pmdname, pmdidSrc, pmdidDest, fBinaryCoercible, pmdidCastFunc, emdPathType),

@@ -118,14 +118,15 @@ CParseHandlerMDCast::StartElement
 											EdxltokenGPDBCast
 											);
 
-	IMDCast::EmdCoercepathType eCoercePathType = (IMDCast::EmdCoercepathType) CDXLOperatorFactory::IValueFromAttrs
-																							(
-																							m_pphm->Pmm(),
-																							attrs,
-																							EdxltokenGPDBCastCoercePathType,
-																							EdxltokenGPDBCast,
-																							true		// eCoercePathType is optional
-																							);
+	IMDCast::EmdCoercepathType eCoercePathType = (IMDCast::EmdCoercepathType)
+													CDXLOperatorFactory::IValueFromAttrs
+															(
+															m_pphm->Pmm(),
+															attrs,
+															EdxltokenGPDBCastCoercePathType,
+															EdxltokenGPDBCast,
+															true		// eCoercePathType is optional
+															);
 
 	m_pimdobj = GPOS_NEW(m_pmp) CMDCastGPDB(m_pmp, pmdid, pmdname, pmdidSrc, pmdidDest, fBinaryCoercible, pmdidCastFunc, eCoercePathType);
 }
