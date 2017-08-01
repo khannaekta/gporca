@@ -2886,13 +2886,31 @@ CTranslatorDXLToExpr::PexprScalarFunc
 	if (CTranslatorDXLToExprUtils::FCastFunc(m_pmda, pdxlnFunc, pmdidInput))
 	{
 		const IMDCast *pmdcast = m_pmda->Pmdcast(pmdidInput, pmdidRetType);
-		pop = GPOS_NEW(m_pmp) CScalarCast
-				(
-				m_pmp,
-				pmdidRetType,
-				pmdidFunc,
-				pmdcast->FBinaryCoercible()
-				);
+
+		if (pmdcast->EmdPathType() == IMDCast::EmdtArrayCoerce)
+		{
+			CMDArrayCoerceCastGPDB *parrayCoerceCast = (CMDArrayCoerceCastGPDB *) pmdcast;
+			pop = GPOS_NEW(m_pmp) CScalarArrayCoerceExpr
+					(
+					m_pmp,
+					parrayCoerceCast->PmdidCastFunc(),
+					pmdidRetType,
+					parrayCoerceCast->IMod(),
+					parrayCoerceCast->FIsExplicit(),
+					(COperator::ECoercionForm) parrayCoerceCast->Ecf(),
+					parrayCoerceCast->ILoc()
+					);
+		}
+		else
+		{
+			pop = GPOS_NEW(m_pmp) CScalarCast
+					(
+					m_pmp,
+					pmdidRetType,
+					pmdidFunc,
+					pmdcast->FBinaryCoercible()
+					);
+		}
 	}
 	else
 	{
@@ -3588,12 +3606,37 @@ CTranslatorDXLToExpr::PexprScalarCast
 	const IMDCast *pmdcast = m_pmda->Pmdcast(pmdidInput, pmdidType);
 	BOOL fRelabel = pmdcast->FBinaryCoercible();
 
-	CExpression *pexpr = GPOS_NEW(m_pmp) CExpression
+	CExpression *pexpr;
+	
+	if (pmdcast->EmdPathType() == IMDCast::EmdtArrayCoerce)
+	{
+		CMDArrayCoerceCastGPDB *parrayCoerceCast = (CMDArrayCoerceCastGPDB *) pmdcast;
+		pexpr = GPOS_NEW(m_pmp) CExpression
+									(
+									m_pmp,
+									GPOS_NEW(m_pmp) CScalarArrayCoerceExpr
+														(
+														m_pmp,
+														parrayCoerceCast->PmdidCastFunc(),
+														pmdidType,
+														parrayCoerceCast->IMod(),
+														parrayCoerceCast->FIsExplicit(),
+														(COperator::ECoercionForm) parrayCoerceCast->Ecf(),
+														parrayCoerceCast->ILoc()
+														),
+									pexprChild
+									);
+	}
+	else
+	{
+		
+		pexpr= GPOS_NEW(m_pmp) CExpression
 									(
 									m_pmp,
 									GPOS_NEW(m_pmp) CScalarCast(m_pmp, pmdidType, pmdidFunc, fRelabel),
 									pexprChild
 									);
+	}
 
 	return pexpr;
 }
