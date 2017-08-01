@@ -3588,7 +3588,7 @@ CParseHandlerFactory::PphScalarValuesList
 // creates a parse handler for parsing a Values Scan operator
 CParseHandlerBase *
 CParseHandlerFactory::PphValuesScan
-(
+	(
 	IMemoryPool *pmp,
 	CParseHandlerManager *pphm,
 	CParseHandlerBase *pphRoot
@@ -3600,7 +3600,7 @@ CParseHandlerFactory::PphValuesScan
 // creates a parse handler for parsing GPDB-specific array coerce cast metadata
 CParseHandlerBase *
 CParseHandlerFactory::PphMDArrayCoerceCast
-(
+	(
 	IMemoryPool *pmp,
 	CParseHandlerManager *pphm,
 	CParseHandlerBase *pphRoot

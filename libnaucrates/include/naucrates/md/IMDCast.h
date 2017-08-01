@@ -40,9 +40,8 @@ namespace gpmd
 			{
 				EmdtNone,			/* failed to find any coercion pathway */
 				EmdtFunc,			/* apply the specified coercion function */
-				EmdtRelableType,	/* binary-compatible cast, no function */
-				EmdtArrayCoerce,	/* need an ArrayCoerceExpr node */
-				EmdtCoerceViaIO		/* need a CoerceViaIO node */
+				EmdtRelabelType,	/* binary-compatible cast, no function */
+				EmdtArrayCoerce		/* need an ArrayCoerceExpr node */
 			};
 
 			// object type

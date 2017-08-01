@@ -95,52 +95,54 @@ CParseHandlerMDArrayCoerceCast::StartElement
 
 	// parse whether func returns a set
 	BOOL fBinaryCoercible = CDXLOperatorFactory::FValueFromAttrs
-											(
-											m_pphm->Pmm(),
-											attrs,
-											EdxltokenGPDBCastBinaryCoercible,
-											EdxltokenGPDBArrayCoerceCast
-											);
+									(
+									m_pphm->Pmm(),
+									attrs,
+									EdxltokenGPDBCastBinaryCoercible,
+									EdxltokenGPDBArrayCoerceCast
+									);
 
-	IMDCast::EmdCoercepathType eCoercePathType = (IMDCast::EmdCoercepathType) CDXLOperatorFactory::IValueFromAttrs
-																							(
-																							m_pphm->Pmm(),
-																							attrs,
-																							EdxltokenGPDBCastCoercePathType,
-																							EdxltokenGPDBArrayCoerceCast
-																							);
+	// parse coercion path type
+	IMDCast::EmdCoercepathType eCoercePathType = (IMDCast::EmdCoercepathType)
+													CDXLOperatorFactory::IValueFromAttrs
+															(
+															m_pphm->Pmm(),
+															attrs,
+															EdxltokenGPDBCastCoercePathType,
+															EdxltokenGPDBArrayCoerceCast
+															);
 
 	INT iMod = CDXLOperatorFactory::IValueFromAttrs
 							(
-							 m_pphm->Pmm(),
-							 attrs,
-							 EdxltokenTypeMod,
-							 EdxltokenGPDBArrayCoerceCast
-							 );
+							m_pphm->Pmm(),
+							attrs,
+							EdxltokenTypeMod,
+							EdxltokenGPDBArrayCoerceCast
+							);
 
 	BOOL fIsExplicit =CDXLOperatorFactory::FValueFromAttrs
 									(
-									 m_pphm->Pmm(),
-									 attrs,
-									 EdxltokenIsExplicit,
-									 EdxltokenGPDBArrayCoerceCast
-									 );
+									m_pphm->Pmm(),
+									attrs,
+									EdxltokenIsExplicit,
+									EdxltokenGPDBArrayCoerceCast
+									);
 
 	EdxlCoercionForm edcf = (EdxlCoercionForm) CDXLOperatorFactory::IValueFromAttrs
 																		(
-																		 m_pphm->Pmm(),
-																		 attrs,
-																		 EdxltokenCoercionForm,
-																		 EdxltokenGPDBArrayCoerceCast
-																		 );
+																		m_pphm->Pmm(),
+																		attrs,
+																		EdxltokenCoercionForm,
+																		EdxltokenGPDBArrayCoerceCast
+																		);
 
 	INT iLoc = CDXLOperatorFactory::IValueFromAttrs
 							(
-							 m_pphm->Pmm(),
-							 attrs,
-							 EdxltokenLocation,
-							 EdxltokenGPDBArrayCoerceCast
-							 );
+							m_pphm->Pmm(),
+							attrs,
+							EdxltokenLocation,
+							EdxltokenGPDBArrayCoerceCast
+							);
 
 	m_pimdobj = GPOS_NEW(m_pmp) CMDArrayCoerceCastGPDB(m_pmp, pmdid, pmdname, pmdidSrc, pmdidDest, fBinaryCoercible, pmdidCastFunc, eCoercePathType, iMod, fIsExplicit, edcf, iLoc);
 }
