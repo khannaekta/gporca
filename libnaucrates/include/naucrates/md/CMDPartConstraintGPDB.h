@@ -64,6 +64,9 @@ namespace gpmd
 			// ctor
 			CMDPartConstraintGPDB(IMemoryPool *pmp, CDXLNode *pdxln, DrgPul *pdrgpulDefaultParts, BOOL fUnbounded);
 
+			// ctor
+			CMDPartConstraintGPDB(IMemoryPool *pmp, DrgPul *pdrgpulDefaultParts, BOOL fUnbounded);
+
 			// dtor
 			virtual
 			~CMDPartConstraintGPDB();

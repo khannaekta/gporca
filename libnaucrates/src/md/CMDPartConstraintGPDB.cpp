@@ -47,6 +47,30 @@ CMDPartConstraintGPDB::CMDPartConstraintGPDB
 
 //---------------------------------------------------------------------------
 //	@function:
+//		CMDPartConstraintGPDB::CMDPartConstraintGPDB
+//
+//	@doc:
+//		Ctor
+//
+//---------------------------------------------------------------------------
+
+CMDPartConstraintGPDB::CMDPartConstraintGPDB
+	(
+	IMemoryPool *pmp,
+	DrgPul *pdrgpulDefaultParts,
+	BOOL fUnbounded
+	)
+	:
+	m_pmp(pmp),
+	m_pdxln(NULL),
+	m_pdrgpulDefaultParts(pdrgpulDefaultParts),
+	m_fUnbounded(fUnbounded)
+{
+	GPOS_ASSERT(NULL != pdrgpulDefaultParts);
+}
+
+//---------------------------------------------------------------------------
+//	@function:
 //		CMDPartConstraintGPDB::~CMDPartConstraintGPDB
 //
 //	@doc:
@@ -55,7 +79,8 @@ CMDPartConstraintGPDB::CMDPartConstraintGPDB
 //---------------------------------------------------------------------------
 CMDPartConstraintGPDB::~CMDPartConstraintGPDB()
 {
-	m_pdxln->Release();
+	if (NULL != m_pdxln)
+		m_pdxln->Release();
 	m_pdrgpulDefaultParts->Release();
 }
 
@@ -137,7 +162,8 @@ CMDPartConstraintGPDB::Serialize
 	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenPartConstraintUnbounded), m_fUnbounded);
 
 	// serialize the scalar expression
-	m_pdxln->SerializeToDXL(pxmlser);
+	if (m_pdxln)
+		m_pdxln->SerializeToDXL(pxmlser);
 
 	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix),
 						CDXLTokens::PstrToken(EdxltokenPartConstraint));
