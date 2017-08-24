@@ -112,4 +112,22 @@ IMDRelation::PstrColumns
 	return pstr;
 }
 
+BOOL
+IMDRelation::FPartialIndex
+	(
+	ULONG // ulPos
+	) const
+{
+	return false;
+}
+
+BOOL
+IMDRelation::FPartialIndex
+	(
+	IMDId * // mdid
+	) const
+{
+	return false;
+}
+
 // EOF
