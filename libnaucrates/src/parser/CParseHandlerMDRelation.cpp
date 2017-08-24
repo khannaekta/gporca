@@ -16,6 +16,7 @@
 #include "naucrates/dxl/parser/CParseHandlerMetadataColumns.h"
 #include "naucrates/dxl/parser/CParseHandlerMetadataIdList.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
+#include "naucrates/dxl/parser/CParseHandlerMDIndexInfoList.h"
 
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 
@@ -222,17 +223,17 @@ CParseHandlerMDRelation::EndElement
 	
 	// construct metadata object from the created child elements
 	CParseHandlerMetadataColumns *pphMdCol = dynamic_cast<CParseHandlerMetadataColumns *>((*this)[0]);
-	CParseHandlerMetadataIdList *pphMdidlIndices = dynamic_cast<CParseHandlerMetadataIdList*>((*this)[1]);
+	CParseHandlerMDIndexInfoList *pphMdidlIndices = dynamic_cast<CParseHandlerMDIndexInfoList*>((*this)[1]);
 	CParseHandlerMetadataIdList *pphMdidlTriggers = dynamic_cast<CParseHandlerMetadataIdList*>((*this)[2]);
 	CParseHandlerMetadataIdList *pphMdidlCheckConstraints = dynamic_cast<CParseHandlerMetadataIdList*>((*this)[3]);
 
 	GPOS_ASSERT(NULL != pphMdCol->Pdrgpmdcol());
-	GPOS_ASSERT(NULL != pphMdidlIndices->Pdrgpmdid());
+	GPOS_ASSERT(NULL != pphMdidlIndices->PdrgpmdIndexInfo());
 	GPOS_ASSERT(NULL != pphMdidlCheckConstraints->Pdrgpmdid());
 
 	// refcount child objects
 	DrgPmdcol *pdrgpmdcol = pphMdCol->Pdrgpmdcol();
-	DrgPmdid *pdrgpmdidIndices = pphMdidlIndices->Pdrgpmdid();
+	DrgPmdIndexInfo *pdrgpmdidIndices = pphMdidlIndices->PdrgpmdIndexInfo();
 	DrgPmdid *pdrgpmdidTriggers = pphMdidlTriggers->Pdrgpmdid();
 	DrgPmdid *pdrgpmdidCheckConstraint = pphMdidlCheckConstraints->Pdrgpmdid();
  
@@ -339,7 +340,7 @@ CParseHandlerMDRelation::ParseChildNodes()
 	m_pphm->ActivateParseHandler(pphTriggerList);
 
 	// parse handler for indices list
-	CParseHandlerBase *pphIndexList = CParseHandlerFactory::Pph(m_pmp, CDXLTokens::XmlstrToken(EdxltokenMetadataIdList), m_pphm, this);
+	CParseHandlerBase *pphIndexList = CParseHandlerFactory::Pph(m_pmp, CDXLTokens::XmlstrToken(EdxltokenIndexInfoList), m_pphm, this);
 	m_pphm->ActivateParseHandler(pphIndexList);
 
 	// parse handler for the columns

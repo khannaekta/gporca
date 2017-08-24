@@ -521,6 +521,9 @@ CDXLTokens::Init
 
 			{EdxltokenIndexes, GPOS_WSZ_LIT("Indexes")},
 			{EdxltokenIndex, GPOS_WSZ_LIT("Index")},
+
+			{EdxltokenIndexInfoList, GPOS_WSZ_LIT("IndexInfoList")},
+			{EdxltokenIndexInfo, GPOS_WSZ_LIT("IndexInfo")},
 			
 			{EdxltokenIndexKeyCols, GPOS_WSZ_LIT("KeyColumns")},
 			{EdxltokenIndexIncludedCols, GPOS_WSZ_LIT("IncludedColumns")},
