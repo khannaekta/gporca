@@ -3886,7 +3886,7 @@
             <dxl:DefaultValue/>
           </dxl:Column>
         </dxl:Columns>
-        <dxl:Indexes/>
+        <dxl:IndexInfoList/>
         <dxl:Triggers/>
         <dxl:CheckConstraints/>
         <dxl:PartConstraint DefaultPartition="" Unbounded="false">
@@ -4010,7 +4010,7 @@
             <dxl:DefaultValue/>
           </dxl:Column>
         </dxl:Columns>
-        <dxl:Indexes/>
+        <dxl:IndexInfoList/>
         <dxl:Triggers/>
         <dxl:CheckConstraints/>
         <dxl:PartConstraint DefaultPartition="" Unbounded="false">
@@ -5915,9 +5915,9 @@
             <dxl:DefaultValue/>
           </dxl:Column>
         </dxl:Columns>
+        <dxl:IndexInfoList/>
         <dxl:Triggers/>
         <dxl:CheckConstraints/>
-        <dxl:Indexes/>
       </dxl:Relation>
       <dxl:ColumnStatistics Mdid="1.1974810.1.1.25" Name="tableoid" Width="8.000000" NullFreq="0.000000" NdvRemain="0.000000" FreqRemain="0.000000"/>
       <dxl:ColumnStatistics Mdid="1.1974810.1.1.24" Name="cmax" Width="8.000000" NullFreq="0.000000" NdvRemain="0.000000" FreqRemain="0.000000"/>
