@@ -113,6 +113,10 @@ namespace gpopt
 				return m_pindexdesc;
 			}
 
+			// check if given index is partial
+			static
+			BOOL fIndexIsPartial(CTableDescriptor *ptabdesc, const IMDIndex *pmdindex);
+
 			// order spec
 			COrderSpec *Pos() const
 			{
