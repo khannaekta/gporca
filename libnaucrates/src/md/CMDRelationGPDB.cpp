@@ -863,8 +863,12 @@ CMDRelationGPDB::DebugPrint
 		
 	os << std::endl;
 		
-	os << "Indexes: ";
-	//TODO: CDXLUtils::DebugPrintDrgpmdid(os, m_pdrgpmdidIndices);
+	os << "Indexe Info: ";
+	for (ULONG ul = 0; ul < m_pdrgpmdidIndices->UlLength(); ul++)
+	{
+		CMDIndexInfo *pmdIndexInfo = (*m_pdrgpmdidIndices)[ul];
+		pmdIndexInfo->DebugPrint(os);
+	}
 
 	os << "Triggers: ";
 	CDXLUtils::DebugPrintDrgpmdid(os, m_pdrgpmdidTriggers);

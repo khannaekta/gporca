@@ -22,7 +22,6 @@
 
 #include "naucrates/md/CMDColumn.h"
 #include "naucrates/md/CMDName.h"
-#include "naucrates/md/CMDIndexInfo.h"
 
 namespace gpdxl
 {
@@ -33,8 +32,6 @@ namespace gpmd
 {
 	using namespace gpos;
 	using namespace gpdxl;
-
-	typedef CDynamicPtrArray<CMDIndexInfo, CleanupRelease> DrgPmdIndexInfo;
 
 
 	//---------------------------------------------------------------------------

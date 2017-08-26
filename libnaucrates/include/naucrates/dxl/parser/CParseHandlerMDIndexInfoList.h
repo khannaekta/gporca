@@ -15,7 +15,7 @@
 #include "gpos/base.h"
 #include "naucrates/dxl/parser/CParseHandlerMetadataObject.h"
 #include "naucrates/md/IMDIndex.h"
-#include "naucrates/md/CMDrelationGPDB.h"
+#include "naucrates/md/CMDRelationGPDB.h"
 
 namespace gpdxl
 {
