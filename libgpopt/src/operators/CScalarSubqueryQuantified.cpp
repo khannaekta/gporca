@@ -231,7 +231,12 @@ CScalarSubqueryQuantified::PexprSubqueryPred
 	GPOS_ASSERT(this == exprhdl.Pop());
 
 	CScalarSubqueryQuantified *popSqQuantified = CScalarSubqueryQuantified::PopConvert(exprhdl.Pop());
-	CExpression *pexprScalar = exprhdl.PexprScalarChild(1 /*ulChildIndex*/);
+	CExpression *pexprScalar;
+	CExpression *pexprChild = (*exprhdl.Pexpr())[1];
+	if(CUtils::FSubquery(pexprChild->Pop()))
+		pexprScalar = pexprChild;
+	else
+		pexprScalar = exprhdl.PexprScalarChild(1 /*ulChildIndex*/);
 	const CColRef *pcr = popSqQuantified->Pcr();
 	IMDId *pmdidOp = popSqQuantified->PmdidOp();
 	const CWStringConst *pstr = popSqQuantified->PstrOp();
