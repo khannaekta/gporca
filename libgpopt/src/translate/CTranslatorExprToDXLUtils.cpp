@@ -1535,7 +1535,7 @@ CTranslatorExprToDXLUtils::ReplaceSubplan
 	pmdidType->AddRef();
 	CMDName *pmdname = GPOS_NEW(pmp) CMDName(pmp, pdxlopPrEl->PmdnameAlias()->Pstr());
 	CDXLColRef *pdxlcr = GPOS_NEW(pmp) CDXLColRef(pmp, pmdname, pdxlopPrEl->UlId());
-	CDXLScalarIdent *pdxlnScId = GPOS_NEW(pmp) CDXLScalarIdent(pmp, pdxlcr, pmdidType);
+	CDXLScalarIdent *pdxlnScId = GPOS_NEW(pmp) CDXLScalarIdent(pmp, pdxlcr, pmdidType, -1); // 151341024_CHG_TYPMOD
 	CDXLNode *pdxln = GPOS_NEW(pmp) CDXLNode(pmp, pdxlnScId);
 #ifdef GPOS_DEBUG
 	BOOL fReplaced =
@@ -1637,7 +1637,7 @@ CTranslatorExprToDXLUtils::PdxlnIdent
 	IMDId *pmdid = pcr->Pmdtype()->Pmdid();
 	pmdid->AddRef();
 	
-	CDXLScalarIdent *pdxlop = GPOS_NEW(pmp) CDXLScalarIdent(pmp, pdxlcr, pmdid);
+	CDXLScalarIdent *pdxlop = GPOS_NEW(pmp) CDXLScalarIdent(pmp, pdxlcr, pmdid, -1); // 151341024_CHG_TYPMOD
 	return GPOS_NEW(pmp) CDXLNode(pmp, pdxlop);
 }
 

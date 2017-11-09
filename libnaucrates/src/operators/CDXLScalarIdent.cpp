@@ -33,12 +33,14 @@ CDXLScalarIdent::CDXLScalarIdent
 	(
 	IMemoryPool *pmp,
 	CDXLColRef *pdxlcr,
-	IMDId *pmdidType
+	IMDId *pmdidType,
+    INT iTypMod
 	)
 	:
 	CDXLScalar(pmp),
 	m_pdxlcr(pdxlcr),
-	m_pmdidType(pmdidType)
+	m_pmdidType(pmdidType),
+	m_iTypMod(iTypMod)
 {
 	GPOS_ASSERT(NULL != m_pdxlcr);
 	GPOS_ASSERT(m_pmdidType->FValid());
@@ -116,6 +118,13 @@ CDXLScalarIdent::PmdidType() const
 	return m_pmdidType;
 }
 
+// Return the typMod of the column
+INT
+CDXLScalarIdent::ITypMod() const
+{
+	return m_iTypMod;
+}
+
 //---------------------------------------------------------------------------
 //	@function:
 //		CDXLScalarIdent::SerializeToDXL
@@ -141,6 +150,7 @@ CDXLScalarIdent::SerializeToDXL
 
 	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenColId), m_pdxlcr->UlID());
 	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenColName), strCName);
+	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenTypeMod), m_iTypMod);
 	m_pmdidType->Serialize(pxmlser, CDXLTokens::PstrToken(EdxltokenTypeId));
 	pdxln->SerializeChildrenToDXL(pxmlser);
 

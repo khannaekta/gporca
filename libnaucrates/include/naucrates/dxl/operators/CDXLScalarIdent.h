@@ -37,6 +37,9 @@ namespace gpdxl
 			
 			// column type
 			IMDId *m_pmdidType;
+		
+			// column typmod as passed from GPDB
+			INT m_iTypMod;
 			
 			// private copy ctor
 			CDXLScalarIdent(CDXLScalarIdent&);
@@ -47,7 +50,8 @@ namespace gpdxl
 				(
 				IMemoryPool *,
 				CDXLColRef *,
-				IMDId *
+				IMDId *,
+			    INT
 				);
 			
 			virtual
@@ -63,6 +67,8 @@ namespace gpdxl
 			const CDXLColRef *Pdxlcr() const;
 
 			IMDId *PmdidType() const;
+		
+			INT ITypMod() const;
 
 			// serialize operator in DXL format
 			virtual

@@ -1414,8 +1414,10 @@ CDXLOperatorFactory::PdxlopScalarIdent
 							EdxltokenTypeId,
 							EdxltokenScalarIdent
 							);
+	
+	INT iMod = IValueFromAttrs(pmm, attrs, EdxltokenTypeMod, EdxltokenScalarIdent);
 
-	return GPOS_NEW(pmp) CDXLScalarIdent(pmp, pdxlcr, pmdidType);
+	return GPOS_NEW(pmp) CDXLScalarIdent(pmp, pdxlcr, pmdidType, iMod);
 }
 
 //---------------------------------------------------------------------------
