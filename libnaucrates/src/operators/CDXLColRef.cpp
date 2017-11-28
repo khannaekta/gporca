@@ -28,12 +28,14 @@ CDXLColRef::CDXLColRef
 	(
 	IMemoryPool *pmp,
 	CMDName *pmdname,
-	ULONG ulId
+	ULONG ulId,
+	INT iTypMod
 	)
 	:
 	m_pmp(pmp),
 	m_pmdname(pmdname),
-	m_ulId(ulId)
+	m_ulId(ulId),
+	m_iTypMod(iTypMod)
 {
 }
 
@@ -78,5 +80,10 @@ CDXLColRef::UlID() const
 	return m_ulId;
 }
 
+INT
+CDXLColRef::ITypMod()
+{
+	return m_iTypMod;
+}
 
 // EOF

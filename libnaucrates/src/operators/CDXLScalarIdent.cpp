@@ -141,6 +141,7 @@ CDXLScalarIdent::SerializeToDXL
 
 	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenColId), m_pdxlcr->UlID());
 	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenColName), strCName);
+	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenTypeMod), m_pdxlcr->ITypMod());
 	m_pmdidType->Serialize(pxmlser, CDXLTokens::PstrToken(EdxltokenTypeId));
 	pdxln->SerializeChildrenToDXL(pxmlser);
 

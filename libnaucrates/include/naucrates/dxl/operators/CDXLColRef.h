@@ -51,7 +51,10 @@ namespace gpdxl
 	
 			// id
 			const ULONG m_ulId;
-			
+
+			// typMod
+			INT m_iTypMod;
+
 			// private copy ctor
 			CDXLColRef(const CDXLColRef &);
 		
@@ -61,7 +64,8 @@ namespace gpdxl
 				(
 				IMemoryPool *,
 				CMDName *,
-				ULONG
+				ULONG,
+				INT m_iTypMod = -1
 				);
 			
 			~CDXLColRef();
@@ -69,6 +73,7 @@ namespace gpdxl
 			// accessors
 			const CMDName *Pmdname() const;
 			ULONG UlID() const;
+			INT ITypMod();
 
 	};
 }
