@@ -160,7 +160,10 @@ CXformSplitDQA::Transform
 	DrgPcr *pDrgPcr = CLogicalGbAgg::PopConvert(pexpr->Pop())->Pdrgpcr();
 	BOOL fScalarDQA = (pDrgPcr == NULL || pDrgPcr->UlLength() == 0);
 	BOOL fForce3StageScalarDQA = GPOS_FTRACE(EopttraceForceThreeStageScalarDQA);
+	// Flag to specify if DQA column is same as the distribution column
 	BOOL fDQAColDistribCol = false;
+
+	//Flag to specify if GROUP BY column is not same as the distribution column
 	BOOL fGBColNotDistribCol = true;
 
 	if(pexprRelational->Pop()->Eopid() == COperator::EopLogicalGet)
@@ -176,15 +179,13 @@ CXformSplitDQA::Transform
 		pcrGbCol->Release();
 	}
 
-	CExpression *pexprPrEl = (*pexprProjectList)[0];
-	CExpression *pexprAggFunc = (*pexprPrEl)[0];
-	CScalarAggFunc *popAggfunc = CScalarAggFunc::PopConvert(pexprAggFunc->Pop());
 	/*
-	* If the AggFunc is not splittable and the group by col
-	* is not same as the distribution columns,
-	* no 3 stage/2 stage agg alternatives are not required
+	* If the group by col is not same as the distribution
+	* columns, we don't need 3 stage/2 stage agg alternatives
+	* as this case can be achieved by a local aggregation 
+	* (generated as part of CXformSimplifyGbAgg).
 	*/
-	if (pmda->Pmdagg(popAggfunc->Pmdid())->FSplittable() && fGBColNotDistribCol)
+	if (fGBColNotDistribCol)
 	{
 		// multi-stage for both scalar and non-scalar aggregates.
 		CExpression *pexprAlt1 = PexprSplitHelper
@@ -201,7 +202,8 @@ CXformSplitDQA::Transform
 		pxfres->Add(pexprAlt1);
 
 		if (!(fForce3StageScalarDQA && fScalarDQA) || (fScalarDQA && fDQAColDistribCol)) {
-			// we skip this option if it is a Scalar DQA and we only want plans with 3-stages of aggregation
+			// we skip this option if it is a Scalar DQA(except Scalar DQA on distribution column)
+			// and we only want plans with 3-stages of aggregation
 
 			// local/global for both scalar and non-scalar aggregates.
 			CExpression *pexprAlt2 = PexprSplitIntoLocalDQAGlobalAgg
