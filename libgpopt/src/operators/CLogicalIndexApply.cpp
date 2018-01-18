@@ -1,50 +1,51 @@
 //---------------------------------------------------------------------------
 //	Greenplum Database
-//	Copyright (C) 2017 Pivotal, Inc.
+//	Copyright (C) 2018 Pivotal Software, Inc.
 //
-//	Implementation of left outer index apply operator
+//	Implementation of inner / left outer index apply operator
 //---------------------------------------------------------------------------
 
 #include "gpos/base.h"
-
-#include "gpopt/operators/CLogicalLeftOuterIndexApply.h"
-
+#include "gpopt/operators/CLogicalIndexApply.h"
 #include "naucrates/statistics/CStatisticsUtils.h"
 
 using namespace gpopt;
 
-CLogicalLeftOuterIndexApply::CLogicalLeftOuterIndexApply
+CLogicalIndexApply::CLogicalIndexApply
 	(
 	IMemoryPool *pmp
 	)
 	:
 	CLogicalApply(pmp),
-	m_pdrgpcrOuterRefs(NULL)
+	m_pdrgpcrOuterRefs(NULL),
+	m_fOuterJoin(false)
 {
 	m_fPattern = true;
 }
 
-CLogicalLeftOuterIndexApply::CLogicalLeftOuterIndexApply
+CLogicalIndexApply::CLogicalIndexApply
 	(
 	IMemoryPool *pmp,
-	DrgPcr *pdrgpcrOuterRefs
+	DrgPcr *pdrgpcrOuterRefs,
+	BOOL fOuterJoin
 	)
 	:
 	CLogicalApply(pmp),
-	m_pdrgpcrOuterRefs(pdrgpcrOuterRefs)
+	m_pdrgpcrOuterRefs(pdrgpcrOuterRefs),
+	m_fOuterJoin(fOuterJoin)
 {
 	GPOS_ASSERT(NULL != pdrgpcrOuterRefs);
 }
 
 
-CLogicalLeftOuterIndexApply::~CLogicalLeftOuterIndexApply()
+CLogicalIndexApply::~CLogicalIndexApply()
 {
 	CRefCount::SafeRelease(m_pdrgpcrOuterRefs);
 }
 
 
 CMaxCard
-CLogicalLeftOuterIndexApply::Maxcard
+CLogicalIndexApply::Maxcard
 	(
 	IMemoryPool *, // pmp
 	CExpressionHandle &exprhdl
@@ -56,20 +57,27 @@ CLogicalLeftOuterIndexApply::Maxcard
 
 
 CXformSet *
-CLogicalLeftOuterIndexApply::PxfsCandidates
+CLogicalIndexApply::PxfsCandidates
 	(
 	IMemoryPool *pmp
 	)
 	const
 {
 	CXformSet *pxfs = GPOS_NEW(pmp) CXformSet(pmp);
-	(void) pxfs->FExchangeSet(CXform::ExfImplementLeftOuterIndexApply);
+	if (m_fOuterJoin)
+	{
+		(void) pxfs->FExchangeSet(CXform::ExfImplementLeftOuterIndexApply);
+	}
+	else
+	{
+		(void) pxfs->FExchangeSet(CXform::ExfImplementInnerIndexApply);
+	}
 
 	return pxfs;
 }
 
 BOOL
-CLogicalLeftOuterIndexApply::FMatch
+CLogicalIndexApply::FMatch
 	(
 	COperator *pop
 	)
@@ -79,29 +87,15 @@ CLogicalLeftOuterIndexApply::FMatch
 
 	if (pop->Eopid() == Eopid())
 	{
-		return m_pdrgpcrOuterRefs->FEqual(CLogicalLeftOuterIndexApply::PopConvert(pop)->PdrgPcrOuterRefs());
+		return m_pdrgpcrOuterRefs->FEqual(CLogicalIndexApply::PopConvert(pop)->PdrgPcrOuterRefs());
 	}
 
 	return false;
 }
 
 
-COperator *
-CLogicalLeftOuterIndexApply::PopCopyWithRemappedColumns
-	(
-	IMemoryPool *pmp,
-	HMUlCr *phmulcr,
-	BOOL fMustExist
-	)
-{
-	DrgPcr *pdrgpcr = CUtils::PdrgpcrRemap(pmp, m_pdrgpcrOuterRefs, phmulcr, fMustExist);
-
-	return GPOS_NEW(pmp) CLogicalLeftOuterIndexApply(pmp, pdrgpcr);
-}
-
-
 IStatistics *
-CLogicalLeftOuterIndexApply::PstatsDerive
+CLogicalIndexApply::PstatsDerive
 	(
 	IMemoryPool *pmp,
 	CExpressionHandle &exprhdl,
@@ -121,7 +115,7 @@ CLogicalLeftOuterIndexApply::PstatsDerive
 	pdrgpstat->Append(pstatsOuter);
 	pstatsInner->AddRef();
 	pdrgpstat->Append(pstatsInner);
-	IStatistics *pstats = CStatisticsUtils::PstatsJoinArray(pmp, true /*fOuterJoin*/, pdrgpstat, pexprScalar);
+	IStatistics *pstats = CStatisticsUtils::PstatsJoinArray(pmp, m_fOuterJoin, pdrgpstat, pexprScalar);
 	pdrgpstat->Release();
 
 	return pstats;
