@@ -1,33 +1,21 @@
 //---------------------------------------------------------------------------
 //	Greenplum Database
-//	Copyright (C) 2013 Pivotal, Inc.
+//	Copyright (C) 2018 Pivotal Software, Inc.
 //
-//	@filename:
-//		CXformImplementInnerIndexApply.h
-//
-//	@doc:
-//		Implementing Inner Index Apply
+//	Implementing Inner Index Apply
 //---------------------------------------------------------------------------
 #ifndef GPOPT_CXformImplementInnerIndexApply_H
 #define GPOPT_CXformImplementInnerIndexApply_H
 
 #include "gpos/base.h"
-#include "gpopt/xforms/CXformImplementation.h"
-
+#include "gpopt/xforms/CXformImplementIndexApply.h"
 
 namespace gpopt
 {
 	using namespace gpos;
 
-	//---------------------------------------------------------------------------
-	//	@class:
-	//		CXformImplementInnerIndexApply
-	//
-	//	@doc:
-	//		Implement Inner Index Apply
-	//
-	//---------------------------------------------------------------------------
-	class CXformImplementInnerIndexApply : public CXformImplementation
+	class CXformImplementInnerIndexApply : public CXformImplementIndexApply
+		<CLogicalInnerIndexApply, CPhysicalInnerIndexNLJoin>
 	{
 
 		private:
@@ -35,12 +23,13 @@ namespace gpopt
 			// private copy ctor
 			CXformImplementInnerIndexApply(const CXformImplementInnerIndexApply &);
 
-
 		public:
 
 			// ctor
 			explicit
-			CXformImplementInnerIndexApply(IMemoryPool *pmp);
+			CXformImplementInnerIndexApply(IMemoryPool *pmp)
+			: CXformImplementIndexApply<CLogicalInnerIndexApply, CPhysicalInnerIndexNLJoin>(pmp)
+			{}
 
 			// dtor
 			virtual
@@ -59,22 +48,6 @@ namespace gpopt
 			{
 				return "CXformImplementInnerIndexApply";
 			}
-
-
-			// compute xform promise for a given expression handle
-			virtual
-			EXformPromise Exfp
-				(
-				CExpressionHandle & // exprhdl
-				)
-				const
-			{
-				return ExfpHigh;
-			}
-
-			// actual transform
-			virtual
-			void Transform(CXformContext *pxfctxt, CXformResult *pxfres, CExpression *pexpr) const;
 
 	}; // class CXformImplementInnerIndexApply
 

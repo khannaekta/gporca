@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 //	Greenplum Database
-//	Copyright (C) 2017 Pivotal, Inc.
+//	Copyright (C) 2018 Pivotal Software, Inc.
 //
 //	Implementing Left Outer Index Apply
 //---------------------------------------------------------------------------
@@ -8,14 +8,14 @@
 #define GPOPT_CXformImplementLeftOuterIndexApply_H
 
 #include "gpos/base.h"
-#include "gpopt/xforms/CXformImplementation.h"
-
+#include "gpopt/xforms/CXformImplementIndexApply.h"
 
 namespace gpopt
 {
 	using namespace gpos;
 
-	class CXformImplementLeftOuterIndexApply : public CXformImplementation
+	class CXformImplementLeftOuterIndexApply : public CXformImplementIndexApply
+		<CLogicalLeftOuterIndexApply, CPhysicalLeftOuterIndexNLJoin>
 	{
 
 		private:
@@ -27,7 +27,9 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformImplementLeftOuterIndexApply(IMemoryPool *pmp);
+			CXformImplementLeftOuterIndexApply(IMemoryPool *pmp)
+			: CXformImplementIndexApply<CLogicalLeftOuterIndexApply, CPhysicalLeftOuterIndexNLJoin>(pmp)
+			{}
 
 			// dtor
 			virtual
@@ -46,22 +48,6 @@ namespace gpopt
 			{
 				return "CXformImplementLeftOuterIndexApply";
 			}
-
-
-			// compute xform promise for a given expression handle
-			virtual
-			EXformPromise Exfp
-				(
-				CExpressionHandle & // exprhdl
-				)
-				const
-			{
-				return ExfpHigh;
-			}
-
-			// actual transform
-			virtual
-			void Transform(CXformContext *pxfctxt, CXformResult *pxfres, CExpression *pexpr) const;
 
 	}; // class CXformImplementLeftOuterIndexApply
 
