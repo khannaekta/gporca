@@ -36,6 +36,7 @@ namespace gpopt
 				CExpression *pexprScalar
 				) const
 			{
+				GPOS_ASSERT(m_fOuterJoin);
 				TGet *popGet = TGet::PopConvert(pexprInner->Pop());
 				IMDRelation::Ereldistrpolicy ereldist = popGet->Ptabdesc()->Ereldistribution();
 
@@ -64,15 +65,15 @@ namespace gpopt
 						CExpression *pexprPred = (*pdrgpexpr)[ul];
 						CColRefSet *pcrsPred = CDrvdPropScalar::Pdpscalar(pexprPred->PdpDerive())->PcrsUsed();
 
-						// if it doesn't have equi-join predicate (including INDF) on
-						// the distribution key, we can't transform to left outer index
-						// apply, because only redistribute motion is allowed for outer
-						// child of join with hash distributed inner child.
-						// Use example R LOJ S mentioned above, consider the predicate
-						// S.a = R.a and S.a > R.b, left outer index apply is still
-						// applicable.
+						// if it doesn't have equi-join predicate on the distribution key,
+						// we can't transform to left outer index apply, because only
+						// redistribute motion is allowed for outer child of join with
+						// hash distributed inner child.
+						// consider R LOJ S (both distribute by a and have index on a)
+						// with the predicate S.a = R.a and S.a > R.b, left outer index
+						// apply is still applicable.
 						if (!pcrsPred->FDisjoint(popGet->PcrsDist()) &&
-							(CPredicateUtils::FEquality(pexprPred) || CPredicateUtils::FINDF(pexprPred)))
+							CPredicateUtils::FEquality(pexprPred))
 						{
 							pcrsEquivPredInner->Include(pcrsPred);
 						}

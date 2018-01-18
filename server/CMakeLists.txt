@@ -66,7 +66,8 @@ IDF-NotNullConstant IDF-NullConstant INDF-NotNullConstant INDF-NullConstant Null
 
 CLeftOuterIndexApplyTest:
 IndexApply-LeftOuter-NLJoin LOJ-IndexApply-MultiIndexes LOJ-IndexApply-Negative-NonEqual-Predicate
-LOJ-IndexApply-DistKey-Multiple-Predicates LOJ-IndexApply-MasterOnly-Table;
+LOJ-IndexApply-DistKey-Multiple-Predicates LOJ-IndexApply-MasterOnly-Table LOJ-IndexApply-Negative-NonDistKey
+LOJ-IndexApply-CompsiteKey-Equiv LOJ-IndexApply-CompsiteKey-NoMotion LOJ-IndexApply-MultiDistKeys-IndexKeys;
 
 CIndexScanTest:
 BTreeIndex-Against-InList BTreeIndex-Against-ScalarSubquery BitmapIndex-Against-InList
