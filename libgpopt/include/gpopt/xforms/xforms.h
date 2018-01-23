@@ -48,11 +48,10 @@
 #include "gpopt/xforms/CXformImplementAssert.h"
 
 #include "gpopt/xforms/CXformInnerJoin2NLJoin.h"
-#include "gpopt/xforms/CXformImplementInnerIndexApply.h"
+#include "gpopt/xforms/CXformImplementIndexApply.h"
 #include "gpopt/xforms/CXformInnerJoin2HashJoin.h"
 #include "gpopt/xforms/CXformPushDownLeftOuterJoin.h"
 #include "gpopt/xforms/CXformSimplifyLeftOuterJoin.h"
-#include "gpopt/xforms/CXformImplementLeftOuterIndexApply.h"
 #include "gpopt/xforms/CXformLeftOuterJoin2NLJoin.h"
 #include "gpopt/xforms/CXformLeftOuterJoin2HashJoin.h"
 #include "gpopt/xforms/CXformLeftSemiJoin2NLJoin.h"

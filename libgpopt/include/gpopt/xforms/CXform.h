@@ -98,7 +98,7 @@ namespace gpopt
 				ExfInnerJoin2DynamicIndexGetApply,
 				ExfInnerApplyWithOuterKey2InnerJoin,
 				ExfInnerJoin2NLJoin,
-				ExfImplementInnerIndexApply,
+				ExfImplementIndexApply,
 				ExfInnerJoin2HashJoin,
 				ExfInnerApply2InnerJoin,
 				ExfInnerApply2InnerJoinNoCorrelations,
@@ -214,7 +214,6 @@ namespace gpopt
 				ExfLeftOuterJoin2IndexGetApply,
 				ExfLeftOuterJoinWithInnerSelect2BitmapIndexGetApply,
 				ExfLeftOuterJoinWithInnerSelect2IndexGetApply,
-				ExfImplementLeftOuterIndexApply,
 				ExfInvalid,
 				ExfSentinel = ExfInvalid
 			};

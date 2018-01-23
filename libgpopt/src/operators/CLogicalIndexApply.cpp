@@ -64,14 +64,7 @@ CLogicalIndexApply::PxfsCandidates
 	const
 {
 	CXformSet *pxfs = GPOS_NEW(pmp) CXformSet(pmp);
-	if (m_fOuterJoin)
-	{
-		(void) pxfs->FExchangeSet(CXform::ExfImplementLeftOuterIndexApply);
-	}
-	else
-	{
-		(void) pxfs->FExchangeSet(CXform::ExfImplementInnerIndexApply);
-	}
+	(void) pxfs->FExchangeSet(CXform::ExfImplementIndexApply);
 	return pxfs;
 }
 

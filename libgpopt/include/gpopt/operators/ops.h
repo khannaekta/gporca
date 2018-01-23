@@ -87,7 +87,6 @@
 #include "gpopt/operators/CLogicalInnerCorrelatedApply.h"
 #include "gpopt/operators/CLogicalIndexApply.h"
 #include "gpopt/operators/CLogicalLeftOuterApply.h"
-//#include "gpopt/operators/CLogicalLeftOuterIndexApply.h"
 #include "gpopt/operators/CLogicalLeftOuterCorrelatedApply.h"
 #include "gpopt/operators/CLogicalLeftSemiApply.h"
 #include "gpopt/operators/CLogicalLeftSemiApplyIn.h"

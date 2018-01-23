@@ -172,7 +172,7 @@ CXformFactory::Instantiate()
 	Add(GPOS_NEW(m_pmp) CXformInnerJoin2DynamicIndexGetApply(m_pmp));
 	Add(GPOS_NEW(m_pmp) CXformInnerApplyWithOuterKey2InnerJoin(m_pmp));
 	Add(GPOS_NEW(m_pmp) CXformInnerJoin2NLJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementInnerIndexApply(m_pmp));
+	Add(GPOS_NEW(m_pmp) CXformImplementIndexApply(m_pmp));
 	Add(GPOS_NEW(m_pmp) CXformInnerJoin2HashJoin(m_pmp));
 	Add(GPOS_NEW(m_pmp) CXformInnerApply2InnerJoin(m_pmp));
 	Add(GPOS_NEW(m_pmp) CXformInnerApply2InnerJoinNoCorrelations(m_pmp));
@@ -288,8 +288,7 @@ CXformFactory::Instantiate()
 	Add(GPOS_NEW(m_pmp) CXformLeftOuterJoin2IndexGetApply(m_pmp));
 	Add(GPOS_NEW(m_pmp) CXformLeftOuterJoinWithInnerSelect2BitmapIndexGetApply(m_pmp));
 	Add(GPOS_NEW(m_pmp) CXformLeftOuterJoinWithInnerSelect2IndexGetApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementLeftOuterIndexApply(m_pmp));
-	
+
 	GPOS_ASSERT(NULL != m_rgpxf[CXform::ExfSentinel - 1] &&
 				"Not all xforms have been instantiated");
 }
