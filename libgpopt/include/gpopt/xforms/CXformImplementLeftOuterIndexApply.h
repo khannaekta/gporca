@@ -15,7 +15,7 @@ namespace gpopt
 	using namespace gpos;
 
 	class CXformImplementLeftOuterIndexApply : public CXformImplementIndexApply
-		<CLogicalLeftOuterIndexApply, CPhysicalLeftOuterIndexNLJoin>
+		<CLogicalIndexApply, CPhysicalLeftOuterIndexNLJoin>
 	{
 
 		private:
@@ -28,7 +28,7 @@ namespace gpopt
 			// ctor
 			explicit
 			CXformImplementLeftOuterIndexApply(IMemoryPool *pmp)
-			: CXformImplementIndexApply<CLogicalLeftOuterIndexApply, CPhysicalLeftOuterIndexNLJoin>(pmp)
+			: CXformImplementIndexApply<CLogicalIndexApply, CPhysicalLeftOuterIndexNLJoin>(pmp)
 			{}
 
 			// dtor

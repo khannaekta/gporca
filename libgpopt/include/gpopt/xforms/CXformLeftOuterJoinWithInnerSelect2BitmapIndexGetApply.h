@@ -18,7 +18,7 @@ namespace gpopt
 	using namespace gpos;
 
 	class CXformLeftOuterJoinWithInnerSelect2BitmapIndexGetApply : public CXformJoin2IndexApplyBase
-		<CLogicalLeftOuterJoin, CLogicalLeftOuterIndexApply, CLogicalGet,
+		<CLogicalLeftOuterJoin, CLogicalIndexApply, CLogicalGet,
 		true /*fWithSelect*/, false /*fPartial*/, IMDIndex::EmdindBitmap>
 	{
 		private:
@@ -33,7 +33,7 @@ namespace gpopt
 			explicit
 			CXformLeftOuterJoinWithInnerSelect2BitmapIndexGetApply(IMemoryPool *pmp)
 				: CXformJoin2IndexApplyBase
-				<CLogicalLeftOuterJoin, CLogicalLeftOuterIndexApply, CLogicalGet,
+				<CLogicalLeftOuterJoin, CLogicalIndexApply, CLogicalGet,
 				true /*fWithSelect*/, false /*fPartial*/, IMDIndex::EmdindBitmap>
 				(pmp)
 			{}

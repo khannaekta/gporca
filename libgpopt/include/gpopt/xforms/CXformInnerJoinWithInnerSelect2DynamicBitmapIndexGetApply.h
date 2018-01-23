@@ -36,7 +36,7 @@ namespace gpopt
 	//
 	//---------------------------------------------------------------------------
 	class CXformInnerJoinWithInnerSelect2DynamicBitmapIndexGetApply : public CXformJoin2IndexApplyBase
-		<CLogicalInnerJoin, CLogicalInnerIndexApply, CLogicalDynamicGet,
+		<CLogicalInnerJoin, CLogicalIndexApply, CLogicalDynamicGet,
 		true /*fWithSelect*/, false /*fPartial*/, IMDIndex::EmdindBitmap>
 	{
 		private:
@@ -51,7 +51,7 @@ namespace gpopt
 			explicit
 			CXformInnerJoinWithInnerSelect2DynamicBitmapIndexGetApply(IMemoryPool *pmp)
 				: CXformJoin2IndexApplyBase
-				 <CLogicalInnerJoin, CLogicalInnerIndexApply, CLogicalDynamicGet,
+				 <CLogicalInnerJoin, CLogicalIndexApply, CLogicalDynamicGet,
 				 true /*fWithSelect*/, false /*fPartial*/, IMDIndex::EmdindBitmap>
 				(pmp)
 			{}

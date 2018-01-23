@@ -109,7 +109,7 @@ namespace gpopt
 				DrgPcr *pdrgpcr
 				) const
 			{
-				return GPOS_NEW(pmp) TApply(pmp, pdrgpcr);
+				return GPOS_NEW(pmp) TApply(pmp, pdrgpcr, m_fOuterJoin);
 			}
 
 		public:

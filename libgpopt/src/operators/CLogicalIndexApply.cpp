@@ -72,7 +72,6 @@ CLogicalIndexApply::PxfsCandidates
 	{
 		(void) pxfs->FExchangeSet(CXform::ExfImplementInnerIndexApply);
 	}
-
 	return pxfs;
 }
 
@@ -119,6 +118,20 @@ CLogicalIndexApply::PstatsDerive
 	pdrgpstat->Release();
 
 	return pstats;
+}
+
+// return a copy of the operator with remapped columns
+COperator *
+CLogicalIndexApply::PopCopyWithRemappedColumns
+(
+	IMemoryPool *pmp,
+	HMUlCr *phmulcr,
+	BOOL fMustExist
+	)
+{
+	DrgPcr *pdrgpcr = CUtils::PdrgpcrRemap(pmp, m_pdrgpcrOuterRefs, phmulcr, fMustExist);
+
+	return GPOS_NEW(pmp) CLogicalIndexApply(pmp, pdrgpcr, m_fOuterJoin);
 }
 
 // EOF

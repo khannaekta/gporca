@@ -19,7 +19,6 @@ namespace gpopt
 
 	class CLogicalIndexApply : public CLogicalApply
 	{
-
 		private:
 
 			// private copy ctor
@@ -48,16 +47,32 @@ namespace gpopt
 
 			// ident accessors
 			virtual
-			EOperatorId Eopid() const = 0;
+			EOperatorId Eopid() const
+			{
+				return EopLogicalIndexApply;
+			}
 
 			// return a string for operator name
 			virtual
-			const CHAR *SzId() const = 0;
+			const CHAR *SzId() const
+			{
+				return "CLogicalIndexApply";
+			}
 
 			// outer column references accessor
 			DrgPcr *PdrgPcrOuterRefs() const
 			{
 				return m_pdrgpcrOuterRefs;
+			}
+
+			// return true if we can pull projections up past this operator from its given child
+			virtual
+			BOOL FCanPullProjectionsUp
+			(
+			 ULONG ulChildIndex
+			 ) const
+			{
+				return (0 == ulChildIndex);
 			}
 
 			//-------------------------------------------------------------------------------------
@@ -134,7 +149,7 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist) = 0;
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist);
 
 			// conversion function
 			static
@@ -144,7 +159,7 @@ namespace gpopt
 				)
 			{
 				GPOS_ASSERT(NULL != pop);
-				GPOS_ASSERT(EopLogicalLeftOuterIndexApply == pop->Eopid() || EopLogicalInnerIndexApply == pop->Eopid());
+				GPOS_ASSERT(EopLogicalIndexApply == pop->Eopid());
 
 				return dynamic_cast<CLogicalIndexApply*>(pop);
 			}
