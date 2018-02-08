@@ -12,6 +12,7 @@
 #include "gpos/base.h"
 #include "gpopt/base/CDistributionSpecReplicated.h"
 #include "gpopt/base/CDistributionSpecNonSingleton.h"
+#include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/base/CUtils.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
@@ -90,6 +91,7 @@ CPhysicalInnerNLJoin::PdsRequired
 	GPOS_ASSERT(2 > ulChildIndex);
 	GPOS_ASSERT(ulOptReq < UlDistrRequests());
 
+	
 	// if expression has to execute on master then we need a gather
 	if (exprhdl.FMasterOnly())
 	{
@@ -114,6 +116,41 @@ CPhysicalInnerNLJoin::PdsRequired
 
 	if (0 == ulChildIndex)
 	{
+		CExpression *pexprScPredicate = exprhdl.PexprScalarChild(2);
+		// requesting distribution spec on the equality predicate key
+		if (CPredicateUtils::FEquality(pexprScPredicate))
+		{
+			CColRefSet *pcrsScPredCols = CDrvdPropScalar::Pdpscalar(pexprScPredicate->PdpDerive())->PcrsUsed();
+			CColRefSet *pcrsOuter =  exprhdl.Pdprel(0)->PcrsOutput();
+			
+			// creating copy to perform bitset operations on
+			CColRefSet *pcrsCopyOuter = GPOS_NEW(pmp) CColRefSet(pmp, *pcrsOuter);
+			
+			pcrsCopyOuter->Intersection(pcrsScPredCols);
+			
+			CDistributionSpecHashed *pdsRequested = NULL;
+			if (pcrsCopyOuter->CElements() > 0)
+			{
+				DrgPexpr *pdrgpexpr = GPOS_NEW(pmp) DrgPexpr(pmp);
+				CColRefSet *pcrsScPredLeftChild = CDrvdPropScalar::Pdpscalar((*pexprScPredicate)[0]->PdpDerive())->PcrsUsed();
+				ULONG ulIndex = 0;
+
+				if (!pcrsCopyOuter->FSubset(pcrsScPredLeftChild))
+					ulIndex = 1;
+
+				CExpression *pexprChild = (*pexprScPredicate)[ulIndex];
+
+				pexprChild->AddRef();
+				pdrgpexpr->Append(pexprChild);
+
+				pdsRequested = GPOS_NEW(pmp) CDistributionSpecHashed(pdrgpexpr, true);
+			}
+			pcrsCopyOuter->Release();
+			
+			if (pdsRequested != NULL)
+				return pdsRequested;
+
+		}
 		return GPOS_NEW(pmp) CDistributionSpecReplicated();
 	}
 
@@ -125,6 +162,40 @@ CPhysicalInnerNLJoin::PdsRequired
 		return GPOS_NEW(pmp) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
 	}
 
+	if (CDistributionSpec::EdtHashed == pdsOuter->Edt())
+	{
+		// first child is hash distributed, request second child to be Hash distributed too
+		CExpression *pexprScPredicate = exprhdl.PexprScalarChild(2);
+		
+		CColRefSet *pcrsOuterHashedCols = pdsOuter->PcrsUsed(pmp);
+		CColRefSet *pcrsScPredCols = CDrvdPropScalar::Pdpscalar(pexprScPredicate->PdpDerive())->PcrsUsed();
+		
+		CColRefSet *pcrsCopyScPredCols = GPOS_NEW(pmp) CColRefSet(pmp, *pcrsScPredCols);
+		
+		pcrsCopyScPredCols->Exclude(pcrsOuterHashedCols);
+		if(pcrsCopyScPredCols->CElements() > 0)
+		{
+			ULONG ulIndex = 0;
+			DrgPexpr *pdrgpexpr = GPOS_NEW(pmp) DrgPexpr(pmp);
+			CColRefSet *pcrsScPredLeftChild = CDrvdPropScalar::Pdpscalar((*pexprScPredicate)[0]->PdpDerive())->PcrsUsed();
+
+			if (!pcrsScPredLeftChild->FSubset(pcrsScPredCols))
+				ulIndex = 1;
+			
+			CExpression *pexprChild = (*pexprScPredicate)[ulIndex];
+			
+			pexprChild->AddRef();
+			pdrgpexpr->Append(pexprChild);
+			
+			CDistributionSpecHashed *pds = GPOS_NEW(pmp) CDistributionSpecHashed(pdrgpexpr, true);
+			
+			pcrsCopyScPredCols->Release();
+			pcrsOuterHashedCols->Release();
+			return pds;
+		}
+		pcrsCopyScPredCols->Release();
+		pcrsOuterHashedCols->Release();
+	}
 	return GPOS_NEW(pmp) CDistributionSpecNonSingleton();
 }
 
