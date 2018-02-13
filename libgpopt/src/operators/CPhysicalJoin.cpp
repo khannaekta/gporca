@@ -325,6 +325,43 @@ CPhysicalJoin::PdsRequired
 			// require inner child to have matching singleton distribution
 			return CPhysical::PdssMatching(pmp, CDistributionSpecSingleton::PdssConvert(pdsOuter));
 		}
+		
+		if (exprhdl.Pop()->Eopid() == COperator::EopPhysicalInnerNLJoin && CDistributionSpec::EdtHashed == pdsOuter->Edt())
+		{
+			// first child is hash distributed, request second child to be Hash distributed too
+			CExpression *pexprScPredicate = exprhdl.PexprScalarChild(2);
+			if (CPredicateUtils::FEquality(pexprScPredicate))
+			{
+				CColRefSet *pcrsOuterHashedCols = pdsOuter->PcrsUsed(pmp);
+				CColRefSet *pcrsScPredCols = CDrvdPropScalar::Pdpscalar(pexprScPredicate->PdpDerive())->PcrsUsed();
+				
+				CColRefSet *pcrsCopyScPredCols = GPOS_NEW(pmp) CColRefSet(pmp, *pcrsScPredCols);
+				
+				pcrsCopyScPredCols->Exclude(pcrsOuterHashedCols);
+				if(pcrsCopyScPredCols->CElements() > 0)
+				{
+					ULONG ulIndex = 0;
+					DrgPexpr *pdrgpexpr = GPOS_NEW(pmp) DrgPexpr(pmp);
+					CColRefSet *pcrsScPredLeftChild = CDrvdPropScalar::Pdpscalar((*pexprScPredicate)[0]->PdpDerive())->PcrsUsed();
+					
+					if (!pcrsScPredLeftChild->FSubset(pcrsScPredCols))
+						ulIndex = 1;
+					
+					CExpression *pexprChild = (*pexprScPredicate)[ulIndex];
+					
+					pexprChild->AddRef();
+					pdrgpexpr->Append(pexprChild);
+					
+					CDistributionSpecHashed *pds = GPOS_NEW(pmp) CDistributionSpecHashed(pdrgpexpr, true);
+					
+					pcrsCopyScPredCols->Release();
+					pcrsOuterHashedCols->Release();
+					return pds;
+				}
+				pcrsCopyScPredCols->Release();
+				pcrsOuterHashedCols->Release();
+			}
+		}
 
 		// otherwise, require inner child to be replicated
 		return GPOS_NEW(pmp) CDistributionSpecReplicated();

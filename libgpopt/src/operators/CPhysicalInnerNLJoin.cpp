@@ -12,6 +12,7 @@
 #include "gpos/base.h"
 #include "gpopt/base/CDistributionSpecReplicated.h"
 #include "gpopt/base/CDistributionSpecNonSingleton.h"
+#include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/base/CUtils.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
@@ -90,6 +91,7 @@ CPhysicalInnerNLJoin::PdsRequired
 	GPOS_ASSERT(2 > ulChildIndex);
 	GPOS_ASSERT(ulOptReq < UlDistrRequests());
 
+	
 	// if expression has to execute on master then we need a gather
 	if (exprhdl.FMasterOnly())
 	{
