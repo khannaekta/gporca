@@ -1238,8 +1238,7 @@ CUtils::FPhysicalInnerJoin
 {
 	GPOS_ASSERT(NULL != pop);
 
-	return 	COperator::EopPhysicalInnerNLJoin == pop->Eopid() ||
-		COperator::EopPhysicalInnerIndexNLJoin == pop->Eopid() ||
+	return COperator::EopPhysicalInnerIndexNLJoin == pop->Eopid() ||
 		COperator::EopPhysicalInnerHashJoin == pop->Eopid() ||
 		COperator::EopPhysicalCorrelatedInnerNLJoin == pop->Eopid();
 }
