@@ -1229,20 +1229,6 @@ CUtils::FPhysicalJoin
 	return FHashJoin(pop) || FNLJoin(pop);
 }
 
-// check if a given operator is a physical inner join
-BOOL
-CUtils::FPhysicalInnerJoin
-	(
-	COperator *pop
-	)
-{
-	GPOS_ASSERT(NULL != pop);
-
-	return COperator::EopPhysicalInnerIndexNLJoin == pop->Eopid() ||
-		COperator::EopPhysicalInnerHashJoin == pop->Eopid() ||
-		COperator::EopPhysicalCorrelatedInnerNLJoin == pop->Eopid();
-}
-
 // check if a given operator is a physical outer join
 BOOL
 CUtils::FPhysicalOuterJoin
@@ -5163,6 +5149,58 @@ CUtils::FCrossJoin
 			fCrossJoin = true;
 	}
 	return fCrossJoin;
+}
+
+// search the given array of predicates for an equality predicate
+// that has one side equal to the given expression,
+// if found, return the other side of equality, otherwise return NULL
+CExpression *
+CUtils::PexprMatchEqualitySide
+	(
+	CExpression *pexprToMatch,
+	DrgPexpr *pdrgpexpr // array of predicates to inspect
+	)
+{
+	GPOS_ASSERT(NULL != pexprToMatch);
+	GPOS_ASSERT(NULL != pdrgpexpr);
+
+	CExpression *pexprMatching = NULL;
+	const ULONG ulSize = pdrgpexpr->UlLength();
+	for (ULONG ul = 0; ul < ulSize; ul++)
+	{
+		CExpression *pexprPred = (*pdrgpexpr)[ul];
+		if (!CPredicateUtils::FEquality(pexprPred))
+		{
+			continue;
+		}
+
+		// extract equality sides
+		CExpression *pexprPredOuter = (*pexprPred)[0];
+		CExpression *pexprPredInner = (*pexprPred)[1];
+
+		IMDId *pmdidTypeOuter = CScalar::PopConvert(pexprPredOuter->Pop())->PmdidType();
+		IMDId *pmdidTypeInner = CScalar::PopConvert(pexprPredInner->Pop())->PmdidType();
+		if (!pmdidTypeOuter->FEquals(pmdidTypeInner))
+		{
+			// only consider equality of identical types
+			continue;
+		}
+
+		pexprToMatch = CCastUtils::PexprWithoutBinaryCoercibleCasts(pexprToMatch);
+		if (CUtils::FEqual(CCastUtils::PexprWithoutBinaryCoercibleCasts(pexprPredOuter), pexprToMatch))
+		{
+			pexprMatching = pexprPredInner;
+			break;
+		}
+
+		if (CUtils::FEqual(CCastUtils::PexprWithoutBinaryCoercibleCasts(pexprPredInner), pexprToMatch))
+		{
+			pexprMatching = pexprPredOuter;
+			break;
+		}
+	}
+
+	return pexprMatching;
 }
 
 // EOF

@@ -597,10 +597,6 @@ namespace gpopt
 			static
 			BOOL FPhysicalJoin(COperator *pop);
 
-			// check if a given operator is a physical inner join
-			static
-			BOOL FPhysicalInnerJoin(COperator *pop);
-
 			// check if a given operator is a physical outer join
 			static
 			BOOL FPhysicalOuterJoin(COperator *pop);
@@ -1082,6 +1078,12 @@ namespace gpopt
 			// return true if the given expression is a cross join
 			static
 			BOOL FCrossJoin(CExpression *pexpr);
+
+			// search the given array of predicates for an equality predicate that has
+			// one side equal to given expression
+			static
+			CExpression *PexprMatchEqualitySide(CExpression *pexprToMatch, DrgPexpr *pdrgpexpr);
+
 	}; // class CUtils
 
 	// hash set from expressions
