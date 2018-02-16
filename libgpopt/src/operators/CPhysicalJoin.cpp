@@ -353,6 +353,7 @@ CPhysicalJoin::PdsDerive
 {
 	CDistributionSpec *pdsOuter = exprhdl.Pdpplan(0 /*ulChildIndex*/)->Pds();
 	CDistributionSpec *pdsInner = exprhdl.Pdpplan(1 /*ulChildIndex*/)->Pds();
+	COperator *pop = exprhdl.Pop();
 
 	if (CDistributionSpec::EdtReplicated == pdsOuter->Edt() ||
 		CDistributionSpec::EdtUniversal == pdsOuter->Edt())
@@ -362,22 +363,33 @@ CPhysicalJoin::PdsDerive
 		return pdsInner;
 	}
 	else if (CDistributionSpec::EdtHashed == pdsOuter->Edt() &&
-			CDistributionSpec::EdtHashed == pdsInner->Edt() &&
-			(CUtils::FPhysicalInnerJoin(exprhdl.Pop()) || CUtils::FPhysicalOuterJoin(exprhdl.Pop())))
+			 CDistributionSpec::EdtHashed == pdsInner->Edt() &&
+			 (COperator::EopPhysicalInnerIndexNLJoin == pop->Eopid() ||
+			  COperator::EopPhysicalInnerHashJoin == pop->Eopid() ||
+			  COperator::EopPhysicalCorrelatedInnerNLJoin == pop->Eopid() ||
+			  CUtils::FPhysicalOuterJoin(pop)
+			 ))
 	{
 		// If both inner and outer children are hash distributed or
 		// redistributed by the join key, and the join is a inner join
-		// or outer join, set the outer's distribution spec as inner's
-		// equiv hashed distribution spec, and return inner's
-		// distribution spec. This is pretty useful for such case
-		// 'R left join S on R.a = S.a left join T on T.a = S.a'
-		// (R, S, T are distributed by a). Without equiv hashed spec,
-		// Orca will assume (R left join S) is hash distributed by R.a,
-		// ignores the facts that it is also distributed by S.a, and
-		// request a redistribute motion on S.a, which is redundant.
-		// With the equiv hashed spec set for inner distribution, Orca
-		// will know that the equivclass has the same distribution
-		// spec during distribution spec matching.
+		// (except CPhysicalInnerNLJoin) or outer join, set the outer's
+		// distribution spec as inner's equiv hashed distribution spec,
+		// and return inner's distribution spec. This is pretty useful
+		// for such case 'R left join S on R.a = S.a left join T on T.a
+		// = S.a' (R, S, T are distributed by a). Without equiv hashed
+		// spec, Orca will assume (R left join S) is hash distributed
+		// by R.a, ignores the facts that it is also distributed by
+		// S.a, and request a redistribute motion on S.a, which is
+		// redundant.  With the equiv hashed spec set for inner
+		// distribution, Orca will know that the equivclass has the
+		// same distribution spec during distribution spec matching.
+		// CPhysicalInnerNLJoin is an exception since we never
+		// initialize equivalent hashed distribution(m_pdshashedEquiv)
+		// ever for inner (refer CPhysicalInnerNLJoin::PdsRequired). So
+		// for R InnerNLJoin S we set S's(m_pdshashedEquiv) to R's
+		// distribution spec and vice-versa for the commutative
+		// alternative. This leads to an infinite-recursion in
+		// CDistributionSpecHashed::FSatisfies().
 		CDistributionSpecHashed *pdsOuterHashed = CDistributionSpecHashed::PdsConvert(pdsOuter);
 		CDistributionSpecHashed *pdsInnerHashed = CDistributionSpecHashed::PdsConvert(pdsInner);
 		pdsInnerHashed->SetHashedEquiv(pdsOuterHashed);

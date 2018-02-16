@@ -33,15 +33,6 @@ namespace gpopt
 			// private copy ctor
 			CPhysicalInnerNLJoin(const CPhysicalInnerNLJoin &);
 
-			// search the given array of predicates for an equality predicate that has
-			// one side equal to given expression
-			static
-			CExpression *PexprMatchEqualitySide
-			(
-			 CExpression *pexprToMatch,
-			 DrgPexpr *pdrgpexpr // array of predicates to inspect
-			);
-
 		public:
 		
 			// ctor
