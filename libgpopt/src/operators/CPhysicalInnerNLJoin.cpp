@@ -132,7 +132,7 @@ CPhysicalInnerNLJoin::PdsRequired
 					CExpression *pexpr = (*pdrgpexprHashed)[ul];
 					// get matching expression from predicate for the corresponding outer child
 					// to create CDistributionSpecHashed for inner child
-					CExpression *pexprMatching = PexprMatchEqualitySide(pexpr, pdrgpexpr);
+					CExpression *pexprMatching = CUtils::PexprMatchEqualitySide(pexpr, pdrgpexpr);
 					fSuccess = (NULL != pexprMatching);
 					if (fSuccess)
 					{
@@ -173,58 +173,6 @@ CPhysicalInnerNLJoin::PdsRequired
 	}
 
 	return GPOS_NEW(pmp) CDistributionSpecNonSingleton();
-}
-
-// search the given array of predicates for an equality predicate
-// that has one side equal to the given expression,
-// if found, return the other side of equality, otherwise return NULL
-CExpression *
-CPhysicalInnerNLJoin::PexprMatchEqualitySide
-(
-	CExpression *pexprToMatch,
-	DrgPexpr *pdrgpexpr // array of predicates to inspect
-)
-{
-	GPOS_ASSERT(NULL != pexprToMatch);
-	GPOS_ASSERT(NULL != pdrgpexpr);
-
-	CExpression *pexprMatching = NULL;
-	const ULONG ulSize = pdrgpexpr->UlLength();
-	for (ULONG ul = 0; ul < ulSize; ul++)
-	{
-		CExpression *pexprPred = (*pdrgpexpr)[ul];
-		if (!CPredicateUtils::FEquality(pexprPred))
-		{
-			continue;
-		}
-
-		// extract equality sides
-		CExpression *pexprPredOuter = (*pexprPred)[0];
-		CExpression *pexprPredInner = (*pexprPred)[1];
-
-		IMDId *pmdidTypeOuter = CScalar::PopConvert(pexprPredOuter->Pop())->PmdidType();
-		IMDId *pmdidTypeInner = CScalar::PopConvert(pexprPredInner->Pop())->PmdidType();
-		if (!pmdidTypeOuter->FEquals(pmdidTypeInner))
-		{
-			// only consider equality of identical types
-			continue;
-		}
-
-		pexprToMatch = CCastUtils::PexprWithoutBinaryCoercibleCasts(pexprToMatch);
-		if (CUtils::FEqual(CCastUtils::PexprWithoutBinaryCoercibleCasts(pexprPredOuter), pexprToMatch))
-		{
-			pexprMatching = pexprPredInner;
-			break;
-		}
-
-		if (CUtils::FEqual(CCastUtils::PexprWithoutBinaryCoercibleCasts(pexprPredInner), pexprToMatch))
-		{
-			pexprMatching = pexprPredOuter;
-			break;
-		}
-	}
-
-	return pexprMatching;
 }
 
 // EOF
