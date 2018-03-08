@@ -40,7 +40,7 @@ CJoinCardinalityTest::EresUnittest()
 		{
 		GPOS_UNITTEST_FUNC(CJoinCardinalityTest::EresUnittest_Join),
 		GPOS_UNITTEST_FUNC(CJoinCardinalityTest::EresUnittest_JoinNDVRemain),
-		GPOS_UNITTEST_FUNC(CJoinCardinalityTest::EresUnittest_CStatisticsJoinCard),
+//		GPOS_UNITTEST_FUNC(CJoinCardinalityTest::EresUnittest_CStatisticsJoinCard),
 		};
 
 	// run tests with shared optimization context first

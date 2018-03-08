@@ -585,14 +585,25 @@ CStatistics::PstatsJoinDriver
 		}
 		else
 		{
-			JoinHistogramsWithUnsupported(
-										  pstatsjoin,
-											   phist1,
-											   phist2,
-											   DRows(),
-											   pstatsOther->DRows(),
-											   &dScaleFactorLocal,
-											   fEmptyInput);
+			JoinHistogramsWithUnsupported(pstatsjoin,
+										  phist1,
+										  phist2,
+										  DRows(),
+										  pstatsOther->DRows(),
+										  &dScaleFactorLocal,
+										  fEmptyInput);
+//			phist1After = GPOS_NEW(pmp) CHistogram(GPOS_NEW(pmp) DrgPbucket(pmp));
+//			phist1After = phist1->PhistCopy(pmp);
+//			phist2After = GPOS_NEW(pmp) CHistogram(GPOS_NEW(pmp) DrgPbucket(pmp));;
+//			phist2After = phist2->PhistCopy(pmp);
+			CStatisticsUtils::AddHistogram(pmp, ulColId1, phist1, phmulhistJoin);
+			if (!fSemiJoin)
+			{
+				CStatisticsUtils::AddHistogram(pmp, ulColId2, phist2, phmulhistJoin);
+			}
+			
+//			GPOS_DELETE(phist1After);
+//			GPOS_DELETE(phist2After);
 		}
 
 		// need to add an unsupported stats object to the array of stats objects
@@ -1193,15 +1204,15 @@ CStatistics::JoinHistograms
 // helper for joining histograms
 void
 CStatistics::JoinHistogramsWithUnsupported
-		(
-				CStatsPredJoin *pstatsjoin,
-				CHistogram *phist1,
-				CHistogram *phist2,
-				CDouble dRows1,
-				CDouble dRows2,
-				CDouble *pdScaleFactor, // output: scale factor based on the join
-				BOOL fEmptyInput
-		)
+	(
+	CStatsPredJoin *pstatsjoin,
+	CHistogram *phist1,
+	CHistogram *phist2,
+	CDouble dRows1,
+	CDouble dRows2,
+	CDouble *pdScaleFactor, // output: scale factor based on the join
+	BOOL fEmptyInput
+	)
 {
 	GPOS_ASSERT(NULL != pstatsjoin);
 	GPOS_ASSERT(NULL != pdScaleFactor);
@@ -1241,7 +1252,6 @@ CStatistics::JoinHistogramsWithUnsupported
 	CDouble dCartesianProduct = dRows1 * dRows2;
 	// bound scale factor by cross product
 	*pdScaleFactor = std::min((*pdScaleFactor).DVal(), dCartesianProduct.DVal());
-
 }
 
 

@@ -387,24 +387,30 @@ CStatsPredUtils::FindExprWithOperatorId(CExpression *pexpr, COperator::EOperator
 	{
 		return pexpr;
 	}
-	for (ULONG ul = 0; ul < pexpr->UlArity(); ul++)
+	int counter = 0;
+	CExpression *pexprScIdent = NULL;
+	for (ULONG ul = 0; ul < pexpr->UlArity() && counter<2 ; ul++)
 	{
 		CExpression *pexprChild = (*pexpr)[ul];
 		if (pexprChild->Pop()->Eopid() == eopid)
 		{
-			return pexprChild;
+			counter++;
+			pexprScIdent = pexprChild;
 		}
 		else
 		{
 			CExpression *pexprResult = FindExprWithOperatorId(pexprChild, eopid);
 			if (pexprResult != NULL)
 			{
-				return pexprResult;
+				pexprScIdent = pexprResult;
 			}
 		}
 	}
 
-	return NULL;
+	if (counter < 2)
+		return pexprScIdent;
+	else
+		return NULL;
 }
 
 BOOL
@@ -440,6 +446,11 @@ CStatsPredUtils::FCmpColsIgnoreCastUnsupported
 	pexprRight = (*pexpr)[1];
 	CExpression *rightScalarIdent = FindExprWithOperatorId(pexprRight, COperator::EopScalarIdent);
 
+	if (NULL == leftScalarIdent || NULL == rightScalarIdent)
+	{
+		// failed to extract a scalar ident
+		return false;
+	}
 
 	(*ppcrLeft) = CCastUtils::PcrExtractFromScIdOrCastScId(leftScalarIdent);
 	(*ppcrRight) = CCastUtils::PcrExtractFromScIdOrCastScId(rightScalarIdent);
@@ -1172,7 +1183,21 @@ CStatsPredUtils::PstatsjoinExtract
 	{
 		BOOL fCheck = FCmpColsIgnoreCastUnsupported(pexprJoinPred, &pcrLeft, &escmpt, &pcrRight);
 		if(fCheck)
-			return GPOS_NEW(pmp) CStatsPredJoin(pcrLeft->UlId(), escmpt, pcrRight->UlId(), true);
+		{
+			ULONG ulIndexLeft = CUtils::UlPcrIndexContainingSet(pdrgpcrsOutput, pcrLeft);
+			ULONG ulIndexRight = CUtils::UlPcrIndexContainingSet(pdrgpcrsOutput, pcrRight);
+			
+			if (ULONG_MAX != ulIndexLeft && ULONG_MAX != ulIndexRight && ulIndexLeft != ulIndexRight)
+			{
+				if (ulIndexLeft < ulIndexRight)
+				{
+					return GPOS_NEW(pmp) CStatsPredJoin(pcrLeft->UlId(), escmpt, pcrRight->UlId());
+				}
+				
+				return GPOS_NEW(pmp) CStatsPredJoin(pcrRight->UlId(), escmpt, pcrLeft->UlId());
+			}
+		}
+//			return GPOS_NEW(pmp) CStatsPredJoin(pcrLeft->UlId(), escmpt, pcrRight->UlId(), true);
 	}
 
 	if (CColRefSet::FCovered(pdrgpcrsOutput, pcrsUsed))
