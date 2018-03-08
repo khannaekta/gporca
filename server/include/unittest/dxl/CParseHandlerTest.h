@@ -76,11 +76,13 @@ namespace gpdxl
 			// test parsing and serializing of metadata
 			static 
 			GPOS_RESULT EresParseAndSerializeMetadata(IMemoryPool *, const CHAR *, BOOL fValidate);
-			
+
 			// test parsing and serializing of metadata requests
 			static 
 			GPOS_RESULT EresParseAndSerializeMDRequest(IMemoryPool *, const CHAR *, BOOL fValidate);
-			
+		static
+		GPOS_RESULT EresParseAndSerializeOptimizerConfig(IMemoryPool *, const CHAR *, BOOL fValidate);
+
 			// test parsing and serializing of stats
 			static 
 			GPOS_RESULT EresParseAndSerializeStatistics(IMemoryPool *, const CHAR *, BOOL fValidate);
@@ -112,6 +114,8 @@ namespace gpdxl
 			// run medata tests
 			static 
 			GPOS_RESULT EresUnittest_Metadata();
+		static
+		GPOS_RESULT EresUnittest_OptimizerConfig();
 			
 			// run MD request test
 			static 

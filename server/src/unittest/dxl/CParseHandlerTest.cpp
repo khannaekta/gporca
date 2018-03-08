@@ -187,6 +187,7 @@ CParseHandlerTest::EresUnittest()
 		GPOS_UNITTEST_FUNC(CParseHandlerTest::EresUnittest_Statistics),
 		GPOS_UNITTEST_FUNC(CParseHandlerTest::EresUnittest_Metadata),
 		GPOS_UNITTEST_FUNC(CParseHandlerTest::EresUnittest_MDRequest),
+			GPOS_UNITTEST_FUNC(CParseHandlerTest::EresUnittest_OptimizerConfig),
 		GPOS_UNITTEST_FUNC(CParseHandlerTest::EresUnittest_RunPlanTests),
 		// tests involving dxl representation of queries.
 		GPOS_UNITTEST_FUNC(CParseHandlerTest::EresUnittest_RunQueryTests),
@@ -277,6 +278,15 @@ CParseHandlerTest::EresUnittest_MDRequest()
 	return EresParseAndSerializeMDRequest(pmp, m_szMDRequestFile, false /* fvalidate */);
 }
 
+GPOS_RESULT
+CParseHandlerTest::EresUnittest_OptimizerConfig()
+{
+	// create own memory pool
+	CAutoMemoryPool amp;
+	IMemoryPool *pmp = amp.Pmp();
+
+	return EresParseAndSerializeOptimizerConfig(pmp, "../data/dxl/parse_tests/OptimizerConfig.xml",false /* fvalidate */);
+}
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -673,6 +683,50 @@ CParseHandlerTest::EresParseAndSerializeMDRequest
 	return GPOS_OK;
 }
 
+GPOS_RESULT
+CParseHandlerTest::EresParseAndSerializeOptimizerConfig
+(
+	IMemoryPool *pmp,
+	const CHAR *szDXLFileName,
+	BOOL fValidate
+	)
+{
+	CWStringDynamic str(pmp);
+	COstreamString oss(&str);
+
+	// read DXL file
+	CHAR *szDXL = CDXLUtils::SzRead(pmp, szDXLFileName);
+
+	GPOS_CHECK_ABORT;
+
+	// parse the mdid objects into a dynamic array
+	const CHAR *szValidationPath = NULL;
+
+	if (fValidate)
+	{
+		szValidationPath = CTestUtils::m_szXSDPath;
+	}
+
+	COptimizerConfig *pmdr = CDXLUtils::PoptimizerConfigParseDXL(pmp, szDXL, szValidationPath);
+
+	GPOS_ASSERT(NULL != pmdr);
+
+	GPOS_CHECK_ABORT;
+
+	CDXLUtils::SerializeOptimizerConfig(pmp, oss, pmdr, true /*fIndent*/);
+
+	GPOS_CHECK_ABORT;
+
+	CWStringDynamic strExpected(pmp);
+	strExpected.AppendFormat(GPOS_WSZ_LIT("%s"), szDXL);
+
+	GPOS_ASSERT(strExpected.FEquals(&str));
+
+	//pmdr->Release();
+	GPOS_DELETE_ARRAY(szDXL);
+
+	return GPOS_OK;
+}
 //---------------------------------------------------------------------------
 //	@function:
 //		CParseHandlerTest::EresParseAndSerializeStatistics
