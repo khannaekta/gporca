@@ -9,7 +9,7 @@
 //		Class for representing DXL oid datum
 //
 //	@owner:
-//		
+//
 //
 //	@test:
 //
@@ -38,63 +38,52 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLDatumOid : public CDXLDatum
 	{
-		private:
-			// oid value
-			OID m_oidVal;
+	private:
+		// oid value
+		OID m_oid_val;
 
-			// private copy ctor
-			CDXLDatumOid(const CDXLDatumOid &);
+		// private copy ctor
+		CDXLDatumOid(const CDXLDatumOid &);
 
-		public:
-			// ctor
-			CDXLDatumOid
-				(
-				IMemoryPool *pmp,
-				IMDId *pmdidType,
-				BOOL fNull,
-				OID oidVal
-				);
+	public:
+		// ctor
+		CDXLDatumOid(IMemoryPool *mp, IMDId *mdid_type, BOOL is_null, OID oid_val);
 
-			// dtor
-			virtual
-			~CDXLDatumOid(){};
+		// dtor
+		virtual ~CDXLDatumOid(){};
 
-			// accessor of oid value
-			OID OidValue() const;
+		// accessor of oid value
+		OID OidValue() const;
 
-			// serialize the datum as the given element
-			virtual
-			void Serialize(CXMLSerializer *pxmlser);
+		// serialize the datum as the given element
+		virtual void Serialize(CXMLSerializer *xml_serializer);
 
-			// datum type
-			virtual
-			EdxldatumType Edxldt() const
-			{
-				return CDXLDatum::EdxldatumOid;
-			}
+		// datum type
+		virtual EdxldatumType
+		GetDatumType() const
+		{
+			return CDXLDatum::EdxldatumOid;
+		}
 
-			// is type passed by value
-			virtual
-			BOOL FByValue() const
-			{
-				return true;
-			}
+		// is type passed by value
+		virtual BOOL
+		IsPassedByValue() const
+		{
+			return true;
+		}
 
-			// conversion function
-			static
-			CDXLDatumOid *PdxldatumConvert
-				(
-				CDXLDatum *pdxldatum
-				)
-			{
-				GPOS_ASSERT(NULL != pdxldatum);
-				GPOS_ASSERT(CDXLDatum::EdxldatumOid == pdxldatum->Edxldt());
+		// conversion function
+		static CDXLDatumOid *
+		Cast(CDXLDatum *dxl_datum)
+		{
+			GPOS_ASSERT(NULL != dxl_datum);
+			GPOS_ASSERT(CDXLDatum::EdxldatumOid == dxl_datum->GetDatumType());
 
-				return dynamic_cast<CDXLDatumOid*>(pdxldatum);
-			}
+			return dynamic_cast<CDXLDatumOid *>(dxl_datum);
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLDatumOid_H
+#endif  // !GPDXL_CDXLDatumOid_H
 
 // EOF

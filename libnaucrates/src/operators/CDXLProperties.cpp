@@ -22,10 +22,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLProperties::CDXLProperties()
-	:
-	m_pdxlstatsderrel(NULL)
-{}
+CDXLProperties::CDXLProperties() : m_dxl_stats_derived_relation(NULL)
+{
+}
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -37,7 +36,7 @@ CDXLProperties::CDXLProperties()
 //---------------------------------------------------------------------------
 CDXLProperties::~CDXLProperties()
 {
-	CRefCount::SafeRelease(m_pdxlstatsderrel);
+	CRefCount::SafeRelease(m_dxl_stats_derived_relation);
 }
 
 //---------------------------------------------------------------------------
@@ -49,29 +48,26 @@ CDXLProperties::~CDXLProperties()
 //
 //---------------------------------------------------------------------------
 void
-CDXLProperties::SetStats
-	(
-	CDXLStatsDerivedRelation *pdxlstatsderrel
-	)
+CDXLProperties::SetStats(CDXLStatsDerivedRelation *dxl_stats_derived_relation)
 {
 	// allow setting properties only once
-	GPOS_ASSERT(NULL == m_pdxlstatsderrel);
-	GPOS_ASSERT(NULL != pdxlstatsderrel);
-	m_pdxlstatsderrel = pdxlstatsderrel;
+	GPOS_ASSERT(NULL == m_dxl_stats_derived_relation);
+	GPOS_ASSERT(NULL != dxl_stats_derived_relation);
+	m_dxl_stats_derived_relation = dxl_stats_derived_relation;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLProperties::Pdxlstatsderrel
+//		CDXLProperties::GetDxlStatsDrvdRelation
 //
 //	@doc:
 //		Return operator's statistical information
 //
 //---------------------------------------------------------------------------
 const CDXLStatsDerivedRelation *
-CDXLProperties::Pdxlstatsderrel() const
+CDXLProperties::GetDxlStatsDrvdRelation() const
 {
-	return m_pdxlstatsderrel;
+	return m_dxl_stats_derived_relation;
 }
 
 //---------------------------------------------------------------------------
@@ -83,13 +79,9 @@ CDXLProperties::Pdxlstatsderrel() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLProperties::SerializePropertiesToDXL
-	(
-	CXMLSerializer *pxmlser
-	)
-	const
+CDXLProperties::SerializePropertiesToDXL(CXMLSerializer *xml_serializer) const
 {
-	SerializeStatsToDXL(pxmlser);
+	SerializeStatsToDXL(xml_serializer);
 }
 
 //---------------------------------------------------------------------------
@@ -101,15 +93,11 @@ CDXLProperties::SerializePropertiesToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLProperties::SerializeStatsToDXL
-	(
-	CXMLSerializer *pxmlser
-	)
-	const
+CDXLProperties::SerializeStatsToDXL(CXMLSerializer *xml_serializer) const
 {
-	if (NULL != m_pdxlstatsderrel)
+	if (NULL != m_dxl_stats_derived_relation)
 	{
-		m_pdxlstatsderrel->Serialize(pxmlser);
+		m_dxl_stats_derived_relation->Serialize(xml_serializer);
 	}
 }
 

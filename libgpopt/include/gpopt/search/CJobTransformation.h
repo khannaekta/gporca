@@ -12,6 +12,7 @@
 #define GPOPT_CJobTransformation_H
 
 #include "gpopt/search/CJob.h"
+#include "gpopt/search/CJobStateMachine.h"
 
 
 namespace gpopt
@@ -62,7 +63,7 @@ namespace gpopt
 			CGroupExpression *m_pgexpr;
 
 			// xform to apply to group expression
-			CXform *m_pxform;
+			CXform *m_xform;
 
 			// job state machine
 			JSM m_jsm;
@@ -110,13 +111,13 @@ namespace gpopt
 			virtual
 			IOstream &OsDiagramToGraphviz
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *mp,
 				IOstream &os,
 				const WCHAR *wszTitle
 				)
 				const
 			{
-				(void) m_jsm.OsDiagramToGraphviz(pmp, os, wszTitle);
+				(void) m_jsm.OsDiagramToGraphviz(mp, os, wszTitle);
 
 				return os;
 			}
@@ -124,13 +125,13 @@ namespace gpopt
 			// compute unreachable states
 			void Unreachable
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *mp,
 				EState **ppestate,
 				ULONG *pulSize
 				)
 				const
 			{
-				m_jsm.Unreachable(pmp, ppestate, pulSize);
+				m_jsm.Unreachable(mp, ppestate, pulSize);
 			}
 
 #endif // GPOS_DEBUG

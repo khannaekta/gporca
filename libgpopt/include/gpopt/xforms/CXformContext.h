@@ -12,6 +12,8 @@
 #define GPOPT_CXformContext_H
 
 #include "gpos/base.h"
+#include "gpos/common/CRefCount.h"
+#include "gpopt/operators/CPatternTree.h"
 
 namespace gpopt
 {
@@ -31,7 +33,7 @@ namespace gpopt
 		private:
 
 			// Memory pool
-			IMemoryPool *m_pmp;
+			IMemoryPool *m_mp;
 
 			// private copy ctor
 			CXformContext(const CXformContext &);
@@ -42,10 +44,10 @@ namespace gpopt
 			explicit
 			CXformContext
 				(
-				IMemoryPool *pmp
+				IMemoryPool *mp
 				)
 				: 
-				m_pmp(pmp)
+				m_mp(mp)
 			{
 			}
 
@@ -57,7 +59,7 @@ namespace gpopt
 			inline
 			IMemoryPool *Pmp() const
 			{
-				return m_pmp;
+				return m_mp;
 			}
 
 	}; // class CXformContext

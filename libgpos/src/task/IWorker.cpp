@@ -18,28 +18,28 @@
 using namespace gpos;
 
 #ifdef GPOS_DEBUG
-BOOL IWorker::m_fEnforceTimeSlices(false);
-#endif // GPOS_DEBUG
+BOOL IWorker::m_enforce_time_slices(false);
+#endif  // GPOS_DEBUG
 
 //---------------------------------------------------------------------------
 //	@function:
-//		IWorker::PwrkrSelf
+//		IWorker::Self
 //
 //	@doc:
 //		static function to lookup ones own worker in the pool manager
 //
 //---------------------------------------------------------------------------
 IWorker *
-IWorker::PwrkrSelf()
+IWorker::Self()
 {
-	IWorker *pwrkr = NULL;
-	
-	if (NULL != CWorkerPoolManager::Pwpm())
+	IWorker *worker = NULL;
+
+	if (NULL != CWorkerPoolManager::WorkerPoolManager())
 	{
-		pwrkr = CWorkerPoolManager::Pwpm()->PwrkrSelf();
+		worker = CWorkerPoolManager::WorkerPoolManager()->Self();
 	}
-	
-	return pwrkr;
+
+	return worker;
 }
 
 
@@ -52,18 +52,13 @@ IWorker::PwrkrSelf()
 //
 //---------------------------------------------------------------------------
 void
-IWorker::CheckAbort
-	(
-	const CHAR *szFile,
-	ULONG cLine
-	)
+IWorker::CheckAbort(const CHAR *file, ULONG line_num)
 {
-	IWorker *pwrkr = PwrkrSelf();
-	if (NULL != pwrkr)
+	IWorker *worker = Self();
+	if (NULL != worker)
 	{
-		pwrkr->CheckForAbort(szFile, cLine);
+		worker->CheckForAbort(file, line_num);
 	}
 }
 
 // EOF
-

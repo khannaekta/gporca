@@ -8,8 +8,8 @@
 //	@doc:
 //		Implementation of the SAX parse handler class for dynamic index scan operators
 //
-//	@owner: 
-//		
+//	@owner:
+//
 //
 //	@test:
 //
@@ -41,16 +41,13 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerDynamicIndexScan::CParseHandlerDynamicIndexScan
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
-	:
-	CParseHandlerIndexScan(pmp, pphm, pphRoot),
-	m_ulPartIndexId(0),
-	m_ulPartIndexIdPrintable(0)
+CParseHandlerDynamicIndexScan::CParseHandlerDynamicIndexScan(
+	IMemoryPool *mp,
+	CParseHandlerManager *parse_handler_mgr,
+	CParseHandlerBase *parse_handler_root)
+	: CParseHandlerIndexScan(mp, parse_handler_mgr, parse_handler_root),
+	  m_part_index_id(0),
+	  m_part_index_id_printable(0)
 {
 }
 
@@ -63,18 +60,25 @@ CParseHandlerDynamicIndexScan::CParseHandlerDynamicIndexScan
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerDynamicIndexScan::StartElement
-	(
-	const XMLCh* const, // xmlszUri,
-	const XMLCh* const xmlszLocalname,
-	const XMLCh* const, // xmlszQname
-	const Attributes& attrs
-	)
+CParseHandlerDynamicIndexScan::StartElement(const XMLCh *const,  // element_uri,
+											const XMLCh *const element_local_name,
+											const XMLCh *const,  // element_qname
+											const Attributes &attrs)
 {
-	StartElementHelper(xmlszLocalname, attrs, EdxltokenPhysicalDynamicIndexScan);
-	
-	m_ulPartIndexId = CDXLOperatorFactory::UlValueFromAttrs(m_pphm->Pmm(), attrs, EdxltokenPartIndexId, EdxltokenPhysicalDynamicIndexScan);
-	m_ulPartIndexIdPrintable = CDXLOperatorFactory::UlValueFromAttrs(m_pphm->Pmm(), attrs, EdxltokenPartIndexIdPrintable, EdxltokenPhysicalDynamicIndexScan, true /*fOptional*/, m_ulPartIndexId);
+	StartElementHelper(element_local_name, attrs, EdxltokenPhysicalDynamicIndexScan);
+
+	m_part_index_id = CDXLOperatorFactory::ExtractConvertAttrValueToUlong(
+		m_parse_handler_mgr->GetDXLMemoryManager(),
+		attrs,
+		EdxltokenPartIndexId,
+		EdxltokenPhysicalDynamicIndexScan);
+	m_part_index_id_printable = CDXLOperatorFactory::ExtractConvertAttrValueToUlong(
+		m_parse_handler_mgr->GetDXLMemoryManager(),
+		attrs,
+		EdxltokenPartIndexIdPrintable,
+		EdxltokenPhysicalDynamicIndexScan,
+		true /*is_optional*/,
+		m_part_index_id);
 }
 
 //---------------------------------------------------------------------------
@@ -86,14 +90,15 @@ CParseHandlerDynamicIndexScan::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerDynamicIndexScan::EndElement
-	(
-	const XMLCh* const, // xmlszUri,
-	const XMLCh* const xmlszLocalname,
-	const XMLCh* const // xmlszQname
-	)
+CParseHandlerDynamicIndexScan::EndElement(const XMLCh *const,  // element_uri,
+										  const XMLCh *const element_local_name,
+										  const XMLCh *const  // element_qname
+)
 {
-	EndElementHelper(xmlszLocalname, EdxltokenPhysicalDynamicIndexScan, m_ulPartIndexId, m_ulPartIndexIdPrintable);
+	EndElementHelper(element_local_name,
+					 EdxltokenPhysicalDynamicIndexScan,
+					 m_part_index_id,
+					 m_part_index_id_printable);
 }
 
 

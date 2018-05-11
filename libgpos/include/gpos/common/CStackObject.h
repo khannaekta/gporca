@@ -2,7 +2,7 @@
 //	Greenplum Database
 //	Copyright (C) 2011 EMC Corp.
 //
-//	@filename: 
+//	@filename:
 //		CStackObject.h
 //
 //	@doc:
@@ -27,13 +27,11 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CStackObject
 	{
-		protected:
-
-			CStackObject();
+	protected:
+		CStackObject();
 	};
-}
+}  // namespace gpos
 
-#endif // !GPOS_CStackObject_H
+#endif  // !GPOS_CStackObject_H
 
 // EOF
-

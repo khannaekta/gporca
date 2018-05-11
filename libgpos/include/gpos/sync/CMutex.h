@@ -20,16 +20,15 @@
 #include "gpos/task/IWorker.h"
 #include "gpos/task/CWorkerId.h"
 
-#define GPOS_MUTEX_CHECK_ABORT_INTERVAL_MSEC   (GPOS_CHECK_ABORT_MAX_INTERVAL_MSEC / 4)
+#define GPOS_MUTEX_CHECK_ABORT_INTERVAL_MSEC (GPOS_CHECK_ABORT_MAX_INTERVAL_MSEC / 4)
 #if defined(GPOS_Darwin)
-#define GPOS_MUTEX_SLEEP_SHORT_INTERVAL_USEC   (ULONG(0))
-#define GPOS_MUTEX_SLEEP_LONG_INTERVAL_USEC    (ULONG(1000))
-#define GPOS_MUTEX_SLEEP_INTERVAL_THRESHOLD    (10)
-#endif // GPOS_Darwin
+#define GPOS_MUTEX_SLEEP_SHORT_INTERVAL_USEC (ULONG(0))
+#define GPOS_MUTEX_SLEEP_LONG_INTERVAL_USEC (ULONG(1000))
+#define GPOS_MUTEX_SLEEP_INTERVAL_THRESHOLD (10)
+#endif  // GPOS_Darwin
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CMutexBase
@@ -40,99 +39,100 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CMutexBase
 	{
-		// CEvent needs access to protected member function Pmutex
+		// CEvent needs access to protected member function GetMutex
 		friend class CEvent;
-				
-		private:
-		
-			// no copy ctor
-			CMutexBase(const CMutexBase&);
 
-			// trackability
-			BOOL m_fTrackable;
+	private:
+		// no copy ctor
+		CMutexBase(const CMutexBase &);
 
-		protected: 
-		
-			// pthread mutex
-			PTHREAD_MUTEX_T m_tmutex;
+		// trackability
+		BOOL m_is_trackable;
 
-			// counting locks
-			volatile ULONG m_ulLockCount;
-			
-#ifdef GPOS_DEBUG
-			// id of holder thread
-			CWorkerId m_wid;
-#endif // GPOS_DEBUG
+	protected:
+		// pthread mutex
+		PTHREAD_MUTEX_T m_mutex;
 
-			// relinquish mutex when waiting for an event
-			void Relinquish()
-			{
-				GPOS_ASSERT(FOwned());
-
-				m_ulLockCount = 0;
-#ifdef GPOS_DEBUG
-				m_wid.Invalid();
-#endif // GPOS_DEBUG
-			}
-
-			// regaining mutex after a wait
-			void Regain()
-			{
-				GPOS_ASSERT(!FOwned());
+		// counting locks
+		volatile ULONG m_lock_count;
 
 #ifdef GPOS_DEBUG
-				m_wid.Current();
-#endif // GPOS_DEBUG
-				m_ulLockCount = 1;
-			}
+		// id of holder thread
+		CWorkerId m_wid;
+#endif  // GPOS_DEBUG
 
-			// expose raw mutex to CEvent
-			PTHREAD_MUTEX_T *Ptmutex()
-			{
-				return &m_tmutex;
-			}
-					
-		public:
-		
-			// ctor
-			CMutexBase
-				(
-				BOOL fTrackable
-				)
-				: 
-				m_fTrackable(fTrackable),
-				m_ulLockCount(0)
+		// relinquish mutex when waiting for an event
+		void
+		Relinquish()
+		{
+			GPOS_ASSERT(IsOwned());
+
+			m_lock_count = 0;
 #ifdef GPOS_DEBUG
-				,
-				m_wid(false /*fValid*/)
-#endif // GPOS_DEBUG
-			{}
-			
-			// dtor
-			virtual ~CMutexBase() {}
-			
-			// lock/trylock/unlock
-			virtual void Lock() = 0;
-			virtual BOOL FTryLock() = 0;
-			virtual void Unlock() = 0;
-					
+			m_wid.SetThreadToInvalid();
+#endif  // GPOS_DEBUG
+		}
+
+		// regaining mutex after a wait
+		void
+		Regain()
+		{
+			GPOS_ASSERT(!IsOwned());
+
 #ifdef GPOS_DEBUG
-			BOOL FOwned() const
-            {
-                CWorkerId wid;
-                return 0 != m_ulLockCount && m_wid.FEqual(wid);
-            }
-#endif // GPOS_DEBUG
+			m_wid.SetThreadToCurrent();
+#endif  // GPOS_DEBUG
+			m_lock_count = 1;
+		}
 
-			BOOL FTrackable() const
-			{
-				return m_fTrackable;
-			}
+		// expose raw mutex to CEvent
+		PTHREAD_MUTEX_T *
+		GetMutex()
+		{
+			return &m_mutex;
+		}
 
-			// link for accounting lists
-			SLink m_link;
-	
-	}; // class CMutexBase
+	public:
+		// ctor
+		CMutexBase(BOOL trackable)
+			: m_is_trackable(trackable),
+			  m_lock_count(0)
+#ifdef GPOS_DEBUG
+			  ,
+			  m_wid(false /*fValid*/)
+#endif  // GPOS_DEBUG
+		{
+		}
+
+		// dtor
+		virtual ~CMutexBase()
+		{
+		}
+
+		// lock/trylock/unlock
+		virtual void Lock() = 0;
+		virtual BOOL TryLock() = 0;
+		virtual void Unlock() = 0;
+
+#ifdef GPOS_DEBUG
+		BOOL
+		IsOwned() const
+		{
+			CWorkerId wid;
+			return 0 != m_lock_count && m_wid.Equals(wid);
+		}
+#endif  // GPOS_DEBUG
+
+		BOOL
+		IsTrackable() const
+		{
+			return m_is_trackable;
+		}
+
+		// link for accounting lists
+		SLink m_link;
+
+	};  // class CMutexBase
 
 
 
@@ -145,256 +145,256 @@ namespace gpos
 	//		at type level
 	//
 	//---------------------------------------------------------------------------
-	template<INT iMutexType, BOOL fTrackable>
+	template <INT mutex_type, BOOL trackable>
 	class CMutexTyped : public CMutexBase
 	{
-		private:
-		
-			// lock mutex, CFA on regular intervals
-			INT ITimedLock()
-            {
-                GPOS_ASSERT_NO_SPINLOCK;
+	private:
+		// lock mutex, CFA on regular intervals
+		INT
+		TimedLock()
+		{
+			GPOS_ASSERT_NO_SPINLOCK;
 
-                INT iRet = 0;
+			INT ret = 0;
 
-                // macosx does not have pthread_mutex_timedlock;
-                // use a workaround with pthread_mutex_trylock and usleep;
-                // this approach has increased overhead when lock contention
-                // is high; it is therefore restricted to macosx
+			// macosx does not have pthread_mutex_timedlock;
+			// use a workaround with pthread_mutex_trylock and usleep;
+			// this approach has increased overhead when lock contention
+			// is high; it is therefore restricted to macosx
 #ifdef GPOS_Darwin
-                CWallClock timerElapsed;
-                ULONG ulRetries = 0;
+			CWallClock elapsed;
+			ULONG retries = 0;
 
-                // loop until we get the lock
-                do
-                {
-                    // attempt to lock the mutex
-                    iRet = pthread::IPthreadMutexTryLock(&m_tmutex);
-                    GPOS_ASSERT(EINVAL != iRet && "Invalid mutex structure");
+			// loop until we get the lock
+			do
+			{
+				// attempt to lock the mutex
+				ret = pthread::MutexTryLock(&m_mutex);
+				GPOS_ASSERT(EINVAL != ret && "Invalid mutex structure");
 
-                    // check if mutex is already locked
-                    if (EBUSY == iRet)
-                    {
-                        if (GPOS_MUTEX_CHECK_ABORT_INTERVAL_MSEC <= timerElapsed.UlElapsedMS())
-                        {
-                            GPOS_CHECK_ABORT;
+				// check if mutex is already locked
+				if (EBUSY == ret)
+				{
+					if (GPOS_MUTEX_CHECK_ABORT_INTERVAL_MSEC <= elapsed.ElapsedMS())
+					{
+						GPOS_CHECK_ABORT;
 
-                            timerElapsed.Restart();
-                        }
+						elapsed.Restart();
+					}
 
-                        ULONG ulInterval = GPOS_MUTEX_SLEEP_SHORT_INTERVAL_USEC;
-                        if (GPOS_MUTEX_SLEEP_INTERVAL_THRESHOLD < ulRetries++)
-                        {
-                            ulInterval = GPOS_MUTEX_SLEEP_LONG_INTERVAL_USEC;
-                            ulRetries = 0;
-                        }
+					ULONG interval = GPOS_MUTEX_SLEEP_SHORT_INTERVAL_USEC;
+					if (GPOS_MUTEX_SLEEP_INTERVAL_THRESHOLD < retries++)
+					{
+						interval = GPOS_MUTEX_SLEEP_LONG_INTERVAL_USEC;
+						retries = 0;
+					}
 
-                        clib::USleep(ulInterval);
-                    }
-                    else
-                    {
-                        GPOS_ASSERT(0 == iRet && "Error occurred while trying to lock mutex");
-                    }
-                }
-                while (0 != iRet);
+					clib::USleep(interval);
+				}
+				else
+				{
+					GPOS_ASSERT(0 == ret && "Error occurred while trying to lock mutex");
+				}
+			} while (0 != ret);
 #else
-                // loop until we get the lock
-                do
-                {
-                    // set expiration timer
-                    TIMEVAL tv;
-                    syslib::GetTimeOfDay(&tv, NULL);
-                    ULLONG ullCurrentUs = tv.tv_sec * GPOS_USEC_IN_SEC + tv.tv_usec;
-                    ULLONG ullExpireUs = ullCurrentUs + GPOS_MUTEX_CHECK_ABORT_INTERVAL_MSEC * GPOS_USEC_IN_MSEC;
-                    TIMESPEC ts;
-                    ts.tv_sec = (ULONG_PTR) (ullExpireUs / GPOS_USEC_IN_SEC);
-                    ts.tv_nsec = (ULONG_PTR) ((ullExpireUs % GPOS_USEC_IN_SEC) * (GPOS_NSEC_IN_SEC / GPOS_USEC_IN_SEC));
+			// loop until we get the lock
+			do
+			{
+				// set expiration timer
+				TIMEVAL tv;
+				syslib::GetTimeOfDay(&tv, NULL);
+				ULLONG current_us = tv.tv_sec * GPOS_USEC_IN_SEC + tv.tv_usec;
+				ULLONG expire_us =
+					current_us + GPOS_MUTEX_CHECK_ABORT_INTERVAL_MSEC * GPOS_USEC_IN_MSEC;
+				TIMESPEC ts;
+				ts.tv_sec = (ULONG_PTR)(expire_us / GPOS_USEC_IN_SEC);
+				ts.tv_nsec = (ULONG_PTR)((expire_us % GPOS_USEC_IN_SEC) *
+										 (GPOS_NSEC_IN_SEC / GPOS_USEC_IN_SEC));
 
-                    iRet = pthread::IPthreadMutexTimedlock(&m_tmutex, &ts);
+				ret = pthread::MutexTimedlock(&m_mutex, &ts);
 
-                    // check if mutex is already locked
-                    if (EBUSY == iRet)
-                    {
-                        GPOS_CHECK_ABORT;
-                    }
-                }
-                while (0 != iRet);
-#endif // GPOS_Darwin
+				// check if mutex is already locked
+				if (EBUSY == ret)
+				{
+					GPOS_CHECK_ABORT;
+				}
+			} while (0 != ret);
+#endif  // GPOS_Darwin
 
-                return iRet;
-            }
+			return ret;
+		}
 
-			// attempt to lock mutex
-			INT IAttemptLock(BOOL fBlocking)
-            {
+		// attempt to lock mutex
+		INT
+		AttemptLock(BOOL blocking)
+		{
 #ifdef GPOS_DEBUG
-                GPOS_ASSERT_NO_SPINLOCK;
+			GPOS_ASSERT_NO_SPINLOCK;
 
-                // check whether we own this mutex already; if so, must be recursive mutex;
-                // disallow potentially deadlocking attempts even if the lock function is only trylock
-                BOOL fOwnedAlready = this->FOwned();
-                GPOS_ASSERT_IMP(fOwnedAlready, PTHREAD_MUTEX_RECURSIVE == iMutexType && "Self-deadlock detected");
-#endif // GPOS_DEBUG
+			// check whether we own this mutex already; if so, must be recursive mutex;
+			// disallow potentially deadlocking attempts even if the lock function is only trylock
+			BOOL owned_already = this->IsOwned();
+			GPOS_ASSERT_IMP(owned_already,
+							PTHREAD_MUTEX_RECURSIVE == mutex_type && "Self-deadlock detected");
+#endif  // GPOS_DEBUG
 
-                INT iRet = 0;
+			INT ret = 0;
 
-                if (fBlocking)
-                {
-                    iRet = ITimedLock();
-                }
-                else
-                {
-                    // attempt to lock the mutex
-                    iRet = pthread::IPthreadMutexTryLock(&m_tmutex);
-                }
+			if (blocking)
+			{
+				ret = TimedLock();
+			}
+			else
+			{
+				// attempt to lock the mutex
+				ret = pthread::MutexTryLock(&m_mutex);
+			}
 
-                if (0 != iRet)
-                {
-                    return iRet;
-                };
+			if (0 != ret)
+			{
+				return ret;
+			};
 
 #ifdef GPOS_DEBUG
-                if (!fOwnedAlready && this->FTrackable())
-                {
-                    IWorker::PwrkrSelf()->RegisterMutex(this);
-                }
+			if (!owned_already && this->IsTrackable())
+			{
+				IWorker::Self()->RegisterMutex(this);
+			}
 
-                // track owner
-                m_wid.Current();
-#endif // GPOS_DEBUG
+			// track owner
+			m_wid.SetThreadToCurrent();
+#endif  // GPOS_DEBUG
 
-                ++m_ulLockCount;
+			++m_lock_count;
 
-                return 0;
-            }
+			return 0;
+		}
 
-		public:
-		
-			// ctor
-			CMutexTyped<iMutexType, fTrackable>()
-            :
-            CMutexBase(fTrackable)
-            {
-                GPOS_ASSERT(
-                            PTHREAD_MUTEX_DEFAULT == iMutexType ||
-                            PTHREAD_MUTEX_RECURSIVE == iMutexType);
+	public:
+		// ctor
+		CMutexTyped<mutex_type, trackable>() : CMutexBase(trackable)
+		{
+			GPOS_ASSERT(PTHREAD_MUTEX_DEFAULT == mutex_type ||
+						PTHREAD_MUTEX_RECURSIVE == mutex_type);
 
-                // initialize mutex struct
-                PTHREAD_MUTEX_T tmutex = PTHREAD_MUTEX_INITIALIZER;
-                m_tmutex = tmutex;
+			// initialize mutex struct
+			PTHREAD_MUTEX_T mutex = PTHREAD_MUTEX_INITIALIZER;
+			m_mutex = mutex;
 
-                PTHREAD_MUTEXATTR_T mat;
+			PTHREAD_MUTEXATTR_T mutex_attr;
 
-                // init can run out of memory
-                if (0 != pthread::IPthreadMutexAttrInit(&mat))
-                {
-                    // raise OOM exception
-                    GPOS_OOM_CHECK(NULL);
-                }
+			// init can run out of memory
+			if (0 != pthread::MutexAttrInit(&mutex_attr))
+			{
+				// raise OOM exception
+				GPOS_OOM_CHECK(NULL);
+			}
 
-                // ignore return value -- all parameters have been checked already
-                pthread::PthreadMutexAttrSettype(&mat, iMutexType);
+			// ignore return value -- all parameters have been checked already
+			pthread::MutexAttrSettype(&mutex_attr, mutex_type);
 
-                if (0 != pthread::IPthreadMutexInit(&m_tmutex, &mat))
-                {
-                    // cleanup
-                    pthread::PthreadMutexAttrDestroy(&mat);
+			if (0 != pthread::MutexInit(&m_mutex, &mutex_attr))
+			{
+				// cleanup
+				pthread::MutexAttrDestroy(&mutex_attr);
 
-                    // out of memory/resources
-                    GPOS_OOM_CHECK(NULL);
-                }
+				// out of memory/resources
+				GPOS_OOM_CHECK(NULL);
+			}
 
-                // ignore return value -- parameter already checked
-                pthread::PthreadMutexAttrDestroy(&mat);
-            }
-					
-			// dtor
-			~CMutexTyped<iMutexType, fTrackable> ()
-            {
-                // disallow destruction of locked mutex
-                GPOS_ASSERT(0 == m_ulLockCount && "Tried to destruct locked mutex.");
+			// ignore return value -- parameter already checked
+			pthread::MutexAttrDestroy(&mutex_attr);
+		}
 
-                // release all locks held
-                while(0 < m_ulLockCount)
-                {
-                    this->Unlock();
-                }
+		// dtor
+		~CMutexTyped<mutex_type, trackable>()
+		{
+			// disallow destruction of locked mutex
+			GPOS_ASSERT(0 == m_lock_count && "Tried to destruct locked mutex.");
 
-                // deallocate resources
-                pthread::PthreadMutexDestroy(&m_tmutex);
-            }
-					
-			// acquire lock
-			void Lock()
-            {
+			// release all locks held
+			while (0 < m_lock_count)
+			{
+				this->Unlock();
+			}
+
+			// deallocate resources
+			pthread::MutexDestroy(&m_mutex);
+		}
+
+		// acquire lock
+		void
+		Lock()
+		{
 #ifdef GPOS_DEBUG
-                GPOS_ASSERT_NO_SPINLOCK;
+			GPOS_ASSERT_NO_SPINLOCK;
 
-                INT iRet =
+			INT ret =
 #else
-                // ignore return value in optimized builds
-                (void)
-#endif // GPOS_DEBUG
-                IAttemptLock(true /*fBlocking*/);
+			// ignore return value in optimized builds
+			(void)
+#endif  // GPOS_DEBUG
+				AttemptLock(true /*fBlocking*/);
 
-                GPOS_ASSERT(0 == iRet && "Unexpectedly failed to lock mutex");
-            }
-			
-			// attempt locking
-			BOOL FTryLock()
-            {
-                GPOS_ASSERT_NO_SPINLOCK;
+			GPOS_ASSERT(0 == ret && "Unexpectedly failed to lock mutex");
+		}
 
-                INT iRet = IAttemptLock(false /*fBlocking*/);
-                GPOS_ASSERT(EBUSY == iRet || 0 == iRet);
+		// attempt locking
+		BOOL
+		TryLock()
+		{
+			GPOS_ASSERT_NO_SPINLOCK;
 
-                return (0 == iRet);
-            }
+			INT ret = AttemptLock(false /*fBlocking*/);
+			GPOS_ASSERT(EBUSY == ret || 0 == ret);
 
-			// release lock
-			void Unlock()
-            {
+			return (0 == ret);
+		}
+
+		// release lock
+		void
+		Unlock()
+		{
 #ifdef GPOS_DEBUG
-                GPOS_ASSERT_NO_SPINLOCK;
+			GPOS_ASSERT_NO_SPINLOCK;
 
-                GPOS_ASSERT(FOwned());
+			GPOS_ASSERT(IsOwned());
 
-                // prepare for final release of lock
-                BOOL fUnlock = false;
-                if (1 == m_ulLockCount)
-                {
-                    fUnlock = true;
-                    m_wid.Invalid();
-                    if (this->FTrackable())
-                    {
-                        IWorker::PwrkrSelf()->UnregisterMutex(this);
-                    }
-                }
-#endif // GPOS_DEBUG
+			// prepare for final release of lock
+			BOOL unlock = false;
+			if (1 == m_lock_count)
+			{
+				unlock = true;
+				m_wid.SetThreadToInvalid();
+				if (this->IsTrackable())
+				{
+					IWorker::Self()->UnregisterMutex(this);
+				}
+			}
+#endif  // GPOS_DEBUG
 
-                --m_ulLockCount;
+			--m_lock_count;
 
-                // ignore return values -- parameters/context have been checked already
-                (void) pthread::IPthreadMutexUnlock(&m_tmutex);
+			// ignore return values -- parameters/context have been checked already
+			(void) pthread::MutexUnlock(&m_mutex);
 
-                GPOS_ASSERT_IMP(fUnlock, !FOwned());
-            }
+			GPOS_ASSERT_IMP(unlock, !IsOwned());
+		}
 
-	}; // class CMutexTyped<int iMutexType, fTrackable>
-	
-	
+	};  // class CMutexTyped<int iMutexType, fTrackable>
+
+
 	// define publicly used types
-	
+
 	// use this only in OS abstraction layer
 	typedef CMutexTyped<PTHREAD_MUTEX_DEFAULT, false /*fTrackable*/> CMutexOS;
 	typedef CMutexTyped<PTHREAD_MUTEX_RECURSIVE, false /*fTrackable*/> CMutexRecursiveOS;
-	
+
 	// use these in regular code where worker context is always available
 	typedef CMutexTyped<PTHREAD_MUTEX_DEFAULT, true /*fTrackable*/> CMutex;
 	typedef CMutexTyped<PTHREAD_MUTEX_RECURSIVE, true /*fTrackable*/> CMutexRecursive;
-}
+}  // namespace gpos
 
-#endif // !GPOS_CMutex_H
+#endif  // !GPOS_CMutex_H
 
 // EOF
-

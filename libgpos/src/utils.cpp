@@ -12,11 +12,11 @@
 #include "gpos/utils.h"
 
 // using 16 addresses a line fits exactly into 80 characters
-#define GPOS_MEM_BPL		16
+#define GPOS_MEM_BPL 16
 
 
 // number of stack frames to search for addresses
-#define GPOS_SEARCH_STACK_FRAMES	16
+#define GPOS_SEARCH_STACK_FRAMES 16
 
 
 using namespace gpos;
@@ -52,30 +52,25 @@ gpos::Print(WCHAR *wsz)
 //		Generic memory dumper; produces regular hex dump
 //
 //---------------------------------------------------------------------------
-IOstream&
-gpos::HexDump
-	(
-	IOstream &os,
-	const void *pv,
-	ULLONG ullSize
-	)
+IOstream &
+gpos::HexDump(IOstream &os, const void *pv, ULLONG size)
 {
-	for(ULONG i = 0; i < 1 + (ullSize / GPOS_MEM_BPL); i++)
+	for (ULONG i = 0; i < 1 + (size / GPOS_MEM_BPL); i++)
 	{
 		// starting address of line
-		BYTE *pBuf = ((BYTE*)pv) + (GPOS_MEM_BPL * i);
-		os << (void*)pBuf << "  ";
+		BYTE *buf = ((BYTE *) pv) + (GPOS_MEM_BPL * i);
+		os << (void *) buf << "  ";
 		os << COstream::EsmHex;
 
-        // individual bytes
-		for(ULONG j = 0; j < GPOS_MEM_BPL; j++)
+		// individual bytes
+		for (ULONG j = 0; j < GPOS_MEM_BPL; j++)
 		{
-			if (pBuf[j] < 16) 
+			if (buf[j] < 16)
 			{
 				os << "0";
 			}
 
-			os << (ULONG)pBuf[j] << " ";
+			os << (ULONG) buf[j] << " ";
 
 			// separator in middle of line
 			if (j + 1 == GPOS_MEM_BPL / 2)
@@ -88,13 +83,13 @@ gpos::HexDump
 		os << " ";
 
 		// text representation
-		for(ULONG j = 0; j < GPOS_MEM_BPL; j++)
+		for (ULONG j = 0; j < GPOS_MEM_BPL; j++)
 		{
 			// print only 'visible' characters
-			if(pBuf[j] >= 0x20 && pBuf[j] <= 0x7f)
+			if (buf[j] >= 0x20 && buf[j] <= 0x7f)
 			{
 				// cast to CHAR to avoid stream from (mis-)interpreting BYTE
-				os << (CHAR)pBuf[j];
+				os << (CHAR) buf[j];
 			}
 			else
 			{
@@ -109,7 +104,7 @@ gpos::HexDump
 
 //---------------------------------------------------------------------------
 //	@function:
-//		gpos::UlHashByteArray
+//		gpos::HashByteArray
 //
 //	@doc:
 //		Generic hash function for an array of BYTEs
@@ -117,101 +112,83 @@ gpos::HexDump
 //
 //---------------------------------------------------------------------------
 ULONG
-gpos::UlHashByteArray
-	( 
-	const BYTE *pb,
-	ULONG ulSize
-	)
+gpos::HashByteArray(const BYTE *byte_array, ULONG size)
 {
-	ULONG ulHash = ulSize;
-		
-	for(ULONG i = 0; i < ulSize; ++i)
+	ULONG hash = size;
+
+	for (ULONG i = 0; i < size; ++i)
 	{
-		BYTE b = pb[i];
-		ulHash = ((ulHash << 5) ^ (ulHash >> 27)) ^ b;
+		BYTE b = byte_array[i];
+		hash = ((hash << 5) ^ (hash >> 27)) ^ b;
 	}
-	
-	return ulHash;
+
+	return hash;
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		gpos::UlCombineHashes
+//		gpos::CombineHashes
 //
 //	@doc:
 //		Combine ULONG-based hash values
 //
 //---------------------------------------------------------------------------
 ULONG
-gpos::UlCombineHashes
-	(
-	ULONG ul0,
-	ULONG ul1
-	)
+gpos::CombineHashes(ULONG hash1, ULONG hash2)
 {
-	ULONG rgul[2];
-	rgul[0] = ul0;
-	rgul[1] = ul1;
+	ULONG hashes[2];
+	hashes[0] = hash1;
+	hashes[1] = hash2;
 
-	return UlHashByteArray((BYTE*)rgul, GPOS_ARRAY_SIZE(rgul) * sizeof(rgul[0]));
+	return HashByteArray((BYTE *) hashes, GPOS_ARRAY_SIZE(hashes) * sizeof(hashes[0]));
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		gpos::UllAdd
+//		gpos::Add
 //
 //	@doc:
 //		Add two unsigned long long values, throw an exception if overflow occurs,
 //
 //---------------------------------------------------------------------------
 ULLONG
-gpos::UllAdd
-	(
-	ULLONG ullFst,
-	ULLONG ullSnd
-	)
+gpos::Add(ULLONG first, ULLONG second)
 {
-	if (ullFst > gpos::ullong_max - ullSnd)
+	if (first > gpos::ullong_max - second)
 	{
 		// if addition result overflows, we have (a + b > gpos::ullong_max),
 		// then we need to check for  (a > gpos::ullong_max - b)
 		GPOS_RAISE(CException::ExmaSystem, CException::ExmiOverflow);
 	}
 
-	ULLONG ullRes = ullFst + ullSnd;
+	ULLONG res = first + second;
 
-	return ullRes;
+	return res;
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		gpos::UllMultiply
+//		gpos::Multiply
 //
 //	@doc:
 //		Multiply two unsigned long long values, throw an exception if overflow occurs,
 //
 //---------------------------------------------------------------------------
 ULLONG
-gpos::UllMultiply
-	(
-	ULLONG ullFst,
-	ULLONG ullSnd
-	)
+gpos::Multiply(ULLONG first, ULLONG second)
 {
-	if (0 < ullSnd && ullFst > gpos::ullong_max / ullSnd)
+	if (0 < second && first > gpos::ullong_max / second)
 	{
 		// if multiplication result overflows, we have (a * b > gpos::ullong_max),
 		// then we need to check for  (a > gpos::ullong_max / b)
 		GPOS_RAISE(CException::ExmaSystem, CException::ExmiOverflow);
-
 	}
-	ULLONG ullRes = ullFst * ullSnd;
+	ULLONG res = first * second;
 
-	return ullRes;
+	return res;
 }
 
 // EOF
-

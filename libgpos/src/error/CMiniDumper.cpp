@@ -27,17 +27,10 @@ using namespace gpos;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMiniDumper::CMiniDumper
-	(
-	IMemoryPool *pmp
-	)
-	:
-	m_pmp(pmp),
-	m_fInit(false),
-	m_fFinal(false),
-	m_oos(NULL)
+CMiniDumper::CMiniDumper(IMemoryPool *mp)
+	: m_mp(mp), m_initialized(false), m_finalized(false), m_oos(NULL)
 {
-	GPOS_ASSERT(NULL != pmp);
+	GPOS_ASSERT(NULL != mp);
 }
 
 
@@ -51,18 +44,17 @@ CMiniDumper::CMiniDumper
 //---------------------------------------------------------------------------
 CMiniDumper::~CMiniDumper()
 {
-	if (m_fInit)
+	if (m_initialized)
 	{
-		CTask *ptsk = CTask::PtskSelf();
+		CTask *task = CTask::Self();
 
-		GPOS_ASSERT(NULL != ptsk);
+		GPOS_ASSERT(NULL != task);
 
-		ptsk->PerrctxtConvert()->Unregister
-			(
+		task->ConvertErrCtxt()->Unregister(
 #ifdef GPOS_DEBUG
 			this
-#endif // GPOS_DEBUG
-			);
+#endif  // GPOS_DEBUG
+		);
 	}
 }
 
@@ -78,18 +70,18 @@ CMiniDumper::~CMiniDumper()
 void
 CMiniDumper::Init(COstream *oos)
 {
-	GPOS_ASSERT(!m_fInit);
-	GPOS_ASSERT(!m_fFinal);
+	GPOS_ASSERT(!m_initialized);
+	GPOS_ASSERT(!m_finalized);
 
-	CTask *ptsk = CTask::PtskSelf();
+	CTask *task = CTask::Self();
 
-	GPOS_ASSERT(NULL != ptsk);
+	GPOS_ASSERT(NULL != task);
 
 	m_oos = oos;
 
-	ptsk->PerrctxtConvert()->Register(this);
+	task->ConvertErrCtxt()->Register(this);
 
-	m_fInit = true;
+	m_initialized = true;
 
 	SerializeHeader();
 }
@@ -106,12 +98,12 @@ CMiniDumper::Init(COstream *oos)
 void
 CMiniDumper::Finalize()
 {
-	GPOS_ASSERT(m_fInit);
-	GPOS_ASSERT(!m_fFinal);
+	GPOS_ASSERT(m_initialized);
+	GPOS_ASSERT(!m_finalized);
 
 	SerializeFooter();
 
-	m_fFinal = true;
+	m_finalized = true;
 }
 
 
@@ -123,16 +115,13 @@ CMiniDumper::Finalize()
 //		Get stream to serialize to
 //
 //---------------------------------------------------------------------------
-COstream&
-CMiniDumper::GetOStream
-	(
-	)
+COstream &
+CMiniDumper::GetOStream()
 {
-	GPOS_ASSERT(m_fInit);
+	GPOS_ASSERT(m_initialized);
 
 	return *m_oos;
 }
 
 
 // EOF
-

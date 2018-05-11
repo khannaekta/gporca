@@ -12,6 +12,7 @@
 #define GPOPT_CXformSelect2IndexGet_H
 
 #include "gpos/base.h"
+#include "gpopt/operators/CLogicalGet.h"
 #include "gpopt/xforms/CXformExploration.h"
 
 namespace gpopt
@@ -35,9 +36,9 @@ namespace gpopt
 			CXformSelect2IndexGet(const CXformSelect2IndexGet &);
 
 			// return the column reference set of included / key columns
-			CColRefSet *Pcrs
+			CColRefSet *GetColRefSet
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *mp,
 				CLogicalGet *popGet,
 				const IMDIndex *pmdindex,
 				BOOL fIncludedColumns
@@ -48,7 +49,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformSelect2IndexGet(IMemoryPool *pmp);
+			CXformSelect2IndexGet(IMemoryPool *mp);
 
 			// dtor
 			virtual

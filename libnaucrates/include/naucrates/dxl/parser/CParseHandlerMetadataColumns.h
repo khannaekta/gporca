@@ -25,7 +25,7 @@ namespace gpdxl
 	using namespace gpmd;
 
 	XERCES_CPP_NAMESPACE_USE
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CParseHandlerMetadataColumns
@@ -36,48 +36,40 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerMetadataColumns : public CParseHandlerBase
 	{
-		private:
-			// list of columns
-			DrgPmdcol *m_pdrgpmdcol;
-		
-			// private copy ctor
-			CParseHandlerMetadataColumns(const CParseHandlerMetadataColumns &);
-			
-			// process the start of an element
-			void StartElement
-				(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
- 					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
-				
-			// process the end of an element
-			void EndElement
-				(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
-					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname		// element's qname
-				);
-			
-		public:
-			// ctor/dtor
-			CParseHandlerMetadataColumns
-				(
-				IMemoryPool *pmp,
-				CParseHandlerManager *pphm,
-				CParseHandlerBase *pphRoot
-				);
-			
-			~CParseHandlerMetadataColumns();
+	private:
+		// list of columns
+		CMDColumnArray *m_md_col_array;
 
-			
-			// returns the constructed columns list
-			DrgPmdcol *Pdrgpmdcol();
-			
+		// private copy ctor
+		CParseHandlerMetadataColumns(const CParseHandlerMetadataColumns &);
+
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
+
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+	public:
+		// ctor/dtor
+		CParseHandlerMetadataColumns(IMemoryPool *mp,
+									 CParseHandlerManager *parse_handler_mgr,
+									 CParseHandlerBase *parse_handler_root);
+
+		~CParseHandlerMetadataColumns();
+
+
+		// returns the constructed columns list
+		CMDColumnArray *GetMdColArray();
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerMetadataColumns_H
+#endif  // !GPDXL_CParseHandlerMetadataColumns_H
 
 // EOF

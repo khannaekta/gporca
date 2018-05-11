@@ -23,7 +23,6 @@
 
 namespace gpmd
 {
-
 	using namespace gpdxl;
 
 	//---------------------------------------------------------------------------
@@ -36,124 +35,114 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class CMDTriggerGPDB : public IMDTrigger
 	{
-		private:
-			// memory pool
-			IMemoryPool *m_pmp;
+	private:
+		// memory pool
+		IMemoryPool *m_mp;
 
-			// DXL for object
-			const CWStringDynamic *m_pstr;
+		// DXL for object
+		const CWStringDynamic *m_dxl_str;
 
-			// trigger id
-			IMDId *m_pmdid;
+		// trigger id
+		IMDId *m_mdid;
 
-			// trigger name
-			CMDName *m_pmdname;
+		// trigger name
+		CMDName *m_mdname;
 
-			// relation id
-			IMDId *m_pmdidRel;
+		// relation id
+		IMDId *m_rel_mdid;
 
-			// function id
-			IMDId *m_pmdidFunc;
+		// function id
+		IMDId *m_func_mdid;
 
-			// trigger type
-			INT m_iType;
+		// trigger type
+		INT m_type;
 
-			// is trigger enabled
-			BOOL m_fEnabled;
+		// is trigger enabled
+		BOOL m_is_enabled;
 
-			// private copy ctor
-			CMDTriggerGPDB(const CMDTriggerGPDB &);
+		// private copy ctor
+		CMDTriggerGPDB(const CMDTriggerGPDB &);
 
-		public:
-			// ctor
-			CMDTriggerGPDB
-				(
-				IMemoryPool *pmp,
-				IMDId *pmdid,
-				CMDName *pmdname,
-				IMDId *pmdidRel,
-				IMDId *pmdidFunc,
-				INT iType,
-				BOOL fEnabled
-				);
+	public:
+		// ctor
+		CMDTriggerGPDB(IMemoryPool *mp,
+					   IMDId *mdid,
+					   CMDName *mdname,
+					   IMDId *rel_mdid,
+					   IMDId *mdid_func,
+					   INT type,
+					   BOOL is_enabled);
 
-			// dtor
-			~CMDTriggerGPDB();
+		// dtor
+		~CMDTriggerGPDB();
 
-			// accessors
-			virtual
-			const CWStringDynamic *Pstr() const
-			{
-				return m_pstr;
-			}
+		// accessors
+		virtual const CWStringDynamic *
+		GetStrRepr() const
+		{
+			return m_dxl_str;
+		}
 
-			// trigger id
-			virtual
-			IMDId *Pmdid() const
-			{
-				return m_pmdid;
-			}
+		// trigger id
+		virtual IMDId *
+		MDId() const
+		{
+			return m_mdid;
+		}
 
-			// trigger name
-			virtual
-			CMDName Mdname() const
-			{
-				return *m_pmdname;
-			}
+		// trigger name
+		virtual CMDName
+		Mdname() const
+		{
+			return *m_mdname;
+		}
 
-			// relation mdid
-			virtual
-			IMDId *PmdidRel() const
-			{
-				return m_pmdidRel;
-			}
+		// relation mdid
+		virtual IMDId *
+		GetRelMdId() const
+		{
+			return m_rel_mdid;
+		}
 
-			// function mdid
-			virtual
-			IMDId *PmdidFunc() const
-			{
-				return m_pmdidFunc;
-			}
+		// function mdid
+		virtual IMDId *
+		FuncMdId() const
+		{
+			return m_func_mdid;
+		}
 
-			// does trigger execute on a row-level
-			virtual
-			BOOL FRow() const;
+		// does trigger execute on a row-level
+		virtual BOOL ExecutesOnRowLevel() const;
 
-			// is this a before trigger
-			virtual
-			BOOL FBefore() const;
+		// is this a before trigger
+		virtual BOOL IsBefore() const;
 
-			// is this an insert trigger
-			virtual
-			BOOL FInsert() const;
+		// is this an insert trigger
+		virtual BOOL IsInsert() const;
 
-			// is this a delete trigger
-			virtual
-			BOOL FDelete() const;
+		// is this a delete trigger
+		virtual BOOL IsDelete() const;
 
-			// is this an update trigger
-			virtual
-			BOOL FUpdate() const;
+		// is this an update trigger
+		virtual BOOL IsUpdate() const;
 
-			// is trigger enabled
-			virtual
-			BOOL FEnabled() const
-			{
-				return m_fEnabled;
-			}
+		// is trigger enabled
+		virtual BOOL
+		IsEnabled() const
+		{
+			return m_is_enabled;
+		}
 
-			// serialize object in DXL format
-			virtual
-			void Serialize(gpdxl::CXMLSerializer *pxmlser) const;
+		// serialize object in DXL format
+		virtual void Serialize(gpdxl::CXMLSerializer *xml_serializer) const;
 
 #ifdef GPOS_DEBUG
-			// debug print of the type in the provided stream
-			virtual
-			void DebugPrint(IOstream &os) const;
+		// debug print of the type in the provided stream
+		virtual void DebugPrint(IOstream &os) const;
 #endif
 	};
-}
+}  // namespace gpmd
 
-#endif // !GPMD_CMDTriggerGPDB_H
+#endif  // !GPMD_CMDTriggerGPDB_H
 
 // EOF

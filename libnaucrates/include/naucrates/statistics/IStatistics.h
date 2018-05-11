@@ -28,7 +28,7 @@ namespace gpopt
 	class CMDAccessor;
 	class CReqdPropRelational;
 	class CColRefSet;
-}
+}  // namespace gpopt
 
 namespace gpnaucrates
 {
@@ -40,27 +40,57 @@ namespace gpnaucrates
 	class IStatistics;
 
 	// hash map from column id to a histogram
-	typedef CHashMap<ULONG, CHistogram, gpos::UlHash<ULONG>, gpos::FEqual<ULONG>,
-					CleanupDelete<ULONG>, CleanupDelete<CHistogram> > HMUlHist;
+	typedef CHashMap<ULONG,
+					 CHistogram,
+					 gpos::HashValue<ULONG>,
+					 gpos::Equals<ULONG>,
+					 CleanupDelete<ULONG>,
+					 CleanupDelete<CHistogram> >
+		UlongToHistogramMap;
 
 	// iterator
-	typedef CHashMapIter<ULONG, CHistogram, gpos::UlHash<ULONG>, gpos::FEqual<ULONG>,
-					CleanupDelete<ULONG>, CleanupDelete<CHistogram> > HMIterUlHist;
+	typedef CHashMapIter<ULONG,
+						 CHistogram,
+						 gpos::HashValue<ULONG>,
+						 gpos::Equals<ULONG>,
+						 CleanupDelete<ULONG>,
+						 CleanupDelete<CHistogram> >
+		UlongToHistogramMapIter;
 
 	// hash map from column ULONG to CDouble
-	typedef CHashMap<ULONG, CDouble, gpos::UlHash<ULONG>, gpos::FEqual<ULONG>,
-					CleanupDelete<ULONG>, CleanupDelete<CDouble> > HMUlDouble;
+	typedef CHashMap<ULONG,
+					 CDouble,
+					 gpos::HashValue<ULONG>,
+					 gpos::Equals<ULONG>,
+					 CleanupDelete<ULONG>,
+					 CleanupDelete<CDouble> >
+		UlongToDoubleMap;
 
 	// iterator
-	typedef CHashMapIter<ULONG, CDouble, gpos::UlHash<ULONG>, gpos::FEqual<ULONG>,
-					CleanupDelete<ULONG>, CleanupDelete<CDouble> > HMIterUlDouble;
+	typedef CHashMapIter<ULONG,
+						 CDouble,
+						 gpos::HashValue<ULONG>,
+						 gpos::Equals<ULONG>,
+						 CleanupDelete<ULONG>,
+						 CleanupDelete<CDouble> >
+		UlongToDoubleMapIter;
 
-	typedef CHashMap<ULONG, ULONG, gpos::UlHash<ULONG>, gpos::FEqual<ULONG>,
-					CleanupDelete<ULONG>, CleanupDelete<ULONG> > HMUlUl;
+	typedef CHashMap<ULONG,
+					 ULONG,
+					 gpos::HashValue<ULONG>,
+					 gpos::Equals<ULONG>,
+					 CleanupDelete<ULONG>,
+					 CleanupDelete<ULONG> >
+		UlongToUlongMap;
 
 	// hash maps mapping INT -> ULONG
-	typedef CHashMap<INT, ULONG, gpos::UlHash<INT>, gpos::FEqual<INT>,
-					CleanupDelete<INT>, CleanupDelete<ULONG> > HMIUl;
+	typedef CHashMap<INT,
+					 ULONG,
+					 gpos::HashValue<INT>,
+					 gpos::Equals<INT>,
+					 CleanupDelete<INT>,
+					 CleanupDelete<ULONG> >
+		IntToUlongMap;
 
 	//---------------------------------------------------------------------------
 	//	@class:
@@ -70,187 +100,148 @@ namespace gpnaucrates
 	//		Abstract statistics API
 	//
 	//---------------------------------------------------------------------------
-	class IStatistics: public CRefCount
+	class IStatistics : public CRefCount
 	{
-		private:
+	private:
+		// private copy ctor
+		IStatistics(const IStatistics &);
 
-			// private copy ctor
-			IStatistics(const IStatistics &);
+		// private assignment operator
+		IStatistics &operator=(IStatistics &);
 
-			// private assignment operator
-			IStatistics& operator=(IStatistics &);
+	public:
+		enum EStatsJoinType
+		{
+			EsjtInnerJoin,
+			EsjtLeftOuterJoin,
+			EsjtLeftSemiJoin,
+			EsjtLeftAntiSemiJoin,
+			EstiSentinel  // should be the last in this enum
+		};
 
-		public:
+		// ctor
+		IStatistics()
+		{
+		}
 
-			enum EStatsJoinType
-					{
-					EsjtInnerJoin,
-					EsjtLeftOuterJoin,
-					EsjtLeftSemiJoin,
-					EsjtLeftAntiSemiJoin,
-					EstiSentinel // should be the last in this enum
-					};
+		// dtor
+		virtual ~IStatistics()
+		{
+		}
 
-			// ctor
-			IStatistics()
-			{}
+		// how many rows
+		virtual CDouble Rows() const = 0;
 
-			// dtor
-			virtual
-			~IStatistics()
-			{}
+		// is statistics on an empty input
+		virtual BOOL IsEmpty() const = 0;
 
-			// how many rows
-			virtual
-			CDouble DRows() const = 0;
+		// statistics could be computed using predicates with external parameters (outer references),
+		// this is the total number of external parameters' values
+		virtual CDouble NumRebinds() const = 0;
 
-			// is statistics on an empty input
-			virtual
-			BOOL FEmpty() const = 0;
+		// skew estimate for given column
+		virtual CDouble GetSkew(ULONG colid) const = 0;
 
-			// statistics could be computed using predicates with external parameters (outer references),
-			// this is the total number of external parameters' values
-			virtual
-			CDouble DRebinds() const = 0;
+		// what is the width in bytes
+		virtual CDouble Width() const = 0;
 
-			// skew estimate for given column
-			virtual
-			CDouble DSkew(ULONG ulColId) const = 0;
+		// what is the width in bytes of set of column id's
+		virtual CDouble Width(ULongPtrArray *colids) const = 0;
 
-			// what is the width in bytes
-			virtual
-			CDouble DWidth() const = 0;
+		// what is the width in bytes of set of column references
+		virtual CDouble Width(IMemoryPool *mp, CColRefSet *colrefs) const = 0;
 
-			// what is the width in bytes of set of column id's
-			virtual
-			CDouble DWidth(DrgPul *pdrgpulColIds) const = 0;
+		// the risk of errors in cardinality estimation
+		virtual ULONG StatsEstimationRisk() const = 0;
 
-			// what is the width in bytes of set of column references
-			virtual
-			CDouble DWidth(IMemoryPool *pmp, CColRefSet *pcrs) const = 0;
+		// update the risk of errors in cardinality estimation
+		virtual void SetStatsEstimationRisk(ULONG risk) = 0;
 
-			// the risk of errors in cardinality estimation
-			virtual
-			ULONG UlStatsEstimationRisk() const = 0;
+		// look up the number of distinct values of a particular column
+		virtual CDouble GetNDVs(const CColRef *colref) = 0;
 
-			// update the risk of errors in cardinality estimation
-			virtual
-			void SetStatsEstimationRisk(ULONG ulRisk) = 0;
+		virtual ULONG GetNumberOfPredicates() const = 0;
 
-			// look up the number of distinct values of a particular column
-			virtual
-			CDouble DNDV(const CColRef *pcr) = 0;
+		// inner join with another stats structure
+		virtual IStatistics *CalcInnerJoinStats(IMemoryPool *mp,
+												const IStatistics *other_stats,
+												CStatsPredJoinArray *join_preds_stats) const = 0;
 
-			virtual
-			ULONG UlNumberOfPredicates() const = 0;
+		// LOJ with another stats structure
+		virtual IStatistics *CalcLOJoinStats(IMemoryPool *mp,
+											 const IStatistics *other_stats,
+											 CStatsPredJoinArray *join_preds_stats) const = 0;
 
-			// inner join with another stats structure
-			virtual
-			IStatistics *PstatsInnerJoin
-						(
-						IMemoryPool *pmp,
-						const IStatistics *pistatsOther,
-						DrgPstatspredjoin *pdrgpstatspredjoin
-						)
-						const = 0;
+		// semi join stats computation
+		virtual IStatistics *CalcLSJoinStats(IMemoryPool *mp,
+											 const IStatistics *inner_side_stats,
+											 CStatsPredJoinArray *join_preds_stats) const = 0;
 
-			// LOJ with another stats structure
-			virtual
-			IStatistics *PstatsLOJ
-						(
-						IMemoryPool *pmp,
-						const IStatistics *pistatsOther,
-						DrgPstatspredjoin *pdrgpstatspredjoin
-						)
-						const = 0;
+		// anti semi join
+		virtual IStatistics *CalcLASJoinStats(IMemoryPool *mp,
+											  const IStatistics *other_stats,
+											  CStatsPredJoinArray *join_preds_stats,
+											  BOOL DoIgnoreLASJHistComputation) const = 0;
 
-			// semi join stats computation
-			virtual
-			IStatistics *PstatsLSJoin
-						(
-						IMemoryPool *pmp,
-						const IStatistics *pstatsInner,
-						DrgPstatspredjoin *pdrgpstatspredjoin
-						)
-						const = 0;
+		// return required props associated with stats object
+		virtual CReqdPropRelational *GetReqdRelationalProps(IMemoryPool *mp) const = 0;
 
-			// anti semi join
-			virtual
-			IStatistics *PstatsLASJoin
-						(
-						IMemoryPool *pmp,
-						const IStatistics *pistatsOther,
-						DrgPstatspredjoin *pdrgpstatspredjoin,
-						BOOL fIgnoreLasjHistComputation
-						)
-						const = 0;
+		// append given stats to current object
+		virtual void AppendStats(IMemoryPool *mp, IStatistics *stats) = 0;
 
-			// return required props associated with stats object
-			virtual
-			CReqdPropRelational *Prprel(IMemoryPool *pmp) const = 0;
+		// set number of rebinds
+		virtual void SetRebinds(CDouble num_rebinds) = 0;
 
-			// append given stats to current object
-			virtual
-			void AppendStats(IMemoryPool *pmp, IStatistics *pstats) = 0;
+		// copy stats
+		virtual IStatistics *CopyStats(IMemoryPool *mp) const = 0;
 
-			// set number of rebinds
-			virtual
-			void SetRebinds(CDouble dRebinds) = 0;
+		// return a copy of this stats object scaled by a given factor
+		virtual IStatistics *ScaleStats(IMemoryPool *mp, CDouble factor) const = 0;
 
-			// copy stats
-			virtual
-			IStatistics *PstatsCopy(IMemoryPool *pmp) const = 0;
+		// copy stats with remapped column ids
+		virtual IStatistics *CopyStatsWithRemap(IMemoryPool *mp,
+												UlongToColRefMap *colref_mapping,
+												BOOL must_exist = true) const = 0;
 
-			// return a copy of this stats object scaled by a given factor
-			virtual
-			IStatistics *PstatsScale(IMemoryPool *pmp, CDouble dFactor) const = 0;
+		// return a set of column references we have stats for
+		virtual CColRefSet *GetColRefSet(IMemoryPool *mp) const = 0;
 
-			// copy stats with remapped column ids
-			virtual
-			IStatistics *PstatsCopyWithRemap(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist = true) const = 0;
+		// print function
+		virtual IOstream &OsPrint(IOstream &os) const = 0;
 
-			// return a set of column references we have stats for
-			virtual
-			CColRefSet *Pcrs(IMemoryPool *pmp) const = 0;
+		// generate the DXL representation of the statistics object
+		virtual CDXLStatsDerivedRelation *GetDxlStatsDrvdRelation(
+			IMemoryPool *mp, CMDAccessor *md_accessor) const = 0;
 
-			// print function
-			virtual
-			IOstream &OsPrint(IOstream &os) const = 0;
-
-			// generate the DXL representation of the statistics object
-			virtual
-			CDXLStatsDerivedRelation *Pdxlstatsderrel(IMemoryPool *pmp, CMDAccessor *pmda) const = 0;
-
-			// is the join type either a left semi join or left anti-semi join
-			static
-			BOOL FSemiJoin
-					(
-					IStatistics::EStatsJoinType esjt
-					)
-			{
-				return (IStatistics::EsjtLeftAntiSemiJoin == esjt) || (IStatistics::EsjtLeftSemiJoin == esjt);
-			}
-	}; // class IStatistics
+		// is the join type either a left semi join or left anti-semi join
+		static BOOL
+		IsSemiJoin(IStatistics::EStatsJoinType join_type)
+		{
+			return (IStatistics::EsjtLeftAntiSemiJoin == join_type) ||
+				   (IStatistics::EsjtLeftSemiJoin == join_type);
+		}
+	};  // class IStatistics
 
 	// shorthand for printing
-	inline
-	IOstream &operator << (IOstream &os, IStatistics &stat)
+	inline IOstream &
+	operator<<(IOstream &os, IStatistics &stats)
 	{
-		return stat.OsPrint(os);
+		return stats.OsPrint(os);
 	}
 	// release istats
-	inline void CleanupStats(IStatistics *pstats)
+	inline void
+	CleanupStats(IStatistics *stats)
 	{
-		if (NULL != pstats)
+		if (NULL != stats)
 		{
-			(dynamic_cast<CRefCount*>(pstats))->Release();
+			(dynamic_cast<CRefCount *>(stats))->Release();
 		}
 	}
 
 	// dynamic array for derived stats
-	typedef CDynamicPtrArray<IStatistics, CleanupStats> DrgPstat;
-}
+	typedef CDynamicPtrArray<IStatistics, CleanupStats> IStatisticsArray;
+}  // namespace gpnaucrates
 
-#endif // !GPNAUCRATES_IStatistics_H
+#endif  // !GPNAUCRATES_IStatistics_H
 
 // EOF

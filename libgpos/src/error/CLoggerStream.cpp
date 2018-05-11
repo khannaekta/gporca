@@ -13,8 +13,8 @@
 
 using namespace gpos;
 
-CLoggerStream CLoggerStream::m_plogStdOut(oswcout);
-CLoggerStream CLoggerStream::m_plogStdErr(oswcerr);
+CLoggerStream CLoggerStream::m_stdout_stream_logger(oswcout);
+CLoggerStream CLoggerStream::m_stderr_stream_logger(oswcerr);
 
 
 //---------------------------------------------------------------------------
@@ -24,14 +24,9 @@ CLoggerStream CLoggerStream::m_plogStdErr(oswcerr);
 //	@doc:
 //
 //---------------------------------------------------------------------------
-CLoggerStream::CLoggerStream
-	(
-	IOstream &os
-	)
-	:
-	CLogger(),
-	m_os(os)
-{}
+CLoggerStream::CLoggerStream(IOstream &os) : CLogger(), m_os(os)
+{
+}
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -41,8 +36,8 @@ CLoggerStream::CLoggerStream
 //
 //---------------------------------------------------------------------------
 CLoggerStream::~CLoggerStream()
-{}
+{
+}
 
 
 // EOF
-

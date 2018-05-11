@@ -12,6 +12,9 @@
 #define GPOPT_CXformSimplifySelectWithSubquery_H
 
 #include "gpos/base.h"
+#include "gpopt/operators/CPatternTree.h"
+#include "gpopt/operators/CPatternLeaf.h"
+#include "gpopt/operators/CLogicalSelect.h"
 #include "gpopt/xforms/CXformSimplifySubquery.h"
 
 namespace gpopt
@@ -40,18 +43,18 @@ namespace gpopt
 			explicit
 			CXformSimplifySelectWithSubquery
 				(
-				IMemoryPool *pmp
+				IMemoryPool *mp
 				)
 				:
 				// pattern
 				CXformSimplifySubquery
 				(
-				GPOS_NEW(pmp) CExpression
+				GPOS_NEW(mp) CExpression
 						(
-						pmp,
-						GPOS_NEW(pmp) CLogicalSelect(pmp),
-						GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)), // relational child
-						GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternTree(pmp))	// predicate tree
+						mp,
+						GPOS_NEW(mp) CLogicalSelect(mp),
+						GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // relational child
+						GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))	// predicate tree
 						)
 				)
 			{}

@@ -32,55 +32,49 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CWStringStatic : public CWString
 	{
-		private:
+	private:
+		// buffer capacity
+		ULONG m_capacity;
 
-			// buffer capacity
-			ULONG m_ulCapacity;
+		// private copy ctor
+		CWStringStatic(const CWStringStatic &);
 
-			// private copy ctor
-			CWStringStatic(const CWStringStatic&);
-			
-		protected:
+	protected:
+		// appends the contents of a buffer to the current string
+		void AppendBuffer(const WCHAR *w_str_buffer);
 
-			// appends the contents of a buffer to the current string
-			void AppendBuffer(const WCHAR *wszBuf);
-			
-		public:
+	public:
+		// ctor
+		CWStringStatic(WCHAR w_str_buffer[], ULONG capacity);
 
-			// ctor
-			CWStringStatic(WCHAR wszBuffer[], ULONG ulCapacity);
+		// ctor with string initialization
+		CWStringStatic(WCHAR w_str_buffer[], ULONG capacity, const WCHAR w_str_init[]);
 
-			// ctor with string initialization
-			CWStringStatic(WCHAR wszBuffer[], ULONG ulCapacity, const WCHAR wszInit[]);
+		// appends a string and replaces character with string
+		void AppendEscape(const CWStringBase *str, WCHAR wc, const WCHAR *w_str_replace);
 
-			// appends a string and replaces character with string
-			void AppendEscape(const CWStringBase *pstr, WCHAR wc, const WCHAR *wszReplace);
+		// appends a formatted string
+		void AppendFormat(const WCHAR *format, ...);
 
-			// appends a formatted string
-			void AppendFormat(const WCHAR *wszFormat, ...);
+		// appends a formatted string based on passed va list
+		void AppendFormatVA(const WCHAR *format, VA_LIST va_args);
 
-			// appends a formatted string based on passed va list
-			void AppendFormatVA(const WCHAR *wszFormat, VA_LIST vaArgs);
+		// appends a null terminated character array
+		virtual void AppendCharArray(const CHAR *sz);
 
-			// appends a null terminated character array
-			virtual
-			void AppendCharArray(const CHAR *sz);
+		// appends a null terminated  wide character array
+		virtual void AppendWideCharArray(const WCHAR *w_str);
 
-			// appends a null terminated  wide character array
-			virtual
-			void AppendWideCharArray(const WCHAR *wsz);
+		// dtor - owner is responsible for releasing the buffer
+		virtual ~CWStringStatic()
+		{
+		}
 
-			// dtor - owner is responsible for releasing the buffer
-			virtual ~CWStringStatic()
-			{}
-					
-			// resets string
-			void Reset();
-
+		// resets string
+		void Reset();
 	};
-}
+}  // namespace gpos
 
-#endif // !GPOS_CWStringStatic_H
+#endif  // !GPOS_CWStringStatic_H
 
 // EOF
-

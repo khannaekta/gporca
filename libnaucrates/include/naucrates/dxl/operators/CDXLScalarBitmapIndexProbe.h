@@ -34,80 +34,66 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarBitmapIndexProbe : public CDXLScalar
 	{
-		private:
-			// index descriptor associated with the scanned table
-			CDXLIndexDescr *m_pdxlid;
+	private:
+		// index descriptor associated with the scanned table
+		CDXLIndexDescr *m_dxl_index_descr;
 
-			// disable copy ctor
-			CDXLScalarBitmapIndexProbe(CDXLScalarBitmapIndexProbe &);
+		// disable copy ctor
+		CDXLScalarBitmapIndexProbe(CDXLScalarBitmapIndexProbe &);
 
-		public:
-			// ctor
-			CDXLScalarBitmapIndexProbe
-				(
-				IMemoryPool *pmp,
-				CDXLIndexDescr *pdxlid
-				);
+	public:
+		// ctor
+		CDXLScalarBitmapIndexProbe(IMemoryPool *mp, CDXLIndexDescr *dxl_index_descr);
 
-			//dtor
-			virtual
-			~CDXLScalarBitmapIndexProbe();
+		//dtor
+		virtual ~CDXLScalarBitmapIndexProbe();
 
-			// operator type
-			virtual
-			Edxlopid Edxlop() const
-			{
-				return EdxlopScalarBitmapIndexProbe;
-			}
+		// operator type
+		virtual Edxlopid
+		GetDXLOperator() const
+		{
+			return EdxlopScalarBitmapIndexProbe;
+		}
 
-			// operator name
-			virtual
-			const CWStringConst *PstrOpName() const;
+		// operator name
+		virtual const CWStringConst *GetOpNameStr() const;
 
-			// index descriptor
-			virtual
-			const CDXLIndexDescr *Pdxlid() const
-			{
-				return m_pdxlid;
-			}
+		// index descriptor
+		virtual const CDXLIndexDescr *
+		GetDXLIndexDescr() const
+		{
+			return m_dxl_index_descr;
+		}
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
-			// does the operator return a boolean result
-			virtual
-			BOOL FBoolean
-					(
-					CMDAccessor *//pmda
-					)
-					const
-			{
-				return false;
-			}
+		// does the operator return a boolean result
+		virtual BOOL
+		HasBoolResult(CMDAccessor *  //md_accessor
+					  ) const
+		{
+			return false;
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			virtual
-			void AssertValid(const CDXLNode *pdxln, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		virtual void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 
-			// conversion function
-			static
-			CDXLScalarBitmapIndexProbe *PdxlopConvert
-				(
-					CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopScalarBitmapIndexProbe== pdxlop->Edxlop());
+		// conversion function
+		static CDXLScalarBitmapIndexProbe *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarBitmapIndexProbe == dxl_op->GetDXLOperator());
 
-				return dynamic_cast<CDXLScalarBitmapIndexProbe *>(pdxlop);
-			}
+			return dynamic_cast<CDXLScalarBitmapIndexProbe *>(dxl_op);
+		}
 
 	};  // class CDXLScalarBitmapIndexProbe
-}
+}  // namespace gpdxl
 
 #endif  // !GPDXL_CDXLScalarBitmapIndexProbe_H
 

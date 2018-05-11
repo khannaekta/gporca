@@ -27,12 +27,8 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarOneTimeFilter::CDXLScalarOneTimeFilter
-	(
-	IMemoryPool *pmp
-	)
-	:
-	CDXLScalarFilter(pmp)
+CDXLScalarOneTimeFilter::CDXLScalarOneTimeFilter(IMemoryPool *mp)
+	: CDXLScalarFilter(mp)
 {
 }
 
@@ -40,14 +36,14 @@ CDXLScalarOneTimeFilter::CDXLScalarOneTimeFilter
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarOneTimeFilter::Edxlop
+//		CDXLScalarOneTimeFilter::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLScalarOneTimeFilter::Edxlop() const
+CDXLScalarOneTimeFilter::GetDXLOperator() const
 {
 	return EdxlopScalarOneTimeFilter;
 }
@@ -55,16 +51,16 @@ CDXLScalarOneTimeFilter::Edxlop() const
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarOneTimeFilter::PstrOpName
+//		CDXLScalarOneTimeFilter::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLScalarOneTimeFilter::PstrOpName() const
+CDXLScalarOneTimeFilter::GetOpNameStr() const
 {
-	return CDXLTokens::PstrToken(EdxltokenScalarOneTimeFilter);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenScalarOneTimeFilter);
 }
 
 //---------------------------------------------------------------------------
@@ -76,21 +72,18 @@ CDXLScalarOneTimeFilter::PstrOpName() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarOneTimeFilter::SerializeToDXL
-	(
-	CXMLSerializer *pxmlser,
-	const CDXLNode * pdxln
-	)
-	const
+CDXLScalarOneTimeFilter::SerializeToDXL(CXMLSerializer *xml_serializer,
+										const CDXLNode *dxlnode) const
 {
-	const CWStringConst *pstrElemName = PstrOpName();
+	const CWStringConst *element_name = GetOpNameStr();
 
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
 	// serilize children
-	pdxln->SerializeChildrenToDXL(pxmlser);
+	dxlnode->SerializeChildrenToDXL(xml_serializer);
 
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 

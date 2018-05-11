@@ -17,6 +17,7 @@
 #define GPOS_CCACHEENTRY_H_
 
 #include "gpos/memory/IMemoryPool.h"
+#include "gpos/common/CList.h"
 
 
 // setting the cache quota to 0 means unlimited
@@ -39,21 +40,25 @@ namespace gpos
 	template <class T>
 	struct ptr
 	{
-		T* operator()(T& obj)
+		T *
+		operator()(T &obj)
 		{
 			return &obj;
 		}
 
-		const T* operator()(const T& obj) {
+		const T *
+		operator()(const T &obj)
+		{
 			return &obj;
 		}
 	};
 
 	// Template specialization for pointer type
 	template <class T>
-	struct ptr<T*>
+	struct ptr<T *>
 	{
-		T* operator()(T* ptr)
+		T *
+		operator()(T *ptr)
 		{
 			return ptr;
 		}
@@ -73,134 +78,134 @@ namespace gpos
 	template <class T, class K>
 	class CCacheEntry
 	{
-		private:
+	private:
+		// allocated memory pool to the cached object
+		IMemoryPool *m_mp;
 
-			// allocated memory pool to the cached object
-			IMemoryPool *m_pmp;
+		// value that needs to be cached
+		T m_val;
 
-			// value that needs to be cached
-			T m_pVal;
+		// true if this entry is marked for deletion
+		BOOL m_deleted;
 
-			// true if this entry is marked for deletion
-			BOOL m_fDeleted;
+		// gclock counter; an entry is eligible for eviction if this
+		// counter drops to 0 and the entry is not pinned
+		ULONG m_g_clock_counter;
 
-			// gclock counter; an entry is eligible for eviction if this
-			// counter drops to 0 and the entry is not pinned
-			ULONG m_ulGClockCounter;
+	public:
+		// ctor
+		CCacheEntry(IMemoryPool *mp, K key, T val, ULONG g_clock_counter)
+			: m_mp(mp),
+			  m_val(val),
+			  m_deleted(false),
+			  m_g_clock_counter(g_clock_counter),
+			  m_key(key)
+		{
+			// CCache entry has the ownership now. So ideally any time ref count can't go lesser than 1.
+			// In destructor, we decrease it from 1 to 0.
+			IncRefCount();
+		}
 
-		public:
+		// dtor
+		virtual ~CCacheEntry()
+		{
+			// Decrease ref count of m_stats_comp_val_int to get destroyed by itself if ref count is 0
+			DecRefCount();
+		}
 
-			// ctor
-			CCacheEntry
-				(
-				IMemoryPool *pmp,
-				K pKey,
-				T pVal,
-				ULONG ulGClockCounter
-				)
-				:
-				m_pmp(pmp),
-				m_pVal(pVal),
-				m_fDeleted(false),
-				m_ulGClockCounter(ulGClockCounter),
-				m_pKey(pKey)
-			{
-				// CCache entry has the ownership now. So ideally any time ref count can't go lesser than 1.
-				// In destructor, we decrease it from 1 to 0.
-				IncRefCount();
-			}
+		// gets the key of cached object
+		K
+		Key() const
+		{
+			return m_key;
+		}
 
-			// dtor
-			virtual
-			~CCacheEntry()
-			{
-				// Decrease ref count of m_pVal to get destroyed by itself if ref count is 0
-				DecRefCount();
-			}
+		// gets the value of cached object
+		T
+		Val() const
+		{
+			return m_val;
+		}
 
-			// gets the key of cached object
-			K PKey() const
-			{
-				return m_pKey;
-			}
+		// gets the memory pool of cached object
+		IMemoryPool *
+		Pmp() const
+		{
+			return m_mp;
+		}
 
-			// gets the value of cached object
-			T PVal() const
-			{
-				return m_pVal;
-			}
+		// marks entry as deleted
+		void
+		MarkForDeletion()
+		{
+			m_deleted = true;
+		}
 
-			// gets the memory pool of cached object
-			IMemoryPool *Pmp() const
-			{
-				return m_pmp;
-			}
+		// returns true if entry is marked as deleted
+		BOOL
+		IsMarkedForDeletion() const
+		{
+			return m_deleted;
+		}
 
-			// marks entry as deleted
-			void MarkForDeletion()
-			{
-				m_fDeleted = true;
-			}
+		// get value's ref-count
+		ULONG
+		RefCount() const
+		{
+			return (ULONG) ptr<T>()(m_val)->RefCount();
+		}
 
-			// returns true if entry is marked as deleted
-			BOOL FMarkedForDeletion() const
-			{
-				return m_fDeleted;
-			}
+		// increments value's ref-count
+		void
+		IncRefCount()
+		{
+			ptr<T>()(m_val)->AddRef();
+		}
 
-			// get value's ref-count
-			ULONG UlRefCount() const
-			{
-				return (ULONG)ptr<T>()(m_pVal)->UlpRefCount();
-			}
+		//decrements value's ref-count
+		void
+		DecRefCount()
+		{
+			ptr<T>()(m_val)->Release();
+		}
 
-			// increments value's ref-count
-			void IncRefCount()
-			{
-				ptr<T>()(m_pVal)->AddRef();
-			}
+		// sets the gclock counter for an entry; useful for updating counter upon access
+		void
+		SetGClockCounter(ULONG g_clock_counter)
+		{
+			m_g_clock_counter = g_clock_counter;
+		}
 
-			//decrements value's ref-count
-			void DecRefCount()
-			{
-				ptr<T>()(m_pVal)->Release();
-			}
+		// decrements the gclock counter for an entry during eviction process
+		void
+		DecrementGClockCounter()
+		{
+			m_g_clock_counter--;
+		}
 
-			// sets the gclock counter for an entry; useful for updating counter upon access
-			void SetGClockCounter(ULONG ulGClockCounter)
-			{
-				m_ulGClockCounter = ulGClockCounter;
-			}
+		// returns the current value of the gclock counter
+		ULONG
+		GetGClockCounter()
+		{
+			return m_g_clock_counter;
+		}
 
-			// decrements the gclock counter for an entry during eviction process
-			void DecrementGClockCounter()
-			{
-				m_ulGClockCounter--;
-			}
+		// the following data members are public because they
+		// need to be used by GPOS_OFFSET macro for list construction
 
-			// returns the current value of the gclock counter
-			ULONG ULGetGClockCounter()
-			{
-				return m_ulGClockCounter;
-			}
+		// a pointer to entry's key
+		K m_key;
 
-			// the following data members are public because they
-			// need to be used by GPOS_OFFSET macro for list construction
+		// link used to maintain entries in a hashtable
+		SLink m_link_hash;
 
-			// a pointer to entry's key
-			K m_pKey;
+		// invalid key
+		static const K m_invalid_key;
 
-			// link used to maintain entries in a hashtable
-			SLink m_linkHash;
+	};  // CCacheEntry
 
-			// invalid key
-			static
-			const K m_pInvalidKey;
+}  // namespace gpos
 
-	}; // CCacheEntry
-
-} // namespace gpos
-
-#endif // GPOS_CCACHEENTRY_H_
+#endif  // GPOS_CCACHEENTRY_H_
 
 // EOF

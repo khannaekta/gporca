@@ -32,48 +32,40 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerLogicalDelete : public CParseHandlerLogicalOp
 	{
-		private:
+	private:
+		// ctid column id
+		ULONG m_ctid_colid;
 
-			// ctid column id
-			ULONG m_ulCtid;
+		// segmentId column id
+		ULONG m_segid_colid;
 
-			// segmentId column id
-			ULONG m_ulSegmentId;
+		// delete col ids
+		ULongPtrArray *m_deletion_colid_array;
 
-			// delete col ids
-			DrgPul *m_pdrgpulDelete;
+		// private copy ctor
+		CParseHandlerLogicalDelete(const CParseHandlerLogicalDelete &);
 
-			// private copy ctor
-			CParseHandlerLogicalDelete(const CParseHandlerLogicalDelete &);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the start of an element
-			void StartElement
-				(
-				const XMLCh* const xmlszUri, 		// URI of element's namespace
-				const XMLCh* const xmlszLocalname,	// local part of element's name
-				const XMLCh* const xmlszQname,		// element's qname
-				const Attributes& attr				// element's attributes
-				);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the end of an element
-			void EndElement
-				(
-				const XMLCh* const xmlszUri, 		// URI of element's namespace
-				const XMLCh* const xmlszLocalname,	// local part of element's name
-				const XMLCh* const xmlszQname		// element's qname
-				);
-
-		public:
-			// ctor
-			CParseHandlerLogicalDelete
-				(
-				IMemoryPool *pmp,
-				CParseHandlerManager *pphm,
-				CParseHandlerBase *pphRoot
-				);
+	public:
+		// ctor
+		CParseHandlerLogicalDelete(IMemoryPool *mp,
+								   CParseHandlerManager *parse_handler_mgr,
+								   CParseHandlerBase *parse_handler_root);
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerLogicalDelete_H
+#endif  // !GPDXL_CParseHandlerLogicalDelete_H
 
 // EOF

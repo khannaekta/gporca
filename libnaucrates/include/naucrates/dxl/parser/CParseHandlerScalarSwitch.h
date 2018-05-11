@@ -33,49 +33,38 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerScalarSwitch : public CParseHandlerScalarOp
 	{
-		private:
+	private:
+		// return type
+		IMDId *m_mdid_type;
 
-			// return type
-			IMDId *m_pmdidType;
+		// was the arg child seen
+		BOOL m_arg_processed;
 
-			// was the arg child seen
-			BOOL m_fArgProcessed;
+		// was the default value seen
+		BOOL m_default_val_processed;
 
-			// was the default value seen
-			BOOL m_fDefaultProcessed;
+		// private copy ctor
+		CParseHandlerScalarSwitch(const CParseHandlerScalarSwitch &);
 
-			// private copy ctor
-			CParseHandlerScalarSwitch(const CParseHandlerScalarSwitch &);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,
+						  const XMLCh *const element_local_name,
+						  const XMLCh *const element_qname,
+						  const Attributes &attr);
 
-			// process the start of an element
-			void StartElement
-					(
-					const XMLCh* const xmlszUri,
-					const XMLCh* const xmlszLocalname,
-					const XMLCh* const xmlszQname,
-					const Attributes& attr
-					);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,
+						const XMLCh *const element_local_name,
+						const XMLCh *const element_qname);
 
-			// process the end of an element
-			void EndElement
-					(
-					const XMLCh* const xmlszUri,
-					const XMLCh* const xmlszLocalname,
-					const XMLCh* const xmlszQname
-					);
+	public:
+		// ctor
+		CParseHandlerScalarSwitch(IMemoryPool *mp,
+								  CParseHandlerManager *parse_handler_mgr,
+								  CParseHandlerBase *parse_handler_root);
+	};
+}  // namespace gpdxl
 
-		public:
-			// ctor
-			CParseHandlerScalarSwitch
-					(
-					IMemoryPool *pmp,
-					CParseHandlerManager *pphm,
-					CParseHandlerBase *pphRoot
-					);
-
-		};
-}
-
-#endif // !GPDXL_CParseHandlerScalarSwitch_H
+#endif  // !GPDXL_CParseHandlerScalarSwitch_H
 
 //EOF

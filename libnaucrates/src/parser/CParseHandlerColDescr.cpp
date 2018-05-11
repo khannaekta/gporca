@@ -30,17 +30,13 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerColDescr::CParseHandlerColDescr
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
-	:
-	CParseHandlerBase(pmp, pphm, pphRoot),
-	m_pdxlcd(NULL)
+CParseHandlerColDescr::CParseHandlerColDescr(IMemoryPool *mp,
+											 CParseHandlerManager *parse_handler_mgr,
+											 CParseHandlerBase *parse_handler_base)
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_base),
+	  m_current_column_descr(NULL)
 {
-	m_pdrgdxlcd = GPOS_NEW(m_pmp) DrgPdxlcd(m_pmp);
+	m_dxl_column_descr_array = GPOS_NEW(mp) CDXLColDescrArray(mp);
 }
 
 //---------------------------------------------------------------------------
@@ -54,21 +50,21 @@ CParseHandlerColDescr::CParseHandlerColDescr
 
 CParseHandlerColDescr::~CParseHandlerColDescr()
 {
-	CRefCount::SafeRelease(m_pdrgdxlcd);
+	CRefCount::SafeRelease(m_dxl_column_descr_array);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CParseHandlerColDescr::Pdrgpdxlcd
+//		CParseHandlerColDescr::GetDXLColumnDescrArray
 //
 //	@doc:
 //		Returns the array of column descriptors.
 //
 //---------------------------------------------------------------------------
-DrgPdxlcd *
-CParseHandlerColDescr::Pdrgpdxlcd()
+CDXLColDescrArray *
+CParseHandlerColDescr::GetDXLColumnDescrArray()
 {
-	return m_pdrgdxlcd;
+	return m_dxl_column_descr_array;
 }
 
 //---------------------------------------------------------------------------
@@ -80,28 +76,29 @@ CParseHandlerColDescr::Pdrgpdxlcd()
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerColDescr::StartElement
-	(
-		const XMLCh* const, // xmlszUri,
-		const XMLCh* const xmlszLocalname,
-		const XMLCh* const, // xmlszQname
-		const Attributes& attrs
-	)
+CParseHandlerColDescr::StartElement(const XMLCh *const,  // element_uri,
+									const XMLCh *const element_local_name,
+									const XMLCh *const,  // element_qname
+									const Attributes &attrs)
 {
-	if (0 == XMLString::compareString(xmlszLocalname, CDXLTokens::XmlstrToken(EdxltokenColumns)))
+	if (0 ==
+		XMLString::compareString(element_local_name, CDXLTokens::XmlstrToken(EdxltokenColumns)))
 	{
 		// start of the columns block
-		GPOS_ASSERT(NULL == m_pdxlcd);
+		GPOS_ASSERT(NULL == m_current_column_descr);
 	}
-	else if (0 == XMLString::compareString(xmlszLocalname, CDXLTokens::XmlstrToken(EdxltokenColumn)))
+	else if (0 ==
+			 XMLString::compareString(element_local_name, CDXLTokens::XmlstrToken(EdxltokenColumn)))
 	{
 		// start of a new column descriptor
-		m_pdxlcd = CDXLOperatorFactory::Pdxlcd(m_pphm->Pmm(), attrs);
+		m_current_column_descr =
+			CDXLOperatorFactory::MakeColumnDescr(m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 	}
 	else
 	{
-		CWStringDynamic *pstr = CDXLUtils::PstrFromXMLCh(m_pphm->Pmm(), xmlszLocalname);
-		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, pstr->Wsz());
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 }
 
@@ -114,34 +111,34 @@ CParseHandlerColDescr::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerColDescr::EndElement
-	(
-		const XMLCh* const, // xmlszUri,
-		const XMLCh* const xmlszLocalname,
-		const XMLCh* const // xmlszQname
-	)
+CParseHandlerColDescr::EndElement(const XMLCh *const,  // element_uri,
+								  const XMLCh *const element_local_name,
+								  const XMLCh *const  // element_qname
+)
 {
-	if (0 == XMLString::compareString(xmlszLocalname, CDXLTokens::XmlstrToken(EdxltokenColumns)))
+	if (0 ==
+		XMLString::compareString(element_local_name, CDXLTokens::XmlstrToken(EdxltokenColumns)))
 	{
 		// finish the columns block
-		GPOS_ASSERT(NULL != m_pdrgdxlcd);
-		m_pphm->DeactivateHandler();
+		GPOS_ASSERT(NULL != m_dxl_column_descr_array);
+		m_parse_handler_mgr->DeactivateHandler();
 	}
-	else if (0 == XMLString::compareString(xmlszLocalname, CDXLTokens::XmlstrToken(EdxltokenColumn)))
+	else if (0 ==
+			 XMLString::compareString(element_local_name, CDXLTokens::XmlstrToken(EdxltokenColumn)))
 	{
 		// finish up a column descriptor
-		GPOS_ASSERT(NULL != m_pdxlcd);
-		GPOS_ASSERT(NULL != m_pdrgdxlcd);
-		m_pdrgdxlcd->Append(m_pdxlcd);
+		GPOS_ASSERT(NULL != m_current_column_descr);
+		GPOS_ASSERT(NULL != m_dxl_column_descr_array);
+		m_dxl_column_descr_array->Append(m_current_column_descr);
 		// reset column descr
-		m_pdxlcd = NULL;
+		m_current_column_descr = NULL;
 	}
 	else
 	{
-		CWStringDynamic *pstr = CDXLUtils::PstrFromXMLCh(m_pphm->Pmm(), xmlszLocalname);
-		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, pstr->Wsz());
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 }
 
 // EOF
-

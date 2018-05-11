@@ -8,7 +8,7 @@
 //	@doc:
 // Implementation of the factory methods for creating parse handlers
 //
-//	@owner: 
+//	@owner:
 //
 //
 //	@test:
@@ -23,2410 +23,2051 @@ using namespace gpdxl;
 
 XERCES_CPP_NAMESPACE_USE
 
-CParseHandlerFactory::HMXMLStrPfPHCreator *
-CParseHandlerFactory::m_phmPHCreators = NULL;
+CParseHandlerFactory::TokenParseHandlerFuncMap
+	*CParseHandlerFactory::m_token_parse_handler_func_map = NULL;
 
 // adds a new mapping of token to corresponding parse handler
 void
-CParseHandlerFactory::AddMapping
-	(
-	Edxltoken edxltok,
-	PfParseHandlerOpCreator *pfphopc
-	)
+CParseHandlerFactory::AddMapping(Edxltoken token_type,
+								 ParseHandlerOpCreatorFunc *parse_handler_op_func)
 {
-	GPOS_ASSERT(NULL != m_phmPHCreators);
-	const XMLCh *xmlszTok = CDXLTokens::XmlstrToken(edxltok);
-	GPOS_ASSERT(NULL != xmlszTok);
-	
+	GPOS_ASSERT(NULL != m_token_parse_handler_func_map);
+	const XMLCh *token_identifier_str = CDXLTokens::XmlstrToken(token_type);
+	GPOS_ASSERT(NULL != token_identifier_str);
+
 #ifdef GPOS_DEBUG
-	BOOL fInserted = 
+	BOOL success =
 #endif
-	m_phmPHCreators->FInsert(xmlszTok, pfphopc);
-	
-	GPOS_ASSERT(fInserted);
+		m_token_parse_handler_func_map->Insert(token_identifier_str, parse_handler_op_func);
+
+	GPOS_ASSERT(success);
 }
 
 // initialize mapping of tokens to parse handlers
 void
-CParseHandlerFactory::Init
-	(
-	IMemoryPool *pmp
-	)
+CParseHandlerFactory::Init(IMemoryPool *mp)
 {
-	m_phmPHCreators = GPOS_NEW(pmp) HMXMLStrPfPHCreator(pmp, ulHashMapSize);
-	
+	m_token_parse_handler_func_map =
+		GPOS_NEW(mp) TokenParseHandlerFuncMap(mp, HASH_MAP_SIZE);
+
 	// array mapping XML Token -> Parse Handler Creator mappings to hashmap
-	SParseHandlerMapping rgParseHandlers[] =
-	{
-			{EdxltokenPlan, &PphPlan},
-			{EdxltokenMetadata, &PphMetadata},
-			{EdxltokenMDRequest, &PphMDRequest},
-			{EdxltokenTraceFlags, &PphTraceFlags},
-			{EdxltokenOptimizerConfig, &PphOptimizerConfig},
-			{EdxltokenRelationExternal, &PphMetadataRelationExternal},
-			{EdxltokenRelationCTAS, &PphMetadataRelationCTAS},
-			{EdxltokenEnumeratorConfig, &PphEnumeratorConfig},
-			{EdxltokenStatisticsConfig, &PphStatisticsConfig},
-			{EdxltokenCTEConfig, &PphCTEConfig},
-			{EdxltokenCostModelConfig, &PphCostModelConfig},
-			{EdxltokenHint, &PphHint},
-			{EdxltokenWindowOids, &PphWindowOids},
+	SParseHandlerMapping token_parse_handler_map[] = {
+		{EdxltokenPlan, &CreatePlanParseHandler},
+		{EdxltokenMetadata, &CreateMetadataParseHandler},
+		{EdxltokenMDRequest, &CreateMDRequestParseHandler},
+		{EdxltokenTraceFlags, &CreateTraceFlagsParseHandler},
+		{EdxltokenOptimizerConfig, &CreateOptimizerCfgParseHandler},
+		{EdxltokenRelationExternal, &CreateMDRelationExtParseHandler},
+		{EdxltokenRelationCTAS, &CreateMDRelationCTASParseHandler},
+		{EdxltokenEnumeratorConfig, &CreateEnumeratorCfgParseHandler},
+		{EdxltokenStatisticsConfig, &CreateStatisticsCfgParseHandler},
+		{EdxltokenCTEConfig, &CreateCTECfgParseHandler},
+		{EdxltokenCostModelConfig, &CreateCostModelCfgParseHandler},
+		{EdxltokenHint, &CreateHintParseHandler},
+		{EdxltokenWindowOids, &CreateWindowOidsParseHandler},
 
-			{EdxltokenRelation, &PphMetadataRelation},
-			{EdxltokenIndex, &PphMDIndex},
-			{EdxltokenMDType, &PphMDGPDBType},
-			{EdxltokenGPDBScalarOp, &PphMDGPDBScalarOp},
-			{EdxltokenGPDBFunc, &PphMDGPDBFunc},
-			{EdxltokenGPDBAgg, &PphMDGPDBAgg},
-			{EdxltokenGPDBTrigger, &PphMDGPDBTrigger},
-			{EdxltokenCheckConstraint, &PphMDGPDBCheckConstraint},
-			{EdxltokenRelationStats, &PphRelStats},
-			{EdxltokenColumnStats, &PphColStats},
-			{EdxltokenMetadataIdList, &PphMetadataIdList},
-			{EdxltokenIndexInfoList, &PphMDIndexInfoList},
-			{EdxltokenMetadataColumns, &PphMetadataColumns},
-			{EdxltokenMetadataColumn, &PphMetadataColumn},
-			{EdxltokenColumnDefaultValue, &PphColumnDefaultValueExpr},
-			{EdxltokenColumnStatsBucket, &PphColStatsBucket},
-			{EdxltokenGPDBCast, &PphMDCast},
-			{EdxltokenGPDBMDScCmp, &PphMDScCmp},
-			{EdxltokenGPDBArrayCoerceCast, &PphMDArrayCoerceCast},
+		{EdxltokenRelation, &CreateMDRelationParseHandler},
+		{EdxltokenIndex, &CreateMDIndexParseHandler},
+		{EdxltokenMDType, &CreateMDTypeParseHandler},
+		{EdxltokenGPDBScalarOp, &CreateMDScalarOpParseHandler},
+		{EdxltokenGPDBFunc, &CreateMDFuncParseHandler},
+		{EdxltokenGPDBAgg, &CreateMDAggParseHandler},
+		{EdxltokenGPDBTrigger, &CreateMDTriggerParseHandler},
+		{EdxltokenCheckConstraint, &CreateMDChkConstraintParseHandler},
+		{EdxltokenRelationStats, &CreateRelStatsParseHandler},
+		{EdxltokenColumnStats, &CreateColStatsParseHandler},
+		{EdxltokenMetadataIdList, &CreateMDIdListParseHandler},
+		{EdxltokenIndexInfoList, &CreateMDIndexInfoListParseHandler},
+		{EdxltokenMetadataColumns, &CreateMDColsParseHandler},
+		{EdxltokenMetadataColumn, &CreateMDColParseHandler},
+		{EdxltokenColumnDefaultValue, &CreateColDefaultValExprParseHandler},
+		{EdxltokenColumnStatsBucket, &CreateColStatsBucketParseHandler},
+		{EdxltokenGPDBCast, &CreateMDCastParseHandler},
+		{EdxltokenGPDBMDScCmp, &CreateMDScCmpParseHandler},
+		{EdxltokenGPDBArrayCoerceCast, &CreateMDArrayCoerceCastParseHandler},
 
-			{EdxltokenPhysical, &PphPhysOp},
+		{EdxltokenPhysical, &CreatePhysicalOpParseHandler},
 
-			{EdxltokenPhysicalAggregate, &PphAgg},
-			{EdxltokenPhysicalTableScan, &PphTableScan},
-			{EdxltokenPhysicalBitmapTableScan, &PphBitmapTableScan},
-			{EdxltokenPhysicalDynamicBitmapTableScan, &PphDynamicBitmapTableScan},
-			{EdxltokenPhysicalExternalScan, &PphExternalScan},
-			{EdxltokenPhysicalHashJoin, &PphHashJoin},
-			{EdxltokenPhysicalNLJoin, &PphNLJoin},
-			{EdxltokenPhysicalMergeJoin, &PphMergeJoin},
-			{EdxltokenPhysicalGatherMotion, &PphGatherMotion},
-			{EdxltokenPhysicalBroadcastMotion, &PphBroadcastMotion},
-			{EdxltokenPhysicalRedistributeMotion, &PphRedistributeMotion},
-			{EdxltokenPhysicalRoutedDistributeMotion, &PphRoutedMotion},
-			{EdxltokenPhysicalRandomMotion, &PphRandomMotion},
-			{EdxltokenPhysicalSubqueryScan, &PphSubqScan},
-			{EdxltokenPhysicalResult, &PphResult},
-			{EdxltokenPhysicalLimit, &PphLimit},
-			{EdxltokenPhysicalSort, &PphSort},
-			{EdxltokenPhysicalAppend, &PphAppend},
-			{EdxltokenPhysicalMaterialize, &PphMaterialize},
-		 	{EdxltokenPhysicalDynamicTableScan, &PphDynamicTableScan},
-		 	{EdxltokenPhysicalDynamicIndexScan, &PphDynamicIndexScan},
-		 	{EdxltokenPhysicalPartitionSelector, &PphPartitionSelector},
-			{EdxltokenPhysicalSequence, &PphSequence},
-			{EdxltokenPhysicalIndexScan, &PphIndexScan},
-			{EdxltokenPhysicalIndexOnlyScan, &PphIndexOnlyScan},
-			{EdxltokenScalarBitmapIndexProbe, &PphBitmapIndexProbe},
-			{EdxltokenIndexDescr, &PphIndexDescr},
+		{EdxltokenPhysicalAggregate, &CreateAggParseHandler},
+		{EdxltokenPhysicalTableScan, &CreateTableScanParseHandler},
+		{EdxltokenPhysicalBitmapTableScan, &CreateBitmapTableScanParseHandler},
+		{EdxltokenPhysicalDynamicBitmapTableScan, &CreateDynBitmapTableScanParseHandler},
+		{EdxltokenPhysicalExternalScan, &CreateExternalScanParseHandler},
+		{EdxltokenPhysicalHashJoin, &CreateHashJoinParseHandler},
+		{EdxltokenPhysicalNLJoin, &CreateNLJoinParseHandler},
+		{EdxltokenPhysicalMergeJoin, &CreateMergeJoinParseHandler},
+		{EdxltokenPhysicalGatherMotion, &CreateGatherMotionParseHandler},
+		{EdxltokenPhysicalBroadcastMotion, &CreateBroadcastMotionParseHandler},
+		{EdxltokenPhysicalRedistributeMotion, &CreateRedistributeMotionParseHandler},
+		{EdxltokenPhysicalRoutedDistributeMotion, &CreateRoutedMotionParseHandler},
+		{EdxltokenPhysicalRandomMotion, &CreateRandomMotionParseHandler},
+		{EdxltokenPhysicalSubqueryScan, &CreateSubqueryScanParseHandler},
+		{EdxltokenPhysicalResult, &CreateResultParseHandler},
+		{EdxltokenPhysicalLimit, &CreateLimitParseHandler},
+		{EdxltokenPhysicalSort, &CreateSortParseHandler},
+		{EdxltokenPhysicalAppend, &CreateAppendParseHandler},
+		{EdxltokenPhysicalMaterialize, &CreateMaterializeParseHandler},
+		{EdxltokenPhysicalDynamicTableScan, &CreateDTSParseHandler},
+		{EdxltokenPhysicalDynamicIndexScan, &CreateDynamicIdxScanParseHandler},
+		{EdxltokenPhysicalPartitionSelector, &CreatePartitionSelectorParseHandler},
+		{EdxltokenPhysicalSequence, &CreateSequenceParseHandler},
+		{EdxltokenPhysicalIndexScan, &CreateIdxScanListParseHandler},
+		{EdxltokenPhysicalIndexOnlyScan, &CreateIdxOnlyScanParseHandler},
+		{EdxltokenScalarBitmapIndexProbe, &CreateBitmapIdxProbeParseHandler},
+		{EdxltokenIndexDescr, &CreateIdxDescrParseHandler},
 
-			{EdxltokenPhysicalWindow, &PphWindow},
-			{EdxltokenScalarWindowref, &PphWindowRef},
-			{EdxltokenWindowFrame, &PphWindowFrame},
-			{EdxltokenScalarWindowFrameLeadingEdge, &PphWindowFrameLeadingEdge},
-			{EdxltokenScalarWindowFrameTrailingEdge, &PphWindowFrameTrailingEdge},
-			{EdxltokenWindowKey, &PphWindowKey},
-			{EdxltokenWindowKeyList, &PphWindowKeyList},
+		{EdxltokenPhysicalWindow, &CreateWindowParseHandler},
+		{EdxltokenScalarWindowref, &CreateWindowRefParseHandler},
+		{EdxltokenWindowFrame, &CreateWindowFrameParseHandler},
+		{EdxltokenScalarWindowFrameLeadingEdge, &CreateFrameLeadingEdgeParseHandler},
+		{EdxltokenScalarWindowFrameTrailingEdge, &CreateFrameTrailingEdgeParseHandler},
+		{EdxltokenWindowKey, &CreateWindowKeyParseHandler},
+		{EdxltokenWindowKeyList, &CreateWindowKeyListParseHandler},
 
-			{EdxltokenScalarIndexCondList, &PphIndexCondList},
- 
-			{EdxltokenScalar, &PphScalarOp},
+		{EdxltokenScalarIndexCondList, &CreateIdxCondListParseHandler},
 
-			{EdxltokenScalarFilter, &PphFilter},
-			{EdxltokenScalarOneTimeFilter, &PphFilter},
-			{EdxltokenScalarRecheckCondFilter, &PphFilter},
-			{EdxltokenScalarProjList, &PphProjList},
-			{EdxltokenScalarProjElem, &PphProjElem},
-			{EdxltokenScalarAggref, &PphAggref},
-			{EdxltokenScalarSortColList, &PphSortColList},
-			{EdxltokenScalarSortCol, &PphSortCol},
-			{EdxltokenScalarCoalesce, &PphScalarCoalesce},
-			{EdxltokenScalarComp, &PphScalarCmp},
-			{EdxltokenScalarDistinctComp, &PphDistinctCmp},
-			{EdxltokenScalarIdent, &PphScalarId},
-			{EdxltokenScalarOpExpr, &PphScalarOpexpr},
-			{EdxltokenScalarArrayComp, &PphScalarArrayCmp},
-			{EdxltokenScalarBoolOr, &PphScalarBoolExpr},
-			{EdxltokenScalarBoolNot, &PphScalarBoolExpr},
-			{EdxltokenScalarBoolAnd, &PphScalarBoolExpr},
-			{EdxltokenScalarMin, &PphScalarMinMax},
-			{EdxltokenScalarMax, &PphScalarMinMax},
-			{EdxltokenScalarBoolTestIsTrue, &PphBooleanTest},
-			{EdxltokenScalarBoolTestIsNotTrue, &PphBooleanTest},
-			{EdxltokenScalarBoolTestIsFalse, &PphBooleanTest},
-			{EdxltokenScalarBoolTestIsNotFalse, &PphBooleanTest},
-			{EdxltokenScalarBoolTestIsUnknown, &PphBooleanTest},
-			{EdxltokenScalarBoolTestIsNotUnknown, &PphBooleanTest},
-			{EdxltokenScalarSubPlan, &PphScalarSubPlan},
-			{EdxltokenScalarConstValue, &PphScalarConstValue},
-			{EdxltokenScalarIfStmt, &PphIfStmt},
-			{EdxltokenScalarSwitch, &PphScalarSwitch},
-			{EdxltokenScalarSwitchCase, &PphScalarSwitchCase},
-			{EdxltokenScalarCaseTest, &PphScalarCaseTest},
-			{EdxltokenScalarFuncExpr, &PphScalarFuncExpr},
-			{EdxltokenScalarIsNull, &PphScalarNullTest},
-			{EdxltokenScalarIsNotNull, &PphScalarNullTest},
-			{EdxltokenScalarNullIf, &PphScalarNullIf},
-			{EdxltokenScalarCast, &PphScalarCast},
-			{EdxltokenScalarCoerceToDomain, PphScalarCoerceToDomain},
-			{EdxltokenScalarCoerceViaIO, PphScalarCoerceViaIO},
-			{EdxltokenScalarArrayCoerceExpr, PphScalarArrayCoerceExpr},
-			{EdxltokenScalarHashExpr, &PphHashExpr},
-			{EdxltokenScalarHashCondList, &PphCondList},
-			{EdxltokenScalarMergeCondList, &PphCondList},
-			{EdxltokenScalarHashExprList, &PphHashExprList},
-			{EdxltokenScalarGroupingColList, &PphGroupingColList},
-			{EdxltokenScalarLimitOffset, &PphLimitoffset},
-			{EdxltokenScalarLimitCount, &PphLimitcount},
-			{EdxltokenScalarSubPlanTestExpr, &PphScalarSubPlanTestExpr},
-			{EdxltokenScalarSubPlanParamList, &PphScalarSubPlanParamList},
-			{EdxltokenScalarSubPlanParam, &PphScalarSubPlanParam},
-			{EdxltokenScalarOpList, &PphScalarOpList},
-			{EdxltokenScalarPartOid, &PphScalarPartOid},
-			{EdxltokenScalarPartDefault, &PphScalarPartDefault},
-			{EdxltokenScalarPartBound, &PphScalarPartBound},
-			{EdxltokenScalarPartBoundInclusion, &PphScalarPartBoundInclusion},
-			{EdxltokenScalarPartBoundOpen, &PphScalarPartBoundOpen},
-			{EdxltokenScalarPartListValues, &PphScalarPartListValues},
-			{EdxltokenScalarPartListNullTest, &PphScalarPartListNullTest},
+		{EdxltokenScalar, &CreateScalarOpParseHandler},
 
-			{EdxltokenScalarSubquery, &PphScalarSubquery},
-			{EdxltokenScalarBitmapAnd, &PphScalarBitmapBoolOp},
-			{EdxltokenScalarBitmapOr, &PphScalarBitmapBoolOp},
+		{EdxltokenScalarFilter, &CreateFilterParseHandler},
+		{EdxltokenScalarOneTimeFilter, &CreateFilterParseHandler},
+		{EdxltokenScalarRecheckCondFilter, &CreateFilterParseHandler},
+		{EdxltokenScalarProjList, &CreateProjListParseHandler},
+		{EdxltokenScalarProjElem, &CreateProjElemParseHandler},
+		{EdxltokenScalarAggref, &CreateAggRefParseHandler},
+		{EdxltokenScalarSortColList, &CreateSortColListParseHandler},
+		{EdxltokenScalarSortCol, &CreateSortColParseHandler},
+		{EdxltokenScalarCoalesce, &CreateScCoalesceParseHandler},
+		{EdxltokenScalarComp, &CreateScCmpParseHandler},
+		{EdxltokenScalarDistinctComp, &CreateDistinctCmpParseHandler},
+		{EdxltokenScalarIdent, &CreateScIdParseHandler},
+		{EdxltokenScalarOpExpr, &CreateScOpExprParseHandler},
+		{EdxltokenScalarArrayComp, &CreateScArrayCmpParseHandler},
+		{EdxltokenScalarBoolOr, &CreateScBoolExprParseHandler},
+		{EdxltokenScalarBoolNot, &CreateScBoolExprParseHandler},
+		{EdxltokenScalarBoolAnd, &CreateScBoolExprParseHandler},
+		{EdxltokenScalarMin, &CreateScMinMaxParseHandler},
+		{EdxltokenScalarMax, &CreateScMinMaxParseHandler},
+		{EdxltokenScalarBoolTestIsTrue, &CreateBooleanTestParseHandler},
+		{EdxltokenScalarBoolTestIsNotTrue, &CreateBooleanTestParseHandler},
+		{EdxltokenScalarBoolTestIsFalse, &CreateBooleanTestParseHandler},
+		{EdxltokenScalarBoolTestIsNotFalse, &CreateBooleanTestParseHandler},
+		{EdxltokenScalarBoolTestIsUnknown, &CreateBooleanTestParseHandler},
+		{EdxltokenScalarBoolTestIsNotUnknown, &CreateBooleanTestParseHandler},
+		{EdxltokenScalarSubPlan, &CreateScSubPlanParseHandler},
+		{EdxltokenScalarConstValue, &CreateScConstValueParseHandler},
+		{EdxltokenScalarIfStmt, &CreateIfStmtParseHandler},
+		{EdxltokenScalarSwitch, &CreateScSwitchParseHandler},
+		{EdxltokenScalarSwitchCase, &CreateScSwitchCaseParseHandler},
+		{EdxltokenScalarCaseTest, &CreateScCaseTestParseHandler},
+		{EdxltokenScalarFuncExpr, &CreateScFuncExprParseHandler},
+		{EdxltokenScalarIsNull, &CreateScNullTestParseHandler},
+		{EdxltokenScalarIsNotNull, &CreateScNullTestParseHandler},
+		{EdxltokenScalarNullIf, &CreateScNullIfParseHandler},
+		{EdxltokenScalarCast, &CreateScCastParseHandler},
+		{EdxltokenScalarCoerceToDomain, CreateScCoerceToDomainParseHandler},
+		{EdxltokenScalarCoerceViaIO, CreateScCoerceViaIOParseHandler},
+		{EdxltokenScalarArrayCoerceExpr, CreateScArrayCoerceExprParseHandler},
+		{EdxltokenScalarHashExpr, &CreateHashExprParseHandler},
+		{EdxltokenScalarHashCondList, &CreateCondListParseHandler},
+		{EdxltokenScalarMergeCondList, &CreateCondListParseHandler},
+		{EdxltokenScalarHashExprList, &CreateHashExprListParseHandler},
+		{EdxltokenScalarGroupingColList, &CreateGroupingColListParseHandler},
+		{EdxltokenScalarLimitOffset, &CreateLimitOffsetParseHandler},
+		{EdxltokenScalarLimitCount, &CreateLimitCountParseHandler},
+		{EdxltokenScalarSubPlanTestExpr, &CreateScSubPlanTestExprParseHandler},
+		{EdxltokenScalarSubPlanParamList, &CreateScSubPlanParamListParseHandler},
+		{EdxltokenScalarSubPlanParam, &CreateScSubPlanParamParseHandler},
+		{EdxltokenScalarOpList, &CreateScOpListParseHandler},
+		{EdxltokenScalarPartOid, &CreateScPartOidParseHandler},
+		{EdxltokenScalarPartDefault, &CreateScPartDefaultParseHandler},
+		{EdxltokenScalarPartBound, &CreateScPartBoundParseHandler},
+		{EdxltokenScalarPartBoundInclusion, &CreateScPartBoundInclParseHandler},
+		{EdxltokenScalarPartBoundOpen, &CreateScPartBoundOpenParseHandler},
+		{EdxltokenScalarPartListValues, &CreateScPartListValuesParseHandler},
+		{EdxltokenScalarPartListNullTest, &CreateScPartListNullTestParseHandler},
 
-			{EdxltokenScalarArray, &PphScalarArray},
-			{EdxltokenScalarArrayRef, &PphScalarArrayRef},
-			{EdxltokenScalarArrayRefIndexList, &PphScalarArrayRefIndexList},
-			
-			{EdxltokenScalarAssertConstraintList, &PphScalarAssertConstraintList},
-			
-			{EdxltokenScalarDMLAction, &PphScalarDMLAction},
-			{EdxltokenDirectDispatchInfo, &PphDirectDispatchInfo},
+		{EdxltokenScalarSubquery, &CreateScSubqueryParseHandler},
+		{EdxltokenScalarBitmapAnd, &CreateScBitmapBoolOpParseHandler},
+		{EdxltokenScalarBitmapOr, &CreateScBitmapBoolOpParseHandler},
 
-			{EdxltokenQueryOutput, &PphQueryOutput},
+		{EdxltokenScalarArray, &CreateScArrayParseHandler},
+		{EdxltokenScalarArrayRef, &CreateScArrayRefParseHandler},
+		{EdxltokenScalarArrayRefIndexList, &CreateScArrayRefIdxListParseHandler},
 
-			{EdxltokenCost, &PphCost},
-			{EdxltokenTableDescr, &PphTableDesc},
-			{EdxltokenColumns, &PphColDesc},
-			{EdxltokenProperties, &PphProperties},
-			{EdxltokenPhysicalTVF, &PphPhysicalTVF},
-			{EdxltokenLogicalTVF, &PphLogicalTVF},
+		{EdxltokenScalarAssertConstraintList, &CreateScAssertConstraintListParseHandler},
 
-			{EdxltokenQuery, &PphQuery},
-			{EdxltokenLogicalGet, &PphLgGet},
-			{EdxltokenLogicalExternalGet, &PphLgExternalGet},
-			{EdxltokenLogical, &PphLgOp},
-			{EdxltokenLogicalProject, &PphLgProject},
-			{EdxltokenLogicalSelect, &PphLgSelect},
-			{EdxltokenLogicalJoin, &PphLgJoin},
-			{EdxltokenLogicalGrpBy, &PphLgGrpBy},
-			{EdxltokenLogicalLimit, &PphLgLimit},
-			{EdxltokenLogicalConstTable, &PphLgConstTable},
-			{EdxltokenLogicalCTEProducer, &PphLgCTEProducer},
-			{EdxltokenLogicalCTEConsumer, &PphLgCTEConsumer},
-			{EdxltokenLogicalCTEAnchor, &PphLgCTEAnchor},
-			{EdxltokenCTEList, &PphCTEList},
+		{EdxltokenScalarDMLAction, &CreateScDMLActionParseHandler},
+		{EdxltokenDirectDispatchInfo, &CreateDirectDispatchParseHandler},
 
-			{EdxltokenLogicalWindow, &PphLgWindow},
-			{EdxltokenWindowSpec, &PphWindowSpec},
-			{EdxltokenWindowSpecList, &PphWindowSpecList},
+		{EdxltokenQueryOutput, &CreateLogicalQueryOpParseHandler},
 
-			{EdxltokenLogicalInsert, &PphLgInsert},
-			{EdxltokenLogicalDelete, &PphLgDelete},
-			{EdxltokenLogicalUpdate, &PphLgUpdate},
-			{EdxltokenPhysicalDMLInsert, &PphPhDML},
-			{EdxltokenPhysicalDMLDelete, &PphPhDML},
-			{EdxltokenPhysicalDMLUpdate, &PphPhDML},
-			{EdxltokenPhysicalSplit, &PphPhSplit},
-			{EdxltokenPhysicalRowTrigger, &PphPhRowTrigger},
-			{EdxltokenPhysicalAssert, &PphPhAssert},
-			{EdxltokenPhysicalCTEProducer, &PphPhCTEProducer},
-			{EdxltokenPhysicalCTEConsumer, &PphPhCTEConsumer},
-			{EdxltokenLogicalCTAS, &PphLgCTAS},
-			{EdxltokenPhysicalCTAS, &PphPhCTAS},
-			{EdxltokenCTASOptions, &PphCTASOptions},
-		
-			{EdxltokenScalarSubqueryAny, &PphScSubqueryQuantified},
-			{EdxltokenScalarSubqueryAll, &PphScSubqueryQuantified},
- 			{EdxltokenScalarSubqueryExists, &PphScSubqueryExists},
-			{EdxltokenScalarSubqueryNotExists, &PphScSubqueryExists},
+		{EdxltokenCost, &CreateCostParseHandler},
+		{EdxltokenTableDescr, &CreateTableDescParseHandler},
+		{EdxltokenColumns, &CreateColDescParseHandler},
+		{EdxltokenProperties, &CreatePropertiesParseHandler},
+		{EdxltokenPhysicalTVF, &CreatePhysicalTVFParseHandler},
+		{EdxltokenLogicalTVF, &CreateLogicalTVFParseHandler},
 
-			{EdxltokenStackTrace, &PphStacktrace},
-			{EdxltokenLogicalUnion, &PphLgSetOp},
-			{EdxltokenLogicalUnionAll, &PphLgSetOp},
-			{EdxltokenLogicalIntersect, &PphLgSetOp},
-			{EdxltokenLogicalIntersectAll, &PphLgSetOp},
-			{EdxltokenLogicalDifference, &PphLgSetOp},
-			{EdxltokenLogicalDifferenceAll, &PphLgSetOp},
+		{EdxltokenQuery, &CreateQueryParseHandler},
+		{EdxltokenLogicalGet, &CreateLogicalGetParseHandler},
+		{EdxltokenLogicalExternalGet, &CreateLogicalExtGetParseHandler},
+		{EdxltokenLogical, &CreateLogicalOpParseHandler},
+		{EdxltokenLogicalProject, &CreateLogicalProjParseHandler},
+		{EdxltokenLogicalSelect, &CreateLogicalSelectParseHandler},
+		{EdxltokenLogicalJoin, &CreateLogicalJoinParseHandler},
+		{EdxltokenLogicalGrpBy, &CreateLogicalGrpByParseHandler},
+		{EdxltokenLogicalLimit, &CreateLogicalLimitParseHandler},
+		{EdxltokenLogicalConstTable, &CreateLogicalConstTableParseHandler},
+		{EdxltokenLogicalCTEProducer, &CreateLogicalCTEProdParseHandler},
+		{EdxltokenLogicalCTEConsumer, &CreateLogicalCTEConsParseHandler},
+		{EdxltokenLogicalCTEAnchor, &CreateLogicalCTEAnchorParseHandler},
+		{EdxltokenCTEList, &CreateCTEListParseHandler},
 
-			{EdxltokenStatistics, &PphStats},
-			{EdxltokenStatsDerivedColumn, &PphStatsDerivedColumn},
-			{EdxltokenStatsDerivedRelation, &PphStatsDerivedRelation},
-			{EdxltokenStatsBucketLowerBound, &PphStatsBucketBound},
-			{EdxltokenStatsBucketUpperBound, &PphStatsBucketBound},
+		{EdxltokenLogicalWindow, &CreateLogicalWindowParseHandler},
+		{EdxltokenWindowSpec, &CreateWindowSpecParseHandler},
+		{EdxltokenWindowSpecList, &CreateWindowSpecListParseHandler},
 
-			{EdxltokenSearchStrategy, &PphSearchStrategy},
-			{EdxltokenSearchStage, &PphSearchStage},
-			{EdxltokenXform, &PphXform},
+		{EdxltokenLogicalInsert, &CreateLogicalInsertParseHandler},
+		{EdxltokenLogicalDelete, &CreateLogicalDeleteParseHandler},
+		{EdxltokenLogicalUpdate, &CreateLogicalUpdateParseHandler},
+		{EdxltokenPhysicalDMLInsert, &CreatePhysicalDMLParseHandler},
+		{EdxltokenPhysicalDMLDelete, &CreatePhysicalDMLParseHandler},
+		{EdxltokenPhysicalDMLUpdate, &CreatePhysicalDMLParseHandler},
+		{EdxltokenPhysicalSplit, &CreatePhysicalSplitParseHandler},
+		{EdxltokenPhysicalRowTrigger, &CreatePhysicalRowTriggerParseHandler},
+		{EdxltokenPhysicalAssert, &CreatePhysicalAssertParseHandler},
+		{EdxltokenPhysicalCTEProducer, &CreatePhysicalCTEProdParseHandler},
+		{EdxltokenPhysicalCTEConsumer, &CreatePhysicalCTEConsParseHandler},
+		{EdxltokenLogicalCTAS, &CreateLogicalCTASParseHandler},
+		{EdxltokenPhysicalCTAS, &CreatePhysicalCTASParseHandler},
+		{EdxltokenCTASOptions, &CreateCTASOptionsParseHandler},
 
-			{EdxltokenCostParams, &PphCostParams},
-			{EdxltokenCostParam, &PphCostParam},
+		{EdxltokenScalarSubqueryAny, &CreateScScalarSubqueryQuantifiedParseHandler},
+		{EdxltokenScalarSubqueryAll, &CreateScScalarSubqueryQuantifiedParseHandler},
+		{EdxltokenScalarSubqueryExists, &CreateScScalarSubqueryExistsParseHandler},
+		{EdxltokenScalarSubqueryNotExists, &CreateScScalarSubqueryExistsParseHandler},
 
-			{EdxltokenScalarExpr, &PphScalarExpr},
-			{EdxltokenScalarValuesList, &PphScalarValuesList},
-			{EdxltokenPhysicalValuesScan, &PphValuesScan},
+		{EdxltokenStackTrace, &CreateStackTraceParseHandler},
+		{EdxltokenLogicalUnion, &CreateLogicalSetOpParseHandler},
+		{EdxltokenLogicalUnionAll, &CreateLogicalSetOpParseHandler},
+		{EdxltokenLogicalIntersect, &CreateLogicalSetOpParseHandler},
+		{EdxltokenLogicalIntersectAll, &CreateLogicalSetOpParseHandler},
+		{EdxltokenLogicalDifference, &CreateLogicalSetOpParseHandler},
+		{EdxltokenLogicalDifferenceAll, &CreateLogicalSetOpParseHandler},
+
+		{EdxltokenStatistics, &CreateStatsParseHandler},
+		{EdxltokenStatsDerivedColumn, &CreateStatsDrvdColParseHandler},
+		{EdxltokenStatsDerivedRelation, &CreateStatsDrvdRelParseHandler},
+		{EdxltokenStatsBucketLowerBound, &CreateStatsBucketBoundParseHandler},
+		{EdxltokenStatsBucketUpperBound, &CreateStatsBucketBoundParseHandler},
+
+		{EdxltokenSearchStrategy, &CreateSearchStrategyParseHandler},
+		{EdxltokenSearchStage, &CreateSearchStageParseHandler},
+		{EdxltokenXform, &CreateXformParseHandler},
+
+		{EdxltokenCostParams, &CreateCostParamsParseHandler},
+		{EdxltokenCostParam, &CreateCostParamParseHandler},
+
+		{EdxltokenScalarExpr, &CreateScExprParseHandler},
+		{EdxltokenScalarValuesList, &CreateScValuesListParseHandler},
+		{EdxltokenPhysicalValuesScan, &CreateValuesScanParseHandler},
 			{EdxltokenNLJIndexParamList, &CreateNLJIndexParamListParseHandler},
 			{EdxltokenNLJIndexParam, &CreateNLJIndexParamParseHandler}
 
 	};
-	
-	const ULONG ulParsehandlers = GPOS_ARRAY_SIZE(rgParseHandlers);
 
-	for (ULONG ul = 0; ul < ulParsehandlers; ul++)
+	const ULONG num_of_parse_handlers = GPOS_ARRAY_SIZE(token_parse_handler_map);
+
+	for (ULONG idx = 0; idx < num_of_parse_handlers; idx++)
 	{
-		SParseHandlerMapping elem = rgParseHandlers[ul];
-		AddMapping(elem.edxltoken, elem.pfphopc);
+		SParseHandlerMapping elem = token_parse_handler_map[idx];
+		AddMapping(elem.token_type, elem.parse_handler_op_func);
 	}
 }
 
 // creates a parse handler instance given an xml tag
 CParseHandlerBase *
-CParseHandlerFactory::Pph
-	(
-	IMemoryPool *pmp,
-	const XMLCh *xmlszName,
-	CParseHandlerManager* pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::GetParseHandler(IMemoryPool *mp,
+									  const XMLCh *token_identifier_str,
+									  CParseHandlerManager *parse_handler_mgr,
+									  CParseHandlerBase *parse_handler_root)
 {
-	GPOS_ASSERT(NULL != m_phmPHCreators);
+	GPOS_ASSERT(NULL != m_token_parse_handler_func_map);
 
-	PfParseHandlerOpCreator *phoc = m_phmPHCreators->PtLookup(xmlszName);
+	ParseHandlerOpCreatorFunc *create_parse_handler_func =
+		m_token_parse_handler_func_map->Find(token_identifier_str);
 
-	if (phoc != NULL)
+	if (create_parse_handler_func != NULL)
 	{
-		return (*phoc) (pmp, pphm, pphRoot);
+		return (*create_parse_handler_func)(mp, parse_handler_mgr, parse_handler_root);
 	}
-	
-	CDXLMemoryManager mm(pmp);
+
+	CDXLMemoryManager dxl_memory_manager(mp);
 
 	// did not find the physical operator in the table
-	CWStringDynamic *pstr = CDXLUtils::PstrFromXMLCh(&mm, xmlszName);;
+	CWStringDynamic *str =
+		CDXLUtils::CreateDynamicStringFromXMLChArray(&dxl_memory_manager, token_identifier_str);
+	;
 
-	GPOS_RAISE
-	(
-	gpdxl::ExmaDXL,
-	gpdxl::ExmiDXLUnrecognizedOperator,
-	pstr->Wsz()
-	);
+	GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnrecognizedOperator, str->GetBuffer());
 
 	return NULL;
 }
 
 // creates a parse handler for parsing a DXL document.
 CParseHandlerDXL *
-CParseHandlerFactory::Pphdxl
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm
-	)
+CParseHandlerFactory::GetParseHandlerDXL(IMemoryPool *mp,
+										 CParseHandlerManager *parse_handler_mgr)
 {
-	return GPOS_NEW(pmp) CParseHandlerDXL(pmp, pphm);
+	return GPOS_NEW(mp) CParseHandlerDXL(mp, parse_handler_mgr);
 }
 
 // creates a parse handler for parsing a Plan
 CParseHandlerBase *
-CParseHandlerFactory::PphPlan
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreatePlanParseHandler(IMemoryPool *mp,
+											 CParseHandlerManager *parse_handler_mgr,
+											 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerPlan(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerPlan(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing metadata
 CParseHandlerBase *
-CParseHandlerFactory::PphMetadata
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMetadataParseHandler(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMetadata(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMetadata(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a metadata request
 CParseHandlerBase *
-CParseHandlerFactory::PphMDRequest
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDRequestParseHandler(IMemoryPool *mp,
+												  CParseHandlerManager *parse_handler_mgr,
+												  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMDRequest(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMDRequest(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing trace flags
 CParseHandlerBase *
-CParseHandlerFactory::PphTraceFlags
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateTraceFlagsParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerTraceFlags(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerTraceFlags(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing optimizer config
 CParseHandlerBase *
-CParseHandlerFactory::PphOptimizerConfig
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateOptimizerCfgParseHandler(IMemoryPool *mp,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerOptimizerConfig(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerOptimizerConfig(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing enumerator config
 CParseHandlerBase *
-CParseHandlerFactory::PphEnumeratorConfig
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateEnumeratorCfgParseHandler(IMemoryPool *mp,
+													  CParseHandlerManager *parse_handler_mgr,
+													  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerEnumeratorConfig(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerEnumeratorConfig(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing statistics configuration
 CParseHandlerBase *
-CParseHandlerFactory::PphStatisticsConfig
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateStatisticsCfgParseHandler(IMemoryPool *mp,
+													  CParseHandlerManager *parse_handler_mgr,
+													  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerStatisticsConfig(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerStatisticsConfig(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing CTE configuration
 CParseHandlerBase *
-CParseHandlerFactory::PphCTEConfig
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateCTECfgParseHandler(IMemoryPool *mp,
+											   CParseHandlerManager *parse_handler_mgr,
+											   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerCTEConfig(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerCTEConfig(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing cost model configuration
 CParseHandlerBase *
-CParseHandlerFactory::PphCostModelConfig
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateCostModelCfgParseHandler(IMemoryPool *mp,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerCostModel(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerCostModel(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing hint configuration
 CParseHandlerBase *
-CParseHandlerFactory::PphHint
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateHintParseHandler(IMemoryPool *mp,
+											 CParseHandlerManager *parse_handler_mgr,
+											 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerHint(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerHint(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing window oids configuration
 CParseHandlerBase *
-CParseHandlerFactory::PphWindowOids
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateWindowOidsParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerWindowOids(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerWindowOids(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing relation metadata
 CParseHandlerBase *
-CParseHandlerFactory::PphMetadataRelation
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDRelationParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMDRelation(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMDRelation(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing external relation metadata
 CParseHandlerBase *
-CParseHandlerFactory::PphMetadataRelationExternal
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDRelationExtParseHandler(IMemoryPool *mp,
+													  CParseHandlerManager *parse_handler_mgr,
+													  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMDRelationExternal(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMDRelationExternal(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing CTAS relation metadata
 CParseHandlerBase *
-CParseHandlerFactory::PphMetadataRelationCTAS
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDRelationCTASParseHandler(IMemoryPool *mp,
+													   CParseHandlerManager *parse_handler_mgr,
+													   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMDRelationCtas(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMDRelationCtas(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a MD index
 CParseHandlerBase *
-CParseHandlerFactory::PphMDIndex
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDIndexParseHandler(IMemoryPool *mp,
+												CParseHandlerManager *parse_handler_mgr,
+												CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMDIndex(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMDIndex(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing relation stats
 CParseHandlerBase *
-CParseHandlerFactory::PphRelStats
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateRelStatsParseHandler(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerRelStats(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerRelStats(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing column stats
 CParseHandlerBase *
-CParseHandlerFactory::PphColStats
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateColStatsParseHandler(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerColStats(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerColStats(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing column stats bucket
 CParseHandlerBase *
-CParseHandlerFactory::PphColStatsBucket
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateColStatsBucketParseHandler(IMemoryPool *mp,
+													   CParseHandlerManager *parse_handler_mgr,
+													   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerColStatsBucket(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerColStatsBucket(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing GPDB type metadata
 CParseHandlerBase *
-CParseHandlerFactory::PphMDGPDBType
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDTypeParseHandler(IMemoryPool *mp,
+											   CParseHandlerManager *parse_handler_mgr,
+											   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMDType(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMDType(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing GPDB-specific operator metadata
 CParseHandlerBase *
-CParseHandlerFactory::PphMDGPDBScalarOp
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDScalarOpParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMDGPDBScalarOp(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMDGPDBScalarOp(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing GPDB-specific function metadata
 CParseHandlerBase *
-CParseHandlerFactory::PphMDGPDBFunc
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDFuncParseHandler(IMemoryPool *mp,
+											   CParseHandlerManager *parse_handler_mgr,
+											   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMDGPDBFunc(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMDGPDBFunc(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing GPDB-specific aggregate metadata
 CParseHandlerBase *
-CParseHandlerFactory::PphMDGPDBAgg
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDAggParseHandler(IMemoryPool *mp,
+											  CParseHandlerManager *parse_handler_mgr,
+											  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMDGPDBAgg(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMDGPDBAgg(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing GPDB-specific trigger metadata
 CParseHandlerBase *
-CParseHandlerFactory::PphMDGPDBTrigger
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDTriggerParseHandler(IMemoryPool *mp,
+												  CParseHandlerManager *parse_handler_mgr,
+												  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMDGPDBTrigger(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMDGPDBTrigger(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing GPDB-specific cast metadata
 CParseHandlerBase *
-CParseHandlerFactory::PphMDCast
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDCastParseHandler(IMemoryPool *mp,
+											   CParseHandlerManager *parse_handler_mgr,
+											   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMDCast(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMDCast(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing GPDB-specific scalar comparison metadata
 CParseHandlerBase *
-CParseHandlerFactory::PphMDScCmp
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDScCmpParseHandler(IMemoryPool *mp,
+												CParseHandlerManager *parse_handler_mgr,
+												CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMDScCmp(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMDScCmp(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a list of metadata identifiers
 CParseHandlerBase *
-CParseHandlerFactory::PphMetadataIdList
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDIdListParseHandler(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMetadataIdList(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMetadataIdList(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a list of column metadata info
 CParseHandlerBase *
-CParseHandlerFactory::PphMetadataColumns
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDColsParseHandler(IMemoryPool *mp,
+											   CParseHandlerManager *parse_handler_mgr,
+											   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMetadataColumns(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMetadataColumns(mp, parse_handler_mgr, parse_handler_root);
 }
 
 CParseHandlerBase *
-CParseHandlerFactory::PphMDIndexInfoList
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDIndexInfoListParseHandler(IMemoryPool *mp,
+														CParseHandlerManager *parse_handler_mgr,
+														CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMDIndexInfoList(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMDIndexInfoList(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing column info
 CParseHandlerBase *
-CParseHandlerFactory::PphMetadataColumn
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDColParseHandler(IMemoryPool *mp,
+											  CParseHandlerManager *parse_handler_mgr,
+											  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMetadataColumn(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMetadataColumn(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a a default value for a column
 CParseHandlerBase *
-CParseHandlerFactory::PphColumnDefaultValueExpr
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateColDefaultValExprParseHandler(IMemoryPool *mp,
+														  CParseHandlerManager *parse_handler_mgr,
+														  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerDefaultValueExpr(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerDefaultValueExpr(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a physical operator
 CParseHandlerBase *
-CParseHandlerFactory::PphPhysOp
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreatePhysicalOpParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerPhysicalOp(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerPhysicalOp(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar operator
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarOp
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScalarOpParseHandler(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarOp(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing the properties of a physical operator
 CParseHandlerBase *
-CParseHandlerFactory::PphProperties
-	(
-		IMemoryPool *pmp,
-		CParseHandlerManager *pphm,
-		CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreatePropertiesParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerProperties(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerProperties(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a filter operator
 CParseHandlerBase *
-CParseHandlerFactory::PphFilter
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateFilterParseHandler(IMemoryPool *mp,
+											   CParseHandlerManager *parse_handler_mgr,
+											   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerFilter(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerFilter(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a table scan
 CParseHandlerBase *
-CParseHandlerFactory::PphTableScan
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateTableScanParseHandler(IMemoryPool *mp,
+												  CParseHandlerManager *parse_handler_mgr,
+												  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerTableScan(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerTableScan(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a bitmap table scan
 CParseHandlerBase *
-CParseHandlerFactory::PphBitmapTableScan
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateBitmapTableScanParseHandler(IMemoryPool *mp,
+														CParseHandlerManager *parse_handler_mgr,
+														CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerPhysicalBitmapTableScan(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerPhysicalBitmapTableScan(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a dynamic bitmap table scan
 CParseHandlerBase *
-CParseHandlerFactory::PphDynamicBitmapTableScan
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateDynBitmapTableScanParseHandler(IMemoryPool *mp,
+														   CParseHandlerManager *parse_handler_mgr,
+														   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerPhysicalDynamicBitmapTableScan(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp) CParseHandlerPhysicalDynamicBitmapTableScan(
+		mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing an external scan
 CParseHandlerBase *
-CParseHandlerFactory::PphExternalScan
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateExternalScanParseHandler(IMemoryPool *mp,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerExternalScan(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerExternalScan(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a subquery scan
 CParseHandlerBase *
-CParseHandlerFactory::PphSubqScan
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateSubqueryScanParseHandler(IMemoryPool *mp,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerSubqueryScan(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerSubqueryScan(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a result node
 CParseHandlerBase *
-CParseHandlerFactory::PphResult
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateResultParseHandler(IMemoryPool *mp,
+											   CParseHandlerManager *parse_handler_mgr,
+											   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerResult(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerResult(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a hash join operator
 CParseHandlerBase *
-CParseHandlerFactory::PphHashJoin
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateHashJoinParseHandler(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerHashJoin(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerHashJoin(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a nested loop join operator
 CParseHandlerBase *
-CParseHandlerFactory::PphNLJoin
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateNLJoinParseHandler(IMemoryPool *mp,
+											   CParseHandlerManager *parse_handler_mgr,
+											   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerNLJoin(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerNLJoin(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a merge join operator
 CParseHandlerBase *
-CParseHandlerFactory::PphMergeJoin
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMergeJoinParseHandler(IMemoryPool *mp,
+												  CParseHandlerManager *parse_handler_mgr,
+												  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMergeJoin(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMergeJoin(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a sort operator
 CParseHandlerBase *
-CParseHandlerFactory::PphSort
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateSortParseHandler(IMemoryPool *mp,
+											 CParseHandlerManager *parse_handler_mgr,
+											 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerSort(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerSort(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing an append operator
 CParseHandlerBase *
-CParseHandlerFactory::PphAppend
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateAppendParseHandler(IMemoryPool *mp,
+											   CParseHandlerManager *parse_handler_mgr,
+											   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerAppend(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerAppend(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a materialize operator
 CParseHandlerBase *
-CParseHandlerFactory::PphMaterialize
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMaterializeParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMaterialize(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMaterialize(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a dynamic table scan operator
 CParseHandlerBase *
-CParseHandlerFactory::PphDynamicTableScan
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateDTSParseHandler(IMemoryPool *mp,
+											CParseHandlerManager *parse_handler_mgr,
+											CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerDynamicTableScan(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerDynamicTableScan(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a dynamic index scan operator
 CParseHandlerBase *
-CParseHandlerFactory::PphDynamicIndexScan
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateDynamicIdxScanParseHandler(IMemoryPool *mp,
+													   CParseHandlerManager *parse_handler_mgr,
+													   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerDynamicIndexScan(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerDynamicIndexScan(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a partition selector operator
 CParseHandlerBase *
-CParseHandlerFactory::PphPartitionSelector
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreatePartitionSelectorParseHandler(IMemoryPool *mp,
+														  CParseHandlerManager *parse_handler_mgr,
+														  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerPartitionSelector(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerPartitionSelector(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a sequence operator
 CParseHandlerBase *
-CParseHandlerFactory::PphSequence
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateSequenceParseHandler(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerSequence(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerSequence(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a Limit operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLimit
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLimitParseHandler(IMemoryPool *mp,
+											  CParseHandlerManager *parse_handler_mgr,
+											  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLimit(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLimit(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a Limit Count operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLimitcount
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLimitCountParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarLimitCount(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarLimitCount(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar subquery operator
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarSubquery
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScSubqueryParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarSubquery(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarSubquery(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar bitmap boolean operator
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarBitmapBoolOp
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScBitmapBoolOpParseHandler(IMemoryPool *mp,
+													   CParseHandlerManager *parse_handler_mgr,
+													   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarBitmapBoolOp(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarBitmapBoolOp(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar array operator.
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarArray
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScArrayParseHandler(IMemoryPool *mp,
+												CParseHandlerManager *parse_handler_mgr,
+												CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerArray(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerArray(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar arrayref operator
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarArrayRef
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScArrayRefParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarArrayRef(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarArrayRef(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing an arrayref index list
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarArrayRefIndexList
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScArrayRefIdxListParseHandler(IMemoryPool *mp,
+														  CParseHandlerManager *parse_handler_mgr,
+														  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarArrayRefIndexList(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarArrayRefIndexList(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar assert predicate operator.
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarAssertConstraintList
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScAssertConstraintListParseHandler(
+	IMemoryPool *mp,
+	CParseHandlerManager *parse_handler_mgr,
+	CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarAssertConstraintList(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarAssertConstraintList(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar DML action operator.
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarDMLAction
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScDMLActionParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarDMLAction(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarDMLAction(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar operator list
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarOpList
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScOpListParseHandler(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarOpList(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarOpList(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar part OID
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarPartOid
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScPartOidParseHandler(IMemoryPool *mp,
+												  CParseHandlerManager *parse_handler_mgr,
+												  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarPartOid(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarPartOid(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar part default
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarPartDefault
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScPartDefaultParseHandler(IMemoryPool *mp,
+													  CParseHandlerManager *parse_handler_mgr,
+													  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarPartDefault(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarPartDefault(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar part boundary
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarPartBound
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScPartBoundParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarPartBound(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarPartBound(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar part bound inclusion
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarPartBoundInclusion
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScPartBoundInclParseHandler(IMemoryPool *mp,
+														CParseHandlerManager *parse_handler_mgr,
+														CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarPartBoundInclusion(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarPartBoundInclusion(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar part bound openness
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarPartBoundOpen
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScPartBoundOpenParseHandler(IMemoryPool *mp,
+														CParseHandlerManager *parse_handler_mgr,
+														CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarPartBoundOpen(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarPartBoundOpen(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar part list values
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarPartListValues
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScPartListValuesParseHandler(IMemoryPool *mp,
+														 CParseHandlerManager *parse_handler_mgr,
+														 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarPartListValues(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarPartListValues(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar part list null test
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarPartListNullTest
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScPartListNullTestParseHandler(IMemoryPool *mp,
+														   CParseHandlerManager *parse_handler_mgr,
+														   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarPartListNullTest(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarPartListNullTest(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing direct dispatch info
 CParseHandlerBase *
-CParseHandlerFactory::PphDirectDispatchInfo
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateDirectDispatchParseHandler(IMemoryPool *mp,
+													   CParseHandlerManager *parse_handler_mgr,
+													   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerDirectDispatchInfo(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerDirectDispatchInfo(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a Limit Count operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLimitoffset
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLimitOffsetParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarLimitOffset(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarLimitOffset(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a gather motion operator
 CParseHandlerBase *
-CParseHandlerFactory::PphGatherMotion
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateGatherMotionParseHandler(IMemoryPool *mp,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerGatherMotion(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerGatherMotion(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a broadcast motion operator
 CParseHandlerBase *
-CParseHandlerFactory::PphBroadcastMotion
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateBroadcastMotionParseHandler(IMemoryPool *mp,
+														CParseHandlerManager *parse_handler_mgr,
+														CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerBroadcastMotion(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerBroadcastMotion(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a redistribute motion operator
 CParseHandlerBase *
-CParseHandlerFactory::PphRedistributeMotion
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateRedistributeMotionParseHandler(IMemoryPool *mp,
+														   CParseHandlerManager *parse_handler_mgr,
+														   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerRedistributeMotion(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerRedistributeMotion(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a routed motion operator
 CParseHandlerBase *
-CParseHandlerFactory::PphRoutedMotion
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateRoutedMotionParseHandler(IMemoryPool *mp,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerRoutedMotion(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerRoutedMotion(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a random motion operator
 CParseHandlerBase *
-CParseHandlerFactory::PphRandomMotion
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateRandomMotionParseHandler(IMemoryPool *mp,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerRandomMotion(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerRandomMotion(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a group by operator
 CParseHandlerBase *
-CParseHandlerFactory::PphAgg
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateAggParseHandler(IMemoryPool *mp,
+											CParseHandlerManager *parse_handler_mgr,
+											CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerAgg(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerAgg(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing aggref operator
 CParseHandlerBase *
-CParseHandlerFactory::PphAggref
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateAggRefParseHandler(IMemoryPool *mp,
+											   CParseHandlerManager *parse_handler_mgr,
+											   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarAggref(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarAggref(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a grouping cols list in a group by
 // operator
 CParseHandlerBase *
-CParseHandlerFactory::PphGroupingColList
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateGroupingColListParseHandler(IMemoryPool *mp,
+														CParseHandlerManager *parse_handler_mgr,
+														CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerGroupingColList(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerGroupingColList(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar comparison operator
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarCmp
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScCmpParseHandler(IMemoryPool *mp,
+											  CParseHandlerManager *parse_handler_mgr,
+											  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarComp(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarComp(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a distinct comparison operator
 CParseHandlerBase *
-CParseHandlerFactory::PphDistinctCmp
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateDistinctCmpParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerDistinctComp(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerDistinctComp(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar identifier operator
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarId
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScIdParseHandler(IMemoryPool *mp,
+											 CParseHandlerManager *parse_handler_mgr,
+											 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarIdent(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarIdent(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar FuncExpr
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarFuncExpr
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScFuncExprParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarFuncExpr(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarFuncExpr(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar OpExpr
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarOpexpr
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScOpExprParseHandler(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarOpExpr(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarOpExpr(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a scalar OpExpr
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarArrayCmp
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScArrayCmpParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarArrayComp(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarArrayComp(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a BoolExpr
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarBoolExpr
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScBoolExprParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarBoolExpr(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarBoolExpr(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a MinMax
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarMinMax
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScMinMaxParseHandler(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarMinMax(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarMinMax(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a BooleanTest
 CParseHandlerBase *
-CParseHandlerFactory::PphBooleanTest
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateBooleanTestParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarBooleanTest(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarBooleanTest(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a NullTest
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarNullTest
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScNullTestParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarNullTest(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarNullTest(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a NullIf
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarNullIf
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScNullIfParseHandler(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarNullIf(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarNullIf(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a cast
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarCast
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScCastParseHandler(IMemoryPool *mp,
+											   CParseHandlerManager *parse_handler_mgr,
+											   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarCast(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarCast(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a CoerceToDomain operator
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarCoerceToDomain
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScCoerceToDomainParseHandler(IMemoryPool *mp,
+														 CParseHandlerManager *parse_handler_mgr,
+														 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarCoerceToDomain(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarCoerceToDomain(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a CoerceViaIO operator
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarCoerceViaIO
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScCoerceViaIOParseHandler(IMemoryPool *mp,
+													  CParseHandlerManager *parse_handler_mgr,
+													  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarCoerceViaIO(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarCoerceViaIO(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing an array coerce expression operator
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarArrayCoerceExpr
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScArrayCoerceExprParseHandler(IMemoryPool *mp,
+														  CParseHandlerManager *parse_handler_mgr,
+														  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarArrayCoerceExpr(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarArrayCoerceExpr(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a SubPlan.
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarSubPlan
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScSubPlanParseHandler(IMemoryPool *mp,
+												  CParseHandlerManager *parse_handler_mgr,
+												  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarSubPlan(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarSubPlan(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a SubPlan test expression
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarSubPlanTestExpr
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScSubPlanTestExprParseHandler(IMemoryPool *mp,
+														  CParseHandlerManager *parse_handler_mgr,
+														  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarSubPlanTestExpr(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarSubPlanTestExpr(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a SubPlan Params DXL node
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarSubPlanParamList
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScSubPlanParamListParseHandler(IMemoryPool *mp,
+														   CParseHandlerManager *parse_handler_mgr,
+														   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarSubPlanParamList(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarSubPlanParamList(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a single SubPlan Param
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarSubPlanParam
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScSubPlanParamParseHandler(IMemoryPool *mp,
+													   CParseHandlerManager *parse_handler_mgr,
+													   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarSubPlanParam(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarSubPlanParam(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical TVF
 CParseHandlerBase *
-CParseHandlerFactory::PphLogicalTVF
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalTVFParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalTVF(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalTVF(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a physical TVF
 CParseHandlerBase *
-CParseHandlerFactory::PphPhysicalTVF
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreatePhysicalTVFParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerPhysicalTVF(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerPhysicalTVF(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a coalesce operator
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarCoalesce
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScCoalesceParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarCoalesce(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarCoalesce(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a Switch operator
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarSwitch
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScSwitchParseHandler(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarSwitch(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarSwitch(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a SwitchCase operator
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarSwitchCase
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScSwitchCaseParseHandler(IMemoryPool *mp,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarSwitchCase(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarSwitchCase(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a case test
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarCaseTest
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScCaseTestParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarCaseTest(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarCaseTest(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a Const
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarConstValue
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScConstValueParseHandler(IMemoryPool *mp,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarConstValue(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarConstValue(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing an if statement
 CParseHandlerBase *
-CParseHandlerFactory::PphIfStmt
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateIfStmtParseHandler(IMemoryPool *mp,
+											   CParseHandlerManager *parse_handler_mgr,
+											   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarIfStmt(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarIfStmt(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a projection list
 CParseHandlerBase *
-CParseHandlerFactory::PphProjList
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateProjListParseHandler(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerProjList(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerProjList(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a projection element
 CParseHandlerBase *
-CParseHandlerFactory::PphProjElem
-	(
-		IMemoryPool *pmp,
-		CParseHandlerManager *pphm,
-		CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateProjElemParseHandler(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerProjElem(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerProjElem(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a hash expr list
 CParseHandlerBase *
-CParseHandlerFactory::PphHashExprList
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,	
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateHashExprListParseHandler(IMemoryPool *mp,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerHashExprList(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerHashExprList(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a hash expression in a redistribute
 // motion node
 CParseHandlerBase *
-CParseHandlerFactory::PphHashExpr
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateHashExprParseHandler(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerHashExpr(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerHashExpr(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a condition list in a hash join or
 // merge join node
 CParseHandlerBase *
-CParseHandlerFactory::PphCondList
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateCondListParseHandler(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerCondList(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerCondList(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a sorting column list in a sort node
 CParseHandlerBase *
-CParseHandlerFactory::PphSortColList
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateSortColListParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerSortColList(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerSortColList(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a sorting column in a sort node
 CParseHandlerBase *
-CParseHandlerFactory::PphSortCol
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateSortColParseHandler(IMemoryPool *mp,
+												CParseHandlerManager *parse_handler_mgr,
+												CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerSortCol(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerSortCol(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing the cost estimates of a physical
 // operator
 CParseHandlerBase *
-CParseHandlerFactory::PphCost
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateCostParseHandler(IMemoryPool *mp,
+											 CParseHandlerManager *parse_handler_mgr,
+											 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerCost(pmp, pphm, pphRoot);	
+	return GPOS_NEW(mp)
+		CParseHandlerCost(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a table descriptor
 CParseHandlerBase *
-CParseHandlerFactory::PphTableDesc
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateTableDescParseHandler(IMemoryPool *mp,
+												  CParseHandlerManager *parse_handler_mgr,
+												  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerTableDescr(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerTableDescr(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a column descriptor
 CParseHandlerBase *
-CParseHandlerFactory::PphColDesc				
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateColDescParseHandler(IMemoryPool *mp,
+												CParseHandlerManager *parse_handler_mgr,
+												CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerColDescr(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerColDescr(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing an index scan node
 CParseHandlerBase *
-CParseHandlerFactory::PphIndexScan
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateIdxScanListParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerIndexScan(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerIndexScan(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing an index only scan node
 CParseHandlerBase *
-CParseHandlerFactory::PphIndexOnlyScan
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateIdxOnlyScanParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerIndexOnlyScan(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerIndexOnlyScan(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a bitmap index scan node
 CParseHandlerBase *
-CParseHandlerFactory::PphBitmapIndexProbe
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateBitmapIdxProbeParseHandler(IMemoryPool *mp,
+													   CParseHandlerManager *parse_handler_mgr,
+													   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarBitmapIndexProbe(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarBitmapIndexProbe(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing an index descriptor of an
 // index scan node
 CParseHandlerBase *
-CParseHandlerFactory::PphIndexDescr
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateIdxDescrParseHandler(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerIndexDescr(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerIndexDescr(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing the list of index condition in a
 // index scan node
 CParseHandlerBase *
-CParseHandlerFactory::PphIndexCondList
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateIdxCondListParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerIndexCondList(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerIndexCondList(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a query
 CParseHandlerBase *
-CParseHandlerFactory::PphQuery
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateQueryParseHandler(IMemoryPool *mp,
+											  CParseHandlerManager *parse_handler_mgr,
+											  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerQuery(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerQuery(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgOp
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalOpParseHandler(IMemoryPool *mp,
+												  CParseHandlerManager *parse_handler_mgr,
+												  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalOp(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalOp(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical get operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgGet
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalGetParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalGet(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalGet(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical external get operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgExternalGet
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalExtGetParseHandler(IMemoryPool *mp,
+													  CParseHandlerManager *parse_handler_mgr,
+													  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalExternalGet(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalExternalGet(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical project operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgProject
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalProjParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalProject(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalProject(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical CTE producer operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgCTEProducer
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalCTEProdParseHandler(IMemoryPool *mp,
+													   CParseHandlerManager *parse_handler_mgr,
+													   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalCTEProducer(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalCTEProducer(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical CTE consumer operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgCTEConsumer
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalCTEConsParseHandler(IMemoryPool *mp,
+													   CParseHandlerManager *parse_handler_mgr,
+													   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalCTEConsumer(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalCTEConsumer(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical CTE anchor operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgCTEAnchor
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalCTEAnchorParseHandler(IMemoryPool *mp,
+														 CParseHandlerManager *parse_handler_mgr,
+														 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalCTEAnchor(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalCTEAnchor(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a CTE list
 CParseHandlerBase *
-CParseHandlerFactory::PphCTEList
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateCTEListParseHandler(IMemoryPool *mp,
+												CParseHandlerManager *parse_handler_mgr,
+												CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerCTEList(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerCTEList(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical set operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgSetOp
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalSetOpParseHandler(IMemoryPool *mp,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalSetOp(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalSetOp(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical select operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgSelect
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalSelectParseHandler(IMemoryPool *mp,
+													  CParseHandlerManager *parse_handler_mgr,
+													  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalSelect(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalSelect(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical join operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgJoin
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalJoinParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalJoin(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalJoin(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing dxl representing query output
 CParseHandlerBase *
-CParseHandlerFactory::PphQueryOutput
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalQueryOpParseHandler(IMemoryPool *mp,
+													   CParseHandlerManager *parse_handler_mgr,
+													   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerQueryOutput(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerQueryOutput(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical group by operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgGrpBy
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalGrpByParseHandler(IMemoryPool *mp,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalGroupBy(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalGroupBy(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical limit operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgLimit
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalLimitParseHandler(IMemoryPool *mp,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalLimit(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalLimit(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical constant table operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgConstTable
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalConstTableParseHandler(IMemoryPool *mp,
+														  CParseHandlerManager *parse_handler_mgr,
+														  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalConstTable(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalConstTable(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing ALL/ANY subquery operators
 CParseHandlerBase *
-CParseHandlerFactory::PphScSubqueryQuantified
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScScalarSubqueryQuantifiedParseHandler(
+	IMemoryPool *mp,
+	CParseHandlerManager *parse_handler_mgr,
+	CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarSubqueryQuantified(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarSubqueryQuantified(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing an EXISTS/NOT EXISTS subquery operator
 CParseHandlerBase *
-CParseHandlerFactory::PphScSubqueryExists
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScScalarSubqueryExistsParseHandler(
+	IMemoryPool *mp,
+	CParseHandlerManager *parse_handler_mgr,
+	CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarSubqueryExists(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarSubqueryExists(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing relation statistics
 CParseHandlerBase *
-CParseHandlerFactory::PphStats
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateStatsParseHandler(IMemoryPool *mp,
+											  CParseHandlerManager *parse_handler_mgr,
+											  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerStatistics(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerStatistics(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a pass-through parse handler
 CParseHandlerBase *
-CParseHandlerFactory::PphStacktrace
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateStackTraceParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerStacktrace(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerStacktrace(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing relation statistics
 CParseHandlerBase *
-CParseHandlerFactory::PphStatsDerivedRelation
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateStatsDrvdRelParseHandler(IMemoryPool *mp,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerStatsDerivedRelation(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerStatsDerivedRelation(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing derived column statistics
 CParseHandlerBase *
-CParseHandlerFactory::PphStatsDerivedColumn
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateStatsDrvdColParseHandler(IMemoryPool *mp,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerStatsDerivedColumn(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerStatsDerivedColumn(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing bucket bound in a histogram
 CParseHandlerBase *
-CParseHandlerFactory::PphStatsBucketBound
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateStatsBucketBoundParseHandler(IMemoryPool *mp,
+														 CParseHandlerManager *parse_handler_mgr,
+														 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerStatsBound(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerStatsBound(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a window node
 CParseHandlerBase *
-CParseHandlerFactory::PphWindow
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateWindowParseHandler(IMemoryPool *mp,
+											   CParseHandlerManager *parse_handler_mgr,
+											   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerPhysicalWindow(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerPhysicalWindow(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing WindowRef operator
 CParseHandlerBase *
-CParseHandlerFactory::PphWindowRef
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateWindowRefParseHandler(IMemoryPool *mp,
+												  CParseHandlerManager *parse_handler_mgr,
+												  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarWindowRef(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarWindowRef(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing window frame node
 CParseHandlerBase *
-CParseHandlerFactory::PphWindowFrame
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateWindowFrameParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerWindowFrame(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerWindowFrame(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing window key node
 CParseHandlerBase *
-CParseHandlerFactory::PphWindowKey
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateWindowKeyParseHandler(IMemoryPool *mp,
+												  CParseHandlerManager *parse_handler_mgr,
+												  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerWindowKey(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerWindowKey(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a list of window keys
 CParseHandlerBase *
-CParseHandlerFactory::PphWindowKeyList
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateWindowKeyListParseHandler(IMemoryPool *mp,
+													  CParseHandlerManager *parse_handler_mgr,
+													  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerWindowKeyList(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerWindowKeyList(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing window specification node
 CParseHandlerBase *
-CParseHandlerFactory::PphWindowSpec
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateWindowSpecParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerWindowSpec(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerWindowSpec(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a list of window specifications
 CParseHandlerBase *
-CParseHandlerFactory::PphWindowSpecList
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateWindowSpecListParseHandler(IMemoryPool *mp,
+													   CParseHandlerManager *parse_handler_mgr,
+													   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerWindowSpecList(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerWindowSpecList(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical window operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgWindow
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalWindowParseHandler(IMemoryPool *mp,
+													  CParseHandlerManager *parse_handler_mgr,
+													  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalWindow(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalWindow(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical insert operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgInsert
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalInsertParseHandler(IMemoryPool *mp,
+													  CParseHandlerManager *parse_handler_mgr,
+													  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalInsert(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalInsert(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical delete operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgDelete
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalDeleteParseHandler(IMemoryPool *mp,
+													  CParseHandlerManager *parse_handler_mgr,
+													  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalDelete(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalDelete(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical update operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgUpdate
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalUpdateParseHandler(IMemoryPool *mp,
+													  CParseHandlerManager *parse_handler_mgr,
+													  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalUpdate(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalUpdate(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a logical CTAS operator
 CParseHandlerBase *
-CParseHandlerFactory::PphLgCTAS
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateLogicalCTASParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerLogicalCTAS(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerLogicalCTAS(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a physical CTAS operator
 CParseHandlerBase *
-CParseHandlerFactory::PphPhCTAS
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreatePhysicalCTASParseHandler(IMemoryPool *mp,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerPhysicalCTAS(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerPhysicalCTAS(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing CTAS storage options
 CParseHandlerBase *
-CParseHandlerFactory::PphCTASOptions
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateCTASOptionsParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerCtasStorageOptions(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerCtasStorageOptions(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a physical CTE producer operator
 CParseHandlerBase *
-CParseHandlerFactory::PphPhCTEProducer
-(
- IMemoryPool *pmp,
- CParseHandlerManager *pphm,
- CParseHandlerBase *pphRoot
- )
+CParseHandlerFactory::CreatePhysicalCTEProdParseHandler(IMemoryPool *mp,
+														CParseHandlerManager *parse_handler_mgr,
+														CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerPhysicalCTEProducer(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerPhysicalCTEProducer(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a physical CTE consumer operator
 CParseHandlerBase *
-CParseHandlerFactory::PphPhCTEConsumer
-(
- IMemoryPool *pmp,
- CParseHandlerManager *pphm,
- CParseHandlerBase *pphRoot
- )
+CParseHandlerFactory::CreatePhysicalCTEConsParseHandler(IMemoryPool *mp,
+														CParseHandlerManager *parse_handler_mgr,
+														CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerPhysicalCTEConsumer(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerPhysicalCTEConsumer(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a physical DML operator
 CParseHandlerBase *
-CParseHandlerFactory::PphPhDML
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreatePhysicalDMLParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerPhysicalDML(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerPhysicalDML(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a physical split operator
 CParseHandlerBase *
-CParseHandlerFactory::PphPhSplit
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreatePhysicalSplitParseHandler(IMemoryPool *mp,
+													  CParseHandlerManager *parse_handler_mgr,
+													  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerPhysicalSplit(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerPhysicalSplit(mp, parse_handler_mgr, parse_handler_root);
 }
 
 //	creates a parse handler for parsing a physical row trigger operator
 CParseHandlerBase *
-CParseHandlerFactory::PphPhRowTrigger
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreatePhysicalRowTriggerParseHandler(IMemoryPool *mp,
+														   CParseHandlerManager *parse_handler_mgr,
+														   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerPhysicalRowTrigger(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerPhysicalRowTrigger(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a physical assert operator
 CParseHandlerBase *
-CParseHandlerFactory::PphPhAssert
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreatePhysicalAssertParseHandler(IMemoryPool *mp,
+													   CParseHandlerManager *parse_handler_mgr,
+													   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerAssert(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerAssert(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a trailing window frame edge parser
 CParseHandlerBase *
-CParseHandlerFactory::PphWindowFrameTrailingEdge
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateFrameTrailingEdgeParseHandler(IMemoryPool *mp,
+														  CParseHandlerManager *parse_handler_mgr,
+														  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarWindowFrameEdge(pmp, pphm, pphRoot, false /*fLeading*/);
+	return GPOS_NEW(mp) CParseHandlerScalarWindowFrameEdge(
+		mp, parse_handler_mgr, parse_handler_root, false /*fLeading*/);
 }
 
 // creates a leading window frame edge parser
 CParseHandlerBase *
-CParseHandlerFactory::PphWindowFrameLeadingEdge
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateFrameLeadingEdgeParseHandler(IMemoryPool *mp,
+														 CParseHandlerManager *parse_handler_mgr,
+														 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarWindowFrameEdge(pmp, pphm, pphRoot, true /*fLeading*/);
+	return GPOS_NEW(mp) CParseHandlerScalarWindowFrameEdge(
+		mp, parse_handler_mgr, parse_handler_root, true /*fLeading*/);
 }
 
 // creates a parse handler for parsing search strategy
 CParseHandlerBase *
-CParseHandlerFactory::PphSearchStrategy
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateSearchStrategyParseHandler(IMemoryPool *mp,
+													   CParseHandlerManager *parse_handler_mgr,
+													   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerSearchStrategy(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerSearchStrategy(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing search stage
 CParseHandlerBase *
-CParseHandlerFactory::PphSearchStage
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateSearchStageParseHandler(IMemoryPool *mp,
+													CParseHandlerManager *parse_handler_mgr,
+													CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerSearchStage(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerSearchStage(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing xform
 CParseHandlerBase *
-CParseHandlerFactory::PphXform
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateXformParseHandler(IMemoryPool *mp,
+											  CParseHandlerManager *parse_handler_mgr,
+											  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerXform(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerXform(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates cost params parse handler
 CParseHandlerBase *
-CParseHandlerFactory::PphCostParams
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateCostParamsParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerCostParams(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerCostParams(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates cost param parse handler
 CParseHandlerBase *
-CParseHandlerFactory::PphCostParam
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateCostParamParseHandler(IMemoryPool *mp,
+												  CParseHandlerManager *parse_handler_mgr,
+												  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerCostParam(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerCostParam(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for top level scalar expressions
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarExpr
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScExprParseHandler(IMemoryPool *mp,
+											   CParseHandlerManager *parse_handler_mgr,
+											   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarExpr(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarExpr(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing GPDB-specific check constraint
 CParseHandlerBase *
-CParseHandlerFactory::PphMDGPDBCheckConstraint
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDChkConstraintParseHandler(IMemoryPool *mp,
+														CParseHandlerManager *parse_handler_mgr,
+														CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMDGPDBCheckConstraint(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMDGPDBCheckConstraint(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a Values List operator
 CParseHandlerBase *
-CParseHandlerFactory::PphScalarValuesList
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateScValuesListParseHandler(IMemoryPool *mp,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerScalarValuesList(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerScalarValuesList(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing a Values Scan operator
 CParseHandlerBase *
-CParseHandlerFactory::PphValuesScan
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateValuesScanParseHandler(IMemoryPool *mp,
+												   CParseHandlerManager *parse_handler_mgr,
+												   CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerValuesScan(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerValuesScan(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a parse handler for parsing GPDB-specific array coerce cast metadata
 CParseHandlerBase *
-CParseHandlerFactory::PphMDArrayCoerceCast
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
+CParseHandlerFactory::CreateMDArrayCoerceCastParseHandler(IMemoryPool *mp,
+														  CParseHandlerManager *parse_handler_mgr,
+														  CParseHandlerBase *parse_handler_root)
 {
-	return GPOS_NEW(pmp) CParseHandlerMDArrayCoerceCast(pmp, pphm, pphRoot);
+	return GPOS_NEW(mp)
+		CParseHandlerMDArrayCoerceCast(mp, parse_handler_mgr, parse_handler_root);
 }
 
 CParseHandlerBase *

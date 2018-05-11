@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/error/CSerializable.h"
+#include "gpopt/operators/CExpression.h"
 
 using namespace gpos;
 using namespace gpdxl;
@@ -49,7 +50,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CSerializableMDAccessor(CMDAccessor *pmda);
+			CSerializableMDAccessor(CMDAccessor *md_accessor);
 
 			// dtor
 			virtual

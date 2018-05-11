@@ -26,15 +26,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerCTEList::CParseHandlerCTEList
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
-	:
-	CParseHandlerBase(pmp, pphm, pphRoot),
-	m_pdrgpdxln(NULL)
+CParseHandlerCTEList::CParseHandlerCTEList(IMemoryPool *mp,
+										   CParseHandlerManager *parse_handler_mgr,
+										   CParseHandlerBase *parse_handler_root)
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root), m_dxl_array(NULL)
 {
 }
 
@@ -48,7 +43,7 @@ CParseHandlerCTEList::CParseHandlerCTEList
 //---------------------------------------------------------------------------
 CParseHandlerCTEList::~CParseHandlerCTEList()
 {
-	CRefCount::SafeRelease(m_pdrgpdxln);
+	CRefCount::SafeRelease(m_dxl_array);
 }
 
 //---------------------------------------------------------------------------
@@ -60,36 +55,41 @@ CParseHandlerCTEList::~CParseHandlerCTEList()
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerCTEList::StartElement
-	(
-	const XMLCh* const xmlszUri,
-	const XMLCh* const xmlszLocalname,
-	const XMLCh* const xmlszQname,
-	const Attributes& attrs
-	)
+CParseHandlerCTEList::StartElement(const XMLCh *const element_uri,
+								   const XMLCh *const element_local_name,
+								   const XMLCh *const element_qname,
+								   const Attributes &attrs)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenCTEList), xmlszLocalname))
+	if (0 ==
+		XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenCTEList), element_local_name))
 	{
-		GPOS_ASSERT(NULL == m_pdrgpdxln);
-		m_pdrgpdxln = GPOS_NEW(m_pmp) DrgPdxln(m_pmp);
+		GPOS_ASSERT(NULL == m_dxl_array);
+		m_dxl_array = GPOS_NEW(m_mp) CDXLNodeArray(m_mp);
 	}
-	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenLogicalCTEProducer), xmlszLocalname))
+	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenLogicalCTEProducer),
+										   element_local_name))
 	{
-		GPOS_ASSERT(NULL != m_pdrgpdxln);
+		GPOS_ASSERT(NULL != m_dxl_array);
 
 		// start new CTE producer
-		CParseHandlerBase *pphCTEProducer = CParseHandlerFactory::Pph(m_pmp, CDXLTokens::XmlstrToken(EdxltokenLogicalCTEProducer), m_pphm, this);
-		m_pphm->ActivateParseHandler(pphCTEProducer);
-		
+		CParseHandlerBase *cte_producer_parse_handler = CParseHandlerFactory::GetParseHandler(
+			m_mp,
+			CDXLTokens::XmlstrToken(EdxltokenLogicalCTEProducer),
+			m_parse_handler_mgr,
+			this);
+		m_parse_handler_mgr->ActivateParseHandler(cte_producer_parse_handler);
+
 		// store parse handler
-		this->Append(pphCTEProducer);
-		
-		pphCTEProducer->startElement(xmlszUri, xmlszLocalname, xmlszQname, attrs);
+		this->Append(cte_producer_parse_handler);
+
+		cte_producer_parse_handler->startElement(
+			element_uri, element_local_name, element_qname, attrs);
 	}
 	else
 	{
-		CWStringDynamic *pstr = CDXLUtils::PstrFromXMLCh(m_pphm->Pmm(), xmlszLocalname);
-		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, pstr->Wsz());
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 }
 
@@ -102,34 +102,35 @@ CParseHandlerCTEList::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerCTEList::EndElement
-	(
-	const XMLCh* const, // xmlszUri,
-	const XMLCh* const xmlszLocalname,
-	const XMLCh* const // xmlszQname
-	)
+CParseHandlerCTEList::EndElement(const XMLCh *const,  // element_uri,
+								 const XMLCh *const element_local_name,
+								 const XMLCh *const  // element_qname
+)
 {
-	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenCTEList), xmlszLocalname))
+	if (0 !=
+		XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenCTEList), element_local_name))
 	{
-		CWStringDynamic *pstr = CDXLUtils::PstrFromXMLCh(m_pphm->Pmm(), xmlszLocalname);
-		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, pstr->Wsz());
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
-	GPOS_ASSERT(NULL != m_pdrgpdxln);
+	GPOS_ASSERT(NULL != m_dxl_array);
 
-	const ULONG ulLen = this->UlLength();
+	const ULONG length = this->Length();
 
 	// add CTEs
-	for (ULONG ul = 0; ul < ulLen; ul++)
+	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CParseHandlerLogicalCTEProducer *pphCTE = dynamic_cast<CParseHandlerLogicalCTEProducer *>((*this)[ul]);
-		CDXLNode *pdxlnCTE = pphCTE->Pdxln();
-		pdxlnCTE->AddRef();
-		m_pdrgpdxln->Append(pdxlnCTE);
+		CParseHandlerLogicalCTEProducer *cte_producer_parse_handler =
+			dynamic_cast<CParseHandlerLogicalCTEProducer *>((*this)[ul]);
+		CDXLNode *dxlnode_cte = cte_producer_parse_handler->CreateDXLNode();
+		dxlnode_cte->AddRef();
+		m_dxl_array->Append(dxlnode_cte);
 	}
-		
+
 	// deactivate handler
-	m_pphm->DeactivateHandler();
+	m_parse_handler_mgr->DeactivateHandler();
 }
 
 // EOF

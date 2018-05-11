@@ -18,7 +18,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CTaskScheduler
@@ -37,52 +36,51 @@ namespace gpos
 
 	class CTaskSchedulerFifo : public ITaskScheduler
 	{
-		private:
+	private:
+		// task queue
+		CList<CTask> m_task_queue;
 
-			// task queue
-			CList<CTask> m_qtsk;
+		// private copy ctor
+		CTaskSchedulerFifo(const CTaskSchedulerFifo &);
 
-			// private copy ctor
-			CTaskSchedulerFifo(const CTaskSchedulerFifo&);
+	public:
+		// ctor
+		CTaskSchedulerFifo()
+		{
+			m_task_queue.Init(GPOS_OFFSET(CTask, m_task_scheduler_link));
+		}
 
-		public:
+		// dtor
+		~CTaskSchedulerFifo()
+		{
+		}
 
-			// ctor
-			CTaskSchedulerFifo()
-			{
-				m_qtsk.Init(GPOS_OFFSET(CTask, m_linkTs));
-			}
+		// add task to waiting queue
+		void Enqueue(CTask *task);
 
-			// dtor
-			~CTaskSchedulerFifo()
-			{}
+		// get next task to execute
+		CTask *Dequeue();
 
-			// add task to waiting queue
-			void Enqueue(CTask *ptsk);
+		// check if task is waiting to be scheduled and remove it
+		GPOS_RESULT Cancel(CTask *task);
 
-			// get next task to execute
-			CTask *PtskDequeue();
+		// get number of waiting tasks
+		ULONG
+		GetQueueSize()
+		{
+			return m_task_queue.Size();
+		}
 
-			// check if task is waiting to be scheduled and remove it
-			GPOS_RESULT EresCancel(CTask *ptsk);
+		// check if task queue is empty
+		BOOL
+		IsEmpty() const
+		{
+			return m_task_queue.IsEmpty();
+		}
 
-			// get number of waiting tasks
-			ULONG UlQueueSize()
-			{
-				return m_qtsk.UlSize();
-			}
-
-			// check if task queue is empty
-			BOOL
-			FEmpty() const
-			{
-				return m_qtsk.FEmpty();
-			}
-
-	};	// class CTaskSchedulerFifo
-}
+	};  // class CTaskSchedulerFifo
+}  // namespace gpos
 
 #endif /* GPOS_CTaskSchedulerFifo_H */
 
 // EOF
-

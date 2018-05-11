@@ -12,91 +12,77 @@
 #include "gpos/common/CDynamicPtrArray.h"
 
 namespace gpos
-{	
-
+{
 	// Hash set iterator
 	template <class T,
-				ULONG (*pfnHash)(const T*), 
-				BOOL (*pfnEq)(const T*, const T*),
-				void (*pfnDestroy)(T*)>
+			  ULONG (*HashFn)(const T *),
+			  BOOL (*EqFn)(const T *, const T *),
+			  void (*CleanupFn)(T *)>
 	class CHashSetIter : public CStackObject
 	{
-	
 		// short hand for hashset type
-		typedef CHashSet<T, pfnHash, pfnEq, pfnDestroy> TSet;
-	
-		private:
+		typedef CHashSet<T, HashFn, EqFn, CleanupFn> TSet;
 
-			// set to iterate
-			const TSet *m_pts;
+	private:
+		// set to iterate
+		const TSet *m_set;
 
-			// current hashchain
-			ULONG m_ulChain;
+		// current hashchain
+		ULONG m_chain_idx;
 
-			// current element
-			ULONG m_ulElement;
+		// current element
+		ULONG m_elem_idx;
 
-			// is initialized?
-			BOOL m_fInit;
+		// is initialized?
+		BOOL m_is_initialized;
 
-			// private copy ctor
-			CHashSetIter(const CHashSetIter<T, pfnHash, pfnEq, pfnDestroy> &);
-			
-			// method to return the current element
-			const typename TSet::CHashSetElem *Phse() const
-            {
-                typename TSet::CHashSetElem *phse = NULL;
-                T *t = (*(m_pts->m_pdrgElements))[m_ulElement-1];
-                m_pts->Lookup(t, &phse);
+		// private copy ctor
+		CHashSetIter(const CHashSetIter<T, HashFn, EqFn, CleanupFn> &);
 
-                return phse;
-            }
+	public:
+		// ctor
+		CHashSetIter<T, HashFn, EqFn, CleanupFn>(TSet *set)
+			: m_set(set), m_chain_idx(0), m_elem_idx(0)
+		{
+			GPOS_ASSERT(NULL != set);
+		}
 
-		public:
-		
-			// ctor
-			CHashSetIter<T, pfnHash, pfnEq, pfnDestroy> (TSet *pts)
-            :
-            m_pts(pts),
-            m_ulChain(0),
-            m_ulElement(0)
-            {
-                GPOS_ASSERT(NULL != pts);
-            }
+		// dtor
+		virtual ~CHashSetIter<T, HashFn, EqFn, CleanupFn>()
+		{
+		}
 
-			// dtor
-			virtual
-			~CHashSetIter<T, pfnHash, pfnEq, pfnDestroy> ()
-			{}
+		// advance iterator to next element
+		BOOL
+		Advance()
+		{
+			if (m_elem_idx < m_set->m_elements->Size())
+			{
+				m_elem_idx++;
+				return true;
+			}
 
-			// advance iterator to next element
-			BOOL FAdvance()
-            {
-                if (m_ulElement < m_pts->m_pdrgElements->UlLength())
-                {
-                    m_ulElement++;
-                    return true;
-                }
+			return false;
+		}
 
-                return false;
-            }
+		// current element
+		const T *
+		Get() const
+		{
+			const typename TSet::CHashSetElem *elem = NULL;
+			T *t = (*(m_set->m_elements))[m_elem_idx - 1];
+			elem = m_set->Lookup(t);
+			if (NULL != elem)
+			{
+				return elem->Value();
+			}
+			return NULL;
+		}
 
-			// current element
-			const T *Pt() const
-            {
-                const typename TSet::CHashSetElem *phse = Phse();
-                if (NULL != phse)
-                {
-                    return phse->Pt();
-                }
-                return NULL;
-            }
+	};  // class CHashSetIter
 
-	}; // class CHashSetIter
+}  // namespace gpos
 
-}
-
-#endif // !GPOS_CHashSetIter_H
+#endif  // !GPOS_CHashSetIter_H
 
 // EOF
-

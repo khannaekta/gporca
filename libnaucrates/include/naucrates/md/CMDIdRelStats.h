@@ -38,103 +38,95 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class CMDIdRelStats : public IMDId
 	{
-		private:
-		
-			// mdid of base relation
-			CMDIdGPDB *m_pmdidRel;
-						
-			// buffer for the serialzied mdid
-			WCHAR m_wszBuffer[GPDXL_MDID_LENGTH];
-			
-			// string representation of the mdid
-			CWStringStatic m_str;
-			
-			// private copy ctor
-			CMDIdRelStats(const CMDIdRelStats &);
-			
-			// serialize mdid
-			void Serialize();
-			
-		public:
-			
-			// ctor
-			explicit
-			CMDIdRelStats(CMDIdGPDB *pmdidRel);
-			
-			// dtor
-			virtual
-			~CMDIdRelStats();
-			
-			virtual
-			EMDIdType Emdidt() const
-			{
-				return EmdidRelStats;
-			}
-			
-			// string representation of mdid
-			virtual
-			const WCHAR *Wsz() const;
-			
-			// source system id
-			virtual
-			CSystemId Sysid() const
-			{
-				return m_pmdidRel->Sysid();
-			}
-			
-			// accessors
-			IMDId *PmdidRel() const;
+	private:
+		// mdid of base relation
+		CMDIdGPDB *m_rel_mdid;
 
-			// equality check
-			virtual
-			BOOL FEquals(const IMDId *pmdid) const;
-			
-			// computes the hash value for the metadata id
-			virtual
-			ULONG UlHash() const
-			{
-				return m_pmdidRel->UlHash();
-			}
-			
-			// is the mdid valid
-			virtual
-			BOOL FValid() const
-			{
-				return IMDId::FValid(m_pmdidRel);
-			}
+		// buffer for the serialzied mdid
+		WCHAR m_mdid_array[GPDXL_MDID_LENGTH];
 
-			// serialize mdid in DXL as the value of the specified attribute 
-			virtual
-			void Serialize(CXMLSerializer *pxmlser, const CWStringConst *pstrAttribute) const;
-						
-			// debug print of the metadata id
-			virtual
-			IOstream &OsPrint(IOstream &os) const;
-			
-			// const converter
-			static
-			const CMDIdRelStats *PmdidConvert(const IMDId *pmdid)
-			{
-				GPOS_ASSERT(NULL != pmdid && EmdidRelStats == pmdid->Emdidt());
+		// string representation of the mdid
+		CWStringStatic m_str;
 
-				return dynamic_cast<const CMDIdRelStats *>(pmdid);
-			}
-			
-			// non-const converter
-			static
-			CMDIdRelStats *PmdidConvert(IMDId *pmdid)
-			{
-				GPOS_ASSERT(NULL != pmdid && EmdidRelStats == pmdid->Emdidt());
+		// private copy ctor
+		CMDIdRelStats(const CMDIdRelStats &);
 
-				return dynamic_cast<CMDIdRelStats *>(pmdid);
-			}
+		// serialize mdid
+		void Serialize();
 
+	public:
+		// ctor
+		explicit CMDIdRelStats(CMDIdGPDB *rel_mdid);
+
+		// dtor
+		virtual ~CMDIdRelStats();
+
+		virtual EMDIdType
+		MdidType() const
+		{
+			return EmdidRelStats;
+		}
+
+		// string representation of mdid
+		virtual const WCHAR *GetBuffer() const;
+
+		// source system id
+		virtual CSystemId
+		Sysid() const
+		{
+			return m_rel_mdid->Sysid();
+		}
+
+		// accessors
+		IMDId *GetRelMdId() const;
+
+		// equality check
+		virtual BOOL Equals(const IMDId *mdid) const;
+
+		// computes the hash value for the metadata id
+		virtual ULONG
+		HashValue() const
+		{
+			return m_rel_mdid->HashValue();
+		}
+
+		// is the mdid valid
+		virtual BOOL
+		IsValid() const
+		{
+			return IMDId::IsValid(m_rel_mdid);
+		}
+
+		// serialize mdid in DXL as the value of the specified attribute
+		virtual void Serialize(CXMLSerializer *xml_serializer,
+							   const CWStringConst *attribute_str) const;
+
+		// debug print of the metadata id
+		virtual IOstream &OsPrint(IOstream &os) const;
+
+		// const converter
+		static const CMDIdRelStats *
+		CastMdid(const IMDId *mdid)
+		{
+			GPOS_ASSERT(NULL != mdid && EmdidRelStats == mdid->MdidType());
+
+			return dynamic_cast<const CMDIdRelStats *>(mdid);
+		}
+
+		// non-const converter
+		static CMDIdRelStats *
+		CastMdid(IMDId *mdid)
+		{
+			GPOS_ASSERT(NULL != mdid && EmdidRelStats == mdid->MdidType());
+
+			return dynamic_cast<CMDIdRelStats *>(mdid);
+		}
 	};
 
-}
+}  // namespace gpmd
 
 
 
-#endif // !GPMD_CMDIdRelStats_H
+#endif  // !GPMD_CMDIdRelStats_H
 
 // EOF

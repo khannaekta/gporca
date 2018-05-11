@@ -29,16 +29,14 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerScalarSubPlanTestExpr::CParseHandlerScalarSubPlanTestExpr
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
-	:
-	CParseHandlerScalarOp(pmp, pphm, pphRoot),
-	m_pdxlnTestExpr(NULL)
-{}
+CParseHandlerScalarSubPlanTestExpr::CParseHandlerScalarSubPlanTestExpr(
+	IMemoryPool *mp,
+	CParseHandlerManager *parse_handler_mgr,
+	CParseHandlerBase *parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root),
+	  m_dxl_test_expr(NULL)
+{
+}
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -50,7 +48,7 @@ CParseHandlerScalarSubPlanTestExpr::CParseHandlerScalarSubPlanTestExpr
 //---------------------------------------------------------------------------
 CParseHandlerScalarSubPlanTestExpr::~CParseHandlerScalarSubPlanTestExpr()
 {
-	CRefCount::SafeRelease(m_pdxlnTestExpr);
+	CRefCount::SafeRelease(m_dxl_test_expr);
 }
 
 //---------------------------------------------------------------------------
@@ -62,25 +60,24 @@ CParseHandlerScalarSubPlanTestExpr::~CParseHandlerScalarSubPlanTestExpr()
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerScalarSubPlanTestExpr::StartElement
-	(
-	const XMLCh* const xmlszUri,
-	const XMLCh* const xmlszLocalname,
-	const XMLCh* const xmlszQname,
-	const Attributes& attrs
-	)
+CParseHandlerScalarSubPlanTestExpr::StartElement(const XMLCh *const element_uri,
+												 const XMLCh *const element_local_name,
+												 const XMLCh *const element_qname,
+												 const Attributes &attrs)
 {
-	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarSubPlanTestExpr), xmlszLocalname))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarSubPlanTestExpr),
+									  element_local_name))
 	{
 		// install a scalar element parser for parsing the test expression
-		CParseHandlerBase *pphChild = CParseHandlerFactory::Pph(m_pmp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_pphm, this);
+		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 
-		m_pphm->ActivateParseHandler(pphChild);
+		m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
 		// store parse handler
-		this->Append(pphChild);
+		this->Append(child_parse_handler);
 
-		pphChild->startElement(xmlszUri, xmlszLocalname, xmlszQname, attrs);
+		child_parse_handler->startElement(element_uri, element_local_name, element_qname, attrs);
 	}
 }
 
@@ -93,32 +90,33 @@ CParseHandlerScalarSubPlanTestExpr::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerScalarSubPlanTestExpr::EndElement
-	(
-	const XMLCh* const, // xmlszUri,
-	const XMLCh* const xmlszLocalname,
-	const XMLCh* const // xmlszQname
-	)
+CParseHandlerScalarSubPlanTestExpr::EndElement(const XMLCh *const,  // element_uri,
+											   const XMLCh *const element_local_name,
+											   const XMLCh *const  // element_qname
+)
 {
-	if(0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarSubPlanTestExpr), xmlszLocalname) && NULL != m_pdxlnTestExpr)
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarSubPlanTestExpr),
+									  element_local_name) &&
+		NULL != m_dxl_test_expr)
 	{
-		CWStringDynamic *pstr = CDXLUtils::PstrFromXMLCh(m_pphm->Pmm(), xmlszLocalname);
-		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, pstr->Wsz());
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
-	if (0 < this->UlLength())
+	if (0 < this->Length())
 	{
-		CParseHandlerScalarOp *pphChild = dynamic_cast<CParseHandlerScalarOp *>((*this)[0]);
-		if (NULL != pphChild->Pdxln())
+		CParseHandlerScalarOp *child_parse_handler =
+			dynamic_cast<CParseHandlerScalarOp *>((*this)[0]);
+		if (NULL != child_parse_handler->CreateDXLNode())
 		{
-			m_pdxlnTestExpr = pphChild->Pdxln();
-			m_pdxlnTestExpr->AddRef();
+			m_dxl_test_expr = child_parse_handler->CreateDXLNode();
+			m_dxl_test_expr->AddRef();
 		}
 	}
 
 	// deactivate handler
-	m_pphm->DeactivateHandler();
+	m_parse_handler_mgr->DeactivateHandler();
 }
 
 // EOF
-

@@ -35,60 +35,53 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerStatsBound : public CParseHandlerBase
 	{
-		private:
+	private:
+		// dxl datum representing the bound
+		CDXLDatum *m_dxl_datum;
 
-			// dxl datum representing the bound
-			CDXLDatum *m_pdxldatum;
+		// is stats bound closed
+		BOOL m_is_stats_bound_closed;
 
-			// is stats bound closed
-			BOOL m_fStatsBoundClosed;
+		// private copy ctor
+		CParseHandlerStatsBound(const CParseHandlerStatsBound &);
 
-			// private copy ctor
-			CParseHandlerStatsBound(const CParseHandlerStatsBound &);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the start of an element
-			void StartElement
-					(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
-					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname,		// element's qname
-					const Attributes& attr				// element's attributes
-					);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the end of an element
-			void EndElement
-					(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
-					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname		// element's qname
-					);
+	public:
+		// ctor/dtor
+		CParseHandlerStatsBound(IMemoryPool *mp,
+								CParseHandlerManager *parse_handler_mgr,
+								CParseHandlerBase *parse_handler_root);
 
-		public:
-			// ctor/dtor
-			CParseHandlerStatsBound
-				(
-				IMemoryPool *pmp,
-				CParseHandlerManager *pphm,
-				CParseHandlerBase *pphRoot
-				);
+		virtual ~CParseHandlerStatsBound();
 
-			virtual
-			~CParseHandlerStatsBound();
+		// return the dxl datum representing the bound point
+		CDXLDatum *
+		GetDatumVal() const
+		{
+			return m_dxl_datum;
+		}
 
-			// return the dxl datum representing the bound point
-			CDXLDatum *Pdxldatum() const
-			{
-				return m_pdxldatum;
-			}
-
-			// is stats bound closed
-			BOOL FStatsBoundClosed() const
-			{
-				return m_fStatsBoundClosed;
-			}
+		// is stats bound closed
+		BOOL
+		IsStatsBoundClosed() const
+		{
+			return m_is_stats_bound_closed;
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // GPDXL_CParseHandlerStatsBound_H
+#endif  // GPDXL_CParseHandlerStatsBound_H
 
 // EOF

@@ -21,25 +21,20 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalar::CDXLScalar
-	(
-	IMemoryPool *pmp
-	)
-	:
-	CDXLOperator(pmp)
+CDXLScalar::CDXLScalar(IMemoryPool *mp) : CDXLOperator(mp)
 {
 }
 
 //---------------------------------------------------------------------------
 //      @function:
-//              CDXLScalar::Edxloperatortype
+//              CDXLScalar::GetDXLOperatorType
 //
 //      @doc:
 //              Operator Type
 //
 //---------------------------------------------------------------------------
 Edxloptype
-CDXLScalar::Edxloperatortype() const
+CDXLScalar::GetDXLOperatorType() const
 {
 	return EdxloptypeScalar;
 }

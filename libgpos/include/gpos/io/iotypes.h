@@ -19,9 +19,8 @@ namespace gpos
 {
 	// file state structure
 	typedef struct stat SFileStat;
-}
+}  // namespace gpos
 
-#endif // !GPOS_iotypes_H
+#endif  // !GPOS_iotypes_H
 
 // EOF
-

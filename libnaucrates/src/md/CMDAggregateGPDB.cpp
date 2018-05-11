@@ -28,31 +28,28 @@ using namespace gpdxl;
 //		Constructs a metadata aggregate
 //
 //---------------------------------------------------------------------------
-CMDAggregateGPDB::CMDAggregateGPDB
-	(
-	IMemoryPool *pmp,
-	IMDId *pmdid,
-	CMDName *pmdname,
-	IMDId *pmdidTypeResult,
-	IMDId *pmdidTypeIntermediate,
-	BOOL fOrdered,
-	BOOL fSplittable,
-	BOOL fHashAggCapable
-	)
-	:
-	m_pmp(pmp),
-	m_pmdid(pmdid),
-	m_pmdname(pmdname),
-	m_pmdidTypeResult(pmdidTypeResult),
-	m_pmdidTypeIntermediate(pmdidTypeIntermediate),
-	m_fOrdered(fOrdered),
-	m_fSplittable(fSplittable),
-	m_fHashAggCapable(fHashAggCapable)
-	{
-		GPOS_ASSERT(pmdid->FValid());
-		
-		m_pstr = CDXLUtils::PstrSerializeMDObj(m_pmp, this, false /*fSerializeHeader*/, false /*fIndent*/);
-	}
+CMDAggregateGPDB::CMDAggregateGPDB(IMemoryPool *mp,
+								   IMDId *mdid,
+								   CMDName *mdname,
+								   IMDId *result_type_mdid,
+								   IMDId *intermediate_result_type_mdid,
+								   BOOL fOrdered,
+								   BOOL is_splittable,
+								   BOOL is_hash_agg_capable)
+	: m_mp(mp),
+	  m_mdid(mdid),
+	  m_mdname(mdname),
+	  m_mdid_type_result(result_type_mdid),
+	  m_mdid_type_intermediate(intermediate_result_type_mdid),
+	  m_is_ordered(fOrdered),
+	  m_is_splittable(is_splittable),
+	  m_hash_agg_capable(is_hash_agg_capable)
+{
+	GPOS_ASSERT(mdid->IsValid());
+
+	m_dxl_str = CDXLUtils::SerializeMDObj(
+		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
+}
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -64,25 +61,25 @@ CMDAggregateGPDB::CMDAggregateGPDB
 //---------------------------------------------------------------------------
 CMDAggregateGPDB::~CMDAggregateGPDB()
 {
-	m_pmdid->Release();
-	m_pmdidTypeIntermediate->Release();
-	m_pmdidTypeResult->Release();
-	GPOS_DELETE(m_pmdname);
-	GPOS_DELETE(m_pstr);
+	m_mdid->Release();
+	m_mdid_type_intermediate->Release();
+	m_mdid_type_result->Release();
+	GPOS_DELETE(m_mdname);
+	GPOS_DELETE(m_dxl_str);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDAggregateGPDB::Pmdid
+//		CMDAggregateGPDB::MDId
 //
 //	@doc:
 //		Agg id
 //
 //---------------------------------------------------------------------------
 IMDId *
-CMDAggregateGPDB::Pmdid() const
+CMDAggregateGPDB::MDId() const
 {
-	return m_pmdid;
+	return m_mdid;
 }
 
 //---------------------------------------------------------------------------
@@ -96,36 +93,36 @@ CMDAggregateGPDB::Pmdid() const
 CMDName
 CMDAggregateGPDB::Mdname() const
 {
-	return *m_pmdname;
+	return *m_mdname;
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDAggregateGPDB::PmdidTypeResult
+//		CMDAggregateGPDB::GetResultTypeMdid
 //
 //	@doc:
 //		Type id of result
 //
 //---------------------------------------------------------------------------
 IMDId *
-CMDAggregateGPDB::PmdidTypeResult() const
+CMDAggregateGPDB::GetResultTypeMdid() const
 {
-	return m_pmdidTypeResult;
+	return m_mdid_type_result;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDAggregateGPDB::PmdidTypeIntermediate
+//		CMDAggregateGPDB::GetIntermediateResultTypeMdid
 //
 //	@doc:
 //		Type id of intermediate result
 //
 //---------------------------------------------------------------------------
 IMDId *
-CMDAggregateGPDB::PmdidTypeIntermediate() const
+CMDAggregateGPDB::GetIntermediateResultTypeMdid() const
 {
-	return m_pmdidTypeIntermediate;
+	return m_mdid_type_intermediate;
 }
 
 //---------------------------------------------------------------------------
@@ -137,33 +134,34 @@ CMDAggregateGPDB::PmdidTypeIntermediate() const
 //
 //---------------------------------------------------------------------------
 void
-CMDAggregateGPDB::Serialize
-	(
-	CXMLSerializer *pxmlser
-	) 
-	const
+CMDAggregateGPDB::Serialize(CXMLSerializer *xml_serializer) const
 {
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), 
-						CDXLTokens::PstrToken(EdxltokenGPDBAgg));
-	
-	m_pmdid->Serialize(pxmlser, CDXLTokens::PstrToken(EdxltokenMdid));
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								CDXLTokens::GetDXLTokenStr(EdxltokenGPDBAgg));
 
-	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenName), m_pmdname->Pstr());
-	if (m_fOrdered)
+	m_mdid->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenMdid));
+
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenName), m_mdname->GetMDName());
+	if (m_is_ordered)
 	{
-		pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenGPDBIsAggOrdered), m_fOrdered);
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenGPDBIsAggOrdered),
+									 m_is_ordered);
 	}
-	
-	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenGPDBAggSplittable), m_fSplittable);
-	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenGPDBAggHashAggCapable), m_fHashAggCapable);
-	
-	SerializeMDIdAsElem(pxmlser, 
-			CDXLTokens::PstrToken(EdxltokenGPDBAggResultTypeId), m_pmdidTypeResult);
-	SerializeMDIdAsElem(pxmlser, 
-			CDXLTokens::PstrToken(EdxltokenGPDBAggIntermediateResultTypeId), m_pmdidTypeIntermediate);
 
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), 
-						CDXLTokens::PstrToken(EdxltokenGPDBAgg));
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenGPDBAggSplittable),
+								 m_is_splittable);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenGPDBAggHashAggCapable),
+								 m_hash_agg_capable);
+
+	SerializeMDIdAsElem(xml_serializer,
+						CDXLTokens::GetDXLTokenStr(EdxltokenGPDBAggResultTypeId),
+						m_mdid_type_result);
+	SerializeMDIdAsElem(xml_serializer,
+						CDXLTokens::GetDXLTokenStr(EdxltokenGPDBAggIntermediateResultTypeId),
+						m_mdid_type_intermediate);
+
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 CDXLTokens::GetDXLTokenStr(EdxltokenGPDBAgg));
 }
 
 
@@ -178,29 +176,25 @@ CMDAggregateGPDB::Serialize
 //
 //---------------------------------------------------------------------------
 void
-CMDAggregateGPDB::DebugPrint
-	(
-	IOstream &os
-	)
-	const
+CMDAggregateGPDB::DebugPrint(IOstream &os) const
 {
 	os << "Aggregate id: ";
-	Pmdid()->OsPrint(os);
+	MDId()->OsPrint(os);
 	os << std::endl;
-	
-	os << "Aggregate name: " << (Mdname()).Pstr()->Wsz() << std::endl;
-	
+
+	os << "Aggregate name: " << (Mdname()).GetMDName()->GetBuffer() << std::endl;
+
 	os << "Result type id: ";
-	PmdidTypeResult()->OsPrint(os);
+	GetResultTypeMdid()->OsPrint(os);
 	os << std::endl;
-	
+
 	os << "Intermediate result type id: ";
-	PmdidTypeIntermediate()->OsPrint(os);
+	GetIntermediateResultTypeMdid()->OsPrint(os);
 	os << std::endl;
-	
-	os << std::endl;	
+
+	os << std::endl;
 }
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

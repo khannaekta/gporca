@@ -16,7 +16,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CErrorHandlerTest
@@ -27,22 +26,19 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CErrorHandlerTest
 	{
-		public:
+	public:
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_Basic();
 
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_Basic();
-			
 #ifdef GPOS_DEBUG
-			static GPOS_RESULT EresUnittest_BadRethrow();
-			static GPOS_RESULT EresUnittest_BadReset();
-			static GPOS_RESULT EresUnittest_Unhandled();
-#endif // GPOS_DEBUG
-
+		static GPOS_RESULT EresUnittest_BadRethrow();
+		static GPOS_RESULT EresUnittest_BadReset();
+		static GPOS_RESULT EresUnittest_Unhandled();
+#endif  // GPOS_DEBUG
 	};
-}
+}  // namespace gpos
 
-#endif // !GPOS_CErrorHandlerTest_H
+#endif  // !GPOS_CErrorHandlerTest_H
 
 // EOF
-

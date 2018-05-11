@@ -30,15 +30,13 @@ using namespace gpos;
 GPOS_RESULT
 CBitSetIterTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
-		GPOS_UNITTEST_FUNC(CBitSetIterTest::EresUnittest_Basics),
+	CUnittest rgut[] = {GPOS_UNITTEST_FUNC(CBitSetIterTest::EresUnittest_Basics),
 
 #ifdef GPOS_DEBUG
-		GPOS_UNITTEST_FUNC_ASSERT(CBitSetIterTest::EresUnittest_Uninitialized),
-		GPOS_UNITTEST_FUNC_ASSERT(CBitSetIterTest::EresUnittest_Overrun)
-#endif // GPOS_DEBUG
-		};
+						GPOS_UNITTEST_FUNC_ASSERT(CBitSetIterTest::EresUnittest_Uninitialized),
+						GPOS_UNITTEST_FUNC_ASSERT(CBitSetIterTest::EresUnittest_Overrun)
+#endif  // GPOS_DEBUG
+	};
 
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
@@ -56,30 +54,30 @@ CBitSetIterTest::EresUnittest_Basics()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
-	ULONG cSizeBits = 32;
-	CBitSet *pbs = GPOS_NEW(pmp) CBitSet(pmp, cSizeBits);
+	ULONG vector_size = 32;
+	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
 
 	ULONG cInserts = 10;
-	for (ULONG i = 0; i < cInserts; i ++)
+	for (ULONG i = 0; i < cInserts; i++)
 	{
 		// forces addition of new link
-		pbs->FExchangeSet(i * cSizeBits);
+		pbs->ExchangeSet(i * vector_size);
 	}
 
 	ULONG cCount = 0;
 	CBitSetIter bsi(*pbs);
-	while(bsi.FAdvance())
+	while (bsi.Advance())
 	{
-		GPOS_ASSERT(bsi.UlBit() == (bsi.UlBit() / cSizeBits) * cSizeBits);
-		GPOS_ASSERT((BOOL)bsi);
+		GPOS_ASSERT(bsi.Bit() == (bsi.Bit() / vector_size) * vector_size);
+		GPOS_ASSERT((BOOL) bsi);
 
 		cCount++;
 	}
 	GPOS_ASSERT(cInserts == cCount);
 
-	GPOS_ASSERT(!((BOOL)bsi));
+	GPOS_ASSERT(!((BOOL) bsi));
 
 	pbs->Release();
 
@@ -101,18 +99,18 @@ CBitSetIterTest::EresUnittest_Uninitialized()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
-	ULONG cSizeBits = 32;
+	ULONG vector_size = 32;
 
 	CAutoRef<CBitSet> a_pbs;
-	CBitSet *pbs = GPOS_NEW(pmp) CBitSet(pmp, cSizeBits);
+	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
 	a_pbs = pbs;
 
 	CBitSetIter bsi(*pbs);
 
 	// this throws
-	bsi.UlBit();
+	bsi.Bit();
 
 	return GPOS_FAILED;
 }
@@ -123,7 +121,7 @@ CBitSetIterTest::EresUnittest_Uninitialized()
 //		CBitSetIterTest::EresUnittest_Overrun
 //
 //	@doc:
-//		Test for calling FAdvance on exhausted iter
+//		Test for calling Advance on exhausted iter
 //
 //---------------------------------------------------------------------------
 GPOS_RESULT
@@ -131,25 +129,26 @@ CBitSetIterTest::EresUnittest_Overrun()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
-	ULONG cSizeBits = 32;
+	ULONG vector_size = 32;
 
 	CAutoRef<CBitSet> a_pbs;
-	CBitSet *pbs = GPOS_NEW(pmp) CBitSet(pmp, cSizeBits);
+	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
 	a_pbs = pbs;
 
 	CBitSetIter bsi(*pbs);
 
-	while (bsi.FAdvance()) {}
+	while (bsi.Advance())
+	{
+	}
 
 	// this throws
-	bsi.FAdvance();
+	bsi.Advance();
 
 	return GPOS_FAILED;
 }
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF
-

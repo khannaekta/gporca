@@ -29,9 +29,9 @@ namespace gpdxl
 	// fwd decl
 	class CXMLSerializer;
 	class CDXLColRef;
-	
+
 	// arrays of column references
-	typedef CDynamicPtrArray<CDXLColRef, CleanupRelease> DrgPdxlcr;
+	typedef CDynamicPtrArray<CDXLColRef, CleanupRelease> CDXLColRefArray;
 
 	//---------------------------------------------------------------------------
 	//	@class:
@@ -43,53 +43,48 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLColRef : public CRefCount
 	{
-		private:
-			// memory pool
-			IMemoryPool *m_pmp;
-			
-			// name
-			CMDName *m_pmdname;
-	
-			// id
-			const ULONG m_ulId;
+	private:
+		// memory pool
+		IMemoryPool *m_mp;
 
-			// column type
-			IMDId *m_pmdidType;
+		// name
+		CMDName *m_mdname;
 
-			// column type modifier
-			INT m_iTypeModifer;
+		// id
+		const ULONG m_id;
 
-			// private copy ctor
-			CDXLColRef(const CDXLColRef &);
-		
-		public:
-			// ctor/dtor
-			CDXLColRef
-				(
-				IMemoryPool *pmp,
-				CMDName *pmdname,
-				ULONG ulId,
-				IMDId *pmdidType,
-				INT iTypeModifier
-				);
+		// column type
+		IMDId *m_mdid_type;
 
-			~CDXLColRef();
-			
-			// accessors
-			const CMDName *Pmdname() const;
+		// column type modifier
+		INT m_iTypeModifer;
 
-			IMDId *PmdidType() const;
+		// private copy ctor
+		CDXLColRef(const CDXLColRef &);
 
-			INT ITypeModifier() const;
+	public:
+		// ctor/dtor
+		CDXLColRef(IMemoryPool *mp,
+				   CMDName *mdname,
+				   ULONG id,
+				   IMDId *mdid_type,
+				   INT type_modifier);
 
-			ULONG UlID() const;
+		~CDXLColRef();
 
+		// accessors
+		const CMDName *MdName() const;
+
+		IMDId *MDIdType() const;
+
+		INT TypeModifier() const;
+
+		ULONG Id() const;
 	};
-}
+}  // namespace gpdxl
 
 
 
-#endif // !GPDXL_CDXLColRef_H
+#endif  // !GPDXL_CDXLColRef_H
 
 // EOF
-

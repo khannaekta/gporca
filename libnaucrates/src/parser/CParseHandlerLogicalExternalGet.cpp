@@ -25,15 +25,13 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerLogicalExternalGet::CParseHandlerLogicalExternalGet
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
-	:
-	CParseHandlerLogicalGet(pmp, pphm, pphRoot)
-{}
+CParseHandlerLogicalExternalGet::CParseHandlerLogicalExternalGet(
+	IMemoryPool *mp,
+	CParseHandlerManager *parse_handler_mgr,
+	CParseHandlerBase *parse_handler_root)
+	: CParseHandlerLogicalGet(mp, parse_handler_mgr, parse_handler_root)
+{
+}
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -44,15 +42,13 @@ CParseHandlerLogicalExternalGet::CParseHandlerLogicalExternalGet
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerLogicalExternalGet::StartElement
-	(
-	const XMLCh* const, // xmlszUri,
-	const XMLCh* const xmlszLocalname,
-	const XMLCh* const, // xmlszQname
-	const Attributes& //attrs
-	)
+CParseHandlerLogicalExternalGet::StartElement(const XMLCh *const,  // element_uri,
+											  const XMLCh *const element_local_name,
+											  const XMLCh *const,  // element_qname
+											  const Attributes &   //attrs
+)
 {
-	CParseHandlerLogicalGet::StartElement(xmlszLocalname, EdxltokenLogicalExternalGet);
+	CParseHandlerLogicalGet::StartElement(element_local_name, EdxltokenLogicalExternalGet);
 }
 
 //---------------------------------------------------------------------------
@@ -64,14 +60,12 @@ CParseHandlerLogicalExternalGet::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerLogicalExternalGet::EndElement
-	(
-	const XMLCh* const, // xmlszUri,
-	const XMLCh* const xmlszLocalname,
-	const XMLCh* const // xmlszQname
-	)
+CParseHandlerLogicalExternalGet::EndElement(const XMLCh *const,  // element_uri,
+											const XMLCh *const element_local_name,
+											const XMLCh *const  // element_qname
+)
 {
-	CParseHandlerLogicalGet::EndElement(xmlszLocalname, EdxltokenLogicalExternalGet);
+	CParseHandlerLogicalGet::EndElement(element_local_name, EdxltokenLogicalExternalGet);
 }
 
 // EOF

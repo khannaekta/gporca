@@ -24,44 +24,38 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalJoin::CDXLPhysicalJoin
-	(
-	IMemoryPool *pmp,
-	EdxlJoinType edxljt
-	)
-	:
-	CDXLPhysical(pmp),
-	m_edxljt(edxljt)
+CDXLPhysicalJoin::CDXLPhysicalJoin(IMemoryPool *mp, EdxlJoinType join_type)
+	: CDXLPhysical(mp), m_join_type(join_type)
 {
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLPhysicalJoin::Edxltype
+//		CDXLPhysicalJoin::GetJoinType
 //
 //	@doc:
 //		Join type
 //
 //---------------------------------------------------------------------------
 EdxlJoinType
-CDXLPhysicalJoin::Edxltype() const
+CDXLPhysicalJoin::GetJoinType() const
 {
-	return m_edxljt;
+	return m_join_type;
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLPhysicalJoin::PstrJoinTypeName
+//		CDXLPhysicalJoin::GetJoinTypeNameStr
 //
 //	@doc:
 //		Join type name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLPhysicalJoin::PstrJoinTypeName() const
+CDXLPhysicalJoin::GetJoinTypeNameStr() const
 {
-	return CDXLOperator::PstrJoinTypeName(m_edxljt);
+	return CDXLOperator::GetJoinTypeNameStr(m_join_type);
 }
 
 // EOF

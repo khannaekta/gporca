@@ -41,43 +41,37 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalHashJoin : public CDXLPhysicalJoin
 	{
-		private:
-			// private copy ctor
-			CDXLPhysicalHashJoin(const CDXLPhysicalHashJoin&);
+	private:
+		// private copy ctor
+		CDXLPhysicalHashJoin(const CDXLPhysicalHashJoin &);
 
-		public:
-			// ctor/dtor
-			CDXLPhysicalHashJoin(IMemoryPool *pmp, EdxlJoinType edxljt);
-			
-			// accessors
-			Edxlopid Edxlop() const;
-			const CWStringConst *PstrOpName() const;
-			
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
+	public:
+		// ctor/dtor
+		CDXLPhysicalHashJoin(IMemoryPool *mp, EdxlJoinType join_type);
 
-			// conversion function
-			static
-			CDXLPhysicalHashJoin *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopPhysicalHashJoin == pdxlop->Edxlop());
-				return dynamic_cast<CDXLPhysicalHashJoin*>(pdxlop);
-			}
+		// accessors
+		Edxlopid GetDXLOperator() const;
+		const CWStringConst *GetOpNameStr() const;
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+
+		// conversion function
+		static CDXLPhysicalHashJoin *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopPhysicalHashJoin == dxl_op->GetDXLOperator());
+			return dynamic_cast<CDXLPhysicalHashJoin *>(dxl_op);
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
-			
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
-#endif // !GPDXL_CDXLPhysicalHashJoin_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLPhysicalHashJoin_H
 
 // EOF
-

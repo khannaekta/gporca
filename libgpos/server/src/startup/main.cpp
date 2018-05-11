@@ -77,8 +77,7 @@
 using namespace gpos;
 
 // static array of all known unittest routines
-static gpos::CUnittest rgut[] =
-{
+static gpos::CUnittest rgut[] = {
 	// common
 	GPOS_UNITTEST_STD(CAutoPTest),
 	GPOS_UNITTEST_STD(CAutoRefTest),
@@ -146,12 +145,12 @@ static gpos::CUnittest rgut[] =
 	// simulation
 	GPOS_UNITTEST_STD(CFSimulatorTest),
 	GPOS_UNITTEST_EXT(CFSimulatorTestExt),
-#endif // GPOS_FPSIMULATOR
+#endif  // GPOS_FPSIMULATOR
 
 #ifdef GPOS_DEBUG
 	// time slicing
 	GPOS_UNITTEST_EXT(CTimeSliceTest),
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 };
 
 // static variable counting the number of failed tests; PvExec overwrites with
@@ -167,12 +166,9 @@ static ULONG tests_failed = 0;
 //
 //---------------------------------------------------------------------------
 static void *
-PvExec
-	(
-	void *pv
-	)
+PvExec(void *pv)
 {
-	CMainArgs *pma = (CMainArgs*) pv;
+	CMainArgs *pma = (CMainArgs *) pv;
 	tests_failed = CUnittest::Driver(pma);
 
 	return NULL;
@@ -188,12 +184,9 @@ PvExec
 //		time being
 //
 //---------------------------------------------------------------------------
-INT main
-	(
-	INT iArgs,
-	const CHAR **rgszArgs
-	)
-{	
+INT
+main(INT iArgs, const CHAR **rgszArgs)
+{
 	// setup args for unittest params
 	CMainArgs ma(iArgs, rgszArgs, "cuU:xT:");
 
@@ -205,7 +198,7 @@ INT main
 	{
 		return GPOS_FAILED;
 	}
-	
+
 	// initialize unittest framework
 	CUnittest::Init(rgut, GPOS_ARRAY_SIZE(rgut), NULL, NULL);
 
@@ -230,4 +223,3 @@ INT main
 
 
 // EOF
-

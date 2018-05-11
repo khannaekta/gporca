@@ -15,7 +15,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CEnumSetTest
@@ -26,25 +25,22 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CEnumSetTest
 	{
+	public:
+		enum eTest
+		{
+			eTestOne,
+			eTestTwo,
 
-		public:
+			eTestSentinel
+		};
 
-			enum eTest
-			{
-				eTestOne,
-				eTestTwo,
-				
-				eTestSentinel
-			};
-		
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_Basics();
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_Basics();
 
-	}; // class CEnumSetTest
-}
+	};  // class CEnumSetTest
+}  // namespace gpos
 
-#endif // !GPOS_CEnumSetTest_H
+#endif  // !GPOS_CEnumSetTest_H
 
 // EOF
-

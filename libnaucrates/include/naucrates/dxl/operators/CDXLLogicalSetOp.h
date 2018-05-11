@@ -7,9 +7,9 @@
 //
 //	@doc:
 //		Class for representing DXL logical set operators
-//		
-//	@owner: 
-//		
+//
+//	@owner:
+//
 //
 //	@test:
 //
@@ -24,7 +24,6 @@
 
 namespace gpdxl
 {
-
 	enum EdxlSetOpType
 	{
 		EdxlsetopUnion,
@@ -46,125 +45,113 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLLogicalSetOp : public CDXLLogical
 	{
-		private:
+	private:
+		// private copy ctor
+		CDXLLogicalSetOp(CDXLLogicalSetOp &);
 
-			// private copy ctor
-			CDXLLogicalSetOp(CDXLLogicalSetOp&);
+		// set operation type
+		EdxlSetOpType m_set_operation_dxl_type;
 
-			// set operation type
-			EdxlSetOpType m_edxlsetoptype;
+		// list of output column descriptors
+		CDXLColDescrArray *m_col_descr_array;
 
-			// list of output column descriptors
-			DrgPdxlcd *m_pdrgpdxlcd;
+		// array of input colid arrays
+		ULongPtrArray2D *m_input_colids_arrays;
 
-			// array of input colid arrays
-			DrgPdrgPul *m_pdrgpdrgpul;
-			
-			// do the columns need to be casted accross inputs
-			BOOL m_fCastAcrossInputs;
+		// do the columns need to be casted accross inputs
+		BOOL m_cast_across_input_req;
 
-		public:
-			// ctor
-			CDXLLogicalSetOp
-				(
-				IMemoryPool *pmp,
-				EdxlSetOpType edxlsetoptype,
-				DrgPdxlcd *pdrgdxlcd,
-				DrgPdrgPul *pdrgpdrgpul,
-				BOOL fCastAcrossInput
-				);
+	public:
+		// ctor
+		CDXLLogicalSetOp(IMemoryPool *mp,
+						 EdxlSetOpType edxlsetoptype,
+						 CDXLColDescrArray *pdrgdxlcd,
+						 ULongPtrArray2D *array_2D,
+						 BOOL fCastAcrossInput);
 
-			// dtor
-			virtual
-			~CDXLLogicalSetOp();
+		// dtor
+		virtual ~CDXLLogicalSetOp();
 
-			// operator id
-			Edxlopid Edxlop() const;
+		// operator id
+		Edxlopid GetDXLOperator() const;
 
-			// operator name
-			const CWStringConst *PstrOpName() const;
+		// operator name
+		const CWStringConst *GetOpNameStr() const;
 
-			// set operator type
-			EdxlSetOpType Edxlsetoptype() const
-			{
-				return m_edxlsetoptype;
-			}
+		// set operator type
+		EdxlSetOpType
+		GetSetOpType() const
+		{
+			return m_set_operation_dxl_type;
+		}
 
-			// array of output columns
-			const DrgPdxlcd *Pdrgpdxlcd() const
-			{
-				return m_pdrgpdxlcd;
-			}
+		// array of output columns
+		const CDXLColDescrArray *
+		GetDXLColumnDescrArray() const
+		{
+			return m_col_descr_array;
+		}
 
-			// number of output columns
-			ULONG UlArity() const
-			{
-				return m_pdrgpdxlcd->UlLength();
-			}
+		// number of output columns
+		ULONG
+		Arity() const
+		{
+			return m_col_descr_array->Size();
+		}
 
-			// output column descriptor at a given position
-			const CDXLColDescr *Pdxlcd
-				(
-				ULONG ulPos
-				)
-				const
-			{
-				return (*m_pdrgpdxlcd)[ulPos];
-			}
+		// output column descriptor at a given position
+		const CDXLColDescr *
+		GetColumnDescrAt(ULONG idx) const
+		{
+			return (*m_col_descr_array)[idx];
+		}
 
-			// number of inputs to the n-ary set operation
-		    ULONG UlChildren() const
-			{
-				return m_pdrgpdrgpul->UlLength();	
-			}
-		
-			// column array of the input at a given position 
-			const DrgPul *Pdrgpul
-				(
-				ULONG ulPos
-				)
-				const
-			{
-				GPOS_ASSERT(ulPos < UlChildren());
-				
-				return (*m_pdrgpdrgpul)[ulPos];
-			}
-		
-			// do the columns across inputs need to be casted
-			BOOL FCastAcrossInputs() const
-			{
-				return m_fCastAcrossInputs;
-			}
+		// number of inputs to the n-ary set operation
+		ULONG
+		ChildCount() const
+		{
+			return m_input_colids_arrays->Size();
+		}
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
+		// column array of the input at a given position
+		const ULongPtrArray *
+		GetInputColIdArrayAt(ULONG idx) const
+		{
+			GPOS_ASSERT(idx < ChildCount());
 
-			// check if given column is defined by operator
-			virtual
-			BOOL FDefinesColumn(ULONG ulColId) const;
+			return (*m_input_colids_arrays)[idx];
+		}
 
-			// conversion function
-			static
-			CDXLLogicalSetOp *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopLogicalSetOp == pdxlop->Edxlop());
+		// do the columns across inputs need to be casted
+		BOOL
+		IsCastAcrossInputReq() const
+		{
+			return m_cast_across_input_req;
+		}
 
-				return dynamic_cast<CDXLLogicalSetOp*>(pdxlop);
-			}
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+
+		// check if given column is defined by operator
+		virtual BOOL IsColDefined(ULONG colid) const;
+
+		// conversion function
+		static CDXLLogicalSetOp *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopLogicalSetOp == dxl_op->GetDXLOperator());
+
+			return dynamic_cast<CDXLLogicalSetOp *>(dxl_op);
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
-
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
-#endif // !GPDXL_CDXLLogicalSetOp_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLLogicalSetOp_H
 
 // EOF

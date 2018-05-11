@@ -12,9 +12,12 @@
 #define GPOPT_CPartConstraintTest_H
 
 #include "gpos/base.h"
+#include "gpopt/base/CConstraint.h"
 
 namespace gpopt
 {
+	using namespace gpos;
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CPartConstraintTest
@@ -58,8 +61,8 @@ namespace gpopt
 			static
 			CConstraint *PcnstrInterval
 				(
-				IMemoryPool *pmp,
-				CColRef *pcr,
+				IMemoryPool *mp,
+				CColRef *colref,
 				ULONG ulLeft,
 				ULONG ulRight
 				);

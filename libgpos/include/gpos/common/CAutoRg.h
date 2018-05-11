@@ -2,7 +2,7 @@
 //	Greenplum Database
 //	Copyright (C) 2008 Greenplum, Inc.
 //
-//	@filename: 
+//	@filename:
 //		CAutoRg.h
 //
 //	@doc:
@@ -18,7 +18,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CAutoRg
@@ -30,69 +29,59 @@ namespace gpos
 	template <class T>
 	class CAutoRg : public CStackObject
 	{
-		
-		private:
+	private:
+		// actual element to point to
+		T *m_object_array;
 
-			// actual element to point to
-			T *m_rgt;
-						
-			// hidden copy ctor
-			CAutoRg<T>(const CAutoRg&);
+		// hidden copy ctor
+		CAutoRg<T>(const CAutoRg &);
 
-		public:
-		
-			// ctor
-			explicit
-			CAutoRg<T>()
-				:
-				m_rgt(NULL)
-			{}
+	public:
+		// ctor
+		explicit CAutoRg<T>() : m_object_array(NULL)
+		{
+		}
 
-			// ctor
-			explicit
-			CAutoRg<T>(T *rgt)
-				:
-				m_rgt(rgt)
-			{}
+		// ctor
+		explicit CAutoRg<T>(T *object_array) : m_object_array(object_array)
+		{
+		}
 
 
-			// dtor
-			virtual ~CAutoRg();
+		// dtor
+		virtual ~CAutoRg();
 
-			// simple assignment
-			inline
-			CAutoRg<T> const & operator = (T* rgt)
-			{
-				m_rgt = rgt;
-				return *this;
-			}
+		// simple assignment
+		inline CAutoRg<T> const &
+		operator=(T *object_array)
+		{
+			m_object_array = object_array;
+			return *this;
+		}
 
-			// indexed access
-			inline
-			T& operator []
-				(
-				ULONG ulPos
-				)
-			{
-				return m_rgt[ulPos];
-			}
-			
-			// return basic pointer
-			T* Rgt()
-			{
-				return m_rgt;
-			}
+		// indexed access
+		inline T &operator[](ULONG ulPos)
+		{
+			return m_object_array[ulPos];
+		}
 
-			// unhook pointer from auto object
-			inline
-			T* RgtReset()
-			{
-				T* rgt = m_rgt;
-				m_rgt = NULL;
-				return rgt;
-			}
+		// return basic pointer
+		T *
+		Rgt()
+		{
+			return m_object_array;
+		}
 
-	}; // class CAutoRg
+		// unhook pointer from auto object
+		inline T *
+		RgtReset()
+		{
+			T *object_array = m_object_array;
+			m_object_array = NULL;
+			return object_array;
+		}
+
+	};  // class CAutoRg
 
 
 	//---------------------------------------------------------------------------
@@ -106,11 +95,10 @@ namespace gpos
 	template <class T>
 	CAutoRg<T>::~CAutoRg()
 	{
-		GPOS_DELETE_ARRAY(m_rgt);
+		GPOS_DELETE_ARRAY(m_object_array);
 	}
-}
+}  // namespace gpos
 
-#endif // !GPOS_CAutoRg_H
+#endif  // !GPOS_CAutoRg_H
 
 // EOF
-

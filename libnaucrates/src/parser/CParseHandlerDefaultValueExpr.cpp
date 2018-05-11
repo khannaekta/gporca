@@ -28,15 +28,12 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerDefaultValueExpr::CParseHandlerDefaultValueExpr
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
-	:
-	CParseHandlerScalarOp(pmp, pphm, pphRoot),
-	m_fDefaultValueStarted(false)
+CParseHandlerDefaultValueExpr::CParseHandlerDefaultValueExpr(
+	IMemoryPool *mp,
+	CParseHandlerManager *parse_handler_mgr,
+	CParseHandlerBase *parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root),
+	  is_default_val_started(false)
 {
 }
 
@@ -49,39 +46,38 @@ CParseHandlerDefaultValueExpr::CParseHandlerDefaultValueExpr
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerDefaultValueExpr::StartElement
-	(
-	const XMLCh* const xmlszUri,
-	const XMLCh* const xmlszLocalname,
-	const XMLCh* const xmlszQname,
-	const Attributes& attrs
-	)
+CParseHandlerDefaultValueExpr::StartElement(const XMLCh *const element_uri,
+											const XMLCh *const element_local_name,
+											const XMLCh *const element_qname,
+											const Attributes &attrs)
 {
-	if(0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenColumnDefaultValue), xmlszLocalname))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenColumnDefaultValue),
+									  element_local_name))
 	{
 		// opening tag for a default expression: assert no other tag has been seen yet
-		GPOS_ASSERT(!m_fDefaultValueStarted);
-		m_fDefaultValueStarted = true;
+		GPOS_ASSERT(!is_default_val_started);
+		is_default_val_started = true;
 	}
 	else
 	{
-		GPOS_ASSERT(m_fDefaultValueStarted);
-		
+		GPOS_ASSERT(is_default_val_started);
+
 		// install a scalar op parse handler to parse the expression
-		CParseHandlerBase *pph = CParseHandlerFactory::Pph(m_pmp, xmlszLocalname, m_pphm, this);
-		
-		GPOS_ASSERT(NULL != pph);
+		CParseHandlerBase *scalar_op_parse_handler = CParseHandlerFactory::GetParseHandler(
+			m_mp, element_local_name, m_parse_handler_mgr, this);
+
+		GPOS_ASSERT(NULL != scalar_op_parse_handler);
 
 		// activate the child parse handler
-		m_pphm->ActivateParseHandler(pph);
-		
-		// pass the startElement message for the specialized parse handler to process
-		pph->startElement(xmlszUri, xmlszLocalname, xmlszQname, attrs);
-		
-		// store parse handlers
-		this->Append(pph);
-	}
+		m_parse_handler_mgr->ActivateParseHandler(scalar_op_parse_handler);
 
+		// pass the startElement message for the specialized parse handler to process
+		scalar_op_parse_handler->startElement(
+			element_uri, element_local_name, element_qname, attrs);
+
+		// store parse handlers
+		this->Append(scalar_op_parse_handler);
+	}
 }
 
 //---------------------------------------------------------------------------
@@ -93,32 +89,32 @@ CParseHandlerDefaultValueExpr::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerDefaultValueExpr::EndElement
-	(
-	const XMLCh* const, // xmlszUri,
-	const XMLCh* const xmlszLocalname,
-	const XMLCh* const // xmlszQname
-	)
+CParseHandlerDefaultValueExpr::EndElement(const XMLCh *const,  // element_uri,
+										  const XMLCh *const element_local_name,
+										  const XMLCh *const  // element_qname
+)
 {
-	if(0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenColumnDefaultValue), xmlszLocalname))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenColumnDefaultValue),
+									  element_local_name))
 	{
-		CWStringDynamic *pstr = CDXLUtils::PstrFromXMLCh(m_pphm->Pmm(), xmlszLocalname);
-		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, pstr->Wsz());
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
-	if (0 < this->UlLength())
+	if (0 < this->Length())
 	{
-		GPOS_ASSERT(1 == this->UlLength());
-		
+		GPOS_ASSERT(1 == this->Length());
+
 		// get node for default value expression from child parse handler
-		CParseHandlerScalarOp *pphChild = dynamic_cast<CParseHandlerScalarOp *>((*this)[0]);
-		m_pdxln = pphChild->Pdxln();
-		m_pdxln->AddRef();
+		CParseHandlerScalarOp *child_parse_handler =
+			dynamic_cast<CParseHandlerScalarOp *>((*this)[0]);
+		m_dxlnode = child_parse_handler->CreateDXLNode();
+		m_dxlnode->AddRef();
 	}
 
 	// deactivate handler
-	m_pphm->DeactivateHandler();
+	m_parse_handler_mgr->DeactivateHandler();
 }
 
 // EOF
-

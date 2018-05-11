@@ -23,32 +23,29 @@ using namespace gpos;
 //
 //---------------------------------------------------------------------------
 void
-CTaskSchedulerFifo::Enqueue
-	(
-	CTask *ptsk
-	)
+CTaskSchedulerFifo::Enqueue(CTask *task)
 {
-	m_qtsk.Append(ptsk);
-	ptsk->SetStatus(CTask::EtsQueued);
+	m_task_queue.Append(task);
+	task->SetStatus(CTask::EtsQueued);
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CTaskSchedulerFifo::PtskDequeue
+//		CTaskSchedulerFifo::Dequeue
 //
 //	@doc:
 //		Get next task to execute
 //
 //---------------------------------------------------------------------------
 CTask *
-CTaskSchedulerFifo::PtskDequeue()
+CTaskSchedulerFifo::Dequeue()
 {
-	GPOS_ASSERT(!m_qtsk.FEmpty());
+	GPOS_ASSERT(!m_task_queue.IsEmpty());
 
-	CTask *ptsk = m_qtsk.RemoveHead();
-	ptsk->SetStatus(CTask::EtsDequeued);
-	return ptsk;
+	CTask *task = m_task_queue.RemoveHead();
+	task->SetStatus(CTask::EtsDequeued);
+	return task;
 }
 
 
@@ -61,23 +58,20 @@ CTaskSchedulerFifo::PtskDequeue()
 //
 //---------------------------------------------------------------------------
 GPOS_RESULT
-CTaskSchedulerFifo::EresCancel
-	(
-	 CTask *ptsk
-	)
+CTaskSchedulerFifo::Cancel(CTask *task)
 {
 	// iterate until found
-	CTask *ptskIt = m_qtsk.PtFirst();
-	while (NULL != ptskIt)
+	CTask *task_it = m_task_queue.First();
+	while (NULL != task_it)
 	{
-		if (ptskIt == ptsk)
+		if (task_it == task)
 		{
-			m_qtsk.Remove(ptskIt);
-			ptskIt->Cancel();
+			m_task_queue.Remove(task_it);
+			task_it->Cancel();
 
 			return GPOS_OK;
 		}
-		ptskIt = m_qtsk.PtNext(ptskIt);
+		task_it = m_task_queue.Next(task_it);
 	}
 
 	return GPOS_NOT_FOUND;
@@ -85,7 +79,4 @@ CTaskSchedulerFifo::EresCancel
 
 
 
-
-
 // EOF
-

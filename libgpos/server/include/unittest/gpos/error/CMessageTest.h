@@ -16,7 +16,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CMessageTest
@@ -27,16 +26,14 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CMessageTest
 	{
-		public:
-
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_BasicWrapper();
-			static GPOS_RESULT EresUnittest_Basic(const void *, ...);
+	public:
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_BasicWrapper();
+		static GPOS_RESULT EresUnittest_Basic(const void *, ...);
 	};
-}
+}  // namespace gpos
 
-#endif // !GPOS_CMessageTest_H
+#endif  // !GPOS_CMessageTest_H
 
 // EOF
-

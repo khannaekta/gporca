@@ -28,21 +28,17 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerBase::CParseHandlerBase
-	(
-	IMemoryPool *pmp, 
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
-	:
-	m_pmp(pmp),
-	m_pphm(pphm),
-	m_pphRoot(pphRoot)
+CParseHandlerBase::CParseHandlerBase(IMemoryPool *mp,
+									 CParseHandlerManager *parse_handler_mgr,
+									 CParseHandlerBase *parse_handler_root)
+	: m_mp(mp),
+	  m_parse_handler_mgr(parse_handler_mgr),
+	  m_parse_handler_root(parse_handler_root)
 {
-	GPOS_ASSERT(NULL != pmp);
-	GPOS_ASSERT(NULL != pphm);
-	
-	m_pdrgpph = GPOS_NEW(m_pmp) DrgPph(m_pmp);
+	GPOS_ASSERT(NULL != mp);
+	GPOS_ASSERT(NULL != parse_handler_mgr);
+
+	m_parse_handler_base_array = GPOS_NEW(m_mp) CParseHandlerBaseArray(m_mp);
 }
 
 //---------------------------------------------------------------------------
@@ -56,20 +52,20 @@ CParseHandlerBase::CParseHandlerBase
 
 CParseHandlerBase::~CParseHandlerBase()
 {
-	m_pdrgpph->Release();
+	m_parse_handler_base_array->Release();
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CParseHandlerBase::Edxlphtype
+//		CParseHandlerBase::GetParseHandlerType
 //
 //	@doc:
-//		Return the type of the parse handler. Currently we overload this method to 
+//		Return the type of the parse handler. Currently we overload this method to
 //		return a specific type for the plan, query, metadata and traceflags parse handlers.
 //
 //---------------------------------------------------------------------------
 EDxlParseHandlerType
-CParseHandlerBase::Edxlphtype() const
+CParseHandlerBase::GetParseHandlerType() const
 {
 	return EdxlphOther;
 }
@@ -83,28 +79,25 @@ CParseHandlerBase::Edxlphtype() const
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerBase::ReplaceParseHandler
-	(
-	CParseHandlerBase *pphOld,
-	CParseHandlerBase *pphNew
-	)
+CParseHandlerBase::ReplaceParseHandler(CParseHandlerBase *parse_handler_base_old,
+									   CParseHandlerBase *parse_handler_base_new)
 {
-	ULONG ulPos = 0;
-	
-	GPOS_ASSERT(NULL != m_pdrgpph);
-	
-	for (ulPos = 0; ulPos < m_pdrgpph->UlLength(); ulPos++)
+	ULONG idx = 0;
+
+	GPOS_ASSERT(NULL != m_parse_handler_base_array);
+
+	for (idx = 0; idx < m_parse_handler_base_array->Size(); idx++)
 	{
-		if ((*m_pdrgpph)[ulPos] == pphOld)
+		if ((*m_parse_handler_base_array)[idx] == parse_handler_base_old)
 		{
 			break;
 		}
 	}
-	
+
 	// assert old parse handler was found in array
-	GPOS_ASSERT(ulPos < m_pdrgpph->UlLength());
-	
-	m_pdrgpph->Replace(ulPos, pphNew);
+	GPOS_ASSERT(idx < m_parse_handler_base_array->Size());
+
+	m_parse_handler_base_array->Replace(idx, parse_handler_base_new);
 }
 
 //---------------------------------------------------------------------------
@@ -116,15 +109,12 @@ CParseHandlerBase::ReplaceParseHandler
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerBase::startElement
-	(
-		const XMLCh* const xmlszUri,
-		const XMLCh* const xmlszLocalname,
-		const XMLCh* const xmlszQname,
-		const Attributes& attrs
-	)
+CParseHandlerBase::startElement(const XMLCh *const element_uri,
+								const XMLCh *const element_local_name,
+								const XMLCh *const element_qname,
+								const Attributes &attrs)
 {
-	StartElement(xmlszUri, xmlszLocalname, xmlszQname, attrs);
+	StartElement(element_uri, element_local_name, element_qname, attrs);
 }
 
 //---------------------------------------------------------------------------
@@ -136,33 +126,27 @@ CParseHandlerBase::startElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerBase::endElement
-	(
-		const XMLCh* const xmlszUri,
-		const XMLCh* const xmlszLocalname,
-		const XMLCh* const xmlszQname
-	)
+CParseHandlerBase::endElement(const XMLCh *const element_uri,
+							  const XMLCh *const element_local_name,
+							  const XMLCh *const element_qname)
 {
-	EndElement(xmlszUri, xmlszLocalname, xmlszQname);
+	EndElement(element_uri, element_local_name, element_qname);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CParseHandlerBase::error
+//		CParseHandlerBase::ProcessError
 //
 //	@doc:
-//		Invoked by Xerces to process an error
+//		Invoked by Xerces to process an ProcessError
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerBase::error
-	(
-	const SAXParseException& toCatch
-	)
+CParseHandlerBase::error(const SAXParseException &to_catch)
 {
-	CHAR* szMessage = XMLString::transcode(toCatch.getMessage(), m_pphm->Pmm());
-	GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLValidationError, szMessage);
+	CHAR *message =
+		XMLString::transcode(to_catch.getMessage(), m_parse_handler_mgr->GetDXLMemoryManager());
+	GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLValidationError, message);
 }
 
 // EOF
-

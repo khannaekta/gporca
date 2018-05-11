@@ -24,15 +24,8 @@ using namespace gpos;
 //		ctor
 //
 //---------------------------------------------------------------------------
-CBitSetIter::CBitSetIter
-	(
-	const CBitSet &bs
-	)
-	:
-	m_bs(bs),
-	m_ulCursor((ULONG)-1),
-	m_pbsl(NULL),
-	m_fActive(true)
+CBitSetIter::CBitSetIter(const CBitSet &bs)
+	: m_bs(bs), m_cursor((ULONG) -1), m_bsl(NULL), m_active(true)
 {
 }
 
@@ -46,31 +39,31 @@ CBitSetIter::CBitSetIter
 //
 //---------------------------------------------------------------------------
 BOOL
-CBitSetIter::FAdvance()
+CBitSetIter::Advance()
 {
-	GPOS_ASSERT(m_fActive && "called advance on exhausted iterator");
-	
-	if (NULL == m_pbsl)
+	GPOS_ASSERT(m_active && "called advance on exhausted iterator");
+
+	if (NULL == m_bsl)
 	{
-		m_pbsl = m_bs.m_bsllist.PtFirst();
+		m_bsl = m_bs.m_bsllist.First();
 	}
-	
-	while (NULL != m_pbsl)
+
+	while (NULL != m_bsl)
 	{
-		if (m_ulCursor + 1 <= m_bs.m_cSizeBits &&
-			m_pbsl->Pbv()->FNextBit(m_ulCursor + 1, m_ulCursor))
+		if (m_cursor + 1 <= m_bs.m_vector_size &&
+			m_bsl->GetVec()->GetNextSetBit(m_cursor + 1, m_cursor))
 		{
 			break;
 		}
 
-		m_pbsl = m_bs.m_bsllist.PtNext(m_pbsl);
-		m_ulCursor = (ULONG)-1;
+		m_bsl = m_bs.m_bsllist.Next(m_bsl);
+		m_cursor = (ULONG) -1;
 	}
 
-	m_fActive = (NULL != m_pbsl);
-	return m_fActive;
+	m_active = (NULL != m_bsl);
+	return m_active;
 }
-	
+
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -81,13 +74,12 @@ CBitSetIter::FAdvance()
 //
 //---------------------------------------------------------------------------
 ULONG
-CBitSetIter::UlBit() const
+CBitSetIter::Bit() const
 {
-	GPOS_ASSERT(m_fActive && NULL != m_pbsl && "iterator uninitialized");
-	GPOS_ASSERT(m_pbsl->Pbv()->FBit(m_ulCursor));
-	
-	return m_pbsl->UlOffset() + m_ulCursor;
+	GPOS_ASSERT(m_active && NULL != m_bsl && "iterator uninitialized");
+	GPOS_ASSERT(m_bsl->GetVec()->Get(m_cursor));
+
+	return m_bsl->GetOffset() + m_cursor;
 }
 
 // EOF
-

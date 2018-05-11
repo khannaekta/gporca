@@ -7,7 +7,7 @@
 //
 //	@doc:
 //		Implementation of DXL logical project operator
-//		
+//
 //---------------------------------------------------------------------------
 
 #include "naucrates/dxl/operators/CDXLLogicalProject.h"
@@ -25,41 +25,37 @@ using namespace gpdxl;
 //		Construct a DXL Logical project node
 //
 //---------------------------------------------------------------------------
-CDXLLogicalProject::CDXLLogicalProject
-	(
-	IMemoryPool *pmp
-	)
-	:CDXLLogical(pmp),
-	 m_pmdnameAlias(NULL)
+CDXLLogicalProject::CDXLLogicalProject(IMemoryPool *mp)
+	: CDXLLogical(mp), m_mdname_alias(NULL)
 {
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLLogicalProject::Edxlop
+//		CDXLLogicalProject::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLLogicalProject::Edxlop() const
+CDXLLogicalProject::GetDXLOperator() const
 {
 	return EdxlopLogicalProject;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLLogicalProject::Pmdname
+//		CDXLLogicalProject::MdName
 //
 //	@doc:
 //		Returns alias name
 //
 //---------------------------------------------------------------------------
 const CMDName *
-CDXLLogicalProject::Pmdname() const
+CDXLLogicalProject::MdName() const
 {
-	return m_pmdnameAlias;
+	return m_mdname_alias;
 }
 
 //---------------------------------------------------------------------------
@@ -71,29 +67,26 @@ CDXLLogicalProject::Pmdname() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalProject::SetAliasName
-	(
-	CMDName *pmdname
-	)
+CDXLLogicalProject::SetAliasName(CMDName *mdname)
 {
-	GPOS_ASSERT(NULL == m_pmdnameAlias);
-	GPOS_ASSERT(NULL != pmdname);
+	GPOS_ASSERT(NULL == m_mdname_alias);
+	GPOS_ASSERT(NULL != mdname);
 
-	m_pmdnameAlias = pmdname;
+	m_mdname_alias = mdname;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLLogicalProject::PstrOpName
+//		CDXLLogicalProject::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLLogicalProject::PstrOpName() const
+CDXLLogicalProject::GetOpNameStr() const
 {
-	return CDXLTokens::PstrToken(EdxltokenLogicalProject);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenLogicalProject);
 }
 
 //---------------------------------------------------------------------------
@@ -105,27 +98,24 @@ CDXLLogicalProject::PstrOpName() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalProject::SerializeToDXL
-	(
-	CXMLSerializer *pxmlser,
-	const CDXLNode *pdxln
-	)
-	const
+CDXLLogicalProject::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const
 {
-	const CWStringConst *pstrElemName = PstrOpName();
+	const CWStringConst *element_name = GetOpNameStr();
 
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
 	// serialize alias
-	if (NULL != m_pmdnameAlias)
+	if (NULL != m_mdname_alias)
 	{
-		pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenDerivedTableName), m_pmdnameAlias->Pstr());
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenDerivedTableName),
+									 m_mdname_alias->GetMDName());
 	}
 
 	// serialize children
-	pdxln->SerializeChildrenToDXL(pxmlser);
+	dxlnode->SerializeChildrenToDXL(xml_serializer);
 
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -138,33 +128,29 @@ CDXLLogicalProject::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalProject::AssertValid
-	(
-	const CDXLNode *pdxln,
-	BOOL fValidateChildren
-	) const
+CDXLLogicalProject::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
-	GPOS_ASSERT(2 == pdxln->UlArity());
+	GPOS_ASSERT(2 == dxlnode->Arity());
 
-	CDXLNode *pdxlnProjList = (*pdxln)[0];
-	CDXLNode *pdxlnChild = (*pdxln)[1];
+	CDXLNode *proj_list_dxlnode = (*dxlnode)[0];
+	CDXLNode *child_dxlnode = (*dxlnode)[1];
 
-	GPOS_ASSERT(EdxlopScalarProjectList == pdxlnProjList->Pdxlop()->Edxlop());
-	GPOS_ASSERT(EdxloptypeLogical == pdxlnChild->Pdxlop()->Edxloperatortype());
-	
-	if (fValidateChildren)
+	GPOS_ASSERT(EdxlopScalarProjectList == proj_list_dxlnode->GetOperator()->GetDXLOperator());
+	GPOS_ASSERT(EdxloptypeLogical == child_dxlnode->GetOperator()->GetDXLOperatorType());
+
+	if (validate_children)
 	{
-		pdxlnProjList->Pdxlop()->AssertValid(pdxlnProjList, fValidateChildren);
-		pdxlnChild->Pdxlop()->AssertValid(pdxlnChild, fValidateChildren);		
+		proj_list_dxlnode->GetOperator()->AssertValid(proj_list_dxlnode, validate_children);
+		child_dxlnode->GetOperator()->AssertValid(child_dxlnode, validate_children);
 	}
 
-	const ULONG ulArity = pdxlnProjList->UlArity();
-	for (ULONG ul = 0; ul < ulArity; ++ul)
+	const ULONG arity = proj_list_dxlnode->Arity();
+	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *pdxlnPrEl = (*pdxlnProjList)[ul];
-		GPOS_ASSERT(EdxlopScalarIdent != pdxlnPrEl->Pdxlop()->Edxlop());
+		CDXLNode *pdxlnPrEl = (*proj_list_dxlnode)[ul];
+		GPOS_ASSERT(EdxlopScalarIdent != pdxlnPrEl->GetOperator()->GetDXLOperator());
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

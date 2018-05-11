@@ -18,23 +18,22 @@ using namespace gpos;
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CWallClock::UlElapsedUS
+//		CWallClock::ElapsedUS
 //
 //	@doc:
 //		Wall-clock time in micro-seconds since object construction
 //
 //---------------------------------------------------------------------------
 ULONG
-CWallClock::UlElapsedUS() const
+CWallClock::ElapsedUS() const
 {
 	timeval time;
-	syslib::GetTimeOfDay(&time, NULL/*timezone*/);
+	syslib::GetTimeOfDay(&time, NULL /*timezone*/);
 
-	ULONG ulDiff = (ULONG)
-		(((time.tv_sec - m_time.tv_sec) * GPOS_USEC_IN_SEC) +
-		 (time.tv_usec - m_time.tv_usec));
+	ULONG diff = (ULONG)(((time.tv_sec - m_time.tv_sec) * GPOS_USEC_IN_SEC) +
+						 (time.tv_usec - m_time.tv_usec));
 
-	return ulDiff;
+	return diff;
 }
 
 
@@ -49,9 +48,8 @@ CWallClock::UlElapsedUS() const
 void
 CWallClock::Restart()
 {
-	syslib::GetTimeOfDay(&m_time, NULL/*timezone*/);
+	syslib::GetTimeOfDay(&m_time, NULL /*timezone*/);
 }
 
 
 // EOF
-

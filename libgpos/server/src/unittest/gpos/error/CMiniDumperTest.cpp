@@ -36,11 +36,10 @@ using namespace gpos;
 GPOS_RESULT
 CMiniDumperTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
+	CUnittest rgut[] = {
 		GPOS_UNITTEST_FUNC(CMiniDumperTest::EresUnittest_Basic),
 		GPOS_UNITTEST_FUNC(CMiniDumperTest::EresUnittest_Concurrency),
-		};
+	};
 
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
@@ -58,11 +57,11 @@ GPOS_RESULT
 CMiniDumperTest::EresUnittest_Basic()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
-	CMiniDumperStream mdrs(pmp);
+	CMiniDumperStream mdrs(mp);
 
-	CWStringDynamic wstrMinidump(pmp);
+	CWStringDynamic wstrMinidump(mp);
 	COstreamString oss(&wstrMinidump);
 	mdrs.Init(&oss);
 
@@ -76,7 +75,7 @@ CMiniDumperTest::EresUnittest_Basic()
 
 		GPOS_RESET_EX;
 
-		GPOS_TRACE(wstrMinidump.Wsz());
+		GPOS_TRACE(wstrMinidump.GetBuffer());
 	}
 	GPOS_CATCH_END;
 
@@ -96,13 +95,13 @@ GPOS_RESULT
 CMiniDumperTest::EresUnittest_Concurrency()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
-	CWorkerPoolManager *pwpm = CWorkerPoolManager::Pwpm();
+	CWorkerPoolManager *pwpm = CWorkerPoolManager::WorkerPoolManager();
 
-	CWStringDynamic wstrMinidump(pmp);
+	CWStringDynamic wstrMinidump(mp);
 	COstreamString oss(&wstrMinidump);
-	CMiniDumperStream mdrs(pmp);
+	CMiniDumperStream mdrs(mp);
 	mdrs.Init(&oss);
 
 	GPOS_TRY
@@ -110,16 +109,16 @@ CMiniDumperTest::EresUnittest_Concurrency()
 		// register stack serializer with error context
 		CSerializableStack ss;
 
-		CAutoTaskProxy atp(pmp, pwpm);
+		CAutoTaskProxy atp(mp, pwpm);
 		CTask *rgPtsk[6];
 
 		// one task throws, the other get aborted
-		rgPtsk[0] = atp.PtskCreate(PvRaise, NULL);
-		rgPtsk[1] = atp.PtskCreate(PvLoop, NULL);
-		rgPtsk[2] = atp.PtskCreate(PvLoop, NULL);
-		rgPtsk[3] = atp.PtskCreate(PvLoopSerialize, NULL);
-		rgPtsk[4] = atp.PtskCreate(PvLoopSerialize, NULL);
-		rgPtsk[5] = atp.PtskCreate(PvLoopSerialize, NULL);
+		rgPtsk[0] = atp.Create(PvRaise, NULL);
+		rgPtsk[1] = atp.Create(PvLoop, NULL);
+		rgPtsk[2] = atp.Create(PvLoop, NULL);
+		rgPtsk[3] = atp.Create(PvLoopSerialize, NULL);
+		rgPtsk[4] = atp.Create(PvLoopSerialize, NULL);
+		rgPtsk[5] = atp.Create(PvLoopSerialize, NULL);
 
 		for (ULONG i = 0; i < GPOS_ARRAY_SIZE(rgPtsk); i++)
 		{
@@ -137,7 +136,7 @@ CMiniDumperTest::EresUnittest_Concurrency()
 
 		GPOS_RESET_EX;
 
-		GPOS_TRACE(wstrMinidump.Wsz());
+		GPOS_TRACE(wstrMinidump.GetBuffer());
 	}
 	GPOS_CATCH_END;
 
@@ -154,10 +153,8 @@ CMiniDumperTest::EresUnittest_Concurrency()
 //
 //---------------------------------------------------------------------------
 void *
-CMiniDumperTest::PvRaise
-	(
-	void * // pv
-	)
+CMiniDumperTest::PvRaise(void *  // pv
+)
 {
 	// register stack serializer with error context
 	CSerializableStack ss;
@@ -180,13 +177,11 @@ CMiniDumperTest::PvRaise
 //
 //---------------------------------------------------------------------------
 void *
-CMiniDumperTest::PvLoop
-	(
-	void * // pv
-	)
+CMiniDumperTest::PvLoop(void *  // pv
+)
 {
 	// loop until task is aborted
-	while(true)
+	while (true)
 	{
 		GPOS_CHECK_ABORT;
 
@@ -206,15 +201,13 @@ CMiniDumperTest::PvLoop
 //
 //---------------------------------------------------------------------------
 void *
-CMiniDumperTest::PvLoopSerialize
-	(
-	void * // pv
-	)
+CMiniDumperTest::PvLoopSerialize(void *  // pv
+)
 {
 	CSerializableStack ss;
 
 	// loop until task is aborted
-	while(true)
+	while (true)
 	{
 		GPOS_CHECK_ABORT;
 
@@ -233,13 +226,10 @@ CMiniDumperTest::PvLoopSerialize
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMiniDumperTest::CMiniDumperStream::CMiniDumperStream
-	(
-	IMemoryPool *pmp
-	)
-	:
-	CMiniDumper(pmp)
-{}
+CMiniDumperTest::CMiniDumperStream::CMiniDumperStream(IMemoryPool *mp)
+	: CMiniDumper(mp)
+{
+}
 
 
 //---------------------------------------------------------------------------
@@ -251,7 +241,8 @@ CMiniDumperTest::CMiniDumperStream::CMiniDumperStream
 //
 //---------------------------------------------------------------------------
 CMiniDumperTest::CMiniDumperStream::~CMiniDumperStream()
-{}
+{
+}
 
 
 //---------------------------------------------------------------------------
@@ -297,13 +288,9 @@ CMiniDumperTest::CMiniDumperStream::SerializeEntryHeader()
 {
 	WCHAR wszBuffer[GPOS_MINIDUMP_BUF_SIZE];
 	CWStringStatic wstr(wszBuffer, GPOS_ARRAY_SIZE(wszBuffer));
-	wstr.AppendFormat
-		(
-		GPOS_WSZ_LIT("<THREAD ID=%d>\n"),
-		CWorker::PwrkrSelf()->UlThreadId()
-		);
+	wstr.AppendFormat(GPOS_WSZ_LIT("<THREAD ID=%d>\n"), CWorker::Self()->GetThreadId());
 
-	*m_oos << wstr.Wsz();
+	*m_oos << wstr.GetBuffer();
 }
 
 
@@ -316,9 +303,7 @@ CMiniDumperTest::CMiniDumperStream::SerializeEntryHeader()
 //
 //---------------------------------------------------------------------------
 void
-CMiniDumperTest::CMiniDumperStream::SerializeEntryFooter
-	(
-	)
+CMiniDumperTest::CMiniDumperStream::SerializeEntryFooter()
 {
 	*m_oos << "</THREAD>\n";
 }
@@ -332,10 +317,9 @@ CMiniDumperTest::CMiniDumperStream::SerializeEntryFooter
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMiniDumperTest::CSerializableStack::CSerializableStack()
-	:
-	CSerializable()
-{}
+CMiniDumperTest::CSerializableStack::CSerializableStack() : CSerializable()
+{
+}
 
 
 //---------------------------------------------------------------------------
@@ -348,7 +332,8 @@ CMiniDumperTest::CSerializableStack::CSerializableStack()
 //---------------------------------------------------------------------------
 
 CMiniDumperTest::CSerializableStack::~CSerializableStack()
-{}
+{
+}
 
 
 //---------------------------------------------------------------------------
@@ -360,22 +345,19 @@ CMiniDumperTest::CSerializableStack::~CSerializableStack()
 //
 //---------------------------------------------------------------------------
 void
-CMiniDumperTest::CSerializableStack::Serialize
-	(
-	COstream& oos
-	)
+CMiniDumperTest::CSerializableStack::Serialize(COstream &oos)
 {
 	WCHAR wszStackBuffer[GPOS_MINIDUMP_BUF_SIZE];
 	CWStringStatic wstr(wszStackBuffer, GPOS_ARRAY_SIZE(wszStackBuffer));
 
 	wstr.AppendFormat(GPOS_WSZ_LIT("<STACK_TRACE>\n"));
 
-	CErrorContext *perrctxt = CTask::PtskSelf()->PerrctxtConvert();
-	perrctxt->Psd()->AppendTrace(&wstr);
+	CErrorContext *perrctxt = CTask::Self()->ConvertErrCtxt();
+	perrctxt->GetStackDescriptor()->AppendTrace(&wstr);
 
 	wstr.AppendFormat(GPOS_WSZ_LIT("</STACK_TRACE>\n"));
 
-	oos << wstr.Wsz();
+	oos << wstr.GetBuffer();
 }
 
 

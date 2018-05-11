@@ -35,83 +35,72 @@ namespace gpnaucrates
 	//---------------------------------------------------------------------------
 	class CStatsPredLike : public CStatsPred
 	{
-		private:
+	private:
+		// private copy ctor
+		CStatsPredLike(const CStatsPredLike &);
 
-			// private copy ctor
-			CStatsPredLike(const CStatsPredLike &);
+		// private assignment operator
+		CStatsPredLike &operator=(CStatsPredLike &);
 
-			// private assignment operator
-			CStatsPredLike& operator=(CStatsPredLike &);
+		// left hand side of the LIKE expression
+		CExpression *m_expr_left;
 
-			// left hand side of the LIKE expression
-			CExpression *m_pexprLeft;
+		// right hand side of the LIKE expression
+		CExpression *m_expr_right;
 
-			// right hand side of the LIKE expression
-			CExpression *m_pexprRight;
+		// default scale factor
+		CDouble m_default_scale_factor;
 
-			// default scale factor
-			CDouble m_dDefaultScaleFactor;
+	public:
+		// ctor
+		CStatsPredLike(ULONG colid,
+					   CExpression *expr_left,
+					   CExpression *expr_right,
+					   CDouble default_scale_factor);
 
-		public:
+		// dtor
+		virtual ~CStatsPredLike();
 
-			// ctor
-			CStatsPredLike
-				(
-				ULONG ulColId,
-				CExpression *pexprLeft,
-				CExpression *pexprRight,
-				CDouble dDefaultScaleFactor
-				);
+		// the column identifier on which the predicates are on
+		virtual ULONG GetColId() const;
 
-			// dtor
-			virtual
-			~CStatsPredLike();
+		// filter type id
+		virtual EStatsPredType
+		GetPredStatsType() const
+		{
+			return CStatsPred::EsptLike;
+		}
 
-			// the column identifier on which the predicates are on
-			virtual
-			ULONG UlColId() const;
+		// left hand side of the LIKE expression
+		virtual CExpression *
+		GetExprOnLeft() const
+		{
+			return m_expr_left;
+		}
 
-			// filter type id
-			virtual
-			EStatsPredType Espt() const
-			{
-				return CStatsPred::EsptLike;
-			}
+		// right hand side of the LIKE expression
+		virtual CExpression *
+		GetExprOnRight() const
+		{
+			return m_expr_right;
+		}
 
-			// left hand side of the LIKE expression
-			virtual
-			CExpression *PexprLeft() const
-			{
-				return m_pexprLeft;
-			}
+		// default scale factor
+		virtual CDouble DefaultScaleFactor() const;
 
-			// right hand side of the LIKE expression
-			virtual
-			CExpression *PexprRight() const
-			{
-				return m_pexprRight;
-			}
+		// conversion function
+		static CStatsPredLike *
+		ConvertPredStats(CStatsPred *pred_stats)
+		{
+			GPOS_ASSERT(NULL != pred_stats);
+			GPOS_ASSERT(CStatsPred::EsptLike == pred_stats->GetPredStatsType());
 
-			// default scale factor
-			virtual
-			CDouble DDefaultScaleFactor() const;
+			return dynamic_cast<CStatsPredLike *>(pred_stats);
+		}
 
-			// conversion function
-			static
-			CStatsPredLike *PstatspredConvert
-				(
-				CStatsPred *pstatspred
-				)
-			{
-				GPOS_ASSERT(NULL != pstatspred);
-				GPOS_ASSERT(CStatsPred::EsptLike == pstatspred->Espt());
+	};  // class CStatsPredLike
+}  // namespace gpnaucrates
 
-				return dynamic_cast<CStatsPredLike*>(pstatspred);
-			}
-
-	}; // class CStatsPredLike
-}
-
-#endif // !GPNAUCRATES_CStatsPredLike_H
+#endif  // !GPNAUCRATES_CStatsPredLike_H
 
 // EOF

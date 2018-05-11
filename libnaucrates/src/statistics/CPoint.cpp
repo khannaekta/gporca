@@ -24,145 +24,113 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPoint::CPoint
-	(
-	IDatum *pdatum
-	)
-	: 
-	m_pdatum(pdatum)
+CPoint::CPoint(IDatum *datum) : m_datum(datum)
 {
-	GPOS_ASSERT(NULL != m_pdatum);
+	GPOS_ASSERT(NULL != m_datum);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CPoint::FEqual
+//		CPoint::Equals
 //
 //	@doc:
 //		Equality check
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::FEqual
-	(
-	const CPoint *ppoint
-	)
-	const
+CPoint::Equals(const CPoint *point) const
 {
-	GPOS_ASSERT(NULL != ppoint);
-	return m_pdatum->FStatsEqual(ppoint->m_pdatum);
+	GPOS_ASSERT(NULL != point);
+	return m_datum->StatsAreEqual(point->m_datum);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CPoint::FNotEqual
+//		CPoint::IsNotEqual
 //
 //	@doc:
 //		Inequality check
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::FNotEqual
-	(
-	const CPoint *ppoint
-	)
-	const
+CPoint::IsNotEqual(const CPoint *point) const
 {
-	return !(this->FEqual(ppoint));
+	return !(this->Equals(point));
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CPoint::FLessThan
+//		CPoint::IsLessThan
 //
 //	@doc:
 //		Less than check
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::FLessThan
-	(
-	const CPoint *ppoint
-	)
-	const
+CPoint::IsLessThan(const CPoint *point) const
 {
-	GPOS_ASSERT(NULL != ppoint);
-	return m_pdatum->FStatsComparable(ppoint->m_pdatum) && m_pdatum->FStatsLessThan(ppoint->m_pdatum);
+	GPOS_ASSERT(NULL != point);
+	return m_datum->StatsAreComparable(point->m_datum) && m_datum->StatsAreLessThan(point->m_datum);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CPoint::FLessThanOrEqual
+//		CPoint::IsLessThanOrEqual
 //
 //	@doc:
 //		Less than or equals check
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::FLessThanOrEqual
-	(
-	const CPoint *ppoint
-	)
-	const
+CPoint::IsLessThanOrEqual(const CPoint *point) const
 {
-	return (this->FLessThan(ppoint) || this->FEqual(ppoint));
+	return (this->IsLessThan(point) || this->Equals(point));
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CPoint::FGreaterThan
+//		CPoint::IsGreaterThan
 //
 //	@doc:
 //		Greater than check
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::FGreaterThan
-	(
-	const CPoint *ppoint
-	)
-	const
+CPoint::IsGreaterThan(const CPoint *point) const
 {
-	return m_pdatum->FStatsComparable(ppoint->m_pdatum) && m_pdatum->FStatsGreaterThan(ppoint->m_pdatum);
+	return m_datum->StatsAreComparable(point->m_datum) &&
+		   m_datum->StatsAreGreaterThan(point->m_datum);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CPoint::FGreaterThanOrEqual
+//		CPoint::IsGreaterThanOrEqual
 //
 //	@doc:
 //		Greater than or equals check
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::FGreaterThanOrEqual
-	(
-	const CPoint *ppoint
-	)
-	const
+CPoint::IsGreaterThanOrEqual(const CPoint *point) const
 {
-	return (this->FGreaterThan(ppoint) || this->FEqual(ppoint));
+	return (this->IsGreaterThan(point) || this->Equals(point));
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CPoint::DDistance
+//		CPoint::Distance
 //
 //	@doc:
-//		DDistance between two points
+//		Distance between two points
 //
 //---------------------------------------------------------------------------
 CDouble
-CPoint::DDistance
-	(
-	const CPoint *ppoint
-	)
-	const
+CPoint::Distance(const CPoint *point) const
 {
-	GPOS_ASSERT(NULL != ppoint);
-	if (m_pdatum->FStatsComparable(ppoint->m_pdatum))
+	GPOS_ASSERT(NULL != point);
+	if (m_datum->StatsAreComparable(point->m_datum))
 	{
-		return CDouble(m_pdatum->DStatsDistance(ppoint->m_pdatum));
+		return CDouble(m_datum->GetStatsDistanceFrom(point->m_datum));
 	}
 
 	// default to a non zero constant for overlap
@@ -178,78 +146,61 @@ CPoint::DDistance
 //		Print function
 //
 //---------------------------------------------------------------------------
-IOstream&
-CPoint::OsPrint
-	(
-	IOstream &os
-	)
-	const
+IOstream &
+CPoint::OsPrint(IOstream &os) const
 {
-	m_pdatum->OsPrint(os);
+	m_datum->OsPrint(os);
 	return os;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CPoint::PpointMin
+//		CPoint::MinPoint
 //
 //	@doc:
 //		minimum of two points using <=
 //
 //---------------------------------------------------------------------------
 CPoint *
-CPoint::PpointMin
-	(
-	CPoint *ppoint1,
-	CPoint *ppoint2
-	)
+CPoint::MinPoint(CPoint *point1, CPoint *point2)
 {
-	if (ppoint1->FLessThanOrEqual(ppoint2))
+	if (point1->IsLessThanOrEqual(point2))
 	{
-		return ppoint1;
+		return point1;
 	}
-	return ppoint2;
+	return point2;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CPoint::PpointMax
+//		CPoint::MaxPoint
 //
 //	@doc:
 //		maximum of two points using >=
 //
 //---------------------------------------------------------------------------
 CPoint *
-CPoint::PpointMax
-	(
-	CPoint *ppoint1,
-	CPoint *ppoint2
-	)
+CPoint::MaxPoint(CPoint *point1, CPoint *point2)
 {
-	if (ppoint1->FGreaterThanOrEqual(ppoint2))
+	if (point1->IsGreaterThanOrEqual(point2))
 	{
-		return ppoint1;
+		return point1;
 	}
-	return ppoint2;
+	return point2;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CPoint::Pdxldatum
+//		CPoint::GetDatumVal
 //
 //	@doc:
 //		Translate the point into its DXL representation
 //---------------------------------------------------------------------------
 CDXLDatum *
-CPoint::Pdxldatum
-	(
-	IMemoryPool *pmp,
-	CMDAccessor *pmda
-	)
-	const
+CPoint::GetDatumVal(IMemoryPool *mp, CMDAccessor *md_accessor) const
 {
-	IMDId *pmdid = m_pdatum->Pmdid();
-	return pmda->Pmdtype(pmdid)->Pdxldatum(pmp, m_pdatum);
+	IMDId *mdid = m_datum->MDId();
+	return md_accessor->RetrieveType(mdid)->GetDatumVal(mp, m_datum);
 }
 
 // EOF

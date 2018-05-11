@@ -29,16 +29,10 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarIdent::CDXLScalarIdent
-	(
-	IMemoryPool *pmp,
-	CDXLColRef *pdxlcr
-	)
-	:
-	CDXLScalar(pmp),
-	m_pdxlcr(pdxlcr)
+CDXLScalarIdent::CDXLScalarIdent(IMemoryPool *mp, CDXLColRef *dxl_colref)
+	: CDXLScalar(mp), m_dxl_colref(dxl_colref)
 {
-	GPOS_ASSERT(NULL != m_pdxlcr);
+	GPOS_ASSERT(NULL != m_dxl_colref);
 }
 
 
@@ -52,19 +46,19 @@ CDXLScalarIdent::CDXLScalarIdent
 //---------------------------------------------------------------------------
 CDXLScalarIdent::~CDXLScalarIdent()
 {
-	m_pdxlcr->Release();
+	m_dxl_colref->Release();
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarIdent::Edxlop
+//		CDXLScalarIdent::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLScalarIdent::Edxlop() const
+CDXLScalarIdent::GetDXLOperator() const
 {
 	return EdxlopScalarIdent;
 }
@@ -72,50 +66,50 @@ CDXLScalarIdent::Edxlop() const
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarIdent::PstrOpName
+//		CDXLScalarIdent::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLScalarIdent::PstrOpName() const
+CDXLScalarIdent::GetOpNameStr() const
 {
-	return CDXLTokens::PstrToken(EdxltokenScalarIdent);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenScalarIdent);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarIdent::Pdxlcr
+//		CDXLScalarIdent::MakeDXLColRef
 //
 //	@doc:
 //		Return column reference of the identifier operator
 //
 //---------------------------------------------------------------------------
 const CDXLColRef *
-CDXLScalarIdent::Pdxlcr() const
+CDXLScalarIdent::MakeDXLColRef() const
 {
-	return m_pdxlcr;
+	return m_dxl_colref;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarIdent::PmdidType
+//		CDXLScalarIdent::MDIdType
 //
 //	@doc:
 //		Return the id of the column type
 //
 //---------------------------------------------------------------------------
 IMDId *
-CDXLScalarIdent::PmdidType() const
+CDXLScalarIdent::MDIdType() const
 {
-	return m_pdxlcr->PmdidType();
+	return m_dxl_colref->MDIdType();
 }
 
 INT
-CDXLScalarIdent::ITypeModifier() const
+CDXLScalarIdent::TypeModifier() const
 {
-	return m_pdxlcr->ITypeModifier();
+	return m_dxl_colref->TypeModifier();
 }
 
 //---------------------------------------------------------------------------
@@ -127,50 +121,43 @@ CDXLScalarIdent::ITypeModifier() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarIdent::SerializeToDXL
-	(
-	CXMLSerializer *pxmlser,
-	const CDXLNode *pdxln
-	)
-	const
+CDXLScalarIdent::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const
 {
-	const CWStringConst *pstrElemName = PstrOpName();
-	
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
-		
+	const CWStringConst *element_name = GetOpNameStr();
+
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+
 	// add col name and col id
-	const CWStringConst *strCName = (m_pdxlcr->Pmdname())->Pstr(); 
+	const CWStringConst *colname = (m_dxl_colref->MdName())->GetMDName();
 
-	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenColId), m_pdxlcr->UlID());
-	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenColName), strCName);
-	m_pdxlcr->PmdidType()->Serialize(pxmlser, CDXLTokens::PstrToken(EdxltokenTypeId));
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenColId), m_dxl_colref->Id());
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenColName), colname);
+	m_dxl_colref->MDIdType()->Serialize(xml_serializer,
+										CDXLTokens::GetDXLTokenStr(EdxltokenTypeId));
 
-	if (IDefaultTypeModifier != ITypeModifier())
+	if (default_type_modifier != TypeModifier())
 	{
-		pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenTypeMod), ITypeModifier());
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenTypeMod), TypeModifier());
 	}
 
-	pdxln->SerializeChildrenToDXL(pxmlser);
+	node->SerializeChildrenToDXL(xml_serializer);
 
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);	
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarIdent::FBoolean
+//		CDXLScalarIdent::HasBoolResult
 //
 //	@doc:
 //		Does the operator return boolean result
 //
 //---------------------------------------------------------------------------
 BOOL
-CDXLScalarIdent::FBoolean
-	(
-	CMDAccessor *pmda
-	)
-	const
+CDXLScalarIdent::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	return (IMDType::EtiBool == pmda->Pmdtype(m_pdxlcr->PmdidType())->Eti());
+	return (IMDType::EtiBool == md_accessor->RetrieveType(m_dxl_colref->MDIdType())->GetDatumType());
 }
 
 #ifdef GPOS_DEBUG
@@ -183,17 +170,14 @@ CDXLScalarIdent::FBoolean
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarIdent::AssertValid
-	(
-	const CDXLNode *pdxln,
-	BOOL // fValidateChildren 
-	) 
-	const
+CDXLScalarIdent::AssertValid(const CDXLNode *node,
+							 BOOL  // validate_children
+							 ) const
 {
-	GPOS_ASSERT(0 == pdxln->UlArity());
-	GPOS_ASSERT(m_pdxlcr->PmdidType()->FValid());
-	GPOS_ASSERT(NULL != m_pdxlcr);
+	GPOS_ASSERT(0 == node->Arity());
+	GPOS_ASSERT(m_dxl_colref->MDIdType()->IsValid());
+	GPOS_ASSERT(NULL != m_dxl_colref);
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

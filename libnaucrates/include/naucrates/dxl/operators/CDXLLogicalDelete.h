@@ -32,88 +32,88 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLLogicalDelete : public CDXLLogical
 	{
-		private:
+	private:
+		// target table descriptor
+		CDXLTableDescr *m_dxl_table_descr;
 
-			// target table descriptor
-			CDXLTableDescr *m_pdxltabdesc;
+		// ctid column id
+		ULONG m_ctid_colid;
 
-			// ctid column id
-			ULONG m_ulCtid;
+		// segmentId column id
+		ULONG m_segid_colid;
 
-			// segmentId column id
-			ULONG m_ulSegmentId;
+		// list of deletion column ids
+		ULongPtrArray *m_deletion_colid_array;
 
-			// list of deletion column ids
-			DrgPul *m_pdrgpulDelete;
+		// private copy ctor
+		CDXLLogicalDelete(const CDXLLogicalDelete &);
 
-			// private copy ctor
-			CDXLLogicalDelete(const CDXLLogicalDelete &);
+	public:
+		// ctor
+		CDXLLogicalDelete(IMemoryPool *mp,
+						  CDXLTableDescr *table_descr,
+						  ULONG ctid_colid,
+						  ULONG segid_colid,
+						  ULongPtrArray *delete_colid_array);
 
-		public:
+		// dtor
+		virtual ~CDXLLogicalDelete();
 
-			// ctor
-			CDXLLogicalDelete(IMemoryPool *pmp, CDXLTableDescr *pdxltabdesc, ULONG ulCtid, ULONG ulSegmentId, DrgPul *pdrgpulDelete);
+		// operator type
+		Edxlopid GetDXLOperator() const;
 
-			// dtor
-			virtual
-			~CDXLLogicalDelete();
+		// operator name
+		const CWStringConst *GetOpNameStr() const;
 
-			// operator type
-			Edxlopid Edxlop() const;
+		// target table descriptor
+		CDXLTableDescr *
+		GetDXLTableDescr() const
+		{
+			return m_dxl_table_descr;
+		}
 
-			// operator name
-			const CWStringConst *PstrOpName() const;
+		// ctid column
+		ULONG
+		GetCtIdColId() const
+		{
+			return m_ctid_colid;
+		}
 
-			// target table descriptor
-			CDXLTableDescr *Pdxltabdesc() const
-			{
-				return m_pdxltabdesc;
-			}
+		// segment id column
+		ULONG
+		GetSegmentIdColId() const
+		{
+			return m_segid_colid;
+		}
 
-			// ctid column
-			ULONG UlCtid() const
-			{
-				return m_ulCtid;
-			}
-
-			// segment id column
-			ULONG UlSegmentId() const
-			{
-				return m_ulSegmentId;
-			}
-
-			// deletion column ids
-			DrgPul *PdrgpulDelete() const
-			{
-				return m_pdrgpulDelete;
-			}
+		// deletion column ids
+		ULongPtrArray *
+		GetDeletionColIdArray() const
+		{
+			return m_deletion_colid_array;
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *pdxln, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *node, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
 
-			// conversion function
-			static
-			CDXLLogicalDelete *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopLogicalDelete == pdxlop->Edxlop());
+		// conversion function
+		static CDXLLogicalDelete *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopLogicalDelete == dxl_op->GetDXLOperator());
 
-				return dynamic_cast<CDXLLogicalDelete*>(pdxlop);
-			}
-
+			return dynamic_cast<CDXLLogicalDelete *>(dxl_op);
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLLogicalDelete_H
+#endif  // !GPDXL_CDXLLogicalDelete_H
 
 // EOF

@@ -6,7 +6,7 @@
 //		CParseHandlerScalarBoolExpr.cpp
 //
 //	@doc:
-//		
+//
 //		Implementation of the SAX parse handler class for parsing scalar BoolExpr.
 //---------------------------------------------------------------------------
 
@@ -31,15 +31,11 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerScalarBoolExpr::CParseHandlerScalarBoolExpr
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
-	:
-	CParseHandlerScalarOp(pmp, pphm, pphRoot),
-	m_edxlBoolType(Edxland)
+CParseHandlerScalarBoolExpr::CParseHandlerScalarBoolExpr(IMemoryPool *mp,
+														 CParseHandlerManager *parse_handler_mgr,
+														 CParseHandlerBase *parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root),
+	  m_dxl_bool_type(Edxland)
 {
 }
 
@@ -52,62 +48,75 @@ CParseHandlerScalarBoolExpr::CParseHandlerScalarBoolExpr
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerScalarBoolExpr::StartElement
-	(
-	const XMLCh* const xmlszUri,
-	const XMLCh* const xmlszLocalname,
-	const XMLCh* const xmlszQname,
-	const Attributes& attrs
-	)
+CParseHandlerScalarBoolExpr::StartElement(const XMLCh *const element_uri,
+										  const XMLCh *const element_local_name,
+										  const XMLCh *const element_qname,
+										  const Attributes &attrs)
 {
-	if ((0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolAnd), xmlszLocalname)) ||
-		(0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolOr), xmlszLocalname)) ||
-		(0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolNot), xmlszLocalname)))
+	if ((0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolAnd),
+									   element_local_name)) ||
+		(0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolOr),
+									   element_local_name)) ||
+		(0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolNot),
+									   element_local_name)))
 	{
-		if (NULL == m_pdxln)
+		if (NULL == m_dxlnode)
 		{
-			if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolNot), xmlszLocalname))
+			if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolNot),
+											  element_local_name))
 			{
-				m_edxlBoolType = Edxlnot;
+				m_dxl_bool_type = Edxlnot;
 			}
-			else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolOr), xmlszLocalname))
+			else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolOr),
+												   element_local_name))
 			{
-				m_edxlBoolType = Edxlor;
+				m_dxl_bool_type = Edxlor;
 			}
 
 			// parse and create scalar BoolExpr
-			CDXLScalarBoolExpr *pdxlop = (CDXLScalarBoolExpr*) CDXLOperatorFactory::PdxlopBoolExpr(m_pphm->Pmm(), m_edxlBoolType);
+			CDXLScalarBoolExpr *dxl_op =
+				(CDXLScalarBoolExpr *) CDXLOperatorFactory::MakeDXLBoolExpr(
+					m_parse_handler_mgr->GetDXLMemoryManager(), m_dxl_bool_type);
 
 			// construct node from the created child nodes
-			m_pdxln = GPOS_NEW(m_pmp) CDXLNode(m_pmp, pdxlop);
+			m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 		}
 		else
 		{
-
 			// This is to support nested BoolExpr. TODO:  - create a separate xml tag for boolean expression
-			CParseHandlerBase *pphBoolExpr = CParseHandlerFactory::Pph(m_pmp, CDXLTokens::XmlstrToken(EdxltokenScalarBoolOr), m_pphm, this);
-			m_pphm->ActivateParseHandler(pphBoolExpr);
+			CParseHandlerBase *bool_expr_parse_handler = CParseHandlerFactory::GetParseHandler(
+				m_mp,
+				CDXLTokens::XmlstrToken(EdxltokenScalarBoolOr),
+				m_parse_handler_mgr,
+				this);
+			m_parse_handler_mgr->ActivateParseHandler(bool_expr_parse_handler);
 
 			// store parse handlers
-			this->Append(pphBoolExpr);
+			this->Append(bool_expr_parse_handler);
 
-			pphBoolExpr->startElement(xmlszUri, xmlszLocalname, xmlszQname, attrs);
+			bool_expr_parse_handler->startElement(
+				element_uri, element_local_name, element_qname, attrs);
 		}
 	}
 	else
 	{
-		if(NULL == m_pdxln)
+		if (NULL == m_dxlnode)
 		{
-			GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, CDXLUtils::PstrFromXMLCh(m_pphm->Pmm(), xmlszLocalname)->Wsz());
+			GPOS_RAISE(gpdxl::ExmaDXL,
+					   gpdxl::ExmiDXLUnexpectedTag,
+					   CDXLUtils::CreateDynamicStringFromXMLChArray(
+						   m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name)
+						   ->GetBuffer());
 		}
 
-		CParseHandlerBase *pphOp = CParseHandlerFactory::Pph(m_pmp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_pphm, this);
-		m_pphm->ActivateParseHandler(pphOp);
+		CParseHandlerBase *op_parse_handler = CParseHandlerFactory::GetParseHandler(
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+		m_parse_handler_mgr->ActivateParseHandler(op_parse_handler);
 
 		// store parse handlers
-		this->Append(pphOp);
+		this->Append(op_parse_handler);
 
-		pphOp->startElement(xmlszUri, xmlszLocalname, xmlszQname, attrs);
+		op_parse_handler->startElement(element_uri, element_local_name, element_qname, attrs);
 	}
 }
 
@@ -120,70 +129,73 @@ CParseHandlerScalarBoolExpr::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerScalarBoolExpr::EndElement
-	(
-	const XMLCh* const, // xmlszUri,
-	const XMLCh* const xmlszLocalname,
-	const XMLCh* const // xmlszQname
-	)
+CParseHandlerScalarBoolExpr::EndElement(const XMLCh *const,  // element_uri,
+										const XMLCh *const element_local_name,
+										const XMLCh *const  // element_qname
+)
 {
 	EdxlBoolExprType edxlBoolType =
-			CParseHandlerScalarBoolExpr::EdxlBoolType(xmlszLocalname);
+		CParseHandlerScalarBoolExpr::GetDxlBoolTypeStr(element_local_name);
 
-	if(EdxlBoolExprTypeSentinel == edxlBoolType || m_edxlBoolType != edxlBoolType)
+	if (EdxlBoolExprTypeSentinel == edxlBoolType || m_dxl_bool_type != edxlBoolType)
 	{
-		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, CDXLUtils::PstrFromXMLCh(m_pphm->Pmm(), xmlszLocalname)->Wsz());
+		GPOS_RAISE(gpdxl::ExmaDXL,
+				   gpdxl::ExmiDXLUnexpectedTag,
+				   CDXLUtils::CreateDynamicStringFromXMLChArray(
+					   m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name)
+					   ->GetBuffer());
 	}
 
-	const ULONG ulSize = this->UlLength();
+	const ULONG size = this->Length();
 	// If the operation is NOT then it only has one child.
-	if (
-	    ((((CDXLScalarBoolExpr*) m_pdxln->Pdxlop())->EdxlBoolType() == Edxlnot)
-		&& (1 != ulSize))
-		||
-		((((CDXLScalarBoolExpr*) m_pdxln->Pdxlop())->EdxlBoolType() != Edxlnot)
-		&& (2 > ulSize))
-	  )
+	if (((((CDXLScalarBoolExpr *) m_dxlnode->GetOperator())->GetDxlBoolTypeStr() == Edxlnot) &&
+		 (1 != size)) ||
+		((((CDXLScalarBoolExpr *) m_dxlnode->GetOperator())->GetDxlBoolTypeStr() != Edxlnot) &&
+		 (2 > size)))
 	{
-		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLIncorrectNumberOfChildren, CDXLUtils::PstrFromXMLCh(m_pphm->Pmm(), xmlszLocalname)->Wsz());
+		GPOS_RAISE(gpdxl::ExmaDXL,
+				   gpdxl::ExmiDXLIncorrectNumberOfChildren,
+				   CDXLUtils::CreateDynamicStringFromXMLChArray(
+					   m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name)
+					   ->GetBuffer());
 	}
 
 	// add constructed children from child parse handlers
-	for (ULONG ul = 0; ul < ulSize; ul++)
+	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CParseHandlerScalarOp *pph = dynamic_cast<CParseHandlerScalarOp*>((*this)[ul]);
+		CParseHandlerScalarOp *pph = dynamic_cast<CParseHandlerScalarOp *>((*this)[ul]);
 		AddChildFromParseHandler(pph);
 	}
 
 	// deactivate handler
-	m_pphm->DeactivateHandler();
+	m_parse_handler_mgr->DeactivateHandler();
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CParseHandlerScalarBoolExpr::EdxlBoolType
+//		CParseHandlerScalarBoolExpr::GetDxlBoolTypeStr
 //
 //	@doc:
 //		Parse the bool type from the attribute value. Raise exception if it is invalid
 //
 //---------------------------------------------------------------------------
 EdxlBoolExprType
-CParseHandlerScalarBoolExpr::EdxlBoolType
-	(
-	const XMLCh *xmlszBoolType
-	)
+CParseHandlerScalarBoolExpr::GetDxlBoolTypeStr(const XMLCh *xmlszBoolType)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolNot), xmlszBoolType))
+	if (0 ==
+		XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolNot), xmlszBoolType))
 	{
 		return Edxlnot;
 	}
 
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolAnd), xmlszBoolType))
+	if (0 ==
+		XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolAnd), xmlszBoolType))
 	{
 		return Edxland;
 	}
 
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolOr), xmlszBoolType))
+	if (0 ==
+		XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolOr), xmlszBoolType))
 	{
 		return Edxlor;
 	}

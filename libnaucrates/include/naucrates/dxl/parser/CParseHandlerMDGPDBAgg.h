@@ -25,7 +25,7 @@ namespace gpdxl
 	using namespace gpmd;
 
 	XERCES_CPP_NAMESPACE_USE
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CParseHandlerMDGPDBAgg
@@ -36,59 +36,52 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerMDGPDBAgg : public CParseHandlerMetadataObject
 	{
-		private:
-			// metadata id comprising of id and version info.
-			IMDId *m_pmdid;
-			
-			// name
-			CMDName *m_pmdname;
-					
-			// result type
-			IMDId *m_pmdidTypeResult;
-			
-			// intermediate result type
-			IMDId *m_pmdidTypeIntermediate;
-						
-			// is aggregate ordered
-			BOOL m_fOrdered;
-			
-			// is aggregate splittable
-			BOOL m_fSplittable;
-			
-			// can we use hash aggregation to compute agg function
-			BOOL m_fHashAggCapable;
+	private:
+		// metadata id comprising of id and version info.
+		IMDId *m_mdid;
 
-			// private copy ctor
-			CParseHandlerMDGPDBAgg(const CParseHandlerMDGPDBAgg &);
-			
-			// process the start of an element
-			void StartElement
-				(
-				const XMLCh* const xmlszUri, 		// URI of element's namespace
-				const XMLCh* const xmlszLocalname,	// local part of element's name
-				const XMLCh* const xmlszQname,		// element's qname
-				const Attributes& attr				// element's attributes
-				);
+		// name
+		CMDName *m_mdname;
 
-			// process the end of an element
-			void EndElement
-				(
-				const XMLCh* const xmlszUri, 		// URI of element's namespace
-				const XMLCh* const xmlszLocalname,	// local part of element's name
-				const XMLCh* const xmlszQname		// element's qname
-				);
-						
-		public:
-			// ctor
-			CParseHandlerMDGPDBAgg
-				(
-				IMemoryPool *pmp,
-				CParseHandlerManager *pphm,
-				CParseHandlerBase *pphRoot
-				);			
+		// result type
+		IMDId *m_mdid_type_result;
+
+		// intermediate result type
+		IMDId *m_mdid_type_intermediate;
+
+		// is aggregate ordered
+		BOOL m_is_ordered;
+
+		// is aggregate splittable
+		BOOL m_is_splittable;
+
+		// can we use hash aggregation to compute agg function
+		BOOL m_hash_agg_capable;
+
+		// private copy ctor
+		CParseHandlerMDGPDBAgg(const CParseHandlerMDGPDBAgg &);
+
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
+
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+	public:
+		// ctor
+		CParseHandlerMDGPDBAgg(IMemoryPool *mp,
+							   CParseHandlerManager *parse_handler_mgr,
+							   CParseHandlerBase *parse_handler_root);
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerMDGPDBAgg_H
+#endif  // !GPDXL_CParseHandlerMDGPDBAgg_H
 
 // EOF

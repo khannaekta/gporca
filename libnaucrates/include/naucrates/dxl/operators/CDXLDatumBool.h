@@ -8,8 +8,8 @@
 //	@doc:
 //		Class for representing DXL boolean datum
 //
-//	@owner: 
-//		
+//	@owner:
+//
 //
 //	@test:
 //
@@ -38,65 +38,58 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLDatumBool : public CDXLDatum
 	{
-		private:
-			// boolean value
-			BOOL m_fVal;
+	private:
+		// boolean value
+		BOOL m_value;
 
-			// private copy ctor
-			CDXLDatumBool(const CDXLDatumBool &);
+		// private copy ctor
+		CDXLDatumBool(const CDXLDatumBool &);
 
-		public:
-			// ctor
-			CDXLDatumBool
-				(
-				IMemoryPool *pmp,
-				IMDId *pmdidType,
-				BOOL fNull,
-				BOOL fVal
-				);
+	public:
+		// ctor
+		CDXLDatumBool(IMemoryPool *mp, IMDId *mdid_type, BOOL is_null, BOOL value);
 
-			// dtor
-			virtual
-			~CDXLDatumBool(){}
+		// dtor
+		virtual ~CDXLDatumBool()
+		{
+		}
 
-			// serialize the datum as the given element
-			virtual
-			void Serialize(CXMLSerializer *pxmlser);
+		// serialize the datum as the given element
+		virtual void Serialize(CXMLSerializer *xml_serializer);
 
-			// is type passed by value
-			virtual BOOL FByValue() const
-			{
-				return true;
-			}
+		// is type passed by value
+		virtual BOOL
+		IsPassedByValue() const
+		{
+			return true;
+		}
 
-			// datum type
-			virtual
-			EdxldatumType Edxldt() const
-			{
-				return CDXLDatum::EdxldatumBool;
-			}
+		// datum type
+		virtual EdxldatumType
+		GetDatumType() const
+		{
+			return CDXLDatum::EdxldatumBool;
+		}
 
-			// accessor of boolean value
-			BOOL FValue() const
-			{
-				return m_fVal;
-			}
+		// accessor of boolean value
+		BOOL
+		GetValue() const
+		{
+			return m_value;
+		}
 
-			// conversion function
-			static
-			CDXLDatumBool *PdxldatumConvert
-				(
-				CDXLDatum *pdxldatum
-				)
-			{
-				GPOS_ASSERT(NULL != pdxldatum);
-				GPOS_ASSERT(CDXLDatum::CDXLDatum::EdxldatumBool == pdxldatum->Edxldt());
+		// conversion function
+		static CDXLDatumBool *
+		Cast(CDXLDatum *dxl_datum)
+		{
+			GPOS_ASSERT(NULL != dxl_datum);
+			GPOS_ASSERT(CDXLDatum::CDXLDatum::EdxldatumBool == dxl_datum->GetDatumType());
 
-				return dynamic_cast<CDXLDatumBool*>(pdxldatum);
-			}
+			return dynamic_cast<CDXLDatumBool *>(dxl_datum);
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLDatumBool_H
+#endif  // !GPDXL_CDXLDatumBool_H
 
 // EOF

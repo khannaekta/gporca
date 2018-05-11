@@ -2,7 +2,7 @@
 //	Greenplum Database
 //	Copyright (C) 2009 Greenplum, Inc.
 //
-//	@filename: 
+//	@filename:
 //		CAutoRef.h
 //
 //	@doc:
@@ -28,41 +28,32 @@ namespace gpos
 	template <class T>
 	class CAutoRef : public CAutoP<T>
 	{
+	private:
+		// hidden copy ctor
+		CAutoRef<T>(const CAutoRef &);
 
-		private:
+	public:
+		// ctor
+		explicit CAutoRef<T>() : CAutoP<T>()
+		{
+		}
 
-			// hidden copy ctor
-			CAutoRef<T>
-				(
-				const CAutoRef&
-				);
+		// ctor
+		explicit CAutoRef<T>(T *object) : CAutoP<T>(object)
+		{
+		}
 
-		public:
-		
-			// ctor
-			explicit
-			CAutoRef<T>()
-				:
-				CAutoP<T>()
-			{}
+		virtual ~CAutoRef();
 
-			// ctor
-			explicit
-			CAutoRef<T>(T *pt)
-				:
-				CAutoP<T>(pt)
-			{}
+		// simple assignment
+		CAutoRef<T> const &
+		operator=(T *object)
+		{
+			CAutoP<T>::m_object = object;
+			return *this;
+		}
 
-			virtual ~CAutoRef();
-
-			// simple assignment
-			CAutoRef<T> const & operator = (T* pt)
-			{
-				CAutoP<T>::m_pt = pt;
-				return *this;
-			}
-
-	}; // class CAutoRef
+	};  // class CAutoRef
 
 	//---------------------------------------------------------------------------
 	//	@function:
@@ -75,17 +66,16 @@ namespace gpos
 	template <class T>
 	CAutoRef<T>::~CAutoRef()
 	{
-		if (NULL != CAutoP<T>::m_pt)
+		if (NULL != CAutoP<T>::m_object)
 		{
-			reinterpret_cast<CRefCount*>(CAutoP<T>::m_pt)->Release();
+			reinterpret_cast<CRefCount *>(CAutoP<T>::m_object)->Release();
 		}
 
 		// null out pointer before ~CAutoP() gets called
-		CAutoP<T>::m_pt = NULL;
+		CAutoP<T>::m_object = NULL;
 	}
-}
+}  // namespace gpos
 
-#endif // !GPOS_CAutoRef_H
+#endif  // !GPOS_CAutoRef_H
 
 // EOF
-

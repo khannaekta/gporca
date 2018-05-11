@@ -18,7 +18,6 @@
 
 namespace gpnaucrates
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDatumInt4GPDB
@@ -27,74 +26,61 @@ namespace gpnaucrates
 	//		GPDB-specific int4 representation
 	//
 	//---------------------------------------------------------------------------
-class CDatumInt4GPDB : public IDatumInt4
-{
-
+	class CDatumInt4GPDB : public IDatumInt4
+	{
 	private:
-
 		// type information
-		IMDId *m_pmdid;
-	
+		IMDId *m_mdid;
+
 		// integer value
-		INT m_iVal;
+		INT m_val;
 
 		// is null
-		BOOL m_fNull;
+		BOOL m_is_null;
 
 		// private copy ctor
 		CDatumInt4GPDB(const CDatumInt4GPDB &);
-		
-	public:
 
+	public:
 		// ctors
-		CDatumInt4GPDB(CSystemId sysid, INT iVal, BOOL fNull = false);
-		CDatumInt4GPDB(IMDId *pmdid, INT iVal, BOOL fNull = false);
+		CDatumInt4GPDB(CSystemId sysid, INT val, BOOL is_null = false);
+		CDatumInt4GPDB(IMDId *mdid, INT val, BOOL is_null = false);
 
 		// dtor
-		virtual
-		~CDatumInt4GPDB();
+		virtual ~CDatumInt4GPDB();
 
 		// accessor of metadata type id
-		virtual
-		IMDId *Pmdid() const;
+		virtual IMDId *MDId() const;
 
 		// accessor of size
-		virtual
-		ULONG UlSize() const;
+		virtual ULONG Size() const;
 
 		// accessor of integer value
-		virtual
-		INT IValue() const;
+		virtual INT Value() const;
 
 		// accessor of is null
-		virtual
-		BOOL FNull() const;
+		virtual BOOL IsNull() const;
 
 		// return string representation
-		virtual
-		const CWStringConst *Pstr(IMemoryPool *pmp) const;
+		virtual const CWStringConst *GetStrRepr(IMemoryPool *mp) const;
 
 		// hash function
-		virtual
-		ULONG UlHash() const;
+		virtual ULONG HashValue() const;
 
 		// match function for datums
-		virtual
-		BOOL FMatch(const IDatum *) const;
+		virtual BOOL Matches(const IDatum *) const;
 
 		// copy datum
-		virtual
-		IDatum *PdatumCopy(IMemoryPool *pmp) const;
-		
+		virtual IDatum *MakeCopy(IMemoryPool *mp) const;
+
 		// print function
-		virtual
-		IOstream &OsPrint(IOstream &os) const;
+		virtual IOstream &OsPrint(IOstream &os) const;
 
-	}; // class CDatumInt4GPDB
+	};  // class CDatumInt4GPDB
 
-}
+}  // namespace gpnaucrates
 
 
-#endif // !GPNAUCRATES_CDatumInt4GPDB_H
+#endif  // !GPNAUCRATES_CDatumInt4GPDB_H
 
 // EOF

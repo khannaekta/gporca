@@ -28,16 +28,14 @@ using namespace gpos;
 GPOS_RESULT
 CAutoSpinlockTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
-		GPOS_UNITTEST_FUNC(CAutoSpinlockTest::EresUnittest_LockRelease)
+	CUnittest rgut[] = {GPOS_UNITTEST_FUNC(CAutoSpinlockTest::EresUnittest_LockRelease)
 #ifdef GPOS_DEBUG
-		,
-		GPOS_UNITTEST_FUNC_ASSERT(CAutoSpinlockTest::EresUnittest_SelfDeadlock),
-		GPOS_UNITTEST_FUNC(CAutoSpinlockTest::EresUnittest_Yield),
-		GPOS_UNITTEST_FUNC_ASSERT(CAutoSpinlockTest::EresUnittest_Rank)
-#endif // GPOS_DEBUG
-		};
+							,
+						GPOS_UNITTEST_FUNC_ASSERT(CAutoSpinlockTest::EresUnittest_SelfDeadlock),
+						GPOS_UNITTEST_FUNC(CAutoSpinlockTest::EresUnittest_Yield),
+						GPOS_UNITTEST_FUNC_ASSERT(CAutoSpinlockTest::EresUnittest_Rank)
+#endif  // GPOS_DEBUG
+	};
 
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
@@ -56,7 +54,7 @@ CAutoSpinlockTest::EresUnittest_LockRelease()
 {
 	CSpinlockDummy slock;
 
-	{ // scope for auto spinlock
+	{  // scope for auto spinlock
 
 		CAutoSpinlock alockOne(slock);
 		alockOne.Lock();
@@ -160,7 +158,6 @@ CAutoSpinlockTest::EresUnittest_Rank()
 	return GPOS_OK;
 }
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF
-

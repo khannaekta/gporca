@@ -27,44 +27,37 @@ namespace gpdxl
 	// class for representing DXL physical Values scan
 	class CDXLPhysicalValuesScan : public CDXLPhysical
 	{
-		private:
-			// private copy ctor
-			CDXLPhysicalValuesScan(CDXLPhysicalValuesScan&);
+	private:
+		// private copy ctor
+		CDXLPhysicalValuesScan(CDXLPhysicalValuesScan &);
 
-		public:
-			// ctor
-			CDXLPhysicalValuesScan
-				(
-					IMemoryPool *pmp
-				);
+	public:
+		// ctor
+		CDXLPhysicalValuesScan(IMemoryPool *mp);
 
-			// dtor
-			virtual
-			~CDXLPhysicalValuesScan();
+		// dtor
+		virtual ~CDXLPhysicalValuesScan();
 
-			// get operator type
-			Edxlopid Edxlop() const;
+		// get operator type
+		Edxlopid GetDXLOperator() const;
 
-			// get operator name
-			const CWStringConst *PstrOpName() const;
+		// get operator name
+		const CWStringConst *GetOpNameStr() const;
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
-			// conversion function
-			static
-			CDXLPhysicalValuesScan *PdxlopConvert(CDXLOperator *pdxlop);
+		// conversion function
+		static CDXLPhysicalValuesScan *Cast(CDXLOperator *dxl_op);
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
-
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLPhysicalValuesScan_H
+#endif  // !GPDXL_CDXLPhysicalValuesScan_H
 
 // EOF

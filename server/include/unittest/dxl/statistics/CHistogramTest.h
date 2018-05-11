@@ -11,6 +11,9 @@
 #ifndef GPNAUCRATES_CHistogramTest_H
 #define GPNAUCRATES_CHistogramTest_H
 
+#include "gpos/base.h"
+#include "naucrates/statistics/CHistogram.h"
+
 namespace gpnaucrates
 {
 
@@ -28,7 +31,7 @@ namespace gpnaucrates
 			// generate int histogram having tuples not covered by buckets,
 			// including null fraction and nDistinctRemain
 			static
-			CHistogram* PhistExampleInt4Remain(IMemoryPool *pmp);
+			CHistogram* PhistExampleInt4Remain(IMemoryPool *mp);
 
 		public:
 

@@ -14,8 +14,8 @@
 #include "gpos/memory/CMemoryPoolManager.h"
 #include "gpos/string/CWString.h"
 
-#define GPOS_WSTR_DYNAMIC_CAPACITY_INIT	(1 << 7)
-#define GPOS_WSTR_DYNAMIC_STATIC_BUFFER	(1 << 10)
+#define GPOS_WSTR_DYNAMIC_CAPACITY_INIT (1 << 7)
+#define GPOS_WSTR_DYNAMIC_STATIC_BUFFER (1 << 10)
 
 namespace gpos
 {
@@ -32,60 +32,53 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CWStringDynamic : public CWString
 	{
-		private:
+	private:
+		// string memory pool used for allocating new memory for the string
+		IMemoryPool *m_mp;
 
-			// string memory pool used for allocating new memory for the string
-			IMemoryPool *m_pmp;
+		// string capacity
+		ULONG m_capacity;
 
-			// string capacity
-			ULONG m_ulCapacity;
+		// increase string capacity
+		void IncreaseCapacity(ULONG requested);
 
-			// increase string capacity
-			void IncreaseCapacity(ULONG ulRequested);
+		// find capacity that fits requested string size
+		static ULONG Capacity(ULONG requested);
 
-			// find capacity that fits requested string size
-			static
-			ULONG UlCapacity(ULONG ulRequested);
+		// private copy ctor
+		CWStringDynamic(const CWStringDynamic &);
 
-			// private copy ctor
-			CWStringDynamic(const CWStringDynamic&);
+	protected:
+		// appends the contents of a buffer to the current string
+		void AppendBuffer(const WCHAR *w_str_buffer);
 
-		protected:
+	public:
+		// ctor
+		CWStringDynamic(IMemoryPool *mp);
 
-			// appends the contents of a buffer to the current string
-			void AppendBuffer(const WCHAR *wszBuf);
+		// ctor - copies passed string
+		CWStringDynamic(IMemoryPool *mp, const WCHAR *w_str_buffer);
 
-		public:
+		// appends a string and replaces character with string
+		void AppendEscape(const CWStringBase *str, WCHAR wc, const WCHAR *w_str_replace);
 
-			// ctor
-			CWStringDynamic(IMemoryPool *pmp);
+		// appends a formatted string
+		void AppendFormat(const WCHAR *format, ...);
 
-			// ctor - copies passed string
-			CWStringDynamic(IMemoryPool *pmp, const WCHAR *wszBuf);
+		// appends a null terminated character array
+		virtual void AppendCharArray(const CHAR *sz);
 
-			// appends a string and replaces character with string
-			void AppendEscape(const CWStringBase *pstr, WCHAR wc, const WCHAR *wszReplace);
+		// appends a null terminated wide character array
+		virtual void AppendWideCharArray(const WCHAR *w_str);
 
-			// appends a formatted string
-			void AppendFormat(const WCHAR *wszFormat, ...);
+		// dtor
+		virtual ~CWStringDynamic();
 
-			// appends a null terminated character array
-			virtual
-			void AppendCharArray(const CHAR *sz);
-
-			// appends a null terminated wide character array
-			virtual
-			void AppendWideCharArray(const WCHAR *wsz);
-
-			// dtor
-			virtual ~CWStringDynamic();
-
-			// resets string
-			void Reset();
+		// resets string
+		void Reset();
 	};
-}
+}  // namespace gpos
 
-#endif // !GPOS_CWStringDynamic_H
+#endif  // !GPOS_CWStringDynamic_H
 
 // EOF
-

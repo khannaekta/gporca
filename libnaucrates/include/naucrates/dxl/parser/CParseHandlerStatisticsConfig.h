@@ -31,53 +31,43 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerStatisticsConfig : public CParseHandlerBase
 	{
-		private:
+	private:
+		// statistics configuration
+		CStatisticsConfig *m_stats_conf;
 
-			// statistics configuration
-			CStatisticsConfig *m_pstatsconf;
+		// private copy ctor
+		CParseHandlerStatisticsConfig(const CParseHandlerStatisticsConfig &);
 
-			// private copy ctor
-			CParseHandlerStatisticsConfig(const CParseHandlerStatisticsConfig&);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the start of an element
-			void StartElement
-				(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
- 					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the end of an element
-			void EndElement
-				(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
-					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname		// element's qname
-				);
+	public:
+		// ctor
+		CParseHandlerStatisticsConfig(IMemoryPool *mp,
+									  CParseHandlerManager *parse_handler_mgr,
+									  CParseHandlerBase *parse_handler_root);
 
-		public:
-			// ctor
-			CParseHandlerStatisticsConfig
-				(
-				IMemoryPool *pmp,
-				CParseHandlerManager *pphm,
-				CParseHandlerBase *pphRoot
-				);
+		// dtor
+		virtual ~CParseHandlerStatisticsConfig();
 
-			// dtor
-			virtual
-			~CParseHandlerStatisticsConfig();
+		// type of the parse handler
+		virtual EDxlParseHandlerType GetParseHandlerType() const;
 
-			// type of the parse handler
-			virtual
-			EDxlParseHandlerType Edxlphtype() const;
-
-			// enumerator configuration
-			CStatisticsConfig *Pstatsconf() const;
+		// enumerator configuration
+		CStatisticsConfig *GetStatsConf() const;
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerStatisticsConfig_H
+#endif  // !GPDXL_CParseHandlerStatisticsConfig_H
 
 // EOF

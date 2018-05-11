@@ -20,7 +20,6 @@
 
 namespace gpmd
 {
-	
 	using namespace gpdxl;
 
 	//---------------------------------------------------------------------------
@@ -33,136 +32,125 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class CMDFunctionGPDB : public IMDFunction
 	{
-		private:
-			// memory pool
-			IMemoryPool *m_pmp;
-			
-			// DXL for object
-			const CWStringDynamic *m_pstr;
-			
-			// func id
-			IMDId *m_pmdid;
-			
-			// func name
-			CMDName *m_pmdname;
-			
-			// result type
-			IMDId *m_pmdidTypeResult;
-			
-			// output argument types
-			DrgPmdid *m_pdrgpmdidTypes;
+	private:
+		// memory pool
+		IMemoryPool *m_mp;
 
-			// whether function returns a set of values
-			BOOL m_fReturnsSet;
-			
-			// function stability
-			EFuncStbl m_efsStability;
-			
-			// function data access
-			EFuncDataAcc m_efdaDataAccess;
+		// DXL for object
+		const CWStringDynamic *m_dxl_str;
 
-			// function strictness (i.e. whether func returns NULL on NULL input)
-			BOOL m_fStrict;
+		// func id
+		IMDId *m_mdid;
 
-			// dxl token array for stability
-			Edxltoken m_drgDxlStability[EfsSentinel];
+		// func name
+		CMDName *m_mdname;
 
-			// dxl token array for data access
-			Edxltoken m_drgDxlDataAccess[EfdaSentinel];
-			
-			// returns the string representation of the function stability
-			const CWStringConst *PstrStability() const;
+		// result type
+		IMDId *m_mdid_type_result;
 
-			// returns the string representation of the function data access
-			const CWStringConst *PstrDataAccess() const;
+		// output argument types
+		IMdIdArray *m_mdid_types_array;
 
-			// serialize the array of output arg types into a comma-separated string
-			CWStringDynamic *PstrOutArgTypes() const;
+		// whether function returns a set of values
+		BOOL m_returns_set;
 
-			// initialize dxl token arrays
-			void InitDXLTokenArrays();
+		// function stability
+		EFuncStbl m_func_stability;
 
-			// private copy ctor
-			CMDFunctionGPDB(const CMDFunctionGPDB &);
-			
-		public:
-			// ctor/dtor
-			CMDFunctionGPDB
-				(
-				IMemoryPool *pmp,
-				IMDId *pmdid,
-				CMDName *pmdname,
-				IMDId *pmdidTypeResult,
-				DrgPmdid *pdrgpmdidTypes,
-				BOOL fReturnsSet,
-				EFuncStbl efsStability,
-				EFuncDataAcc efdaDataAccess,
-				BOOL fStrict
-				);
-			
-			virtual
-			~CMDFunctionGPDB();
-			
-			// accessors
-			virtual 
-			const CWStringDynamic *Pstr() const
-			{
-				return m_pstr;
-			}
-			
-			// function id
-			virtual 
-			IMDId *Pmdid() const;
-			
-			// function name
-			virtual 
-			CMDName Mdname() const;
-			
-			// result type
-			virtual 
-			IMDId *PmdidTypeResult() const;
+		// function data access
+		EFuncDataAcc m_func_data_access;
 
-			// output argument types
-			virtual
-			DrgPmdid *PdrgpmdidOutputArgTypes() const;
+		// function strictness (i.e. whether func returns NULL on NULL input)
+		BOOL m_is_strict;
 
-			// does function return NULL on NULL input
-			virtual 
-			BOOL FStrict() const
-			{
-				return m_fStrict;
-			}
-			
-			// function stability
-			virtual
-			EFuncStbl EfsStability() const
-			{
-				return m_efsStability;
-			}
+		// dxl token array for stability
+		Edxltoken m_dxl_func_stability_array[EfsSentinel];
 
-			// function data access
-			virtual
-			EFuncDataAcc EfdaDataAccess() const
-			{
-				return m_efdaDataAccess;
-			}
+		// dxl token array for data access
+		Edxltoken m_dxl_data_access_array[EfdaSentinel];
 
-			// does function return a set of values
-			virtual 
-			BOOL FReturnsSet() const;
-			
-			// serialize object in DXL format
-			virtual 
-			void Serialize(gpdxl::CXMLSerializer *pxmlser) const;
-			
+		// returns the string representation of the function stability
+		const CWStringConst *GetFuncStabilityStr() const;
+
+		// returns the string representation of the function data access
+		const CWStringConst *GetFuncDataAccessStr() const;
+
+		// serialize the array of output arg types into a comma-separated string
+		CWStringDynamic *GetOutputArgTypeArrayStr() const;
+
+		// initialize dxl token arrays
+		void InitDXLTokenArrays();
+
+		// private copy ctor
+		CMDFunctionGPDB(const CMDFunctionGPDB &);
+
+	public:
+		// ctor/dtor
+		CMDFunctionGPDB(IMemoryPool *mp,
+						IMDId *mdid,
+						CMDName *mdname,
+						IMDId *result_type_mdid,
+						IMdIdArray *mdid_array,
+						BOOL ReturnsSet,
+						EFuncStbl func_stability,
+						EFuncDataAcc func_data_access,
+						BOOL is_strict);
+
+		virtual ~CMDFunctionGPDB();
+
+		// accessors
+		virtual const CWStringDynamic *
+		GetStrRepr() const
+		{
+			return m_dxl_str;
+		}
+
+		// function id
+		virtual IMDId *MDId() const;
+
+		// function name
+		virtual CMDName Mdname() const;
+
+		// result type
+		virtual IMDId *GetResultTypeMdid() const;
+
+		// output argument types
+		virtual IMdIdArray *OutputArgTypesMdidArray() const;
+
+		// does function return NULL on NULL input
+		virtual BOOL
+		IsStrict() const
+		{
+			return m_is_strict;
+		}
+
+		// function stability
+		virtual EFuncStbl
+		GetFuncStability() const
+		{
+			return m_func_stability;
+		}
+
+		// function data access
+		virtual EFuncDataAcc
+		GetFuncDataAccess() const
+		{
+			return m_func_data_access;
+		}
+
+		// does function return a set of values
+		virtual BOOL ReturnsSet() const;
+
+		// serialize object in DXL format
+		virtual void Serialize(gpdxl::CXMLSerializer *xml_serializer) const;
+
 #ifdef GPOS_DEBUG
-			// debug print of the type in the provided stream
-			virtual 
-			void DebugPrint(IOstream &os) const;
+		// debug print of the type in the provided stream
+		virtual void DebugPrint(IOstream &os) const;
 #endif
 	};
-}
+}  // namespace gpmd
 
-#endif // !GPMD_CMDFunctionGPDB_H
+#endif  // !GPMD_CMDFunctionGPDB_H
 
 // EOF

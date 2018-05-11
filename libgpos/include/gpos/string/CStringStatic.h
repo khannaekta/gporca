@@ -14,10 +14,10 @@
 #include "gpos/base.h"
 #include "gpos/common/clibwrapper.h"
 
-#define GPOS_SZ_LENGTH(x) gpos::clib::UlStrLen(x)
+#define GPOS_SZ_LENGTH(x) gpos::clib::Strlen(x)
 
 // use this character to substitute non-ASCII wide characters
-#define GPOS_WCHAR_UNPRINTABLE	'.'
+#define GPOS_WCHAR_UNPRINTABLE '.'
 
 // end-of-string character
 #define CHAR_EOS '\0'
@@ -40,81 +40,81 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CStringStatic
 	{
-		private:
+	private:
+		// null-terminated wide character buffer
+		CHAR *m_buffer;
 
-			// null-terminated wide character buffer
-			CHAR *m_szBuf;
+		// size of the string in number of CHAR units,
+		// not counting the terminating '\0'
+		ULONG m_length;
 
-			// size of the string in number of CHAR units,
-			// not counting the terminating '\0'
-			ULONG m_ulLength;
-
-			// buffer capacity
-			ULONG m_ulCapacity;
+		// buffer capacity
+		ULONG m_capacity;
 
 #ifdef GPOS_DEBUG
-			// checks whether a string is properly null-terminated
-			bool FValid() const;
-#endif // GPOS_DEBUG
+		// checks whether a string is properly null-terminated
+		bool IsValid() const;
+#endif  // GPOS_DEBUG
 
-			// private copy ctor
-			CStringStatic(const CStringStatic&);
+		// private copy ctor
+		CStringStatic(const CStringStatic &);
 
-		public:
+	public:
+		// ctor
+		CStringStatic(CHAR buffer[], ULONG capacity);
 
-			// ctor
-			CStringStatic(CHAR szBuffer[], ULONG ulCapacity);
+		// ctor with string initialization
+		CStringStatic(CHAR buffer[], ULONG capacity, const CHAR init_str[]);
 
-			// ctor with string initialization
-			CStringStatic(CHAR szBuffer[], ULONG ulCapacity, const CHAR szInit[]);
+		// dtor - owner is responsible for releasing the buffer
+		~CStringStatic()
+		{
+		}
 
-			// dtor - owner is responsible for releasing the buffer
-			~CStringStatic()
-			{}
+		// returns the wide character buffer storing the string
+		const CHAR *
+		Buffer() const
+		{
+			return m_buffer;
+		}
 
-			// returns the wide character buffer storing the string
-			const CHAR* Sz() const
-			{
-				return m_szBuf;
-			}
+		// returns the string length
+		ULONG
+		Length() const
+		{
+			return m_length;
+		}
 
-			// returns the string length
-			ULONG UlLength() const
-			{
-				return m_ulLength;
-			}
+		// checks whether the string contains any characters
+		BOOL
+		IsEmpty() const
+		{
+			return (0 == m_length);
+		}
 
-			// checks whether the string contains any characters
-			BOOL FEmpty() const
-			{
-				return (0 == m_ulLength);
-			}
+		// checks whether the string is byte-wise equal to a given string literal
+		BOOL Equals(const CHAR *buf) const;
 
-			// checks whether the string is byte-wise equal to a given string literal
-			BOOL FEquals(const CHAR *szBuf) const;
+		// appends a string
+		void Append(const CStringStatic *str);
 
-			// appends a string
-			void Append(const CStringStatic *pstr);
+		// appends the contents of a buffer to the current string
+		void AppendBuffer(const CHAR *buf);
 
-			// appends the contents of a buffer to the current string
-			void AppendBuffer(const CHAR *szBuf);
+		// appends a formatted string
+		void AppendFormat(const CHAR *format, ...);
 
-			// appends a formatted string
-			void AppendFormat(const CHAR *szFormat, ...);
+		// appends a formatted string based on passed va list
+		void AppendFormatVA(const CHAR *format, VA_LIST va_args);
 
-			// appends a formatted string based on passed va list
-			void AppendFormatVA(const CHAR *szFormat, VA_LIST vaArgs);
+		// appends wide character string
+		void AppendConvert(const WCHAR *wc_str);
 
-			// appends wide character string
-			void AppendConvert(const WCHAR *wsz);
-
-			// resets string
-			void Reset();
-
+		// resets string
+		void Reset();
 	};
-}
+}  // namespace gpos
 
-#endif // !GPOS_CStringStatic_H
+#endif  // !GPOS_CStringStatic_H
 
 // EOF
-

@@ -33,43 +33,32 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerScalarCoalesce : public CParseHandlerScalarOp
 	{
-		private:
+	private:
+		// return type
+		IMDId *m_mdid_type;
 
-			// return type
-			IMDId *m_pmdidType;
+		// private copy ctor
+		CParseHandlerScalarCoalesce(const CParseHandlerScalarCoalesce &);
 
-			// private copy ctor
-			CParseHandlerScalarCoalesce(const CParseHandlerScalarCoalesce &);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,
+						  const XMLCh *const element_local_name,
+						  const XMLCh *const element_qname,
+						  const Attributes &attr);
 
-			// process the start of an element
-			void StartElement
-					(
-					const XMLCh* const xmlszUri,
-					const XMLCh* const xmlszLocalname,
-					const XMLCh* const xmlszQname,
-					const Attributes& attr
-					);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,
+						const XMLCh *const element_local_name,
+						const XMLCh *const element_qname);
 
-			// process the end of an element
-			void EndElement
-					(
-					const XMLCh* const xmlszUri,
-					const XMLCh* const xmlszLocalname,
-					const XMLCh* const xmlszQname
-					);
+	public:
+		// ctor
+		CParseHandlerScalarCoalesce(IMemoryPool *mp,
+									CParseHandlerManager *parse_handler_mgr,
+									CParseHandlerBase *parse_handler_root);
+	};
+}  // namespace gpdxl
 
-		public:
-			// ctor
-			CParseHandlerScalarCoalesce
-					(
-					IMemoryPool *pmp,
-					CParseHandlerManager *pphm,
-					CParseHandlerBase *pphRoot
-					);
-
-		};
-}
-
-#endif // !GPDXL_CParseHandlerScalarCoalesce_H
+#endif  // !GPDXL_CParseHandlerScalarCoalesce_H
 
 //EOF

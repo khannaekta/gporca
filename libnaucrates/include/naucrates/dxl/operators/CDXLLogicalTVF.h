@@ -31,103 +31,96 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLLogicalTVF : public CDXLLogical
 	{
-		private:
-			// catalog id of the function
-			IMDId *m_pmdidFunc;
+	private:
+		// catalog id of the function
+		IMDId *m_func_mdid;
 
-			// return type
-			IMDId *m_pmdidRetType;
+		// return type
+		IMDId *m_return_type_mdid;
 
-			// function name
-			CMDName *m_pmdname;
+		// function name
+		CMDName *m_mdname;
 
-			// list of column descriptors		
-			DrgPdxlcd *m_pdrgdxlcd;
-			
-			// private copy ctor
-			CDXLLogicalTVF(const CDXLLogicalTVF &);
-			
-		public:
-			// ctor/dtor
-			CDXLLogicalTVF
-				(
-				IMemoryPool *pmp,
-				IMDId *pmdidFunc,
-				IMDId *pmdidRetType,
-				CMDName *pmdname,
-				DrgPdxlcd *pdrgdxlcd
-				);
-						
-			virtual
-			~CDXLLogicalTVF();
-		
-			// get operator type
-			Edxlopid Edxlop() const;
+		// list of column descriptors
+		CDXLColDescrArray *m_dxl_col_descr_array;
 
-			// get operator name
-			const CWStringConst *PstrOpName() const;
+		// private copy ctor
+		CDXLLogicalTVF(const CDXLLogicalTVF &);
 
-			// get function name
-			CMDName *Pmdname() const
-			{
-				return m_pmdname;
-			}
+	public:
+		// ctor/dtor
+		CDXLLogicalTVF(IMemoryPool *mp,
+					   IMDId *mdid_func,
+					   IMDId *mdid_return_type,
+					   CMDName *mdname,
+					   CDXLColDescrArray *pdrgdxlcd);
 
-			// get function id
-			IMDId *PmdidFunc() const
-			{
-				return m_pmdidFunc;
-			}
+		virtual ~CDXLLogicalTVF();
 
-			// get return type
-			IMDId *PmdidRetType() const
-			{
-				return m_pmdidRetType;
-			}
+		// get operator type
+		Edxlopid GetDXLOperator() const;
 
-			// get number of output columns
-			ULONG UlArity() const;
-			
-			// return the array of column descriptors
-			const DrgPdxlcd *Pdrgpdxlcd() const
-			{
-				return m_pdrgdxlcd;
-			}
+		// get operator name
+		const CWStringConst *GetOpNameStr() const;
 
-			// get the column descriptor at the given position
-			const CDXLColDescr *Pdxlcd(ULONG ul) const;
+		// get function name
+		CMDName *
+		MdName() const
+		{
+			return m_mdname;
+		}
 
-			// check if given column is defined by operator
-			virtual
-			BOOL FDefinesColumn(ULONG ulColId) const;
+		// get function id
+		IMDId *
+		FuncMdId() const
+		{
+			return m_func_mdid;
+		}
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
+		// get return type
+		IMDId *
+		ReturnTypeMdId() const
+		{
+			return m_return_type_mdid;
+		}
 
-			// conversion function
-			static
-			CDXLLogicalTVF *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopLogicalTVF == pdxlop->Edxlop());
+		// get number of output columns
+		ULONG Arity() const;
 
-				return dynamic_cast<CDXLLogicalTVF*>(pdxlop);
-			}
+		// return the array of column descriptors
+		const CDXLColDescrArray *
+		GetDXLColumnDescrArray() const
+		{
+			return m_dxl_col_descr_array;
+		}
+
+		// get the column descriptor at the given position
+		const CDXLColDescr *GetColumnDescrAt(ULONG ul) const;
+
+		// check if given column is defined by operator
+		virtual BOOL IsColDefined(ULONG colid) const;
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
+
+		// conversion function
+		static CDXLLogicalTVF *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopLogicalTVF == dxl_op->GetDXLOperator());
+
+			return dynamic_cast<CDXLLogicalTVF *>(dxl_op);
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
-
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLLogicalTVF_H
+#endif  // !GPDXL_CDXLLogicalTVF_H
 
 // EOF
-

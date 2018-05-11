@@ -30,77 +30,60 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarNullIf : public CDXLScalar
 	{
+	private:
+		// operator number
+		IMDId *m_mdid_op;
 
-		private:
+		// return type
+		IMDId *m_mdid_type;
 
-			// operator number
-			IMDId *m_pmdidOp;
+		// private copy ctor
+		CDXLScalarNullIf(CDXLScalarNullIf &);
 
-			// return type
-			IMDId *m_pmdidType;
+	public:
+		// ctor
+		CDXLScalarNullIf(IMemoryPool *mp, IMDId *mdid_op, IMDId *mdid_type);
 
-			// private copy ctor
-			CDXLScalarNullIf(CDXLScalarNullIf&);
+		// dtor
+		virtual ~CDXLScalarNullIf();
 
-		public:
-			// ctor
-			CDXLScalarNullIf
-				(
-				IMemoryPool *pmp,
-				IMDId *pmdidOp,
-				IMDId *pmdidType
-				);
+		// ident accessors
+		virtual Edxlopid GetDXLOperator() const;
 
-			// dtor
-			virtual
-			~CDXLScalarNullIf();
+		// name of the DXL operator
+		const CWStringConst *GetOpNameStr() const;
 
-			// ident accessors
-			virtual
-			Edxlopid Edxlop() const;
+		// operator id
+		virtual IMDId *MdIdOp() const;
 
-			// name of the DXL operator
-			const CWStringConst *PstrOpName() const;
+		// return type
+		virtual IMDId *MDIdType() const;
 
-			// operator id
-			virtual
-			IMDId *PmdidOp() const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
-			// return type
-			virtual
-			IMDId *PmdidType() const;
+		// does the operator return a boolean result
+		virtual BOOL HasBoolResult(CMDAccessor *md_accessor) const;
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
+		// conversion function
+		static CDXLScalarNullIf *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarNullIf == dxl_op->GetDXLOperator());
 
-			// does the operator return a boolean result
-			virtual
-			BOOL FBoolean(CMDAccessor *pmda) const;
-
-			// conversion function
-			static
-			CDXLScalarNullIf *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopScalarNullIf == pdxlop->Edxlop());
-
-				return dynamic_cast<CDXLScalarNullIf*>(pdxlop);
-			}
+			return dynamic_cast<CDXLScalarNullIf *>(dxl_op);
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			virtual
-			void AssertValid(const CDXLNode *pdxln, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		virtual void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLScalarNullIf_H
+#endif  // !GPDXL_CDXLScalarNullIf_H
 
 
 // EOF

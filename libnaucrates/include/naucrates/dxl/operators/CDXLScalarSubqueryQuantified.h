@@ -22,7 +22,6 @@
 
 namespace gpdxl
 {
-
 	using namespace gpmd;
 
 	//---------------------------------------------------------------------------
@@ -35,93 +34,89 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarSubqueryQuantified : public CDXLScalar
 	{
-		public:
+	public:
+		// indices of the subquery elements in the children array
+		enum Edxlsqquantified
+		{
+			EdxlsqquantifiedIndexScalar,
+			EdxlsqquantifiedIndexRelational,
+			EdxlsqquantifiedIndexSentinel
+		};
 
-			// indices of the subquery elements in the children array
-			enum Edxlsqquantified
-			{
-				EdxlsqquantifiedIndexScalar,
-				EdxlsqquantifiedIndexRelational,
-				EdxlsqquantifiedIndexSentinel
-			};
+	private:
+		// id of the scalar comparison operator
+		IMDId *m_scalar_op_mdid;
 
-		private:
-			// id of the scalar comparison operator
-			IMDId *m_pmdidScalarOp;
+		// name of scalar comparison operator
+		CMDName *m_scalar_op_mdname;
 
-			// name of scalar comparison operator
-			CMDName *m_pmdnameScalarOp;
+		// colid produced by the relational child of the AnySubquery operator
+		ULONG m_colid;
 
-			// colid produced by the relational child of the AnySubquery operator
-			ULONG m_ulColId;
+		// private copy ctor
+		CDXLScalarSubqueryQuantified(CDXLScalarSubqueryQuantified &);
 
-			// private copy ctor
-			CDXLScalarSubqueryQuantified(CDXLScalarSubqueryQuantified&);
+	public:
+		// ctor
+		CDXLScalarSubqueryQuantified(IMemoryPool *mp,
+									 IMDId *scalar_op_mdid,
+									 CMDName *mdname,
+									 ULONG colid);
 
-		public:
-			// ctor
-			CDXLScalarSubqueryQuantified(IMemoryPool *pmp, IMDId *pmdidScalarOp, CMDName *pmdname, ULONG ulColId);
+		// dtor
+		virtual ~CDXLScalarSubqueryQuantified();
 
-			// dtor
-			virtual
-			~CDXLScalarSubqueryQuantified();
+		// scalar operator id
+		IMDId *
+		GetScalarOpMdId() const
+		{
+			return m_scalar_op_mdid;
+		}
 
-			// scalar operator id
-			IMDId *PmdidScalarOp() const
-			{
-				return m_pmdidScalarOp;
-			}
+		// scalar operator name
+		const CMDName *
+		GetScalarOpMdName() const
+		{
+			return m_scalar_op_mdname;
+		}
 
-			// scalar operator name
-			const CMDName *PmdnameScalarOp() const
-			{
-				return m_pmdnameScalarOp;
-			}
+		// subquery colid
+		ULONG
+		GetColId() const
+		{
+			return m_colid;
+		}
 
-			// subquery colid
-			ULONG UlColId() const
-			{
-				return m_ulColId;
-			}
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const;
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const;
+		// conversion function
+		static CDXLScalarSubqueryQuantified *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarSubqueryAll == dxl_op->GetDXLOperator() ||
+						EdxlopScalarSubqueryAny == dxl_op->GetDXLOperator());
 
-			// conversion function
-			static
-			CDXLScalarSubqueryQuantified *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopScalarSubqueryAll == pdxlop->Edxlop() ||
-						EdxlopScalarSubqueryAny == pdxlop->Edxlop());
+			return dynamic_cast<CDXLScalarSubqueryQuantified *>(dxl_op);
+		}
 
-				return dynamic_cast<CDXLScalarSubqueryQuantified*>(pdxlop);
-			}
-
-			// does the operator return a boolean result
-			virtual
-			BOOL FBoolean
-					(
-					CMDAccessor *//pmda
-					)
-					const
-			{
-				return true;
-			}
+		// does the operator return a boolean result
+		virtual BOOL
+		HasBoolResult(CMDAccessor *  //md_accessor
+					  ) const
+		{
+			return true;
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *pdxln, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
-
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLScalarSubqueryQuantified_H
+#endif  // !GPDXL_CDXLScalarSubqueryQuantified_H
 
 // EOF

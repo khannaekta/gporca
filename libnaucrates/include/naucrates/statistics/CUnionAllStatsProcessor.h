@@ -11,27 +11,25 @@
 #ifndef GPNAUCRATES_CUnionAllStatsProcessor_H
 #define GPNAUCRATES_CUnionAllStatsProcessor_H
 
+#include "gpopt/operators/ops.h"
+#include "gpopt/optimizer/COptimizerConfig.h"
+
+#include "naucrates/statistics/CStatistics.h"
+
 namespace gpnaucrates
 {
-
 	class CUnionAllStatsProcessor
 	{
-		public:
-
-		static
-		CStatistics *PstatsUnionAll
-						(
-						IMemoryPool *pmp,
-						const CStatistics *pstatsFst,
-						const CStatistics *pstatsSnd,
-						DrgPul *pdrgpulOutput,
-						DrgPul *pdrgpulInput1,
-						DrgPul *pdrgpulInput2
-						);
+	public:
+		static CStatistics *CreateStatsForUnionAll(IMemoryPool *mp,
+												   const CStatistics *stats_first_child,
+												   const CStatistics *stats_second_child,
+												   ULongPtrArray *output_colids,
+												   ULongPtrArray *first_child_colids,
+												   ULongPtrArray *second_child_colids);
 	};
-}
+}  // namespace gpnaucrates
 
-#endif // !GPNAUCRATES_CUnionAllStatsProcessor_H
+#endif  // !GPNAUCRATES_CUnionAllStatsProcessor_H
 
 // EOF
-

@@ -15,7 +15,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CStackTest
@@ -26,24 +25,22 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CStackTest
 	{
-		public:
+	public:
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_Basic();
+		static GPOS_RESULT EresUnittest_PushPop();
 
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_Basic();
-			static GPOS_RESULT EresUnittest_PushPop();
-			
 #ifdef GPOS_DEBUG
-			static GPOS_RESULT EresUnittest_Pop();
+		static GPOS_RESULT EresUnittest_Pop();
 #endif
 
-			// destructor function for char's
-			static void DestroyChar(char *);
+		// destructor function for char's
+		static void DestroyChar(char *);
 
-	}; // class CStackTest
-}
+	};  // class CStackTest
+}  // namespace gpos
 
-#endif // !GPOS_CStackTest_H
+#endif  // !GPOS_CStackTest_H
 
 // EOF
-

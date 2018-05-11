@@ -21,15 +21,15 @@ namespace gpdxl
 	using namespace gpos;
 
 	enum EdxlBooleanTestType
-		{
-			EdxlbooleantestIsTrue,
-			EdxlbooleantestIsNotTrue,
-			EdxlbooleantestIsFalse,
-			EdxlbooleantestIsNotFalse,
-			EdxlbooleantestIsUnknown,
-			EdxlbooleantestIsNotUnknown,
-			EdxlbooleantestSentinel
-		};
+	{
+		EdxlbooleantestIsTrue,
+		EdxlbooleantestIsNotTrue,
+		EdxlbooleantestIsFalse,
+		EdxlbooleantestIsNotFalse,
+		EdxlbooleantestIsUnknown,
+		EdxlbooleantestIsNotUnknown,
+		EdxlbooleantestSentinel
+	};
 
 	//---------------------------------------------------------------------------
 	//	@class:
@@ -41,69 +41,55 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarBooleanTest : public CDXLScalar
 	{
+	private:
+		// operator type
+		const EdxlBooleanTestType m_dxl_bool_test_type;
 
-		private:
+		// private copy ctor
+		CDXLScalarBooleanTest(const CDXLScalarBooleanTest &);
 
-			// operator type
-			const EdxlBooleanTestType m_edxlbooleantesttype;
+		// name of the DXL operator name
+		const CWStringConst *GetOpNameStr() const;
 
-			// private copy ctor
-			CDXLScalarBooleanTest(const CDXLScalarBooleanTest&);
+	public:
+		// ctor/dtor
+		CDXLScalarBooleanTest(IMemoryPool *mp, const EdxlBooleanTestType dxl_bool_type);
 
-			// name of the DXL operator name
-			const CWStringConst *PstrOpName() const;
+		// ident accessors
+		Edxlopid GetDXLOperator() const;
 
-		public:
-			// ctor/dtor
-			CDXLScalarBooleanTest
-				(
-				IMemoryPool *pmp,
-				const EdxlBooleanTestType edxlboolexptesttype
-				);
+		// BooleanTest operator type
+		EdxlBooleanTestType GetDxlBoolTypeStr() const;
 
-			// ident accessors
-			Edxlopid Edxlop() const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
-			// BooleanTest operator type
-			EdxlBooleanTestType EdxlBoolType() const;
+		// conversion function
+		static CDXLScalarBooleanTest *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarBooleanTest == dxl_op->GetDXLOperator());
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
+			return dynamic_cast<CDXLScalarBooleanTest *>(dxl_op);
+		}
 
-			// conversion function
-			static
-			CDXLScalarBooleanTest *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopScalarBooleanTest == pdxlop->Edxlop());
-
-				return dynamic_cast<CDXLScalarBooleanTest*>(pdxlop);
-			}
-
-			// does the operator return a boolean result
-			virtual
-			BOOL FBoolean
-					(
-					CMDAccessor *//pmda
-					)
-					const
-			{
-				return true;
-			}
+		// does the operator return a boolean result
+		virtual BOOL
+		HasBoolResult(CMDAccessor *  //md_accessor
+					  ) const
+		{
+			return true;
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *pdxln, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
-
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLScalarBooleanTest_H
+#endif  // !GPDXL_CDXLScalarBooleanTest_H
 
 // EOF

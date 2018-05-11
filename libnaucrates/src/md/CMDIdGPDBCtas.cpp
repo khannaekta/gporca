@@ -18,7 +18,7 @@ using namespace gpmd;
 #define GPMD_GPDB_CTAS_SYSID GPOS_WSZ_LIT("CTAS")
 
 // invalid key
-CMDIdGPDBCtas CMDIdGPDBCtas::m_mdidInvalidKey(0);
+CMDIdGPDBCtas CMDIdGPDBCtas::m_mdid_invalid_key(0);
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -28,12 +28,8 @@ CMDIdGPDBCtas CMDIdGPDBCtas::m_mdidInvalidKey(0);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDIdGPDBCtas::CMDIdGPDBCtas
-	(
-	OID oid
-	)
-	:
-	CMDIdGPDB(CSystemId(IMDId::EmdidGPDB, GPMD_GPDB_CTAS_SYSID), oid)
+CMDIdGPDBCtas::CMDIdGPDBCtas(OID oid)
+	: CMDIdGPDB(CSystemId(IMDId::EmdidGPDB, GPMD_GPDB_CTAS_SYSID), oid)
 {
 	Serialize();
 }
@@ -47,21 +43,17 @@ CMDIdGPDBCtas::CMDIdGPDBCtas
 //		Copy constructor
 //
 //---------------------------------------------------------------------------
-CMDIdGPDBCtas::CMDIdGPDBCtas
-	(
-	const CMDIdGPDBCtas &mdidSource
-	)
-	:
-	CMDIdGPDB(mdidSource.Sysid(), mdidSource.OidObjectId())
+CMDIdGPDBCtas::CMDIdGPDBCtas(const CMDIdGPDBCtas &mdid_source)
+	: CMDIdGPDB(mdid_source.Sysid(), mdid_source.Oid())
 {
-	GPOS_ASSERT(mdidSource.FValid());
-	GPOS_ASSERT(IMDId::EmdidGPDBCtas == mdidSource.Emdidt());
+	GPOS_ASSERT(mdid_source.IsValid());
+	GPOS_ASSERT(IMDId::EmdidGPDBCtas == mdid_source.MdidType());
 	Serialize();
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDIdGPDBCtas::FEquals
+//		CMDIdGPDBCtas::Equals
 //
 //	@doc:
 //		Checks if the version of the current object is compatible with another version
@@ -69,33 +61,30 @@ CMDIdGPDBCtas::CMDIdGPDBCtas
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIdGPDBCtas::FEquals
-	(
-	const IMDId *pmdid
-	) 
-	const
+CMDIdGPDBCtas::Equals(const IMDId *mdid) const
 {
-	if (NULL == pmdid || EmdidGPDBCtas != pmdid->Emdidt())
+	if (NULL == mdid || EmdidGPDBCtas != mdid->MdidType())
 	{
 		return false;
 	}
-	
-	const CMDIdGPDBCtas *pmdidGPDBCTAS = CMDIdGPDBCtas::PmdidConvert(const_cast<IMDId *>(pmdid));
-	
-	return m_oid == pmdidGPDBCTAS->OidObjectId(); 
+
+	const CMDIdGPDBCtas *mdidGPDBCTAS = CMDIdGPDBCtas::CastMdid(const_cast<IMDId *>(mdid));
+
+	return m_oid == mdidGPDBCTAS->Oid();
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDIdGPDBCtas::FValid
+//		CMDIdGPDBCtas::IsValid
 //
 //	@doc:
 //		Is the mdid valid
 //
 //---------------------------------------------------------------------------
-BOOL CMDIdGPDBCtas::FValid() const
+BOOL
+CMDIdGPDBCtas::IsValid() const
 {
-	return !FEquals(&CMDIdGPDBCtas::m_mdidInvalidKey);
+	return !Equals(&CMDIdGPDBCtas::m_mdid_invalid_key);
 }
 
 //---------------------------------------------------------------------------
@@ -107,14 +96,9 @@ BOOL CMDIdGPDBCtas::FValid() const
 //
 //---------------------------------------------------------------------------
 IOstream &
-CMDIdGPDBCtas::OsPrint
-	(
-	IOstream &os
-	) 
-	const
+CMDIdGPDBCtas::OsPrint(IOstream &os) const
 {
-	os << "(" << OidObjectId() << "," << 
-				UlVersionMajor() << "." << UlVersionMinor() << ")";
+	os << "(" << Oid() << "," << VersionMajor() << "." << VersionMinor() << ")";
 	return os;
 }
 

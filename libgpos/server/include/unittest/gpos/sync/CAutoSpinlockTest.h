@@ -26,22 +26,19 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CAutoSpinlockTest
 	{
-
-		public:
-
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_LockRelease();
+	public:
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_LockRelease();
 #ifdef GPOS_DEBUG
-			static GPOS_RESULT EresUnittest_SelfDeadlock();
-			static GPOS_RESULT EresUnittest_Yield();
-			static GPOS_RESULT EresUnittest_Rank();
-#endif // GPOS_DEBUG
+		static GPOS_RESULT EresUnittest_SelfDeadlock();
+		static GPOS_RESULT EresUnittest_Yield();
+		static GPOS_RESULT EresUnittest_Rank();
+#endif  // GPOS_DEBUG
 
-	}; // class CAutoSpinlockTest
-}
+	};  // class CAutoSpinlockTest
+}  // namespace gpos
 
-#endif // !GPOS_CAutoSpinlockTest_H
+#endif  // !GPOS_CAutoSpinlockTest_H
 
 // EOF
-

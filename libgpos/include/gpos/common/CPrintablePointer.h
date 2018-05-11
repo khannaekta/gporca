@@ -10,29 +10,35 @@ namespace gpos
 	template <typename T>
 	class CPrintablePointer
 	{
-		private:
-			T *m_pt;
-			friend IOstream &operator << (IOstream &os, CPrintablePointer p)
+	private:
+		T *m_obj;
+		friend IOstream &
+		operator<<(IOstream &os, CPrintablePointer p)
+		{
+			if (p.m_obj)
 			{
-				if (p.m_pt)
-				{
-					return os << *p.m_pt;
-				}
-				else
-				{
-					return os;
-				}
+				return os << *p.m_obj;
 			}
+			else
+			{
+				return os;
+			}
+		}
 
-		public:
-			explicit CPrintablePointer(T *pt) : m_pt(pt) {}
-			CPrintablePointer(const CPrintablePointer &pointer) : m_pt(pointer.m_pt) {}
+	public:
+		explicit CPrintablePointer(T *obj) : m_obj(obj)
+		{
+		}
+		CPrintablePointer(const CPrintablePointer &pointer) : m_obj(pointer.m_obj)
+		{
+		}
 	};
 
 	template <typename T>
-	CPrintablePointer<T> pp(T *pt)
+	CPrintablePointer<T>
+	GetPrintablePtr(T *obj)
 	{
-		return CPrintablePointer<T>(pt);
+		return CPrintablePointer<T>(obj);
 	}
-}
-#endif // GPOS_CPrintablePointer_H
+}  // namespace gpos
+#endif  // GPOS_CPrintablePointer_H

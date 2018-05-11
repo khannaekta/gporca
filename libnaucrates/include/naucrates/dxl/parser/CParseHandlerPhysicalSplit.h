@@ -32,60 +32,52 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerPhysicalSplit : public CParseHandlerPhysicalOp
 	{
-		private:
+	private:
+		// deletion col ids
+		ULongPtrArray *m_deletion_colid_array;
 
-			// deletion col ids
-			DrgPul *m_pdrgpulDelete;
+		// insertion col ids
+		ULongPtrArray *m_insert_colid_array;
 
-			// insertion col ids
-			DrgPul *m_pdrgpulInsert;
+		// action column id
+		ULONG m_action_colid;
 
-			// action column id
-			ULONG m_ulAction;
+		// ctid column id
+		ULONG m_ctid_colid;
 
-			// ctid column id
-			ULONG m_ulCtid;
+		// segmentId column id
+		ULONG m_segid_colid;
 
-			// segmentId column id
-			ULONG m_ulSegmentId;
+		// does update preserve oids
+		BOOL m_preserve_oids;
 
-			// does update preserve oids
-			BOOL m_fPreserveOids;
-			
-			// tuple oid column id
-			ULONG m_ulTupleOidColId;
-			
-			// private copy ctor
-			CParseHandlerPhysicalSplit(const CParseHandlerPhysicalSplit &);
+		// tuple oid column id
+		ULONG m_tuple_oid_col_oid;
 
-			// process the start of an element
-			void StartElement
-				(
-				const XMLCh* const xmlszUri, 		// URI of element's namespace
-				const XMLCh* const xmlszLocalname,	// local part of element's name
-				const XMLCh* const xmlszQname,		// element's qname
-				const Attributes& attr				// element's attributes
-				);
+		// private copy ctor
+		CParseHandlerPhysicalSplit(const CParseHandlerPhysicalSplit &);
 
-			// process the end of an element
-			void EndElement
-				(
-				const XMLCh* const xmlszUri, 		// URI of element's namespace
-				const XMLCh* const xmlszLocalname,	// local part of element's name
-				const XMLCh* const xmlszQname		// element's qname
-				);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-		public:
-			// ctor
-			CParseHandlerPhysicalSplit
-				(
-				IMemoryPool *pmp,
-				CParseHandlerManager *pphm,
-				CParseHandlerBase *pphRoot
-				);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+	public:
+		// ctor
+		CParseHandlerPhysicalSplit(IMemoryPool *mp,
+								   CParseHandlerManager *parse_handler_mgr,
+								   CParseHandlerBase *parse_handler_root);
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerPhysicalSplit_H
+#endif  // !GPDXL_CParseHandlerPhysicalSplit_H
 
 // EOF

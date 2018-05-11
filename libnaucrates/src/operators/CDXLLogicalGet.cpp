@@ -7,7 +7,7 @@
 //
 //	@doc:
 //		Implementation of DXL logical get operator
-//		
+//
 //---------------------------------------------------------------------------
 
 #include "naucrates/dxl/operators/CDXLLogicalGet.h"
@@ -28,13 +28,8 @@ using namespace gpdxl;
 //		Construct a logical get operator node given its table descriptor rtable entry
 //
 //---------------------------------------------------------------------------
-CDXLLogicalGet::CDXLLogicalGet
-	(
-	IMemoryPool *pmp,
-	CDXLTableDescr *pdxltabdesc
-	)
-	:CDXLLogical(pmp),
-	 m_pdxltabdesc(pdxltabdesc)
+CDXLLogicalGet::CDXLLogicalGet(IMemoryPool *mp, CDXLTableDescr *table_descr)
+	: CDXLLogical(mp), m_dxl_table_descr(table_descr)
 {
 }
 
@@ -48,49 +43,49 @@ CDXLLogicalGet::CDXLLogicalGet
 //---------------------------------------------------------------------------
 CDXLLogicalGet::~CDXLLogicalGet()
 {
-	CRefCount::SafeRelease(m_pdxltabdesc);
+	CRefCount::SafeRelease(m_dxl_table_descr);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLLogicalGet::Edxlop
+//		CDXLLogicalGet::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLLogicalGet::Edxlop() const
+CDXLLogicalGet::GetDXLOperator() const
 {
 	return EdxlopLogicalGet;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLLogicalGet::PstrOpName
+//		CDXLLogicalGet::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLLogicalGet::PstrOpName() const
+CDXLLogicalGet::GetOpNameStr() const
 {
-	return CDXLTokens::PstrToken(EdxltokenLogicalGet);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenLogicalGet);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLLogicalGet::Pdxltabdesc
+//		CDXLLogicalGet::GetDXLTableDescr
 //
 //	@doc:
 //		Table descriptor for the table scan
 //
 //---------------------------------------------------------------------------
 CDXLTableDescr *
-CDXLLogicalGet::Pdxltabdesc() const
+CDXLLogicalGet::GetDXLTableDescr() const
 {
-	return m_pdxltabdesc;
+	return m_dxl_table_descr;
 }
 
 
@@ -103,43 +98,37 @@ CDXLLogicalGet::Pdxltabdesc() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalGet::SerializeToDXL
-	(
-	CXMLSerializer *pxmlser,
-	const CDXLNode *//pdxln
-	)
-	const
+CDXLLogicalGet::SerializeToDXL(CXMLSerializer *xml_serializer,
+							   const CDXLNode *  //dxlnode
+							   ) const
 {
-	const CWStringConst *pstrElemName = PstrOpName();
+	const CWStringConst *element_name = GetOpNameStr();
 
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
 	// serialize table descriptor
-	m_pdxltabdesc->SerializeToDXL(pxmlser);
+	m_dxl_table_descr->SerializeToDXL(xml_serializer);
 
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLLogicalGet::FDefinesColumn
+//		CDXLLogicalGet::IsColDefined
 //
 //	@doc:
 //		Check if given column is defined by operator
 //
 //---------------------------------------------------------------------------
 BOOL
-CDXLLogicalGet::FDefinesColumn
-	(
-	ULONG ulColId
-	)
-	const
+CDXLLogicalGet::IsColDefined(ULONG colid) const
 {
-	const ULONG ulSize = m_pdxltabdesc->UlArity();
-	for (ULONG ulDescr = 0; ulDescr < ulSize; ulDescr++)
+	const ULONG size = m_dxl_table_descr->Arity();
+	for (ULONG descr_id = 0; descr_id < size; descr_id++)
 	{
-		ULONG ulId = m_pdxltabdesc->Pdxlcd(ulDescr)->UlID();
-		if (ulId == ulColId)
+		ULONG id = m_dxl_table_descr->GetColumnDescrAt(descr_id)->Id();
+		if (id == colid)
 		{
 			return true;
 		}
@@ -158,17 +147,15 @@ CDXLLogicalGet::FDefinesColumn
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalGet::AssertValid
-	(
-	const CDXLNode *, //pdxln
-	BOOL // fValidateChildren
-	) const
+CDXLLogicalGet::AssertValid(const CDXLNode *,  //dxlnode
+							BOOL			   // validate_children
+							) const
 {
 	// assert validity of table descriptor
-	GPOS_ASSERT(NULL != m_pdxltabdesc);
-	GPOS_ASSERT(NULL != m_pdxltabdesc->Pmdname());
-	GPOS_ASSERT(m_pdxltabdesc->Pmdname()->Pstr()->FValid());
+	GPOS_ASSERT(NULL != m_dxl_table_descr);
+	GPOS_ASSERT(NULL != m_dxl_table_descr->MdName());
+	GPOS_ASSERT(m_dxl_table_descr->MdName()->GetMDName()->IsValid());
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

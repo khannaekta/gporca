@@ -29,47 +29,43 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CAutoSpinlock : public CStackObject
 	{
-		private:
-		
-			// the actual spin lock
-			CSpinlockBase &m_slock;
+	private:
+		// the actual spin lock
+		CSpinlockBase &m_lock;
 
-			// flag to indicate ownership
-			BOOL m_fLocked;
-			
-		public:
+		// flag to indicate ownership
+		BOOL m_locked;
 
-			// ctor
-			explicit
-			CAutoSpinlock
-				(
-				CSpinlockBase &slock
-				) 
-				: m_slock(slock), m_fLocked(false) {}
-			
-			// dtor
-			~CAutoSpinlock();
-			
-			// acquire lock
-			void Lock()
-			{
-				m_slock.Lock();
-				m_fLocked = true;
-			}
-			
-			// release lock
-			void Unlock()
-			{
-				GPOS_ASSERT(m_fLocked);
-				
-				m_slock.Unlock();
-				m_fLocked = false;
-			}
+	public:
+		// ctor
+		explicit CAutoSpinlock(CSpinlockBase &lock) : m_lock(lock), m_locked(false)
+		{
+		}
 
-	}; // class CAutoSpinlock
-}
+		// dtor
+		~CAutoSpinlock();
 
-#endif // !GPOS_CAutoSpinlock_H
+		// acquire lock
+		void
+		Lock()
+		{
+			m_lock.Lock();
+			m_locked = true;
+		}
+
+		// release lock
+		void
+		Unlock()
+		{
+			GPOS_ASSERT(m_locked);
+
+			m_lock.Unlock();
+			m_locked = false;
+		}
+
+	};  // class CAutoSpinlock
+}  // namespace gpos
+
+#endif  // !GPOS_CAutoSpinlock_H
 
 // EOF
-

@@ -22,7 +22,7 @@ namespace gpdxl
 	using namespace gpos;
 
 	XERCES_CPP_NAMESPACE_USE
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CParseHandlerGatherMotion
@@ -33,43 +33,34 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerGatherMotion : public CParseHandlerPhysicalOp
 	{
-		private:
-			
-			// the gather motion operator
-			CDXLPhysicalGatherMotion *m_pdxlop;
-			
-			// private copy ctor
-			CParseHandlerGatherMotion(const CParseHandlerGatherMotion &);
-			
-			// process the start of an element
-			void StartElement
-				(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
- 					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
+	private:
+		// the gather motion operator
+		CDXLPhysicalGatherMotion *m_dxl_op;
 
-			// process the end of an element
-			void EndElement
-				(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
-					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname		// element's qname
-				);							
-		
-		public:
-			// ctor/dtor
-			CParseHandlerGatherMotion
-				(
-				IMemoryPool *pmp,
-				CParseHandlerManager *pphm,
-				CParseHandlerBase *pphRoot
-				);
-			
+		// private copy ctor
+		CParseHandlerGatherMotion(const CParseHandlerGatherMotion &);
+
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
+
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+	public:
+		// ctor/dtor
+		CParseHandlerGatherMotion(IMemoryPool *mp,
+								  CParseHandlerManager *parse_handler_mgr,
+								  CParseHandlerBase *parse_handler_root);
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerGatherMotion_H
+#endif  // !GPDXL_CParseHandlerGatherMotion_H
 
 // EOF

@@ -23,12 +23,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysical::CDXLPhysical
-	(
-	IMemoryPool *pmp
-	)
-	:
-	CDXLOperator(pmp)
+CDXLPhysical::CDXLPhysical(IMemoryPool *mp) : CDXLOperator(mp)
 {
 }
 
@@ -46,14 +41,14 @@ CDXLPhysical::~CDXLPhysical()
 
 //---------------------------------------------------------------------------
 //      @function:
-//              CDXLPhysical::Edxloperatortype
+//              CDXLPhysical::GetDXLOperatorType
 //
 //      @doc:
 //              Operator Type
 //
 //---------------------------------------------------------------------------
 Edxloptype
-CDXLPhysical::Edxloperatortype() const
+CDXLPhysical::GetDXLOperatorType() const
 {
 	return EdxloptypePhysical;
 }
@@ -65,34 +60,29 @@ CDXLPhysical::Edxloperatortype() const
 //		CDXLPhysical::AssertValid
 //
 //	@doc:
-//		Checks whether operator node is well-structured 
+//		Checks whether operator node is well-structured
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysical::AssertValid
-	(
-	const CDXLNode *pdxln,
-	BOOL fValidateChildren
-	) const
+CDXLPhysical::AssertValid(const CDXLNode *node, BOOL validate_children) const
 {
-	GPOS_ASSERT(NULL != pdxln);
-	
-	GPOS_ASSERT(2 <= pdxln->UlArity());
-	
-	CDXLNode *pdxlnProjList = (*pdxln)[0];
-	CDXLNode *pdxlnFilter = (*pdxln)[1];
-	
-	GPOS_ASSERT(EdxlopScalarProjectList == pdxlnProjList->Pdxlop()->Edxlop());
-	GPOS_ASSERT(EdxlopScalarFilter == pdxlnFilter->Pdxlop()->Edxlop());
-	
-	if (fValidateChildren)
+	GPOS_ASSERT(NULL != node);
+
+	GPOS_ASSERT(2 <= node->Arity());
+
+	CDXLNode *proj_list_dxlnode = (*node)[0];
+	CDXLNode *filter_dxlnode = (*node)[1];
+
+	GPOS_ASSERT(EdxlopScalarProjectList == proj_list_dxlnode->GetOperator()->GetDXLOperator());
+	GPOS_ASSERT(EdxlopScalarFilter == filter_dxlnode->GetOperator()->GetDXLOperator());
+
+	if (validate_children)
 	{
-		pdxlnProjList->Pdxlop()->AssertValid(pdxlnProjList, fValidateChildren);
-		pdxlnFilter->Pdxlop()->AssertValid(pdxlnFilter, fValidateChildren);
+		proj_list_dxlnode->GetOperator()->AssertValid(proj_list_dxlnode, validate_children);
+		filter_dxlnode->GetOperator()->AssertValid(filter_dxlnode, validate_children);
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 
 // EOF
-

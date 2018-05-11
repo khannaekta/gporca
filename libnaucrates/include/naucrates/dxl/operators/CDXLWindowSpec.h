@@ -34,76 +34,73 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLWindowSpec : public CRefCount
 	{
-		private:
+	private:
+		// memory pool;
+		IMemoryPool *m_mp;
 
-			// memory pool;
-			IMemoryPool *m_pmp;
+		// partition-by column identifiers
+		ULongPtrArray *m_partition_by_colid_array;
 
-			// partition-by column identifiers
-			DrgPul *m_pdrgpulPartCol;
+		// name of window specification
+		CMDName *m_mdname;
 
-			// name of window specification
-			CMDName *m_pmdname;
+		// sorting columns
+		CDXLNode *m_sort_col_list_dxlnode;
 
-			// sorting columns
-			CDXLNode *m_pdxlnSortColList;
+		// window frame associated with the window key
+		CDXLWindowFrame *m_window_frame;
 
-			// window frame associated with the window key
-			CDXLWindowFrame *m_pdxlwf;
+		// private copy ctor
+		CDXLWindowSpec(const CDXLWindowSpec &);
 
-			// private copy ctor
-			CDXLWindowSpec(const CDXLWindowSpec&);
+	public:
+		// ctor
+		CDXLWindowSpec(IMemoryPool *mp,
+					   ULongPtrArray *partition_by_colid_array,
+					   CMDName *mdname,
+					   CDXLNode *sort_col_list_dxlnode,
+					   CDXLWindowFrame *window_frame);
 
-		public:
+		// dtor
+		virtual ~CDXLWindowSpec();
 
-			// ctor
-			CDXLWindowSpec
-				(
-				IMemoryPool *pmp,
-				DrgPul *pdrgpulPartCol,
-				CMDName *pmdname,
-				CDXLNode *pdxlnSortColList,
-				CDXLWindowFrame *pdxlwf
-				);
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *) const;
 
-			// dtor
-			virtual
-			~CDXLWindowSpec();
+		// set window frame definition
+		void SetWindowFrame(CDXLWindowFrame *window_frame);
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *) const;
+		// return window frame
+		CDXLWindowFrame *
+		GetWindowFrame() const
+		{
+			return m_window_frame;
+		}
 
-			// set window frame definition
-			void SetWindowFrame(CDXLWindowFrame *pdxlwf);
+		// partition-by column identifiers
+		ULongPtrArray *
+		GetPartitionByColIdArray() const
+		{
+			return m_partition_by_colid_array;
+		}
 
-			// return window frame
-			CDXLWindowFrame *Pdxlwf() const
-			{
-				return m_pdxlwf;
-			}
+		// sort columns
+		CDXLNode *
+		GetSortColListDXL() const
+		{
+			return m_sort_col_list_dxlnode;
+		}
 
-			// partition-by column identifiers
-			DrgPul *PdrgulPartColList() const
-			{
-				return m_pdrgpulPartCol;
-			}
-
-			// sort columns
-			CDXLNode *PdxlnSortColList() const
-			{
-				return m_pdxlnSortColList;
-			}
-
-			// window specification name
-			CMDName *Pmdname() const
-			{
-				return m_pmdname;
-			}
+		// window specification name
+		CMDName *
+		MdName() const
+		{
+			return m_mdname;
+		}
 	};
 
-	typedef CDynamicPtrArray<CDXLWindowSpec, CleanupRelease> DrgPdxlws;
-}
-#endif // !GPDXL_CDXLWindowSpec_H
+	typedef CDynamicPtrArray<CDXLWindowSpec, CleanupRelease> CDXLWindowSpecArray;
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLWindowSpec_H
 
 // EOF

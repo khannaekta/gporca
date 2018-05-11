@@ -37,39 +37,35 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerMDType::CParseHandlerMDType
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
-	:
-	CParseHandlerMetadataObject(pmp, pphm, pphRoot),
-	m_pmdid(NULL),
-	m_pmdname(NULL),
-	m_pmdidOpEq(NULL),
-	m_pmdidOpNEq(NULL),
-	m_pmdidOpLT(NULL),
-	m_pmdidOpLEq(NULL),
-	m_pmdidOpGT(NULL),
-	m_pmdidOpGEq(NULL),
-	m_pmdidOpComp(NULL),
-	m_pmdidMin(NULL),
-	m_pmdidMax(NULL),
-	m_pmdidAvg(NULL),
-	m_pmdidSum(NULL),
-	m_pmdidCount(NULL),
-	m_fHashable(false),
-	m_fComposite(false),
-	m_pmdidBaseRelation(NULL),
-	m_pmdidTypeArray(NULL)
+CParseHandlerMDType::CParseHandlerMDType(IMemoryPool *mp,
+										 CParseHandlerManager *parse_handler_mgr,
+										 CParseHandlerBase *parse_handler_root)
+	: CParseHandlerMetadataObject(mp, parse_handler_mgr, parse_handler_root),
+	  m_mdid(NULL),
+	  m_mdname(NULL),
+	  m_mdid_eq_op(NULL),
+	  m_mdid_neq_op(NULL),
+	  m_mdid_lt_op(NULL),
+	  m_mdid_lteq_op(NULL),
+	  m_mdid_gt_op(NULL),
+	  m_mdid_gteq_op(NULL),
+	  m_mdid_cmp_op(NULL),
+	  m_mdid_min_op(NULL),
+	  m_mdid_max_op(NULL),
+	  m_mdid_avg_op(NULL),
+	  m_mdid_sum_op(NULL),
+	  m_mdid_count_op(NULL),
+	  m_is_hashable(false),
+	  m_is_composite(false),
+	  m_mdid_base_rel(NULL),
+	  m_mdid_array_type(NULL)
 {
 	// default: no aggregates for type
-	m_pmdidMin = GPOS_NEW(pmp) CMDIdGPDB(0);
-	m_pmdidMax = GPOS_NEW(pmp) CMDIdGPDB(0);
-	m_pmdidAvg = GPOS_NEW(pmp) CMDIdGPDB(0);
-	m_pmdidSum = GPOS_NEW(pmp) CMDIdGPDB(0);
-	m_pmdidCount = GPOS_NEW(pmp) CMDIdGPDB(0);
+	m_mdid_min_op = GPOS_NEW(mp) CMDIdGPDB(0);
+	m_mdid_max_op = GPOS_NEW(mp) CMDIdGPDB(0);
+	m_mdid_avg_op = GPOS_NEW(mp) CMDIdGPDB(0);
+	m_mdid_sum_op = GPOS_NEW(mp) CMDIdGPDB(0);
+	m_mdid_count_op = GPOS_NEW(mp) CMDIdGPDB(0);
 }
 
 
@@ -83,21 +79,21 @@ CParseHandlerMDType::CParseHandlerMDType
 //---------------------------------------------------------------------------
 CParseHandlerMDType::~CParseHandlerMDType()
 {
-	m_pmdid->Release();
-	m_pmdidOpEq->Release();
-	m_pmdidOpNEq->Release();
-	m_pmdidOpLT->Release();
-	m_pmdidOpLEq->Release();
-	m_pmdidOpGT->Release();
-	m_pmdidOpGEq->Release();
-	m_pmdidOpComp->Release();
-	m_pmdidTypeArray->Release();
-	m_pmdidMin->Release();
-	m_pmdidMax->Release();
-	m_pmdidAvg->Release();
-	m_pmdidSum->Release();
-	m_pmdidCount->Release();
-	CRefCount::SafeRelease(m_pmdidBaseRelation);
+	m_mdid->Release();
+	m_mdid_eq_op->Release();
+	m_mdid_neq_op->Release();
+	m_mdid_lt_op->Release();
+	m_mdid_lteq_op->Release();
+	m_mdid_gt_op->Release();
+	m_mdid_gteq_op->Release();
+	m_mdid_cmp_op->Release();
+	m_mdid_array_type->Release();
+	m_mdid_min_op->Release();
+	m_mdid_max_op->Release();
+	m_mdid_avg_op->Release();
+	m_mdid_sum_op->Release();
+	m_mdid_count_op->Release();
+	CRefCount::SafeRelease(m_mdid_base_rel);
 }
 
 //---------------------------------------------------------------------------
@@ -109,115 +105,97 @@ CParseHandlerMDType::~CParseHandlerMDType()
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerMDType::StartElement
-	(
-	const XMLCh* const, // xmlszUri,
-	const XMLCh* const xmlszLocalname,
-	const XMLCh* const, // xmlszQname
-	const Attributes& attrs
-	)
+CParseHandlerMDType::StartElement(const XMLCh *const,  // element_uri,
+								  const XMLCh *const element_local_name,
+								  const XMLCh *const,  // element_qname
+								  const Attributes &attrs)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenMDType), xmlszLocalname))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenMDType), element_local_name))
 	{
 		// parse metadata id info
-		m_pmdid = CDXLOperatorFactory::PmdidFromAttrs(m_pphm->Pmm(), attrs, EdxltokenMdid, EdxltokenMDType);
-		
-		if (!FBuiltInType(m_pmdid))
+		m_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid, EdxltokenMDType);
+
+		if (!IsBuiltInType(m_mdid))
 		{
 			// parse type name
-			const XMLCh *xmlszTypeName = CDXLOperatorFactory::XmlstrFromAttrs
-																(
-																attrs,
-																EdxltokenName,
-																EdxltokenMDType
-																);
+			const XMLCh *xmlszTypeName =
+				CDXLOperatorFactory::ExtractAttrValue(attrs, EdxltokenName, EdxltokenMDType);
 
-			CWStringDynamic *pstrTypeName = CDXLUtils::PstrFromXMLCh(m_pphm->Pmm(), xmlszTypeName);
+			CWStringDynamic *pstrTypeName = CDXLUtils::CreateDynamicStringFromXMLChArray(
+				m_parse_handler_mgr->GetDXLMemoryManager(), xmlszTypeName);
 
 			// create a copy of the string in the CMDName constructor
-			m_pmdname = GPOS_NEW(m_pmp) CMDName(m_pmp, pstrTypeName);
+			m_mdname = GPOS_NEW(m_mp) CMDName(m_mp, pstrTypeName);
 			GPOS_DELETE(pstrTypeName);
-			
+
 			// parse if type is redistributable
-			m_fRedistributable = CDXLOperatorFactory::FValueFromAttrs
-														(
-														m_pphm->Pmm(),
-														attrs,
-														EdxltokenMDTypeRedistributable,
-														EdxltokenMDType
-														);
+			m_is_redistributable = CDXLOperatorFactory::ExtractConvertAttrValueToBool(
+				m_parse_handler_mgr->GetDXLMemoryManager(),
+				attrs,
+				EdxltokenMDTypeRedistributable,
+				EdxltokenMDType);
 
 			// parse if type is passed by value
-			m_fByValue = CDXLOperatorFactory::FValueFromAttrs
-												(
-												m_pphm->Pmm(),
-												attrs,
-												EdxltokenMDTypeByValue,
-												EdxltokenMDType
-												);
-			
+			m_type_passed_by_value = CDXLOperatorFactory::ExtractConvertAttrValueToBool(
+				m_parse_handler_mgr->GetDXLMemoryManager(),
+				attrs,
+				EdxltokenMDTypeByValue,
+				EdxltokenMDType);
+
 			// parse if type is hashable
-			m_fHashable = CDXLOperatorFactory::FValueFromAttrs
-										(
-										m_pphm->Pmm(),
-										attrs,
-										EdxltokenMDTypeHashable,
-										EdxltokenMDType
-										);
+			m_is_hashable = CDXLOperatorFactory::ExtractConvertAttrValueToBool(
+				m_parse_handler_mgr->GetDXLMemoryManager(),
+				attrs,
+				EdxltokenMDTypeHashable,
+				EdxltokenMDType);
 
 			// parse if type is composite
-			const XMLCh *xmlszAttributeVal = attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenMDTypeComposite));
-			if (NULL == xmlszAttributeVal)
+			const XMLCh *attribute_val_xml =
+				attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenMDTypeComposite));
+			if (NULL == attribute_val_xml)
 			{
-				m_fComposite = false;
+				m_is_composite = false;
 			}
 			else
 			{
-				m_fComposite = CDXLOperatorFactory::FValueFromXmlstr
-										(
-										m_pphm->Pmm(),
-										xmlszAttributeVal,
-										EdxltokenMDTypeComposite,
-										EdxltokenMDType
-										);
+				m_is_composite = CDXLOperatorFactory::ConvertAttrValueToBool(
+					m_parse_handler_mgr->GetDXLMemoryManager(),
+					attribute_val_xml,
+					EdxltokenMDTypeComposite,
+					EdxltokenMDType);
 			}
 
-			if (m_fComposite)
+			if (m_is_composite)
 			{
 				// get base relation id
-				m_pmdidBaseRelation = CDXLOperatorFactory::PmdidFromAttrs
-										(
-										m_pphm->Pmm(),
-										attrs,
-										EdxltokenMDTypeRelid,
-										EdxltokenMDType
-										);
+				m_mdid_base_rel = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+					m_parse_handler_mgr->GetDXLMemoryManager(),
+					attrs,
+					EdxltokenMDTypeRelid,
+					EdxltokenMDType);
 			}
 
-			// parse if type is fixed-length			
-			m_fFixedLength = CDXLOperatorFactory::FValueFromAttrs
-											(
-											m_pphm->Pmm(),
-											attrs,
-											EdxltokenMDTypeFixedLength,
-											EdxltokenMDType
-											);
-			if (m_fFixedLength)
+			// parse if type is fixed-length
+			m_istype_fixed_Length = CDXLOperatorFactory::ExtractConvertAttrValueToBool(
+				m_parse_handler_mgr->GetDXLMemoryManager(),
+				attrs,
+				EdxltokenMDTypeFixedLength,
+				EdxltokenMDType);
+			if (m_istype_fixed_Length)
 			{
 				// get type length
-				m_iLength = CDXLOperatorFactory::IValueFromAttrs
-											(
-											m_pphm->Pmm(),
-											attrs,
-											EdxltokenMDTypeLength,
-											EdxltokenMDType
-											);
+				m_type_length = CDXLOperatorFactory::ExtractConvertAttrValueToInt(
+					m_parse_handler_mgr->GetDXLMemoryManager(),
+					attrs,
+					EdxltokenMDTypeLength,
+					EdxltokenMDType);
 			}
 		}
 	}
 	else
 	{
-		ParseMdid(xmlszLocalname, attrs);
+		ParseMdid(element_local_name, attrs);
 	}
 }
 
@@ -230,76 +208,70 @@ CParseHandlerMDType::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerMDType::ParseMdid
-	(
-	const XMLCh *xmlszLocalname, 	
-	const Attributes& attrs
-	)
+CParseHandlerMDType::ParseMdid(const XMLCh *element_local_name, const Attributes &attrs)
 {
-	const SMdidMapElem rgmdidmap[] =
-	{
-		{EdxltokenMDTypeEqOp, &m_pmdidOpEq},
-		{EdxltokenMDTypeNEqOp, &m_pmdidOpNEq},
-		{EdxltokenMDTypeLTOp, &m_pmdidOpLT},
-		{EdxltokenMDTypeLEqOp, &m_pmdidOpLEq},
-		{EdxltokenMDTypeGTOp, &m_pmdidOpGT},
-		{EdxltokenMDTypeGEqOp, &m_pmdidOpGEq},
-		{EdxltokenMDTypeCompOp, &m_pmdidOpComp},
-		{EdxltokenMDTypeArray, &m_pmdidTypeArray},
-		{EdxltokenMDTypeAggMin, &m_pmdidMin},
-		{EdxltokenMDTypeAggMax, &m_pmdidMax},
-		{EdxltokenMDTypeAggAvg, &m_pmdidAvg},
-		{EdxltokenMDTypeAggSum, &m_pmdidSum},
-		{EdxltokenMDTypeAggCount, &m_pmdidCount},
+	const SMdidMapElem rgmdidmap[] = {
+		{EdxltokenMDTypeEqOp, &m_mdid_eq_op},
+		{EdxltokenMDTypeNEqOp, &m_mdid_neq_op},
+		{EdxltokenMDTypeLTOp, &m_mdid_lt_op},
+		{EdxltokenMDTypeLEqOp, &m_mdid_lteq_op},
+		{EdxltokenMDTypeGTOp, &m_mdid_gt_op},
+		{EdxltokenMDTypeGEqOp, &m_mdid_gteq_op},
+		{EdxltokenMDTypeCompOp, &m_mdid_cmp_op},
+		{EdxltokenMDTypeArray, &m_mdid_array_type},
+		{EdxltokenMDTypeAggMin, &m_mdid_min_op},
+		{EdxltokenMDTypeAggMax, &m_mdid_max_op},
+		{EdxltokenMDTypeAggAvg, &m_mdid_avg_op},
+		{EdxltokenMDTypeAggSum, &m_mdid_sum_op},
+		{EdxltokenMDTypeAggCount, &m_mdid_count_op},
 	};
-	
-	Edxltoken edxltoken = EdxltokenSentinel;
-	IMDId **ppmdid = NULL;
+
+	Edxltoken token_type = EdxltokenSentinel;
+	IMDId **token_mdid = NULL;
 	for (ULONG ul = 0; ul < GPOS_ARRAY_SIZE(rgmdidmap); ul++)
 	{
 		SMdidMapElem mdidmapelem = rgmdidmap[ul];
-		if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(mdidmapelem.m_edxltoken), xmlszLocalname))
+		if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(mdidmapelem.m_edxltoken),
+										  element_local_name))
 		{
-			edxltoken = mdidmapelem.m_edxltoken;
-			ppmdid = mdidmapelem.m_ppmdid;
+			token_type = mdidmapelem.m_edxltoken;
+			token_mdid = mdidmapelem.m_token_mdid;
 		}
 	}
 
-	GPOS_ASSERT(EdxltokenSentinel != edxltoken);
-	GPOS_ASSERT(NULL != ppmdid);
+	GPOS_ASSERT(EdxltokenSentinel != token_type);
+	GPOS_ASSERT(NULL != token_mdid);
 
-	if (m_pmdidMin == *ppmdid || m_pmdidMax == *ppmdid || m_pmdidAvg == *ppmdid  || 
-		m_pmdidSum == *ppmdid || m_pmdidCount == *ppmdid)
+	if (m_mdid_min_op == *token_mdid || m_mdid_max_op == *token_mdid ||
+		m_mdid_avg_op == *token_mdid || m_mdid_sum_op == *token_mdid ||
+		m_mdid_count_op == *token_mdid)
 	{
-		(*ppmdid)->Release();
+		(*token_mdid)->Release();
 	}
-	
-	*ppmdid = CDXLOperatorFactory::PmdidFromAttrs(m_pphm->Pmm(), attrs, EdxltokenMdid, edxltoken);
+
+	*token_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid, token_type);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CParseHandlerMDType::FBuiltInType
+//		CParseHandlerMDType::IsBuiltInType
 //
 //	@doc:
 //		Is this a built-in type
 //
 //---------------------------------------------------------------------------
 BOOL
-CParseHandlerMDType::FBuiltInType
-	(
-	const IMDId *pmdid
-	)
-	const
+CParseHandlerMDType::IsBuiltInType(const IMDId *mdid) const
 {
-	if (IMDId::EmdidGPDB != pmdid->Emdidt())
+	if (IMDId::EmdidGPDB != mdid->MdidType())
 	{
 		return false;
 	}
-	
-	const CMDIdGPDB *pmdidGPDB = CMDIdGPDB::PmdidConvert(pmdid);
-	
-	switch (pmdidGPDB->OidObjectId())
+
+	const CMDIdGPDB *mdidGPDB = CMDIdGPDB::CastMdid(mdid);
+
+	switch (mdidGPDB->Oid())
 	{
 		case GPDB_INT2:
 		case GPDB_INT4:
@@ -314,47 +286,44 @@ CParseHandlerMDType::FBuiltInType
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CParseHandlerMDType::Ppmdid
+//		CParseHandlerMDType::GetTokenMDid
 //
 //	@doc:
 //		Return the address of the mdid variable corresponding to the dxl token
 //
 //---------------------------------------------------------------------------
 IMDId **
-CParseHandlerMDType::Ppmdid
-	(
-	Edxltoken edxltoken
-	)
+CParseHandlerMDType::GetTokenMDid(Edxltoken token_type)
 {
-	switch (edxltoken)
-		{
-			case EdxltokenMDTypeEqOp:
-				return &m_pmdidOpEq;
+	switch (token_type)
+	{
+		case EdxltokenMDTypeEqOp:
+			return &m_mdid_eq_op;
 
-			case EdxltokenMDTypeNEqOp:
-				return &m_pmdidOpNEq;
+		case EdxltokenMDTypeNEqOp:
+			return &m_mdid_neq_op;
 
-			case EdxltokenMDTypeLTOp:
-				return &m_pmdidOpLT;
+		case EdxltokenMDTypeLTOp:
+			return &m_mdid_lt_op;
 
-			case EdxltokenMDTypeLEqOp:
-				return &m_pmdidOpLEq;
+		case EdxltokenMDTypeLEqOp:
+			return &m_mdid_lteq_op;
 
-			case EdxltokenMDTypeGTOp:
-				return &m_pmdidOpGT;
+		case EdxltokenMDTypeGTOp:
+			return &m_mdid_gt_op;
 
-			case EdxltokenMDTypeGEqOp:
-				return &m_pmdidOpGEq;
+		case EdxltokenMDTypeGEqOp:
+			return &m_mdid_gteq_op;
 
-			case EdxltokenMDTypeCompOp:
-				return &m_pmdidOpComp;
+		case EdxltokenMDTypeCompOp:
+			return &m_mdid_cmp_op;
 
-			case EdxltokenMDTypeArray:
-				return &m_pmdidTypeArray;
+		case EdxltokenMDTypeArray:
+			return &m_mdid_array_type;
 
-			default:
-				break;
-		}
+		default:
+			break;
+	}
 	GPOS_ASSERT(!"Unexpected DXL token when parsing MDType");
 	return NULL;
 }
@@ -368,101 +337,96 @@ CParseHandlerMDType::Ppmdid
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerMDType::EndElement
-	(
-	const XMLCh* const, // xmlszUri,
-	const XMLCh* const xmlszLocalname,
-	const XMLCh* const // xmlszQname
-	)
+CParseHandlerMDType::EndElement(const XMLCh *const,  // element_uri,
+								const XMLCh *const element_local_name,
+								const XMLCh *const  // element_qname
+)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenMDType), xmlszLocalname))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenMDType), element_local_name))
 	{
 		// construct the MD type object from its part
-		GPOS_ASSERT(m_pmdid->FValid());
+		GPOS_ASSERT(m_mdid->IsValid());
 
 		// TODO:  - Jan 30, 2012; add support for other types of mdids
-		
-		const CMDIdGPDB *pmdidGPDB = CMDIdGPDB::PmdidConvert(m_pmdid);
-		
-		switch(pmdidGPDB->OidObjectId())
+
+		const CMDIdGPDB *pmdidGPDB = CMDIdGPDB::CastMdid(m_mdid);
+
+		switch (pmdidGPDB->Oid())
 		{
 			case GPDB_INT2:
-				m_pimdobj = GPOS_NEW(m_pmp) CMDTypeInt2GPDB(m_pmp);
+				m_imd_obj = GPOS_NEW(m_mp) CMDTypeInt2GPDB(m_mp);
 				break;
 
 			case GPDB_INT4:
-				m_pimdobj = GPOS_NEW(m_pmp) CMDTypeInt4GPDB(m_pmp);
+				m_imd_obj = GPOS_NEW(m_mp) CMDTypeInt4GPDB(m_mp);
 				break;
 
 			case GPDB_INT8:
-				m_pimdobj = GPOS_NEW(m_pmp) CMDTypeInt8GPDB(m_pmp);
+				m_imd_obj = GPOS_NEW(m_mp) CMDTypeInt8GPDB(m_mp);
 				break;
 
 			case GPDB_BOOL:
-				m_pimdobj = GPOS_NEW(m_pmp) CMDTypeBoolGPDB(m_pmp);
+				m_imd_obj = GPOS_NEW(m_mp) CMDTypeBoolGPDB(m_mp);
 				break;
 
 			case GPDB_OID:
-				m_pimdobj = GPOS_NEW(m_pmp) CMDTypeOidGPDB(m_pmp);
+				m_imd_obj = GPOS_NEW(m_mp) CMDTypeOidGPDB(m_mp);
 				break;
 
 			default:
-				m_pmdid->AddRef();
-				m_pmdidOpEq->AddRef();
-				m_pmdidOpNEq->AddRef();
-				m_pmdidOpLT->AddRef();
-				m_pmdidOpLEq->AddRef();
-				m_pmdidOpGT->AddRef();
-				m_pmdidOpGEq->AddRef();
-				m_pmdidOpComp->AddRef();
-				m_pmdidMin->AddRef();
-				m_pmdidMax->AddRef();
-				m_pmdidAvg->AddRef();
-				m_pmdidSum->AddRef();
-				m_pmdidCount->AddRef();
-				if(NULL != m_pmdidBaseRelation)
+				m_mdid->AddRef();
+				m_mdid_eq_op->AddRef();
+				m_mdid_neq_op->AddRef();
+				m_mdid_lt_op->AddRef();
+				m_mdid_lteq_op->AddRef();
+				m_mdid_gt_op->AddRef();
+				m_mdid_gteq_op->AddRef();
+				m_mdid_cmp_op->AddRef();
+				m_mdid_min_op->AddRef();
+				m_mdid_max_op->AddRef();
+				m_mdid_avg_op->AddRef();
+				m_mdid_sum_op->AddRef();
+				m_mdid_count_op->AddRef();
+				if (NULL != m_mdid_base_rel)
 				{
-					m_pmdidBaseRelation->AddRef();
+					m_mdid_base_rel->AddRef();
 				}
-				m_pmdidTypeArray->AddRef();
-				
-				ULONG ulLen = 0;
-				if (0 < m_iLength)
+				m_mdid_array_type->AddRef();
+
+				ULONG length = 0;
+				if (0 < m_type_length)
 				{
-					ulLen = (ULONG) m_iLength;
+					length = (ULONG) m_type_length;
 				}
-				m_pimdobj = GPOS_NEW(m_pmp) CMDTypeGenericGPDB
-										(
-										m_pmp,
-										m_pmdid,
-										m_pmdname,
-										m_fRedistributable,
-										m_fFixedLength,
-										ulLen,
-										m_fByValue,
-										m_pmdidOpEq,
-										m_pmdidOpNEq,
-										m_pmdidOpLT,
-										m_pmdidOpLEq,
-										m_pmdidOpGT,
-										m_pmdidOpGEq,
-										m_pmdidOpComp,
-										m_pmdidMin,
-										m_pmdidMax,
-										m_pmdidAvg,
-										m_pmdidSum,
-										m_pmdidCount,
-										m_fHashable,
-										m_fComposite,
-										m_pmdidBaseRelation,
-										m_pmdidTypeArray,
-										m_iLength
-										);
+				m_imd_obj = GPOS_NEW(m_mp) CMDTypeGenericGPDB(m_mp,
+																	   m_mdid,
+																	   m_mdname,
+																	   m_is_redistributable,
+																	   m_istype_fixed_Length,
+																	   length,
+																	   m_type_passed_by_value,
+																	   m_mdid_eq_op,
+																	   m_mdid_neq_op,
+																	   m_mdid_lt_op,
+																	   m_mdid_lteq_op,
+																	   m_mdid_gt_op,
+																	   m_mdid_gteq_op,
+																	   m_mdid_cmp_op,
+																	   m_mdid_min_op,
+																	   m_mdid_max_op,
+																	   m_mdid_avg_op,
+																	   m_mdid_sum_op,
+																	   m_mdid_count_op,
+																	   m_is_hashable,
+																	   m_is_composite,
+																	   m_mdid_base_rel,
+																	   m_mdid_array_type,
+																	   m_type_length);
 				break;
 		}
-		
+
 		// deactivate handler
-		m_pphm->DeactivateHandler();
+		m_parse_handler_mgr->DeactivateHandler();
 	}
 }
 

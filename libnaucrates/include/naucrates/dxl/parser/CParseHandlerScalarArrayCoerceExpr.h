@@ -41,43 +41,33 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerScalarArrayCoerceExpr : public CParseHandlerScalarOp
 	{
-		private:
+	private:
+		// private copy ctor
+		CParseHandlerScalarArrayCoerceExpr(const CParseHandlerScalarArrayCoerceExpr &);
 
-			// private copy ctor
-			CParseHandlerScalarArrayCoerceExpr(const CParseHandlerScalarArrayCoerceExpr &);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the start of an element
-			void StartElement
-					(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
-					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname,		// element's qname
-					const Attributes& attr				// element's attributes
-					);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the end of an element
-			void EndElement
-					(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
-					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname		// element's qname
-					);
+	public:
+		// ctor/dtor
+		CParseHandlerScalarArrayCoerceExpr(IMemoryPool *mp,
+										   CParseHandlerManager *parse_handler_mgr,
+										   CParseHandlerBase *parse_handler_root);
 
-		public:
-			// ctor/dtor
-			CParseHandlerScalarArrayCoerceExpr
-					(
-					IMemoryPool *pmp,
-					CParseHandlerManager *pphm,
-					CParseHandlerBase *pphRoot
-					);
-
-			virtual
-			~CParseHandlerScalarArrayCoerceExpr(){};
-
+		virtual ~CParseHandlerScalarArrayCoerceExpr(){};
 	};
 
-}
-#endif // GPDXL_CParseHandlerScalarArrayCoerceExpr_H
+}  // namespace gpdxl
+#endif  // GPDXL_CParseHandlerScalarArrayCoerceExpr_H
 
 //EOF

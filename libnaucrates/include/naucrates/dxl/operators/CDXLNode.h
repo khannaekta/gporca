@@ -19,21 +19,26 @@
 
 namespace gpdxl
 {
-	using namespace gpos;	
+	using namespace gpos;
 
 	// fwd decl
 	class CDXLNode;
 	class CDXLOperator;
 	class CXMLSerializer;
 	class CDXLDirectDispatchInfo;
-	
-	typedef CDynamicPtrArray<CDXLNode, CleanupRelease> DrgPdxln;
+
+	typedef CDynamicPtrArray<CDXLNode, CleanupRelease> CDXLNodeArray;
 
 	// arrays of OID
-	typedef CDynamicPtrArray<OID, CleanupDelete> DrgPoid;
+	typedef CDynamicPtrArray<OID, CleanupDelete> OidArray;
 
-	typedef CHashMap<ULONG, CDXLNode, gpos::UlHash<ULONG>, gpos::FEqual<ULONG>,
-				CleanupDelete<ULONG>, CleanupRelease<CDXLNode> > HMUlPdxln;
+	typedef CHashMap<ULONG,
+					 CDXLNode,
+					 gpos::HashValue<ULONG>,
+					 gpos::Equals<ULONG>,
+					 CleanupDelete<ULONG>,
+					 CleanupRelease<CDXLNode> >
+		IdToCDXLNodeMap;
 
 	//---------------------------------------------------------------------------
 	//	@class:
@@ -46,133 +51,120 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLNode : public CRefCount
 	{
-		private:
-		
-			// memory pool
-			IMemoryPool *m_pmp;
-			
-			// dxl tree operator class
-			CDXLOperator *m_pdxlop;
+	private:
+		// memory pool
+		IMemoryPool *m_mp;
 
-			// properties of the operator
-			CDXLProperties *m_pdxlprop;
-			
-			// array of children
-			DrgPdxln *m_pdrgpdxln;
+		// dxl tree operator class
+		CDXLOperator *m_dxl_op;
 
-			// direct dispatch spec
-			CDXLDirectDispatchInfo *m_pdxlddinfo;
-			
-			// private copy ctor
-			CDXLNode(const CDXLNode&);
-			
-		public:
-		
-			// ctors
+		// properties of the operator
+		CDXLProperties *m_dxl_properties;
 
-			explicit
-			CDXLNode(IMemoryPool *pmp);			
-			CDXLNode(IMemoryPool *pmp, CDXLOperator *pdxlop);
-			CDXLNode(IMemoryPool *pmp, CDXLOperator *pdxlop, CDXLNode *pdxlnChild);
-			CDXLNode(IMemoryPool *pmp, CDXLOperator *pdxlop, CDXLNode *pdxlnFst, CDXLNode *pdxlnSnd);
-			CDXLNode(IMemoryPool *pmp, CDXLOperator *pdxlop, CDXLNode *pdxlnFst, CDXLNode *pdxlnSnd, CDXLNode *pdxlnThrd);
-			CDXLNode(IMemoryPool *pmp, CDXLOperator *pdxlop, DrgPdxln *pdrgpdxln);
-			
-			// dtor
-			virtual
-			~CDXLNode();
-			
-			// shorthand to access children
-			inline
-			CDXLNode *operator [] 
-				(
-				ULONG ulPos
-				)
-				const
-			{
-				GPOS_ASSERT(NULL != m_pdrgpdxln);
-				CDXLNode *pdxln = (*m_pdrgpdxln)[ulPos];
-				GPOS_ASSERT(NULL != pdxln);
-				return pdxln;
-			};
-	
-			// arity function, returns the number of children this node has
-			inline
-			ULONG UlArity() const
-			{
-				return (m_pdrgpdxln == NULL) ? 0 : m_pdrgpdxln->UlLength();
-			}
-			
-			// accessor for operator
-			inline
-			CDXLOperator *Pdxlop() const
-			{
-				return m_pdxlop;
-			}
-			
-			// return properties
-			CDXLProperties *Pdxlprop() const
-			{
-				return m_pdxlprop;
-			}
+		// array of children
+		CDXLNodeArray *m_dxl_array;
 
-			// accessor for children nodes
-			const DrgPdxln *PdrgpdxlnChildren() const
-			{
-				return m_pdrgpdxln;
-			}
-			
-			// accessor to direct dispatch info
-			CDXLDirectDispatchInfo *Pdxlddinfo() const
-			{
-				return m_pdxlddinfo;
-			}
-			
-			// setters
-			void AddChild
-				(
-				CDXLNode *pdxlnChild
-				);
-			
-			void SetOperator
-				(
-				CDXLOperator *pdxlop
-				);
+		// direct dispatch spec
+		CDXLDirectDispatchInfo *m_direct_dispatch_info;
 
-			void SerializeToDXL
-				(
-				CXMLSerializer *
-				)
-				const;
-			
-			// replace a given child of this DXL node with the given node
-			void ReplaceChild
-				(
-				ULONG ulPos,
-				CDXLNode *pdxlnChild
-				);
+		// private copy ctor
+		CDXLNode(const CDXLNode &);
 
-			void SerializeChildrenToDXL(CXMLSerializer *pxmlser) const;
+	public:
+		// ctors
 
-			// setter
-			void SetProperties(CDXLProperties *pdxlprop);
+		explicit CDXLNode(IMemoryPool *mp);
+		CDXLNode(IMemoryPool *mp, CDXLOperator *dxl_op);
+		CDXLNode(IMemoryPool *mp, CDXLOperator *dxl_op, CDXLNode *child_dxlnode);
+		CDXLNode(IMemoryPool *mp,
+				 CDXLOperator *dxl_op,
+				 CDXLNode *first_child_dxlnode,
+				 CDXLNode *second_child_dxlnode);
+		CDXLNode(IMemoryPool *mp,
+				 CDXLOperator *dxl_op,
+				 CDXLNode *first_child_dxlnode,
+				 CDXLNode *second_child_dxlnode,
+				 CDXLNode *third_child_dxlnode);
+		CDXLNode(IMemoryPool *mp, CDXLOperator *dxl_op, CDXLNodeArray *dxl_array);
 
-			// setter for direct dispatch info
-			void SetDirectDispatchInfo(CDXLDirectDispatchInfo *pdxlddinfo);
-			
-			// serialize properties in DXL format
-			void SerializePropertiesToDXL(CXMLSerializer *pxmlser) const;
+		// dtor
+		virtual ~CDXLNode();
+
+		// shorthand to access children
+		inline CDXLNode *operator[](ULONG idx) const
+		{
+			GPOS_ASSERT(NULL != m_dxl_array);
+			CDXLNode *dxlnode = (*m_dxl_array)[idx];
+			GPOS_ASSERT(NULL != dxlnode);
+			return dxlnode;
+		};
+
+		// arity function, returns the number of children this node has
+		inline ULONG
+		Arity() const
+		{
+			return (m_dxl_array == NULL) ? 0 : m_dxl_array->Size();
+		}
+
+		// accessor for operator
+		inline CDXLOperator *
+		GetOperator() const
+		{
+			return m_dxl_op;
+		}
+
+		// return properties
+		CDXLProperties *
+		GetProperties() const
+		{
+			return m_dxl_properties;
+		}
+
+		// accessor for children nodes
+		const CDXLNodeArray *
+		GetChildDXLNodeArray() const
+		{
+			return m_dxl_array;
+		}
+
+		// accessor to direct dispatch info
+		CDXLDirectDispatchInfo *
+		GetDXLDirectDispatchInfo() const
+		{
+			return m_direct_dispatch_info;
+		}
+
+		// setters
+		void AddChild(CDXLNode *child_dxlnode);
+
+		void SetOperator(CDXLOperator *dxl_op);
+
+		void SerializeToDXL(CXMLSerializer *) const;
+
+		// replace a given child of this DXL node with the given node
+		void ReplaceChild(ULONG idx, CDXLNode *child_dxlnode);
+
+		void SerializeChildrenToDXL(CXMLSerializer *xml_serializer) const;
+
+		// setter
+		void SetProperties(CDXLProperties *dxl_properties);
+
+		// setter for direct dispatch info
+		void SetDirectDispatchInfo(CDXLDirectDispatchInfo *dxl_direct_dispatch_info);
+
+		// serialize properties in DXL format
+		void SerializePropertiesToDXL(CXMLSerializer *xml_serializer) const;
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
-			
-	}; // class CDXLNode
-}
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(BOOL validate_children) const;
+#endif  // GPOS_DEBUG
+
+	};  // class CDXLNode
+}  // namespace gpdxl
 
 
-#endif // !GPDXL_CDXLNode_H
+#endif  // !GPDXL_CDXLNode_H
 
 // EOF

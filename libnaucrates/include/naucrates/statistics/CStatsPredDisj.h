@@ -28,79 +28,72 @@ namespace gpnaucrates
 	//---------------------------------------------------------------------------
 	class CStatsPredDisj : public CStatsPred
 	{
-		private:
+	private:
+		// private copy ctor
+		CStatsPredDisj(const CStatsPredDisj &);
 
-			// private copy ctor
-			CStatsPredDisj(const CStatsPredDisj &);
+		// private assignment operator
+		CStatsPredDisj &operator=(CStatsPredDisj &);
 
-			// private assignment operator
-			CStatsPredDisj& operator=(CStatsPredDisj &);
+		// array of filters
+		CStatsPredPtrArry *m_disj_pred_stats_array;
 
-			// array of filters
-			DrgPstatspred *m_pdrgpstatspred;
+	public:
+		// ctor
+		explicit CStatsPredDisj(CStatsPredPtrArry *disj_pred_stats_array);
 
-		public:
+		// dtor
+		virtual ~CStatsPredDisj()
+		{
+			m_disj_pred_stats_array->Release();
+		}
 
-			// ctor
-			explicit
-			CStatsPredDisj(DrgPstatspred *pdrgpstatspred);
+		// the column identifier on which the predicates are on
+		virtual ULONG GetColId() const;
 
-			// dtor
-			virtual
-			~CStatsPredDisj()
-			{
-				m_pdrgpstatspred->Release();
-			}
+		// total number of predicates in the disjunction
+		ULONG
+		GetNumPreds() const
+		{
+			return m_disj_pred_stats_array->Size();
+		}
 
-			// the column identifier on which the predicates are on
-			virtual
-			ULONG UlColId() const;
+		// return the array of predicate filters
+		CStatsPredPtrArry *
+		GetDisjPredStatsArray() const
+		{
+			return m_disj_pred_stats_array;
+		}
 
-			// total number of predicates in the disjunction
-			ULONG UlFilters() const
-			{
-				return m_pdrgpstatspred->UlLength();
-			}
+		// sort the components of the disjunction
+		void Sort() const;
 
-			// return the array of predicate filters
-			DrgPstatspred *Pdrgpstatspred() const
-			{
-				return m_pdrgpstatspred;
-			}
+		// return the point filter at a particular position
+		CStatsPred *GetPredStats(ULONG pos) const;
 
-			// sort the components of the disjunction
-			void Sort() const;
+		// filter type id
+		virtual EStatsPredType
+		GetPredStatsType() const
+		{
+			return CStatsPred::EsptDisj;
+		}
 
-			// return the point filter at a particular position
-			CStatsPred *Pstatspred(ULONG ulPos) const;
+		// return the column id of the filter based on the column ids of its child filters
+		static ULONG GetColId(const CStatsPredPtrArry *pdrgpstatspred);
 
-			// filter type id
-			virtual
-			EStatsPredType Espt() const
-			{
-				return CStatsPred::EsptDisj;
-			}
+		// conversion function
+		static CStatsPredDisj *
+		ConvertPredStats(CStatsPred *pred_stats)
+		{
+			GPOS_ASSERT(NULL != pred_stats);
+			GPOS_ASSERT(CStatsPred::EsptDisj == pred_stats->GetPredStatsType());
 
-			// return the column id of the filter based on the column ids of its child filters
-			static
-			ULONG UlColId(const DrgPstatspred *pdrgpstatspred);
+			return dynamic_cast<CStatsPredDisj *>(pred_stats);
+		}
 
-			// conversion function
-			static
-			CStatsPredDisj *PstatspredConvert
-				(
-				CStatsPred *pstatspred
-				)
-			{
-				GPOS_ASSERT(NULL != pstatspred);
-				GPOS_ASSERT(CStatsPred::EsptDisj == pstatspred->Espt());
+	};  // class CStatsPredDisj
+}  // namespace gpnaucrates
 
-				return dynamic_cast<CStatsPredDisj*>(pstatspred);
-			}
-
-	}; // class CStatsPredDisj
-}
-
-#endif // !GPNAUCRATES_CStatsPredDisj_H
+#endif  // !GPNAUCRATES_CStatsPredDisj_H
 
 // EOF

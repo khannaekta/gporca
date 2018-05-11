@@ -32,62 +32,52 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarSwitch : public CDXLScalar
 	{
-		private:
-			// return type
-			IMDId *m_pmdidType;
+	private:
+		// return type
+		IMDId *m_mdid_type;
 
-			// private copy ctor
-			CDXLScalarSwitch(const CDXLScalarSwitch&);
+		// private copy ctor
+		CDXLScalarSwitch(const CDXLScalarSwitch &);
 
-		public:
+	public:
+		// ctor
+		CDXLScalarSwitch(IMemoryPool *mp, IMDId *mdid_type);
 
-			// ctor
-			CDXLScalarSwitch(IMemoryPool *pmp, IMDId *pmdidType);
+		//dtor
+		virtual ~CDXLScalarSwitch();
 
-			//dtor
-			virtual
-			~CDXLScalarSwitch();
+		// name of the operator
+		virtual const CWStringConst *GetOpNameStr() const;
 
-			// name of the operator
-			virtual
-			const CWStringConst *PstrOpName() const;
+		// return type
+		virtual IMDId *MDIdType() const;
 
-			// return type
-			virtual
-			IMDId *PmdidType() const;
+		// DXL Operator ID
+		virtual Edxlopid GetDXLOperator() const;
 
-			// DXL Operator ID
-			virtual
-			Edxlopid Edxlop() const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
+		// conversion function
+		static CDXLScalarSwitch *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarSwitch == dxl_op->GetDXLOperator());
 
-			// conversion function
-			static
-			CDXLScalarSwitch *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopScalarSwitch == pdxlop->Edxlop());
+			return dynamic_cast<CDXLScalarSwitch *>(dxl_op);
+		}
 
-				return dynamic_cast<CDXLScalarSwitch*>(pdxlop);
-			}
-
-			// does the operator return a boolean result
-			virtual
-			BOOL FBoolean(CMDAccessor *pmda) const;
+		// does the operator return a boolean result
+		virtual BOOL HasBoolResult(CMDAccessor *md_accessor) const;
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *pdxln, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
-#endif // !GPDXL_CDXLScalarSwitch_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLScalarSwitch_H
 
 // EOF

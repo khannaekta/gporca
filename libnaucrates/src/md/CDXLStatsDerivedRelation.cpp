@@ -25,18 +25,11 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLStatsDerivedRelation::CDXLStatsDerivedRelation
-	(
-	CDouble dRows,
-	BOOL fEmpty,
-	DrgPdxlstatsdercol *pdrgpdxldercolstat
-	)
-	:
-	m_dRows(dRows),
-	m_fEmpty(fEmpty),
-	m_pdrgpdxlstatsdercol(pdrgpdxldercolstat)
+CDXLStatsDerivedRelation::CDXLStatsDerivedRelation(
+	CDouble rows, BOOL is_empty, CDXLStatsDerivedColumnArray *dxl_stats_derived_col_array)
+	: m_rows(rows), m_empty(is_empty), m_dxl_stats_derived_col_array(dxl_stats_derived_col_array)
 {
-	GPOS_ASSERT(NULL != pdrgpdxldercolstat);
+	GPOS_ASSERT(NULL != dxl_stats_derived_col_array);
 }
 
 //---------------------------------------------------------------------------
@@ -49,21 +42,21 @@ CDXLStatsDerivedRelation::CDXLStatsDerivedRelation
 //---------------------------------------------------------------------------
 CDXLStatsDerivedRelation::~CDXLStatsDerivedRelation()
 {
-	m_pdrgpdxlstatsdercol->Release();
+	m_dxl_stats_derived_col_array->Release();
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLStatsDerivedRelation::Pdrgpdxlstatsdercol
+//		CDXLStatsDerivedRelation::GetDXLStatsDerivedColArray
 //
 //	@doc:
 //		Returns the array of derived columns stats
 //
 //---------------------------------------------------------------------------
-const DrgPdxlstatsdercol *
-CDXLStatsDerivedRelation::Pdrgpdxlstatsdercol() const
+const CDXLStatsDerivedColumnArray *
+CDXLStatsDerivedRelation::GetDXLStatsDerivedColArray() const
 {
-	return m_pdrgpdxlstatsdercol;
+	return m_dxl_stats_derived_col_array;
 }
 
 //---------------------------------------------------------------------------
@@ -75,31 +68,27 @@ CDXLStatsDerivedRelation::Pdrgpdxlstatsdercol() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLStatsDerivedRelation::Serialize
-	(
-	CXMLSerializer *pxmlser
-	)
-	const
+CDXLStatsDerivedRelation::Serialize(CXMLSerializer *xml_serializer) const
 {
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix),
-						CDXLTokens::PstrToken(EdxltokenStatsDerivedRelation));
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								CDXLTokens::GetDXLTokenStr(EdxltokenStatsDerivedRelation));
 
-	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenRows), m_dRows);
-	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenEmptyRelation), m_fEmpty);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenRows), m_rows);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenEmptyRelation), m_empty);
 
-	const ULONG ulColStats = m_pdrgpdxlstatsdercol->UlLength();
-	for (ULONG ul = 0; ul < ulColStats; ul++)
+	const ULONG arity = m_dxl_stats_derived_col_array->Size();
+	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		GPOS_CHECK_ABORT;
 
-		CDXLStatsDerivedColumn *pdxldercolstats = (*m_pdrgpdxlstatsdercol)[ul];
-		pdxldercolstats->Serialize(pxmlser);
+		CDXLStatsDerivedColumn *derived_col_stats_dxl = (*m_dxl_stats_derived_col_array)[ul];
+		derived_col_stats_dxl->Serialize(xml_serializer);
 
 		GPOS_CHECK_ABORT;
 	}
 
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix),
-						CDXLTokens::PstrToken(EdxltokenStatsDerivedRelation));
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 CDXLTokens::GetDXLTokenStr(EdxltokenStatsDerivedRelation));
 }
 
 #ifdef GPOS_DEBUG
@@ -112,18 +101,13 @@ CDXLStatsDerivedRelation::Serialize
 //
 //---------------------------------------------------------------------------
 void
-CDXLStatsDerivedRelation::DebugPrint
-	(
-	IOstream &os
-	)
-	const
+CDXLStatsDerivedRelation::DebugPrint(IOstream &os) const
 {
-	os << "Rows: " << DRows() << std::endl;
+	os << "Rows: " << Rows() << std::endl;
 
-	os << "Empty: " << FEmpty() << std::endl;
+	os << "Empty: " << IsEmpty() << std::endl;
 }
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF
-

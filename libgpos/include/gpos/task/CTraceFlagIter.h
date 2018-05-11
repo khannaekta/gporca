@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CBitSetIter.h"
+#include "gpos/task/CTask.h"
 
 
 namespace gpos
@@ -27,30 +28,26 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CTraceFlagIter : public CBitSetIter
 	{
-		private:
+	private:
+		// no copy ctor
+		CTraceFlagIter(const CTraceFlagIter &);
 
-			// no copy ctor
-			CTraceFlagIter(const CTraceFlagIter&);
+	public:
+		// ctor
+		CTraceFlagIter() : CBitSetIter(*CTask::Self()->GetTaskCtxt()->m_bitset)
+		{
+		}
 
-		public:
+		// dtor
+		virtual ~CTraceFlagIter()
+		{
+		}
 
-			// ctor
-			CTraceFlagIter()
-				:
-				CBitSetIter(*CTask::PtskSelf()->Ptskctxt()->m_pbs)
-			{}
+	};  // class CTraceFlagIter
 
-			// dtor
-			virtual
-			~CTraceFlagIter ()
-			{}
-
-	}; // class CTraceFlagIter
-
-}
+}  // namespace gpos
 
 
-#endif // !GPOS_CTraceFlagIter_H
+#endif  // !GPOS_CTraceFlagIter_H
 
 // EOF
-

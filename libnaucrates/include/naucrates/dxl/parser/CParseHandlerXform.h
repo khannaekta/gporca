@@ -23,7 +23,6 @@ namespace gpopt
 
 namespace gpdxl
 {
-
 	using namespace gpos;
 
 	//---------------------------------------------------------------------------
@@ -36,60 +35,50 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerXform : public CParseHandlerBase
 	{
+	private:
+		// xform referred to by XML node
+		CXform *m_xform;
 
-		private:
+		// private copy ctor
+		CParseHandlerXform(const CParseHandlerXform &);
 
-			// xform referred to by XML node
-			CXform *m_pxform;
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// private copy ctor
-			CParseHandlerXform(const CParseHandlerXform&);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the start of an element
-			void StartElement
-				(
-				const XMLCh* const xmlszUri, 		// URI of element's namespace
- 				const XMLCh* const xmlszLocalname,	// local part of element's name
-				const XMLCh* const xmlszQname,		// element's qname
-				const Attributes& attr				// element's attributes
-				);
+	public:
+		// ctor
+		CParseHandlerXform(IMemoryPool *mp,
+						   CParseHandlerManager *parse_handler_mgr,
+						   CParseHandlerBase *parse_handler_root);
 
-			// process the end of an element
-			void EndElement
-				(
-				const XMLCh* const xmlszUri, 		// URI of element's namespace
-				const XMLCh* const xmlszLocalname,	// local part of element's name
-				const XMLCh* const xmlszQname		// element's qname
-				);
+		// dtor
+		virtual ~CParseHandlerXform();
 
-		public:
+		// returns the root of constructed DXL plan
+		CXform *
+		GetXform()
+		{
+			return m_xform;
+		}
 
-			// ctor
-			CParseHandlerXform
-				(
-				IMemoryPool *pmp,
-				CParseHandlerManager *pphm,
-				CParseHandlerBase *pphRoot
-				);
-
-			// dtor
-			virtual
-			~CParseHandlerXform();
-
-			// returns the root of constructed DXL plan
-			CXform *Pxform()
-			{
-				return m_pxform;
-			}
-
-			EDxlParseHandlerType Edxlphtype() const
-			{
-				return EdxlphSearchStrategy;
-			}
-
+		EDxlParseHandlerType
+		GetParseHandlerType() const
+		{
+			return EdxlphSearchStrategy;
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerXform_H
+#endif  // !GPDXL_CParseHandlerXform_H
 
 // EOF

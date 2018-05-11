@@ -20,7 +20,6 @@
 
 namespace gpnaucrates
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDatumGenericGPDB
@@ -29,182 +28,149 @@ namespace gpnaucrates
 	//		GPDB-specific generic datum representation
 	//
 	//---------------------------------------------------------------------------
-class CDatumGenericGPDB : public IDatumGeneric
-{
-
+	class CDatumGenericGPDB : public IDatumGeneric
+	{
 	private:
-
 		// memory pool
-		IMemoryPool *m_pmp;
+		IMemoryPool *m_mp;
 
 		// size in bytes
-		ULONG m_ulSize;
+		ULONG m_size;
 
 		// a pointer to datum value
-		BYTE *m_pbVal;
+		BYTE *m_bytearray_value;
 
 		// is null
-		BOOL m_fNull;
+		BOOL m_is_null;
 
 		// type information
-		IMDId *m_pmdid;
+		IMDId *m_mdid;
 
-		INT m_iTypeModifier;
+		INT m_type_modifier;
 
 		// long int value used for statistic computation
-		LINT m_lValue;
+		LINT m_stats_comp_val_int;
 
 		// double value used for statistic computation
-		CDouble m_dValue;
+		CDouble m_stats_comp_val_double;
 
 		// private copy ctor
 		CDatumGenericGPDB(const CDatumGenericGPDB &);
 
 	public:
-
 		// ctor
-		CDatumGenericGPDB
-			(
-			IMemoryPool *pmp,
-			IMDId *pmdid,
-			INT iTypeModifier,
-			const void *pv,
-			ULONG ulSize,
-			BOOL fNull,
-			LINT lValue,
-			CDouble dValue
-			);
+		CDatumGenericGPDB(IMemoryPool *mp,
+						  IMDId *mdid,
+						  INT type_modifier,
+						  const void *src,
+						  ULONG size,
+						  BOOL is_null,
+						  LINT stats_comp_val_int,
+						  CDouble stats_comp_val_double);
 
 		// dtor
-		virtual
-		~CDatumGenericGPDB();
+		virtual ~CDatumGenericGPDB();
 
 		// accessor of metadata type id
-		virtual
-		IMDId *Pmdid() const;
+		virtual IMDId *MDId() const;
 
-		virtual
-		INT ITypeModifier() const;
+		virtual INT TypeModifier() const;
 
 		// accessor of size
-		virtual
-		ULONG UlSize() const;
+		virtual ULONG Size() const;
 
 		// accessor of is null
-		virtual
-		BOOL FNull() const;
+		virtual BOOL IsNull() const;
 
 		// return string representation
-		virtual
-		const CWStringConst *Pstr(IMemoryPool *pmp) const;
+		virtual const CWStringConst *GetStrRepr(IMemoryPool *mp) const;
 
 		// hash function
-		virtual
-		ULONG UlHash() const;
+		virtual ULONG HashValue() const;
 
 		// match function for datums
-		virtual
-		BOOL FMatch(const IDatum *pdatum) const;
+		virtual BOOL Matches(const IDatum *datum) const;
 
 		// copy datum
-		virtual
-		IDatum *PdatumCopy(IMemoryPool *pmp) const;
-		
+		virtual IDatum *MakeCopy(IMemoryPool *mp) const;
+
 		// print function
-		virtual
-		IOstream &OsPrint(IOstream &os) const;
+		virtual IOstream &OsPrint(IOstream &os) const;
 
 		// accessor to bytearray, creates a copy
-		virtual
-		BYTE *PbaVal(IMemoryPool *pmp, ULONG *pulLength) const;
+		virtual BYTE *MakeCopyOfValue(IMemoryPool *mp, ULONG *pulLength) const;
 
 		// statistics related APIs
 
 		// can datum be mapped to a double
-		virtual
-		BOOL FHasStatsDoubleMapping() const;
+		virtual BOOL IsDatumMappableToDouble() const;
 
 		// map to double for stats computation
-		virtual
-		CDouble DStatsMapping() const
+		virtual CDouble
+		GetDoubleMapping() const
 		{
-			GPOS_ASSERT(FHasStatsDoubleMapping());
+			GPOS_ASSERT(IsDatumMappableToDouble());
 
-			return m_dValue;
+			return m_stats_comp_val_double;
 		}
 
 		// can datum be mapped to LINT
-		virtual
-		BOOL FHasStatsLINTMapping() const;
+		virtual BOOL IsDatumMappableToLINT() const;
 
 		// map to LINT for statistics computation
-		virtual
-		LINT LStatsMapping() const
+		virtual LINT
+		GetLINTMapping() const
 		{
-			GPOS_ASSERT(FHasStatsLINTMapping());
+			GPOS_ASSERT(IsDatumMappableToLINT());
 
-			return m_lValue;
+			return m_stats_comp_val_int;
 		}
 
 		//  supports statistical comparisons based on the byte array representation of datum
-		virtual
-		BOOL FSupportsBinaryComp(const IDatum *pdatum) const;
+		virtual BOOL SupportsBinaryComp(const IDatum *datum) const;
 
 		// byte array representation of datum
-		virtual
-		const BYTE *PbaVal() const;
+		virtual const BYTE *GetByteArrayValue() const;
 
 		// stats equality
-		virtual
-		BOOL FStatsEqual(const IDatum *pdatum) const;
+		virtual BOOL StatsAreEqual(const IDatum *datum) const;
 
 		// does the datum need to be padded before statistical derivation
-		virtual
-		BOOL FNeedsPadding() const;
+		virtual BOOL NeedsPadding() const;
 
 		// return the padded datum
-		virtual
-		IDatum *PdatumPadded(IMemoryPool *pmp, ULONG ulColLen) const;
+		virtual IDatum *MakePaddedDatum(IMemoryPool *mp, ULONG col_len) const;
 
 		// statistics equality based on byte array representation of datums
-		virtual
-		BOOL FStatsEqualBinary(const IDatum *pdatum) const;
+		virtual BOOL StatsEqualBinary(const IDatum *datum) const;
 
 		// statistics less than based on byte array representation of datums
-		virtual
-		BOOL FStatsLessThanBinary(const IDatum *pdatum) const;
+		virtual BOOL StatsLessThanBinary(const IDatum *datum) const;
 
 		// does datum support like predicate
-		virtual
-		BOOL FSupportLikePredicate() const
+		virtual BOOL
+		SupportsLikePredicate() const
 		{
 			return true;
 		}
 
 		// return the default scale factor of like predicate
-		virtual
-		CDouble DLikePredicateScaleFactor() const;
+		virtual CDouble GetLikePredicateScaleFactor() const;
 
 		// default selectivity of the trailing wildcards
-		virtual
-		CDouble DTrailingWildcardSelectivity(const BYTE *pba, ULONG ulPos) const;
+		virtual CDouble GetTrailingWildcardSelectivity(const BYTE *pba, ULONG ulPos) const;
 
 		// selectivities needed for LIKE predicate statistics evaluation
-		static
-		const CDouble DDefaultFixedCharSelectivity;
-		static
-		const CDouble DDefaultCharRangeSelectivity;
-		static
-		const CDouble DDefaultAnyCharSelectivity;
-		static
-		const CDouble DDefaultCdbRanchorSelectivity;
-		static
-		const CDouble DDefaultCdbRolloffSelectivity;
+		static const CDouble DefaultFixedCharSelectivity;
+		static const CDouble DefaultCharRangeSelectivity;
+		static const CDouble DefaultAnyCharSelectivity;
+		static const CDouble DefaultCdbRanchorSelectivity;
+		static const CDouble DefaultCdbRolloffSelectivity;
 
-	}; // class CDatumGenericGPDB
-}
+	};  // class CDatumGenericGPDB
+}  // namespace gpnaucrates
 
 
-#endif // !GPNAUCRATES_CDatumGenericGPDB_H
+#endif  // !GPNAUCRATES_CDatumGenericGPDB_H
 
 // EOF

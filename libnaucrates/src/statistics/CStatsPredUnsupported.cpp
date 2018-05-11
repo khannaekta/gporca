@@ -23,17 +23,10 @@ using namespace gpnaucrates;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CStatsPredUnsupported::CStatsPredUnsupported
-	(
-	ULONG ulColId,
-	CStatsPred::EStatsCmpType estatscmptype
-	)
-	:
-	CStatsPred(ulColId),
-	m_estatscmptype(estatscmptype),
-	m_dDefaultScaleFactor(0.0)
+CStatsPredUnsupported::CStatsPredUnsupported(ULONG colid, CStatsPred::EStatsCmpType stats_cmp_type)
+	: CStatsPred(colid), m_stats_cmp_type(stats_cmp_type), m_default_scale_factor(0.0)
 {
-	m_dDefaultScaleFactor = DScaleFactorInit();
+	m_default_scale_factor = InitScaleFactor();
 }
 
 
@@ -45,31 +38,27 @@ CStatsPredUnsupported::CStatsPredUnsupported
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CStatsPredUnsupported::CStatsPredUnsupported
-	(
-	ULONG ulColId,
-	CStatsPred::EStatsCmpType estatscmptype,
-	CDouble dDefaultScaleFactor
-	)
-	:
-	CStatsPred(ulColId),
-	m_estatscmptype(estatscmptype),
-	m_dDefaultScaleFactor(dDefaultScaleFactor)
+CStatsPredUnsupported::CStatsPredUnsupported(ULONG colid,
+											 CStatsPred::EStatsCmpType stats_cmp_type,
+											 CDouble default_scale_factor)
+	: CStatsPred(colid),
+	  m_stats_cmp_type(stats_cmp_type),
+	  m_default_scale_factor(default_scale_factor)
 {
-	GPOS_ASSERT(CStatistics::DEpsilon < dDefaultScaleFactor);
+	GPOS_ASSERT(CStatistics::Epsilon < default_scale_factor);
 }
 
 
 //---------------------------------------------------------------------------
-//		CStatsPredUnsupported::DScaleFactorInit
+//		CStatsPredUnsupported::InitScaleFactor
 //
 //	@doc:
 //		Initialize the scale factor of the unknown predicate
 //---------------------------------------------------------------------------
 CDouble
-CStatsPredUnsupported::DScaleFactorInit()
+CStatsPredUnsupported::InitScaleFactor()
 {
-	return (1 / CHistogram::DDefaultSelectivity).DVal();
+	return (1 / CHistogram::DefaultSelectivity).Get();
 }
 
 // EOF

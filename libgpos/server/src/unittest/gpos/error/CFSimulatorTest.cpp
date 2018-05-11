@@ -33,15 +33,11 @@ using namespace gpos;
 GPOS_RESULT
 CFSimulatorTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
-		GPOS_UNITTEST_FUNC(CFSimulatorTest::EresUnittest_BasicTracking),
-		GPOS_UNITTEST_FUNC(CFSimulatorTest::EresUnittest_OOM)
-		};
-		
+	CUnittest rgut[] = {GPOS_UNITTEST_FUNC(CFSimulatorTest::EresUnittest_BasicTracking),
+						GPOS_UNITTEST_FUNC(CFSimulatorTest::EresUnittest_OOM)};
+
 	// ignore this test for FP simulation and time slicing check
-	if (CFSimulator::FSimulation() ||
-	    IWorker::m_fEnforceTimeSlices)
+	if (CFSimulator::FSimulation() || IWorker::m_enforce_time_slices)
 	{
 		return GPOS_OK;
 	}
@@ -68,9 +64,9 @@ CFSimulatorTest::EresUnittest_BasicTracking()
 {
 	BOOL fThrown = false;
 	static ULONG ul = 0;
- 	if (10 == ul)
- 	{
- 		return GPOS_OK;
+	if (10 == ul)
+	{
+		return GPOS_OK;
 	}
 
 	GPOS_TRY
@@ -88,7 +84,7 @@ CFSimulatorTest::EresUnittest_BasicTracking()
 
 			fThrown = true;
 		}
-		
+
 		GPOS_RESET_EX;
 	}
 	GPOS_CATCH_END;
@@ -119,7 +115,7 @@ CFSimulatorTest::EresUnittest_OOM()
 {
 	// create memory pool of 128KB
 	CAutoMemoryPool amp(CAutoMemoryPool::ElcStrict);
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	GPOS_RESULT eres = GPOS_FAILED;
 
@@ -129,16 +125,16 @@ CFSimulatorTest::EresUnittest_OOM()
 	GPOS_TRY
 	{
 		// attempt allocation
-		GPOS_NEW_ARRAY(pmp, CHAR, 1234);
+		GPOS_NEW_ARRAY(mp, CHAR, 1234);
 	}
 	GPOS_CATCH_EX(ex)
 	{
 		// must throw
-		if(GPOS_MATCH_EX(ex, CException::ExmaSystem, CException::ExmiOOM))
+		if (GPOS_MATCH_EX(ex, CException::ExmaSystem, CException::ExmiOOM))
 		{
 			eres = GPOS_OK;
 		}
-		
+
 		GPOS_RESET_EX;
 	}
 	GPOS_CATCH_END;
@@ -147,7 +143,6 @@ CFSimulatorTest::EresUnittest_OOM()
 }
 
 
-#endif // GPOS_FPSIMULATOR
+#endif  // GPOS_FPSIMULATOR
 
 // EOF
-

@@ -19,7 +19,7 @@ using namespace gpopt;
 
 //---------------------------------------------------------------------------
 //      @function:
-//              CUpperBoundNDVs::PubndvCopyWithRemap
+//              CUpperBoundNDVs::CopyUpperBoundNDVWithRemap
 //
 //      @doc:
 //              Copy upper bound ndvs with remapped column id; function will
@@ -27,80 +27,68 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CUpperBoundNDVs *
-CUpperBoundNDVs::PubndvCopyWithRemap
-        (
-        IMemoryPool *pmp,
-        HMUlCr *phmulcr
-        )
-        const
+CUpperBoundNDVs::CopyUpperBoundNDVWithRemap(IMemoryPool *mp,
+											UlongToColRefMap *colid_to_colref_map) const
 {
-        BOOL fMappingNotFound = false;
+	BOOL mapping_not_found = false;
 
-        CColRefSet *pcrsCopy = GPOS_NEW(pmp) CColRefSet(pmp);
-        CColRefSetIter crsi(*m_pcrs);
-        while (crsi.FAdvance() && !fMappingNotFound)
-        {
-                ULONG ulColId = crsi.Pcr()->UlId();
-                CColRef *pcrNew = phmulcr->PtLookup(&ulColId);
-                if (NULL != pcrNew)
-                {
-                        pcrsCopy->Include(pcrNew);
-                }
-               else
-                {
-                        fMappingNotFound = true;
-                }
-        }
+	CColRefSet *column_refset_copy = GPOS_NEW(mp) CColRefSet(mp);
+	CColRefSetIter column_refset_iter(*m_column_refset);
+	while (column_refset_iter.Advance() && !mapping_not_found)
+	{
+		ULONG colid = column_refset_iter.Pcr()->Id();
+		CColRef *column_ref = colid_to_colref_map->Find(&colid);
+		if (NULL != column_ref)
+		{
+			column_refset_copy->Include(column_ref);
+		}
+		else
+		{
+			mapping_not_found = true;
+		}
+	}
 
-        if (0 < pcrsCopy->CElements() && !fMappingNotFound)
-        {
-                return GPOS_NEW(pmp) CUpperBoundNDVs(pcrsCopy, DUpperBoundNDVs());
-        }
+	if (0 < column_refset_copy->Size() && !mapping_not_found)
+	{
+		return GPOS_NEW(mp) CUpperBoundNDVs(column_refset_copy, UpperBoundNDVs());
+	}
 
-        pcrsCopy->Release();
+	column_refset_copy->Release();
 
-        return NULL;
+	return NULL;
 }
 
 
 //---------------------------------------------------------------------------
 //      @function:
-//              CUpperBoundNDVs::PubndvCopy
+//              CUpperBoundNDVs::CopyUpperBoundNDVs
 //
 //      @doc:
 //              Copy upper bound ndvs
 //
 //---------------------------------------------------------------------------
 CUpperBoundNDVs *
-CUpperBoundNDVs::PubndvCopy
-        (
-        IMemoryPool *pmp,
-        CDouble dUpperBoundNDVs
-       )
-        const
+CUpperBoundNDVs::CopyUpperBoundNDVs(IMemoryPool *mp, CDouble upper_bound_ndv) const
 {
-        m_pcrs->AddRef();
-        CUpperBoundNDVs *pndvCopy = GPOS_NEW(pmp) CUpperBoundNDVs(m_pcrs, dUpperBoundNDVs);
+	m_column_refset->AddRef();
+	CUpperBoundNDVs *ndv_copy =
+		GPOS_NEW(mp) CUpperBoundNDVs(m_column_refset, upper_bound_ndv);
 
-        return pndvCopy;
+	return ndv_copy;
 }
 
 //---------------------------------------------------------------------------
 //      @function:
-//              CUpperBoundNDVs::PubndvCopy
+//              CUpperBoundNDVs::CopyUpperBoundNDVs
 //
 //      @doc:
 //              Copy upper bound ndvs
 //
 //---------------------------------------------------------------------------
 CUpperBoundNDVs *
-CUpperBoundNDVs::PubndvCopy
-        (
-        IMemoryPool *pmp
-        )
-        const
+CUpperBoundNDVs::CopyUpperBoundNDVs(IMemoryPool *mp) const
 {
-        return PubndvCopy(pmp, m_dUpperBoundNDVs);
+	return CopyUpperBoundNDVs(mp, m_upper_bound_ndv);
 }
 
 
@@ -113,20 +101,14 @@ CUpperBoundNDVs::PubndvCopy
 //
 //---------------------------------------------------------------------------
 IOstream &
-CUpperBoundNDVs::OsPrint
-        (
-        IOstream &os
-        )
-        const
+CUpperBoundNDVs::OsPrint(IOstream &os) const
 {
-        os << "{" << std::endl;
-        m_pcrs->OsPrint(os);
-        os << " Upper Bound of NDVs" << DUpperBoundNDVs() << std::endl;
-        os << "}" << std::endl;
+	os << "{" << std::endl;
+	m_column_refset->OsPrint(os);
+	os << " Upper Bound of NDVs" << UpperBoundNDVs() << std::endl;
+	os << "}" << std::endl;
 
-        return os;
+	return os;
 }
 
 // EOF
-
-

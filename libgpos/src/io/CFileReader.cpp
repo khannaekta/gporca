@@ -9,7 +9,6 @@
 //		Implementation of file handler for raw input
 //---------------------------------------------------------------------------
 
-#include <fcntl.h>
 #include "gpos/base.h"
 #include "gpos/io/ioutils.h"
 #include "gpos/io/CFileReader.h"
@@ -25,12 +24,9 @@ using namespace gpos;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CFileReader::CFileReader()
-	:
-	CFileDescriptor(),
-	m_ullSize(0),
-	m_ullReadSize(0)
-{}
+CFileReader::CFileReader() : CFileDescriptor(), m_file_size(0), m_file_read_size(0)
+{
+}
 
 
 //---------------------------------------------------------------------------
@@ -42,7 +38,8 @@ CFileReader::CFileReader()
 //
 //---------------------------------------------------------------------------
 CFileReader::~CFileReader()
-{}
+{
+}
 
 
 //---------------------------------------------------------------------------
@@ -54,17 +51,13 @@ CFileReader::~CFileReader()
 //
 //---------------------------------------------------------------------------
 void
-CFileReader::Open
-	(
-	const CHAR *szPath,
-	const ULONG ulPerms
-	)
+CFileReader::Open(const CHAR *file_path, const ULONG permission_bits)
 {
-	GPOS_ASSERT(NULL != szPath);
+	GPOS_ASSERT(NULL != file_path);
 
-	OpenInternal(szPath, O_RDONLY, ulPerms);
+	OpenFile(file_path, O_RDONLY, permission_bits);
 
-	m_ullSize = ioutils::UllFileSize(szPath);
+	m_file_size = ioutils::FileSize(file_path);
 }
 
 
@@ -79,8 +72,8 @@ CFileReader::Open
 void
 CFileReader::Close()
 {
-	CloseInternal();
-	m_ullSize = 0;
+	CloseFile();
+	m_file_size = 0;
 }
 
 
@@ -93,81 +86,77 @@ CFileReader::Close()
 //
 //---------------------------------------------------------------------------
 ULONG_PTR
-CFileReader::UlpRead
-	(
-	BYTE *pb,
-	const ULONG_PTR ulpReadSize
-	)
+CFileReader::ReadBytesToBuffer(BYTE *read_buffer, const ULONG_PTR file_read_size)
 {
-	GPOS_ASSERT(CFileDescriptor::FOpened() && "Attempt to read from invalid file descriptor");
-	GPOS_ASSERT(0 < ulpReadSize);
-	GPOS_ASSERT(NULL != pb);
+	GPOS_ASSERT(CFileDescriptor::IsFileOpen() && "Attempt to read from invalid file descriptor");
+	GPOS_ASSERT(0 < file_read_size);
+	GPOS_ASSERT(NULL != read_buffer);
 
-	ULONG_PTR ulpBytesLeft = ulpReadSize;
+	ULONG_PTR bytes_to_read = file_read_size;
 
-	while (0 < ulpBytesLeft)
+	while (0 < bytes_to_read)
 	{
-			INT_PTR iBytes = -1;
+		INT_PTR current_byte = -1;
 
-    	 	// read from file and check to simulate I/O error
-    	 	GPOS_CHECK_SIM_IO_ERR(&iBytes, ioutils::IRead(IFileDescr(), pb, ulpBytesLeft));
+		// read from file and check to simulate I/O error
+		GPOS_CHECK_SIM_IO_ERR(&current_byte,
+							  ioutils::Read(GetFileDescriptor(), read_buffer, bytes_to_read));
 
-    	 	// reach the end of file
-    	 	if (0 == iBytes)
-    	 	{
-    	 		break;
-    	 	}
+		// reach the end of file
+		if (0 == current_byte)
+		{
+			break;
+		}
 
-    	 	// check for error
-    	 	if (-1 == iBytes)
-    	 	{
-    	 		// in case an interrupt was received we retry
-    	 		if (EINTR == errno)
-    	 		{
-    	 			GPOS_CHECK_ABORT;
-    	 			continue;
-    	 		}
+		// check for error
+		if (-1 == current_byte)
+		{
+			// in case an interrupt was received we retry
+			if (EINTR == errno)
+			{
+				GPOS_CHECK_ABORT;
+				continue;
+			}
 
-    	 		GPOS_RAISE(CException::ExmaSystem, CException::ExmiIOError, errno);
-    	 	}
+			GPOS_RAISE(CException::ExmaSystem, CException::ExmiIOError, errno);
+		}
 
-    	 	ulpBytesLeft -= iBytes;
-    	 	pb += iBytes;
-    	 	m_ullReadSize += iBytes;
+		bytes_to_read -= current_byte;
+		read_buffer += current_byte;
+		m_file_read_size += current_byte;
 	};
 
-    return ulpReadSize - ulpBytesLeft;
+	return file_read_size - bytes_to_read;
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CFileReader::UllSize
+//		CFileReader::FileSize
 //
 //	@doc:
 //		Get file size
 //
 //---------------------------------------------------------------------------
 ULLONG
-CFileReader::UllSize() const
+CFileReader::FileSize() const
 {
-	return m_ullSize;
+	return m_file_size;
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CFileReader::UllReadSize
+//		CFileReader::FileReadSize
 //
 //	@doc:
 //		Get file read size
 //
 //---------------------------------------------------------------------------
 ULLONG
-CFileReader::UllReadSize() const
+CFileReader::FileReadSize() const
 {
-	return m_ullReadSize;
+	return m_file_read_size;
 }
 
 // EOF
-

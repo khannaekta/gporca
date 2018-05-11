@@ -17,7 +17,7 @@
 using namespace gpos;
 
 // invalid locale
-const ELocale CMessageTable::m_elocInvalid = ELocInvalid;
+const ELocale CMessageTable::m_invalid_locale = ELocInvalid;
 
 
 //---------------------------------------------------------------------------
@@ -27,44 +27,32 @@ const ELocale CMessageTable::m_elocInvalid = ELocInvalid;
 //	@doc:
 //
 //---------------------------------------------------------------------------
-CMessageTable::CMessageTable
-	(
-	IMemoryPool *pmp,
-	ULONG ulSize,
-	ELocale eloc
-	)
-	:
-	m_eloc(eloc)
+CMessageTable::CMessageTable(IMemoryPool *mp, ULONG size, ELocale locale)
+	: m_locale(locale)
 {
-	m_sht.Init
-		(
-		pmp,
-		ulSize,
-		GPOS_OFFSET(CMessage, m_link),
-		GPOS_OFFSET(CMessage, m_exc),
-		&(CException::m_excInvalid),
-		CException::UlHash,
-		CException::FEqual
-		);
+	m_hash_table.Init(mp,
+					  size,
+					  GPOS_OFFSET(CMessage, m_link),
+					  GPOS_OFFSET(CMessage, m_exception),
+					  &(CException::m_invalid_exception),
+					  CException::HashValue,
+					  CException::Equals);
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMessageTable::PmsgLookup
+//		CMessageTable::LookupMessage
 //
 //	@doc:
-//		Lookup message 
+//		Lookup message
 //
 //---------------------------------------------------------------------------
-CMessage*
-CMessageTable::PmsgLookup
-	(
-	CException exc
-	)
+CMessage *
+CMessageTable::LookupMessage(CException exc)
 {
-	MTAccessor shta(m_sht, exc);
-	return shta.PtLookup();
+	MTAccessor acc(m_hash_table, exc);
+	return acc.Find();
 }
 
 
@@ -77,21 +65,17 @@ CMessageTable::PmsgLookup
 //
 //---------------------------------------------------------------------------
 void
-CMessageTable::AddMessage
-	(
-	CMessage *pmsg
-	)
+CMessageTable::AddMessage(CMessage *msg)
 {
-	MTAccessor shta(m_sht, pmsg->m_exc);
+	MTAccessor acc(m_hash_table, msg->m_exception);
 
-	if (NULL == shta.PtLookup())
+	if (NULL == acc.Find())
 	{
-		shta.Insert(pmsg);
+		acc.Insert(msg);
 	}
-	
+
 	// TODO: 6/24/2010; raise approp. error for duplicate message
 	// or simply ignore?
 }
 
 // EOF
-

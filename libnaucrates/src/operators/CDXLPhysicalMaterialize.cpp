@@ -26,18 +26,13 @@ using namespace gpdxl;
 //		Construct a non-spooling materialize
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalMaterialize::CDXLPhysicalMaterialize
-	(
-	IMemoryPool *pmp,
-	BOOL fEager
-	)
-	:
-	CDXLPhysical(pmp),
-	m_fEager(fEager),
-	m_ulSpoolId(0),
-	m_edxlsptype(EdxlspoolNone),
-	m_iExecutorSlice(-1),
-	m_ulConsumerSlices(0)
+CDXLPhysicalMaterialize::CDXLPhysicalMaterialize(IMemoryPool *mp, BOOL is_eager)
+	: CDXLPhysical(mp),
+	  m_is_eager(is_eager),
+	  m_spooling_op_id(0),
+	  m_spool_type(EdxlspoolNone),
+	  m_executor_slice(-1),
+	  m_num_consumer_slices(0)
 {
 }
 
@@ -49,35 +44,31 @@ CDXLPhysicalMaterialize::CDXLPhysicalMaterialize
 //		Construct a spooling materialize
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalMaterialize::CDXLPhysicalMaterialize
-	(
-	IMemoryPool *pmp,
-	BOOL fEager,
-	ULONG ulSpoolId,
-	INT iExecutorSlice,
-	ULONG ulConsumerSlices
-	)
-	:
-	CDXLPhysical(pmp),
-	m_fEager(fEager),
-	m_ulSpoolId(ulSpoolId),
-	m_edxlsptype(EdxlspoolMaterialize),
-	m_iExecutorSlice(iExecutorSlice),
-	m_ulConsumerSlices(ulConsumerSlices)
+CDXLPhysicalMaterialize::CDXLPhysicalMaterialize(IMemoryPool *mp,
+												 BOOL is_eager,
+												 ULONG spooling_op_id,
+												 INT executor_slice,
+												 ULONG num_consumer_slices)
+	: CDXLPhysical(mp),
+	  m_is_eager(is_eager),
+	  m_spooling_op_id(spooling_op_id),
+	  m_spool_type(EdxlspoolMaterialize),
+	  m_executor_slice(executor_slice),
+	  m_num_consumer_slices(num_consumer_slices)
 {
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLPhysicalMaterialize::Edxlop
+//		CDXLPhysicalMaterialize::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLPhysicalMaterialize::Edxlop() const
+CDXLPhysicalMaterialize::GetDXLOperator() const
 {
 	return EdxlopPhysicalMaterialize;
 }
@@ -85,127 +76,84 @@ CDXLPhysicalMaterialize::Edxlop() const
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLPhysicalMaterialize::PstrOpName
+//		CDXLPhysicalMaterialize::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLPhysicalMaterialize::PstrOpName() const
+CDXLPhysicalMaterialize::GetOpNameStr() const
 {
-	return CDXLTokens::PstrToken(EdxltokenPhysicalMaterialize);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenPhysicalMaterialize);
 }
 
-//---------------------------------------------------------------------------
-//	@function:
-//		CDXLPhysicalMaterialize::FSpooling
-//
-//	@doc:
 //		Is this a spooling materialize operator
-//
-//---------------------------------------------------------------------------
 BOOL
-CDXLPhysicalMaterialize::FSpooling() const
+CDXLPhysicalMaterialize::IsSpooling() const
 {
-	return (EdxlspoolNone != m_edxlsptype);
+	return (EdxlspoolNone != m_spool_type);
 }
 
-//---------------------------------------------------------------------------
-//	@function:
-//		CDXLPhysicalMaterialize::UlSpoolId
-//
-//	@doc:
 //		Id of the spool if the materialize node is spooling
-//
-//---------------------------------------------------------------------------
 ULONG
-CDXLPhysicalMaterialize::UlSpoolId() const
+CDXLPhysicalMaterialize::GetSpoolingOpId() const
 {
-	return m_ulSpoolId;
+	return m_spooling_op_id;
 }
 
-//---------------------------------------------------------------------------
-//	@function:
-//		CDXLPhysicalMaterialize::IExecutorSlice
-//
-//	@doc:
 //		Id of the slice executing the spool
-//
-//---------------------------------------------------------------------------
 INT
-CDXLPhysicalMaterialize::IExecutorSlice() const
+CDXLPhysicalMaterialize::GetExecutorSlice() const
 {
-	return m_iExecutorSlice;
+	return m_executor_slice;
 }
 
-//---------------------------------------------------------------------------
-//	@function:
-//		CDXLPhysicalMaterialize::UlConsumerSlices
-//
-//	@doc:
 //		Number of slices consuming the spool
-//
-//---------------------------------------------------------------------------
 ULONG
-CDXLPhysicalMaterialize::UlConsumerSlices() const
+CDXLPhysicalMaterialize::GetNumConsumerSlices() const
 {
-	return m_ulConsumerSlices;
+	return m_num_consumer_slices;
 }
 
 
-//---------------------------------------------------------------------------
-//	@function:
-//		CDXLPhysicalMaterialize::FEager
-//
-//	@doc:
 //		Does the materialize node do eager materialization
-//
-//---------------------------------------------------------------------------
 BOOL
-CDXLPhysicalMaterialize::FEager() const
+CDXLPhysicalMaterialize::IsEager() const
 {
-	return m_fEager;
+	return m_is_eager;
 }
 
-//---------------------------------------------------------------------------
-//	@function:
-//		CDXLPhysicalMaterialize::SerializeToDXL
-//
-//	@doc:
 //		Serialize operator in DXL format
-//
-//---------------------------------------------------------------------------
 void
-CDXLPhysicalMaterialize::SerializeToDXL
-	(
-	CXMLSerializer *pxmlser,
-	const CDXLNode *pdxln
-	)
-	const
+CDXLPhysicalMaterialize::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const
 {
-	const CWStringConst *pstrElemName = PstrOpName();
+	const CWStringConst *element_name = GetOpNameStr();
 
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
-	
-	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenMaterializeEager), m_fEager);
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
-	if (EdxlspoolMaterialize == m_edxlsptype)
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenMaterializeEager), m_is_eager);
+
+	if (EdxlspoolMaterialize == m_spool_type)
 	{
 		// serialize spool info
-		pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenSpoolId), m_ulSpoolId);
-		
-		pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenExecutorSliceId), m_iExecutorSlice);
-		pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenConsumerSliceCount), m_ulConsumerSlices);
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenSpoolId),
+									 m_spooling_op_id);
+
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenExecutorSliceId),
+									 m_executor_slice);
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenConsumerSliceCount),
+									 m_num_consumer_slices);
 	}
-		
+
 	// serialize properties
-	pdxln->SerializePropertiesToDXL(pxmlser);
+	node->SerializePropertiesToDXL(xml_serializer);
 
 	// serialize children
-	pdxln->SerializeChildrenToDXL(pxmlser);
+	node->SerializeChildrenToDXL(xml_serializer);
 
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -218,24 +166,19 @@ CDXLPhysicalMaterialize::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalMaterialize::AssertValid
-	(
-	const CDXLNode *pdxln,
-	BOOL fValidateChildren
-	) 
-	const
+CDXLPhysicalMaterialize::AssertValid(const CDXLNode *node, BOOL validate_children) const
 {
-	GPOS_ASSERT(EdxlspoolNone == m_edxlsptype || EdxlspoolMaterialize == m_edxlsptype);
-	GPOS_ASSERT(EdxlmatIndexSentinel == pdxln->UlArity());
+	GPOS_ASSERT(EdxlspoolNone == m_spool_type || EdxlspoolMaterialize == m_spool_type);
+	GPOS_ASSERT(EdxlmatIndexSentinel == node->Arity());
 
-	CDXLNode *pdxlnChild = (*pdxln)[EdxlmatIndexChild];
-	GPOS_ASSERT(EdxloptypePhysical == pdxlnChild->Pdxlop()->Edxloperatortype());
+	CDXLNode *child_dxlnode = (*node)[EdxlmatIndexChild];
+	GPOS_ASSERT(EdxloptypePhysical == child_dxlnode->GetOperator()->GetDXLOperatorType());
 
-	if (fValidateChildren)
+	if (validate_children)
 	{
-		pdxlnChild->Pdxlop()->AssertValid(pdxlnChild, fValidateChildren);
+		child_dxlnode->GetOperator()->AssertValid(child_dxlnode, validate_children);
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

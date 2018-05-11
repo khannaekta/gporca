@@ -15,7 +15,7 @@
 //		is raised.
 //
 //	@owner:
-//		
+//
 //
 //	@test:
 //
@@ -43,53 +43,44 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarCoerceToDomain : public CDXLScalarCoerceBase
 	{
+	private:
+		// private copy ctor
+		CDXLScalarCoerceToDomain(const CDXLScalarCoerceToDomain &);
 
-		private:
-			// private copy ctor
-			CDXLScalarCoerceToDomain(const CDXLScalarCoerceToDomain&);
+	public:
+		// ctor/dtor
+		CDXLScalarCoerceToDomain(IMemoryPool *mp,
+								 IMDId *mdid_type,
+								 INT type_modifier,
+								 EdxlCoercionForm dxl_coerce_format,
+								 INT location);
 
-		public:
-			// ctor/dtor
-			CDXLScalarCoerceToDomain
-				(
-				IMemoryPool *pmp,
-				IMDId *pmdidType,
-				INT iTypeModifier,
-				EdxlCoercionForm edxlcf,
-				INT iLoc
-				);
+		virtual ~CDXLScalarCoerceToDomain()
+		{
+		}
 
-			virtual
-			~CDXLScalarCoerceToDomain()
-			{
-			}
+		// ident accessor
+		virtual Edxlopid
+		GetDXLOperator() const
+		{
+			return EdxlopScalarCoerceToDomain;
+		}
 
-			// ident accessor
-			virtual
-			Edxlopid Edxlop() const
-			{
-				return EdxlopScalarCoerceToDomain;
-			}
+		// name of the DXL operator name
+		virtual const CWStringConst *GetOpNameStr() const;
 
-			// name of the DXL operator name
-			virtual
-			const CWStringConst *PstrOpName() const;
+		// conversion function
+		static CDXLScalarCoerceToDomain *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarCoerceToDomain == dxl_op->GetDXLOperator());
 
-			// conversion function
-			static
-			CDXLScalarCoerceToDomain *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopScalarCoerceToDomain == pdxlop->Edxlop());
-
-				return dynamic_cast<CDXLScalarCoerceToDomain*>(pdxlop);
-			}
+			return dynamic_cast<CDXLScalarCoerceToDomain *>(dxl_op);
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLScalarCoerceToDomain_H
+#endif  // !GPDXL_CDXLScalarCoerceToDomain_H
 
 // EOF

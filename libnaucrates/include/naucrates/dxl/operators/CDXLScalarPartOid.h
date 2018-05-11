@@ -17,7 +17,6 @@
 
 namespace gpdxl
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDXLScalarPartOid
@@ -29,69 +28,59 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarPartOid : public CDXLScalar
 	{
-		private:
+	private:
+		// partitioning level
+		ULONG m_partitioning_level;
 
-			// partitioning level
-			ULONG m_ulLevel;
+		// private copy ctor
+		CDXLScalarPartOid(const CDXLScalarPartOid &);
 
-			// private copy ctor
-			CDXLScalarPartOid(const CDXLScalarPartOid&);
+	public:
+		// ctor
+		CDXLScalarPartOid(IMemoryPool *mp, ULONG partitioning_level);
 
-		public:
-			// ctor
-			CDXLScalarPartOid(IMemoryPool *pmp, ULONG ulLevel);
+		// operator type
+		virtual Edxlopid GetDXLOperator() const;
 
-			// operator type
-			virtual
-			Edxlopid Edxlop() const;
+		// operator name
+		virtual const CWStringConst *GetOpNameStr() const;
 
-			// operator name
-			virtual
-			const CWStringConst *PstrOpName() const;
+		// partitioning level
+		ULONG
+		GetPartitioningLevel() const
+		{
+			return m_partitioning_level;
+		}
 
-			// partitioning level
-			ULONG UlLevel() const
-			{
-				return m_ulLevel;
-			}
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
-
-			// does the operator return a boolean result
-			virtual
-			BOOL FBoolean
-					(
-					CMDAccessor * //pmda
-					)
-					const
-			{
-				return false;
-			}
+		// does the operator return a boolean result
+		virtual BOOL
+		HasBoolResult(CMDAccessor *  //md_accessor
+					  ) const
+		{
+			return false;
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			virtual
-			void AssertValid(const CDXLNode *pdxln, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		virtual void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 
-			// conversion function
-			static
-			CDXLScalarPartOid *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopScalarPartOid == pdxlop->Edxlop());
+		// conversion function
+		static CDXLScalarPartOid *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarPartOid == dxl_op->GetDXLOperator());
 
-				return dynamic_cast<CDXLScalarPartOid*>(pdxlop);
-			}
+			return dynamic_cast<CDXLScalarPartOid *>(dxl_op);
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLScalarPartOid_H
+#endif  // !GPDXL_CDXLScalarPartOid_H
 
 // EOF

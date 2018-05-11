@@ -35,48 +35,37 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerIndexDescr : public CParseHandlerBase
 	{
-		private:
+	private:
+		// the index descriptor to construct
+		CDXLIndexDescr *m_dxl_index_descr;
 
-			// the index descriptor to construct
-			CDXLIndexDescr *m_pdxlid;
+		// private copy ctor
+		CParseHandlerIndexDescr(const CParseHandlerIndexDescr &);
 
-			// private copy ctor
-			CParseHandlerIndexDescr(const CParseHandlerIndexDescr &);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the start of an element
-			void StartElement
-				(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
- 					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the end of an element
-			void EndElement
-				(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
-					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname		// element's qname
-				);
+	public:
+		// ctor
+		CParseHandlerIndexDescr(IMemoryPool *, CParseHandlerManager *, CParseHandlerBase *);
 
-		public:
-			// ctor
-			CParseHandlerIndexDescr
-				(
-				IMemoryPool *,
-				CParseHandlerManager *,
-				CParseHandlerBase *
-				);
+		//dtor
+		~CParseHandlerIndexDescr();
 
-			//dtor
-			~CParseHandlerIndexDescr();
-
-			CDXLIndexDescr *Pdxlid();
-
+		CDXLIndexDescr *GetDXLIndexDescr();
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerIndexDescriptor_H
+#endif  // !GPDXL_CParseHandlerIndexDescriptor_H
 
 // EOF

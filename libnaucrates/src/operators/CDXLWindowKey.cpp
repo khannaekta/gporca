@@ -7,7 +7,7 @@
 //
 //	@doc:
 //		Implementation of DXL window key
-//		
+//
 //---------------------------------------------------------------------------
 
 #include "naucrates/dxl/operators/CDXLWindowKey.h"
@@ -26,16 +26,10 @@ using namespace gpdxl;
 //		Constructs a scalar window key node
 //
 //---------------------------------------------------------------------------
-CDXLWindowKey::CDXLWindowKey
-	(
-	IMemoryPool *pmp
-	)
-	:
-	m_pmp(pmp),
-	m_pdxlwf(NULL),
-	m_pdxlnSortColList(NULL)
+CDXLWindowKey::CDXLWindowKey(IMemoryPool *mp)
+	: m_mp(mp), m_window_frame_dxl(NULL), m_sort_col_list_dxlnode(NULL)
 {
-	GPOS_ASSERT(NULL != m_pmp);
+	GPOS_ASSERT(NULL != m_mp);
 }
 
 //---------------------------------------------------------------------------
@@ -48,8 +42,8 @@ CDXLWindowKey::CDXLWindowKey
 //---------------------------------------------------------------------------
 CDXLWindowKey::~CDXLWindowKey()
 {
-	CRefCount::SafeRelease(m_pdxlwf);
-	CRefCount::SafeRelease(m_pdxlnSortColList);
+	CRefCount::SafeRelease(m_window_frame_dxl);
+	CRefCount::SafeRelease(m_sort_col_list_dxlnode);
 }
 
 //---------------------------------------------------------------------------
@@ -61,14 +55,11 @@ CDXLWindowKey::~CDXLWindowKey()
 //
 //---------------------------------------------------------------------------
 void
-CDXLWindowKey::SetWindowFrame
-	(
-	CDXLWindowFrame *pdxlwf
-	)
+CDXLWindowKey::SetWindowFrame(CDXLWindowFrame *window_frame)
 {
 	// allow setting window frame only once
-	GPOS_ASSERT (NULL == m_pdxlwf);
-	m_pdxlwf = pdxlwf;
+	GPOS_ASSERT(NULL == m_window_frame_dxl);
+	m_window_frame_dxl = window_frame;
 }
 
 //---------------------------------------------------------------------------
@@ -80,14 +71,11 @@ CDXLWindowKey::SetWindowFrame
 //
 //---------------------------------------------------------------------------
 void
-CDXLWindowKey::SetSortColList
-	(
-	CDXLNode *pdxlnSortColList
-	)
+CDXLWindowKey::SetSortColList(CDXLNode *sort_col_list_dxlnode)
 {
 	// allow setting window frame only once
-	GPOS_ASSERT(NULL == m_pdxlnSortColList);
-	m_pdxlnSortColList = pdxlnSortColList;
+	GPOS_ASSERT(NULL == m_sort_col_list_dxlnode);
+	m_sort_col_list_dxlnode = sort_col_list_dxlnode;
 }
 
 //---------------------------------------------------------------------------
@@ -99,26 +87,23 @@ CDXLWindowKey::SetSortColList
 //
 //---------------------------------------------------------------------------
 void
-CDXLWindowKey::SerializeToDXL
-	(
-	CXMLSerializer *pxmlser
-	)
-	const
+CDXLWindowKey::SerializeToDXL(CXMLSerializer *xml_serializer) const
 {
-	const CWStringConst *pstrElemName = CDXLTokens::PstrToken(EdxltokenWindowKey);
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	const CWStringConst *element_name = CDXLTokens::GetDXLTokenStr(EdxltokenWindowKey);
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
-	if (NULL != m_pdxlnSortColList)
+	if (NULL != m_sort_col_list_dxlnode)
 	{
-		m_pdxlnSortColList->SerializeToDXL(pxmlser);
+		m_sort_col_list_dxlnode->SerializeToDXL(xml_serializer);
 	}
 
-	if (NULL != m_pdxlwf)
+	if (NULL != m_window_frame_dxl)
 	{
-		m_pdxlwf->SerializeToDXL(pxmlser);
+		m_window_frame_dxl->SerializeToDXL(xml_serializer);
 	}
 
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 // EOF

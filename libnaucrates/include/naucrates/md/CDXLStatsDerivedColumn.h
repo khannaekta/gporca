@@ -37,91 +37,89 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class CDXLStatsDerivedColumn : public CRefCount
 	{
-		private:
+	private:
+		// column identifier
+		ULONG m_colid;
 
-			// column identifier
-			ULONG m_ulColId;
+		// column width
+		CDouble m_width;
 
-			// column width
-			CDouble m_dWidth;
+		// null fraction
+		CDouble m_null_freq;
 
-			// null fraction
-			CDouble m_dNullFreq;
+		// ndistinct of remaining tuples
+		CDouble m_distinct_remaining;
 
-			// ndistinct of remaining tuples
-			CDouble m_dDistinctRemain;
+		// frequency of remaining tuples
+		CDouble m_freq_remaining;
 
-			// frequency of remaining tuples
-			CDouble m_dFreqRemain;
+		CDXLBucketArray *m_dxl_stats_bucket_array;
 
-			DrgPdxlbucket *m_pdrgpdxlbucket;
+		// private copy ctor
+		CDXLStatsDerivedColumn(const CDXLStatsDerivedColumn &);
 
-			// private copy ctor
-			CDXLStatsDerivedColumn(const CDXLStatsDerivedColumn &);
+	public:
+		// ctor
+		CDXLStatsDerivedColumn(ULONG colid,
+							   CDouble width,
+							   CDouble null_freq,
+							   CDouble distinct_remaining,
+							   CDouble freq_remaining,
+							   CDXLBucketArray *dxl_stats_bucket_array);
 
-		public:
+		// dtor
+		virtual ~CDXLStatsDerivedColumn();
 
-			// ctor
-			CDXLStatsDerivedColumn
-				(
-				ULONG ulColId,
-				CDouble dWidth,
-				CDouble dNullFreq,
-				CDouble dDistinctRemain,
-				CDouble dFreqRemain,
-				DrgPdxlbucket *pdrgpdxlbucket
-				);
+		// column identifier
+		ULONG
+		GetColId() const
+		{
+			return m_colid;
+		}
 
-			// dtor
-			virtual
-			~CDXLStatsDerivedColumn();
+		// column width
+		CDouble
+		Width() const
+		{
+			return m_width;
+		}
 
-			// column identifier
-			ULONG UlColId() const
-			{
-				return m_ulColId;
-			}
+		// null fraction of this column
+		CDouble
+		GetNullFreq() const
+		{
+			return m_null_freq;
+		}
 
-			// column width
-			CDouble DWidth() const
-			{
-				return m_dWidth;
-			}
+		// ndistinct of remaining tuples
+		CDouble
+		GetDistinctRemain() const
+		{
+			return m_distinct_remaining;
+		}
 
-			// null fraction of this column
-			CDouble DNullFreq() const
-			{
-				return m_dNullFreq;
-			}
+		// frequency of remaining tuples
+		CDouble
+		GetFreqRemain() const
+		{
+			return m_freq_remaining;
+		}
 
-			// ndistinct of remaining tuples
-			CDouble DDistinctRemain() const
-			{
-				return m_dDistinctRemain;
-			}
+		const CDXLBucketArray *TransformHistogramToDXLBucketArray() const;
 
-			// frequency of remaining tuples
-			CDouble DFreqRemain() const
-			{
-				return m_dFreqRemain;
-			}
-
-			const DrgPdxlbucket *Pdrgpdxlbucket() const;
-
-			// serialize bucket in DXL format
-			void Serialize(gpdxl::CXMLSerializer *) const;
+		// serialize bucket in DXL format
+		void Serialize(gpdxl::CXMLSerializer *) const;
 
 #ifdef GPOS_DEBUG
-			// debug print of the bucket
-			void DebugPrint(IOstream &os) const;
+		// debug print of the bucket
+		void DebugPrint(IOstream &os) const;
 #endif
-
 	};
 
 	// array of dxl buckets
-	typedef CDynamicPtrArray<CDXLStatsDerivedColumn, CleanupRelease> DrgPdxlstatsdercol;
-}
+	typedef CDynamicPtrArray<CDXLStatsDerivedColumn, CleanupRelease> CDXLStatsDerivedColumnArray;
+}  // namespace gpmd
 
-#endif // !GPMD_CDXLStatsDerivedColumn_H
+#endif  // !GPMD_CDXLStatsDerivedColumn_H
 
 // EOF

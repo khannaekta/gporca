@@ -22,7 +22,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CHashSetTest
@@ -33,17 +32,15 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CHashSetTest
 	{
-		public:
+	public:
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_Basic();
+		static GPOS_RESULT EresUnittest_Ownership();
 
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_Basic();
-			static GPOS_RESULT EresUnittest_Ownership();
+	};  // class CHashSetTest
+}  // namespace gpos
 
-	}; // class CHashSetTest
-}
-
-#endif // !GPOS_CHashSetTest_H
+#endif  // !GPOS_CHashSetTest_H
 
 // EOF
-

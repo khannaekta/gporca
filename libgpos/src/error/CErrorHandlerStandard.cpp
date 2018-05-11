@@ -28,35 +28,32 @@ using namespace gpos;
 //
 //---------------------------------------------------------------------------
 void
-CErrorHandlerStandard::Process
-	(
-	CException exc
-	)
+CErrorHandlerStandard::Process(CException exception)
 {
-	CTask *ptsk = CTask::PtskSelf();
+	CTask *task = CTask::Self();
 
-	GPOS_ASSERT(NULL != ptsk && "No task in current context");
+	GPOS_ASSERT(NULL != task && "No task in current context");
 
-	IErrorContext *perrctxt = ptsk->Perrctxt();
-	CLogger *plog = dynamic_cast<CLogger*>(ptsk->PlogErr());
-	
-	GPOS_ASSERT(perrctxt->FPending() && "No error to process");
-	GPOS_ASSERT(perrctxt->Exc() == exc && 
-			"Exception processed different from pending");
+	IErrorContext *err_ctxt = task->GetErrCtxt();
+	CLogger *log = dynamic_cast<CLogger *>(task->GetErrorLogger());
+
+	GPOS_ASSERT(err_ctxt->IsPending() && "No error to process");
+	GPOS_ASSERT(err_ctxt->GetException() == exception &&
+				"Exception processed different from pending");
 
 	// print error stack trace
-	if (CException::ExmaSystem == exc.UlMajor() && !perrctxt->FRethrow())
+	if (CException::ExmaSystem == exception.Major() && !err_ctxt->IsRethrown())
 	{
-		if ((CException::ExmiIOError == exc.UlMinor() ||
-		    CException::ExmiNetError == exc.UlMinor() ) &&
+		if ((CException::ExmiIOError == exception.Minor() ||
+			 CException::ExmiNetError == exception.Minor()) &&
 			0 < errno)
 		{
-			perrctxt->AppendErrnoMsg();
+			err_ctxt->AppendErrnoMsg();
 		}
 
-		if (ILogger::EeilMsgHeaderStack <= plog->Eil())
+		if (ILogger::EeilMsgHeaderStack <= log->InfoLevel())
 		{
-			perrctxt->AppendStackTrace();
+			err_ctxt->AppendStackTrace();
 		}
 	}
 
@@ -66,9 +63,8 @@ CErrorHandlerStandard::Process
 		CAutoSuspendAbort asa;
 
 		// log error message
-		plog->Log(perrctxt->WszMsg(), perrctxt->UlSev(), __FILE__, __LINE__);
+		log->Log(err_ctxt->GetErrorMsg(), err_ctxt->GetSeverity(), __FILE__, __LINE__);
 	}
 }
 
 // EOF
-

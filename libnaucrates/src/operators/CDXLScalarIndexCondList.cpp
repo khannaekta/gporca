@@ -24,25 +24,20 @@ using namespace gpdxl;
 //		ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarIndexCondList::CDXLScalarIndexCondList
-	(
-	IMemoryPool *pmp
-	)
-	:
-	CDXLScalar(pmp)
+CDXLScalarIndexCondList::CDXLScalarIndexCondList(IMemoryPool *mp) : CDXLScalar(mp)
 {
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarIndexCondList::Edxlop
+//		CDXLScalarIndexCondList::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLScalarIndexCondList::Edxlop() const
+CDXLScalarIndexCondList::GetDXLOperator() const
 {
 	return EdxlopScalarIndexCondList;
 }
@@ -50,16 +45,16 @@ CDXLScalarIndexCondList::Edxlop() const
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarIndexCondList::PstrOpName
+//		CDXLScalarIndexCondList::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLScalarIndexCondList::PstrOpName() const
+CDXLScalarIndexCondList::GetOpNameStr() const
 {
-	return CDXLTokens::PstrToken(EdxltokenScalarIndexCondList);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenScalarIndexCondList);
 }
 
 //---------------------------------------------------------------------------
@@ -71,17 +66,13 @@ CDXLScalarIndexCondList::PstrOpName() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarIndexCondList::SerializeToDXL
-	(
-	CXMLSerializer *pxmlser,
-	const CDXLNode *pdxln
-	)
-	const
+CDXLScalarIndexCondList::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const
 {
-	const CWStringConst *pstrElemName = PstrOpName();
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
-	pdxln->SerializeChildrenToDXL(pxmlser);
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	const CWStringConst *element_name = GetOpNameStr();
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	node->SerializeChildrenToDXL(xml_serializer);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -94,26 +85,21 @@ CDXLScalarIndexCondList::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarIndexCondList::AssertValid
-	(
-	const CDXLNode *pdxln,
-	BOOL fValidateChildren
-	)
-	const
+CDXLScalarIndexCondList::AssertValid(const CDXLNode *node, BOOL validate_children) const
 {
-	GPOS_ASSERT(NULL != pdxln);
+	GPOS_ASSERT(NULL != node);
 
-	if (fValidateChildren)
+	if (validate_children)
 	{
-		const ULONG ulArity = pdxln->UlArity();
-		for (ULONG ul = 0; ul < ulArity; ul++)
+		const ULONG arity = node->Arity();
+		for (ULONG ul = 0; ul < arity; ul++)
 		{
-			CDXLNode *pdxlnChild = (*pdxln)[ul];
-			GPOS_ASSERT(EdxloptypeScalar == pdxlnChild->Pdxlop()->Edxloperatortype());
-			pdxlnChild->Pdxlop()->AssertValid(pdxlnChild, fValidateChildren);
+			CDXLNode *child_dxlnode = (*node)[ul];
+			GPOS_ASSERT(EdxloptypeScalar == child_dxlnode->GetOperator()->GetDXLOperatorType());
+			child_dxlnode->GetOperator()->AssertValid(child_dxlnode, validate_children);
 		}
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

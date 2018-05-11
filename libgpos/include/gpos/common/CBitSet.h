@@ -19,7 +19,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CBitSet
@@ -32,156 +31,147 @@ namespace gpos
 	{
 		// bitset iter needs to access internals
 		friend class CBitSetIter;
-		
-		protected:
 
-			//---------------------------------------------------------------------------
-			//	@class:
-			//		CBitSetLink
-			//
-			//	@doc:
-			//		bit vector + offset + link
-			//
-			//---------------------------------------------------------------------------
-			class CBitSetLink
-			{
-				private:
-				
-					// private copy ctor
-					CBitSetLink(const CBitSetLink &);
-
-					// offset
-					ULONG m_ulOffset;
-					
-					// bitvector
-					CBitVector *m_pbv;
-
-				public:
-				
-					// ctor
-                    explicit
-                    CBitSetLink(IMemoryPool *, ULONG ulOffset, ULONG cSizeBits);
-
-        			explicit
-					CBitSetLink(IMemoryPool *, const CBitSetLink &);
-					
-					// dtor
-					~CBitSetLink();
-
-					// accessor
-					ULONG UlOffset() const
-					{
-						return m_ulOffset;
-					}
-					
-					// accessor
-					CBitVector *Pbv() const
-					{
-						return m_pbv;
-					}
-										
-					// list link
-					SLink m_link;
-					
-			}; // class CBitSetLink
-		
-			// list of bit set links
-			typedef CList<CBitSetLink> BSLList;
-			BSLList m_bsllist;
-		
-			// pool to allocate links from
-			IMemoryPool *m_pmp;
-		
-			// size of individual bitvectors
-			ULONG m_cSizeBits;
-			
-			// number of elements
-			ULONG m_cElements;
-		
+	protected:
+		//---------------------------------------------------------------------------
+		//	@class:
+		//		CBitSetLink
+		//
+		//	@doc:
+		//		bit vector + offset + link
+		//
+		//---------------------------------------------------------------------------
+		class CBitSetLink
+		{
+		private:
 			// private copy ctor
-			CBitSet(const CBitSet&);
-			
-			// find link with offset less or equal to given value
-			CBitSetLink *PbslLocate(ULONG, CBitSetLink * = NULL) const;
-			
-			// reset set
-			void Clear();
-			
-			// compute target offset
-			ULONG UlOffset(ULONG) const;
-			
-			// re-compute size of set
-			void RecomputeSize();
-			
+			CBitSetLink(const CBitSetLink &);
+
+			// offset
+			ULONG m_offset;
+
+			// bitvector
+			CBitVector *m_vec;
+
 		public:
-				
 			// ctor
-			CBitSet(IMemoryPool *pmp, ULONG cSizeBits = 256);
-			CBitSet(IMemoryPool *pmp, const CBitSet &);
-			
+			explicit CBitSetLink(IMemoryPool *, ULONG offset, ULONG vector_size);
+
+			explicit CBitSetLink(IMemoryPool *, const CBitSetLink &);
+
 			// dtor
-			virtual ~CBitSet();
-			
-			// determine if bit is set
-			BOOL FBit(ULONG ulBit) const;
-			
-			// set given bit; return previous value
-			BOOL FExchangeSet(ULONG ulBit);
-						
-			// clear given bit; return previous value
-			BOOL FExchangeClear(ULONG ulBit);
-			
-			// union sets
-			void Union(const CBitSet *);
-			
-			// intersect sets
-			void Intersection(const CBitSet *);
-			
-			// difference of sets
-			void Difference(const CBitSet *);
-			
-			// is subset
-			BOOL FSubset(const CBitSet *) const;
-			
-			// equality
-			BOOL FEqual(const CBitSet *) const;
-			
-			// disjoint
-			BOOL FDisjoint(const CBitSet *) const;
-			
-			// hash value for set
-			ULONG UlHash() const;
-			
-			// number of elements
-			ULONG CElements() const
+			~CBitSetLink();
+
+			// accessor
+			ULONG
+			GetOffset() const
 			{
-				return m_cElements;
+				return m_offset;
 			}
-			
-			// print function
-			IOstream &OsPrint(IOstream &os) const;
+
+			// accessor
+			CBitVector *
+			GetVec() const
+			{
+				return m_vec;
+			}
+
+			// list link
+			SLink m_link;
+
+		};  // class CBitSetLink
+
+		// list of bit set links
+		CList<CBitSetLink> m_bsllist;
+
+		// pool to allocate links from
+		IMemoryPool *m_mp;
+
+		// size of individual bitvectors
+		ULONG m_vector_size;
+
+		// number of elements
+		ULONG m_size;
+
+		// private copy ctor
+		CBitSet(const CBitSet &);
+
+		// find link with offset less or equal to given value
+		CBitSetLink *FindLinkByOffset(ULONG, CBitSetLink * = NULL) const;
+
+		// reset set
+		void Clear();
+
+		// compute target offset
+		ULONG ComputeOffset(ULONG) const;
+
+		// re-compute size of set
+		void RecomputeSize();
+
+	public:
+		// ctor
+		CBitSet(IMemoryPool *mp, ULONG vector_size = 256);
+		CBitSet(IMemoryPool *mp, const CBitSet &);
+
+		// dtor
+		virtual ~CBitSet();
+
+		// determine if bit is set
+		BOOL Get(ULONG pos) const;
+
+		// set given bit; return previous value
+		BOOL ExchangeSet(ULONG pos);
+
+		// clear given bit; return previous value
+		BOOL ExchangeClear(ULONG pos);
+
+		// union sets
+		void Union(const CBitSet *);
+
+		// intersect sets
+		void Intersection(const CBitSet *);
+
+		// difference of sets
+		void Difference(const CBitSet *);
+
+		// is subset
+		BOOL ContainsAll(const CBitSet *) const;
+
+		// equality
+		BOOL Equals(const CBitSet *) const;
+
+		// disjoint
+		BOOL IsDisjoint(const CBitSet *) const;
+
+		// hash value for set
+		ULONG HashValue() const;
+
+		// number of elements
+		ULONG
+		Size() const
+		{
+			return m_size;
+		}
+
+		// print function
+		IOstream &OsPrint(IOstream &os) const;
 
 #ifdef GPOS_DEBUG
-			// debug print for interactive debugging sessions only
-			void DbgPrint() const;
-#endif // GPOS_DEBUG
+		// debug print for interactive debugging sessions only
+		void DbgPrint() const;
+#endif  // GPOS_DEBUG
 
-	}; // class CBitSet
+	};  // class CBitSet
 
 
 	// shorthand for printing
-	inline
-	IOstream &operator << 
-		(
-		IOstream &os, 
-		CBitSet &bs
-		)
+	inline IOstream &
+	operator<<(IOstream &os, CBitSet &bs)
 	{
 		return bs.OsPrint(os);
 	}
-}
+}  // namespace gpos
 
-#endif // !GPOS_CBitSet_H
+#endif  // !GPOS_CBitSet_H
 
 // EOF
-

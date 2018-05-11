@@ -45,46 +45,39 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalAbstractBitmapScan : public CDXLPhysical
 	{
-		private:
-			// private copy ctor
-			CDXLPhysicalAbstractBitmapScan(const CDXLPhysicalAbstractBitmapScan &);
+	private:
+		// private copy ctor
+		CDXLPhysicalAbstractBitmapScan(const CDXLPhysicalAbstractBitmapScan &);
 
-		protected:
-			// table descriptor for the scanned table
-			CDXLTableDescr *m_pdxltabdesc;
+	protected:
+		// table descriptor for the scanned table
+		CDXLTableDescr *m_dxl_table_descr;
 
-		public:
-			// ctor
-			CDXLPhysicalAbstractBitmapScan
-				(
-				IMemoryPool *pmp,
-				CDXLTableDescr *pdxltabdesc
-				)
-				:
-				CDXLPhysical(pmp),
-				m_pdxltabdesc(pdxltabdesc)
-			{
-				GPOS_ASSERT(NULL != pdxltabdesc);
-			}
+	public:
+		// ctor
+		CDXLPhysicalAbstractBitmapScan(IMemoryPool *mp, CDXLTableDescr *table_descr)
+			: CDXLPhysical(mp), m_dxl_table_descr(table_descr)
+		{
+			GPOS_ASSERT(NULL != table_descr);
+		}
 
-			// dtor
-			virtual
-			~CDXLPhysicalAbstractBitmapScan();
+		// dtor
+		virtual ~CDXLPhysicalAbstractBitmapScan();
 
-			// table descriptor
-			const CDXLTableDescr *Pdxltabdesc()
-			{
-				return m_pdxltabdesc;
-			}
+		// table descriptor
+		const CDXLTableDescr *
+		GetDXLTableDescr()
+		{
+			return m_dxl_table_descr;
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			virtual
-			void AssertValid(const CDXLNode *pdxln, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		virtual void AssertValid(const CDXLNode *node, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};  // class CDXLPhysicalAbstractBitmapScan
-}
+}  // namespace gpdxl
 
 #endif  // !GPDXL_CDXLPhysicalAbstractBitmapScan_H
 

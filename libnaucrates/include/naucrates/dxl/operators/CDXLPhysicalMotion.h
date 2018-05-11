@@ -23,7 +23,7 @@
 namespace gpdxl
 {
 	using namespace gpos;
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDXLPhysicalMotion
@@ -34,68 +34,60 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalMotion : public CDXLPhysical
 	{
-		private:
-			// private copy ctor
-			CDXLPhysicalMotion(CDXLPhysicalMotion&);
-			
-			// serialize the given list of segment ids into a comma-separated string
-			CWStringDynamic *PstrSegIds(const DrgPi *pdrgpi) const;
+	private:
+		// private copy ctor
+		CDXLPhysicalMotion(CDXLPhysicalMotion &);
 
-			// serialize input and output segment ids into a comma-separated string
-			CWStringDynamic *PstrInputSegIds() const;
-			CWStringDynamic *PstrOutputSegIds() const;
-			
-		protected:
-			// list of input segment ids
-			DrgPi *m_pdrgpiInputSegIds;
-			
-			// list of output segment ids
-			DrgPi *m_pdrgpiOutputSegIds;
+		// serialize the given list of segment ids into a comma-separated string
+		CWStringDynamic *GetSegIdsCommaSeparatedStr(const IntPtrArray *segment_ids_array) const;
 
-			void SerializeSegmentInfoToDXL(CXMLSerializer *pxmlser) const;
+		// serialize input and output segment ids into a comma-separated string
+		CWStringDynamic *GetInputSegIdsStr() const;
+		CWStringDynamic *GetOutputSegIdsStr() const;
 
-			
-		public:
-			// ctor/dtor
-			explicit
-			CDXLPhysicalMotion(IMemoryPool *pmp);
+	protected:
+		// list of input segment ids
+		IntPtrArray *m_input_segids_array;
 
-			virtual
-			~CDXLPhysicalMotion();
-			
-			// accessors
-			const DrgPi *PdrgpiInputSegIds() const;
-			const DrgPi *PdrgpiOutputSegIds() const;
-			
-			// setters
-			void SetInputSegIds(DrgPi *pdrgpi);
-			void SetOutputSegIds(DrgPi *pdrgpi);
-			void SetSegmentInfo(DrgPi *pdrgpiInputSegIds, DrgPi *pdrgpiOutputSegIds);
+		// list of output segment ids
+		IntPtrArray *m_output_segids_array;
 
-			// index of relational child node in the children array
-			virtual 
-			ULONG UlChildIndex() const = 0;
-			
-			// conversion function
-			static
-			CDXLPhysicalMotion *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopPhysicalMotionGather == pdxlop->Edxlop()
-						|| EdxlopPhysicalMotionBroadcast == pdxlop->Edxlop()
-						|| EdxlopPhysicalMotionRedistribute == pdxlop->Edxlop()
-						|| EdxlopPhysicalMotionRoutedDistribute == pdxlop->Edxlop()
-						|| EdxlopPhysicalMotionRandom == pdxlop->Edxlop());
+		void SerializeSegmentInfoToDXL(CXMLSerializer *xml_serializer) const;
 
-				return dynamic_cast<CDXLPhysicalMotion*>(pdxlop);
-			}
 
+	public:
+		// ctor/dtor
+		explicit CDXLPhysicalMotion(IMemoryPool *mp);
+
+		virtual ~CDXLPhysicalMotion();
+
+		// accessors
+		const IntPtrArray *GetInputSegIdsArray() const;
+		const IntPtrArray *GetOutputSegIdsArray() const;
+
+		// setters
+		void SetInputSegIds(IntPtrArray *input_segids_array);
+		void SetOutputSegIds(IntPtrArray *output_segids_array);
+		void SetSegmentInfo(IntPtrArray *input_segids_array, IntPtrArray *output_segids_array);
+
+		// index of relational child node in the children array
+		virtual ULONG GetRelationChildIdx() const = 0;
+
+		// conversion function
+		static CDXLPhysicalMotion *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopPhysicalMotionGather == dxl_op->GetDXLOperator() ||
+						EdxlopPhysicalMotionBroadcast == dxl_op->GetDXLOperator() ||
+						EdxlopPhysicalMotionRedistribute == dxl_op->GetDXLOperator() ||
+						EdxlopPhysicalMotionRoutedDistribute == dxl_op->GetDXLOperator() ||
+						EdxlopPhysicalMotionRandom == dxl_op->GetDXLOperator());
+
+			return dynamic_cast<CDXLPhysicalMotion *>(dxl_op);
+		}
 	};
-}
-#endif // !GPDXL_CDXLPhysicalMotion_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLPhysicalMotion_H
 
 // EOF
-

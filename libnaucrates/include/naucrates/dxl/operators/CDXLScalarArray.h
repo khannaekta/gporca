@@ -30,87 +30,73 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarArray : public CDXLScalar
 	{
-		private:
+	private:
+		// base element type id
+		IMDId *m_elem_type_mdid;
 
-			// base element type id
-			IMDId *m_pmdidElem;
-			
-			// array type id
-			IMDId *m_pmdidArray;
+		// array type id
+		IMDId *m_array_type_mdid;
 
-			// is it a multidimensional array
-			BOOL m_fMultiDimensional;
+		// is it a multidimensional array
+		BOOL m_multi_dimensional_array;
 
-			// private copy ctor
-			CDXLScalarArray(const CDXLScalarArray&);
+		// private copy ctor
+		CDXLScalarArray(const CDXLScalarArray &);
 
-		public:
-			// ctor
-			CDXLScalarArray
-				(
-				IMemoryPool *pmp,
-				IMDId *pmdidElem,
-				IMDId *pmdidArray,
-				BOOL fMultiDimensional
-				);
+	public:
+		// ctor
+		CDXLScalarArray(IMemoryPool *mp,
+						IMDId *elem_type_mdid,
+						IMDId *array_type_mdid,
+						BOOL multi_dimensional_array);
 
-			// dtor
-			virtual
-			~CDXLScalarArray();
+		// dtor
+		virtual ~CDXLScalarArray();
 
-			// ident accessors
-			virtual
-			Edxlopid Edxlop() const;
+		// ident accessors
+		virtual Edxlopid GetDXLOperator() const;
 
-			// operator name
-			virtual
-			const CWStringConst *PstrOpName() const;
+		// operator name
+		virtual const CWStringConst *GetOpNameStr() const;
 
-			// element type id
-			IMDId *PmdidElem() const;
+		// element type id
+		IMDId *ElementTypeMDid() const;
 
-			// array type id
-			IMDId *PmdidArray() const;
+		// array type id
+		IMDId *ArrayTypeMDid() const;
 
-			// is array multi-dimensional 
-			BOOL FMultiDimensional() const;
+		// is array multi-dimensional
+		BOOL IsMultiDimensional() const;
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
-			// conversion function
-			static
-			CDXLScalarArray *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopScalarArray == pdxlop->Edxlop());
+		// conversion function
+		static CDXLScalarArray *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarArray == dxl_op->GetDXLOperator());
 
-				return dynamic_cast<CDXLScalarArray*>(pdxlop);
-			}
+			return dynamic_cast<CDXLScalarArray *>(dxl_op);
+		}
 
-			// does the operator return a boolean result
-			virtual
-			BOOL FBoolean
-					(
-					CMDAccessor *//pmda
-					)
-					const
-			{
-				return false;
-			}
+		// does the operator return a boolean result
+		virtual BOOL
+		HasBoolResult(CMDAccessor *  //md_accessor
+					  ) const
+		{
+			return false;
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *pdxln, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLScalarArray_H
+#endif  // !GPDXL_CDXLScalarArray_H
 
 // EOF

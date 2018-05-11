@@ -7,9 +7,9 @@
 //
 //	@doc:
 //		Implementation of DXL datum of type integer
-//		
-//	@owner: 
-//		
+//
+//	@owner:
+//
 //
 //	@test:
 //
@@ -29,31 +29,23 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLDatumInt4::CDXLDatumInt4
-	(
-	IMemoryPool *pmp,
-	IMDId *pmdidType,
-	BOOL fNull,
-	INT iVal
-	)
-	:
-	CDXLDatum(pmp, pmdidType, IDefaultTypeModifier, fNull, 4 /*ulLength*/ ),
-	m_iVal(iVal)
+CDXLDatumInt4::CDXLDatumInt4(IMemoryPool *mp, IMDId *mdid_type, BOOL is_null, INT val)
+	: CDXLDatum(mp, mdid_type, default_type_modifier, is_null, 4 /*length*/), m_val(val)
 {
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLDatumInt4::IValue
+//		CDXLDatumInt4::Value
 //
 //	@doc:
 //		Return the integer value
 //
 //---------------------------------------------------------------------------
 INT
-CDXLDatumInt4::IValue() const
+CDXLDatumInt4::Value() const
 {
-	return m_iVal;
+	return m_val;
 }
 
 //---------------------------------------------------------------------------
@@ -65,18 +57,15 @@ CDXLDatumInt4::IValue() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLDatumInt4::Serialize
-	(
-	CXMLSerializer *pxmlser
-	)
+CDXLDatumInt4::Serialize(CXMLSerializer *xml_serializer)
 {
-	m_pmdidType->Serialize(pxmlser, CDXLTokens::PstrToken(EdxltokenTypeId));
-	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenIsNull), m_fNull);
-	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenIsByValue), FByValue());
-	
-	if (!m_fNull)
+	m_mdid_type->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenTypeId));
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenIsNull), m_is_null);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenIsByValue), IsPassedByValue());
+
+	if (!m_is_null)
 	{
-		pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenValue), m_iVal);
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenValue), m_val);
 	}
 }
 

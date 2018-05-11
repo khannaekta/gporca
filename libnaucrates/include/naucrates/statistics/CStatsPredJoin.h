@@ -13,6 +13,8 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/CDynamicPtrArray.h"
+#include "naucrates/statistics/CStatsPred.h"
 #include "naucrates/md/IMDType.h"
 
 namespace gpnaucrates
@@ -29,66 +31,60 @@ namespace gpnaucrates
 	//---------------------------------------------------------------------------
 	class CStatsPredJoin : public CRefCount
 	{
-		private:
+	private:
+		// private copy ctor
+		CStatsPredJoin(const CStatsPredJoin &);
 
-			// private copy ctor
-			CStatsPredJoin(const CStatsPredJoin &);
+		// private assignment operator
+		CStatsPredJoin &operator=(CStatsPredJoin &);
 
-			// private assignment operator
-			CStatsPredJoin& operator=(CStatsPredJoin &);
+		// column id
+		ULONG m_colidOuter;
 
-			// column id
-			ULONG m_ulColId1;
+		// comparison type
+		CStatsPred::EStatsCmpType m_stats_cmp_type;
 
-			// comparison type
-			CStatsPred::EStatsCmpType m_escmpt;
+		// column id
+		ULONG m_colidInner;
 
-			// column id
-			ULONG m_ulColId2;
+	public:
+		// c'tor
+		CStatsPredJoin(ULONG colid1, CStatsPred::EStatsCmpType stats_cmp_type, ULONG colid2)
+			: m_colidOuter(colid1), m_stats_cmp_type(stats_cmp_type), m_colidInner(colid2)
+		{
+		}
 
-		public:
+		// accessors
+		ULONG
+		ColIdOuter() const
+		{
+			return m_colidOuter;
+		}
 
-			// c'tor
-			CStatsPredJoin
-				(
-				ULONG ulColId1,
-				CStatsPred::EStatsCmpType escmpt,
-				ULONG ulColId2
-				)
-				:
-				m_ulColId1(ulColId1),
-				m_escmpt(escmpt),
-				m_ulColId2(ulColId2)
-			{}
+		// comparison type
+		CStatsPred::EStatsCmpType
+		GetCmpType() const
+		{
+			return m_stats_cmp_type;
+		}
 
-			// accessors
-			ULONG UlColId1() const
-			{
-				return m_ulColId1;
-			}
+		ULONG
+		ColIdInner() const
+		{
+			return m_colidInner;
+		}
 
-			// comparison type
-			CStatsPred::EStatsCmpType Escmpt() const
-			{
-				return m_escmpt;
-			}
+		// d'tor
+		virtual ~CStatsPredJoin()
+		{
+		}
 
-			ULONG UlColId2() const
-			{
-				return m_ulColId2;
-			}
-
-			// d'tor
-			virtual
-			~CStatsPredJoin()
-			{}
-
-	}; // class CStatsPredJoin
+	};  // class CStatsPredJoin
 
 	// array of filters
-	typedef CDynamicPtrArray<CStatsPredJoin, CleanupRelease> DrgPstatspredjoin;
-}
+	typedef CDynamicPtrArray<CStatsPredJoin, CleanupRelease> CStatsPredJoinArray;
+}  // namespace gpnaucrates
 
-#endif // !GPNAUCRATES_CStatsPredJoin_H
+#endif  // !GPNAUCRATES_CStatsPredJoin_H
 
 // EOF

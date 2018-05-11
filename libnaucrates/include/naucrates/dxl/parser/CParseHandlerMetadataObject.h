@@ -32,35 +32,30 @@ namespace gpdxl
 	//
 	//
 	//---------------------------------------------------------------------------
-	class CParseHandlerMetadataObject : public CParseHandlerBase 
+	class CParseHandlerMetadataObject : public CParseHandlerBase
 	{
-		private:
+	private:
+		// private copy ctor
+		CParseHandlerMetadataObject(const CParseHandlerMetadataObject &);
 
-			// private copy ctor
-			CParseHandlerMetadataObject(const CParseHandlerMetadataObject&);
-			
-			
-		protected:
-			// the metadata object constructed by the parse handler
-			IMDCacheObject *m_pimdobj;
-						
-		public:
-			// ctor/dtor
-			CParseHandlerMetadataObject
-				(
-				IMemoryPool *pmp,
-				CParseHandlerManager *pphm,
-				CParseHandlerBase *pphRoot
-				);
-			
-			virtual
-			~CParseHandlerMetadataObject();
-			
-			// returns constructed metadata object
-			IMDCacheObject *Pimdobj() const;	
+
+	protected:
+		// the metadata object constructed by the parse handler
+		IMDCacheObject *m_imd_obj;
+
+	public:
+		// ctor/dtor
+		CParseHandlerMetadataObject(IMemoryPool *mp,
+									CParseHandlerManager *parse_handler_mgr,
+									CParseHandlerBase *parse_handler_root);
+
+		virtual ~CParseHandlerMetadataObject();
+
+		// returns constructed metadata object
+		IMDCacheObject *GetImdObj() const;
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerMetadataObject_H
+#endif  // !GPDXL_CParseHandlerMetadataObject_H
 
 // EOF

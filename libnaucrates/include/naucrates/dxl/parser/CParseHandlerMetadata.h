@@ -26,8 +26,8 @@ namespace gpdxl
 	using namespace gpnaucrates;
 
 	XERCES_CPP_NAMESPACE_USE
-	
-	
+
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CParseHandlerMetadata
@@ -38,70 +38,61 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerMetadata : public CParseHandlerBase
 	{
-		private:
-			
-			// list of parsed metadata objects
-			DrgPimdobj *m_pdrgpmdobj;
-			
-			// list of parsed mdids
-			DrgPmdid *m_pdrgpmdid;
+	private:
+		// list of parsed metadata objects
+		IMDCacheObjectArray *m_mdid_cached_obj_array;
 
-			// list of parsed metatadata source system ids
-			DrgPsysid *m_pdrgpsysid;
+		// list of parsed mdids
+		IMdIdArray *m_mdid_array;
 
-			// private copy ctor
-			CParseHandlerMetadata(const CParseHandlerMetadata&);
-			
-			// process the start of an element
-			void StartElement
-				(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
- 					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
+		// list of parsed metatadata source system ids
+		CSystemIdArray *m_system_id_array;
 
-			// process the end of an element
-			void EndElement
-				(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
-					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname		// element's qname
-				);
-			
-			// parse an array of system ids from the XML attributes
-			DrgPsysid *PdrgpsysidParse
-						(	
-						const Attributes &attr,
-						Edxltoken edxltokenAttr,
-						Edxltoken edxltokenElement
-						);
+		// private copy ctor
+		CParseHandlerMetadata(const CParseHandlerMetadata &);
 
-			
-		public:
-			// ctor
-			CParseHandlerMetadata(IMemoryPool *pmp, CParseHandlerManager *pphm, CParseHandlerBase *pphRoot);
-			
-			// dtor
-			virtual
-			~CParseHandlerMetadata();
-			
-			// parse hander type
-			virtual
-			EDxlParseHandlerType Edxlphtype() const;
-			
-			// return the list of parsed metadata objects
-			DrgPimdobj *Pdrgpmdobj();
-			
-			// return the list of parsed mdids
-			DrgPmdid *Pdrgpmdid();
-			
-			// return the list of parsed system ids
-			DrgPsysid *Pdrgpsysid();
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+		// parse an array of system ids from the XML attributes
+		CSystemIdArray *GetSrcSysIdArray(const Attributes &attr,
+										Edxltoken target_attr,
+										Edxltoken target_elem);
+
+
+	public:
+		// ctor
+		CParseHandlerMetadata(IMemoryPool *mp,
+							  CParseHandlerManager *parse_handler_mgr,
+							  CParseHandlerBase *parse_handler_root);
+
+		// dtor
+		virtual ~CParseHandlerMetadata();
+
+		// parse hander type
+		virtual EDxlParseHandlerType GetParseHandlerType() const;
+
+		// return the list of parsed metadata objects
+		IMDCacheObjectArray *GetMdIdCachedObjArray();
+
+		// return the list of parsed mdids
+		IMdIdArray *GetMdIdArray();
+
+		// return the list of parsed system ids
+		CSystemIdArray *GetSysidPtrArray();
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerMetadata_H
+#endif  // !GPDXL_CParseHandlerMetadata_H
 
 // EOF

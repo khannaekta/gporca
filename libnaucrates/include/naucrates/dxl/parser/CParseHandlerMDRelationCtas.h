@@ -34,42 +34,34 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerMDRelationCtas : public CParseHandlerMDRelation
 	{
-		private:
+	private:
+		// vartypemod list
+		IntPtrArray *m_vartypemod_array;
 
-			// vartypemod list
-			DrgPi *m_pdrgpiVarTypeMod;
+		// private copy ctor
+		CParseHandlerMDRelationCtas(const CParseHandlerMDRelationCtas &);
 
-			// private copy ctor
-			CParseHandlerMDRelationCtas(const CParseHandlerMDRelationCtas &);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the start of an element
-			void StartElement
-				(
-				const XMLCh* const xmlszUri, 		// URI of element's namespace
-				const XMLCh* const xmlszLocalname,	// local part of element's name
-				const XMLCh* const xmlszQname,		// element's qname
-				const Attributes& attr				// element's attributes
-				);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the end of an element
-			void EndElement
-				(
-				const XMLCh* const xmlszUri, 		// URI of element's namespace
-				const XMLCh* const xmlszLocalname,	// local part of element's name
-				const XMLCh* const xmlszQname		// element's qname
-				);
-
-		public:
-			// ctor
-			CParseHandlerMDRelationCtas
-				(
-				IMemoryPool *pmp,
-				CParseHandlerManager *pphm,
-				CParseHandlerBase *pphRoot
-				);
+	public:
+		// ctor
+		CParseHandlerMDRelationCtas(IMemoryPool *mp,
+									CParseHandlerManager *parse_handler_mgr,
+									CParseHandlerBase *parse_handler_root);
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerMDRelationCTAS_H
+#endif  // !GPDXL_CParseHandlerMDRelationCTAS_H
 
 // EOF

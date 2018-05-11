@@ -22,7 +22,7 @@ namespace gpmd
 {
 	using namespace gpos;
 
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CMDScalarOpGPDB
@@ -32,146 +32,124 @@ namespace gpmd
 	//
 	//---------------------------------------------------------------------------
 	class CMDScalarOpGPDB : public IMDScalarOp
-	{		
-		
-		private:
-		
-			// memory pool
-			IMemoryPool *m_pmp;
-			
-			// DXL for object
-			const CWStringDynamic *m_pstr;
-			
-			// operator id
-			IMDId *m_pmdid;
-			
-			// operator name
-			CMDName *m_pmdname;
-			
-			// type of left operand
-			IMDId *m_pmdidTypeLeft;
-			
-			// type of right operand
-			IMDId *m_pmdidTypeRight;
+	{
+	private:
+		// memory pool
+		IMemoryPool *m_mp;
 
-			// type of result operand
-			IMDId *m_pmdidTypeResult;
-			
-			// id of function which implements the operator
-			IMDId *m_pmdidFunc;
-			
-			// id of commute operator
-			IMDId *m_pmdidOpCommute;
-			
-			// id of inverse operator
-			IMDId *m_pmdidOpInverse;
-			
-			// comparison type for comparison operators
-			IMDType::ECmpType m_ecmpt;
-			
-			// does operator return NULL when all inputs are NULL?
-			BOOL m_fReturnsNullOnNullInput;
-			
-			// operator classes this operator belongs to
-			DrgPmdid *m_pdrgpmdidOpClasses;
+		// DXL for object
+		const CWStringDynamic *m_dxl_str;
 
-			CMDScalarOpGPDB(const CMDScalarOpGPDB &);
-			
-		public:
-			
-			// ctor/dtor
-			CMDScalarOpGPDB
-				(
-				IMemoryPool *pmp,
-				IMDId *pmdid,
-				CMDName *pmdname,
-				IMDId *pmdidTypeLeft,
-				IMDId *pmdidTypeRight,
-				IMDId *pmdidTypeResult,
-				IMDId *pmdidFunc,
-				IMDId *pmdidOpCommute,
-				IMDId *pmdidOpInverse,
-				IMDType::ECmpType ecmpt,
-				BOOL fReturnsNullOnNullInput,
-				DrgPmdid *pdrgpmdidOpClasses
-				);
-			
-			~CMDScalarOpGPDB();
-			
-			// accessors
-			virtual 
-			const CWStringDynamic *Pstr() const
-			{
-				return m_pstr;
-			}
-			
-			// operator id
-			virtual
-			IMDId *Pmdid() const;
-			
-			// operator name
-			virtual
-			CMDName Mdname() const;
+		// operator id
+		IMDId *m_mdid;
 
-			// left operand type id
-			virtual
-			IMDId *PmdidTypeLeft() const;
-			
-			// right operand type id
-			virtual
-			IMDId *PmdidTypeRight() const;
+		// operator name
+		CMDName *m_mdname;
 
-			// resulttype id
-			virtual
-			IMDId *PmdidTypeResult() const;
+		// type of left operand
+		IMDId *m_mdid_type_left;
 
-			// implementer function id
-			virtual
-			IMDId *PmdidFunc() const;
+		// type of right operand
+		IMDId *m_mdid_type_right;
 
-			// commutor id
-			virtual
-			IMDId *PmdidOpCommute() const;
+		// type of result operand
+		IMDId *m_mdid_type_result;
 
-			// inverse operator id
-			virtual
-			IMDId *PmdidOpInverse() const;
+		// id of function which implements the operator
+		IMDId *m_func_mdid;
 
-			// is this an equality operator
-			virtual
-			BOOL FEquality() const;
+		// id of commute operator
+		IMDId *m_mdid_commute_opr;
 
-			// does operator return NULL when all inputs are NULL?
-			// STRICT implies NULL-returning, but the opposite is not always true,
-			// the implementation in GPDB returns what STRICT property states
-			virtual
-			BOOL FReturnsNullOnNullInput() const;
+		// id of inverse operator
+		IMDId *m_mdid_inverse_opr;
 
-			// comparison type
-			virtual
-			IMDType::ECmpType Ecmpt() const;
-			
-			// serialize object in DXL format
-			virtual
-			void Serialize(gpdxl::CXMLSerializer *pxmlser) const;
-			
-			// number of classes this operator belongs to
-			virtual
-			ULONG UlOpCLasses() const;
-			
-			// operator class at given position
-			virtual
-			IMDId *PmdidOpClass(ULONG ulPos) const;
-			
+		// comparison type for comparison operators
+		IMDType::ECmpType m_comparision_type;
+
+		// does operator return NULL when all inputs are NULL?
+		BOOL m_returns_null_on_null_input;
+
+		// operator classes this operator belongs to
+		IMdIdArray *m_mdid_op_classes_array;
+
+		CMDScalarOpGPDB(const CMDScalarOpGPDB &);
+
+	public:
+		// ctor/dtor
+		CMDScalarOpGPDB(IMemoryPool *mp,
+						IMDId *mdid,
+						CMDName *mdname,
+						IMDId *mdid_type_left,
+						IMDId *mdid_type_right,
+						IMDId *result_type_mdid,
+						IMDId *mdid_func,
+						IMDId *mdid_commute_opr,
+						IMDId *m_mdid_inverse_opr,
+						IMDType::ECmpType cmp_type,
+						BOOL returns_null_on_null_input,
+						IMdIdArray *mdid_op_classes_array);
+
+		~CMDScalarOpGPDB();
+
+		// accessors
+		virtual const CWStringDynamic *
+		GetStrRepr() const
+		{
+			return m_dxl_str;
+		}
+
+		// operator id
+		virtual IMDId *MDId() const;
+
+		// operator name
+		virtual CMDName Mdname() const;
+
+		// left operand type id
+		virtual IMDId *GetLeftMdid() const;
+
+		// right operand type id
+		virtual IMDId *GetRightMdid() const;
+
+		// resulttype id
+		virtual IMDId *GetResultTypeMdid() const;
+
+		// implementer function id
+		virtual IMDId *FuncMdId() const;
+
+		// commutor id
+		virtual IMDId *GetCommuteOpMdid() const;
+
+		// inverse operator id
+		virtual IMDId *GetInverseOpMdid() const;
+
+		// is this an equality operator
+		virtual BOOL IsEqualityOp() const;
+
+		// does operator return NULL when all inputs are NULL?
+		// STRICT implies NULL-returning, but the opposite is not always true,
+		// the implementation in GPDB returns what STRICT property states
+		virtual BOOL ReturnsNullOnNullInput() const;
+
+		// comparison type
+		virtual IMDType::ECmpType ParseCmpType() const;
+
+		// serialize object in DXL format
+		virtual void Serialize(gpdxl::CXMLSerializer *xml_serializer) const;
+
+		// number of classes this operator belongs to
+		virtual ULONG OpClassesCount() const;
+
+		// operator class at given position
+		virtual IMDId *OpClassMdidAt(ULONG pos) const;
+
 #ifdef GPOS_DEBUG
-			// debug print of the type in the provided stream
-			virtual
-			void DebugPrint(IOstream &os) const;
+		// debug print of the type in the provided stream
+		virtual void DebugPrint(IOstream &os) const;
 #endif
-			
 	};
-}
+}  // namespace gpmd
 
-#endif // !GPMD_CMDScalarOpGPDB_H
+#endif  // !GPMD_CMDScalarOpGPDB_H
 
 // EOF

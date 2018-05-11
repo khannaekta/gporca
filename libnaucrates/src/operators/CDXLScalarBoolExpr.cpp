@@ -26,68 +26,61 @@ using namespace gpdxl;
 //		Constructs a BoolExpr node
 //
 //---------------------------------------------------------------------------
-CDXLScalarBoolExpr::CDXLScalarBoolExpr
-	(
-	IMemoryPool *pmp,
-	const EdxlBoolExprType boolexptype
-	)
-	:
-	CDXLScalar(pmp),
-	m_boolexptype(boolexptype)
+CDXLScalarBoolExpr::CDXLScalarBoolExpr(IMemoryPool *mp, const EdxlBoolExprType bool_type)
+	: CDXLScalar(mp), m_bool_type(bool_type)
 {
-
 }
 
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarBoolExpr::Edxlop
+//		CDXLScalarBoolExpr::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLScalarBoolExpr::Edxlop() const
+CDXLScalarBoolExpr::GetDXLOperator() const
 {
 	return EdxlopScalarBoolExpr;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarBoolExpr::EdxlBoolType
+//		CDXLScalarBoolExpr::GetDxlBoolTypeStr
 //
 //	@doc:
 //		Boolean expression type
 //
 //---------------------------------------------------------------------------
 EdxlBoolExprType
-CDXLScalarBoolExpr::EdxlBoolType() const
+CDXLScalarBoolExpr::GetDxlBoolTypeStr() const
 {
-	return m_boolexptype;
+	return m_bool_type;
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarBoolExpr::PstrOpName
+//		CDXLScalarBoolExpr::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLScalarBoolExpr::PstrOpName() const
+CDXLScalarBoolExpr::GetOpNameStr() const
 {
-	switch (m_boolexptype)
+	switch (m_bool_type)
 	{
 		case Edxland:
-				return CDXLTokens::PstrToken(EdxltokenScalarBoolAnd);
+			return CDXLTokens::GetDXLTokenStr(EdxltokenScalarBoolAnd);
 		case Edxlor:
-				return CDXLTokens::PstrToken(EdxltokenScalarBoolOr);
+			return CDXLTokens::GetDXLTokenStr(EdxltokenScalarBoolOr);
 		case Edxlnot:
-				return CDXLTokens::PstrToken(EdxltokenScalarBoolNot);
+			return CDXLTokens::GetDXLTokenStr(EdxltokenScalarBoolNot);
 		default:
 			return NULL;
 	}
@@ -102,23 +95,19 @@ CDXLScalarBoolExpr::PstrOpName() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBoolExpr::SerializeToDXL
-	(
-	CXMLSerializer *pxmlser,
-	const CDXLNode *pdxln
-	)
-	const
+CDXLScalarBoolExpr::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const
 {
 	GPOS_CHECK_ABORT;
 
-	const CWStringConst *pstrElemName = PstrOpName();
+	const CWStringConst *element_name = GetOpNameStr();
 
-	GPOS_ASSERT(NULL != pstrElemName);
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	GPOS_ASSERT(NULL != element_name);
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
-	pdxln->SerializeChildrenToDXL(pxmlser);
+	dxlnode->SerializeChildrenToDXL(xml_serializer);
 
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 
 	GPOS_CHECK_ABORT;
 }
@@ -133,38 +122,35 @@ CDXLScalarBoolExpr::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBoolExpr::AssertValid
-	(
-	const CDXLNode *pdxln,
-	BOOL fValidateChildren
-	) 
-	const
+CDXLScalarBoolExpr::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
-	EdxlBoolExprType edxlbooltype = ((CDXLScalarBoolExpr *) pdxln->Pdxlop())->EdxlBoolType();
+	EdxlBoolExprType dxl_bool_type =
+		((CDXLScalarBoolExpr *) dxlnode->GetOperator())->GetDxlBoolTypeStr();
 
-	GPOS_ASSERT( (edxlbooltype == Edxlnot) || (edxlbooltype == Edxlor) || (edxlbooltype == Edxland));
+	GPOS_ASSERT((dxl_bool_type == Edxlnot) || (dxl_bool_type == Edxlor) ||
+				(dxl_bool_type == Edxland));
 
-	const ULONG ulArity = pdxln->UlArity();
-	if(edxlbooltype == Edxlnot)
+	const ULONG arity = dxlnode->Arity();
+	if (dxl_bool_type == Edxlnot)
 	{
-		GPOS_ASSERT(1 == ulArity);
+		GPOS_ASSERT(1 == arity);
 	}
 	else
 	{
-		GPOS_ASSERT(2 <= ulArity);
+		GPOS_ASSERT(2 <= arity);
 	}
 
-	for (ULONG ul = 0; ul < ulArity; ++ul)
+	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *pdxlnArg = (*pdxln)[ul];
-		GPOS_ASSERT(EdxloptypeScalar == pdxlnArg->Pdxlop()->Edxloperatortype());
-		
-		if (fValidateChildren)
+		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
+		GPOS_ASSERT(EdxloptypeScalar == dxlnode_arg->GetOperator()->GetDXLOperatorType());
+
+		if (validate_children)
 		{
-			pdxlnArg->Pdxlop()->AssertValid(pdxlnArg, fValidateChildren);
+			dxlnode_arg->GetOperator()->AssertValid(dxlnode_arg, validate_children);
 		}
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

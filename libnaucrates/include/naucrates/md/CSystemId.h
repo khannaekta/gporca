@@ -35,46 +35,49 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class CSystemId
 	{
-		private:
-		
-			// system id type
-			IMDId::EMDIdType m_emdidt;
-					
-			// system id
-			WCHAR m_wsz[GPDXL_SYSID_LENGTH + 1];
+	private:
+		// system id type
+		IMDId::EMDIdType m_mdid_type;
 
-		public:
-			// ctor
-			CSystemId(IMDId::EMDIdType emdidt, const WCHAR *wsz, ULONG ulLength = GPDXL_SYSID_LENGTH);
-			
-			// copy ctor
-			CSystemId(const CSystemId &);
-			
-			// type of system id
-			IMDId::EMDIdType Emdidt() const
-			{
-				return m_emdidt;
-			}
-			
-			// system id string
-			const WCHAR *Wsz() const
-			{
-				return m_wsz;
-			}
-			
-			// equality
-			BOOL FEquals(const CSystemId &sysid) const;
-			
-			// hash function
-			ULONG UlHash() const;
+		// system id
+		WCHAR m_sysid_char[GPDXL_SYSID_LENGTH + 1];
+
+	public:
+		// ctor
+		CSystemId(IMDId::EMDIdType mdid_type,
+				  const WCHAR *sysid_char,
+				  ULONG length = GPDXL_SYSID_LENGTH);
+
+		// copy ctor
+		CSystemId(const CSystemId &);
+
+		// type of system id
+		IMDId::EMDIdType
+		MdidType() const
+		{
+			return m_mdid_type;
+		}
+
+		// system id string
+		const WCHAR *
+		GetBuffer() const
+		{
+			return m_sysid_char;
+		}
+
+		// equality
+		BOOL Equals(const CSystemId &sysid) const;
+
+		// hash function
+		ULONG HashValue() const;
 	};
 
 	// dynamic arrays over md system id elements
-	typedef CDynamicPtrArray<CSystemId, CleanupDelete> DrgPsysid;
-}
+	typedef CDynamicPtrArray<CSystemId, CleanupDelete> CSystemIdArray;
+}  // namespace gpmd
 
 
 
-#endif // !GPMD_CSystemId_H
+#endif  // !GPMD_CSystemId_H
 
 // EOF

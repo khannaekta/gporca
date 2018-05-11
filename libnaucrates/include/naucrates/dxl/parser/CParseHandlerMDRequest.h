@@ -24,7 +24,7 @@ namespace gpdxl
 	using namespace gpmd;
 
 	XERCES_CPP_NAMESPACE_USE
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CParseHandlerMDRequest
@@ -35,54 +35,49 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerMDRequest : public CParseHandlerBase
 	{
-		private:
-		
-			// array of metadata ids
-			DrgPmdid *m_pdrgpmdid;
-			
-			// array of type requests
-			CMDRequest::DrgPtr *m_pdrgptr;
+	private:
+		// array of metadata ids
+		IMdIdArray *m_mdid_array;
 
-			// private copy ctor
-			CParseHandlerMDRequest(const CParseHandlerMDRequest &);
-			
-			// process the start of an element
-			void StartElement
-				(
-				const XMLCh* const xmlszUri, 		// URI of element's namespace
-				const XMLCh* const xmlszLocalname,	// local part of element's name
-				const XMLCh* const xmlszQname,		// element's qname
-				const Attributes& attr				// element's attributes
-				);
-				
-			// process the end of an element
-			void EndElement
-				(
-				const XMLCh* const xmlszUri, 		// URI of element's namespace
-				const XMLCh* const xmlszLocalname,	// local part of element's name
-				const XMLCh* const xmlszQname		// element's qname
-				);
-			
-		public:
-			// ctor
-			CParseHandlerMDRequest(IMemoryPool *pmp, CParseHandlerManager *pphm, CParseHandlerBase *pph);
-			
-			// dtor
-			virtual
-			~CParseHandlerMDRequest();
-			
-			// parse handler type
-			virtual 
-			EDxlParseHandlerType Edxlphtype() const;
+		// array of type requests
+		CMDRequest::SMDTypeRequestArray *m_mdtype_request_array;
 
-			// parsed mdids
-			DrgPmdid *Pdrgpmdid() const;	
-			
-			// parsed type requests
-			CMDRequest::DrgPtr *Pdrgptr() const;	
+		// private copy ctor
+		CParseHandlerMDRequest(const CParseHandlerMDRequest &);
+
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
+
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+	public:
+		// ctor
+		CParseHandlerMDRequest(IMemoryPool *mp,
+							   CParseHandlerManager *parse_handler_mgr,
+							   CParseHandlerBase *pph);
+
+		// dtor
+		virtual ~CParseHandlerMDRequest();
+
+		// parse handler type
+		virtual EDxlParseHandlerType GetParseHandlerType() const;
+
+		// parsed mdids
+		IMdIdArray *GetMdIdArray() const;
+
+		// parsed type requests
+		CMDRequest::SMDTypeRequestArray *GetMDTypeRequestArray() const;
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerMDRequest_H
+#endif  // !GPDXL_CParseHandlerMDRequest_H
 
 // EOF

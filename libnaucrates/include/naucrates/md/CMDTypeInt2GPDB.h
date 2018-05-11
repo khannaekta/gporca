@@ -49,7 +49,6 @@ namespace gpnaucrates
 
 namespace gpmd
 {
-
 	using namespace gpos;
 	using namespace gpnaucrates;
 
@@ -63,191 +62,179 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class CMDTypeInt2GPDB : public IMDTypeInt2
 	{
-		private:
-		
-			// memory pool
-			IMemoryPool *m_pmp;
-			
-			// type id
-			IMDId *m_pmdid;
-			
-			// mdids of different operators
-			IMDId *m_pmdidOpEq;
-			IMDId *m_pmdidOpNeq;
-			IMDId *m_pmdidOpLT;
-			IMDId *m_pmdidOpLEq;
-			IMDId *m_pmdidOpGT;
-			IMDId *m_pmdidOpGEq;
-			IMDId *m_pmdidOpComp;
-			IMDId *m_pmdidTypeArray;
-			
-			// min aggregate
-			IMDId *m_pmdidMin;
-			
-			// max aggregate
-			IMDId *m_pmdidMax;
-			
-			// avg aggregate
-			IMDId *m_pmdidAvg;
-			
-			// sum aggregate
-			IMDId *m_pmdidSum;
-			
-			// count aggregate
-			IMDId *m_pmdidCount;
+	private:
+		// memory pool
+		IMemoryPool *m_mp;
 
-			// DXL for object
-			const CWStringDynamic *m_pstr;
-			
-			// type name and type
-			static CWStringConst m_str;
-			static CMDName m_mdname;
-	
-			// a null datum of this type (used for statistics comparison)
-			IDatum *m_pdatumNull;
+		// type id
+		IMDId *m_mdid;
 
-			// private copy ctor
-			CMDTypeInt2GPDB(const CMDTypeInt2GPDB &);
-	
-		public:
-			// ctor
-			explicit 
-			CMDTypeInt2GPDB(IMemoryPool *pmp);
-	
-			// dtor
-			virtual
-			~CMDTypeInt2GPDB();
-	
-			// factory method for creating INT2 datums
-			virtual
-			IDatumInt2 *PdatumInt2(IMemoryPool *pmp, SINT sValue, BOOL fNULL) const;
-	
-			// accessors
-			virtual 
-			const CWStringDynamic *Pstr() const
-			{
-				return m_pstr;
-			}
-			
-			// accessor of metadata id
-			virtual 
-			IMDId *Pmdid() const;
-			
-			// accessor of type name
-			virtual 
-			CMDName Mdname() const;
-			
-			// id of specified comparison operator type
-			virtual 
-			IMDId *PmdidCmp(ECmpType ecmpt) const;
+		// mdids of different operators
+		IMDId *m_mdid_op_eq;
+		IMDId *m_mdid_op_neq;
+		IMDId *m_mdid_op_lt;
+		IMDId *m_mdid_op_leq;
+		IMDId *m_mdid_op_gt;
+		IMDId *m_mdid_op_geq;
+		IMDId *m_mdid_op_cmp;
+		IMDId *m_mdid_type_array;
 
-			// id of specified aggregate type
-			virtual 
-			IMDId *PmdidAgg(EAggType eagg) const;
+		// min aggregate
+		IMDId *m_mdid_min;
 
-			// is type redistributable
-			virtual
-			BOOL FRedistributable() const
-			{
-				return true;
-			}
-			
-			// is type has fixed length
-			virtual
-			BOOL FFixedLength() const
-			{
-				return true;
-			}
-			
-			// is type composite
-			virtual
-			BOOL FComposite() const
-			{
-				return false;
-			}
+		// max aggregate
+		IMDId *m_mdid_max;
 
-			// size of type
-			virtual
-			ULONG UlLength() const
-			{
-				return GPDB_INT2_LENGTH;
-			}
-			
-			// is type passed by value
-			virtual
-			BOOL FByValue() const
-			{
-				return true;
-			}
-			
-			// metadata id of b-tree lookup operator
-			virtual 
-			const IMDId *PmdidOpComp() const
-			{
-				return m_pmdidOpComp;
-			}
-			
-			// is type hashable
-			virtual 
-			BOOL FHashable() const
-			{
-				return true;
-			}
-			
-			// metadata id of array type
-			virtual 
-			IMDId *PmdidTypeArray() const
-			{
-				return m_pmdidTypeArray;
-			}
-			
-			// id of the relation corresponding to a composite type
-			virtual
-			IMDId *PmdidBaseRelation() const
-			{
-				return NULL;
-			}
+		// avg aggregate
+		IMDId *m_mdid_avg;
 
-			// serialize object in DXL format
-			virtual 
-			void Serialize(gpdxl::CXMLSerializer *pxmlser) const;
-	
-			// return the null constant for this type
-			virtual
-			IDatum *PdatumNull() const
-			{
-				return m_pdatumNull;
-			}
+		// sum aggregate
+		IMDId *m_mdid_sum;
 
-			// transformation method for generating datum from CDXLScalarConstValue
-			virtual 
-			IDatum* Pdatum(const CDXLScalarConstValue *pdxlop) const;
-	
-			// create typed datum from DXL datum
-			virtual
-			IDatum *Pdatum(IMemoryPool *pmp, const CDXLDatum *pdxldatum) const;
-	
-			// generate the DXL datum from IDatum
-			virtual
-			CDXLDatum* Pdxldatum(IMemoryPool *pmp, IDatum *pdatum) const;
+		// count aggregate
+		IMDId *m_mdid_count;
 
-			// generate the DXL datum representing null value
-			virtual
-			CDXLDatum* PdxldatumNull(IMemoryPool *pmp) const;
+		// DXL for object
+		const CWStringDynamic *m_dxl_str;
 
-			// generate the DXL scalar constant from IDatum
-			virtual
-			CDXLScalarConstValue* PdxlopScConst(IMemoryPool *pmp, IDatum *pdatum) const;
+		// type name and type
+		static CWStringConst m_str;
+		static CMDName m_mdname;
+
+		// a null datum of this type (used for statistics comparison)
+		IDatum *m_datum_null;
+
+		// private copy ctor
+		CMDTypeInt2GPDB(const CMDTypeInt2GPDB &);
+
+	public:
+		// ctor
+		explicit CMDTypeInt2GPDB(IMemoryPool *mp);
+
+		// dtor
+		virtual ~CMDTypeInt2GPDB();
+
+		// factory method for creating INT2 datums
+		virtual IDatumInt2 *CreateInt2Datum(IMemoryPool *mp,
+											SINT value,
+											BOOL is_null) const;
+
+		// accessors
+		virtual const CWStringDynamic *
+		GetStrRepr() const
+		{
+			return m_dxl_str;
+		}
+
+		// accessor of metadata id
+		virtual IMDId *MDId() const;
+
+		// accessor of type name
+		virtual CMDName Mdname() const;
+
+		// id of specified comparison operator type
+		virtual IMDId *GetMdidForCmpType(ECmpType cmp_type) const;
+
+		// id of specified aggregate type
+		virtual IMDId *GetMdidForAggType(EAggType agg_type) const;
+
+		// is type redistributable
+		virtual BOOL
+		IsRedistributable() const
+		{
+			return true;
+		}
+
+		// is type has fixed length
+		virtual BOOL
+		IsFixedLength() const
+		{
+			return true;
+		}
+
+		// is type composite
+		virtual BOOL
+		IsComposite() const
+		{
+			return false;
+		}
+
+		// size of type
+		virtual ULONG
+		Length() const
+		{
+			return GPDB_INT2_LENGTH;
+		}
+
+		// is type passed by value
+		virtual BOOL
+		IsPassedByValue() const
+		{
+			return true;
+		}
+
+		// metadata id of b-tree lookup operator
+		virtual const IMDId *
+		CmpOpMdid() const
+		{
+			return m_mdid_op_cmp;
+		}
+
+		// is type hashable
+		virtual BOOL
+		IsHashable() const
+		{
+			return true;
+		}
+
+		// metadata id of array type
+		virtual IMDId *
+		GetArrayTypeMdid() const
+		{
+			return m_mdid_type_array;
+		}
+
+		// id of the relation corresponding to a composite type
+		virtual IMDId *
+		GetBaseRelMdid() const
+		{
+			return NULL;
+		}
+
+		// serialize object in DXL format
+		virtual void Serialize(gpdxl::CXMLSerializer *xml_serializer) const;
+
+		// return the null constant for this type
+		virtual IDatum *
+		DatumNull() const
+		{
+			return m_datum_null;
+		}
+
+		// transformation method for generating datum from CDXLScalarConstValue
+		virtual IDatum *GetDatumForDXLConstVal(const CDXLScalarConstValue *dxl_op) const;
+
+		// create typed datum from DXL datum
+		virtual IDatum *GetDatumForDXLDatum(IMemoryPool *mp,
+											const CDXLDatum *dxl_datum) const;
+
+		// generate the DXL datum from IDatum
+		virtual CDXLDatum *GetDatumVal(IMemoryPool *mp, IDatum *datum) const;
+
+		// generate the DXL datum representing null value
+		virtual CDXLDatum *GetDXLDatumNull(IMemoryPool *mp) const;
+
+		// generate the DXL scalar constant from IDatum
+		virtual CDXLScalarConstValue *GetDXLOpScConst(IMemoryPool *mp,
+													  IDatum *datum) const;
 
 #ifdef GPOS_DEBUG
-			// debug print of the type in the provided stream
-			virtual 
-			void DebugPrint(IOstream &os) const;
+		// debug print of the type in the provided stream
+		virtual void DebugPrint(IOstream &os) const;
 #endif
-
 	};
-}
+}  // namespace gpmd
 
-#endif // !GPMD_CMDTypeInt2GPDB_H
+#endif  // !GPMD_CMDTypeInt2GPDB_H
 
 // EOF

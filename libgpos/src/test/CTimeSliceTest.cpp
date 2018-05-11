@@ -31,11 +31,8 @@ using namespace gpos;
 GPOS_RESULT
 CTimeSliceTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
-		GPOS_UNITTEST_FUNC(CTimeSliceTest::EresUnittest_Basic),
-		GPOS_UNITTEST_FUNC(CTimeSliceTest::EresUnittest_CheckTimeSlice)
-		};
+	CUnittest rgut[] = {GPOS_UNITTEST_FUNC(CTimeSliceTest::EresUnittest_Basic),
+						GPOS_UNITTEST_FUNC(CTimeSliceTest::EresUnittest_CheckTimeSlice)};
 
 	GPOS_RESULT eres = CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 
@@ -54,9 +51,9 @@ CTimeSliceTest::EresUnittest()
 GPOS_RESULT
 CTimeSliceTest::EresUnittest_Basic()
 {
-	BOOL fTimeSlices = IWorker::m_fEnforceTimeSlices;
-	IWorker::m_fEnforceTimeSlices = true;
-	CWorker::PwrkrSelf()->ResetTimeSlice();
+	BOOL fTimeSlices = IWorker::m_enforce_time_slices;
+	IWorker::m_enforce_time_slices = true;
+	CWorker::Self()->ResetTimeSlice();
 
 	GPOS_RESULT eres = GPOS_OK;
 
@@ -66,8 +63,9 @@ CTimeSliceTest::EresUnittest_Basic()
 		timer.Restart();
 
 		// loop until time slice is exceeded
-		ULONG ulThreads = std::max((ULONG) 1, CWorkerPoolManager::Pwpm()->UlWorkersRunning());
-		while (GPOS_CHECK_ABORT_MAX_INTERVAL_MSEC * ulThreads >= timer.UlElapsedMS())
+		ULONG ulThreads =
+			std::max((ULONG) 1, CWorkerPoolManager::WorkerPoolManager()->GetNumWorkersRunning());
+		while (GPOS_CHECK_ABORT_MAX_INTERVAL_MSEC * ulThreads >= timer.ElapsedMS())
 		{
 			// burn some CPU
 			for (ULONG i = 0, j = 0; i < 1000; i++)
@@ -96,7 +94,7 @@ CTimeSliceTest::EresUnittest_Basic()
 	}
 	GPOS_CATCH_END;
 
-	IWorker::m_fEnforceTimeSlices = fTimeSlices;
+	IWorker::m_enforce_time_slices = fTimeSlices;
 	return eres;
 }
 
@@ -114,8 +112,8 @@ CTimeSliceTest::EresUnittest_CheckTimeSlice()
 	// assemble -u option
 	const CHAR *rgsz[] = {"", "-u"};
 
-	BOOL fTimeSlices = IWorker::m_fEnforceTimeSlices;
-	IWorker::m_fEnforceTimeSlices = true;
+	BOOL fTimeSlices = IWorker::m_enforce_time_slices;
+	IWorker::m_enforce_time_slices = true;
 
 	GPOS_RESULT eres = GPOS_OK;
 
@@ -134,11 +132,10 @@ CTimeSliceTest::EresUnittest_CheckTimeSlice()
 	}
 	GPOS_CATCH_END;
 
-	IWorker::m_fEnforceTimeSlices = fTimeSlices;
+	IWorker::m_enforce_time_slices = fTimeSlices;
 	return eres;
 }
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF
-

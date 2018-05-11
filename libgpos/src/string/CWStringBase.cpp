@@ -16,60 +16,54 @@
 
 using namespace gpos;
 
-const WCHAR CWStringBase::m_wcEmpty = GPOS_WSZ_LIT('\0');
+const WCHAR CWStringBase::m_empty_wcstr = GPOS_WSZ_LIT('\0');
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CWStringBase::PStrCopy
+//		CWStringBase::Copy
 //
 //	@doc:
 //		Creates a deep copy of the string
 //
 //---------------------------------------------------------------------------
-CWStringConst *CWStringBase::PStrCopy
-	(
-	IMemoryPool *pmp
-	) const
+CWStringConst *
+CWStringBase::Copy(IMemoryPool *mp) const
 {
-	return GPOS_NEW(pmp) CWStringConst(pmp, Wsz());
+	return GPOS_NEW(mp) CWStringConst(mp, GetBuffer());
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CWStringBase::FValid
+//		CWStringBase::IsValid
 //
 //	@doc:
 //		Checks if the string is properly NULL-terminated
 //
 //---------------------------------------------------------------------------
 bool
-CWStringBase::FValid() const
+CWStringBase::IsValid() const
 {
-	return (UlLength() == GPOS_WSZ_LENGTH(Wsz()));
+	return (Length() == GPOS_WSZ_LENGTH(GetBuffer()));
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CWStringBase::operator == 
+//		CWStringBase::operator ==
 //
 //	@doc:
 //		Equality operator on strings
 //
 //---------------------------------------------------------------------------
 BOOL
-CWStringBase::operator ==
-	(
-	const CWStringBase &str
-	)
-	const
+CWStringBase::operator==(const CWStringBase &str) const
 {
-	return FEquals(&str);
+	return Equals(&str);
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CWStringBase::UlLength()
+//		CWStringBase::Length()
 //
 //	@doc:
 //		Returns the length of the string in number of wide characters,
@@ -77,49 +71,40 @@ CWStringBase::operator ==
 //
 //---------------------------------------------------------------------------
 ULONG
-CWStringBase::UlLength() const
+CWStringBase::Length() const
 {
-	return m_ulLength;
+	return m_length;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CWStringBase::FEquals
+//		CWStringBase::Equals
 //
 //	@doc:
 //		Checks whether the string is byte-wise equal to another string
 //
 //---------------------------------------------------------------------------
 BOOL
-CWStringBase::FEquals
-	(
-	const CWStringBase *pStr
-	)
-	const
+CWStringBase::Equals(const CWStringBase *str) const
 {
-	GPOS_ASSERT(NULL != pStr);
-	return FEquals(pStr->Wsz());
+	GPOS_ASSERT(NULL != str);
+	return Equals(str->GetBuffer());
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CWStringBase::FEquals
+//		CWStringBase::Equals
 //
 //	@doc:
 //		Checks whether the string is byte-wise equal to a string literal
 //
 //---------------------------------------------------------------------------
 BOOL
-CWStringBase::FEquals
-	(
-	const WCHAR *wszBuf
-	)
-	const
+CWStringBase::Equals(const WCHAR *w_str_buffer) const
 {
-	GPOS_ASSERT(NULL != wszBuf);
-	ULONG ulLength = GPOS_WSZ_LENGTH(wszBuf);
-	if (UlLength() == ulLength &&
-		0 == clib::IWcsNCmp(Wsz(), wszBuf, ulLength))
+	GPOS_ASSERT(NULL != w_str_buffer);
+	ULONG length = GPOS_WSZ_LENGTH(w_str_buffer);
+	if (Length() == length && 0 == clib::Wcsncmp(GetBuffer(), w_str_buffer, length))
 	{
 		return true;
 	}
@@ -128,39 +113,35 @@ CWStringBase::FEquals
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CWStringBase::FEmpty
+//		CWStringBase::IsEmpty
 //
 //	@doc:
 //		Checks whether the string is empty
 //
 //---------------------------------------------------------------------------
 BOOL
-CWStringBase::FEmpty() const
+CWStringBase::IsEmpty() const
 {
-	return (0 == UlLength());
+	return (0 == Length());
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CWStringBase::IFind
+//		CWStringBase::Find
 //
 //	@doc:
 //		Returns the index of the first occurrence of a character, -1 if not found
 //
 //---------------------------------------------------------------------------
 INT
-CWStringBase::IFind
-	(
-	WCHAR wc
-	)
-	const
+CWStringBase::Find(WCHAR wc) const
 {
-	const WCHAR *wsz = Wsz();
-	const ULONG ulLength = UlLength();
+	const WCHAR *w_str = GetBuffer();
+	const ULONG length = Length();
 
-	for (ULONG i = 0; i < ulLength; i++)
+	for (ULONG i = 0; i < length; i++)
 	{
-		if (wc == wsz[i])
+		if (wc == w_str[i])
 		{
 			return i;
 		}
@@ -172,30 +153,26 @@ CWStringBase::IFind
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CWStringBase::FEscaped
+//		CWStringBase::HasEscapedCharAt
 //
 //	@doc:
 //		Checks if a character is escaped
 //
 //---------------------------------------------------------------------------
 BOOL
-CWStringBase::FEscaped
-	(
-	ULONG ulOfst
-	)
-	const
+CWStringBase::HasEscapedCharAt(ULONG offset) const
 {
-	GPOS_ASSERT(!FEmpty());
-	GPOS_ASSERT(UlLength() > ulOfst);
+	GPOS_ASSERT(!IsEmpty());
+	GPOS_ASSERT(Length() > offset);
 
-	const WCHAR *wszBuf = Wsz();
+	const WCHAR *w_str_buffer = GetBuffer();
 
-	for (ULONG i = ulOfst; i > 0; i--)
+	for (ULONG i = offset; i > 0; i--)
 	{
 		// check for escape character
-		if (GPOS_WSZ_LIT('\\') != wszBuf[i - 1])
+		if (GPOS_WSZ_LIT('\\') != w_str_buffer[i - 1])
 		{
-			if (0 == ((ulOfst - i) & ULONG(1)))
+			if (0 == ((offset - i) & ULONG(1)))
 			{
 				return false;
 			}
@@ -207,7 +184,7 @@ CWStringBase::FEscaped
 	}
 
 	// reached beginning of string
-	if (0 == (ulOfst & ULONG(1)))
+	if (0 == (offset & ULONG(1)))
 	{
 		return false;
 	}
@@ -219,30 +196,26 @@ CWStringBase::FEscaped
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CWStringBase::UlOccurences
+//		CWStringBase::CountOccurrencesOf
 //
 //	@doc:
 //		Count how many times the character appears in string
 //
 //---------------------------------------------------------------------------
 ULONG
-CWStringBase::UlOccurences
-	(
-	const WCHAR wc
-	) const
+CWStringBase::CountOccurrencesOf(const WCHAR wc) const
 {
-	ULONG ulOccurences = 0;
-	ULONG ulLength = UlLength();
-	const WCHAR *wsz = Wsz();
+	ULONG occurrences = 0;
+	ULONG length = Length();
+	const WCHAR *buf = GetBuffer();
 
-	for (ULONG i = 0; i < ulLength; i++)
+	for (ULONG i = 0; i < length; i++)
 	{
-		if (wc == wsz[i] && !FEscaped(i))
+		if (wc == buf[i] && !HasEscapedCharAt(i))
 		{
-			ulOccurences++;
+			occurrences++;
 		}
 	}
-	return ulOccurences;
+	return occurrences;
 }
 // EOF
-

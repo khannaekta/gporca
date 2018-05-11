@@ -25,7 +25,7 @@ namespace gpdxl
 {
 	class CDXLNode;
 	class CXMLSerializer;
-}
+}  // namespace gpdxl
 
 namespace gpmd
 {
@@ -39,103 +39,92 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class CMDColumn : public IMDColumn
 	{
-		private:
-			// attribute name
-			CMDName *m_pmdname;
-			
-			// attribute number
-			INT m_iAttNo;
-			
-			// column type
-			IMDId *m_pmdidType;
+	private:
+		// attribute name
+		CMDName *m_mdname;
 
-			INT m_iTypeModifier;
+		// attribute number
+		INT m_attno;
 
-			// is NULL an allowed value for the attribute
-			BOOL m_fNullable;
+		// column type
+		IMDId *m_mdid_type;
 
-			// is column dropped
-			BOOL m_fDropped;
-			
-			// length of the column
-			ULONG m_ulLength;
-			
-			// default value expression
-			gpdxl::CDXLNode *m_pdxlnDefaultValue;
-						
-			// private copy ctor
-			CMDColumn(const CMDColumn &);
-		
-		public:
-			// ctor
-			CMDColumn
-				(
-				CMDName *pmdname,
-				INT iAttNo,
-				IMDId *pmdidType,
-				INT iTypeModifier,
-				BOOL fNullable,
-				BOOL fDropped,
-				gpdxl::CDXLNode *pdxnlDefaultValue,
-				ULONG ulLength = gpos::ulong_max
-				);
+		INT m_type_modifier;
 
-			// dtor
-			virtual
-			~CMDColumn();
+		// is NULL an allowed value for the attribute
+		BOOL m_is_nullable;
 
-			// accessors
-			virtual
-			CMDName Mdname() const;
-			
-			// column type
-			virtual 
-			IMDId *PmdidType() const;
+		// is column dropped
+		BOOL m_is_dropped;
 
-			virtual
-			INT ITypeModifier() const;
+		// length of the column
+		ULONG m_length;
 
-			// attribute number
-			virtual
-			INT IAttno() const;
-			
-			// is this a system column
-			virtual
-			BOOL FSystemColumn() const
-			{
-				return (0 > m_iAttNo);
-			}
+		// default value expression
+		gpdxl::CDXLNode *m_dxl_default_val;
 
-			// length of the column
-			ULONG UlLength() const
-			{
-				return m_ulLength;
-			}
+		// private copy ctor
+		CMDColumn(const CMDColumn &);
 
-			// is the column nullable
-			virtual
-			BOOL FNullable() const;
-			
-			// is the column dropped
-			virtual
-			BOOL FDropped() const;
-		
-			// serialize metadata object in DXL format given a serializer object
-			virtual	
-			void Serialize(gpdxl::CXMLSerializer *) const;
-			
+	public:
+		// ctor
+		CMDColumn(CMDName *mdname,
+				  INT attrnum,
+				  IMDId *mdid_type,
+				  INT type_modifier,
+				  BOOL is_nullable,
+				  BOOL is_dropped,
+				  gpdxl::CDXLNode *dxl_dafault_value,
+				  ULONG length = gpos::ulong_max);
+
+		// dtor
+		virtual ~CMDColumn();
+
+		// accessors
+		virtual CMDName Mdname() const;
+
+		// column type
+		virtual IMDId *MDIdType() const;
+
+		virtual INT TypeModifier() const;
+
+		// attribute number
+		virtual INT AttrNum() const;
+
+		// is this a system column
+		virtual BOOL
+		IsSystemColumn() const
+		{
+			return (0 > m_attno);
+		}
+
+		// length of the column
+		ULONG
+		Length() const
+		{
+			return m_length;
+		}
+
+		// is the column nullable
+		virtual BOOL IsNullable() const;
+
+		// is the column dropped
+		virtual BOOL IsDropped() const;
+
+		// serialize metadata object in DXL format given a serializer object
+		virtual void Serialize(gpdxl::CXMLSerializer *) const;
+
 #ifdef GPOS_DEBUG
-			// debug print of the column
-			virtual
-			void DebugPrint(IOstream &os) const;
+		// debug print of the column
+		virtual void DebugPrint(IOstream &os) const;
 #endif
 	};
 
 	// array of metadata column descriptor
-	typedef CDynamicPtrArray<CMDColumn, CleanupRelease> DrgPmdcol;
+	typedef CDynamicPtrArray<CMDColumn, CleanupRelease> CMDColumnArray;
 
-}
+}  // namespace gpmd
 
-#endif // !GPMD_CDXLColumn_H
+#endif  // !GPMD_CDXLColumn_H
 
 // EOF

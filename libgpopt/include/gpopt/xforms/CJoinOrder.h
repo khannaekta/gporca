@@ -12,6 +12,7 @@
 #define GPOPT_CJoinOrder_H
 
 #include "gpos/base.h"
+#include "gpopt/operators/CExpression.h"
 #include "gpos/io/IOstream.h"
 
 namespace gpopt
@@ -50,7 +51,7 @@ namespace gpopt
 				BOOL m_fUsed;
 
 				// ctor
-				SEdge(IMemoryPool *pmp, CExpression *pexpr);
+				SEdge(IMemoryPool *mp, CExpression *pexpr);
 				
 				// dtor
 				~SEdge();
@@ -80,7 +81,7 @@ namespace gpopt
 				BOOL m_fUsed;
 
 				// ctor
-				SComponent(IMemoryPool *pmp, CExpression *pexpr);
+				SComponent(IMemoryPool *mp, CExpression *pexpr);
 				
 				// ctor
 				SComponent(CExpression *pexpr, CBitSet *pbs);
@@ -95,7 +96,7 @@ namespace gpopt
 		protected:
 				
 			// memory pool
-			IMemoryPool *m_pmp;
+			IMemoryPool *m_mp;
 			
 			// edges
 			SEdge **m_rgpedge;
@@ -129,9 +130,9 @@ namespace gpopt
 			// ctor
 			CJoinOrder
 				(
-				IMemoryPool *pmp,
-				DrgPexpr *pdrgpexprComponents,
-				DrgPexpr *pdrgpexprConjuncts
+				IMemoryPool *mp,
+				CExpressionArray *pdrgpexprComponents,
+				CExpressionArray *pdrgpexprConjuncts
 				);
 		
 			// dtor

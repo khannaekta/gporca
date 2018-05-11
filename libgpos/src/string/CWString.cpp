@@ -23,32 +23,27 @@ using namespace gpos;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CWString::CWString
-	(
-	ULONG ulLength
-	)
-	:
-	CWStringBase
-		(
-		ulLength,
-		true // fOwnsMemory
-		),
-	m_wszBuf(NULL)
-{}
+CWString::CWString(ULONG length)
+	: CWStringBase(length,
+				   true  // owns_memory
+				   ),
+	  m_w_str_buffer(NULL)
+{
+}
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CWString::Wsz
+//		CWString::GetBuffer
 //
 //	@doc:
 //		Returns the wide character buffer storing the string
 //
 //---------------------------------------------------------------------------
-const WCHAR*
-CWString::Wsz() const
+const WCHAR *
+CWString::GetBuffer() const
 {
-	return m_wszBuf;
+	return m_w_str_buffer;
 }
 
 
@@ -61,18 +56,14 @@ CWString::Wsz() const
 //
 //---------------------------------------------------------------------------
 void
-CWString::Append
-	(
-	const CWStringBase *pstr
-	)
+CWString::Append(const CWStringBase *str)
 {
-	GPOS_ASSERT(NULL != pstr);
-	if (0 < pstr->UlLength())
+	GPOS_ASSERT(NULL != str);
+	if (0 < str->Length())
 	{
-		AppendBuffer(pstr->Wsz());
+		AppendBuffer(str->GetBuffer());
 	}
-	GPOS_ASSERT(FValid());
+	GPOS_ASSERT(IsValid());
 }
 
 // EOF
-

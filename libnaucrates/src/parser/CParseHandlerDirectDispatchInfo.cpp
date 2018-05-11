@@ -9,7 +9,7 @@
 //		Implementation of the SAX parse handler class for parsing direct dispatch info
 //
 //	@owner:
-//		
+//
 //
 //	@test:
 //
@@ -33,18 +33,16 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerDirectDispatchInfo::CParseHandlerDirectDispatchInfo
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
-	:
-	CParseHandlerBase(pmp, pphm, pphRoot),
-	m_pdrgpdxldatum(NULL),
-	m_pdrgpdrgpdxldatum(NULL),
-	m_pdxlddinfo(NULL)
-{}
+CParseHandlerDirectDispatchInfo::CParseHandlerDirectDispatchInfo(
+	IMemoryPool *mp,
+	CParseHandlerManager *parse_handler_mgr,
+	CParseHandlerBase *parse_handler_root)
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
+	  m_dxl_datum_array(NULL),
+	  m_datum_array_combination(NULL),
+	  m_direct_dispatch_info(NULL)
+{
+}
 
 
 //---------------------------------------------------------------------------
@@ -57,8 +55,8 @@ CParseHandlerDirectDispatchInfo::CParseHandlerDirectDispatchInfo
 //---------------------------------------------------------------------------
 CParseHandlerDirectDispatchInfo::~CParseHandlerDirectDispatchInfo()
 {
-	CRefCount::SafeRelease(m_pdrgpdxldatum);
-	CRefCount::SafeRelease(m_pdxlddinfo);
+	CRefCount::SafeRelease(m_dxl_datum_array);
+	CRefCount::SafeRelease(m_direct_dispatch_info);
 }
 
 
@@ -71,34 +69,36 @@ CParseHandlerDirectDispatchInfo::~CParseHandlerDirectDispatchInfo()
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerDirectDispatchInfo::StartElement
-	(
-	const XMLCh* const , //xmlstrUri,
-	const XMLCh* const xmlstrLocalname,
-	const XMLCh* const , // xmlstrQname,
-	const Attributes& attrs
-	)
+CParseHandlerDirectDispatchInfo::StartElement(const XMLCh *const,  //element_uri,
+											  const XMLCh *const element_local_name,
+											  const XMLCh *const,  // element_qname,
+											  const Attributes &attrs)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchInfo), xmlstrLocalname))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchInfo),
+									  element_local_name))
 	{
-		m_pdrgpdrgpdxldatum = GPOS_NEW(m_pmp) DrgPdrgPdxldatum(m_pmp);
+		m_datum_array_combination = GPOS_NEW(m_mp) DXLDatumArrays(m_mp);
 	}
-	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchKeyValue), xmlstrLocalname))
+	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchKeyValue),
+										   element_local_name))
 	{
-		CRefCount::SafeRelease(m_pdrgpdxldatum);
-		m_pdrgpdxldatum = GPOS_NEW(m_pmp) DrgPdxldatum(m_pmp);
+		CRefCount::SafeRelease(m_dxl_datum_array);
+		m_dxl_datum_array = GPOS_NEW(m_mp) CDXLDatumArray(m_mp);
 	}
-	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDatum), xmlstrLocalname))
+	else if (0 ==
+			 XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDatum), element_local_name))
 	{
-		GPOS_ASSERT(NULL != m_pdrgpdxldatum);
+		GPOS_ASSERT(NULL != m_dxl_datum_array);
 
-		CDXLDatum *pdxldatum = CDXLOperatorFactory::Pdxldatum(m_pphm->Pmm(), attrs, EdxltokenDirectDispatchInfo);
-		m_pdrgpdxldatum->Append(pdxldatum);
+		CDXLDatum *dxl_datum = CDXLOperatorFactory::GetDatumVal(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenDirectDispatchInfo);
+		m_dxl_datum_array->Append(dxl_datum);
 	}
 	else
 	{
-		CWStringDynamic *pstr = CDXLUtils::PstrFromXMLCh(m_pphm->Pmm(), xmlstrLocalname);
-		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, pstr->Wsz());
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 }
 
@@ -111,44 +111,46 @@ CParseHandlerDirectDispatchInfo::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerDirectDispatchInfo::EndElement
-	(
-	const XMLCh* const, // xmlstrUri,
-	const XMLCh* const xmlstrLocalname,
-	const XMLCh* const // xmlstrQname
-	)
+CParseHandlerDirectDispatchInfo::EndElement(const XMLCh *const,  // element_uri,
+											const XMLCh *const element_local_name,
+											const XMLCh *const  // element_qname
+)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchInfo), xmlstrLocalname))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchInfo),
+									  element_local_name))
 	{
-		m_pdxlddinfo = GPOS_NEW(m_pmp) CDXLDirectDispatchInfo(m_pdrgpdrgpdxldatum);
-		m_pphm->DeactivateHandler();
+		m_direct_dispatch_info =
+			GPOS_NEW(m_mp) CDXLDirectDispatchInfo(m_datum_array_combination);
+		m_parse_handler_mgr->DeactivateHandler();
 	}
-	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchKeyValue), xmlstrLocalname))
+	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchKeyValue),
+										   element_local_name))
 	{
-		GPOS_ASSERT(NULL != m_pdrgpdxldatum);
-		m_pdrgpdxldatum->AddRef();
-		m_pdrgpdrgpdxldatum->Append(m_pdrgpdxldatum);
+		GPOS_ASSERT(NULL != m_dxl_datum_array);
+		m_dxl_datum_array->AddRef();
+		m_datum_array_combination->Append(m_dxl_datum_array);
 	}
-	else if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDatum), xmlstrLocalname))
+	else if (0 !=
+			 XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDatum), element_local_name))
 	{
-		CWStringDynamic *pstr = CDXLUtils::PstrFromXMLCh(m_pphm->Pmm(), xmlstrLocalname);
-		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, pstr->Wsz());
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CParseHandlerDirectDispatchInfo::Pdxlddinfo
+//		CParseHandlerDirectDispatchInfo::GetDXLDirectDispatchInfo
 //
 //	@doc:
 //		Return parsed DXL datum array
 //
 //---------------------------------------------------------------------------
 CDXLDirectDispatchInfo *
-CParseHandlerDirectDispatchInfo::Pdxlddinfo() const
+CParseHandlerDirectDispatchInfo::GetDXLDirectDispatchInfo() const
 {
-	return m_pdxlddinfo;
+	return m_direct_dispatch_info;
 }
 
 // EOF
-

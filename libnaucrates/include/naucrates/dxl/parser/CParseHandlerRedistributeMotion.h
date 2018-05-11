@@ -22,7 +22,7 @@ namespace gpdxl
 	using namespace gpos;
 
 	XERCES_CPP_NAMESPACE_USE
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CParseHandlerRedistributeMotion
@@ -33,43 +33,34 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerRedistributeMotion : public CParseHandlerPhysicalOp
 	{
-		private:
-						
-			// the redistribute motion operator
-			CDXLPhysicalRedistributeMotion *m_pdxlop;
-			
-			// private copy ctor
-			CParseHandlerRedistributeMotion(const CParseHandlerRedistributeMotion &);
-			
-			// process the start of an element
-			void StartElement
-				(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
-					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
-				
-			// process the end of an element
-			void EndElement
-				(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
-					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname		// element's qname
-				);
-	
-		public:
-			// ctor
-			CParseHandlerRedistributeMotion
-				(
-				IMemoryPool *pmp,
-				CParseHandlerManager *pphm,
-				CParseHandlerBase *pphRoot
-				);
-						
-	};
-}
+	private:
+		// the redistribute motion operator
+		CDXLPhysicalRedistributeMotion *m_dxl_op;
 
-#endif // !GPDXL_CParseHandlerRedistributeMotion_H
+		// private copy ctor
+		CParseHandlerRedistributeMotion(const CParseHandlerRedistributeMotion &);
+
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
+
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+	public:
+		// ctor
+		CParseHandlerRedistributeMotion(IMemoryPool *mp,
+										CParseHandlerManager *parse_handler_mgr,
+										CParseHandlerBase *parse_handler_root);
+	};
+}  // namespace gpdxl
+
+#endif  // !GPDXL_CParseHandlerRedistributeMotion_H
 
 // EOF

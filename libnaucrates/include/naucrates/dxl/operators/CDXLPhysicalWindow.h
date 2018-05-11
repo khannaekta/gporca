@@ -38,71 +38,65 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalWindow : public CDXLPhysical
 	{
-		private:
+	private:
+		// partition columns
+		ULongPtrArray *m_part_by_colid_array;
 
-			// partition columns
-			DrgPul *m_pdrgpulPartCols;
+		// window keys
+		CDXLWindowKeyArray *m_dxl_window_key_array;
 
-			// window keys
-			DrgPdxlwk *m_pdrgpdxlwk;
+		// private copy ctor
+		CDXLPhysicalWindow(CDXLPhysicalWindow &);
 
-			// private copy ctor
-			CDXLPhysicalWindow(CDXLPhysicalWindow&);
+	public:
+		//ctor
+		CDXLPhysicalWindow(IMemoryPool *mp,
+						   ULongPtrArray *part_by_colid_array,
+						   CDXLWindowKeyArray *window_key_array);
 
-		public:
+		//dtor
+		virtual ~CDXLPhysicalWindow();
 
-			//ctor
-			CDXLPhysicalWindow(IMemoryPool *pmp, DrgPul *pdrgpulPartCols, DrgPdxlwk *pdrgpdxlwk);
+		// accessors
+		Edxlopid GetDXLOperator() const;
+		const CWStringConst *GetOpNameStr() const;
 
-			//dtor
-			virtual
-			~CDXLPhysicalWindow();
+		// number of partition columns
+		ULONG PartByColsCount() const;
 
-			// accessors
-			Edxlopid Edxlop() const;
-			const CWStringConst *PstrOpName() const;
+		// return partition columns
+		const ULongPtrArray *
+		GetPartByColsArray() const
+		{
+			return m_part_by_colid_array;
+		}
 
-			// number of partition columns
-			ULONG UlPartCols() const;
+		// number of window keys
+		ULONG WindowKeysCount() const;
 
-			// return partition columns
-			const DrgPul *PrgpulPartCols() const
-			{
-				return m_pdrgpulPartCols;
-			}
+		// return the window key at a given position
+		CDXLWindowKey *GetDXLWindowKeyAt(ULONG ulPos) const;
 
-			// number of window keys
-			ULONG UlWindowKeys() const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
-			// return the window key at a given position
-			CDXLWindowKey *PdxlWindowKey(ULONG ulPos) const;
+		// conversion function
+		static CDXLPhysicalWindow *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopPhysicalWindow == dxl_op->GetDXLOperator());
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
-
-			// conversion function
-			static
-			CDXLPhysicalWindow *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopPhysicalWindow == pdxlop->Edxlop());
-
-				return dynamic_cast<CDXLPhysicalWindow*>(pdxlop);
-			}
+			return dynamic_cast<CDXLPhysicalWindow *>(dxl_op);
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
-
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
-#endif // !GPDXL_CDXLPhysicalWindow_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLPhysicalWindow_H
 
 // EOF
-

@@ -12,6 +12,10 @@
 #define GPOPT_CXformSubqNAryJoin2Apply_H
 
 #include "gpos/base.h"
+#include "gpopt/operators/CPatternMultiLeaf.h"
+#include "gpopt/operators/CPatternTree.h"
+#include "gpopt/operators/CExpression.h"
+#include "gpopt/operators/CLogicalNAryJoin.h"
 #include "gpopt/xforms/CXformSubqJoin2Apply.h"
 
 namespace gpopt
@@ -40,18 +44,18 @@ namespace gpopt
 			explicit
 			CXformSubqNAryJoin2Apply
 				(
-				IMemoryPool *pmp
+				IMemoryPool *mp
 				)
 				:
 				CXformSubqJoin2Apply
 					(
 					 // pattern
-					GPOS_NEW(pmp) CExpression
+					GPOS_NEW(mp) CExpression
 						(
-						pmp,
-						GPOS_NEW(pmp) CLogicalNAryJoin(pmp),
-						GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternMultiLeaf(pmp)),
-						GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternTree(pmp))
+						mp,
+						GPOS_NEW(mp) CLogicalNAryJoin(mp),
+						GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternMultiLeaf(mp)),
+						GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))
 						)
 					)
 			{}

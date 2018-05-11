@@ -37,88 +37,75 @@ namespace gpnaucrates
 	//---------------------------------------------------------------------------
 	class CStatsPredPoint : public CStatsPred
 	{
-		private:
+	private:
+		// private copy ctor
+		CStatsPredPoint(const CStatsPredPoint &);
 
-			// private copy ctor
-			CStatsPredPoint(const CStatsPredPoint &);
+		// private assignment operator
+		CStatsPredPoint &operator=(CStatsPredPoint &);
 
-			// private assignment operator
-			CStatsPredPoint& operator=(CStatsPredPoint &);
+		// comparison type
+		CStatsPred::EStatsCmpType m_stats_cmp_type;
 
-			// comparison type
-			CStatsPred::EStatsCmpType m_escmpt;
+		// point to be used for comparison
+		CPoint *m_pred_point;
 
-			// point to be used for comparison
-			CPoint *m_ppoint;
+		// add padding to datums when needed
+		static IDatum *PreprocessDatum(IMemoryPool *mp,
+									   const CColRef *colref,
+									   IDatum *datum);
 
-			// add padding to datums when needed
-			static
-			IDatum *PdatumPreprocess(IMemoryPool *pmp, const CColRef *pcr, IDatum *pdatum);
+	public:
+		// ctor
+		CStatsPredPoint(ULONG colid, CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point);
 
-		public:
+		// ctor
+		CStatsPredPoint(IMemoryPool *mp,
+						const CColRef *colref,
+						CStatsPred::EStatsCmpType stats_cmp_type,
+						IDatum *datum);
 
-			// ctor
-			CStatsPredPoint
-				(
-				ULONG ulColId,
-				CStatsPred::EStatsCmpType escmpt,
-				CPoint *ppoint
-				);
+		// dtor
+		virtual ~CStatsPredPoint()
+		{
+			m_pred_point->Release();
+		}
 
-			// ctor
-			CStatsPredPoint
-				(
-				IMemoryPool *pmp,
-				const CColRef *pcr,
-				CStatsPred::EStatsCmpType escmpt,
-				IDatum *pdatum
-				);
+		// comparison types for stats computation
+		virtual CStatsPred::EStatsCmpType
+		GetCmpType() const
+		{
+			return m_stats_cmp_type;
+		}
 
-			// dtor
-			virtual
-			~CStatsPredPoint()
-			{
-				m_ppoint->Release();
-			}
+		// filter point
+		virtual CPoint *
+		GetPredPoint() const
+		{
+			return m_pred_point;
+		}
 
-			// comparison types for stats computation
-			virtual
-			CStatsPred::EStatsCmpType Escmpt() const
-			{
-				return m_escmpt;
-			}
+		// filter type id
+		virtual EStatsPredType
+		GetPredStatsType() const
+		{
+			return CStatsPred::EsptPoint;
+		}
 
-			// filter point
-			virtual
-			CPoint *Ppoint() const
-			{
-				return m_ppoint;
-			}
+		// conversion function
+		static CStatsPredPoint *
+		ConvertPredStats(CStatsPred *pred_stats)
+		{
+			GPOS_ASSERT(NULL != pred_stats);
+			GPOS_ASSERT(CStatsPred::EsptPoint == pred_stats->GetPredStatsType());
 
-			// filter type id
-			virtual
-			EStatsPredType Espt() const
-			{
-				return CStatsPred::EsptPoint;
-			}
+			return dynamic_cast<CStatsPredPoint *>(pred_stats);
+		}
 
-			// conversion function
-			static
-			CStatsPredPoint *PstatspredConvert
-				(
-				CStatsPred *pstatspred
-				)
-			{
-				GPOS_ASSERT(NULL != pstatspred);
-				GPOS_ASSERT(CStatsPred::EsptPoint == pstatspred->Espt());
+	};  // class CStatsPredPoint
 
-				return dynamic_cast<CStatsPredPoint*>(pstatspred);
-			}
+}  // namespace gpnaucrates
 
-	}; // class CStatsPredPoint
-
-}
-
-#endif // !GPNAUCRATES_CStatsPredPoint_H
+#endif  // !GPNAUCRATES_CStatsPredPoint_H
 
 // EOF

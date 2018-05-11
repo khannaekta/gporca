@@ -28,7 +28,7 @@ namespace gpdxl
 namespace gpmd
 {
 	using namespace gpos;
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CMDTypeGenericGPDB
@@ -38,313 +38,282 @@ namespace gpmd
 	//
 	//---------------------------------------------------------------------------
 	class CMDTypeGenericGPDB : public IMDTypeGeneric
-	{		
-		private:
-			// memory pool
-			IMemoryPool *m_pmp;
-			
-			// DXL for object
-			const CWStringDynamic *m_pstr;
-			
-			// metadata id
-			IMDId *m_pmdid;
-			
-			// type name
-			CMDName *m_pmdname;
-			
-			// can type be redistributed
-			BOOL m_fRedistributable;
-			
-			// is this a fixed-length type
-			BOOL m_fFixedLength;
-			
-			// type length in number of bytes for fixed-length types, 0 otherwise
-			ULONG m_ulLength;
-			
-			// is type passed by value or by reference
-			BOOL m_fByValue;
-			
-			// id of equality operator for type
-			IMDId *m_pmdidOpEq;
-			
-			// id of inequality operator for type
-			IMDId *m_pmdidOpNeq;
+	{
+	private:
+		// memory pool
+		IMemoryPool *m_mp;
 
-			// id of less than operator for type
-			IMDId *m_pmdidOpLT;
-			
-			// id of less than equals operator for type
-			IMDId *m_pmdidOpLEq;
+		// DXL for object
+		const CWStringDynamic *m_dxl_str;
 
-			// id of greater than operator for type
-			IMDId *m_pmdidOpGT;
-			
-			// id of greater than equals operator for type
-			IMDId *m_pmdidOpGEq;
+		// metadata id
+		IMDId *m_mdid;
 
-			// id of comparison operator for type used in btree lookups
-			IMDId *m_pmdidOpComp;
-			
-			// min aggregate
-			IMDId *m_pmdidMin;
-			
-			// max aggregate
-			IMDId *m_pmdidMax;
-			
-			// avg aggregate
-			IMDId *m_pmdidAvg;
-			
-			// sum aggregate
-			IMDId *m_pmdidSum;
-			
-			// count aggregate
-			IMDId *m_pmdidCount;
+		// type name
+		CMDName *m_mdname;
 
-			// is type hashable
-			BOOL m_fHashable;
-		
-			// is type composite
-			BOOL m_fComposite;
+		// can type be redistributed
+		BOOL m_is_redistributable;
 
-			// id of the relation corresponding to a composite type
-			IMDId *m_pmdidBaseRelation;
+		// is this a fixed-length type
+		BOOL m_is_fixed_length;
 
-			// id of array type for type
-			IMDId *m_pmdidTypeArray;
-			
-			// GPDB specific length
-			INT m_iLength;
+		// type length in number of bytes for fixed-length types, 0 otherwise
+		ULONG m_length;
 
-			// a null datum of this type (used for statistics comparison)
-			IDatum *m_pdatumNull;
+		// is type passed by value or by reference
+		BOOL m_is_passed_by_value;
 
-			// private copy ctor
-			CMDTypeGenericGPDB(const CMDTypeGenericGPDB &);
-			
-		public:
-			// ctor
-			CMDTypeGenericGPDB
-				(
-				IMemoryPool *pmp,
-				IMDId *pmdid,
-				CMDName *pmdname,
-				BOOL fRedistributable,
-				BOOL fFixedLength,
-				ULONG ulLength, 
-				BOOL fByValue,
-				IMDId *pmdidOpEq,
-				IMDId *pmdidOpNEq,
-				IMDId *pmdidOpLT,
-				IMDId *pmdidOpLEq,
-				IMDId *pmdidOpGT,
-				IMDId *pmdidOpGEq,
-				IMDId *pmdidOpComp,
-				IMDId *pmdidMin,
-				IMDId *pmdidMax,
-				IMDId *pmdidAvg,
-				IMDId *pmdidSum,
-				IMDId *pmdidCount,
-				BOOL fHashable,
-				BOOL fComposite,
-				IMDId *pmdidBaseRelation,
-				IMDId *pmdidTypeArray,
-				INT iLength
-				);
-			
-			// dtor
-			virtual 
-			~CMDTypeGenericGPDB();
-			
-			// accessors
-			virtual 
-			const CWStringDynamic *Pstr() const
-			{
-				return m_pstr;
-			}
-			
-			virtual 
-			IMDId *Pmdid() const;
-			
-			virtual 
-			CMDName Mdname() const;
-			
-			virtual
-			BOOL FRedistributable() const
-			{
-				return m_fRedistributable;
-			}
-			
-			virtual
-			BOOL FFixedLength() const
-			{
-				return m_fFixedLength;
-			}
-			
-			// is type composite
-			virtual
-			BOOL FComposite() const
-			{
-				return m_fComposite;
-			}
+		// id of equality operator for type
+		IMDId *m_mdid_op_eq;
 
-			virtual
-			ULONG UlLength () const
-			{
-				return m_ulLength;
-			}
-			
-			virtual
-			BOOL FByValue() const
-			{
-				return m_fByValue;
-			}
-			
-			// id of specified comparison operator type
-			virtual 
-			IMDId *PmdidCmp(ECmpType ecmpt) const;
+		// id of inequality operator for type
+		IMDId *m_mdid_op_neq;
 
-			// id of specified specified aggregate type
-			virtual 
-			IMDId *PmdidAgg(EAggType eagg) const;
+		// id of less than operator for type
+		IMDId *m_mdid_op_lt;
 
-			virtual 
-			const IMDId *PmdidOpComp() const
-			{
-				return m_pmdidOpComp;
-			}
-			
-			// is type hashable
-			virtual 
-			BOOL FHashable() const
-			{
-				return m_fHashable;
-			}
-			
-			// id of the relation corresponding to a composite type
-			virtual 
-			IMDId *PmdidBaseRelation() const
-			{
-				return m_pmdidBaseRelation;
-			}
+		// id of less than equals operator for type
+		IMDId *m_mdid_op_leq;
 
-			virtual
-			IMDId *PmdidTypeArray() const
-			{
-				return m_pmdidTypeArray;
-			}
-			
-			// serialize object in DXL format
-			virtual 
-			void Serialize(gpdxl::CXMLSerializer *pxmlser) const;
+		// id of greater than operator for type
+		IMDId *m_mdid_op_gt;
 
-			// factory method for generating generic datum from CDXLScalarConstValue
-			virtual 
-			IDatum* Pdatum(const CDXLScalarConstValue *pdxlop) const;
+		// id of greater than equals operator for type
+		IMDId *m_mdid_op_geq;
 
-			// create typed datum from DXL datum
-			virtual
-			IDatum *Pdatum(IMemoryPool *pmp, const CDXLDatum *pdxldatum) const;
+		// id of comparison operator for type used in btree lookups
+		IMDId *m_mdid_op_cmp;
 
-			// return the GPDB length
-			INT
-			ILength() const
-			{
-				return m_iLength;
-			}
+		// min aggregate
+		IMDId *m_mdid_min;
 
-			// return the null constant for this type
-			virtual
-			IDatum *PdatumNull() const
-			{
-				return m_pdatumNull;
-			}
+		// max aggregate
+		IMDId *m_mdid_max;
 
-			// generate the DXL datum from IDatum
-			virtual
-			CDXLDatum* Pdxldatum(IMemoryPool *pmp, IDatum *pdatum) const;
+		// avg aggregate
+		IMDId *m_mdid_avg;
 
-			// generate the DXL datum representing null value
-			virtual
-			CDXLDatum* PdxldatumNull(IMemoryPool *pmp) const;
+		// sum aggregate
+		IMDId *m_mdid_sum;
 
-			// generate the DXL scalar constant from IDatum
-			virtual
-			CDXLScalarConstValue* PdxlopScConst(IMemoryPool *pmp, IDatum *pdatum) const;
+		// count aggregate
+		IMDId *m_mdid_count;
+
+		// is type hashable
+		BOOL m_is_hashable;
+
+		// is type composite
+		BOOL m_is_composite_type;
+
+		// id of the relation corresponding to a composite type
+		IMDId *m_mdid_base_relation;
+
+		// id of array type for type
+		IMDId *m_mdid_type_array;
+
+		// GPDB specific length
+		INT m_gpdb_length;
+
+		// a null datum of this type (used for statistics comparison)
+		IDatum *m_datum_null;
+
+		// private copy ctor
+		CMDTypeGenericGPDB(const CMDTypeGenericGPDB &);
+
+	public:
+		// ctor
+		CMDTypeGenericGPDB(IMemoryPool *mp,
+						   IMDId *mdid,
+						   CMDName *mdname,
+						   BOOL is_redistributable,
+						   BOOL is_fixed_length,
+						   ULONG length,
+						   BOOL is_passed_by_value,
+						   IMDId *mdid_op_eq,
+						   IMDId *mdid_op_neq,
+						   IMDId *mdid_op_lt,
+						   IMDId *mdid_op_leq,
+						   IMDId *mdid_op_gt,
+						   IMDId *mdid_op_geq,
+						   IMDId *mdid_op_cmp,
+						   IMDId *pmdidMin,
+						   IMDId *pmdidMax,
+						   IMDId *pmdidAvg,
+						   IMDId *pmdidSum,
+						   IMDId *pmdidCount,
+						   BOOL is_hashable,
+						   BOOL is_composite_type,
+						   IMDId *mdid_base_relation,
+						   IMDId *mdid_type_array,
+						   INT gpdb_length);
+
+		// dtor
+		virtual ~CMDTypeGenericGPDB();
+
+		// accessors
+		virtual const CWStringDynamic *
+		GetStrRepr() const
+		{
+			return m_dxl_str;
+		}
+
+		virtual IMDId *MDId() const;
+
+		virtual CMDName Mdname() const;
+
+		virtual BOOL
+		IsRedistributable() const
+		{
+			return m_is_redistributable;
+		}
+
+		virtual BOOL
+		IsFixedLength() const
+		{
+			return m_is_fixed_length;
+		}
+
+		// is type composite
+		virtual BOOL
+		IsComposite() const
+		{
+			return m_is_composite_type;
+		}
+
+		virtual ULONG
+		Length() const
+		{
+			return m_length;
+		}
+
+		virtual BOOL
+		IsPassedByValue() const
+		{
+			return m_is_passed_by_value;
+		}
+
+		// id of specified comparison operator type
+		virtual IMDId *GetMdidForCmpType(ECmpType ecmpt) const;
+
+		// id of specified specified aggregate type
+		virtual IMDId *GetMdidForAggType(EAggType agg_type) const;
+
+		virtual const IMDId *
+		CmpOpMdid() const
+		{
+			return m_mdid_op_cmp;
+		}
+
+		// is type hashable
+		virtual BOOL
+		IsHashable() const
+		{
+			return m_is_hashable;
+		}
+
+		// id of the relation corresponding to a composite type
+		virtual IMDId *
+		GetBaseRelMdid() const
+		{
+			return m_mdid_base_relation;
+		}
+
+		virtual IMDId *
+		GetArrayTypeMdid() const
+		{
+			return m_mdid_type_array;
+		}
+
+		// serialize object in DXL format
+		virtual void Serialize(gpdxl::CXMLSerializer *xml_serializer) const;
+
+		// factory method for generating generic datum from CDXLScalarConstValue
+		virtual IDatum *GetDatumForDXLConstVal(const CDXLScalarConstValue *dxl_op) const;
+
+		// create typed datum from DXL datum
+		virtual IDatum *GetDatumForDXLDatum(IMemoryPool *mp,
+											const CDXLDatum *dxl_datum) const;
+
+		// return the GPDB length
+		INT
+		GetGPDBLength() const
+		{
+			return m_gpdb_length;
+		}
+
+		// return the null constant for this type
+		virtual IDatum *
+		DatumNull() const
+		{
+			return m_datum_null;
+		}
+
+		// generate the DXL datum from IDatum
+		virtual CDXLDatum *GetDatumVal(IMemoryPool *mp, IDatum *datum) const;
+
+		// generate the DXL datum representing null value
+		virtual CDXLDatum *GetDXLDatumNull(IMemoryPool *mp) const;
+
+		// generate the DXL scalar constant from IDatum
+		virtual CDXLScalarConstValue *GetDXLOpScConst(IMemoryPool *mp,
+													  IDatum *datum) const;
 
 #ifdef GPOS_DEBUG
-			// debug print of the type in the provided stream
-			virtual 
-			void DebugPrint(IOstream &os) const;
+		// debug print of the type in the provided stream
+		virtual void DebugPrint(IOstream &os) const;
 #endif
 
-			// is type an ambiguous one? e.g., AnyElement in GPDB
-			virtual
-			BOOL FAmbiguous() const;
+		// is type an ambiguous one? e.g., AnyElement in GPDB
+		virtual BOOL IsAmbiguous() const;
 
-			// create a dxl datum
-			static
-			CDXLDatum *Pdxldatum
-						(
-						IMemoryPool *pmp,
-						IMDId *pmdid,
-						INT iTypeModifier,
-						BOOL fByVal,
-						BOOL fNull,
-						BYTE *pba,
-						ULONG ulLength,
-						LINT lValue,
-						CDouble dValue
-						);
+		// create a dxl datum
+		static CDXLDatum *CreateDXLDatumVal(IMemoryPool *mp,
+											IMDId *mdid,
+											INT type_modifier,
+											BOOL is_passed_by_value,
+											BOOL is_null,
+											BYTE *byte_array,
+											ULONG length,
+											LINT lint_Value,
+											CDouble double_Value);
 
-			// create a dxl datum of types having double mapping
-			static
-			CDXLDatum *PdxldatumStatsDoubleMappable
-						(
-						IMemoryPool *pmp,
-						IMDId *pmdid,
-						INT iTypeModifier,
-						BOOL fByValue,
-						BOOL fNull,
-						BYTE *pba,
-						ULONG ulLength,
-						LINT lValue,
-						CDouble dValue
-						);
+		// create a dxl datum of types having double mapping
+		static CDXLDatum *CreateDXLDatumStatsDoubleMappable(IMemoryPool *mp,
+															IMDId *mdid,
+															INT type_modifier,
+															BOOL is_passed_by_value,
+															BOOL is_null,
+															BYTE *byte_array,
+															ULONG length,
+															LINT lint_Value,
+															CDouble double_Value);
 
-			// create a dxl datum of types having lint mapping
-			static
-			CDXLDatum *PdxldatumStatsLintMappable
-						(
-						IMemoryPool *pmp,
-						IMDId *pmdid,
-						INT iTypeModifier,
-						BOOL fByValue,
-						BOOL fNull,
-						BYTE *pba,
-						ULONG ulLength,
-						LINT lValue,
-						CDouble dValue
-						);
+		// create a dxl datum of types having lint mapping
+		static CDXLDatum *CreateDXLDatumStatsIntMappable(IMemoryPool *mp,
+														 IMDId *mdid,
+														 INT type_modifier,
+														 BOOL is_passed_by_value,
+														 BOOL is_null,
+														 BYTE *byte_array,
+														 ULONG length,
+														 LINT lint_Value,
+														 CDouble double_Value);
 
-			// does a datum of this type need bytea to Lint mapping for statistics computation
-			static
-			BOOL FHasByteLintMapping(const IMDId *pmdid);
+		// does a datum of this type need bytea to Lint mapping for statistics computation
+		static BOOL HasByte2IntMapping(const IMDId *mdid);
 
-			// does a datum of this type need bytea to double mapping for statistics computation
-			static
-			BOOL FHasByteDoubleMapping(const IMDId *pmdid);
+		// does a datum of this type need bytea to double mapping for statistics computation
+		static BOOL HasByte2DoubleMapping(const IMDId *mdid);
 
-			// is this a time-related type
-			static
-			BOOL FTimeRelatedType(const IMDId *pmdid);
+		// is this a time-related type
+		static BOOL IsTimeRelatedType(const IMDId *mdid);
 
-			// is this a network-related type
-			static
-			BOOL FNetworkRelatedType(const IMDId *pmdid);
-
+		// is this a network-related type
+		static BOOL IsNetworkRelatedType(const IMDId *mdid);
 	};
-}
+}  // namespace gpmd
 
-#endif // !GPMD_CMDTypeGenericGPDB_H
+#endif  // !GPMD_CMDTypeGenericGPDB_H
 
 // EOF

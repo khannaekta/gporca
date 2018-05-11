@@ -30,81 +30,71 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarBitmapBoolOp : public CDXLScalar
 	{
+	public:
+		// type of bitmap operator
+		enum EdxlBitmapBoolOp
+		{
+			EdxlbitmapAnd,
+			EdxlbitmapOr,
+			EdxlbitmapSentinel
+		};
 
-		public:
-		
-			// type of bitmap operator
-			enum EdxlBitmapBoolOp
-			{
-				EdxlbitmapAnd,
-				EdxlbitmapOr,
-				EdxlbitmapSentinel
-			};
-		
-		private:
+	private:
+		// type id
+		IMDId *m_mdid_type;
 
-			// type id
-			IMDId *m_pmdidType;
-			
-			// operator type
-			const EdxlBitmapBoolOp m_bitmapboolop;
+		// operator type
+		const EdxlBitmapBoolOp m_bitmap_op_type;
 
-			// private copy ctor
-			CDXLScalarBitmapBoolOp(const CDXLScalarBitmapBoolOp&);
+		// private copy ctor
+		CDXLScalarBitmapBoolOp(const CDXLScalarBitmapBoolOp &);
 
-		public:
-			// ctor
-			CDXLScalarBitmapBoolOp(IMemoryPool *pmp, IMDId *pmdidType, EdxlBitmapBoolOp bitmapboolop);
-			
-			// dtor 
-			virtual
-			~CDXLScalarBitmapBoolOp();
+	public:
+		// ctor
+		CDXLScalarBitmapBoolOp(IMemoryPool *mp,
+							   IMDId *mdid_type,
+							   EdxlBitmapBoolOp bitmap_op_type);
 
-			// dxl operator type
-			virtual
-			Edxlopid Edxlop() const;
+		// dtor
+		virtual ~CDXLScalarBitmapBoolOp();
 
-			// bitmap operator type
-			EdxlBitmapBoolOp Edxlbitmapboolop() const;
-			
-			// return type
-			IMDId *PmdidType() const;
+		// dxl operator type
+		virtual Edxlopid GetDXLOperator() const;
 
-			// name of the DXL operator name
-			virtual
-			const CWStringConst *PstrOpName() const;
+		// bitmap operator type
+		EdxlBitmapBoolOp GetDXLBitmapOpType() const;
 
-			// does the operator return a boolean result
-			virtual
-			BOOL FBoolean(CMDAccessor *pmda) const;
-			
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
+		// return type
+		IMDId *MDIdType() const;
+
+		// name of the DXL operator name
+		virtual const CWStringConst *GetOpNameStr() const;
+
+		// does the operator return a boolean result
+		virtual BOOL HasBoolResult(CMDAccessor *md_accessor) const;
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			virtual
-			void AssertValid(const CDXLNode *pdxln, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		virtual void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 
-			// conversion function
-			static
-			CDXLScalarBitmapBoolOp *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopScalarBitmapBoolOp == pdxlop->Edxlop());
+		// conversion function
+		static CDXLScalarBitmapBoolOp *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarBitmapBoolOp == dxl_op->GetDXLOperator());
 
-				return dynamic_cast<CDXLScalarBitmapBoolOp*>(pdxlop);
-			}
+			return dynamic_cast<CDXLScalarBitmapBoolOp *>(dxl_op);
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLScalarBitmapBoolOp_H
+#endif  // !GPDXL_CDXLScalarBitmapBoolOp_H
 
 // EOF

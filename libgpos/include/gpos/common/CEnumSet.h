@@ -17,7 +17,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CEnumSet
@@ -26,70 +25,70 @@ namespace gpos
 	//		Template derived from CBitSet
 	//
 	//---------------------------------------------------------------------------
-	template<class T, ULONG eSentinel>
+	template <class T, ULONG sentinel_index>
 	class CEnumSet : public CBitSet
 	{
-	
-		private:
-	
-			// hidden copy ctor
-			CEnumSet<T, eSentinel>(const CEnumSet<T, eSentinel>&);
-			
-		public:
-				
-			// ctor
-			explicit
-			CEnumSet<T, eSentinel>(IMemoryPool *pmp)
-				:
-				CBitSet(pmp, eSentinel)
-			{}
-		
-			explicit
-			CEnumSet<T, eSentinel>(IMemoryPool *pmp, const CEnumSet<T, eSentinel> &pes)
-				:
-				CBitSet(pmp, pes)
-			{}
-			
-			// dtor
-			virtual ~CEnumSet<T, eSentinel>() {}
-			
-			// determine if bit is set
-			BOOL FBit(T t) const
-			{
-				GPOS_ASSERT(t >= 0);
+	private:
+		// hidden copy ctor
+		CEnumSet<T, sentinel_index>(const CEnumSet<T, sentinel_index> &);
 
-				ULONG ulT = static_cast<ULONG>(t);
-				GPOS_ASSERT(ulT < eSentinel && "Out of range of enum");
-				
-				return CBitSet::FBit(ulT);
-			}
-			
-			// set given bit; return previous value
-			BOOL FExchangeSet(T t)
-			{
-				GPOS_ASSERT(t >= 0);
+	public:
+		// ctor
+		explicit CEnumSet<T, sentinel_index>(IMemoryPool *mp)
+			: CBitSet(mp, sentinel_index)
+		{
+		}
 
-				ULONG ulT = static_cast<ULONG>(t);
-				GPOS_ASSERT(ulT < eSentinel && "Out of range of enum");
-				
-				return CBitSet::FExchangeSet(ulT);
-			}
-		
-			// clear given bit; return previous value
-			BOOL FExchangeClear(T t)
-			{
-				GPOS_ASSERT(t >= 0);
+		explicit CEnumSet<T, sentinel_index>(IMemoryPool *mp,
+											 const CEnumSet<T, sentinel_index> &enum_set)
+			: CBitSet(mp, enum_set)
+		{
+		}
 
-				ULONG ulT = static_cast<ULONG>(t);
-				GPOS_ASSERT(ulT < eSentinel && "Out of range of enum");
-				
-				return CBitSet::FExchangeClear(ulT);
-			}
+		// dtor
+		virtual ~CEnumSet<T, sentinel_index>()
+		{
+		}
 
-	}; // class CEnumSet
-}
+		// determine if bit is set
+		BOOL
+		Get(T t) const
+		{
+			GPOS_ASSERT(t >= 0);
 
-#endif // !GPOS_CEnumSet_H
+			ULONG bit_index = static_cast<ULONG>(t);
+			GPOS_ASSERT(bit_index < sentinel_index && "Out of range of enum");
+
+			return CBitSet::Get(bit_index);
+		}
+
+		// set given bit; return previous value
+		BOOL
+		ExchangeSet(T t)
+		{
+			GPOS_ASSERT(t >= 0);
+
+			ULONG bit_index = static_cast<ULONG>(t);
+			GPOS_ASSERT(bit_index < sentinel_index && "Out of range of enum");
+
+			return CBitSet::ExchangeSet(bit_index);
+		}
+
+		// clear given bit; return previous value
+		BOOL
+		ExchangeClear(T t)
+		{
+			GPOS_ASSERT(t >= 0);
+
+			ULONG bit_index = static_cast<ULONG>(t);
+			GPOS_ASSERT(bit_index < sentinel_index && "Out of range of enum");
+
+			return CBitSet::ExchangeClear(bit_index);
+		}
+
+	};  // class CEnumSet
+}  // namespace gpos
+
+#endif  // !GPOS_CEnumSet_H
 
 // EOF
-

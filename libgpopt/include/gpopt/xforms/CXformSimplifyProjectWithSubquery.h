@@ -12,6 +12,9 @@
 #define GPOPT_CXformSimplifyProjectWithSubquery_H
 
 #include "gpos/base.h"
+#include "gpopt/operators/CPatternLeaf.h"
+#include "gpopt/operators/CExpression.h"
+#include "gpopt/operators/CLogicalProject.h"
 #include "gpopt/xforms/CXformSimplifySubquery.h"
 
 namespace gpopt
@@ -40,18 +43,18 @@ namespace gpopt
 			explicit
 			CXformSimplifyProjectWithSubquery
 				(
-				IMemoryPool *pmp
+				IMemoryPool *mp
 				)
 				:
 				// pattern
 				CXformSimplifySubquery
 				(
-				GPOS_NEW(pmp) CExpression
+				GPOS_NEW(mp) CExpression
 						(
-						pmp,
-						GPOS_NEW(pmp) CLogicalProject(pmp),
-						GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)),	// relational child
-						GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternTree(pmp))	// project list
+						mp,
+						GPOS_NEW(mp) CLogicalProject(mp),
+						GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)),	// relational child
+						GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))	// project list
 						)
 				)
 			{}

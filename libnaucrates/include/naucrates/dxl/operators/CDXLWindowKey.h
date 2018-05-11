@@ -29,55 +29,52 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLWindowKey : public CRefCount
 	{
-		private:
+	private:
+		// memory pool;
+		IMemoryPool *m_mp;
 
-			// memory pool;
-			IMemoryPool *m_pmp;
+		// window frame associated with the window key
+		CDXLWindowFrame *m_window_frame_dxl;
 
-			// window frame associated with the window key
-			CDXLWindowFrame *m_pdxlwf;
+		// private copy ctor
+		CDXLWindowKey(const CDXLWindowKey &);
 
-			// private copy ctor
-			CDXLWindowKey(const CDXLWindowKey&);
+		// sorting columns
+		CDXLNode *m_sort_col_list_dxlnode;
 
-			// sorting columns
-			CDXLNode *m_pdxlnSortColList;
+	public:
+		// ctor
+		explicit CDXLWindowKey(IMemoryPool *mp);
 
-		public:
+		// dtor
+		virtual ~CDXLWindowKey();
 
-			// ctor
-			explicit
-			CDXLWindowKey(IMemoryPool *pmp);
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *) const;
 
-			// dtor
-			virtual
-			~CDXLWindowKey();
+		// set window frame definition
+		void SetWindowFrame(CDXLWindowFrame *window_frame);
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *) const;
+		// return window frame
+		CDXLWindowFrame *
+		GetWindowFrame() const
+		{
+			return m_window_frame_dxl;
+		}
 
-			// set window frame definition
-			void SetWindowFrame(CDXLWindowFrame *pdxlwf);
+		// set the list of sort columns
+		void SetSortColList(CDXLNode *sort_col_list_dxlnode);
 
-			// return window frame
-			CDXLWindowFrame *Pdxlwf() const
-			{
-				return m_pdxlwf;
-			}
-
-			// set the list of sort columns
-			void SetSortColList(CDXLNode *pdxlnSortColList);
-
-			// sort columns
-			CDXLNode *PdxlnSortColList() const
-			{
-				return m_pdxlnSortColList;
-			}
+		// sort columns
+		CDXLNode *
+		GetSortColListDXL() const
+		{
+			return m_sort_col_list_dxlnode;
+		}
 	};
 
-	typedef CDynamicPtrArray<CDXLWindowKey, CleanupRelease> DrgPdxlwk;
-}
-#endif // !GPDXL_CDXLWindowKey_H
+	typedef CDynamicPtrArray<CDXLWindowKey, CleanupRelease> CDXLWindowKeyArray;
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLWindowKey_H
 
 // EOF

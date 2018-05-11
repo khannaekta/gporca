@@ -41,90 +41,73 @@ namespace gpmd
 	//
 	//---------------------------------------------------------------------------
 	class CDXLRelStats : public IMDRelStats
-	{		
-		private:
-		
-			// memory pool
-			IMemoryPool *m_pmp;
+	{
+	private:
+		// memory pool
+		IMemoryPool *m_mp;
 
-			// metadata id of the object
-			CMDIdRelStats *m_pmdidRelStats;
-			
-			// table name
-			CMDName *m_pmdname;
-			
-			// number of rows
-			CDouble m_dRows;
-			
-			// flag to indicate if input relation is empty
-			BOOL m_fEmpty;
+		// metadata id of the object
+		CMDIdRelStats *m_rel_stats_mdid;
 
-			// DXL string for object
-			CWStringDynamic *m_pstr;
-			
-			// private copy ctor
-			CDXLRelStats(const CDXLRelStats &);
-		
-		public:
-			
-			CDXLRelStats
-				(
-				IMemoryPool *pmp,
-				CMDIdRelStats *pmdidRelStats,
-				CMDName *pmdname,
-				CDouble dRows,
-				BOOL fEmpty
-				);
-			
-			virtual
-			~CDXLRelStats();
-			
-			// the metadata id
-			virtual 
-			IMDId *Pmdid() const;
-			
-			// relation name
-			virtual 
-			CMDName Mdname() const;
-			
-			// DXL string representation of cache object 
-			virtual 
-			const CWStringDynamic *Pstr() const;
-			
-			// number of rows
-			virtual
-			CDouble DRows() const;
-			
-			// is statistics on an empty input
-			virtual
-			BOOL FEmpty() const
-			{
-				return m_fEmpty;
-			}
+		// table name
+		CMDName *m_mdname;
 
-			// serialize relation stats in DXL format given a serializer object
-			virtual 
-			void Serialize(gpdxl::CXMLSerializer *) const;
+		// number of rows
+		CDouble m_rows;
+
+		// flag to indicate if input relation is empty
+		BOOL m_empty;
+
+		// DXL string for object
+		CWStringDynamic *m_dxl_str;
+
+		// private copy ctor
+		CDXLRelStats(const CDXLRelStats &);
+
+	public:
+		CDXLRelStats(IMemoryPool *mp,
+					 CMDIdRelStats *rel_stats_mdid,
+					 CMDName *mdname,
+					 CDouble rows,
+					 BOOL is_empty);
+
+		virtual ~CDXLRelStats();
+
+		// the metadata id
+		virtual IMDId *MDId() const;
+
+		// relation name
+		virtual CMDName Mdname() const;
+
+		// DXL string representation of cache object
+		virtual const CWStringDynamic *GetStrRepr() const;
+
+		// number of rows
+		virtual CDouble Rows() const;
+
+		// is statistics on an empty input
+		virtual BOOL
+		IsEmpty() const
+		{
+			return m_empty;
+		}
+
+		// serialize relation stats in DXL format given a serializer object
+		virtual void Serialize(gpdxl::CXMLSerializer *) const;
 
 #ifdef GPOS_DEBUG
-			// debug print of the metadata relation
-			virtual 
-			void DebugPrint(IOstream &os) const;
+		// debug print of the metadata relation
+		virtual void DebugPrint(IOstream &os) const;
 #endif
 
-			// dummy relstats
-			static
-			CDXLRelStats *PdxlrelstatsDummy
-								(
-								IMemoryPool *pmp,
-								IMDId *pmdid
-								);
+		// dummy relstats
+		static CDXLRelStats *CreateDXLDummyRelStats(IMemoryPool *mp, IMDId *mdid);
 	};
 
-}
+}  // namespace gpmd
 
 
 
-#endif // !GPMD_CDXLRelStats_H
+#endif  // !GPMD_CDXLRelStats_H
 
 // EOF

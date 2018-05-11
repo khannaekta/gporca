@@ -39,51 +39,44 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalBroadcastMotion : public CDXLPhysicalMotion
 	{
-		private:
-			
-			// private copy ctor
-			CDXLPhysicalBroadcastMotion(const CDXLPhysicalBroadcastMotion&);
-			
-		public:
-			// ctor/dtor
-			explicit CDXLPhysicalBroadcastMotion(IMemoryPool *pmp);
-			
-			// accessors
-			Edxlopid Edxlop() const;
-			const CWStringConst *PstrOpName() const;
-			
-			// index of relational child node in the children array
-			virtual 
-			ULONG UlChildIndex() const
-			{
-				return EdxlbmIndexChild;
-			}
-			
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
+	private:
+		// private copy ctor
+		CDXLPhysicalBroadcastMotion(const CDXLPhysicalBroadcastMotion &);
 
-			// conversion function
-			static
-			CDXLPhysicalBroadcastMotion *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopPhysicalMotionBroadcast == pdxlop->Edxlop());
-				return dynamic_cast<CDXLPhysicalBroadcastMotion*>(pdxlop);
-			}
+	public:
+		// ctor/dtor
+		explicit CDXLPhysicalBroadcastMotion(IMemoryPool *mp);
+
+		// accessors
+		Edxlopid GetDXLOperator() const;
+		const CWStringConst *GetOpNameStr() const;
+
+		// index of relational child node in the children array
+		virtual ULONG
+		GetRelationChildIdx() const
+		{
+			return EdxlbmIndexChild;
+		}
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+
+		// conversion function
+		static CDXLPhysicalBroadcastMotion *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopPhysicalMotionBroadcast == dxl_op->GetDXLOperator());
+			return dynamic_cast<CDXLPhysicalBroadcastMotion *>(dxl_op);
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
-			
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
-#endif // !GPDXL_CDXLPhysicalBroadcastMotion_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLPhysicalBroadcastMotion_H
 
 // EOF
-

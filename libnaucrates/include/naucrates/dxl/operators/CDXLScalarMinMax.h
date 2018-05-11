@@ -31,84 +31,75 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarMinMax : public CDXLScalar
 	{
-		public:
+	public:
+		// types of operations: either min or max
+		enum EdxlMinMaxType
+		{
+			EmmtMin,
+			EmmtMax,
+			EmmtSentinel
+		};
 
-			// types of operations: either min or max
-			enum EdxlMinMaxType
-				{
-					EmmtMin,
-					EmmtMax,
-					EmmtSentinel
-				};
+	private:
+		// return type
+		IMDId *m_mdid_type;
 
-		private:
-			// return type
-			IMDId *m_pmdidType;
+		// min/max type
+		EdxlMinMaxType m_min_max_type;
 
-			// min/max type
-			EdxlMinMaxType m_emmt;
+		// private copy ctor
+		CDXLScalarMinMax(const CDXLScalarMinMax &);
 
-			// private copy ctor
-			CDXLScalarMinMax(const CDXLScalarMinMax&);
+	public:
+		// ctor
+		CDXLScalarMinMax(IMemoryPool *mp, IMDId *mdid_type, EdxlMinMaxType min_max_type);
 
-		public:
+		//dtor
+		virtual ~CDXLScalarMinMax();
 
-			// ctor
-			CDXLScalarMinMax(IMemoryPool *pmp, IMDId *pmdidType, EdxlMinMaxType emmt);
+		// name of the operator
+		virtual const CWStringConst *GetOpNameStr() const;
 
-			//dtor
-			virtual
-			~CDXLScalarMinMax();
+		// return type
+		virtual IMDId *
+		MDIdType() const
+		{
+			return m_mdid_type;
+		}
 
-			// name of the operator
-			virtual
-			const CWStringConst *PstrOpName() const;
+		// DXL Operator ID
+		virtual Edxlopid GetDXLOperator() const;
 
-			// return type
-			virtual
-			IMDId *PmdidType() const
-			{
-				return m_pmdidType;
-			}
+		// min/max type
+		EdxlMinMaxType
+		GetMinMaxType() const
+		{
+			return m_min_max_type;
+		}
 
-			// DXL Operator ID
-			virtual
-			Edxlopid Edxlop() const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
 
-			// min/max type
-			EdxlMinMaxType Emmt() const
-			{
-				return m_emmt;
-			}
-
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
-
-			// does the operator return a boolean result
-			virtual
-			BOOL FBoolean(CMDAccessor *pmda) const;
+		// does the operator return a boolean result
+		virtual BOOL HasBoolResult(CMDAccessor *md_accessor) const;
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *pdxln, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *node, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 
-			// conversion function
-			static
-			CDXLScalarMinMax *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopScalarMinMax == pdxlop->Edxlop());
+		// conversion function
+		static CDXLScalarMinMax *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarMinMax == dxl_op->GetDXLOperator());
 
-				return dynamic_cast<CDXLScalarMinMax*>(pdxlop);
-			}
+			return dynamic_cast<CDXLScalarMinMax *>(dxl_op);
+		}
 	};
-}
-#endif // !GPDXL_CDXLScalarMinMax_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLScalarMinMax_H
 
 // EOF

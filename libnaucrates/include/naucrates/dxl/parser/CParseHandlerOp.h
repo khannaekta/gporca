@@ -32,39 +32,33 @@ namespace gpdxl
 	//
 	//
 	//---------------------------------------------------------------------------
-	class CParseHandlerOp : public CParseHandlerBase 
+	class CParseHandlerOp : public CParseHandlerBase
 	{
-		private:
+	private:
+		// private copy ctor
+		CParseHandlerOp(const CParseHandlerOp &);
 
-			// private copy ctor
-			CParseHandlerOp(const CParseHandlerOp&);
-			
-			
-		protected:
 
-			// the root of the parsed DXL tree constructed by the parse handler
-			CDXLNode *m_pdxln;
-			
-			
-			void AddChildFromParseHandler(const CParseHandlerOp *);
-			
-		public:
-			// ctor/dtor
-			CParseHandlerOp
-				(
-				IMemoryPool *pmp,
-				CParseHandlerManager *pphm,
-				CParseHandlerBase *pphRoot
-				);
-			
-			virtual
-			~CParseHandlerOp();
+	protected:
+		// the root of the parsed DXL tree constructed by the parse handler
+		CDXLNode *m_dxlnode;
 
-			// returns constructed DXL node
-			CDXLNode *Pdxln() const;	
+
+		void AddChildFromParseHandler(const CParseHandlerOp *);
+
+	public:
+		// ctor/dtor
+		CParseHandlerOp(IMemoryPool *mp,
+						CParseHandlerManager *parse_handler_mgr,
+						CParseHandlerBase *parse_handler_root);
+
+		virtual ~CParseHandlerOp();
+
+		// returns constructed DXL node
+		CDXLNode *CreateDXLNode() const;
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerOp_H
+#endif  // !GPDXL_CParseHandlerOp_H
 
 // EOF

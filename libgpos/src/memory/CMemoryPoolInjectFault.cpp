@@ -33,21 +33,17 @@ using namespace gpos;
 //	  Ctor
 //
 //---------------------------------------------------------------------------
-CMemoryPoolInjectFault::CMemoryPoolInjectFault
-	(
-	IMemoryPool *pmp,
-	BOOL fOwnsUnderlying
-	)
-	:
-	CMemoryPool(pmp, fOwnsUnderlying, true /*fThreadSafe*/)
+CMemoryPoolInjectFault::CMemoryPoolInjectFault(IMemoryPool *mp,
+											   BOOL owns_underlying_mp)
+	: CMemoryPool(mp, owns_underlying_mp, true /*fThreadSafe*/)
 {
-	GPOS_ASSERT(pmp != NULL);
+	GPOS_ASSERT(mp != NULL);
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMemoryPoolInjectFault::PvAllocate
+//		CMemoryPoolInjectFault::Allocate
 //
 //	@doc:
 //	  Allocate memory; it will either simulate an allocation failure
@@ -55,23 +51,18 @@ CMemoryPoolInjectFault::CMemoryPoolInjectFault
 //
 //---------------------------------------------------------------------------
 void *
-CMemoryPoolInjectFault::PvAllocate
-	(
-	const ULONG ulNumBytes,
-	const CHAR *szFilename,
-	const ULONG ulLine
-	)
+CMemoryPoolInjectFault::Allocate(const ULONG num_bytes, const CHAR *filename, const ULONG line)
 {
 #ifdef GPOS_FPSIMULATOR
-	if (FSimulateAllocFailure())
+	if (SimulateAllocFailure())
 	{
-		GPOS_TRACE_FORMAT_ERR("Simulating OOM at %s:%d", szFilename, ulLine);
+		GPOS_TRACE_FORMAT_ERR("Simulating OOM at %s:%d", filename, line);
 
 		return NULL;
 	}
 #endif
 
-	return PmpUnderlying()->PvAllocate(ulNumBytes, szFilename, ulLine);
+	return GetUnderlyingMemoryPool()->Allocate(num_bytes, filename, line);
 }
 
 
@@ -88,12 +79,9 @@ CMemoryPoolInjectFault::PvAllocate
 //
 //---------------------------------------------------------------------------
 void
-CMemoryPoolInjectFault::Free
-	(
-	void *pvMemory
-	)
+CMemoryPoolInjectFault::Free(void *memory)
 {
-	PmpUnderlying()->Free(pvMemory);
+	GetUnderlyingMemoryPool()->Free(memory);
 }
 
 
@@ -108,21 +96,19 @@ CMemoryPoolInjectFault::Free
 //
 //---------------------------------------------------------------------------
 BOOL
-CMemoryPoolInjectFault::FSimulateAllocFailure()
+CMemoryPoolInjectFault::SimulateAllocFailure()
 {
-	ITask *ptsk = ITask::PtskSelf();
-	if (NULL != ptsk)
+	ITask *task = ITask::Self();
+	if (NULL != task)
 	{
-		return
-			ptsk->FTrace(EtraceSimulateOOM) &&
-			CFSimulator::Pfsim()->FNewStack(CException::ExmaSystem, CException::ExmiOOM);
+		return task->IsTraceSet(EtraceSimulateOOM) &&
+			   CFSimulator::FSim()->NewStack(CException::ExmaSystem, CException::ExmiOOM);
 	}
 
 	return false;
 }
 
-#endif // GPOS_FPSIMULATOR
+#endif  // GPOS_FPSIMULATOR
 
 
 // EOF
-

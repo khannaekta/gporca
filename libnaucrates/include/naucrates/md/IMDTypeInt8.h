@@ -38,25 +38,28 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class IMDTypeInt8 : public IMDType
 	{
-		public:
-			// type id
-			static ETypeInfo EtiType()
-			{
-				return EtiInt8;
-			}
+	public:
+		// type id
+		static ETypeInfo
+		GetTypeInfo()
+		{
+			return EtiInt8;
+		}
 
-			virtual ETypeInfo Eti() const
-			{
-				return IMDTypeInt8::EtiType();
-			}
+		virtual ETypeInfo
+		GetDatumType() const
+		{
+			return IMDTypeInt8::GetTypeInfo();
+		}
 
-			// factory function for INT8 datums
-			virtual IDatumInt8 *PdatumInt8(IMemoryPool *pmp, LINT ulValue, BOOL fNULL) const = 0;
-
+		// factory function for INT8 datums
+		virtual IDatumInt8 *CreateInt8Datum(IMemoryPool *mp,
+											LINT value,
+											BOOL is_null) const = 0;
 	};
 
-}
+}  // namespace gpmd
 
-#endif // !GPMD_IMDTypeInt8_H
+#endif  // !GPMD_IMDTypeInt8_H
 
 // EOF

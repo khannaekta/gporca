@@ -25,120 +25,119 @@ namespace gpos
 	// Statistics for a memory pool
 	class CMemoryPoolStatistics
 	{
-		private:
+	private:
+		ULLONG m_num_successful_allocations;
 
-			ULLONG m_ullSuccessfulAllocations;
+		ULLONG m_num_failed_allocations;
 
-			ULLONG m_ullFailedAllocations;
+		ULLONG m_num_free;
 
-			ULLONG m_ullFree;
+		ULLONG m_num_live_obj;
 
-			ULLONG m_ullLiveObj;
+		ULLONG m_live_obj_user_size;
 
-			ULLONG m_ullLiveObjUserSize;
+		ULLONG m_live_obj_total_size;
 
-			ULLONG m_ullLiveObjTotalSize;
+		// private copy ctor
+		CMemoryPoolStatistics(CMemoryPoolStatistics &);
 
-			// private copy ctor
-			CMemoryPoolStatistics(CMemoryPoolStatistics &);
+	public:
+		// ctor
+		CMemoryPoolStatistics()
+			: m_num_successful_allocations(0),
+			  m_num_failed_allocations(0),
+			  m_num_free(0),
+			  m_num_live_obj(0),
+			  m_live_obj_user_size(0),
+			  m_live_obj_total_size(0)
+		{
+		}
 
-		public:
+		// dtor
+		virtual ~CMemoryPoolStatistics()
+		{
+		}
 
-			// ctor
-			CMemoryPoolStatistics()
-				:
-				m_ullSuccessfulAllocations(0),
-				m_ullFailedAllocations(0),
-				m_ullFree(0),
-				m_ullLiveObj(0),
-				m_ullLiveObjUserSize(0),
-				m_ullLiveObjTotalSize(0)
-			 {}
+		// get the total number of successful allocation calls
+		ULLONG
+		GetNumSuccessfulAllocations() const
+		{
+			return m_num_successful_allocations;
+		}
 
-			// dtor
-			virtual ~CMemoryPoolStatistics()
-			{}
+		// get the total number of failed allocation calls
+		ULLONG
+		GetNumFailedAllocations() const
+		{
+			return m_num_failed_allocations;
+		}
 
-			// get the total number of successful allocation calls
-			ULLONG UllSuccessfulAllocations() const
-			{
-				return m_ullSuccessfulAllocations;
-			}
+		// get the total number of free calls
+		ULLONG
+		GetNumFree() const
+		{
+			return m_num_free;
+		}
 
-			// get the total number of failed allocation calls
-			ULLONG UllFailedAllocations() const
-			{
-				return m_ullFailedAllocations;
-			}
+		// get the number of live objects
+		ULLONG
+		GetNumLiveObj() const
+		{
+			return m_num_live_obj;
+		}
 
-			// get the total number of free calls
-			ULLONG UllFree() const
-			{
-				return m_ullFree;
-			}
+		// get the user data size of live objects
+		ULLONG
+		LiveObjUserSize() const
+		{
+			return m_live_obj_user_size;
+		}
 
-			// get the number of live objects
-			ULLONG UllLiveObj() const
-			{
-				return m_ullLiveObj;
-			}
+		// get the total data size (user + header padding) of live objects;
+		// not accounting for memory used by the underlying allocator for its header;
+		ULLONG
+		LiveObjTotalSize() const
+		{
+			return m_live_obj_total_size;
+		}
 
-			// get the user data size of live objects
-			ULLONG UllLiveObjUserSize() const
-			{
-				return m_ullLiveObjUserSize;
-			}
+		// record a successful allocation
+		void
+		RecordAllocation(ULONG user_data_size, ULONG total_data_size)
+		{
+			++m_num_successful_allocations;
+			++m_num_live_obj;
+			m_live_obj_user_size += user_data_size;
+			m_live_obj_total_size += total_data_size;
+		}
 
-			// get the total data size (user + header padding) of live objects;
-			// not accounting for memory used by the underlying allocator for its header;
-			ULLONG UllLiveObjTotalSize() const
-			{
-				return m_ullLiveObjTotalSize;
-			}
+		// record a successful free call (of a valid, non-NULL pointer)
+		void
+		RecordFree(ULONG user_data_size, ULONG total_data_size)
+		{
+			++m_num_free;
+			--m_num_live_obj;
+			m_live_obj_user_size -= user_data_size;
+			m_live_obj_total_size -= total_data_size;
+		}
 
-			// record a successful allocation
-			void RecordAllocation
-				(
-				ULONG ulUserDataSize,
-				ULONG ulTotalDataSize
-				)
-			{
-				++m_ullSuccessfulAllocations;
-				++m_ullLiveObj;
-				m_ullLiveObjUserSize += ulUserDataSize;
-				m_ullLiveObjTotalSize += ulTotalDataSize;
-			}
+		// record a failed allocation attempt
+		void
+		RecordFailedAllocation()
+		{
+			++m_num_failed_allocations;
+		}
 
-			// record a successful free call (of a valid, non-NULL pointer)
-			void RecordFree
-				(
-				ULONG ulUserDataSize,
-				ULONG ulTotalDataSize
-				)
-			{
-				++m_ullFree;
-				--m_ullLiveObj;
-				m_ullLiveObjUserSize -= ulUserDataSize;
-				m_ullLiveObjTotalSize -= ulTotalDataSize;
-			}
+		// return total allocated size
+		virtual ULLONG
+		TotalAllocatedSize() const
+		{
+			return m_live_obj_total_size;
+		}
 
-			// record a failed allocation attempt
-			void RecordFailedAllocation()
-			{
-				++m_ullFailedAllocations;
-			}
+	};  // class CMemoryPoolStatistics
+}  // namespace gpos
 
-			// return total allocated size
-			virtual
-			ULLONG UllTotalAllocatedSize() const
-			{
-				return m_ullLiveObjTotalSize;
-			}
-
-	}; // class CMemoryPoolStatistics
-}
-
-#endif // ! CMemoryPoolStatistics
+#endif  // ! CMemoryPoolStatistics
 
 // EOF
-

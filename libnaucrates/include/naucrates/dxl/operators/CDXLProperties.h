@@ -19,11 +19,11 @@ namespace gpdxl
 	using namespace gpos;
 	using namespace gpmd;
 
-	enum Edxlprop
+	enum Edxlproperty
 	{
-		EdxlpropLogical,
-		EdxlpropPhysical,
-		EdxlpropSentinel
+		EdxlpropertyLogical,
+		EdxlpropertyPhysical,
+		EdxlpropertySentinel
 	};
 
 	//---------------------------------------------------------------------------
@@ -36,50 +36,42 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLProperties : public CRefCount
 	{
-		private:
+	private:
+		// derived statistics
+		CDXLStatsDerivedRelation *m_dxl_stats_derived_relation;
 
-			// derived statistics
-			CDXLStatsDerivedRelation *m_pdxlstatsderrel;
+		// private copy ctor
+		CDXLProperties(const CDXLProperties &);
 
-			// private copy ctor
-			CDXLProperties(const CDXLProperties&);
+	protected:
+		// serialize statistics in DXL format
+		void SerializeStatsToDXL(CXMLSerializer *xml_serializer) const;
 
-		protected:
+	public:
+		// ctor
+		explicit CDXLProperties();
 
-			// serialize statistics in DXL format
-			void SerializeStatsToDXL(CXMLSerializer *pxmlser) const;
+		//dtor
+		virtual ~CDXLProperties();
 
-		public:
+		// setter
+		virtual void SetStats(CDXLStatsDerivedRelation *dxl_stats_derived_relation);
 
-			// ctor
-			explicit
-			CDXLProperties();
+		// statistical information
+		virtual const CDXLStatsDerivedRelation *GetDxlStatsDrvdRelation() const;
 
-			//dtor
-			virtual
-			~CDXLProperties();
+		virtual Edxlproperty
+		GetDXLPropertyType() const
+		{
+			return EdxlpropertyLogical;
+		}
 
-			// setter
-			virtual
-			void SetStats(CDXLStatsDerivedRelation *pdxlstatsderrel);
-
-			// statistical information
-			virtual
-			const CDXLStatsDerivedRelation *Pdxlstatsderrel() const;
-
-			virtual
-			Edxlprop Edxlproptype() const
-			{
-				return EdxlpropLogical;
-			}
-
-			// serialize properties in DXL format
-			virtual
-			void SerializePropertiesToDXL(CXMLSerializer *pxmlser) const;
+		// serialize properties in DXL format
+		virtual void SerializePropertiesToDXL(CXMLSerializer *xml_serializer) const;
 	};
 
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLProperties_H
+#endif  // !GPDXL_CDXLProperties_H
 
 // EOF

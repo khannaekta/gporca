@@ -23,28 +23,26 @@ using namespace gpos;
 //		ctor
 //
 //---------------------------------------------------------------------------
-COstream::COstream
-    (
-    )
-	:
-    m_wss(m_wsz, GPOS_OSTREAM_CONVBUF_SIZE),
-    m_esm(EsmDec)
-{}
+COstream::COstream()
+	: m_static_string_buffer(m_string_format_buffer, GPOS_OSTREAM_CONVBUF_SIZE),
+	  m_stream_manipulator(EsmDec)
+{
+}
 
 
 IOstream &
-COstream::AppendFormat(const WCHAR *wszFormat, ...)
+COstream::AppendFormat(const WCHAR *format, ...)
 {
 	VA_LIST vl;
 
-	VA_START(vl, wszFormat);
+	VA_START(vl, format);
 
-	m_wss.Reset();
-	m_wss.AppendFormatVA(wszFormat, vl);
+	m_static_string_buffer.Reset();
+	m_static_string_buffer.AppendFormatVA(format, vl);
 
 	VA_END(vl);
 
-	(* this) << m_wss.Wsz();
+	(*this) << m_static_string_buffer.GetBuffer();
 	return *this;
 }
 
@@ -58,12 +56,9 @@ COstream::AppendFormat(const WCHAR *wszFormat, ...)
 //
 //---------------------------------------------------------------------------
 IOstream &
-COstream::operator << 
-	(
-	const CHAR *sz
-	)
+COstream::operator<<(const CHAR *input_char)
 {
-	return AppendFormat(GPOS_WSZ_LIT("%s"), sz);
+	return AppendFormat(GPOS_WSZ_LIT("%s"), input_char);
 }
 
 
@@ -76,12 +71,9 @@ COstream::operator <<
 //
 //---------------------------------------------------------------------------
 IOstream &
-COstream::operator << 
-	(
-	const WCHAR wc
-	)
+COstream::operator<<(const WCHAR input_char)
 {
-	return AppendFormat(GPOS_WSZ_LIT("%lc"), wc);
+	return AppendFormat(GPOS_WSZ_LIT("%lc"), input_char);
 }
 
 
@@ -94,12 +86,9 @@ COstream::operator <<
 //
 //---------------------------------------------------------------------------
 IOstream &
-COstream::operator << 
-	(
-	const CHAR c
-	)
+COstream::operator<<(const CHAR input_char)
 {
-	return AppendFormat(GPOS_WSZ_LIT("%c"), c);
+	return AppendFormat(GPOS_WSZ_LIT("%c"), input_char);
 }
 
 
@@ -112,18 +101,15 @@ COstream::operator <<
 //
 //---------------------------------------------------------------------------
 IOstream &
-COstream::operator << 
-	(
-	ULONG ul
-	)
+COstream::operator<<(ULONG input_ulong)
 {
-	switch(FstreamMod())
+	switch (GetStreamManipulator())
 	{
 		case EsmDec:
-			return AppendFormat(GPOS_WSZ_LIT("%u"), ul);
-			
+			return AppendFormat(GPOS_WSZ_LIT("%u"), input_ulong);
+
 		case EsmHex:
-			return AppendFormat(GPOS_WSZ_LIT("%x"), ul);
+			return AppendFormat(GPOS_WSZ_LIT("%x"), input_ulong);
 
 		default:
 			GPOS_ASSERT(!"Unexpected stream mode");
@@ -142,18 +128,15 @@ COstream::operator <<
 //
 //---------------------------------------------------------------------------
 IOstream &
-COstream::operator << 
-	(
-	ULLONG ull
-	)
+COstream::operator<<(ULLONG input_ullong)
 {
-	switch(FstreamMod())
+	switch (GetStreamManipulator())
 	{
 		case EsmDec:
-			return AppendFormat(GPOS_WSZ_LIT("%llu"), ull);
-			
+			return AppendFormat(GPOS_WSZ_LIT("%llu"), input_ullong);
+
 		case EsmHex:
-			return AppendFormat(GPOS_WSZ_LIT("%llx"), ull);
+			return AppendFormat(GPOS_WSZ_LIT("%llx"), input_ullong);
 
 		default:
 			GPOS_ASSERT(!"Unexpected stream mode");
@@ -172,18 +155,15 @@ COstream::operator <<
 //
 //---------------------------------------------------------------------------
 IOstream &
-COstream::operator << 
-	(
-	INT i
-	)
+COstream::operator<<(INT input_int)
 {
-	switch(FstreamMod())
+	switch (GetStreamManipulator())
 	{
 		case EsmDec:
-			return AppendFormat(GPOS_WSZ_LIT("%d"), i);
-			
+			return AppendFormat(GPOS_WSZ_LIT("%d"), input_int);
+
 		case EsmHex:
-			return AppendFormat(GPOS_WSZ_LIT("%x"), i);
+			return AppendFormat(GPOS_WSZ_LIT("%x"), input_int);
 
 		default:
 			GPOS_ASSERT(!"Unexpected stream mode");
@@ -202,18 +182,15 @@ COstream::operator <<
 //
 //---------------------------------------------------------------------------
 IOstream &
-COstream::operator <<
-	(
-	LINT li
-	)
+COstream::operator<<(LINT input_long_int)
 {
-	switch(FstreamMod())
+	switch (GetStreamManipulator())
 	{
 		case EsmDec:
-			return AppendFormat(GPOS_WSZ_LIT("%lld"), li);
+			return AppendFormat(GPOS_WSZ_LIT("%lld"), input_long_int);
 
 		case EsmHex:
-			return AppendFormat(GPOS_WSZ_LIT("%llx"), li);
+			return AppendFormat(GPOS_WSZ_LIT("%llx"), input_long_int);
 
 		default:
 			GPOS_ASSERT(!"Unexpected stream mode");
@@ -232,12 +209,9 @@ COstream::operator <<
 //
 //---------------------------------------------------------------------------
 IOstream &
-COstream::operator <<
-	(
-	const DOUBLE d
-	)
+COstream::operator<<(const DOUBLE input_double)
 {
-	return AppendFormat(GPOS_WSZ_LIT("%f"), d);
+	return AppendFormat(GPOS_WSZ_LIT("%f"), input_double);
 }
 
 
@@ -250,12 +224,9 @@ COstream::operator <<
 //
 //---------------------------------------------------------------------------
 IOstream &
-COstream::operator << 
-	(
-	const void *pv
-	)
+COstream::operator<<(const void *input_pointer)
 {
-	return AppendFormat(GPOS_WSZ_LIT("%p"), pv);
+	return AppendFormat(GPOS_WSZ_LIT("%p"), input_pointer);
 }
 
 //---------------------------------------------------------------------------
@@ -267,12 +238,9 @@ COstream::operator <<
 //
 //---------------------------------------------------------------------------
 IOstream &
-COstream::operator << 
-	(
-	EstreamMod esm
-	)
+COstream::operator<<(EStreamManipulator stream_manipulator)
 {
-	m_esm = esm;
+	m_stream_manipulator = stream_manipulator;
 	return *this;
 }
 
@@ -284,12 +252,10 @@ COstream::operator <<
 //		Return the stream modifier
 //
 //---------------------------------------------------------------------------
-IOstream::EstreamMod
-COstream::FstreamMod
-	(
-	) const
+IOstream::EStreamManipulator
+COstream::GetStreamManipulator() const
 {
-	return m_esm;
+	return m_stream_manipulator;
 }
 
 
@@ -303,22 +269,18 @@ COstream::FstreamMod
 //---------------------------------------------------------------------------
 
 IOstream &
-COstream::operator << 
-	(
-	WOSTREAM& (*pfunc)(WOSTREAM&) __attribute__ ((unused))
-	)
+COstream::operator<<(WOSTREAM &(*func_ptr)(WOSTREAM &) __attribute__((unused)))
 {
 // This extra safety check is not portable accross different C++
 // standard-library implementations that may implement std::endl as a template.
 // It is enabled only for GNU libstdc++, where it is known to work.
 #if defined(GPOS_DEBUG) && defined(__GLIBCXX__)
-	typedef WOSTREAM& (*TManip)(WOSTREAM&);
-	TManip tmf = pfunc;
-	GPOS_ASSERT(tmf==static_cast<TManip>(std::endl) && "Only std::endl allowed");
+	typedef WOSTREAM &(*TManip)(WOSTREAM &);
+	TManip tmf = func_ptr;
+	GPOS_ASSERT(tmf == static_cast<TManip>(std::endl) && "Only std::endl allowed");
 #endif
-	(* this) << '\n';
+	(*this) << '\n';
 	return *this;
 }
 
 // EOF
-

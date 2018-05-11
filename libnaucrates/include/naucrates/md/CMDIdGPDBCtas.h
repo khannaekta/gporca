@@ -33,67 +33,60 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class CMDIdGPDBCtas : public CMDIdGPDB
 	{
-			
-		public:
-			// ctor
-			explicit 
-			CMDIdGPDBCtas(OID oid);
-			
-			// copy ctor
-			explicit
-			CMDIdGPDBCtas(const CMDIdGPDBCtas &mdidSource);
+	public:
+		// ctor
+		explicit CMDIdGPDBCtas(OID oid);
 
-			// mdid type
-			virtual
-			EMDIdType Emdidt() const
-			{
-				return EmdidGPDBCtas;
-			}
-			
-			// source system id
-			virtual
-			CSystemId Sysid() const
-			{
-				return m_sysid;
-			}
+		// copy ctor
+		explicit CMDIdGPDBCtas(const CMDIdGPDBCtas &mdid_source);
 
-			// equality check
-			virtual
-			BOOL FEquals(const IMDId *pmdid) const;
-			
-			// is the mdid valid
-			virtual
-			BOOL FValid() const;
-						
-			// debug print of the metadata id
-			virtual
-			IOstream &OsPrint(IOstream &os) const;
-			
-			// invalid mdid
-			static 
-			CMDIdGPDBCtas m_mdidInvalidKey;
-			
-			// const converter
-			static
-			const CMDIdGPDBCtas *PmdidConvert(const IMDId *pmdid)
-			{
-				GPOS_ASSERT(NULL != pmdid && EmdidGPDBCtas == pmdid->Emdidt());
+		// mdid type
+		virtual EMDIdType
+		MdidType() const
+		{
+			return EmdidGPDBCtas;
+		}
 
-				return dynamic_cast<const CMDIdGPDBCtas *>(pmdid);
-			}
-			
-			// non-const converter
-			static
-			CMDIdGPDBCtas *PmdidConvert(IMDId *pmdid)
-			{
-				GPOS_ASSERT(NULL != pmdid && EmdidGPDBCtas == pmdid->Emdidt());
+		// source system id
+		virtual CSystemId
+		Sysid() const
+		{
+			return m_sysid;
+		}
 
-				return dynamic_cast<CMDIdGPDBCtas *>(pmdid);
-			}
+		// equality check
+		virtual BOOL Equals(const IMDId *mdid) const;
+
+		// is the mdid valid
+		virtual BOOL IsValid() const;
+
+		// debug print of the metadata id
+		virtual IOstream &OsPrint(IOstream &os) const;
+
+		// invalid mdid
+		static CMDIdGPDBCtas m_mdid_invalid_key;
+
+		// const converter
+		static const CMDIdGPDBCtas *
+		CastMdid(const IMDId *mdid)
+		{
+			GPOS_ASSERT(NULL != mdid && EmdidGPDBCtas == mdid->MdidType());
+
+			return dynamic_cast<const CMDIdGPDBCtas *>(mdid);
+		}
+
+		// non-const converter
+		static CMDIdGPDBCtas *
+		CastMdid(IMDId *mdid)
+		{
+			GPOS_ASSERT(NULL != mdid && EmdidGPDBCtas == mdid->MdidType());
+
+			return dynamic_cast<CMDIdGPDBCtas *>(mdid);
+		}
 	};
 
-}
+}  // namespace gpmd
 
-#endif // !GPMD_CMDIdGPDBCTAS_H
+#endif  // !GPMD_CMDIdGPDBCTAS_H
 
 // EOF

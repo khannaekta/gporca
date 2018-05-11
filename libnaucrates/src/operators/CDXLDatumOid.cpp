@@ -9,7 +9,7 @@
 //		Implementation of DXL datum of type oid
 //
 //	@owner:
-//		
+//
 //
 //	@test:
 //
@@ -29,16 +29,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLDatumOid::CDXLDatumOid
-	(
-	IMemoryPool *pmp,
-	IMDId *pmdidType,
-	BOOL fNull,
-	OID oidVal
-	)
-	:
-	CDXLDatum(pmp, pmdidType, IDefaultTypeModifier, fNull, 4 /*ulLength*/ ),
-	m_oidVal(oidVal)
+CDXLDatumOid::CDXLDatumOid(IMemoryPool *mp, IMDId *mdid_type, BOOL is_null, OID oid_val)
+	: CDXLDatum(mp, mdid_type, default_type_modifier, is_null, 4 /*length*/),
+	  m_oid_val(oid_val)
 {
 }
 
@@ -53,7 +46,7 @@ CDXLDatumOid::CDXLDatumOid
 OID
 CDXLDatumOid::OidValue() const
 {
-	return m_oidVal;
+	return m_oid_val;
 }
 
 //---------------------------------------------------------------------------
@@ -65,18 +58,15 @@ CDXLDatumOid::OidValue() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLDatumOid::Serialize
-	(
-	CXMLSerializer *pxmlser
-	)
+CDXLDatumOid::Serialize(CXMLSerializer *xml_serializer)
 {
-	m_pmdidType->Serialize(pxmlser, CDXLTokens::PstrToken(EdxltokenTypeId));
-	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenIsNull), m_fNull);
-	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenIsByValue), FByValue());
+	m_mdid_type->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenTypeId));
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenIsNull), m_is_null);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenIsByValue), IsPassedByValue());
 
-	if (!m_fNull)
+	if (!m_is_null)
 	{
-		pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenValue), m_oidVal);
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenValue), m_oid_val);
 	}
 }
 

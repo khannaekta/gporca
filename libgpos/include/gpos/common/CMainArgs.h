@@ -16,7 +16,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CMainArgs
@@ -27,41 +26,38 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CMainArgs
 	{
-		private:
-			
-			// number of arguments
-			ULONG m_ulArgs;
-			
-			// pointer to string array
-			const CHAR **m_rgszArgs;
-			
-			// format string
-			const CHAR *m_szFmt;
+	private:
+		// number of arguments
+		ULONG m_argc;
 
-			// saved option params
-			CHAR *m_szOptarg;
-			INT m_iOptind;
-			INT m_iOptopt;
-			INT m_iOpterr;
+		// pointer to string array
+		const CHAR **m_argv;
+
+		// format string
+		const CHAR *m_fmt;
+
+		// saved option params
+		CHAR *m_optarg;
+		INT m_optind;
+		INT m_optopt;
+		INT m_opterr;
 #ifdef GPOS_Darwin
-			INT m_iOptreset;
-#endif // GPOS_Darwin
+		INT m_optreset;
+#endif  // GPOS_Darwin
 
-		public:
+	public:
+		// ctor
+		CMainArgs(ULONG ulArgs, const CHAR **rgszArgs, const CHAR *szFmt);
 
-			// ctor
-			CMainArgs(ULONG ulArgs, const CHAR **rgszArgs, const CHAR *szFmt);
+		// dtor -- restores option params
+		~CMainArgs();
 
-			// dtor -- restores option params
-			~CMainArgs();
-			
-			// getopt functionality
-			BOOL FGetopt(CHAR *ch);
-			
-	}; // class CMainArgs
-}
+		// getopt functionality
+		BOOL Getopt(CHAR *ch);
 
-#endif // GPOS_CMainArgs_H
+	};  // class CMainArgs
+}  // namespace gpos
+
+#endif  // GPOS_CMainArgs_H
 
 // EOF
-

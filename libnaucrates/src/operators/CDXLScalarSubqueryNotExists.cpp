@@ -27,12 +27,8 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarSubqueryNotExists::CDXLScalarSubqueryNotExists
-	(
-	IMemoryPool *pmp
-	)
-	:
-	CDXLScalar(pmp)
+CDXLScalarSubqueryNotExists::CDXLScalarSubqueryNotExists(IMemoryPool *mp)
+	: CDXLScalar(mp)
 {
 }
 
@@ -50,14 +46,14 @@ CDXLScalarSubqueryNotExists::~CDXLScalarSubqueryNotExists()
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarSubqueryNotExists::Edxlop
+//		CDXLScalarSubqueryNotExists::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLScalarSubqueryNotExists::Edxlop() const
+CDXLScalarSubqueryNotExists::GetDXLOperator() const
 {
 	return EdxlopScalarSubqueryNotExists;
 }
@@ -65,16 +61,16 @@ CDXLScalarSubqueryNotExists::Edxlop() const
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarSubqueryNotExists::PstrOpName
+//		CDXLScalarSubqueryNotExists::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLScalarSubqueryNotExists::PstrOpName() const
+CDXLScalarSubqueryNotExists::GetOpNameStr() const
 {
-	return CDXLTokens::PstrToken(EdxltokenScalarSubqueryNotExists);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenScalarSubqueryNotExists);
 }
 
 //---------------------------------------------------------------------------
@@ -86,17 +82,14 @@ CDXLScalarSubqueryNotExists::PstrOpName() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubqueryNotExists::SerializeToDXL
-	(
-	CXMLSerializer *pxmlser,
-	const CDXLNode *pdxln
-	)
-	const
+CDXLScalarSubqueryNotExists::SerializeToDXL(CXMLSerializer *xml_serializer,
+											const CDXLNode *dxlnode) const
 {
-	const CWStringConst *pstrElemName = PstrOpName();
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
-	pdxln->SerializeChildrenToDXL(pxmlser);
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	const CWStringConst *element_name = GetOpNameStr();
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	dxlnode->SerializeChildrenToDXL(xml_serializer);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -105,24 +98,19 @@ CDXLScalarSubqueryNotExists::SerializeToDXL
 //		CDXLScalarSubqueryNotExists::AssertValid
 //
 //	@doc:
-//		Checks whether operator node is well-structured 
+//		Checks whether operator node is well-structured
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubqueryNotExists::AssertValid
-	(
-	const CDXLNode *pdxln,
-	BOOL fValidateChildren
-	) 
-	const
+CDXLScalarSubqueryNotExists::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
-	GPOS_ASSERT(1 == pdxln->UlArity());
-	
-	CDXLNode *pdxlnChild = (*pdxln)[0];
-	GPOS_ASSERT(EdxloptypeLogical == pdxlnChild->Pdxlop()->Edxloperatortype());
+	GPOS_ASSERT(1 == dxlnode->Arity());
 
-	pdxln->AssertValid(fValidateChildren);
+	CDXLNode *child_dxlnode = (*dxlnode)[0];
+	GPOS_ASSERT(EdxloptypeLogical == child_dxlnode->GetOperator()->GetDXLOperatorType());
+
+	dxlnode->AssertValid(validate_children);
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

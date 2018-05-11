@@ -26,28 +26,23 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalRoutedDistributeMotion::CDXLPhysicalRoutedDistributeMotion
-	(
-	IMemoryPool *pmp,
-	ULONG ulSegmentIdCol
-	)
-	:
-	CDXLPhysicalMotion(pmp),
-	m_ulSegmentIdCol(ulSegmentIdCol)
+CDXLPhysicalRoutedDistributeMotion::CDXLPhysicalRoutedDistributeMotion(IMemoryPool *mp,
+																	   ULONG segment_id_col)
+	: CDXLPhysicalMotion(mp), m_segment_id_col(segment_id_col)
 {
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLPhysicalRoutedDistributeMotion::Edxlop
+//		CDXLPhysicalRoutedDistributeMotion::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLPhysicalRoutedDistributeMotion::Edxlop() const
+CDXLPhysicalRoutedDistributeMotion::GetDXLOperator() const
 {
 	return EdxlopPhysicalMotionRoutedDistribute;
 }
@@ -55,16 +50,16 @@ CDXLPhysicalRoutedDistributeMotion::Edxlop() const
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLPhysicalRoutedDistributeMotion::PstrOpName
+//		CDXLPhysicalRoutedDistributeMotion::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLPhysicalRoutedDistributeMotion::PstrOpName() const
+CDXLPhysicalRoutedDistributeMotion::GetOpNameStr() const
 {
-	return CDXLTokens::PstrToken(EdxltokenPhysicalRoutedDistributeMotion);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenPhysicalRoutedDistributeMotion);
 }
 
 //---------------------------------------------------------------------------
@@ -76,28 +71,26 @@ CDXLPhysicalRoutedDistributeMotion::PstrOpName() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalRoutedDistributeMotion::SerializeToDXL
-	(
-	CXMLSerializer *pxmlser,
-	const CDXLNode *pdxln
-	)
-	const
+CDXLPhysicalRoutedDistributeMotion::SerializeToDXL(CXMLSerializer *xml_serializer,
+												   const CDXLNode *dxlnode) const
 {
-	const CWStringConst *pstrElemName = PstrOpName();
-	
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
-	
-	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenSegmentIdCol), m_ulSegmentIdCol);
-	
-	SerializeSegmentInfoToDXL(pxmlser);
-	
+	const CWStringConst *element_name = GetOpNameStr();
+
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenSegmentIdCol),
+								 m_segment_id_col);
+
+	SerializeSegmentInfoToDXL(xml_serializer);
+
 	// serialize properties
-	pdxln->SerializePropertiesToDXL(pxmlser);
-	
+	dxlnode->SerializePropertiesToDXL(xml_serializer);
+
 	// serialize children
-	pdxln->SerializeChildrenToDXL(pxmlser);
-	
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	dxlnode->SerializeChildrenToDXL(xml_serializer);
+
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 
@@ -107,36 +100,32 @@ CDXLPhysicalRoutedDistributeMotion::SerializeToDXL
 //		CDXLPhysicalRoutedDistributeMotion::AssertValid
 //
 //	@doc:
-//		Checks whether operator node is well-structured 
+//		Checks whether operator node is well-structured
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalRoutedDistributeMotion::AssertValid
-	(
-	const CDXLNode *pdxln,
-	BOOL fValidateChildren
-	) 
-	const
+CDXLPhysicalRoutedDistributeMotion::AssertValid(const CDXLNode *dxlnode,
+												BOOL validate_children) const
 {
 	// assert proj list and filter are valid
-	CDXLPhysical::AssertValid(pdxln, fValidateChildren);
-	
-	GPOS_ASSERT(m_pdrgpiInputSegIds != NULL);
-	GPOS_ASSERT(0 < m_pdrgpiInputSegIds->UlLength());
-	GPOS_ASSERT(m_pdrgpiOutputSegIds != NULL);
-	GPOS_ASSERT(0 < m_pdrgpiOutputSegIds->UlLength());
-	
-	GPOS_ASSERT(EdxlroutedmIndexSentinel == pdxln->UlArity());
-	
-	CDXLNode *pdxlnChild = (*pdxln)[EdxlroutedmIndexChild];
+	CDXLPhysical::AssertValid(dxlnode, validate_children);
 
-	GPOS_ASSERT(EdxloptypePhysical == pdxlnChild->Pdxlop()->Edxloperatortype());
-	
-	if (fValidateChildren)
+	GPOS_ASSERT(m_input_segids_array != NULL);
+	GPOS_ASSERT(0 < m_input_segids_array->Size());
+	GPOS_ASSERT(m_output_segids_array != NULL);
+	GPOS_ASSERT(0 < m_output_segids_array->Size());
+
+	GPOS_ASSERT(EdxlroutedmIndexSentinel == dxlnode->Arity());
+
+	CDXLNode *child_dxlnode = (*dxlnode)[EdxlroutedmIndexChild];
+
+	GPOS_ASSERT(EdxloptypePhysical == child_dxlnode->GetOperator()->GetDXLOperatorType());
+
+	if (validate_children)
 	{
-		pdxlnChild->Pdxlop()->AssertValid(pdxlnChild, fValidateChildren);
+		child_dxlnode->GetOperator()->AssertValid(child_dxlnode, validate_children);
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

@@ -11,6 +11,8 @@
 #ifndef GPOS_CBitSetTest_H
 #define GPOS_CBitSetTest_H
 
+#include "gpos/base.h"
+
 namespace gpos
 {
 	//---------------------------------------------------------------------------
@@ -23,20 +25,17 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CBitSetTest
 	{
+	public:
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_Basics();
+		static GPOS_RESULT EresUnittest_Removal();
+		static GPOS_RESULT EresUnittest_SetOps();
+		static GPOS_RESULT EresUnittest_Performance();
 
-		public:
+	};  // class CBitSetTest
+}  // namespace gpos
 
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_Basics();
-			static GPOS_RESULT EresUnittest_Removal();
-			static GPOS_RESULT EresUnittest_SetOps();
-			static GPOS_RESULT EresUnittest_Performance();
-
-	}; // class CBitSetTest
-}
-
-#endif // !GPOS_CBitSetTest_H
+#endif  // !GPOS_CBitSetTest_H
 
 // EOF
-

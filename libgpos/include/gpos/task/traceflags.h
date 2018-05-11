@@ -52,7 +52,6 @@ namespace gpos
 	};
 }
 
-#endif // ! GPOS_traceflags_H
+#endif  // ! GPOS_traceflags_H
 
 // EOF
-

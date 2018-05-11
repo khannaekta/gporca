@@ -34,17 +34,14 @@ using namespace gpmd;
 //		Constructs a file-based metadata provider
 //
 //---------------------------------------------------------------------------
-CMDProviderGeneric::CMDProviderGeneric
-	(
-	IMemoryPool *pmp
-	)
+CMDProviderGeneric::CMDProviderGeneric(IMemoryPool *mp)
 {
 	// TODO:  - Jan 25, 2012; those should not be tied to a particular system
-	m_pmdidInt2 = GPOS_NEW(pmp) CMDIdGPDB(GPDB_INT2);
-	m_pmdidInt4 = GPOS_NEW(pmp) CMDIdGPDB(GPDB_INT4);
-	m_pmdidInt8 = GPOS_NEW(pmp) CMDIdGPDB(GPDB_INT8);
-	m_pmdidBool = GPOS_NEW(pmp) CMDIdGPDB(GPDB_BOOL);
-	m_pmdidOid = GPOS_NEW(pmp) CMDIdGPDB(GPDB_OID);
+	m_mdid_int2 = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT2);
+	m_mdid_int4 = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT4);
+	m_mdid_int8 = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT8);
+	m_mdid_bool = GPOS_NEW(mp) CMDIdGPDB(GPDB_BOOL);
+	m_mdid_oid = GPOS_NEW(mp) CMDIdGPDB(GPDB_OID);
 }
 
 //---------------------------------------------------------------------------
@@ -52,56 +49,52 @@ CMDProviderGeneric::CMDProviderGeneric
 //		CMDProviderGeneric::~CMDProviderGeneric
 //
 //	@doc:
-//		Destructor 
+//		Destructor
 //
 //---------------------------------------------------------------------------
 CMDProviderGeneric::~CMDProviderGeneric()
 {
-	m_pmdidInt2->Release();
-	m_pmdidInt4->Release();
-	m_pmdidInt8->Release();
-	m_pmdidBool->Release();
-	m_pmdidOid->Release();
+	m_mdid_int2->Release();
+	m_mdid_int4->Release();
+	m_mdid_int8->Release();
+	m_mdid_bool->Release();
+	m_mdid_oid->Release();
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDProviderGeneric::Pmdid
+//		CMDProviderGeneric::MDId
 //
 //	@doc:
 //		return the mdid of a requested type
 //
 //---------------------------------------------------------------------------
 IMDId *
-CMDProviderGeneric::Pmdid
-	(
-	IMDType::ETypeInfo eti
-	) 
-	const
+CMDProviderGeneric::MDId(IMDType::ETypeInfo type_info) const
 {
-	GPOS_ASSERT(IMDType::EtiGeneric > eti);
-	
-	switch(eti)
+	GPOS_ASSERT(IMDType::EtiGeneric > type_info);
+
+	switch (type_info)
 	{
 		case IMDType::EtiInt2:
-			return m_pmdidInt2;
+			return m_mdid_int2;
 
 		case IMDType::EtiInt4:
-			return m_pmdidInt4;
+			return m_mdid_int4;
 
 		case IMDType::EtiInt8:
-			return m_pmdidInt8;
+			return m_mdid_int8;
 
 		case IMDType::EtiBool:
-			return m_pmdidBool;
+			return m_mdid_bool;
 
 		case IMDType::EtiOid:
-			return m_pmdidOid;
+			return m_mdid_oid;
 
 		default:
 			return NULL;
 	}
-}	
+}
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -111,7 +104,7 @@ CMDProviderGeneric::Pmdid
 //		Get the default system id of the MD provider
 //
 //---------------------------------------------------------------------------
-CSystemId 
+CSystemId
 CMDProviderGeneric::SysidDefault() const
 {
 	return CSystemId(IMDId::EmdidGPDB, GPMD_GPDB_SYSID);

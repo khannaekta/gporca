@@ -26,41 +26,37 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarAssertConstraintList::CDXLScalarAssertConstraintList
-	(
-	IMemoryPool *pmp
-	)
-	:
-	CDXLScalar(pmp)
+CDXLScalarAssertConstraintList::CDXLScalarAssertConstraintList(IMemoryPool *mp)
+	: CDXLScalar(mp)
 {
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarAssertConstraintList::Edxlop
+//		CDXLScalarAssertConstraintList::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLScalarAssertConstraintList::Edxlop() const
+CDXLScalarAssertConstraintList::GetDXLOperator() const
 {
 	return EdxlopScalarAssertConstraintList;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarAssertConstraintList::PstrOpName
+//		CDXLScalarAssertConstraintList::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLScalarAssertConstraintList::PstrOpName() const
+CDXLScalarAssertConstraintList::GetOpNameStr() const
 {
-	return CDXLTokens::PstrToken(EdxltokenScalarAssertConstraintList);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenScalarAssertConstraintList);
 }
 
 //---------------------------------------------------------------------------
@@ -72,18 +68,15 @@ CDXLScalarAssertConstraintList::PstrOpName() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarAssertConstraintList::SerializeToDXL
-	(
-	CXMLSerializer *pxmlser,
-	const CDXLNode *pdxln
-	)
-	const
+CDXLScalarAssertConstraintList::SerializeToDXL(CXMLSerializer *xml_serializer,
+											   const CDXLNode *dxlnode) const
 {
-	const CWStringConst *pstrElemName = PstrOpName();
+	const CWStringConst *element_name = GetOpNameStr();
 
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
-	pdxln->SerializeChildrenToDXL(pxmlser);
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	dxlnode->SerializeChildrenToDXL(xml_serializer);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 
@@ -97,27 +90,22 @@ CDXLScalarAssertConstraintList::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarAssertConstraintList::AssertValid
-	(
-	const CDXLNode *pdxln,
-	BOOL fValidateChildren
-	)
-	const
+CDXLScalarAssertConstraintList::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
-	const ULONG ulArity = pdxln->UlArity();
-	GPOS_ASSERT(0 < ulArity);
-	
-	for (ULONG ul = 0; ul < ulArity; ++ul)
-	{
-		CDXLNode *pdxlnChild = (*pdxln)[ul];
-		GPOS_ASSERT(EdxlopScalarAssertConstraint == pdxlnChild->Pdxlop()->Edxlop());
+	const ULONG arity = dxlnode->Arity();
+	GPOS_ASSERT(0 < arity);
 
-		if (fValidateChildren)
+	for (ULONG ul = 0; ul < arity; ++ul)
+	{
+		CDXLNode *child_dxlnode = (*dxlnode)[ul];
+		GPOS_ASSERT(EdxlopScalarAssertConstraint == child_dxlnode->GetOperator()->GetDXLOperator());
+
+		if (validate_children)
 		{
-			pdxlnChild->Pdxlop()->AssertValid(pdxlnChild, fValidateChildren);
+			child_dxlnode->GetOperator()->AssertValid(child_dxlnode, validate_children);
 		}
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

@@ -42,81 +42,68 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CCacheFactory
 	{
-		private:
+	private:
+		// global instance
+		static CCacheFactory *m_factory;
 
-			// global instance
-			static CCacheFactory *m_pcf;
+		// memory pool allocated to caches
+		IMemoryPool *m_mp;
 
-			// memory pool allocated to caches
-			IMemoryPool *m_pmp;
+		// private ctor
+		CCacheFactory(IMemoryPool *mp);
 
-			// private ctor
-			CCacheFactory(IMemoryPool *pmp);
-
-			// no copy ctor
-			CCacheFactory(const CCacheFactory&);
-
+		// no copy ctor
+		CCacheFactory(const CCacheFactory &);
 
 
-		public:
 
-			// private dtor
-			~CCacheFactory()
-			{
-				GPOS_ASSERT(NULL == m_pcf &&
-							"Cache factory has not been shut down");
-			}
+	public:
+		// private dtor
+		~CCacheFactory()
+		{
+			GPOS_ASSERT(NULL == m_factory && "Cache factory has not been shut down");
+		}
 
-			// initialize global memory pool
-			static
-			GPOS_RESULT EresInit();
+		// initialize global memory pool
+		static GPOS_RESULT Init();
 
-			// destroy global instance
-			void Shutdown();
+		// destroy global instance
+		void Shutdown();
 
-			// global accessor
-			inline
-			static CCacheFactory *Pcf()
-			{
-				return m_pcf;
-			}
+		// global accessor
+		inline static CCacheFactory *
+		GetFactory()
+		{
+			return m_factory;
+		}
 
-			// create a cache instance
-			template <class T, class K>
-			static
-			CCache<T, K> *PCacheCreate
-				(
-				BOOL fUnique,
-				ULLONG ullCacheQuota,
-				typename CCache<T, K>::HashFuncPtr pfuncHash,
-				typename CCache<T, K>::EqualFuncPtr pfuncEqual
-				)
-			{
-				GPOS_ASSERT(NULL != Pcf() &&
-						    "Cache factory has not been initialized");
+		// create a cache instance
+		template <class T, class K>
+		static CCache<T, K> *
+		CreateCache(BOOL unique,
+					ULLONG cache_quota,
+					typename CCache<T, K>::HashFuncPtr hash_func,
+					typename CCache<T, K>::EqualFuncPtr equal_func)
+		{
+			GPOS_ASSERT(NULL != GetFactory() && "Cache factory has not been initialized");
 
-				IMemoryPool *pmp = Pcf()->Pmp();
-				CCache<T, K> *pcache = GPOS_NEW(pmp) CCache<T, K>
-							(
-							pmp,
-							fUnique,
-							ullCacheQuota,
-							CCACHE_GCLOCK_INIT_COUNTER,
-							pfuncHash,
-							pfuncEqual
-							);
+			IMemoryPool *mp = GetFactory()->Pmp();
+			CCache<T, K> *cache = GPOS_NEW(mp) CCache<T, K>(mp,
+																	 unique,
+																	 cache_quota,
+																	 CCACHE_GCLOCK_INIT_COUNTER,
+																	 hash_func,
+																	 equal_func);
 
-				return pcache;
+			return cache;
+		}
 
-			}
+		IMemoryPool *Pmp() const;
 
-			IMemoryPool *Pmp() const;
-
-	}; // CCacheFactory
-} // namespace gpos
+	};  // CCacheFactory
+}  // namespace gpos
 
 
-#endif // CCACHEFACTORY_H_
+#endif  // CCACHEFACTORY_H_
 
 // EOF
-

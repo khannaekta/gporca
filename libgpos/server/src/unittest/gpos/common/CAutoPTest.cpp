@@ -31,10 +31,7 @@ using namespace gpos;
 GPOS_RESULT
 CAutoPTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
-		GPOS_UNITTEST_FUNC(CAutoPTest::EresUnittest_Basics)
-		};
+	CUnittest rgut[] = {GPOS_UNITTEST_FUNC(CAutoPTest::EresUnittest_Basics)};
 
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
@@ -53,16 +50,16 @@ CAutoPTest::EresUnittest_Basics()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// assignment
 	CAutoP<CHAR> asz;
-	CHAR *sz = GPOS_NEW(pmp) CHAR;
+	CHAR *sz = GPOS_NEW(mp) CHAR;
 	asz = sz;
 
 	CAutoP<CHAR> asz2;
 	CAutoP<CHAR> asz3;
-	CHAR *sz2 = GPOS_NEW(pmp) CHAR;
+	CHAR *sz2 = GPOS_NEW(mp) CHAR;
 
 	*sz2 = '\0';
 	asz2 = sz2;
@@ -72,9 +69,9 @@ CAutoPTest::EresUnittest_Basics()
 
 	// accessor
 #ifdef GPOS_DEBUG
-	CHAR *szBack = asz3.Pt();
+	CHAR *szBack = asz3.Value();
 	GPOS_ASSERT(szBack == sz2);
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 	// deref
 	GPOS_ASSERT(*sz2 == *asz3);
@@ -83,9 +80,9 @@ CAutoPTest::EresUnittest_Basics()
 	asz2 = NULL;
 
 	// unhooking of object
-	GPOS_DELETE(asz3.PtReset());
+	GPOS_DELETE(asz3.Reset());
 
-	CElem *pelem = GPOS_NEW(pmp) CElem;
+	CElem *pelem = GPOS_NEW(mp) CElem;
 	pelem->m_ul = 3;
 
 	CAutoP<CElem> aelem;
@@ -95,11 +92,10 @@ CAutoPTest::EresUnittest_Basics()
 	GPOS_ASSERT(pelem->m_ul == aelem->m_ul);
 
 	// c'tor
-	CAutoP<CHAR> asz4(GPOS_NEW(pmp) CHAR);
-	*(asz4.Pt()) = 'a';
+	CAutoP<CHAR> asz4(GPOS_NEW(mp) CHAR);
+	*(asz4.Value()) = 'a';
 
 	return GPOS_OK;
 }
 
 // EOF
-

@@ -27,21 +27,19 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CAutoMutexTest
 	{
-		public:
-
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_LockRelease();
-			static GPOS_RESULT EresUnittest_Recursion();
+	public:
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_LockRelease();
+		static GPOS_RESULT EresUnittest_Recursion();
 #ifdef GPOS_DEBUG
-			static GPOS_RESULT EresUnittest_SelfDeadlock();
-			static GPOS_RESULT EresUnittest_SelfDeadlockAttempt();
-#endif // GPOS_DEBUG
+		static GPOS_RESULT EresUnittest_SelfDeadlock();
+		static GPOS_RESULT EresUnittest_SelfDeadlockAttempt();
+#endif  // GPOS_DEBUG
 
-	}; // CAutoMutexTest
-}
+	};  // CAutoMutexTest
+}  // namespace gpos
 
-#endif // !GPOS_CAutoMutexTest_H
+#endif  // !GPOS_CAutoMutexTest_H
 
 // EOF
-

@@ -27,13 +27,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerDummy::CParseHandlerDummy
-	(
-	CDXLMemoryManager *pmm
-	)
-	:
-	m_pmm(pmm)
-{}
+CParseHandlerDummy::CParseHandlerDummy(CDXLMemoryManager *dxl_memory_manager)
+	: m_dxl_memory_manager(dxl_memory_manager)
+{
+}
 
 
 
@@ -46,13 +43,10 @@ CParseHandlerDummy::CParseHandlerDummy
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerDummy::error
-	(
-	const SAXParseException &saxex
-	)
+CParseHandlerDummy::error(const SAXParseException &sax_parse_ex)
 {
-	CHAR* szMessage = XMLString::transcode(saxex.getMessage(), m_pmm);
-	GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLValidationError, szMessage);
+	CHAR *message = XMLString::transcode(sax_parse_ex.getMessage(), m_dxl_memory_manager);
+	GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLValidationError, message);
 }
 
 // EOF

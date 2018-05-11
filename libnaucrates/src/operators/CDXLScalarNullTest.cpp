@@ -26,64 +26,57 @@ using namespace gpdxl;
 //		Constructs a NullTest node
 //
 //---------------------------------------------------------------------------
-CDXLScalarNullTest::CDXLScalarNullTest
-	(
-	IMemoryPool *pmp,
-	BOOL fIsNull
-	)
-	:
-	CDXLScalar(pmp),
-	m_fIsNull(fIsNull)
+CDXLScalarNullTest::CDXLScalarNullTest(IMemoryPool *mp, BOOL is_null)
+	: CDXLScalar(mp), m_is_null(is_null)
 {
-
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarNullTest::Edxlop
+//		CDXLScalarNullTest::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLScalarNullTest::Edxlop() const
+CDXLScalarNullTest::GetDXLOperator() const
 {
 	return EdxlopScalarNullTest;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarNullTest::FIsNullTest
+//		CDXLScalarNullTest::IsNullTest
 //
 //	@doc:
 //		Null Test type (is null or is not null)
 //
 //---------------------------------------------------------------------------
 BOOL
-CDXLScalarNullTest::FIsNullTest() const
+CDXLScalarNullTest::IsNullTest() const
 {
-	return m_fIsNull;
+	return m_is_null;
 }
 
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarNullTest::PstrOpName
+//		CDXLScalarNullTest::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLScalarNullTest::PstrOpName() const
+CDXLScalarNullTest::GetOpNameStr() const
 {
-	if(m_fIsNull)
+	if (m_is_null)
 	{
-		return CDXLTokens::PstrToken(EdxltokenScalarIsNull);
+		return CDXLTokens::GetDXLTokenStr(EdxltokenScalarIsNull);
 	}
-	return CDXLTokens::PstrToken(EdxltokenScalarIsNotNull);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenScalarIsNotNull);
 }
 
 //---------------------------------------------------------------------------
@@ -95,21 +88,16 @@ CDXLScalarNullTest::PstrOpName() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarNullTest::SerializeToDXL
-	(
-	CXMLSerializer *pxmlser,
-	const CDXLNode *pdxln
-	)
-	const
+CDXLScalarNullTest::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const
 {
-	const CWStringConst *pstrElemName = PstrOpName();
+	const CWStringConst *element_name = GetOpNameStr();
 
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
-	pdxln->SerializeChildrenToDXL(pxmlser);
+	dxlnode->SerializeChildrenToDXL(xml_serializer);
 
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
-
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -122,23 +110,18 @@ CDXLScalarNullTest::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarNullTest::AssertValid
-	(
-	const CDXLNode *pdxln,
-	BOOL fValidateChildren
-	)
-	const
+CDXLScalarNullTest::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
-	GPOS_ASSERT(1 == pdxln->UlArity());
+	GPOS_ASSERT(1 == dxlnode->Arity());
 
-	CDXLNode *pdxlnArg = (*pdxln)[0];
-	GPOS_ASSERT(EdxloptypeScalar == pdxlnArg->Pdxlop()->Edxloperatortype());
-	
-	if (fValidateChildren)
+	CDXLNode *dxlnode_arg = (*dxlnode)[0];
+	GPOS_ASSERT(EdxloptypeScalar == dxlnode_arg->GetOperator()->GetDXLOperatorType());
+
+	if (validate_children)
 	{
-		pdxlnArg->Pdxlop()->AssertValid(pdxlnArg, fValidateChildren);
+		dxlnode_arg->GetOperator()->AssertValid(dxlnode_arg, validate_children);
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

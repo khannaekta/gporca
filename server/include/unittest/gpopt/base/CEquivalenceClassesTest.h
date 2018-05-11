@@ -7,9 +7,12 @@
 #define GPOPT_CEquivalenceClassesTest_H
 
 #include "gpos/base.h"
+#include "gpopt/base/CColRefSet.h"
 
 namespace gpopt
 {
+	using namespace gpos;
+
 	// Static unit tests for equivalence classes
 	class CEquivalenceClassesTest
 	{
@@ -20,7 +23,7 @@ namespace gpopt
 			static GPOS_RESULT EresUnittest();
 			static GPOS_RESULT EresUnittest_NotDisjointEquivalanceClasses();
 			static GPOS_RESULT EresUnittest_IntersectEquivalanceClasses();
-			static DrgPcrs* createEquivalenceClasses(IMemoryPool *pmp, CColRefSet *pcrs, int breakpoints[]);
+			static CColRefSetArray* createEquivalenceClasses(IMemoryPool *mp, CColRefSet *pcrs, int breakpoints[]);
 
 	}; // class CEquivalenceClassesTest
 }

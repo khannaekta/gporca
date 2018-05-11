@@ -7,7 +7,7 @@
 //
 //	@doc:
 //		Implementation of DXL logical operators
-//		
+//
 //---------------------------------------------------------------------------
 #include "naucrates/dxl/operators/CDXLLogical.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
@@ -23,29 +23,23 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLLogical::CDXLLogical
-	(
-	IMemoryPool *pmp
-	)
-	:
-	CDXLOperator(pmp)
+CDXLLogical::CDXLLogical(IMemoryPool *mp) : CDXLOperator(mp)
 {
 }
 
 //---------------------------------------------------------------------------
 //      @function:
-//              CDXLLogical::Edxloperatortype
+//              CDXLLogical::GetDXLOperatorType
 //
 //      @doc:
 //              Operator Type
 //
 //---------------------------------------------------------------------------
 Edxloptype
-CDXLLogical::Edxloperatortype() const
+CDXLLogical::GetDXLOperatorType() const
 {
 	return EdxloptypeLogical;
 }
-
 
 
 

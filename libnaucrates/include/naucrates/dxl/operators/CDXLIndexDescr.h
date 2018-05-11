@@ -30,37 +30,35 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLIndexDescr : public CRefCount
 	{
-		private:
-			// memory pool
-			IMemoryPool *m_pmp;
+	private:
+		// memory pool
+		IMemoryPool *m_mp;
 
-			// id and version information for the table
-			IMDId *m_pmdid;
+		// id and version information for the table
+		IMDId *m_mdid;
 
-			// index name
-			CMDName *m_pmdname;
+		// index name
+		CMDName *m_mdname;
 
-			// private copy ctor
-			CDXLIndexDescr(const CDXLIndexDescr &);
+		// private copy ctor
+		CDXLIndexDescr(const CDXLIndexDescr &);
 
-		public:
-			// ctor
-			CDXLIndexDescr(IMemoryPool *pmp, IMDId *pmdid, CMDName *pmdname);
+	public:
+		// ctor
+		CDXLIndexDescr(IMemoryPool *mp, IMDId *mdid, CMDName *mdname);
 
-			// dtor
-			virtual
-			~CDXLIndexDescr();
+		// dtor
+		virtual ~CDXLIndexDescr();
 
-			// accessors
-			const CMDName *Pmdname() const;
-			IMDId *Pmdid() const;
+		// accessors
+		const CMDName *MdName() const;
+		IMDId *MDId() const;
 
-			// serialize the operator to a DXL document
-			void SerializeToDXL(CXMLSerializer *) const;
+		// serialize the operator to a DXL document
+		void SerializeToDXL(CXMLSerializer *) const;
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLIndexDescriptor_H
+#endif  // !GPDXL_CDXLIndexDescriptor_H
 
 // EOF
-

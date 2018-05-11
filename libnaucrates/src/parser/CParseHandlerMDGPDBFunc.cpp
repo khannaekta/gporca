@@ -30,20 +30,17 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerMDGPDBFunc::CParseHandlerMDGPDBFunc
-	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
-	)
-	:
-	CParseHandlerMetadataObject(pmp, pphm, pphRoot),
-	m_pmdid(NULL),
-	m_pmdname(NULL),
-	m_pmdidTypeResult(NULL),
-	m_pdrgpmdidTypes(NULL),
-	m_efuncstbl(CMDFunctionGPDB::EfsSentinel)
-{}
+CParseHandlerMDGPDBFunc::CParseHandlerMDGPDBFunc(IMemoryPool *mp,
+												 CParseHandlerManager *parse_handler_mgr,
+												 CParseHandlerBase *parse_handler_root)
+	: CParseHandlerMetadataObject(mp, parse_handler_mgr, parse_handler_root),
+	  m_mdid(NULL),
+	  m_mdname(NULL),
+	  m_mdid_type_result(NULL),
+	  m_mdid_types_array(NULL),
+	  m_func_stability(CMDFunctionGPDB::EfsSentinel)
+{
+}
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -54,110 +51,82 @@ CParseHandlerMDGPDBFunc::CParseHandlerMDGPDBFunc
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerMDGPDBFunc::StartElement
-	(
-	const XMLCh* const, // xmlszUri,
-	const XMLCh* const xmlszLocalname,
-	const XMLCh* const, // xmlszQname
-	const Attributes& attrs
-	)
+CParseHandlerMDGPDBFunc::StartElement(const XMLCh *const,  // element_uri,
+									  const XMLCh *const element_local_name,
+									  const XMLCh *const,  // element_qname
+									  const Attributes &attrs)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFunc), xmlszLocalname))
+	if (0 ==
+		XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFunc), element_local_name))
 	{
 		// parse func name
-		const XMLCh *xmlszFuncName = CDXLOperatorFactory::XmlstrFromAttrs
-															(
-															attrs,
-															EdxltokenName,
-															EdxltokenGPDBFunc
-															);
+		const XMLCh *xml_str_func_name =
+			CDXLOperatorFactory::ExtractAttrValue(attrs, EdxltokenName, EdxltokenGPDBFunc);
 
-		CWStringDynamic *pstrFuncName = CDXLUtils::PstrFromXMLCh(m_pphm->Pmm(), xmlszFuncName);
-		
+		CWStringDynamic *str_func_name = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), xml_str_func_name);
+
 		// create a copy of the string in the CMDName constructor
-		m_pmdname = GPOS_NEW(m_pmp) CMDName(m_pmp, pstrFuncName);
-		
-		GPOS_DELETE(pstrFuncName);
+		m_mdname = GPOS_NEW(m_mp) CMDName(m_mp, str_func_name);
+
+		GPOS_DELETE(str_func_name);
 
 		// parse metadata id info
-		m_pmdid = CDXLOperatorFactory::PmdidFromAttrs
-										(
-										m_pphm->Pmm(),
-										attrs,
-										EdxltokenMdid,
-										EdxltokenGPDBFunc
-										);
-		
+		m_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid, EdxltokenGPDBFunc);
+
 		// parse whether func returns a set
-		m_fReturnsSet = CDXLOperatorFactory::FValueFromAttrs
-												(
-												m_pphm->Pmm(),
-												attrs,
-												EdxltokenGPDBFuncReturnsSet,
-												EdxltokenGPDBFunc
-												);
+		m_returns_set = CDXLOperatorFactory::ExtractConvertAttrValueToBool(
+			m_parse_handler_mgr->GetDXLMemoryManager(),
+			attrs,
+			EdxltokenGPDBFuncReturnsSet,
+			EdxltokenGPDBFunc);
 		// parse whether func is strict
-		m_fStrict = CDXLOperatorFactory::FValueFromAttrs
-											(
-											m_pphm->Pmm(),
-											attrs,
-											EdxltokenGPDBFuncStrict,
-											EdxltokenGPDBFunc
-											);
-		
+		m_is_strict = CDXLOperatorFactory::ExtractConvertAttrValueToBool(
+			m_parse_handler_mgr->GetDXLMemoryManager(),
+			attrs,
+			EdxltokenGPDBFuncStrict,
+			EdxltokenGPDBFunc);
+
 		// parse func stability property
-		const XMLCh *xmlszStbl = CDXLOperatorFactory::XmlstrFromAttrs
-														(
-														attrs,
-														EdxltokenGPDBFuncStability,
-														EdxltokenGPDBFunc
-														);
-		
-		m_efuncstbl = EFuncStability(xmlszStbl);
+		const XMLCh *xmlszStbl = CDXLOperatorFactory::ExtractAttrValue(
+			attrs, EdxltokenGPDBFuncStability, EdxltokenGPDBFunc);
+
+		m_func_stability = ParseFuncStability(xmlszStbl);
 
 		// parse func data access property
-		const XMLCh *xmlszDataAcc = CDXLOperatorFactory::XmlstrFromAttrs
-														(
-														attrs,
-														EdxltokenGPDBFuncDataAccess,
-														EdxltokenGPDBFunc
-														);
+		const XMLCh *xmlszDataAcc = CDXLOperatorFactory::ExtractAttrValue(
+			attrs, EdxltokenGPDBFuncDataAccess, EdxltokenGPDBFunc);
 
-		m_efuncdataacc = EFuncDataAccess(xmlszDataAcc);
+		m_func_data_access = ParseFuncDataAccess(xmlszDataAcc);
 	}
-	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncResultTypeId), xmlszLocalname))
+	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncResultTypeId),
+										   element_local_name))
 	{
 		// parse result type
-		GPOS_ASSERT(NULL != m_pmdname);
+		GPOS_ASSERT(NULL != m_mdname);
 
-		m_pmdidTypeResult = CDXLOperatorFactory::PmdidFromAttrs
-													(
-													m_pphm->Pmm(),
-													attrs,
-													EdxltokenMdid,
-													EdxltokenGPDBFuncResultTypeId
-													);
+		m_mdid_type_result = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(),
+			attrs,
+			EdxltokenMdid,
+			EdxltokenGPDBFuncResultTypeId);
 	}
-	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenOutputCols), xmlszLocalname))
+	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenOutputCols),
+										   element_local_name))
 	{
 		// parse output column type
-		GPOS_ASSERT(NULL != m_pmdname);
-		GPOS_ASSERT(NULL == m_pdrgpmdidTypes);
+		GPOS_ASSERT(NULL != m_mdname);
+		GPOS_ASSERT(NULL == m_mdid_types_array);
 
-		const XMLCh *xmlszTypes = CDXLOperatorFactory::XmlstrFromAttrs
-															(
-															attrs,
-															EdxltokenTypeIds,
-															EdxltokenOutputCols
-															);
+		const XMLCh *xmlszTypes =
+			CDXLOperatorFactory::ExtractAttrValue(attrs, EdxltokenTypeIds, EdxltokenOutputCols);
 
-		m_pdrgpmdidTypes = CDXLOperatorFactory::PdrgpmdidFromXMLCh
-													(
-													m_pphm->Pmm(),
-													xmlszTypes,
-													EdxltokenTypeIds,
-													EdxltokenOutputCols
-													);
+		m_mdid_types_array = CDXLOperatorFactory::ExtractConvertMdIdsToArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(),
+			xmlszTypes,
+			EdxltokenTypeIds,
+			EdxltokenOutputCols);
 	}
 }
 
@@ -170,121 +139,113 @@ CParseHandlerMDGPDBFunc::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerMDGPDBFunc::EndElement
-	(
-	const XMLCh* const, // xmlszUri,
-	const XMLCh* const xmlszLocalname,
-	const XMLCh* const // xmlszQname
-	)
+CParseHandlerMDGPDBFunc::EndElement(const XMLCh *const,  // element_uri,
+									const XMLCh *const element_local_name,
+									const XMLCh *const  // element_qname
+)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFunc), xmlszLocalname))
+	if (0 ==
+		XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFunc), element_local_name))
 	{
 		// construct the MD func object from its part
-		GPOS_ASSERT(m_pmdid->FValid() && NULL != m_pmdname);
-		
-		m_pimdobj = GPOS_NEW(m_pmp) CMDFunctionGPDB(m_pmp,
-												m_pmdid,
-												m_pmdname,
-												m_pmdidTypeResult,
-												m_pdrgpmdidTypes,
-												m_fReturnsSet,
-												m_efuncstbl,
-												m_efuncdataacc,
-												m_fStrict);
-		
-		// deactivate handler
-		m_pphm->DeactivateHandler();
+		GPOS_ASSERT(m_mdid->IsValid() && NULL != m_mdname);
 
+		m_imd_obj = GPOS_NEW(m_mp) CMDFunctionGPDB(m_mp,
+															m_mdid,
+															m_mdname,
+															m_mdid_type_result,
+															m_mdid_types_array,
+															m_returns_set,
+															m_func_stability,
+															m_func_data_access,
+															m_is_strict);
+
+		// deactivate handler
+		m_parse_handler_mgr->DeactivateHandler();
 	}
-	else if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncResultTypeId), xmlszLocalname) &&
-			0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenOutputCols), xmlszLocalname))
+	else if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncResultTypeId),
+										   element_local_name) &&
+			 0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenOutputCols),
+										   element_local_name))
 	{
-		CWStringDynamic *pstr = CDXLUtils::PstrFromXMLCh(m_pphm->Pmm(), xmlszLocalname);
-		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, pstr->Wsz());
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CParseHandlerMDGPDBFunc::EFuncStability
+//		CParseHandlerMDGPDBFunc::ParseFuncStability
 //
 //	@doc:
 //		Parses function stability property from XML string
 //
 //---------------------------------------------------------------------------
-CMDFunctionGPDB::EFuncStbl 
-CParseHandlerMDGPDBFunc::EFuncStability
-	(
-	const XMLCh *xmlsz
-	)
+CMDFunctionGPDB::EFuncStbl
+CParseHandlerMDGPDBFunc::ParseFuncStability(const XMLCh *xml_val)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncStable), xmlsz))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncStable), xml_val))
 	{
 		return CMDFunctionGPDB::EfsStable;
 	}
 
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncImmutable), xmlsz))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncImmutable), xml_val))
 	{
 		return CMDFunctionGPDB::EfsImmutable;
 	}
 
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncVolatile), xmlsz))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncVolatile), xml_val))
 	{
 		return CMDFunctionGPDB::EfsVolatile;
 	}
 
-	GPOS_RAISE
-		(
-		gpdxl::ExmaDXL,
-		gpdxl::ExmiDXLInvalidAttributeValue,
-		CDXLTokens::PstrToken(EdxltokenGPDBFuncStability)->Wsz(),
-		CDXLTokens::PstrToken(EdxltokenGPDBFunc)->Wsz()
-		);
+	GPOS_RAISE(gpdxl::ExmaDXL,
+			   gpdxl::ExmiDXLInvalidAttributeValue,
+			   CDXLTokens::GetDXLTokenStr(EdxltokenGPDBFuncStability)->GetBuffer(),
+			   CDXLTokens::GetDXLTokenStr(EdxltokenGPDBFunc)->GetBuffer());
 
 	return CMDFunctionGPDB::EfsSentinel;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CParseHandlerMDGPDBFunc::EFuncDataAccess
+//		CParseHandlerMDGPDBFunc::ParseFuncDataAccess
 //
 //	@doc:
 //		Parses function data access property from XML string
 //
 //---------------------------------------------------------------------------
 CMDFunctionGPDB::EFuncDataAcc
-CParseHandlerMDGPDBFunc::EFuncDataAccess
-	(
-	const XMLCh *xmlsz
-	)
+CParseHandlerMDGPDBFunc::ParseFuncDataAccess(const XMLCh *xml_val)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncNoSQL), xmlsz))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncNoSQL), xml_val))
 	{
 		return CMDFunctionGPDB::EfdaNoSQL;
 	}
 
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncContainsSQL), xmlsz))
+	if (0 ==
+		XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncContainsSQL), xml_val))
 	{
 		return CMDFunctionGPDB::EfdaContainsSQL;
 	}
 
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncReadsSQLData), xmlsz))
+	if (0 ==
+		XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncReadsSQLData), xml_val))
 	{
 		return CMDFunctionGPDB::EfdaReadsSQLData;
 	}
 
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncModifiesSQLData), xmlsz))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGPDBFuncModifiesSQLData),
+									  xml_val))
 	{
 		return CMDFunctionGPDB::EfdaModifiesSQLData;
 	}
 
-	GPOS_RAISE
-		(
-		gpdxl::ExmaDXL,
-		gpdxl::ExmiDXLInvalidAttributeValue,
-		CDXLTokens::PstrToken(EdxltokenGPDBFuncDataAccess)->Wsz(),
-		CDXLTokens::PstrToken(EdxltokenGPDBFunc)->Wsz()
-		);
+	GPOS_RAISE(gpdxl::ExmaDXL,
+			   gpdxl::ExmiDXLInvalidAttributeValue,
+			   CDXLTokens::GetDXLTokenStr(EdxltokenGPDBFuncDataAccess)->GetBuffer(),
+			   CDXLTokens::GetDXLTokenStr(EdxltokenGPDBFunc)->GetBuffer());
 
 	return CMDFunctionGPDB::EfdaSentinel;
 }

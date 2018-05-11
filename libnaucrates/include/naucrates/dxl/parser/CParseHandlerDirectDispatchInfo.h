@@ -20,10 +20,10 @@ namespace gpdxl
 	using namespace gpos;
 
 	XERCES_CPP_NAMESPACE_USE
-	
+
 	// fwd decl
 	class CDXLDirectDispatchInfo;
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CParseHandlerDirectDispatchInfo
@@ -34,54 +34,46 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerDirectDispatchInfo : public CParseHandlerBase
 	{
-		private:
+	private:
+		// current array of datums being parsed
+		CDXLDatumArray *m_dxl_datum_array;
 
-			// current array of datums being parsed
-			DrgPdxldatum *m_pdrgpdxldatum;
-			
-			// array of datum combinations
-			DrgPdrgPdxldatum *m_pdrgpdrgpdxldatum;
-		
-			// direct dispatch spec
-			CDXLDirectDispatchInfo *m_pdxlddinfo;
-			
-			// private copy ctor
-			CParseHandlerDirectDispatchInfo(const CParseHandlerDirectDispatchInfo &);
-			
-			// process the start of an element
-			void StartElement
-				(
-				const XMLCh* const xmlszUri, 		// URI of element's namespace
-				const XMLCh* const xmlszLocalname,	// local part of element's name
-				const XMLCh* const xmlszQname,		// element's qname
-				const Attributes& attr				// element's attributes
-				);
-				
-			// process the end of an element
-			void EndElement
-				(
-				const XMLCh* const xmlszUri, 		// URI of element's namespace
-				const XMLCh* const xmlszLocalname,	// local part of element's name
-				const XMLCh* const xmlszQname		// element's qname
-				);
-			
-		public:
-			// ctor
-			CParseHandlerDirectDispatchInfo
-				(
-				IMemoryPool *pmp,
-				CParseHandlerManager *pphm,
-				CParseHandlerBase *pphRoot
-				);
-			
-			// dtor
-			~CParseHandlerDirectDispatchInfo();
-			
-			// accessor to the parsed direct dispatch spec
-			CDXLDirectDispatchInfo *Pdxlddinfo() const;
+		// array of datum combinations
+		DXLDatumArrays *m_datum_array_combination;
+
+		// direct dispatch spec
+		CDXLDirectDispatchInfo *m_direct_dispatch_info;
+
+		// private copy ctor
+		CParseHandlerDirectDispatchInfo(const CParseHandlerDirectDispatchInfo &);
+
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
+
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+	public:
+		// ctor
+		CParseHandlerDirectDispatchInfo(IMemoryPool *mp,
+										CParseHandlerManager *parse_handler_mgr,
+										CParseHandlerBase *parse_handler_root);
+
+		// dtor
+		~CParseHandlerDirectDispatchInfo();
+
+		// accessor to the parsed direct dispatch spec
+		CDXLDirectDispatchInfo *GetDXLDirectDispatchInfo() const;
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerDirectDispatchInfo_H
+#endif  // !GPDXL_CParseHandlerDirectDispatchInfo_H
 
 // EOF

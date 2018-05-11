@@ -29,27 +29,26 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CWStringConst : public CWStringBase
 	{
-		private:
-			// null terminated wide character buffer
-			const WCHAR *m_wszBuf;
-			
-		public:
-			// ctors
-			CWStringConst(const WCHAR *wszBuf);
-			CWStringConst(IMemoryPool *pmp, const WCHAR *wszBuf);
-			
-			// shallow copy ctor
-			CWStringConst(const CWStringConst&);
-			
-			//dtor
-			~CWStringConst();
-			
-			// returns the wide character buffer storing the string
-			const WCHAR* Wsz() const;
-	};
-}
+	private:
+		// null terminated wide character buffer
+		const WCHAR *m_w_str_buffer;
 
-#endif // #ifndef GPOS_CWStringConst_H
+	public:
+		// ctors
+		CWStringConst(const WCHAR *w_str_buffer);
+		CWStringConst(IMemoryPool *mp, const WCHAR *w_str_buffer);
+
+		// shallow copy ctor
+		CWStringConst(const CWStringConst &);
+
+		//dtor
+		~CWStringConst();
+
+		// returns the wide character buffer storing the string
+		const WCHAR *GetBuffer() const;
+	};
+}  // namespace gpos
+
+#endif  // #ifndef GPOS_CWStringConst_H
 
 // EOF
-

@@ -18,7 +18,6 @@
 
 namespace gpdxl
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDXLScalarSubquery
@@ -29,69 +28,61 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarSubquery : public CDXLScalar
 	{
-		private:
-			// id of column computed by the subquery
-			ULONG m_ulColId;
-			
-			// private copy ctor
-			CDXLScalarSubquery(CDXLScalarSubquery&);
-			
-		public:
-			// ctor/dtor
-			CDXLScalarSubquery(IMemoryPool *pmp, ULONG ulColId);
-			
-			virtual
-			~CDXLScalarSubquery();
+	private:
+		// id of column computed by the subquery
+		ULONG m_colid;
 
-			// ident accessors
-			Edxlopid Edxlop() const;
-			
-			// colid of subquery column
-			ULONG UlColId() const
-			{
-				return m_ulColId;
-			}
-			
-			// name of the operator
-			const CWStringConst *PstrOpName() const;
-			
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const;
+		// private copy ctor
+		CDXLScalarSubquery(CDXLScalarSubquery &);
 
-			// conversion function
-			static
-			CDXLScalarSubquery *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopScalarSubquery == pdxlop->Edxlop());
+	public:
+		// ctor/dtor
+		CDXLScalarSubquery(IMemoryPool *mp, ULONG colid);
 
-				return dynamic_cast<CDXLScalarSubquery*>(pdxlop);
-			}
+		virtual ~CDXLScalarSubquery();
 
-			// does the operator return a boolean result
-			virtual
-			BOOL FBoolean
-					(
-					CMDAccessor *//pmda
-					)
-					const
-			{
-				return true;
-			}
+		// ident accessors
+		Edxlopid GetDXLOperator() const;
+
+		// colid of subquery column
+		ULONG
+		GetColId() const
+		{
+			return m_colid;
+		}
+
+		// name of the operator
+		const CWStringConst *GetOpNameStr() const;
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const;
+
+		// conversion function
+		static CDXLScalarSubquery *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarSubquery == dxl_op->GetDXLOperator());
+
+			return dynamic_cast<CDXLScalarSubquery *>(dxl_op);
+		}
+
+		// does the operator return a boolean result
+		virtual BOOL
+		HasBoolResult(CMDAccessor *  //md_accessor
+					  ) const
+		{
+			return true;
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *pdxln, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
-			
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLScalarSubquery_H
+#endif  // !GPDXL_CDXLScalarSubquery_H
 
 // EOF

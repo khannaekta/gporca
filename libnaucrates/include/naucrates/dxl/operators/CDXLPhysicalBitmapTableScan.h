@@ -34,57 +34,47 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalBitmapTableScan : public CDXLPhysicalAbstractBitmapScan
 	{
-		private:
-			// private copy ctor
-			CDXLPhysicalBitmapTableScan(const CDXLPhysicalBitmapTableScan &);
+	private:
+		// private copy ctor
+		CDXLPhysicalBitmapTableScan(const CDXLPhysicalBitmapTableScan &);
 
-		public:
-			// ctors
-			CDXLPhysicalBitmapTableScan
-				(
-				IMemoryPool *pmp,
-				CDXLTableDescr *pdxltabdesc
-				)
-				:
-				CDXLPhysicalAbstractBitmapScan(pmp, pdxltabdesc)
-			{
-			}
+	public:
+		// ctors
+		CDXLPhysicalBitmapTableScan(IMemoryPool *mp, CDXLTableDescr *table_descr)
+			: CDXLPhysicalAbstractBitmapScan(mp, table_descr)
+		{
+		}
 
-			// dtor
-			virtual
-			~CDXLPhysicalBitmapTableScan()
-			{}
+		// dtor
+		virtual ~CDXLPhysicalBitmapTableScan()
+		{
+		}
 
-			// operator type
-			virtual
-			Edxlopid Edxlop() const
-			{
-				return EdxlopPhysicalBitmapTableScan;
-			}
+		// operator type
+		virtual Edxlopid
+		GetDXLOperator() const
+		{
+			return EdxlopPhysicalBitmapTableScan;
+		}
 
-			// operator name
-			virtual
-			const CWStringConst *PstrOpName() const;
+		// operator name
+		virtual const CWStringConst *GetOpNameStr() const;
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
-			// conversion function
-			static
-			CDXLPhysicalBitmapTableScan *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopPhysicalBitmapTableScan == pdxlop->Edxlop());
+		// conversion function
+		static CDXLPhysicalBitmapTableScan *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopPhysicalBitmapTableScan == dxl_op->GetDXLOperator());
 
- 	 	 		return dynamic_cast<CDXLPhysicalBitmapTableScan *>(pdxlop);
-			}
+			return dynamic_cast<CDXLPhysicalBitmapTableScan *>(dxl_op);
+		}
 
 	};  // class CDXLPhysicalBitmapTableScan
-}
+}  // namespace gpdxl
 
 #endif  // !GPDXL_CDXLPhysicalBitmapTableScan_H
 

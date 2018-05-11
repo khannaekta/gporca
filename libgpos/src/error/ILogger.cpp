@@ -30,7 +30,8 @@ using namespace gpos;
 //
 //---------------------------------------------------------------------------
 ILogger::ILogger()
-{}
+{
+}
 
 
 //---------------------------------------------------------------------------
@@ -42,7 +43,8 @@ ILogger::ILogger()
 //
 //---------------------------------------------------------------------------
 ILogger::~ILogger()
-{}
+{
+}
 
 
 //---------------------------------------------------------------------------
@@ -54,49 +56,42 @@ ILogger::~ILogger()
 //
 //---------------------------------------------------------------------------
 void
-ILogger::Warning
-	(
-	const CHAR *szFilename,
-	ULONG ulLine,
-	ULONG ulMajor,
-	ULONG ulMinor
-	...
-	)
+ILogger::Warning(const CHAR *filename, ULONG line, ULONG major, ULONG minor...)
 {
 	GPOS_CHECK_ABORT;
 
 	// get warning
-	CException exc(ulMajor, ulMinor, szFilename, ulLine);
+	CException exc(major, minor, filename, line);
 
-	ITask *ptsk = ITask::PtskSelf();
+	ITask *task = ITask::Self();
 
 	// get current task's locale
-	ELocale eloc = ElocEnUS_Utf8;
-	if (NULL != ptsk)
+	ELocale locale = ElocEnUS_Utf8;
+	if (NULL != task)
 	{
-		eloc = ptsk->Eloc();
+		locale = task->Locale();
 	}
 
 	// retrieve warning message from repository
-	CMessage *pmsg = CMessageRepository::Pmr()->PmsgLookup(exc, eloc);
+	CMessage *msg = CMessageRepository::GetMessageRepository()->LookupMessage(exc, locale);
 
-	GPOS_ASSERT(CException::ExsevWarning == pmsg->UlSev());
+	GPOS_ASSERT(CException::ExsevWarning == msg->GetSeverity());
 
-	WCHAR wszBuffer[GPOS_LOG_MESSAGE_BUFFER_SIZE];
-	CWStringStatic str(wszBuffer, GPOS_ARRAY_SIZE(wszBuffer));
+	WCHAR buffer[GPOS_LOG_MESSAGE_BUFFER_SIZE];
+	CWStringStatic str(buffer, GPOS_ARRAY_SIZE(buffer));
 
 	// format warning message
 	{
-		VA_LIST vaArgs;
+		VA_LIST va_args;
 
-		VA_START(vaArgs, ulMinor);
+		VA_START(va_args, minor);
 
-		pmsg->Format(&str, vaArgs);
+		msg->Format(&str, va_args);
 
-		VA_END(vaArgs);
+		VA_END(va_args);
 	}
 
-	LogTask(str.Wsz(), CException::ExsevWarning, true /*fErr*/, szFilename, ulLine);
+	LogTask(str.GetBuffer(), CException::ExsevWarning, true /*is_err*/, filename, line);
 }
 
 
@@ -109,17 +104,11 @@ ILogger::Warning
 //
 //---------------------------------------------------------------------------
 void
-ILogger::Trace
-	(
-	const CHAR *szFilename,
-	ULONG ulLine,
-	BOOL fErr,
-	const WCHAR *wszMsg
-	)
+ILogger::Trace(const CHAR *filename, ULONG line, BOOL is_err, const WCHAR *msg)
 {
 	GPOS_CHECK_ABORT;
 
-	LogTask(wszMsg, CException::ExsevTrace, fErr, szFilename, ulLine);
+	LogTask(msg, CException::ExsevTrace, is_err, filename, line);
 }
 
 
@@ -132,31 +121,24 @@ ILogger::Trace
 //
 //---------------------------------------------------------------------------
 void
-ILogger::TraceFormat
-	(
-	const CHAR *szFilename,
-	ULONG ulLine,
-	BOOL fErr,
-	const WCHAR *wszFormat,
-	...
-	)
+ILogger::TraceFormat(const CHAR *filename, ULONG line, BOOL is_err, const WCHAR *format, ...)
 {
 	GPOS_CHECK_ABORT;
 
-	WCHAR wszBuffer[GPOS_LOG_TRACE_BUFFER_SIZE];
-	CWStringStatic str(wszBuffer, GPOS_ARRAY_SIZE(wszBuffer));
+	WCHAR buffer[GPOS_LOG_TRACE_BUFFER_SIZE];
+	CWStringStatic str(buffer, GPOS_ARRAY_SIZE(buffer));
 
-	VA_LIST vaArgs;
+	VA_LIST va_args;
 
 	// get arguments
-	VA_START(vaArgs, wszFormat);
+	VA_START(va_args, format);
 
-	str.AppendFormatVA(wszFormat, vaArgs);
+	str.AppendFormatVA(format, va_args);
 
 	// reset arguments
-	VA_END(vaArgs);
+	VA_END(va_args);
 
-	LogTask(str.Wsz(), CException::ExsevTrace, fErr, szFilename, ulLine);
+	LogTask(str.GetBuffer(), CException::ExsevTrace, is_err, filename, line);
 }
 
 
@@ -170,43 +152,35 @@ ILogger::TraceFormat
 //
 //---------------------------------------------------------------------------
 void
-ILogger::LogTask
-	(
-	const WCHAR *wszMsg,
-	ULONG ulSeverity,
-	BOOL fErr,
-	const CHAR *szFilename,
-	ULONG ulLine
-	)
+ILogger::LogTask(const WCHAR *msg, ULONG severity, BOOL is_err, const CHAR *filename, ULONG line)
 {
-	CLogger *plog = NULL;
+	CLogger *log = NULL;
 
-	if (fErr)
+	if (is_err)
 	{
-		plog = &CLoggerStream::m_plogStdErr;
+		log = &CLoggerStream::m_stderr_stream_logger;
 	}
 	else
 	{
-		plog = &CLoggerStream::m_plogStdOut;
+		log = &CLoggerStream::m_stdout_stream_logger;
 	}
 
-	ITask *ptsk = ITask::PtskSelf();
-	if (NULL != ptsk)
+	ITask *task = ITask::Self();
+	if (NULL != task)
 	{
-		if (fErr)
+		if (is_err)
 		{
-			plog = dynamic_cast<CLogger*>(ptsk->PlogErr());
+			log = dynamic_cast<CLogger *>(task->GetErrorLogger());
 		}
 		else
 		{
-			plog = dynamic_cast<CLogger*>(ptsk->PlogOut());
+			log = dynamic_cast<CLogger *>(task->GetOutputLogger());
 		}
 	}
 
-	GPOS_ASSERT(NULL != plog);
+	GPOS_ASSERT(NULL != log);
 
-	plog->Log(wszMsg, ulSeverity, szFilename, ulLine);
+	log->Log(msg, severity, filename, line);
 }
 
 // EOF
-

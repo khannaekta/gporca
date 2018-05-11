@@ -38,26 +38,27 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class IMDTypeOid : public IMDType
 	{
-		public:
-			// type id
-			static
-			ETypeInfo EtiType()
-			{
-				return EtiOid;
-			}
+	public:
+		// type id
+		static ETypeInfo
+		GetTypeInfo()
+		{
+			return EtiOid;
+		}
 
-			virtual
-			ETypeInfo Eti() const
-			{
-				return IMDTypeOid::EtiType();
-			}
+		virtual ETypeInfo
+		GetDatumType() const
+		{
+			return IMDTypeOid::GetTypeInfo();
+		}
 
-			// factory function for OID datums
-			virtual
-			IDatumOid *PdatumOid(IMemoryPool *pmp, OID oidValue, BOOL fNull) const = 0;
+		// factory function for OID datums
+		virtual IDatumOid *CreateOidDatum(IMemoryPool *mp,
+										  OID oid_value,
+										  BOOL is_null) const = 0;
 	};
-}
+}  // namespace gpmd
 
-#endif // !GPMD_IMDTypeOid_H
+#endif  // !GPMD_IMDTypeOid_H
 
 // EOF

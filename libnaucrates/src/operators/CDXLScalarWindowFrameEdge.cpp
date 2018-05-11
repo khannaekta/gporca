@@ -24,29 +24,23 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarWindowFrameEdge::CDXLScalarWindowFrameEdge
-	(
-	IMemoryPool *pmp,
-	BOOL fLeading,
-	EdxlFrameBoundary edxlfb
-	)
-	:
-	CDXLScalar(pmp),
-	m_fLeading(fLeading),
-	m_edxlfb(edxlfb)
+CDXLScalarWindowFrameEdge::CDXLScalarWindowFrameEdge(IMemoryPool *mp,
+													 BOOL fLeading,
+													 EdxlFrameBoundary frame_boundary)
+	: CDXLScalar(mp), m_leading_edge(fLeading), m_dxl_frame_boundary(frame_boundary)
 {
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarWindowFrameEdge::Edxlop
+//		CDXLScalarWindowFrameEdge::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLScalarWindowFrameEdge::Edxlop() const
+CDXLScalarWindowFrameEdge::GetDXLOperator() const
 {
 	return EdxlopScalarWindowFrameEdge;
 }
@@ -54,59 +48,53 @@ CDXLScalarWindowFrameEdge::Edxlop() const
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarWindowFrameEdge::PstrOpName
+//		CDXLScalarWindowFrameEdge::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLScalarWindowFrameEdge::PstrOpName() const
+CDXLScalarWindowFrameEdge::GetOpNameStr() const
 {
-	if (m_fLeading)
+	if (m_leading_edge)
 	{
-		return CDXLTokens::PstrToken(EdxltokenScalarWindowFrameLeadingEdge);
+		return CDXLTokens::GetDXLTokenStr(EdxltokenScalarWindowFrameLeadingEdge);
 	}
 
-	return CDXLTokens::PstrToken(EdxltokenScalarWindowFrameTrailingEdge);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenScalarWindowFrameTrailingEdge);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarWindowFrameEdge::PstrFrameBoundary
+//		CDXLScalarWindowFrameEdge::GetFrameBoundaryStr
 //
 //	@doc:
 //		Return the string representation of the window frame boundary
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLScalarWindowFrameEdge::PstrFrameBoundary
-	(
-	EdxlFrameBoundary edxlfb
-	)
-	const
+CDXLScalarWindowFrameEdge::GetFrameBoundaryStr(EdxlFrameBoundary frame_boundary) const
 {
-	GPOS_ASSERT(EdxlfbSentinel > edxlfb);
+	GPOS_ASSERT(EdxlfbSentinel > frame_boundary);
 
-	ULONG rgrgulMapping[][2] =
-					{
-					{EdxlfbUnboundedPreceding, EdxltokenWindowBoundaryUnboundedPreceding},
-					{EdxlfbBoundedPreceding, EdxltokenWindowBoundaryBoundedPreceding},
-					{EdxlfbCurrentRow, EdxltokenWindowBoundaryCurrentRow},
-					{EdxlfbUnboundedFollowing, EdxltokenWindowBoundaryUnboundedFollowing},
-					{EdxlfbBoundedFollowing, EdxltokenWindowBoundaryBoundedFollowing},
-					{EdxlfbDelayedBoundedPreceding, EdxltokenWindowBoundaryDelayedBoundedPreceding},
-					{EdxlfbDelayedBoundedFollowing, EdxltokenWindowBoundaryDelayedBoundedFollowing}
-					};
+	ULONG dxl_frame_boundary_token_mapping[][2] = {
+		{EdxlfbUnboundedPreceding, EdxltokenWindowBoundaryUnboundedPreceding},
+		{EdxlfbBoundedPreceding, EdxltokenWindowBoundaryBoundedPreceding},
+		{EdxlfbCurrentRow, EdxltokenWindowBoundaryCurrentRow},
+		{EdxlfbUnboundedFollowing, EdxltokenWindowBoundaryUnboundedFollowing},
+		{EdxlfbBoundedFollowing, EdxltokenWindowBoundaryBoundedFollowing},
+		{EdxlfbDelayedBoundedPreceding, EdxltokenWindowBoundaryDelayedBoundedPreceding},
+		{EdxlfbDelayedBoundedFollowing, EdxltokenWindowBoundaryDelayedBoundedFollowing}};
 
-	const ULONG ulArity = GPOS_ARRAY_SIZE(rgrgulMapping);
-	for (ULONG ul = 0; ul < ulArity; ul++)
+	const ULONG arity = GPOS_ARRAY_SIZE(dxl_frame_boundary_token_mapping);
+	for (ULONG idx = 0; idx < arity; idx++)
 	{
-		ULONG *pulElem = rgrgulMapping[ul];
-		if ((ULONG) edxlfb == pulElem[0])
+		ULONG *element = dxl_frame_boundary_token_mapping[idx];
+		if ((ULONG) frame_boundary == element[0])
 		{
-			Edxltoken edxltk = (Edxltoken) pulElem[1];
-			return CDXLTokens::PstrToken(edxltk);
+			Edxltoken dxl_token = (Edxltoken) element[1];
+			return CDXLTokens::GetDXLTokenStr(dxl_token);
 		}
 	}
 
@@ -123,28 +111,26 @@ CDXLScalarWindowFrameEdge::PstrFrameBoundary
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarWindowFrameEdge::SerializeToDXL
-	(
-	CXMLSerializer *pxmlser,
-	const CDXLNode *pdxln
-	)
-	const
+CDXLScalarWindowFrameEdge::SerializeToDXL(CXMLSerializer *xml_serializer,
+										  const CDXLNode *dxlnode) const
 {
+	const CWStringConst *element_name = GetOpNameStr();
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
-	const CWStringConst *pstrElemName = PstrOpName();
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
-
-	if (m_fLeading)
+	if (m_leading_edge)
 	{
-		pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenWindowLeadingBoundary), PstrFrameBoundary(m_edxlfb));
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowLeadingBoundary),
+									 GetFrameBoundaryStr(m_dxl_frame_boundary));
 	}
 	else
 	{
-		pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenWindowTrailingBoundary), PstrFrameBoundary(m_edxlfb));
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowTrailingBoundary),
+									 GetFrameBoundaryStr(m_dxl_frame_boundary));
 	}
 
-	pdxln->SerializeChildrenToDXL(pxmlser);
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	dxlnode->SerializeChildrenToDXL(xml_serializer);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -157,31 +143,32 @@ CDXLScalarWindowFrameEdge::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarWindowFrameEdge::AssertValid
-	(
-	const CDXLNode *pdxln,
-	BOOL fValidateChildren
-	)
-	const
+CDXLScalarWindowFrameEdge::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
-	const ULONG ulArity = pdxln->UlArity();
-	GPOS_ASSERT(1 >= ulArity);
+	const ULONG arity = dxlnode->Arity();
+	GPOS_ASSERT(1 >= arity);
 
-	GPOS_ASSERT_IMP((m_edxlfb == EdxlfbBoundedPreceding || m_edxlfb == EdxlfbBoundedFollowing
-					|| m_edxlfb == EdxlfbDelayedBoundedPreceding || m_edxlfb == EdxlfbDelayedBoundedFollowing), 1 == ulArity);
-	GPOS_ASSERT_IMP((m_edxlfb == EdxlfbUnboundedPreceding || m_edxlfb == EdxlfbUnboundedFollowing || m_edxlfb == EdxlfbCurrentRow), 0 == ulArity);
+	GPOS_ASSERT_IMP((m_dxl_frame_boundary == EdxlfbBoundedPreceding ||
+					 m_dxl_frame_boundary == EdxlfbBoundedFollowing ||
+					 m_dxl_frame_boundary == EdxlfbDelayedBoundedPreceding ||
+					 m_dxl_frame_boundary == EdxlfbDelayedBoundedFollowing),
+					1 == arity);
+	GPOS_ASSERT_IMP((m_dxl_frame_boundary == EdxlfbUnboundedPreceding ||
+					 m_dxl_frame_boundary == EdxlfbUnboundedFollowing ||
+					 m_dxl_frame_boundary == EdxlfbCurrentRow),
+					0 == arity);
 
-	for (ULONG ul = 0; ul < ulArity; ++ul)
+	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		CDXLNode *pdxlnArg = (*pdxln)[ul];
-		GPOS_ASSERT(EdxloptypeScalar == pdxlnArg->Pdxlop()->Edxloperatortype());
+		CDXLNode *dxlnode_arg = (*dxlnode)[idx];
+		GPOS_ASSERT(EdxloptypeScalar == dxlnode_arg->GetOperator()->GetDXLOperatorType());
 
-		if (fValidateChildren)
+		if (validate_children)
 		{
-			pdxlnArg->Pdxlop()->AssertValid(pdxlnArg, fValidateChildren);
+			dxlnode_arg->GetOperator()->AssertValid(dxlnode_arg, validate_children);
 		}
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

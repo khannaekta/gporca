@@ -24,7 +24,7 @@ namespace gpdxl
 
 	// fwd decl
 	class CDXLDirectDispatchInfo;
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CParseHandlerPlan
@@ -33,74 +33,66 @@ namespace gpdxl
 	//		Parse handler for converting physical plans from a DXL document
 	//		into a DXL tree.
 	//---------------------------------------------------------------------------
-	class CParseHandlerPlan : public CParseHandlerBase 
+	class CParseHandlerPlan : public CParseHandlerBase
 	{
-		private:
+	private:
+		// plan id
+		ULLONG m_plan_id;
 
-			// plan id
-			ULLONG m_ullId;
+		// size of plan space
+		ULLONG m_plan_space_size;
 
-			// size of plan space
-			ULLONG m_ullSpaceSize;
+		// the root of the parsed DXL tree constructed by the parse handler
+		CDXLNode *m_dxlnode;
 
-			// the root of the parsed DXL tree constructed by the parse handler
-			CDXLNode *m_pdxln;
-			
-			// direct dispatch info spec
-			CDXLDirectDispatchInfo *m_pdxlddinfo;
-			
-			// private ctor 
-			CParseHandlerPlan(const CParseHandlerPlan&);
-						
-			// process the end of an element
-			void StartElement
-				(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
- 					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
-				
-			// process the end of an element
-			void EndElement
-				(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
-					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname		// element's qname
-				);
-			
-		public:
-			// ctor/dtor
-			CParseHandlerPlan
-				(
-				IMemoryPool *pmp,
-				CParseHandlerManager *pphm,
-				CParseHandlerBase *pphRoot
-				);
-			
-			virtual
-			~CParseHandlerPlan();
-			
-			// returns the root of constructed DXL plan
-			CDXLNode *Pdxln();
-			
-			// return plan id
-			ULLONG UllId() const
-			{
-				return m_ullId;
-			}
+		// direct dispatch info spec
+		CDXLDirectDispatchInfo *m_direct_dispatch_info;
 
-			// return size of plan space
-			ULLONG UllSpaceSize() const
-			{
-				return m_ullSpaceSize;
-			}
+		// private ctor
+		CParseHandlerPlan(const CParseHandlerPlan &);
 
-			EDxlParseHandlerType Edxlphtype() const;
-			
+		// process the end of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
+
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+	public:
+		// ctor/dtor
+		CParseHandlerPlan(IMemoryPool *mp,
+						  CParseHandlerManager *parse_handler_mgr,
+						  CParseHandlerBase *parse_handler_root);
+
+		virtual ~CParseHandlerPlan();
+
+		// returns the root of constructed DXL plan
+		CDXLNode *CreateDXLNode();
+
+		// return plan id
+		ULLONG
+		PlanId() const
+		{
+			return m_plan_id;
+		}
+
+		// return size of plan space
+		ULLONG
+		PlanSpaceSize() const
+		{
+			return m_plan_space_size;
+		}
+
+		EDxlParseHandlerType GetParseHandlerType() const;
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerPlan_H
+#endif  // !GPDXL_CParseHandlerPlan_H
 
 // EOF

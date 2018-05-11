@@ -13,7 +13,7 @@
 
 #include "gpos/error/CLogger.h"
 
-#define GPOS_SYSLOG_ALERT(szMsg)   CLoggerSyslog::Alert(GPOS_WSZ_LIT(szMsg))
+#define GPOS_SYSLOG_ALERT(szMsg) CLoggerSyslog::Alert(GPOS_WSZ_LIT(szMsg))
 
 namespace gpos
 {
@@ -28,44 +28,37 @@ namespace gpos
 
 	class CLoggerSyslog : public CLogger
 	{
-		private:
+	private:
+		// executable name
+		const CHAR *m_proc_name;
 
-			// executable name
-			const CHAR *m_szProcName;
+		// initialization flags
+		ULONG m_init_mask;
 
-			// initialization flags
-			ULONG m_ulInitMask;
+		// message priotity
+		ULONG m_message_priority;
 
-			// message priotity
-			ULONG m_ulMessagePriority;
+		// no copy ctor
+		CLoggerSyslog(const CLoggerSyslog &);
 
-			// no copy ctor
-			CLoggerSyslog(const CLoggerSyslog&);
+		// write string to syslog
+		void Write(const WCHAR *log_entry, ULONG severity);
 
-			// write string to syslog
-			void Write(const WCHAR *wszLogEntry, ULONG ulSev);
+		static CLoggerSyslog m_alert_logger;
 
-			static CLoggerSyslog m_loggerAlert;
+	public:
+		// ctor
+		CLoggerSyslog(const CHAR *proc_name, ULONG init_mask, ULONG message_priority);
 
-		public:
-			// ctor
-			CLoggerSyslog
-				(
-				const CHAR *szProcName,
-				ULONG ulInitMask,
-				ULONG ulMessagePriority
-				);
+		// dtor
+		virtual ~CLoggerSyslog();
 
-			// dtor
-			virtual	~CLoggerSyslog();
+		// write alert message to syslog - use ASCII characters only
+		static void Alert(const WCHAR *msg);
 
-			// write alert message to syslog - use ASCII characters only
-			static void Alert(const WCHAR *wszMsg);
+	};  // class CLoggerSyslog
+}  // namespace gpos
 
-	};	// class CLoggerSyslog
-}
-
-#endif // !GPOS_CLoggerSyslog_H
+#endif  // !GPOS_CLoggerSyslog_H
 
 // EOF
-

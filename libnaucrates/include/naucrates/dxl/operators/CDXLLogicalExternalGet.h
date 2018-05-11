@@ -28,38 +28,31 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLLogicalExternalGet : public CDXLLogicalGet
 	{
-		private:
+	private:
+		// private copy ctor
+		CDXLLogicalExternalGet(CDXLLogicalExternalGet &);
 
-			// private copy ctor
-			CDXLLogicalExternalGet(CDXLLogicalExternalGet&);
+	public:
+		// ctor
+		CDXLLogicalExternalGet(IMemoryPool *mp, CDXLTableDescr *table_descr);
 
-		public:
-			// ctor
-			CDXLLogicalExternalGet(IMemoryPool *pmp, CDXLTableDescr *pdxltabdesc);
+		// operator type
+		virtual Edxlopid GetDXLOperator() const;
 
-			// operator type
-			virtual
-			Edxlopid Edxlop() const;
+		// operator name
+		virtual const CWStringConst *GetOpNameStr() const;
 
-			// operator name
-			virtual
-			const CWStringConst *PstrOpName() const;
+		// conversion function
+		static CDXLLogicalExternalGet *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopLogicalExternalGet == dxl_op->GetDXLOperator());
 
-			// conversion function
-			static
-			CDXLLogicalExternalGet *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopLogicalExternalGet == pdxlop->Edxlop());
-
-				return dynamic_cast<CDXLLogicalExternalGet*>(pdxlop);
-			}
-
+			return dynamic_cast<CDXLLogicalExternalGet *>(dxl_op);
+		}
 	};
-}
-#endif // !GPDXL_CDXLLogicalExternalGet_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLLogicalExternalGet_H
 
 // EOF

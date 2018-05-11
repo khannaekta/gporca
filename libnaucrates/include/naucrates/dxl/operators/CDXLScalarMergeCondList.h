@@ -17,7 +17,6 @@
 
 namespace gpdxl
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDXLScalarMergeCondList
@@ -28,60 +27,50 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarMergeCondList : public CDXLScalar
 	{
-		private:
-		
-			// private copy ctor
-			CDXLScalarMergeCondList(CDXLScalarMergeCondList&);
-			
-		public:
-			// ctor
-			explicit
-			CDXLScalarMergeCondList(IMemoryPool *pmp);
-			
-			// ident accessors
-			Edxlopid Edxlop() const;
-			
-			// name of the operator
-			const CWStringConst *PstrOpName() const;
-			
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const;
+	private:
+		// private copy ctor
+		CDXLScalarMergeCondList(CDXLScalarMergeCondList &);
 
-			// conversion function
-			static
-			CDXLScalarMergeCondList *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopScalarMergeCondList == pdxlop->Edxlop());
+	public:
+		// ctor
+		explicit CDXLScalarMergeCondList(IMemoryPool *mp);
 
-				return dynamic_cast<CDXLScalarMergeCondList*>(pdxlop);
-			}
+		// ident accessors
+		Edxlopid GetDXLOperator() const;
 
-			// does the operator return a boolean result
-			virtual
-			BOOL FBoolean
-					(
-					CMDAccessor *//pmda
-					)
-					const
-			{
-				GPOS_ASSERT(!"Invalid function call for a container operator");
-				return false;
-			}
+		// name of the operator
+		const CWStringConst *GetOpNameStr() const;
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const;
+
+		// conversion function
+		static CDXLScalarMergeCondList *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarMergeCondList == dxl_op->GetDXLOperator());
+
+			return dynamic_cast<CDXLScalarMergeCondList *>(dxl_op);
+		}
+
+		// does the operator return a boolean result
+		virtual BOOL
+		HasBoolResult(CMDAccessor *  //md_accessor
+					  ) const
+		{
+			GPOS_ASSERT(!"Invalid function call for a container operator");
+			return false;
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *pdxln, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
-			
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *node, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLScalarMergeCondList_H
+#endif  // !GPDXL_CDXLScalarMergeCondList_H
 
 // EOF

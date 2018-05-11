@@ -19,7 +19,7 @@ using namespace gpos;
 
 
 // invalid worker id
-const CWorkerId CWorkerId::m_widInvalid (false /*fvalid*/);
+const CWorkerId CWorkerId::m_wid_invalid(false /*fvalid*/);
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -29,41 +29,34 @@ const CWorkerId CWorkerId::m_widInvalid (false /*fvalid*/);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CWorkerId::CWorkerId
-	(
-	BOOL fValid
-	)
+CWorkerId::CWorkerId(BOOL valid)
 {
-	if (fValid)
+	if (valid)
 	{
-		Current();
+		SetThreadToCurrent();
 	}
 	else
 	{
-		Invalid();
+		SetThreadToInvalid();
 	}
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CWorkerId::FEqual
+//		CWorkerId::Equals
 //
 //	@doc:
 //		comparison of worker ids
 //
 //---------------------------------------------------------------------------
 BOOL
-CWorkerId::FEqual
-	(
-	const CWorkerId &wid
-	)
-	const
+CWorkerId::Equals(const CWorkerId &wid) const
 {
 	// compare on thread id first; if equal then there cannot be a race on the
 	// valid flags
 
-	return pthread::FPthreadEqual(wid.m_pthread, m_pthread);
+	return pthread::Equal(wid.m_pthread, m_pthread);
 }
 
 
@@ -76,9 +69,9 @@ CWorkerId::FEqual
 //
 //---------------------------------------------------------------------------
 void
-CWorkerId::Current()
+CWorkerId::SetThreadToCurrent()
 {
-	m_pthread = pthread::PthrdtPthreadSelf();
+	m_pthread = pthread::Self();
 }
 
 
@@ -91,31 +84,28 @@ CWorkerId::Current()
 //
 //---------------------------------------------------------------------------
 void
-CWorkerId::Invalid()
+CWorkerId::SetThreadToInvalid()
 {
 	// reset bytes to 0
-	clib::PvMemSet(this, 0, sizeof(CWorkerId));
+	clib::Memset(this, 0, sizeof(CWorkerId));
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CWorkerId::UlHash
+//		CWorkerId::HashValue
 //
 //	@doc:
 //		Primitive hash function
 //
 //---------------------------------------------------------------------------
 ULONG
-CWorkerId::UlHash
-	(
-	const CWorkerId &wid
-	)
+CWorkerId::HashValue(const CWorkerId &wid)
 {
 	// don't compute hash value for invalid id
-	GPOS_ASSERT(wid.FValid() && "Invalid worker id.");
+	GPOS_ASSERT(wid.IsValid() && "Invalid worker id.");
 
-	return gpos::UlHash<PTHREAD_T>(&wid.m_pthread);
+	return gpos::HashValue<PTHREAD_T>(&wid.m_pthread);
 }
 
 
@@ -123,19 +113,18 @@ CWorkerId::UlHash
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CWorkerId::FValid
+//		CWorkerId::IsValid
 //
 //	@doc:
 //		Check if worker id is valid
 //
 //---------------------------------------------------------------------------
 BOOL
-CWorkerId::FValid() const
+CWorkerId::IsValid() const
 {
-	return !FEqual(m_widInvalid);
+	return !Equals(m_wid_invalid);
 }
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF
-

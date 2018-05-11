@@ -8,20 +8,17 @@
 
 namespace gpos
 {
-
 	// Static unit tests
 	class CHashSetIterTest
 	{
-		public:
+	public:
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_Basic();
 
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_Basic();
+	};  // class CHashSetIterTest
+}  // namespace gpos
 
-	}; // class CHashSetIterTest
-}
-
-#endif // !GPOS_CHashSetIterTest_H
+#endif  // !GPOS_CHashSetIterTest_H
 
 // EOF
-

@@ -21,9 +21,9 @@ namespace gpdxl
 	using namespace gpos;
 
 	XERCES_CPP_NAMESPACE_USE
-	
+
 	class CDXLMemoryManager;
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CParseHandlerDummy
@@ -34,19 +34,19 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerDummy : public DefaultHandler
 	{
-		private:
-			// memory manager to use for Xerces allocation
-			CDXLMemoryManager *m_pmm;
-			
-		public:
-			// ctor
-			explicit CParseHandlerDummy(CDXLMemoryManager *pmm);
-						
-			// process a parsing error
-			void error(const SAXParseException &saxex);
-	};
-}
+	private:
+		// memory manager to use for Xerces allocation
+		CDXLMemoryManager *m_dxl_memory_manager;
 
-#endif // !GPDXL_CParseHandlerDummy_H
+	public:
+		// ctor
+		explicit CParseHandlerDummy(CDXLMemoryManager *dxl_memory_manager);
+
+		// process a parsing error
+		void error(const SAXParseException &sax_parse_ex);
+	};
+}  // namespace gpdxl
+
+#endif  // !GPDXL_CParseHandlerDummy_H
 
 // EOF

@@ -36,102 +36,87 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLDatum : public CRefCount
 	{
-		private:
+	private:
+		// private copy ctor
+		CDXLDatum(const CDXLDatum &);
 
-			// private copy ctor
-			CDXLDatum(const CDXLDatum &);
+	protected:
+		// memory pool
+		IMemoryPool *m_mp;
 
-		protected:
+		// mdid of the datum's type
+		IMDId *m_mdid_type;
 
-			// memory pool
-			IMemoryPool *m_pmp;
-			
-			// mdid of the datum's type
-			IMDId *m_pmdidType;
+		const INT m_type_modifier;
 
-			const INT m_iTypeModifier;
+		// is the datum NULL
+		BOOL m_is_null;
 
-			// is the datum NULL
-			BOOL m_fNull;
-	
-			// length
-			const ULONG m_ulLength;
-			
-		public:
+		// length
+		const ULONG m_length;
 
-			// datum types
-			enum EdxldatumType
-			{
-				EdxldatumInt2,
-				EdxldatumInt4,
-				EdxldatumInt8,
-				EdxldatumBool,
-				EdxldatumGeneric,
-				EdxldatumStatsDoubleMappable,
-				EdxldatumStatsLintMappable,
-				EdxldatumOid,
-				EdxldatumSentinel
-			};
-			// ctor
-			CDXLDatum
-				(
-				IMemoryPool *pmp,
-				IMDId *pmdidType,
-				INT iTypeModifier,
-				BOOL fNull,
-				ULONG ulLength
-				);
+	public:
+		// datum types
+		enum EdxldatumType
+		{
+			EdxldatumInt2,
+			EdxldatumInt4,
+			EdxldatumInt8,
+			EdxldatumBool,
+			EdxldatumGeneric,
+			EdxldatumStatsDoubleMappable,
+			EdxldatumStatsLintMappable,
+			EdxldatumOid,
+			EdxldatumSentinel
+		};
+		// ctor
+		CDXLDatum(IMemoryPool *mp,
+				  IMDId *mdid_type,
+				  INT type_modifier,
+				  BOOL is_null,
+				  ULONG length);
 
-			// dtor
-			virtual
-			~CDXLDatum()
-			{
-				m_pmdidType->Release();
-			}
+		// dtor
+		virtual ~CDXLDatum()
+		{
+			m_mdid_type->Release();
+		}
 
-			// mdid type of the datum
-			virtual
-			IMDId *Pmdid() const
-			{
-				return m_pmdidType;
-			}
+		// mdid type of the datum
+		virtual IMDId *
+		MDId() const
+		{
+			return m_mdid_type;
+		}
 
-			INT
-			ITypeModifier() const;
+		INT TypeModifier() const;
 
-			// is datum NULL
-			virtual
-			BOOL FNull() const;
+		// is datum NULL
+		virtual BOOL IsNull() const;
 
-			// byte array length
-			virtual
-			ULONG UlLength() const;
+		// byte array length
+		virtual ULONG Length() const;
 
-			// serialize the datum as the given element
-			virtual
-			void Serialize(CXMLSerializer *pxmlser, const CWStringConst *pstrElem);
+		// serialize the datum as the given element
+		virtual void Serialize(CXMLSerializer *xml_serializer, const CWStringConst *datum_string);
 
-			// is type passed by value
-			virtual
-			BOOL FByValue() const = 0;
+		// is type passed by value
+		virtual BOOL IsPassedByValue() const = 0;
 
-			// serialize the datum as the given element
-			virtual
-			void Serialize(CXMLSerializer *pxmlser) = 0;
+		// serialize the datum as the given element
+		virtual void Serialize(CXMLSerializer *xml_serializer) = 0;
 
-			// ident accessors
-			virtual
-			EdxldatumType Edxldt() const = 0;
+		// ident accessors
+		virtual EdxldatumType GetDatumType() const = 0;
 	};
 
 	// array of datums
-	typedef CDynamicPtrArray<CDXLDatum, CleanupRelease> DrgPdxldatum;
+	typedef CDynamicPtrArray<CDXLDatum, CleanupRelease> CDXLDatumArray;
 
 	// dynamic array of datum arrays -- array owns elements
-	typedef CDynamicPtrArray<DrgPdxldatum, CleanupRelease> DrgPdrgPdxldatum;
-}
+	typedef CDynamicPtrArray<CDXLDatumArray, CleanupRelease> DXLDatumArrays;
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLDatum_H
+#endif  // !GPDXL_CDXLDatum_H
 
 // EOF
-

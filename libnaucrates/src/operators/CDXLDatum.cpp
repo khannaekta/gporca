@@ -7,9 +7,9 @@
 //
 //	@doc:
 //		Implementation of DXL datum with type information
-//		
-//	@owner: 
-//		
+//
+//	@owner:
+//
 //
 //	@test:
 //
@@ -29,56 +29,49 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLDatum::CDXLDatum
-	(
-	IMemoryPool *pmp,
-	IMDId *pmdidType,
-	INT iTypeModifier,
-	BOOL fNull,
-	ULONG ulLength
-	)
-	:
-	m_pmp(pmp),
-	m_pmdidType(pmdidType),
-	m_iTypeModifier(iTypeModifier),
-	m_fNull(fNull),
-	m_ulLength(ulLength)
+CDXLDatum::CDXLDatum(
+	IMemoryPool *mp, IMDId *mdid_type, INT type_modifier, BOOL is_null, ULONG length)
+	: m_mp(mp),
+	  m_mdid_type(mdid_type),
+	  m_type_modifier(type_modifier),
+	  m_is_null(is_null),
+	  m_length(length)
 {
-	GPOS_ASSERT(m_pmdidType->FValid());
+	GPOS_ASSERT(m_mdid_type->IsValid());
 }
 
 INT
-CDXLDatum::ITypeModifier() const
+CDXLDatum::TypeModifier() const
 {
-	return m_iTypeModifier;
+	return m_type_modifier;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLDatum::FNull
+//		CDXLDatum::IsNull
 //
 //	@doc:
 //		Is the datum NULL
 //
 //---------------------------------------------------------------------------
 BOOL
-CDXLDatum::FNull() const
+CDXLDatum::IsNull() const
 {
-	return m_fNull;
+	return m_is_null;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLDatum::UlLength
+//		CDXLDatum::Length
 //
 //	@doc:
 //		Returns the size of the byte array
 //
 //---------------------------------------------------------------------------
-ULONG 
-CDXLDatum::UlLength() const
+ULONG
+CDXLDatum::Length() const
 {
-	return m_ulLength;
+	return m_length;
 }
 
 //---------------------------------------------------------------------------
@@ -90,15 +83,12 @@ CDXLDatum::UlLength() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLDatum::Serialize
-	(
-	CXMLSerializer *pxmlser,
-	const CWStringConst *pstrElem
-	)
+CDXLDatum::Serialize(CXMLSerializer *xml_serializer, const CWStringConst *datum_string)
 {
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElem);
-	Serialize(pxmlser);
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElem);
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), datum_string);
+	Serialize(xml_serializer);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 datum_string);
 }
 
 // EOF

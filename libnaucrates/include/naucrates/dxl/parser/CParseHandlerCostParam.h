@@ -17,7 +17,6 @@
 
 namespace gpdxl
 {
-
 	using namespace gpos;
 
 	//---------------------------------------------------------------------------
@@ -30,87 +29,80 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerCostParam : public CParseHandlerBase
 	{
+	private:
+		// param name
+		CHAR *m_param_name;
 
-		private:
+		// param value
+		CDouble m_value;
 
-			// param name
-			CHAR *m_szName;
+		// lower bound value
+		CDouble m_lower_bound_val;
 
-			// param value
-			CDouble m_dVal;
+		// upper bound value
+		CDouble m_upper_bound_val;
 
-			// lower bound value
-			CDouble m_dLowerBound;
+		// private copy ctor
+		CParseHandlerCostParam(const CParseHandlerCostParam &);
 
-			// upper bound value
-			CDouble m_dUpperBound;
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// private copy ctor
-			CParseHandlerCostParam(const CParseHandlerCostParam&);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the start of an element
-			void StartElement
-				(
-				const XMLCh* const xmlszUri, 		// URI of element's namespace
- 				const XMLCh* const xmlszLocalname,	// local part of element's name
-				const XMLCh* const xmlszQname,		// element's qname
-				const Attributes& attr				// element's attributes
-				);
+	public:
+		// ctor
+		CParseHandlerCostParam(IMemoryPool *mp,
+							   CParseHandlerManager *parse_handler_mgr,
+							   CParseHandlerBase *parse_handler_root);
 
-			// process the end of an element
-			void EndElement
-				(
-				const XMLCh* const xmlszUri, 		// URI of element's namespace
-				const XMLCh* const xmlszLocalname,	// local part of element's name
-				const XMLCh* const xmlszQname		// element's qname
-				);
+		// dtor
+		virtual ~CParseHandlerCostParam();
 
-		public:
+		// return parsed param name
+		CHAR *
+		GetName() const
+		{
+			return m_param_name;
+		}
 
-			// ctor
-			CParseHandlerCostParam
-				(
-				IMemoryPool *pmp,
-				CParseHandlerManager *pphm,
-				CParseHandlerBase *pphRoot
-				);
+		// return parsed param value
+		CDouble
+		Get() const
+		{
+			return m_value;
+		}
 
-			// dtor
-			virtual
-			~CParseHandlerCostParam();
+		// return parsed param lower bound value
+		CDouble
+		GetLowerBoundVal() const
+		{
+			return m_lower_bound_val;
+		}
 
-			// return parsed param name
-			CHAR *SzName() const
-			{
-				return m_szName;
-			}
+		// return parsed param upper bound value
+		CDouble
+		GetUpperBoundVal() const
+		{
+			return m_upper_bound_val;
+		}
 
-			// return parsed param value
-			CDouble DVal() const
-			{
-				return m_dVal;
-			}
-
-			// return parsed param lower bound value
-			CDouble DLowerBound() const
-			{
-				return m_dLowerBound;
-			}
-
-			// return parsed param upper bound value
-			CDouble DUpperBound() const
-			{
-				return m_dUpperBound;
-			}
-
-			EDxlParseHandlerType Edxlphtype() const
-			{
-				return EdxlphCostParam;
-			}
-
+		EDxlParseHandlerType
+		GetParseHandlerType() const
+		{
+			return EdxlphCostParam;
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerCostParam_H
+#endif  // !GPDXL_CParseHandlerCostParam_H
 
 // EOF

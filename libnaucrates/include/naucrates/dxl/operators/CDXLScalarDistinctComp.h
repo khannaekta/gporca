@@ -36,63 +36,50 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarDistinctComp : public CDXLScalarComp
 	{
-		
-		private:
-						
-			// private copy ctor
-			CDXLScalarDistinctComp(CDXLScalarDistinctComp&);
-			
-		public:
-			// ctor/dtor		
-			CDXLScalarDistinctComp
-				(
-				IMemoryPool *pmp,
-				IMDId *pmdidOp
-				);
-						
-			// ident accessors
-			Edxlopid Edxlop() const;
-			
-			// name of the DXL operator
-			const CWStringConst *PstrOpName() const;
-						
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
+	private:
+		// private copy ctor
+		CDXLScalarDistinctComp(CDXLScalarDistinctComp &);
 
-			// conversion function
-			static
-			CDXLScalarDistinctComp *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopScalarDistinct == pdxlop->Edxlop());
+	public:
+		// ctor/dtor
+		CDXLScalarDistinctComp(IMemoryPool *mp, IMDId *operator_mdid);
 
-				return dynamic_cast<CDXLScalarDistinctComp*>(pdxlop);
-			}
+		// ident accessors
+		Edxlopid GetDXLOperator() const;
 
-			// does the operator return a boolean result
-			virtual
-			BOOL FBoolean
-					(
-					CMDAccessor *//pmda
-					)
-					const
-			{
-				return true;
-			}
+		// name of the DXL operator
+		const CWStringConst *GetOpNameStr() const;
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
+
+		// conversion function
+		static CDXLScalarDistinctComp *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarDistinct == dxl_op->GetDXLOperator());
+
+			return dynamic_cast<CDXLScalarDistinctComp *>(dxl_op);
+		}
+
+		// does the operator return a boolean result
+		virtual BOOL
+		HasBoolResult(CMDAccessor *  //md_accessor
+					  ) const
+		{
+			return true;
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *pdxln, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *node, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLScalarDistinctComp_H
+#endif  // !GPDXL_CDXLScalarDistinctComp_H
 
 
 // EOF

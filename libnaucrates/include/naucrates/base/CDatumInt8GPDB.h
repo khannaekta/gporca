@@ -19,7 +19,6 @@
 
 namespace gpnaucrates
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDatumInt8GPDB
@@ -30,73 +29,60 @@ namespace gpnaucrates
 	//---------------------------------------------------------------------------
 	class CDatumInt8GPDB : public IDatumInt8
 	{
+	private:
+		// type information
+		IMDId *m_mdid;
 
-		private:
+		// integer value
+		LINT m_val;
 
-			// type information
-			IMDId *m_pmdid;
-		
-			// integer value
-			LINT m_lVal;
-
-			// is null
-			BOOL m_fNull;
+		// is null
+		BOOL m_is_null;
 
 
-			// private copy ctor
-			CDatumInt8GPDB(const CDatumInt8GPDB &);
+		// private copy ctor
+		CDatumInt8GPDB(const CDatumInt8GPDB &);
 
-		public:
+	public:
+		// ctors
+		CDatumInt8GPDB(CSystemId sysid, LINT val, BOOL is_null = false);
+		CDatumInt8GPDB(IMDId *mdid, LINT val, BOOL is_null = false);
 
-			// ctors
-			CDatumInt8GPDB(CSystemId sysid, LINT lVal, BOOL fNull = false);
-			CDatumInt8GPDB(IMDId *pmdid, LINT lVal, BOOL fNull = false);
+		// dtor
+		virtual ~CDatumInt8GPDB();
 
-			// dtor
-			virtual
-			~CDatumInt8GPDB();
+		// accessor of metadata type id
+		virtual IMDId *MDId() const;
 
-			// accessor of metadata type id
-			virtual
-			IMDId *Pmdid() const;
+		// accessor of size
+		virtual ULONG Size() const;
 
-			// accessor of size
-			virtual
-			ULONG UlSize() const;
+		// accessor of integer value
+		virtual LINT Value() const;
 
-			// accessor of integer value
-			virtual
-			LINT LValue() const;
+		// accessor of is null
+		virtual BOOL IsNull() const;
 
-			// accessor of is null
-			virtual
-			BOOL FNull() const;
+		// return string representation
+		virtual const CWStringConst *GetStrRepr(IMemoryPool *mp) const;
 
-			// return string representation
-			virtual
-			const CWStringConst *Pstr(IMemoryPool *pmp) const;
+		// hash function
+		virtual ULONG HashValue() const;
 
-			// hash function
-			virtual
-			ULONG UlHash() const;
+		// match function for datums
+		virtual BOOL Matches(const IDatum *) const;
 
-			// match function for datums
-			virtual
-			BOOL FMatch(const IDatum *) const;
+		// copy datum
+		virtual IDatum *MakeCopy(IMemoryPool *mp) const;
 
-			// copy datum
-			virtual
-			IDatum *PdatumCopy(IMemoryPool *pmp) const;
+		// print function
+		virtual IOstream &OsPrint(IOstream &os) const;
 
-			// print function
-			virtual
-			IOstream &OsPrint(IOstream &os) const;
+	};  // class CDatumInt8GPDB
 
-	}; // class CDatumInt8GPDB
-
-}
+}  // namespace gpnaucrates
 
 
-#endif // !GPNAUCRATES_CDatumInt8GPDB_H
+#endif  // !GPNAUCRATES_CDatumInt8GPDB_H
 
 // EOF

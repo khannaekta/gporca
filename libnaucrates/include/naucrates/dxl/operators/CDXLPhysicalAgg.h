@@ -28,7 +28,7 @@ namespace gpdxl
 		EdxlaggIndexChild,
 		EdxlaggIndexSentinel
 	};
-	
+
 	enum EdxlAggStrategy
 	{
 		EdxlaggstrategyPlain,
@@ -36,7 +36,7 @@ namespace gpdxl
 		EdxlaggstrategyHashed,
 		EdxlaggstrategySentinel
 	};
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDXLPhysicalAgg
@@ -47,79 +47,69 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalAgg : public CDXLPhysical
 	{
-		private:
-			
-			// private copy ctor
-			CDXLPhysicalAgg(const CDXLPhysicalAgg&);
-			
-			// grouping column ids
-			DrgPul *m_pdrgpulGroupingCols;
-			
-			EdxlAggStrategy m_edxlaggstr;
-			
-			// is it safe to stream the local hash aggregate
-			BOOL m_fStreamSafe;
-			
-			// serialize output grouping columns indices in DXL
-			void SerializeGroupingColsToDXL(CXMLSerializer *pxmlser) const;
-			
-		public:
-			// ctor
-			CDXLPhysicalAgg
-				(
-				IMemoryPool *pmp,
-				EdxlAggStrategy edxlaggstr,
-				BOOL fStreamSafe
-				);
-			
-			// dtor
-			virtual
-			~CDXLPhysicalAgg();
+	private:
+		// private copy ctor
+		CDXLPhysicalAgg(const CDXLPhysicalAgg &);
 
-			// accessors
-			Edxlopid Edxlop() const;
-			EdxlAggStrategy Edxlaggstr() const;
-			
-			const CWStringConst *PstrOpName() const;
-			const CWStringConst *PstrAggStrategy() const;
-			const CWStringConst *PstrAggLevel() const;
-			const DrgPul *PdrgpulGroupingCols() const;
-			
-			// set grouping column indices
-			void SetGroupingCols(DrgPul *);
-			
-			// is aggregate a hash aggregate that it safe to stream
-			BOOL FStreamSafe() const
-			{
-				return (EdxlaggstrategyHashed == m_edxlaggstr) && m_fStreamSafe;
-			}
-			
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
+		// grouping column ids
+		ULongPtrArray *m_grouping_colids_array;
 
-			// conversion function
-			static
-			CDXLPhysicalAgg *PdxlopConvert
-				(
-				CDXLOperator *pdxlop
-				)
-			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopPhysicalAgg == pdxlop->Edxlop());
+		EdxlAggStrategy m_dxl_agg_strategy;
 
-				return dynamic_cast<CDXLPhysicalAgg*>(pdxlop);
-			}
+		// is it safe to stream the local hash aggregate
+		BOOL m_stream_safe;
+
+		// serialize output grouping columns indices in DXL
+		void SerializeGroupingColsToDXL(CXMLSerializer *xml_serializer) const;
+
+	public:
+		// ctor
+		CDXLPhysicalAgg(IMemoryPool *mp,
+						EdxlAggStrategy dxl_agg_strategy,
+						BOOL stream_safe);
+
+		// dtor
+		virtual ~CDXLPhysicalAgg();
+
+		// accessors
+		Edxlopid GetDXLOperator() const;
+		EdxlAggStrategy GetAggStrategy() const;
+
+		const CWStringConst *GetOpNameStr() const;
+		const CWStringConst *GetAggStrategyNameStr() const;
+		const CWStringConst *PstrAggLevel() const;
+		const ULongPtrArray *GetGroupingColidArray() const;
+
+		// set grouping column indices
+		void SetGroupingCols(ULongPtrArray *);
+
+		// is aggregate a hash aggregate that it safe to stream
+		BOOL
+		IsStreamSafe() const
+		{
+			return (EdxlaggstrategyHashed == m_dxl_agg_strategy) && m_stream_safe;
+		}
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
+
+		// conversion function
+		static CDXLPhysicalAgg *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopPhysicalAgg == dxl_op->GetDXLOperator());
+
+			return dynamic_cast<CDXLPhysicalAgg *>(dxl_op);
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL fValidateChildren) const;
-#endif // GPOS_DEBUG
-			
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
-#endif // !GPDXL_CDXLPhysicalAgg_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLPhysicalAgg_H
 
 // EOF
-

@@ -9,7 +9,7 @@
 //		Filter for rechecking an index condition on the operator upstream of the index scan
 //
 //	@owner:
-//		
+//
 //
 //	@test:
 //
@@ -23,16 +23,16 @@ using namespace gpdxl;
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarRecheckCondFilter::PstrOpName
+//		CDXLScalarRecheckCondFilter::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLScalarRecheckCondFilter::PstrOpName() const
+CDXLScalarRecheckCondFilter::GetOpNameStr() const
 {
-	return CDXLTokens::PstrToken(EdxltokenScalarRecheckCondFilter);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenScalarRecheckCondFilter);
 }
 
 // EOF

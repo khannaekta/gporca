@@ -33,67 +33,59 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerStatsDerivedColumn : public CParseHandlerBase
 	{
-		private:
+	private:
+		// column id
+		ULONG m_colid;
 
-			// column id
-			ULONG m_ulColId;
+		// width
+		CDouble m_width;
 
-			// width
-			CDouble m_dWidth;
+		// null fraction
+		CDouble m_null_freq;
 
-			// null fraction
-			CDouble m_dNullFreq;
+		// ndistinct of remaining tuples
+		CDouble m_distinct_remaining;
 
-			// ndistinct of remaining tuples
-			CDouble m_dDistinctRemain;
+		// frequency of remaining tuples
+		CDouble m_freq_remaining;
 
-			// frequency of remaining tuples
-			CDouble m_dFreqRemain;
+		// derived column stats
+		CDXLStatsDerivedColumn *m_dxl_stats_derived_col;
 
-			// derived column stats
-			CDXLStatsDerivedColumn *m_pstatsdercol;
+		// private copy ctor
+		CParseHandlerStatsDerivedColumn(const CParseHandlerStatsDerivedColumn &);
 
-			// private copy ctor
-			CParseHandlerStatsDerivedColumn(const CParseHandlerStatsDerivedColumn &);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the start of an element
-			void StartElement
-				(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
- 					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the end of an element
-			void EndElement
-				(
-					const XMLCh* const xmlszUri, 		// URI of element's namespace
-					const XMLCh* const xmlszLocalname,	// local part of element's name
-					const XMLCh* const xmlszQname		// element's qname
-				);
+	public:
+		// ctor
+		CParseHandlerStatsDerivedColumn(IMemoryPool *mp,
+										CParseHandlerManager *parse_handler_mgr,
+										CParseHandlerBase *parse_handler_root);
 
-		public:
+		//dtor
+		~CParseHandlerStatsDerivedColumn();
 
-			// ctor
-			CParseHandlerStatsDerivedColumn
-				(
-				IMemoryPool *pmp,
-				CParseHandlerManager *pphm,
-				CParseHandlerBase *pphRoot
-				);
-
-			//dtor
-			~CParseHandlerStatsDerivedColumn();
-
-			// derived column stats
-			CDXLStatsDerivedColumn *Pstatsdercol() const
-			{
-				return m_pstatsdercol;
-			}
+		// derived column stats
+		CDXLStatsDerivedColumn *
+		GetDxlStatsDerivedCol() const
+		{
+			return m_dxl_stats_derived_col;
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerStatsDerivedColumn_H
+#endif  // !GPDXL_CParseHandlerStatsDerivedColumn_H
 
 // EOF

@@ -25,18 +25,10 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarProjElem::CDXLScalarProjElem
-	(
-	IMemoryPool *pmp,
-	ULONG ulId,
-	const CMDName *pmdname
-	)
-	:
-	CDXLScalar(pmp),
-	m_ulId(ulId),
-	m_pmdname(pmdname)
+CDXLScalarProjElem::CDXLScalarProjElem(IMemoryPool *mp, ULONG id, const CMDName *mdname)
+	: CDXLScalar(mp), m_id(id), m_mdname(mdname)
 {
-	GPOS_ASSERT(NULL != pmdname);
+	GPOS_ASSERT(NULL != mdname);
 }
 
 //---------------------------------------------------------------------------
@@ -49,19 +41,19 @@ CDXLScalarProjElem::CDXLScalarProjElem
 //---------------------------------------------------------------------------
 CDXLScalarProjElem::~CDXLScalarProjElem()
 {
-	GPOS_DELETE(m_pmdname);
+	GPOS_DELETE(m_mdname);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarProjElem::Edxlop
+//		CDXLScalarProjElem::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLScalarProjElem::Edxlop() const
+CDXLScalarProjElem::GetDXLOperator() const
 {
 	return EdxlopScalarProjectElem;
 }
@@ -69,44 +61,44 @@ CDXLScalarProjElem::Edxlop() const
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarProjElem::PstrOpName
+//		CDXLScalarProjElem::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLScalarProjElem::PstrOpName() const
+CDXLScalarProjElem::GetOpNameStr() const
 {
-	return CDXLTokens::PstrToken(EdxltokenScalarProjElem);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenScalarProjElem);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarProjElem::UlId
+//		CDXLScalarProjElem::Id
 //
 //	@doc:
 //		Col id for this project element
 //
 //---------------------------------------------------------------------------
 ULONG
-CDXLScalarProjElem::UlId() const
+CDXLScalarProjElem::Id() const
 {
-	return m_ulId;
+	return m_id;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarProjElem::PmdnameAlias
+//		CDXLScalarProjElem::GetMdNameAlias
 //
 //	@doc:
 //		Alias
 //
 //---------------------------------------------------------------------------
 const CMDName *
-CDXLScalarProjElem::PmdnameAlias() const
+CDXLScalarProjElem::GetMdNameAlias() const
 {
-	return m_pmdname;
+	return m_mdname;
 }
 
 
@@ -119,26 +111,22 @@ CDXLScalarProjElem::PmdnameAlias() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarProjElem::SerializeToDXL
-	(
-	CXMLSerializer *pxmlser,
-	const CDXLNode *pdxln
-	)
-	const
+CDXLScalarProjElem::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const
 {
-	const CWStringConst *pstrElemName = PstrOpName();
+	const CWStringConst *element_name = GetOpNameStr();
 
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
-		
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+
 	// serialize proj elem id
-	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenColId), m_ulId);
-		
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenColId), m_id);
+
 	// serialize proj element alias
-	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenAlias), m_pmdname->Pstr());
-	
-	pdxln->SerializeChildrenToDXL(pxmlser);
-	
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenAlias), m_mdname->GetMDName());
+
+	dxlnode->SerializeChildrenToDXL(xml_serializer);
+
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -151,25 +139,20 @@ CDXLScalarProjElem::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarProjElem::AssertValid
-	(
-	const CDXLNode *pdxln,
-	BOOL fValidateChildren 
-	) 
-	const
+CDXLScalarProjElem::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
-	GPOS_ASSERT(1 == pdxln->UlArity());
-	CDXLNode *pdxlnChild = (*pdxln)[0];
-	
-	GPOS_ASSERT(EdxloptypeScalar == pdxlnChild->Pdxlop()->Edxloperatortype());
+	GPOS_ASSERT(1 == dxlnode->Arity());
+	CDXLNode *child_dxlnode = (*dxlnode)[0];
 
-	if (fValidateChildren)
+	GPOS_ASSERT(EdxloptypeScalar == child_dxlnode->GetOperator()->GetDXLOperatorType());
+
+	if (validate_children)
 	{
-		pdxlnChild->Pdxlop()->AssertValid(pdxlnChild, fValidateChildren);
+		child_dxlnode->GetOperator()->AssertValid(child_dxlnode, validate_children);
 	}
 }
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 
 // EOF

@@ -28,7 +28,7 @@ namespace gpopt
 {
 	class CExpression;
 	class CMDAccessor;
-}
+}  // namespace gpopt
 
 namespace gpmd
 {
@@ -45,48 +45,45 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class CMDPartConstraintGPDB : public IMDPartConstraint
 	{
-		private:
+	private:
+		// memory pool
+		IMemoryPool *m_mp;
 
-			// memory pool
-			IMemoryPool *m_pmp;
+		// included default partitions
+		ULongPtrArray *m_level_with_default_part_array;
 
-			// included default partitions
-			DrgPul *m_pdrgpulDefaultParts;
-			
-			// is constraint unbounded
-			BOOL m_fUnbounded;
+		// is constraint unbounded
+		BOOL m_is_unbounded;
 
-			// the DXL representation of the part constraint
-			CDXLNode *m_pdxln;
-		public:
+		// the DXL representation of the part constraint
+		CDXLNode *m_dxlnode;
 
-			// ctor
-			CMDPartConstraintGPDB(IMemoryPool *pmp, DrgPul *pdrgpulDefaultParts, BOOL fUnbounded, CDXLNode *pdxln);
+	public:
+		// ctor
+		CMDPartConstraintGPDB(IMemoryPool *mp,
+							  ULongPtrArray *level_with_default_part_array,
+							  BOOL is_unbounded,
+							  CDXLNode *dxlnode);
 
-			// dtor
-			virtual
-			~CMDPartConstraintGPDB();
+		// dtor
+		virtual ~CMDPartConstraintGPDB();
 
-			// serialize constraint in DXL format
-			virtual
-			void Serialize(CXMLSerializer *pxmlser) const;
-			
-			// the scalar expression of the check constraint
-			virtual
-			CExpression *Pexpr(IMemoryPool *pmp, CMDAccessor *pmda, DrgPcr *pdrgpcr) const;
-			
-			// included default partitions
-			virtual
-			DrgPul *PdrgpulDefaultParts() const;
+		// serialize constraint in DXL format
+		virtual void Serialize(CXMLSerializer *xml_serializer) const;
 
-			// is constraint unbounded
-			virtual
-			BOOL FUnbounded() const;
+		// the scalar expression of the part constraint
+		virtual CExpression *GetPartConstraintExpr(IMemoryPool *mp,
+												   CMDAccessor *md_accessor,
+												   CColRefArray *colref_array) const;
 
+		// included default partitions
+		virtual ULongPtrArray *GetDefaultPartsArray() const;
+
+		// is constraint unbounded
+		virtual BOOL IsConstraintUnbounded() const;
 	};
-}
+}  // namespace gpmd
 
-#endif // !GPMD_CMDPartConstraintGPDB_H
+#endif  // !GPMD_CMDPartConstraintGPDB_H
 
 // EOF
-

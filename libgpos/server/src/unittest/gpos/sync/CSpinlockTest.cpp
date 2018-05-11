@@ -31,18 +31,16 @@ using namespace gpos;
 GPOS_RESULT
 CSpinlockTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
-		GPOS_UNITTEST_FUNC(CSpinlockTest::EresUnittest_LockRelease),
-		GPOS_UNITTEST_FUNC(CSpinlockTest::EresUnittest_Concurrency)
+	CUnittest rgut[] = {GPOS_UNITTEST_FUNC(CSpinlockTest::EresUnittest_LockRelease),
+						GPOS_UNITTEST_FUNC(CSpinlockTest::EresUnittest_Concurrency)
 #ifdef GPOS_DEBUG
-		,
-		GPOS_UNITTEST_FUNC_ASSERT(CSpinlockTest::EresUnittest_SelfDeadlock),
-		GPOS_UNITTEST_FUNC_ASSERT(CSpinlockTest::EresUnittest_LockedDestruction),
-		GPOS_UNITTEST_FUNC_ASSERT(CSpinlockTest::EresUnittest_Allocation)
-#endif // GPOS_DEBUG
-		};
-		
+							,
+						GPOS_UNITTEST_FUNC_ASSERT(CSpinlockTest::EresUnittest_SelfDeadlock),
+						GPOS_UNITTEST_FUNC_ASSERT(CSpinlockTest::EresUnittest_LockedDestruction),
+						GPOS_UNITTEST_FUNC_ASSERT(CSpinlockTest::EresUnittest_Allocation)
+#endif  // GPOS_DEBUG
+	};
+
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
 
@@ -75,32 +73,32 @@ CSpinlockTest::EresUnittest_LockRelease()
 //		Spawn a number of threads to loop on a spinlock
 //
 //---------------------------------------------------------------------------
-#define GPOS_SLOCK_THREADS	10
+#define GPOS_SLOCK_THREADS 10
 GPOS_RESULT
 CSpinlockTest::EresUnittest_Concurrency()
 {
 #ifdef GPOS_DEBUG
-	if (IWorker::m_fEnforceTimeSlices)
- 	{
- 		return GPOS_OK;
+	if (IWorker::m_enforce_time_slices)
+	{
+		return GPOS_OK;
 	}
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 	CSpinlockDummy slock;
 
 	CAutoMemoryPool amp(CAutoMemoryPool::ElcStrict);
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
-	CWorkerPoolManager *pwpm = CWorkerPoolManager::Pwpm();
+	CWorkerPoolManager *pwpm = CWorkerPoolManager::WorkerPoolManager();
 
 	// scope for tasks
 	{
-		CAutoTaskProxy atp(pmp, pwpm);
+		CAutoTaskProxy atp(mp, pwpm);
 		CTask *rgPtsk[GPOS_SLOCK_THREADS];
 
 		for (ULONG i = 0; i < GPOS_SLOCK_THREADS; i++)
 		{
-			rgPtsk[i] = atp.PtskCreate(CSpinlockTest::PvUnittest_ConcurrencyRun, &slock);
+			rgPtsk[i] = atp.Create(CSpinlockTest::PvUnittest_ConcurrencyRun, &slock);
 		}
 
 		for (ULONG i = 0; i < GPOS_SLOCK_THREADS; i++)
@@ -132,13 +130,9 @@ CSpinlockTest::EresUnittest_Concurrency()
 //
 //---------------------------------------------------------------------------
 void *
-CSpinlockTest::PvUnittest_ConcurrencyRun
-	(
-	void *pv
-	)
+CSpinlockTest::PvUnittest_ConcurrencyRun(void *pv)
 {
-
-	CSpinlockDummy *pslock = (CSpinlockDummy*)pv;
+	CSpinlockDummy *pslock = (CSpinlockDummy *) pv;
 
 	for (ULONG i = 0; i < 10000; i++)
 	{
@@ -223,21 +217,20 @@ CSpinlockTest::EresUnittest_Allocation()
 {
 	// create mem pool for 1KB
 	CAutoMemoryPool amp(CAutoMemoryPool::ElcStrict);
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	CSpinlockDummy slock;
 	{
 		CAutoSpinlock alock(slock);
 		alock.Lock();
 
-		GPOS_NEW_ARRAY(pmp, BYTE, 10);
+		GPOS_NEW_ARRAY(mp, BYTE, 10);
 	}
 
 	return GPOS_FAILED;
 }
 
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF
-

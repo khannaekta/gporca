@@ -12,9 +12,13 @@
 #define GPOPT_CXformTest_H
 
 #include "gpos/base.h"
+#include "gpopt/operators/CExpression.h"
+#include "gpopt/mdcache/CMDAccessor.h"
 
 namespace gpopt
 {
+	using namespace gpos;
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CXformTest
@@ -35,15 +39,15 @@ namespace gpopt
 
 			// generate a random join tree
 			static
-			CExpression *PexprJoinTree(IMemoryPool *pmp);
+			CExpression *PexprJoinTree(IMemoryPool *mp);
 			
 			// generate random star join tree
 			static
-			CExpression *PexprStarJoinTree(IMemoryPool *pmp, ULONG ulTabs);
+			CExpression *PexprStarJoinTree(IMemoryPool *mp, ULONG ulTabs);
 
 			// application of different xforms for the given expression
 			static
-			void ApplyExprXforms(IMemoryPool *pmp, IOstream &os, CExpression *pexpr);
+			void ApplyExprXforms(IMemoryPool *mp, IOstream &os, CExpression *pexpr);
 
 		public:
 
