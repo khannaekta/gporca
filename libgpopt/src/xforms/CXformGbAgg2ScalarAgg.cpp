@@ -30,15 +30,15 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformGbAgg2ScalarAgg::CXformGbAgg2ScalarAgg
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	CXformImplementation
 		(
 		 // pattern
-		GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CLogicalGbAgg(pmp),
-							 GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)),
-							 GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)))
+		GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CLogicalGbAgg(memory_pool),
+							 GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),
+							 GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)))
 		)
 {}
 
@@ -59,8 +59,8 @@ CXformGbAgg2ScalarAgg::Exfp
 	)
 	const
 {
-	if (0 < CLogicalGbAgg::PopConvert(exprhdl.Pop())->Pdrgpcr()->UlLength() ||
-		exprhdl.Pdpscalar(1 /*ulChildIndex*/)->FHasSubquery())
+	if (0 < CLogicalGbAgg::PopConvert(exprhdl.Pop())->Pdrgpcr()->Size() ||
+		exprhdl.GetDrvdScalarProps(1 /*child_index*/)->FHasSubquery())
 	{
 		// GbAgg has grouping columns, or agg functions use subquery arguments
 		return CXform::ExfpNone;
@@ -92,9 +92,9 @@ CXformGbAgg2ScalarAgg::Transform
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
-	IMemoryPool *pmp = pxfctxt->Pmp();
-	DrgPcr *pdrgpcr = popAgg->Pdrgpcr();
-	pdrgpcr->AddRef();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	DrgPcr *colref_array = popAgg->Pdrgpcr();
+	colref_array->AddRef();
 	
 	// extract components
 	CExpression *pexprRel = (*pexpr)[0];
@@ -105,20 +105,20 @@ CXformGbAgg2ScalarAgg::Transform
 	pexprScalar->AddRef();
 
 	DrgPcr *pdrgpcrArgDQA = popAgg->PdrgpcrArgDQA();
-	if (pdrgpcrArgDQA != NULL && 0 != pdrgpcrArgDQA->UlLength())
+	if (pdrgpcrArgDQA != NULL && 0 != pdrgpcrArgDQA->Size())
 	{
 		pdrgpcrArgDQA->AddRef();
 	}
 
 	// create alternative expression
 	CExpression *pexprAlt = 
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 			(
-			pmp,
-			GPOS_NEW(pmp) CPhysicalScalarAgg
+			memory_pool,
+			GPOS_NEW(memory_pool) CPhysicalScalarAgg
 						(
-						pmp,
-						pdrgpcr,
+						memory_pool,
+						colref_array,
 						popAgg->PdrgpcrMinimal(),
 						popAgg->Egbaggtype(),
 						popAgg->FGeneratesDuplicates(),

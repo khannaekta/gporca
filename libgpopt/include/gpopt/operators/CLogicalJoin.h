@@ -38,7 +38,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CLogicalJoin(IMemoryPool *pmp);
+			CLogicalJoin(IMemoryPool *memory_pool);
 		
 			// dtor
 			virtual 
@@ -49,7 +49,7 @@ namespace gpopt
 		
 			// match function
 			virtual
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 
 			// sensitivity to order of inputs
@@ -62,9 +62,9 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //pmp,
-						HMUlCr *, //phmulcr,
-						BOOL //fMustExist
+						IMemoryPool *, //memory_pool,
+						UlongColRefHashMap *, //colref_mapping,
+						BOOL //must_exist
 						)
 			{
 				return PopCopyDefault();
@@ -78,47 +78,47 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsDeriveOutput
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl
 				)
 			{
-				return PcrsDeriveOutputCombineLogical(pmp, exprhdl);
+				return PcrsDeriveOutputCombineLogical(memory_pool, exprhdl);
 			}
 					
 			// derive partition consumer info
 			virtual
 			CPartInfo *PpartinfoDerive
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl
 				) 
 				const
 			{
-				return PpartinfoDeriveCombine(pmp, exprhdl);
+				return PpartinfoDeriveCombine(memory_pool, exprhdl);
 			}
 
 			
 			// derive keys
 			CKeyCollection *PkcDeriveKeys
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PkcCombineKeys(pmp, exprhdl);
+				return PkcCombineKeys(memory_pool, exprhdl);
 			}
 
 			// derive function properties
 			virtual
 			CFunctionProp *PfpDerive
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PfpDeriveFromScalar(pmp, exprhdl, exprhdl.UlArity() - 1);
+				return PfpDeriveFromScalar(memory_pool, exprhdl, exprhdl.Arity() - 1);
 			}
 
 			//-------------------------------------------------------------------------------------
@@ -134,7 +134,7 @@ namespace gpopt
 				const
 			{
 				// no stat derivation on Join trees with subqueries
-				if (exprhdl.Pdpscalar(exprhdl.UlArity() - 1)->FHasSubquery())
+				if (exprhdl.GetDrvdScalarProps(exprhdl.Arity() - 1)->FHasSubquery())
 				{
 					 return EspLow;
 				}
@@ -152,9 +152,9 @@ namespace gpopt
 			virtual
 			IStatistics *PstatsDerive
 						(
-						IMemoryPool *pmp,
+						IMemoryPool *memory_pool,
 						CExpressionHandle &exprhdl,
-						DrgPstat *pdrgpstatCtxt
+						StatsArray *stats_ctxt
 						)
 						const;
 
@@ -166,16 +166,16 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsStat
 					(
-					IMemoryPool *pmp,
+					IMemoryPool *memory_pool,
 					CExpressionHandle &exprhdl,
 					CColRefSet *pcrsInput,
-					ULONG ulChildIndex
+					ULONG child_index
 					)
 					const
 			{
-				const ULONG ulArity = exprhdl.UlArity();
+				const ULONG arity = exprhdl.Arity();
 
-				return PcrsReqdChildStats(pmp, exprhdl, pcrsInput, exprhdl.Pdpscalar(ulArity - 1)->PcrsUsed(), ulChildIndex);
+				return PcrsReqdChildStats(memory_pool, exprhdl, pcrsInput, exprhdl.GetDrvdScalarProps(arity - 1)->PcrsUsed(), child_index);
 			}
 
 			// return true if operator can select a subset of input tuples based on some predicate

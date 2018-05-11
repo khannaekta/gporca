@@ -45,11 +45,11 @@ namespace gpopt
 			virtual
 			CDrvdPropCtxt *PdpctxtCopy
 				(
-				IMemoryPool *pmp
+				IMemoryPool *memory_pool
 				)
 				const
 			{
-				return GPOS_NEW(pmp) CDrvdPropCtxtScalar(pmp);
+				return GPOS_NEW(memory_pool) CDrvdPropCtxtScalar(memory_pool);
 			}
 
 			// add props to context
@@ -67,10 +67,10 @@ namespace gpopt
 			// ctor
 			CDrvdPropCtxtScalar
 				(
-				IMemoryPool *pmp
+				IMemoryPool *memory_pool
 				)
 				:
-				CDrvdPropCtxt(pmp)
+				CDrvdPropCtxt(memory_pool)
 			{}
 
 			// dtor

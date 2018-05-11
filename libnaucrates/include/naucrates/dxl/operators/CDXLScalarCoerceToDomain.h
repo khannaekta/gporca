@@ -7,11 +7,11 @@
 //
 //	@doc:
 //		Class for representing DXL CoerceToDomain operation,
-//		the operator captures coercing a value to a domain type,
+//		the operator captures coercing a m_bytearray_value to a domain type,
 //
 //		at runtime, the precise set of constraints to be checked against
-//		value are determined,
-//		if the value passes, it is returned as the result, otherwise an error
+//		m_bytearray_value are determined,
+//		if the m_bytearray_value passes, it is returned as the result, otherwise an error
 //		is raised.
 //
 //	@owner:
@@ -52,11 +52,11 @@ namespace gpdxl
 			// ctor/dtor
 			CDXLScalarCoerceToDomain
 				(
-				IMemoryPool *pmp,
-				IMDId *pmdidType,
-				INT iTypeModifier,
-				EdxlCoercionForm edxlcf,
-				INT iLoc
+				IMemoryPool *memory_pool,
+				IMDId *mdid_type,
+				INT type_modifier,
+				EdxlCoercionForm dxl_coerce_format,
+				INT location
 				);
 
 			virtual
@@ -66,26 +66,26 @@ namespace gpdxl
 
 			// ident accessor
 			virtual
-			Edxlopid Edxlop() const
+			Edxlopid GetDXLOperator() const
 			{
 				return EdxlopScalarCoerceToDomain;
 			}
 
 			// name of the DXL operator name
 			virtual
-			const CWStringConst *PstrOpName() const;
+			const CWStringConst *GetOpNameStr() const;
 
 			// conversion function
 			static
-			CDXLScalarCoerceToDomain *PdxlopConvert
+			CDXLScalarCoerceToDomain *Cast
 				(
-				CDXLOperator *pdxlop
+				CDXLOperator *dxl_op
 				)
 			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopScalarCoerceToDomain == pdxlop->Edxlop());
+				GPOS_ASSERT(NULL != dxl_op);
+				GPOS_ASSERT(EdxlopScalarCoerceToDomain == dxl_op->GetDXLOperator());
 
-				return dynamic_cast<CDXLScalarCoerceToDomain*>(pdxlop);
+				return dynamic_cast<CDXLScalarCoerceToDomain*>(dxl_op);
 			}
 	};
 }

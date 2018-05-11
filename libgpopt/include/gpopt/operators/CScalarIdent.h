@@ -45,12 +45,12 @@ namespace gpopt
 			// ctor
 			CScalarIdent
 				(
-				IMemoryPool *pmp,
-				const CColRef *pcr
+				IMemoryPool *memory_pool,
+				const CColRef *colref
 				)
 				: 
-				CScalar(pmp),
-				m_pcr(pcr)
+				CScalar(memory_pool),
+				m_pcr(colref)
 			{}
 
 			// dtor
@@ -78,29 +78,29 @@ namespace gpopt
 			}
 
 			// operator specific hash function
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 
 			// match function
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			// sensitivity to order of inputs
 			BOOL FInputOrderSensitive() const;
 				
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 
 			// return locally used columns
 			virtual
 			CColRefSet *PcrsUsed
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle & // exprhdl
 
 				)
 			{
-				CColRefSet *pcrs = GPOS_NEW(pmp) CColRefSet(pmp);
+				CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 				pcrs->Include(m_pcr);
 
 				return pcrs;
@@ -121,11 +121,11 @@ namespace gpopt
 			
 			// the type of the scalar expression
 			virtual 
-			IMDId *PmdidType() const;
+			IMDId *MDIdType() const;
 
 			// the type modifier of the scalar expression
 			virtual
-			INT ITypeModifier() const;
+			INT TypeModifier() const;
 
 			// print
 			virtual 
@@ -137,7 +137,7 @@ namespace gpopt
 
 			// is the given expression a scalar cast of given scalar identifier
 			static
-			BOOL FCastedScId(CExpression *pexpr, CColRef *pcr);
+			BOOL FCastedScId(CExpression *pexpr, CColRef *colref);
 
 
 	}; // class CScalarIdent

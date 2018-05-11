@@ -55,10 +55,10 @@ namespace gpopt
 		public:
 		
 			// ctor
-			CScalarArray(IMemoryPool *pmp, IMDId *pmdidElem, IMDId *pmdidArray, BOOL fMultiDimensional);
+			CScalarArray(IMemoryPool *memory_pool, IMDId *elem_type_mdid, IMDId *array_type_mdid, BOOL is_multidimenstional);
 
 			// ctor
-			CScalarArray(IMemoryPool *pmp, IMDId *pmdidElem, IMDId *pmdidArray, BOOL fMultiDimensional, DrgPconst *pdrgPconst);
+			CScalarArray(IMemoryPool *memory_pool, IMDId *elem_type_mdid, IMDId *array_type_mdid, BOOL is_multidimenstional, DrgPconst *pdrgPconst);
 
 			// dtor
 			virtual 
@@ -80,10 +80,10 @@ namespace gpopt
 
 
 			// operator specific hash function
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 			
 			// match function
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 			
 			// sensitivity to order of inputs
 			BOOL FInputOrderSensitive() const
@@ -95,9 +95,9 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //pmp,
-						HMUlCr *, //phmulcr,
-						BOOL //fMustExist
+						IMemoryPool *, //memory_pool,
+						UlongColRefHashMap *, //colref_mapping,
+						BOOL //must_exist
 						)
 			{
 				return PopCopyDefault();
@@ -127,7 +127,7 @@ namespace gpopt
 
 			// type of expression's result
 			virtual 
-			IMDId *PmdidType() const;
+			IMDId *MDIdType() const;
 
 			// CScalarConst array
 			DrgPconst *PdrgPconst() const;

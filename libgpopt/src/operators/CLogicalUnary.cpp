@@ -20,14 +20,14 @@ using namespace gpopt;
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CLogicalUnary::FMatch
+//		CLogicalUnary::Matches
 //
 //	@doc:
 //		Match function
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalUnary::FMatch
+CLogicalUnary::Matches
 	(
 	COperator *pop
 	)
@@ -53,8 +53,8 @@ CLogicalUnary::Esp
 {
 	// low promise for stat derivation if scalar predicate has subqueries, or logical
 	// expression has outer-refs or is part of an Apply expression
-	if (exprhdl.Pdpscalar(1)->FHasSubquery() ||
-		exprhdl.FHasOuterRefs() ||
+	if (exprhdl.GetDrvdScalarProps(1)->FHasSubquery() ||
+		exprhdl.HasOuterRefs() ||
 		 (NULL != exprhdl.Pgexpr() &&
 			CXformUtils::FGenerateApply(exprhdl.Pgexpr()->ExfidOrigin()))
 		)
@@ -76,25 +76,25 @@ CLogicalUnary::Esp
 IStatistics *
 CLogicalUnary::PstatsDeriveProject
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &exprhdl,
 	HMUlDatum *phmuldatum
 	)
 	const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	IStatistics *pstatsChild = exprhdl.Pstats(0);
-	CReqdPropRelational *prprel = CReqdPropRelational::Prprel(exprhdl.Prp());
+	IStatistics *child_stats = exprhdl.Pstats(0);
+	CReqdPropRelational *prprel = CReqdPropRelational::GetReqdRelationalProps(exprhdl.Prp());
 	CColRefSet *pcrs = prprel->PcrsStat();
-	DrgPul *pdrgpulColIds = GPOS_NEW(pmp) DrgPul(pmp);
-	pcrs->ExtractColIds(pmp, pdrgpulColIds);
+	ULongPtrArray *col_ids = GPOS_NEW(memory_pool) ULongPtrArray(memory_pool);
+	pcrs->ExtractColIds(memory_pool, col_ids);
 
-	IStatistics *pstats = CProjectStatsProcessor::PstatsProject(pmp, dynamic_cast<CStatistics *>(pstatsChild), pdrgpulColIds, phmuldatum);
+	IStatistics *stats = CProjectStatsProcessor::CalcProjStats(memory_pool, dynamic_cast<CStatistics *>(child_stats), col_ids, phmuldatum);
 
 	// clean up
-	pdrgpulColIds->Release();
+	col_ids->Release();
 
-	return pstats;
+	return stats;
 }
 
 // EOF

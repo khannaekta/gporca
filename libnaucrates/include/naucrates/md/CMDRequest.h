@@ -45,7 +45,7 @@ namespace gpmd
 			struct SMDFuncRequest;
 			
 			// array of type requests
-			typedef CDynamicPtrArray<SMDTypeRequest, CleanupDelete> DrgPtr;
+			typedef CDynamicPtrArray<SMDTypeRequest, CleanupDelete> MDTypeRequestPtrArray;
 			
 			//---------------------------------------------------------------------------
 			//	@class:
@@ -62,17 +62,17 @@ namespace gpmd
 				CSystemId m_sysid;
 				
 				// type info
-				IMDType::ETypeInfo m_eti;
+				IMDType::ETypeInfo m_type_info;
 				
 				// ctor
 				SMDTypeRequest
 					(
 					CSystemId sysid,
-					IMDType::ETypeInfo eti
+					IMDType::ETypeInfo type_info
 					)
 					:
 					m_sysid(sysid),
-					m_eti(eti)
+					m_type_info(type_info)
 				{}
 	
 			};
@@ -80,16 +80,16 @@ namespace gpmd
 		private:
 			
 			// memory pool
-			IMemoryPool *m_pmp;
+			IMemoryPool *m_memory_pool;
 			
 			// array of mdids
-			DrgPmdid *m_pdrgpmdid;
+			MdidPtrArray *m_mdid_array;
 			
 			// type info requests
-			DrgPtr *m_pdrgptr;
+			MDTypeRequestPtrArray *m_mdtype_request_array;
 			
 			// serialize system id
-			CWStringDynamic *Pstr(CSystemId sysid);
+			CWStringDynamic *GetStrRepr(CSystemId sysid);
 
 			// private copy ctor
 			CMDRequest(const CMDRequest &);
@@ -97,10 +97,10 @@ namespace gpmd
 		public:
 			
 			// ctor
-			CMDRequest(IMemoryPool *pmp, DrgPmdid *pdrgpmdid, DrgPtr *pdrgptr);
+			CMDRequest(IMemoryPool *memory_pool, MdidPtrArray *mdid_array, MDTypeRequestPtrArray *mdtype_request_array);
 			
 			// ctor: type request only
-			CMDRequest(IMemoryPool *pmp, SMDTypeRequest *pmdtr);
+			CMDRequest(IMemoryPool *memory_pool, SMDTypeRequest *md_type_request);
 			
 			// dtor
 			virtual
@@ -109,20 +109,20 @@ namespace gpmd
 			// accessors
 			
 			// array of mdids
-			DrgPmdid *Pdrgpmdid() const
+			MdidPtrArray *GetMdIdArray() const
 			{
-				return m_pdrgpmdid;
+				return m_mdid_array;
 			}
 			
 			// array of type info requests
-			DrgPtr *Pdrgptr() const
+			MDTypeRequestPtrArray *GetMDTypeRequestArray() const
 			{
-				return m_pdrgptr;
+				return m_mdtype_request_array;
 			}
 
 			// serialize request in DXL format
 			virtual
-			void Serialize(gpdxl::CXMLSerializer *pxmlser);
+			void Serialize(gpdxl::CXMLSerializer *xml_serializer);
 				
 	};
 }

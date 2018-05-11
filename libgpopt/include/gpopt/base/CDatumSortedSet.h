@@ -21,7 +21,7 @@ namespace gpopt
 		public:
 			CDatumSortedSet
 			(
-			IMemoryPool *pmp,
+			IMemoryPool *memory_pool,
 			CExpression *pexprArray,
 			const IComparator *pcomp
 			);

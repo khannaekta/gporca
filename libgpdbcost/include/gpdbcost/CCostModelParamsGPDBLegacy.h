@@ -59,53 +59,53 @@ namespace gpopt
 		private:
 
 			// memory pool
-			IMemoryPool *m_pmp;
+			IMemoryPool *m_memory_pool;
 
 			// array of parameters
 			// cost param enum is used as index in this array
 			SCostParam* m_rgpcp[EcpSentinel];
 
-			// default value of sequential i/o bandwidth
+			// default m_bytearray_value of sequential i/o bandwidth
 			static
 			const CDouble DSeqIOBandwidthVal;
 
-			// default value of random i/o bandwidth
+			// default m_bytearray_value of random i/o bandwidth
 			static
 			const CDouble DRandomIOBandwidthVal;
 
-			// default value of tuple processing bandwidth
+			// default m_bytearray_value of tuple processing bandwidth
 			static
 			const CDouble DTupProcBandwidthVal;
 
-			// default value of tuple update bandwidth
+			// default m_bytearray_value of tuple update bandwidth
 			static
 			const CDouble DTupUpdateBandwidthVal;
 
-			// default value of network bandwidth
+			// default m_bytearray_value of network bandwidth
 			static
 			const CDouble DNetBandwidthVal;
 
-			// default value of number of segments
+			// default m_bytearray_value of number of segments
 			static
 			const CDouble DSegmentsVal;
 
-			// default value of nested loop outer child factor
+			// default m_bytearray_value of nested loop outer child factor
 			static
 			const CDouble DNLJOuterFactorVal;
 
-			// default value of nested loop factor
+			// default m_bytearray_value of nested loop factor
 			static
 			const CDouble DNLJFactorVal;
 
-			// default value of hash join factor
+			// default m_bytearray_value of hash join factor
 			static
 			const CDouble DHJFactorVal;
 
-			// default value of hash building factor
+			// default m_bytearray_value of hash building factor
 			static
 			const CDouble DHashFactorVal;
 
-			// default cost value when one is not computed
+			// default cost m_bytearray_value when one is not computed
 			static
 			const CDouble DDefaultCostVal;
 
@@ -116,7 +116,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CCostModelParamsGPDBLegacy(IMemoryPool *pmp);
+			CCostModelParamsGPDBLegacy(IMemoryPool *memory_pool);
 
 			// dtor
 			virtual
@@ -124,7 +124,7 @@ namespace gpopt
 
 			// lookup param by id
 			virtual
-			SCostParam *PcpLookup(ULONG ulId) const;
+			SCostParam *PcpLookup(ULONG id) const;
 
 			// lookup param by name
 			virtual
@@ -132,7 +132,7 @@ namespace gpopt
 
 			// set param by id
 			virtual
-			void SetParam(ULONG ulId, CDouble dVal, CDouble dLowerBound, CDouble dUpperBound);
+			void SetParam(ULONG id, CDouble dVal, CDouble dLowerBound, CDouble dUpperBound);
 
 			// set param by name
 			virtual
@@ -143,10 +143,10 @@ namespace gpopt
 			IOstream &OsPrint(IOstream &os) const;
 
 			virtual BOOL
-			FEquals(ICostModelParams *pcm) const;
+			Equals(ICostModelParams *pcm) const;
 
 			virtual const CHAR *
-			SzNameLookup(ULONG ulId) const;
+			SzNameLookup(ULONG id) const;
 
 	}; // class CCostModelParamsGPDBLegacy
 

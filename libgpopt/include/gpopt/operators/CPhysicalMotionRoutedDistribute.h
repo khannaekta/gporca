@@ -47,7 +47,7 @@ namespace gpopt
 			// ctor
 			CPhysicalMotionRoutedDistribute
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CDistributionSpecRouted *pdsRouted
 				);
 			
@@ -77,7 +77,7 @@ namespace gpopt
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *) const;
+			BOOL Matches(COperator *) const;
 
 			//-------------------------------------------------------------------------------------
 			// Required Plan Properties
@@ -87,10 +87,10 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsInput,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				);
@@ -99,10 +99,10 @@ namespace gpopt
 			virtual
 			COrderSpec *PosRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				COrderSpec *posInput,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
@@ -118,7 +118,7 @@ namespace gpopt
 
 			// derive sort order
 			virtual
-			COrderSpec *PosDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			COrderSpec *PosDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			//-------------------------------------------------------------------------------------
 			// Enforced Properties

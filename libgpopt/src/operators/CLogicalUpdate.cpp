@@ -31,10 +31,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalUpdate::CLogicalUpdate
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
-	CLogical(pmp),
+	CLogical(memory_pool),
 	m_ptabdesc(NULL),
 	m_pdrgpcrDelete(NULL),
 	m_pdrgpcrInsert(NULL),
@@ -55,7 +55,7 @@ CLogicalUpdate::CLogicalUpdate
 //---------------------------------------------------------------------------
 CLogicalUpdate::CLogicalUpdate
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CTableDescriptor *ptabdesc,
 	DrgPcr *pdrgpcrDelete,
 	DrgPcr *pdrgpcrInsert,
@@ -64,7 +64,7 @@ CLogicalUpdate::CLogicalUpdate
 	CColRef *pcrTupleOid
 	)
 	:
-	CLogical(pmp),
+	CLogical(memory_pool),
 	m_ptabdesc(ptabdesc),
 	m_pdrgpcrDelete(pdrgpcrDelete),
 	m_pdrgpcrInsert(pdrgpcrInsert),
@@ -76,7 +76,7 @@ CLogicalUpdate::CLogicalUpdate
 	GPOS_ASSERT(NULL != ptabdesc);
 	GPOS_ASSERT(NULL != pdrgpcrDelete);
 	GPOS_ASSERT(NULL != pdrgpcrInsert);
-	GPOS_ASSERT(pdrgpcrDelete->UlLength() == pdrgpcrInsert->UlLength());
+	GPOS_ASSERT(pdrgpcrDelete->Size() == pdrgpcrInsert->Size());
 	GPOS_ASSERT(NULL != pcrCtid);
 	GPOS_ASSERT(NULL != pcrSegmentId);
 
@@ -108,14 +108,14 @@ CLogicalUpdate::~CLogicalUpdate()
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CLogicalUpdate::FMatch
+//		CLogicalUpdate::Matches
 //
 //	@doc:
 //		Match function
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalUpdate::FMatch
+CLogicalUpdate::Matches
 	(
 	COperator *pop
 	)
@@ -131,27 +131,27 @@ CLogicalUpdate::FMatch
 	return m_pcrCtid == popUpdate->PcrCtid() &&
 			m_pcrSegmentId == popUpdate->PcrSegmentId() &&
 			m_pcrTupleOid == popUpdate->PcrTupleOid() &&
-			m_ptabdesc->Pmdid()->FEquals(popUpdate->Ptabdesc()->Pmdid()) &&
-			m_pdrgpcrDelete->FEqual(popUpdate->PdrgpcrDelete()) &&
-			m_pdrgpcrInsert->FEqual(popUpdate->PdrgpcrInsert());
+			m_ptabdesc->MDId()->Equals(popUpdate->Ptabdesc()->MDId()) &&
+			m_pdrgpcrDelete->Equals(popUpdate->PdrgpcrDelete()) &&
+			m_pdrgpcrInsert->Equals(popUpdate->PdrgpcrInsert());
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CLogicalUpdate::UlHash
+//		CLogicalUpdate::HashValue
 //
 //	@doc:
 //		Hash function
 //
 //---------------------------------------------------------------------------
 ULONG
-CLogicalUpdate::UlHash() const
+CLogicalUpdate::HashValue() const
 {
-	ULONG ulHash = gpos::UlCombineHashes(COperator::UlHash(), m_ptabdesc->Pmdid()->UlHash());
-	ulHash = gpos::UlCombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrDelete));
-	ulHash = gpos::UlCombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrInsert));
-	ulHash = gpos::UlCombineHashes(ulHash, gpos::UlHashPtr<CColRef>(m_pcrCtid));
-	ulHash = gpos::UlCombineHashes(ulHash, gpos::UlHashPtr<CColRef>(m_pcrSegmentId));
+	ULONG ulHash = gpos::CombineHashes(COperator::HashValue(), m_ptabdesc->MDId()->HashValue());
+	ulHash = gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrDelete));
+	ulHash = gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrInsert));
+	ulHash = gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(m_pcrCtid));
+	ulHash = gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(m_pcrSegmentId));
 
 	return ulHash;
 }
@@ -167,23 +167,23 @@ CLogicalUpdate::UlHash() const
 COperator *
 CLogicalUpdate::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *pmp,
-	HMUlCr *phmulcr,
-	BOOL fMustExist
+	IMemoryPool *memory_pool,
+	UlongColRefHashMap *colref_mapping,
+	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcrDelete = CUtils::PdrgpcrRemap(pmp, m_pdrgpcrDelete, phmulcr, fMustExist);
-	DrgPcr *pdrgpcrInsert = CUtils::PdrgpcrRemap(pmp, m_pdrgpcrInsert, phmulcr, fMustExist);
-	CColRef *pcrCtid = CUtils::PcrRemap(m_pcrCtid, phmulcr, fMustExist);
-	CColRef *pcrSegmentId = CUtils::PcrRemap(m_pcrSegmentId, phmulcr, fMustExist);
+	DrgPcr *pdrgpcrDelete = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrDelete, colref_mapping, must_exist);
+	DrgPcr *pdrgpcrInsert = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrInsert, colref_mapping, must_exist);
+	CColRef *pcrCtid = CUtils::PcrRemap(m_pcrCtid, colref_mapping, must_exist);
+	CColRef *pcrSegmentId = CUtils::PcrRemap(m_pcrSegmentId, colref_mapping, must_exist);
 	m_ptabdesc->AddRef();
 
 	CColRef *pcrTupleOid = NULL;
 	if (NULL != m_pcrTupleOid)
 	{
-		pcrTupleOid = CUtils::PcrRemap(m_pcrTupleOid, phmulcr, fMustExist);
+		pcrTupleOid = CUtils::PcrRemap(m_pcrTupleOid, colref_mapping, must_exist);
 	}
-	return GPOS_NEW(pmp) CLogicalUpdate(pmp, m_ptabdesc, pdrgpcrDelete, pdrgpcrInsert, pcrCtid, pcrSegmentId, pcrTupleOid);
+	return GPOS_NEW(memory_pool) CLogicalUpdate(memory_pool, m_ptabdesc, pdrgpcrDelete, pdrgpcrInsert, pcrCtid, pcrSegmentId, pcrTupleOid);
 }
 
 //---------------------------------------------------------------------------
@@ -197,11 +197,11 @@ CLogicalUpdate::PopCopyWithRemappedColumns
 CColRefSet *
 CLogicalUpdate::PcrsDeriveOutput
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle & //exprhdl
 	)
 {
-	CColRefSet *pcrsOutput = GPOS_NEW(pmp) CColRefSet(pmp);
+	CColRefSet *pcrsOutput = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 	pcrsOutput->Include(m_pdrgpcrInsert);
 	pcrsOutput->Include(m_pcrCtid);
 	pcrsOutput->Include(m_pcrSegmentId);
@@ -224,7 +224,7 @@ CLogicalUpdate::PcrsDeriveOutput
 CKeyCollection *
 CLogicalUpdate::PkcDeriveKeys
 	(
-	IMemoryPool *, // pmp
+	IMemoryPool *, // memory_pool
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -243,13 +243,13 @@ CLogicalUpdate::PkcDeriveKeys
 CMaxCard
 CLogicalUpdate::Maxcard
 	(
-	IMemoryPool *, // pmp
+	IMemoryPool *, // memory_pool
 	CExpressionHandle &exprhdl
 	)
 	const
 {
 	// pass on max card of first child
-	return exprhdl.Pdprel(0)->Maxcard();
+	return exprhdl.GetRelationalProperties(0)->Maxcard();
 }
 
 //---------------------------------------------------------------------------
@@ -263,13 +263,13 @@ CLogicalUpdate::Maxcard
 CXformSet *
 CLogicalUpdate::PxfsCandidates
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	const
 {
-	CXformSet *pxfs = GPOS_NEW(pmp) CXformSet(pmp);
-	(void) pxfs->FExchangeSet(CXform::ExfUpdate2DML);
-	return pxfs;
+	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	(void) xform_set->ExchangeSet(CXform::ExfUpdate2DML);
+	return xform_set;
 }
 
 //---------------------------------------------------------------------------
@@ -283,9 +283,9 @@ CLogicalUpdate::PxfsCandidates
 IStatistics *
 CLogicalUpdate::PstatsDerive
 	(
-	IMemoryPool *, // pmp,
+	IMemoryPool *, // memory_pool,
 	CExpressionHandle &exprhdl,
-	DrgPstat * // not used
+	StatsArray * // not used
 	)
 	const
 {

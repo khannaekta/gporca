@@ -28,19 +28,19 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLPhysicalIndexScan::CDXLPhysicalIndexScan
 	(
-	IMemoryPool *pmp,
-	CDXLTableDescr *pdxltabdesc,
-	CDXLIndexDescr *pdxlid,
-	EdxlIndexScanDirection edxlisd
+	IMemoryPool *memory_pool,
+	CDXLTableDescr *table_descr,
+	CDXLIndexDescr *index_descr_dxl,
+	EdxlIndexScanDirection idx_scan_direction
 	)
 	:
-	CDXLPhysical(pmp),
-	m_pdxltabdesc(pdxltabdesc),
-	m_pdxlid(pdxlid),
-	m_edxlisd(edxlisd)
+	CDXLPhysical(memory_pool),
+	m_table_descr_dxl(table_descr),
+	m_index_descr_dxl(index_descr_dxl),
+	m_index_scan_dir(idx_scan_direction)
 {
-	GPOS_ASSERT(NULL != m_pdxltabdesc);
-	GPOS_ASSERT(NULL != m_pdxlid);
+	GPOS_ASSERT(NULL != m_table_descr_dxl);
+	GPOS_ASSERT(NULL != m_index_descr_dxl);
 }
 
 //---------------------------------------------------------------------------
@@ -53,78 +53,78 @@ CDXLPhysicalIndexScan::CDXLPhysicalIndexScan
 //---------------------------------------------------------------------------
 CDXLPhysicalIndexScan::~CDXLPhysicalIndexScan()
 {
-	m_pdxlid->Release();
-	m_pdxltabdesc->Release();
+	m_index_descr_dxl->Release();
+	m_table_descr_dxl->Release();
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLPhysicalIndexScan::Edxlop
+//		CDXLPhysicalIndexScan::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLPhysicalIndexScan::Edxlop() const
+CDXLPhysicalIndexScan::GetDXLOperator() const
 {
 	return EdxlopPhysicalIndexScan;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLPhysicalIndexScan::PstrOpName
+//		CDXLPhysicalIndexScan::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLPhysicalIndexScan::PstrOpName() const
+CDXLPhysicalIndexScan::GetOpNameStr() const
 {
-	return CDXLTokens::PstrToken(EdxltokenPhysicalIndexScan);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenPhysicalIndexScan);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLPhysicalIndexScan::Pdxlid
+//		CDXLPhysicalIndexScan::MakeDXLIndexDescr
 //
 //	@doc:
 //		Index descriptor for the index scan
 //
 //---------------------------------------------------------------------------
 const CDXLIndexDescr *
-CDXLPhysicalIndexScan::Pdxlid() const
+CDXLPhysicalIndexScan::GetDXLIndexDescr() const
 {
-	return m_pdxlid;
+	return m_index_descr_dxl;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLPhysicalIndexScan::EdxlScanDirection
+//		CDXLPhysicalIndexScan::GetIndexScanDir
 //
 //	@doc:
 //		Return the scan direction of the index
 //
 //---------------------------------------------------------------------------
 EdxlIndexScanDirection
-CDXLPhysicalIndexScan::EdxlScanDirection() const
+CDXLPhysicalIndexScan::GetIndexScanDir() const
 {
-	return m_edxlisd;
+	return m_index_scan_dir;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLPhysicalIndexScan::Pdxltabdesc
+//		CDXLPhysicalIndexScan::MakeDXLTableDescr
 //
 //	@doc:
 //		Return the associated table descriptor
 //
 //---------------------------------------------------------------------------
 const CDXLTableDescr *
-CDXLPhysicalIndexScan::Pdxltabdesc() const
+CDXLPhysicalIndexScan::GetDXLTableDescr() const
 {
-	return m_pdxltabdesc;
+	return m_table_descr_dxl;
 }
 
 //---------------------------------------------------------------------------
@@ -138,33 +138,33 @@ CDXLPhysicalIndexScan::Pdxltabdesc() const
 void
 CDXLPhysicalIndexScan::SerializeToDXL
 	(
-	CXMLSerializer *pxmlser,
-	const CDXLNode *pdxln
+	CXMLSerializer *xml_serializer,
+	const CDXLNode *node
 	)
 	const
 {
-	const CWStringConst *pstrElemName = PstrOpName();
+	const CWStringConst *element_name = GetOpNameStr();
 
-	pxmlser->OpenElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
-	pxmlser->AddAttribute
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->AddAttribute
 				(
-				CDXLTokens::PstrToken(EdxltokenIndexScanDirection),
-				CDXLOperator::PstrIndexScanDirection(m_edxlisd)
+				CDXLTokens::GetDXLTokenStr(EdxltokenIndexScanDirection),
+				CDXLOperator::GetIdxScanDirectionStr(m_index_scan_dir)
 				);
 
 	// serialize properties
-	pdxln->SerializePropertiesToDXL(pxmlser);
+	node->SerializePropertiesToDXL(xml_serializer);
 
 	// serialize children
-	pdxln->SerializeChildrenToDXL(pxmlser);
+	node->SerializeChildrenToDXL(xml_serializer);
 
 	// serialize index descriptor
-	m_pdxlid->SerializeToDXL(pxmlser);
+	m_index_descr_dxl->SerializeToDXL(xml_serializer);
 
 	// serialize table descriptor
-	m_pdxltabdesc->SerializeToDXL(pxmlser);
+	m_table_descr_dxl->SerializeToDXL(xml_serializer);
 
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -179,35 +179,35 @@ CDXLPhysicalIndexScan::SerializeToDXL
 void
 CDXLPhysicalIndexScan::AssertValid
 	(
-	const CDXLNode *pdxln,
-	BOOL fValidateChildren
+	const CDXLNode *node,
+	BOOL validate_children
 	)
 	const
 {
 	// assert proj list and filter are valid
-	CDXLPhysical::AssertValid(pdxln, fValidateChildren);
+	CDXLPhysical::AssertValid(node, validate_children);
 
 	// index scan has only 3 children
-	GPOS_ASSERT(3 == pdxln->UlArity());
+	GPOS_ASSERT(3 == node->Arity());
 
 	// assert validity of the index descriptor
-	GPOS_ASSERT(NULL != m_pdxlid);
-	GPOS_ASSERT(NULL != m_pdxlid->Pmdname());
-	GPOS_ASSERT(m_pdxlid->Pmdname()->Pstr()->FValid());
+	GPOS_ASSERT(NULL != m_index_descr_dxl);
+	GPOS_ASSERT(NULL != m_index_descr_dxl->MdName());
+	GPOS_ASSERT(m_index_descr_dxl->MdName()->GetMDName()->IsValid());
 
 	// assert validity of the table descriptor
-	GPOS_ASSERT(NULL != m_pdxltabdesc);
-	GPOS_ASSERT(NULL != m_pdxltabdesc->Pmdname());
-	GPOS_ASSERT(m_pdxltabdesc->Pmdname()->Pstr()->FValid());
+	GPOS_ASSERT(NULL != m_table_descr_dxl);
+	GPOS_ASSERT(NULL != m_table_descr_dxl->MdName());
+	GPOS_ASSERT(m_table_descr_dxl->MdName()->GetMDName()->IsValid());
 
-	CDXLNode *pdxlnIndexConds = (*pdxln)[EdxlisIndexCondition];
+	CDXLNode *index_cond_dxlnode = (*node)[EdxlisIndexCondition];
 
 	// assert children are of right type (physical/scalar)
-	GPOS_ASSERT(EdxlopScalarIndexCondList == pdxlnIndexConds->Pdxlop()->Edxlop());
+	GPOS_ASSERT(EdxlopScalarIndexCondList == index_cond_dxlnode->GetOperator()->GetDXLOperator());
 
-	if (fValidateChildren)
+	if (validate_children)
 	{
-		pdxlnIndexConds->Pdxlop()->AssertValid(pdxlnIndexConds, fValidateChildren);
+		index_cond_dxlnode->GetOperator()->AssertValid(index_cond_dxlnode, validate_children);
 	}
 }
 #endif // GPOS_DEBUG

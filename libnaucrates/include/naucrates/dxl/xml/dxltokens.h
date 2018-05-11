@@ -741,14 +741,14 @@ namespace gpdxl
 				SStrMapElem
 					(
 					Edxltoken edxlt,
-					CWStringConst *pstr
+					CWStringConst *str
 					)
 					:
 					m_edxlt(edxlt),
-					m_pstr(pstr)
+					m_pstr(str)
 				{
 					GPOS_ASSERT(edxlt < EdxltokenSentinel);
-					GPOS_ASSERT(pstr->FValid());
+					GPOS_ASSERT(str->IsValid());
 				}
 				
 				//dtor
@@ -775,14 +775,14 @@ namespace gpdxl
 				SXMLStrMapElem
 					(
 					Edxltoken edxlt,
-					XMLCh *xmlsz
+					XMLCh *xml_val
 					)
 					:
 					m_edxlt(edxlt),
-					m_xmlsz(xmlsz)
+					m_xmlsz(xml_val)
 				{
 					GPOS_ASSERT(edxlt < EdxltokenSentinel);
-					GPOS_ASSERT(NULL != xmlsz);
+					GPOS_ASSERT(NULL != xml_val);
 				}
 				
 				//dtor
@@ -802,11 +802,11 @@ namespace gpdxl
 
 			// memory pool -- not owned
 			static
-			IMemoryPool *m_pmp;
+			IMemoryPool *m_memory_pool;
 
 			// local dxl memory manager
 			static
-			CDXLMemoryManager *m_pmm;
+			CDXLMemoryManager *m_memory_manager_dxl;
 
 			// create a string in Xerces XMLCh* format
 			static 
@@ -816,14 +816,14 @@ namespace gpdxl
 			
 			// retrieve a token in CWStringConst and XMLCh* format, respectively
 			static 
-			const CWStringConst *PstrToken(Edxltoken edxltoken);
+			const CWStringConst *GetDXLTokenStr(Edxltoken token_type);
 			
 			static 
-			const XMLCh *XmlstrToken(Edxltoken edxltoken);
+			const XMLCh *XmlstrToken(Edxltoken token_type);
 		
 			// initialize constants. Must be called before constants are accessed.
 			static 
-			void Init(IMemoryPool *pmp);
+			void Init(IMemoryPool *memory_pool);
 
 			// cleanup tokens
 			static 

@@ -52,7 +52,7 @@ namespace gpopt
 			// ctor
 			CScalarBitmapIndexProbe
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CIndexDescriptor *pindexdesc,
 				IMDId *pmdidBitmapType
 				);
@@ -60,7 +60,7 @@ namespace gpopt
 			// ctor
 			// only for transforms
 			explicit
-			CScalarBitmapIndexProbe(IMemoryPool *pmp);
+			CScalarBitmapIndexProbe(IMemoryPool *memory_pool);
 
 			// dtor
 			virtual
@@ -74,7 +74,7 @@ namespace gpopt
 
 			// bitmap type id
 			virtual
-			IMDId *PmdidType() const
+			IMDId *MDIdType() const
 			{
 				return m_pmdidBitmapType;
 			}
@@ -95,11 +95,11 @@ namespace gpopt
 
 			// operator specific hash function
 			virtual
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			// sensitivity to order of inputs
 			virtual
@@ -112,9 +112,9 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //pmp,
-						HMUlCr *, //phmulcr,
-						BOOL //fMustExist
+						IMemoryPool *, //memory_pool,
+						UlongColRefHashMap *, //colref_mapping,
+						BOOL //must_exist
 						)
 			{
 				return PopCopyDefault();

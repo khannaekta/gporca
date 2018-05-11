@@ -44,10 +44,10 @@ namespace gpopt
 			ULONG m_ulOriginOpId;
 
 			// true iff it is a partial scan
-			BOOL m_fPartial;
+			BOOL m_is_partial;
 
 			// id of the dynamic scan
-			ULONG m_ulScanId;
+			ULONG m_scan_id;
 
 			// partition keys
 			DrgDrgPcr *m_pdrgpdrgpcrPart;
@@ -56,7 +56,7 @@ namespace gpopt
 			ULONG m_ulSecondaryScanId;
 
 			// dynamic index part constraint
-			CPartConstraint *m_ppartcnstr;
+			CPartConstraint *m_part_constraint;
 
 			// relation part constraint
 			CPartConstraint *m_ppartcnstrRel;
@@ -68,12 +68,12 @@ namespace gpopt
 			// ctor
 			CPhysicalDynamicScan
 				(
-				IMemoryPool *pmp,
-				BOOL fPartial,
+				IMemoryPool *memory_pool,
+				BOOL is_partial,
 				CTableDescriptor *ptabdesc,
 				ULONG ulOriginOpId,
 				const CName *pnameAlias,
-				ULONG ulScanId,
+				ULONG scan_id,
 				DrgPcr *pdrgpcrOutput,
 				DrgDrgPcr *pdrgpdrgpcrParts,
 				ULONG ulSecondaryScanId,
@@ -92,15 +92,15 @@ namespace gpopt
 			}
 
 			// true iff the scan is partial
-			BOOL FPartial() const
+			BOOL IsPartial() const
 			{
-				return m_fPartial;
+				return m_is_partial;
 			}
 
 			// return scan id
-			ULONG UlScanId() const
+			ULONG ScanId() const
 			{
-				return m_ulScanId;
+				return m_scan_id;
 			}
 
 			// partition keys
@@ -118,7 +118,7 @@ namespace gpopt
 			// dynamic index part constraint
 			CPartConstraint *Ppartcnstr() const
 			{
-				return m_ppartcnstr;
+				return m_part_constraint;
 			}
 
 			// relation part constraint
@@ -136,11 +136,11 @@ namespace gpopt
 
 			// operator specific hash function
 			virtual
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 
 			// derive partition index map
 			virtual
-			CPartIndexMap *PpimDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl, CDrvdPropCtxt *pdpctxt) const;
+			CPartIndexMap *PpimDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CDrvdPropCtxt *pdpctxt) const;
 
 			// return true if operator is dynamic scan
 			virtual

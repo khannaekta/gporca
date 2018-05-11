@@ -54,11 +54,11 @@ namespace gpopt
 
 			// ctors
 			explicit
-			CLogicalDynamicIndexGet(IMemoryPool *pmp);
+			CLogicalDynamicIndexGet(IMemoryPool *memory_pool);
 
 			CLogicalDynamicIndexGet
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				const IMDIndex *pmdindex,
 				CTableDescriptor *ptabdesc,
 				ULONG ulOriginOpId,
@@ -115,7 +115,7 @@ namespace gpopt
 
 			// check if index is partial given the table descriptor and the index mdid
 			static
-			BOOL FPartialIndex(CTableDescriptor *ptabdesc, const IMDIndex *pmdindex);
+			BOOL IsPartialIndex(CTableDescriptor *ptabdesc, const IMDIndex *pmdindex);
 
 			// order spec
 			COrderSpec *Pos() const
@@ -125,15 +125,15 @@ namespace gpopt
 
 			// operator specific hash function
 			virtual
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			// derive outer references
 			virtual
-			CColRefSet *PcrsDeriveOuter(IMemoryPool *pmp, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsDeriveOuter(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
 			
 			// sensitivity to order of inputs
 			virtual
@@ -141,7 +141,7 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			//-------------------------------------------------------------------------------------
 			// Required Relational Properties
@@ -151,10 +151,10 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsStat
 				(
-				IMemoryPool *, //pmp
+				IMemoryPool *, //memory_pool
 				CExpressionHandle &, // exprhdl
 				CColRefSet *, //pcrsInput
-				ULONG // ulChildIndex
+				ULONG // child_index
 				)
 				const
 			{
@@ -166,9 +166,9 @@ namespace gpopt
 			virtual
 			IStatistics *PstatsDerive
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
-				DrgPstat *pdrgpstatCtxt
+				StatsArray *stats_ctxt
 				)
 				const;
 
@@ -185,7 +185,7 @@ namespace gpopt
 
 			// candidate set of xforms
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *pmp) const;
+			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
 
 			//-------------------------------------------------------------------------------------
 			// conversion function

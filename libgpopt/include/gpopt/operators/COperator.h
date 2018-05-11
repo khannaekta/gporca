@@ -36,7 +36,7 @@ namespace gpopt
 	typedef CDynamicPtrArray<COperator, CleanupRelease> DrgPop;
 
 	// hash map mapping CColRef -> CColRef
-	typedef CHashMap<CColRef, CColRef, CColRef::UlHash, CColRef::FEqual,
+	typedef CHashMap<CColRef, CColRef, CColRef::HashValue, CColRef::Equals,
 					CleanupNULL<CColRef>, CleanupNULL<CColRef> > HMCrCr;
 
 	//---------------------------------------------------------------------------
@@ -62,7 +62,7 @@ namespace gpopt
 			ULONG m_ulOpId;
 			
 			// memory pool for internal allocations
-			IMemoryPool *m_pmp;
+			IMemoryPool *m_memory_pool;
 		
 			// is pattern of xform
 			BOOL m_fPattern;
@@ -91,7 +91,7 @@ namespace gpopt
 			static
 			CFunctionProp *PfpDeriveFromChildren
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				IMDFunction::EFuncStbl efsDefault,
 				IMDFunction::EFuncDataAcc efdaDefault,
@@ -300,7 +300,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			COperator(IMemoryPool *pmp);
+			COperator(IMemoryPool *memory_pool);
 
 			// dtor
 			virtual ~COperator() {}
@@ -350,41 +350,41 @@ namespace gpopt
 			}
 
 			// hash function
-			virtual ULONG UlHash() const;
+			virtual ULONG HashValue() const;
 
 			// sensitivity to order of inputs
 			virtual BOOL FInputOrderSensitive() const = 0;
 
 			// match function; 
 			// abstract to enforce an implementation for each new operator
-			virtual BOOL FMatch(COperator *pop) const = 0;
+			virtual BOOL Matches(COperator *pop) const = 0;
 			
 			// create container for derived properties
 			virtual
-			CDrvdProp *PdpCreate(IMemoryPool *pmp) const = 0;
+			CDrvdProp *PdpCreate(IMemoryPool *memory_pool) const = 0;
 
 			// create container for required properties
 			virtual
-			CReqdProp *PrpCreate(IMemoryPool *pmp) const = 0;
+			CReqdProp *PrpCreate(IMemoryPool *memory_pool) const = 0;
 
 			// return empty container;
 			// caller adds outer references using property derivation
 			virtual
 			CColRefSet *PcrsOuter
 				(
-				IMemoryPool *pmp
+				IMemoryPool *memory_pool
 				)
 			{
-				return GPOS_NEW(pmp) CColRefSet(pmp);
+				return GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 			}
 
 			// return a copy of the operator with remapped columns
 			virtual
 			COperator *PopCopyWithRemappedColumns
 							(
-							IMemoryPool *pmp,
-							HMUlCr *phmulcr,
-							BOOL fMustExist
+							IMemoryPool *memory_pool,
+							UlongColRefHashMap *colref_mapping,
+							BOOL must_exist
 							) = 0;
 
 			// print

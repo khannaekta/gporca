@@ -21,7 +21,7 @@ CDistributionSpec::EDistributionType CDistributionSpecHashedNoOp::Edt() const
 	return CDistributionSpec::EdtHashedNoOp;
 }
 
-BOOL CDistributionSpecHashedNoOp::FMatch(const CDistributionSpec *pds) const
+BOOL CDistributionSpecHashedNoOp::Matches(const CDistributionSpec *pds) const
 {
 	return pds->Edt() == Edt();
 }
@@ -29,7 +29,7 @@ BOOL CDistributionSpecHashedNoOp::FMatch(const CDistributionSpec *pds) const
 void
 CDistributionSpecHashedNoOp::AppendEnforcers
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &exprhdl,
 	CReqdPropPlan *,
 	DrgPexpr *pdrgpexpr,
@@ -47,12 +47,12 @@ CDistributionSpecHashedNoOp::AppendEnforcers
 
 	DrgPexpr *pdrgpexprNoOpRedistributionColumns = pdsChildHashed->Pdrgpexpr();
 	pdrgpexprNoOpRedistributionColumns->AddRef();
-	CDistributionSpecHashedNoOp* pdsNoOp = GPOS_NEW(pmp) CDistributionSpecHashedNoOp(pdrgpexprNoOpRedistributionColumns);
+	CDistributionSpecHashedNoOp* pdsNoOp = GPOS_NEW(memory_pool) CDistributionSpecHashedNoOp(pdrgpexprNoOpRedistributionColumns);
 	pexpr->AddRef();
-	CExpression *pexprMotion = GPOS_NEW(pmp) CExpression
+	CExpression *pexprMotion = GPOS_NEW(memory_pool) CExpression
 			(
-					pmp,
-					GPOS_NEW(pmp) CPhysicalMotionHashDistribute(pmp, pdsNoOp),
+					memory_pool,
+					GPOS_NEW(memory_pool) CPhysicalMotionHashDistribute(memory_pool, pdsNoOp),
 					pexpr
 			);
 	pdrgpexpr->Append(pexprMotion);

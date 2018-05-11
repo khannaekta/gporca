@@ -34,7 +34,7 @@ namespace gpopt
 	using namespace gpos;
 
 	// arrays of unsigned integer arrays
-	typedef CDynamicPtrArray<ULONG_PTR, CleanupDeleteRg> DrgPulp;
+	typedef CDynamicPtrArray<ULONG_PTR, CleanupDeleteArray> DrgPulp;
 
 	// forward declaration
 	class CPartIndexMap;
@@ -105,12 +105,12 @@ namespace gpopt
 					CReqdColsRequest
 						(
 						CColRefSet *pcrsRequired,
-						ULONG ulChildIndex,
+						ULONG child_index,
 						ULONG ulScalarChildIndex
 						)
 						:
 						m_pcrsRequired(pcrsRequired),
-						m_ulChildIndex(ulChildIndex),
+						m_ulChildIndex(child_index),
 						m_ulScalarChildIndex(ulScalarChildIndex)
 					{
 						GPOS_ASSERT(NULL != pcrsRequired);
@@ -124,7 +124,7 @@ namespace gpopt
 					}
 
 					// required columns
-					CColRefSet *Pcrs() const
+					CColRefSet *GetColRefSet() const
 					{
 						return m_pcrsRequired;
 					}
@@ -143,16 +143,16 @@ namespace gpopt
 
 					// hash function
 					static
-					ULONG UlHash(const CReqdColsRequest *prcr);
+					ULONG HashValue(const CReqdColsRequest *prcr);
 
 					// equality function
 					static
-					BOOL FEqual(const CReqdColsRequest *prcrFst, const CReqdColsRequest *prcrSnd);
+					BOOL Equals(const CReqdColsRequest *prcrFst, const CReqdColsRequest *prcrSnd);
 
 			}; // class CReqdColsRequest
 
 			// map of incoming required columns request to computed column sets
-			typedef CHashMap<CReqdColsRequest, CColRefSet, CReqdColsRequest::UlHash, CReqdColsRequest::FEqual,
+			typedef CHashMap<CReqdColsRequest, CColRefSet, CReqdColsRequest::HashValue, CReqdColsRequest::Equals,
 						CleanupRelease<CReqdColsRequest>, CleanupRelease<CColRefSet> > HMReqdColsRequest;
 
 			// hash map of child columns requests
@@ -182,7 +182,7 @@ namespace gpopt
 			// check whether we can push a part table requirement to a given child, given
 			// the knowledge of where the part index id is defined
 			static
-			BOOL FCanPushPartReqToChild(CBitSet *pbsPartConsumer, ULONG ulChildIndex);
+			BOOL FCanPushPartReqToChild(CBitSet *pbsPartConsumer, ULONG child_index);
 
 		protected:
 
@@ -225,10 +225,10 @@ namespace gpopt
 			// pass cte requirement to the n-th child
 			CCTEReq *PcterNAry
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CCTEReq *pcter,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt
 				)
 				const;
@@ -237,35 +237,35 @@ namespace gpopt
 			// columns and excluding defined columns of the scalar child
 			CColRefSet *PcrsChildReqd
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsInput,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				ULONG ulScalarIndex
 				);
 
 			// compute distribution spec from the table descriptor
 			static
-			CDistributionSpec *PdsCompute(IMemoryPool *pmp, const CTableDescriptor *ptabdesc, DrgPcr *pdrgpcrOutput);
+			CDistributionSpec *PdsCompute(IMemoryPool *memory_pool, const CTableDescriptor *ptabdesc, DrgPcr *pdrgpcrOutput);
 
 			// helper for a simple case of computing child's required sort order
 			static
 			COrderSpec *PosPassThru
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				COrderSpec *posInput,
-				ULONG ulChildIndex
+				ULONG child_index
 				);
 
 			// helper for a simple case of computing child's required distribution
 			static
 			CDistributionSpec *PdsPassThru
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsInput,
-				ULONG ulChildIndex
+				ULONG child_index
 				);
 			
 			// helper for computing child's required distribution when Master-Only/Replicated
@@ -273,10 +273,10 @@ namespace gpopt
 			static
 			CDistributionSpec *PdsMasterOnlyOrReplicated
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsInput,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				ULONG ulOptReq
 				);
 
@@ -285,10 +285,10 @@ namespace gpopt
 			static
 			CDistributionSpec *PdsUnary
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsInput,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				ULONG ulOptReq
 				);
 
@@ -296,30 +296,30 @@ namespace gpopt
 			static
 			CRewindabilitySpec *PrsPassThru
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CRewindabilitySpec *prsRequired,
-				ULONG ulChildIndex
+				ULONG child_index
 				);
 
 			// pass partition propagation requirement to the child
 			static
 			CPartitionPropagationSpec *PppsRequiredPushThru
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CPartitionPropagationSpec *pppsRequired,
-				ULONG ulChildIndex
+				ULONG child_index
 				);
 			
 			// pass partition propagation requirement to the children of an n-ary operator
 			static
 			CPartitionPropagationSpec *PppsRequiredPushThruNAry
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CPartitionPropagationSpec *pppsRequired,
-				ULONG ulChildIndex
+				ULONG child_index
 				);
 			
 			// helper function for pushing unresolved partition propagation in unary
@@ -327,7 +327,7 @@ namespace gpopt
 			static
 			CPartitionPropagationSpec *PppsRequiredPushThruUnresolvedUnary
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CPartitionPropagationSpec *pppsRequired,
 				EPropogatePartConstraint eppcPropogate
@@ -342,7 +342,7 @@ namespace gpopt
 			static
 			CCTEMap *PcmCombine
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				DrgPdp *pdrgpdpCtxt
 				);
 
@@ -373,25 +373,25 @@ namespace gpopt
 
 			// combine derived part filter maps of relational children
 			static
-			CPartFilterMap *PpfmDeriveCombineRelational(IMemoryPool *pmp, CExpressionHandle &exprhdl);
+			CPartFilterMap *PpfmDeriveCombineRelational(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
 
 			// helper for common case of combining partition index maps of all relational children
 			static
-			CPartIndexMap *PpimDeriveCombineRelational(IMemoryPool *pmp, CExpressionHandle &exprhdl);
+			CPartIndexMap *PpimDeriveCombineRelational(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
 
 			// enforce an operator to be executed on the master
 			static
 			CDistributionSpec *PdsEnforceMaster
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pds,
-				ULONG ulChildIndex
+				ULONG child_index
 				);
 
 			// helper to compute skew estimate based on given stats and distribution spec
 			static
-			CDouble DSkew(IStatistics *pstats, CDistributionSpec *pds);
+			CDouble GetSkew(IStatistics *stats, CDistributionSpec *pds);
 
 
 			// return true if the given column set includes any of the columns defined by
@@ -403,7 +403,7 @@ namespace gpopt
 		
 			// ctor
 			explicit
-			CPhysical(IMemoryPool *pmp);
+			CPhysical(IMemoryPool *memory_pool);
 
 			// dtor
 			virtual 
@@ -423,11 +423,11 @@ namespace gpopt
 
 			// create base container of derived properties
 			virtual
-			CDrvdProp *PdpCreate(IMemoryPool *pmp) const;
+			CDrvdProp *PdpCreate(IMemoryPool *memory_pool) const;
 
 			// create base container of required properties
 			virtual
-			CReqdProp *PrpCreate(IMemoryPool *pmp) const;
+			CReqdProp *PrpCreate(IMemoryPool *memory_pool) const;
 
 			//-------------------------------------------------------------------------------------
 			// Required Plan Properties
@@ -437,10 +437,10 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				) = 0;
@@ -449,10 +449,10 @@ namespace gpopt
 			virtual
 			CCTEReq *PcteRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CCTEReq *pcter,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
@@ -462,10 +462,10 @@ namespace gpopt
 			virtual
 			COrderSpec *PosRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				COrderSpec *posRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
@@ -475,10 +475,10 @@ namespace gpopt
 			virtual
 			CDistributionSpec *PdsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
@@ -488,10 +488,10 @@ namespace gpopt
 			virtual
 			CRewindabilitySpec *PrsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CRewindabilitySpec *prsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
@@ -501,10 +501,10 @@ namespace gpopt
 			virtual
 			CPartitionPropagationSpec *PppsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CPartitionPropagationSpec *pppsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				) = 0;
@@ -523,27 +523,27 @@ namespace gpopt
 
 			// derive sort order
 			virtual
-			COrderSpec *PosDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl) const = 0;
+			COrderSpec *PosDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const = 0;
 
 			// dderive distribution
 			virtual
-			CDistributionSpec *PdsDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl) const = 0;
+			CDistributionSpec *PdsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const = 0;
 
 			// derived properties: derive rewindability
 			virtual
-			CRewindabilitySpec *PrsDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl) const = 0;
+			CRewindabilitySpec *PrsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const = 0;
 
 			// derive partition index map
 			virtual
-			CPartIndexMap *PpimDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl, CDrvdPropCtxt *pdpctxt) const = 0;
+			CPartIndexMap *PpimDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CDrvdPropCtxt *pdpctxt) const = 0;
 
 			// derive partition filter map
 			virtual
-			CPartFilterMap *PpfmDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl) const = 0;
+			CPartFilterMap *PpfmDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const = 0;
 
 			// derive cte map
 			virtual
-			CCTEMap *PcmDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CCTEMap *PcmDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			//-------------------------------------------------------------------------------------
 			// Enforced Properties
@@ -588,7 +588,7 @@ namespace gpopt
 			CEnfdDistribution::EDistributionMatching Edm
 				(
 				CReqdPropPlan *prppInput,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				);
@@ -598,7 +598,7 @@ namespace gpopt
 			CEnfdOrder::EOrderMatching Eom
 				(
 				CReqdPropPlan *prppInput,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				);
@@ -608,7 +608,7 @@ namespace gpopt
 			CEnfdRewindability::ERewindabilityMatching Erm
 				(
 				CReqdPropPlan *prppInput,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				);
@@ -617,7 +617,7 @@ namespace gpopt
 			virtual
 			BOOL FValidContext
 				(
-				IMemoryPool *, // pmp
+				IMemoryPool *, // memory_pool
 				COptimizationContext *, // poc,
 				DrgPoc * // pdrgpocChild
 				)
@@ -689,7 +689,7 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// conversion function
 			static
@@ -706,7 +706,7 @@ namespace gpopt
 
 			// helper for computing a singleton distribution matching the given distribution
 			static
-			CDistributionSpecSingleton *PdssMatching(IMemoryPool *pmp, CDistributionSpecSingleton *pdss);
+			CDistributionSpecSingleton *PdssMatching(IMemoryPool *memory_pool, CDistributionSpecSingleton *pdss);
 
 	}; // class CPhysical
 

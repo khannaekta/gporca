@@ -41,8 +41,8 @@ namespace gpopt
 			// ctor
 			CPhysicalPartitionSelectorDML
 				(
-				IMemoryPool *pmp,
-				IMDId *pmdid,
+				IMemoryPool *memory_pool,
+				IMDId *mdid,
 				HMUlExpr *phmulexprEqPredicates,
 				CColRef *pcrOid
 				);
@@ -69,11 +69,11 @@ namespace gpopt
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			// hash function
 			virtual
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 
 			//-------------------------------------------------------------------------------------
 			// Required Plan Properties
@@ -83,10 +83,10 @@ namespace gpopt
 			virtual
 			CDistributionSpec *PdsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
@@ -96,10 +96,10 @@ namespace gpopt
 			virtual
 			COrderSpec *PosRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				COrderSpec *posRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
@@ -109,10 +109,10 @@ namespace gpopt
 			virtual
 			CPartitionPropagationSpec *PppsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CPartitionPropagationSpec *pppsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				);
@@ -127,11 +127,11 @@ namespace gpopt
 
 			// derive partition index map
 			virtual
-			CPartIndexMap *PpimDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl, CDrvdPropCtxt *pdpctxt) const;
+			CPartIndexMap *PpimDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CDrvdPropCtxt *pdpctxt) const;
 
 			// derive partition filter map
 			virtual
-			CPartFilterMap *PpfmDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CPartFilterMap *PpfmDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			//-------------------------------------------------------------------------------------
 			// Enforced Properties

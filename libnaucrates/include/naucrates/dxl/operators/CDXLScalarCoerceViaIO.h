@@ -7,7 +7,7 @@
 //
 //	@doc:
 //		Class for representing DXL CoerceViaIO operation,
-//		the operator captures coercing a value from one type to another, by
+//		the operator captures coercing a m_bytearray_value from one type to another, by
 //		calling the output function of the argument type, and passing the
 //		result to the input function of the result type.
 //
@@ -48,11 +48,11 @@ namespace gpdxl
 			// ctor/dtor
 			CDXLScalarCoerceViaIO
 				(
-				IMemoryPool *pmp,
-				IMDId *pmdidType,
-				INT iTypeModifier,
-				EdxlCoercionForm edxlcf,
-				INT iLoc
+				IMemoryPool *memory_pool,
+				IMDId *mdid_type,
+				INT type_modifier,
+				EdxlCoercionForm dxl_coerce_format,
+				INT location
 				);
 
 			virtual
@@ -62,26 +62,26 @@ namespace gpdxl
 
 			// ident accessor
 			virtual
-			Edxlopid Edxlop() const
+			Edxlopid GetDXLOperator() const
 			{
 				return EdxlopScalarCoerceViaIO;
 			}
 
 			// name of the DXL operator name
 			virtual
-			const CWStringConst *PstrOpName() const;
+			const CWStringConst *GetOpNameStr() const;
 
 			// conversion function
 			static
-			CDXLScalarCoerceViaIO *PdxlopConvert
+			CDXLScalarCoerceViaIO *Cast
 				(
-				CDXLOperator *pdxlop
+				CDXLOperator *dxl_op
 				)
 			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopScalarCoerceViaIO == pdxlop->Edxlop());
+				GPOS_ASSERT(NULL != dxl_op);
+				GPOS_ASSERT(EdxlopScalarCoerceViaIO == dxl_op->GetDXLOperator());
 
-				return dynamic_cast<CDXLScalarCoerceViaIO*>(pdxlop);
+				return dynamic_cast<CDXLScalarCoerceViaIO*>(dxl_op);
 			}
 	};
 }

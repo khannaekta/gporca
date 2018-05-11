@@ -39,8 +39,8 @@ namespace gpopt
 			// ctor
 			CPhysicalStreamAggDeduplicate
 				(
-				IMemoryPool *pmp,
-				DrgPcr *pdrgpcr,
+				IMemoryPool *memory_pool,
+				DrgPcr *colref_array,
 				DrgPcr *pdrgpcrMinimal,
 				COperator::EGbAggType egbaggtype,
 				DrgPcr *pdrgpcrKeys,
@@ -80,47 +80,47 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *, //pdrgpdpCtxt,
 				ULONG //ulOptReq
 				)
 			{
-				return PcrsRequiredAgg(pmp, exprhdl, pcrsRequired, ulChildIndex, m_pdrgpcrKeys);
+				return PcrsRequiredAgg(memory_pool, exprhdl, pcrsRequired, child_index, m_pdrgpcrKeys);
 			}
 
 			// compute required sort columns of the n-th child
 			virtual
 			COrderSpec *PosRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				COrderSpec *posRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *, //pdrgpdpCtxt,
 				ULONG //ulOptReq
 				)
 				const
 			{
-				return PosRequiredStreamAgg(pmp, exprhdl, posRequired, ulChildIndex, m_pdrgpcrKeys);
+				return PosRequiredStreamAgg(memory_pool, exprhdl, posRequired, child_index, m_pdrgpcrKeys);
 			}
 
 			// compute required distribution of the n-th child
 			virtual
 			CDistributionSpec *PdsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *, //pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
 				const
 			{
-				return PdsRequiredAgg(pmp, exprhdl, pdsRequired, ulChildIndex, ulOptReq, m_pdrgpcrKeys, m_pdrgpcrKeys);
+				return PdsRequiredAgg(memory_pool, exprhdl, pdsRequired, child_index, ulOptReq, m_pdrgpcrKeys, m_pdrgpcrKeys);
 			}
 
 			//-------------------------------------------------------------------------------------

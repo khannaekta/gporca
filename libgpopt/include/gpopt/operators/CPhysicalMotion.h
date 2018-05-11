@@ -41,10 +41,10 @@ namespace gpopt
 			explicit
 			CPhysicalMotion
 				(
-				IMemoryPool *pmp
+				IMemoryPool *memory_pool
 				)
 				:
-				CPhysical(pmp)
+				CPhysical(memory_pool)
 			{}
 
 			// sensitivity to order of inputs
@@ -62,7 +62,7 @@ namespace gpopt
 
 			// check if optimization contexts is valid
 			virtual
-			BOOL FValidContext(IMemoryPool *pmp, COptimizationContext *poc, DrgPoc *pdrgpocChild) const;
+			BOOL FValidContext(IMemoryPool *memory_pool, COptimizationContext *poc, DrgPoc *pdrgpocChild) const;
 
 			//-------------------------------------------------------------------------------------
 			// Required Plan Properties
@@ -72,10 +72,10 @@ namespace gpopt
 			virtual
 			CCTEReq *PcteRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CCTEReq *pcter,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
@@ -85,10 +85,10 @@ namespace gpopt
 			virtual
 			CDistributionSpec *PdsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
@@ -98,10 +98,10 @@ namespace gpopt
 			virtual
 			CRewindabilitySpec *PrsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &, // exprhdl
 				CRewindabilitySpec *, // prsRequired
-				ULONG, // ulChildIndex
+				ULONG, // child_index
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
@@ -111,10 +111,10 @@ namespace gpopt
 			virtual
 			CPartitionPropagationSpec *PppsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CPartitionPropagationSpec *pppsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				);
@@ -125,17 +125,17 @@ namespace gpopt
 
 			// derive distribution
 			virtual
-			CDistributionSpec *PdsDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CDistributionSpec *PdsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			// derive rewindability
 			virtual
-			CRewindabilitySpec *PrsDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CRewindabilitySpec *PrsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			// derive partition index map
 			virtual
 			CPartIndexMap *PpimDerive
 				(
-				IMemoryPool *, // pmp
+				IMemoryPool *, // memory_pool
 				CExpressionHandle &exprhdl,
 				CDrvdPropCtxt * //pdpctxt
 				)
@@ -148,7 +148,7 @@ namespace gpopt
 			virtual
 			CPartFilterMap *PpfmDerive
 				(
-				IMemoryPool *, // pmp
+				IMemoryPool *, // memory_pool
 				CExpressionHandle &exprhdl
 				)
 				const

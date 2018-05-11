@@ -27,17 +27,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformImplementPartitionSelector::CXformImplementPartitionSelector
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	// pattern
 	CXformImplementation
 		(
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 					(
-					pmp,
-					GPOS_NEW(pmp) CLogicalPartitionSelector(pmp),
-					GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp))	// relational child
+					memory_pool,
+					GPOS_NEW(memory_pool) CLogicalPartitionSelector(memory_pool),
+					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))	// relational child
 					)
 		)
 {}
@@ -63,19 +63,19 @@ CXformImplementPartitionSelector::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 
 	// extract components
 	CLogicalPartitionSelector *popSelector = CLogicalPartitionSelector::PopConvert(pexpr->Pop());
 	CExpression *pexprRelational = (*pexpr)[0];
 
-	IMDId *pmdid = popSelector->Pmdid();
+	IMDId *mdid = popSelector->MDId();
 
 	// addref all components
 	pexprRelational->AddRef();
-	pmdid->AddRef();
+	mdid->AddRef();
 
-	HMUlExpr *phmulexprFilter = GPOS_NEW(pmp) HMUlExpr(pmp);
+	HMUlExpr *phmulexprFilter = GPOS_NEW(memory_pool) HMUlExpr(memory_pool);
 
 	const ULONG ulLevels = popSelector->UlPartLevels();
 	for (ULONG ul = 0; ul < ulLevels; ul++)
@@ -86,24 +86,24 @@ CXformImplementPartitionSelector::Transform
 #ifdef GPOS_DEBUG
 		BOOL fInserted =
 #endif
-		phmulexprFilter->FInsert(GPOS_NEW(pmp) ULONG(ul), pexprFilter);
+		phmulexprFilter->Insert(GPOS_NEW(memory_pool) ULONG(ul), pexprFilter);
 		GPOS_ASSERT(fInserted);
 	}
 
 	// assemble physical operator
 	CPhysicalPartitionSelectorDML *popPhysicalPartitionSelector =
-			GPOS_NEW(pmp) CPhysicalPartitionSelectorDML
+			GPOS_NEW(memory_pool) CPhysicalPartitionSelectorDML
 						(
-						pmp,
-						pmdid,
+						memory_pool,
+						mdid,
 						phmulexprFilter,
 						popSelector->PcrOid()
 						);
 
 	CExpression *pexprPartitionSelector =
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 					(
-					pmp,
+					memory_pool,
 					popPhysicalPartitionSelector,
 					pexprRelational
 					);

@@ -108,7 +108,7 @@ GPOS_RESULT
 CSchedulerTest::EresUnittest_SpawnLight()
 {
 #ifdef GPOS_DEBUG
-	if (IWorker::m_fEnforceTimeSlices)
+	if (IWorker::m_enforce_time_slices)
  	{
  		return GPOS_OK;
 	}
@@ -253,17 +253,17 @@ CSchedulerTest::ScheduleRoot
 	GPOS_ASSERT(CJobTest::EttSpawn == ett || CJobTest::EttStartQueue == ett);
 
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
 	const ULONG ulJobs = ulRounds * ulFanout + 1;
 
 	// initialize job factory
-	CJobFactory jf(pmp, ulJobs);
+	CJobFactory jf(memory_pool, ulJobs);
 
 	// initialize scheduler
 	CScheduler sched
 				(
-				pmp,
+				memory_pool,
 				ulJobs,
 				ulWorkers
 #ifdef GPOS_DEBUG
@@ -273,7 +273,7 @@ CSchedulerTest::ScheduleRoot
 				);
 
 	// initialize engine
-	CEngine eng(pmp);
+	CEngine eng(memory_pool);
 
 	GPOS_CHECK_ABORT;
 
@@ -284,7 +284,7 @@ CSchedulerTest::ScheduleRoot
 	pjt->ResetCnt();
 	sched.Add(pjt, NULL);
 
-	RunTasks(pmp, &jf, &sched, &eng, ulWorkers);
+	RunTasks(memory_pool, &jf, &sched, &eng, ulWorkers);
 
 	// print statistics
 	sched.PrintStats();
@@ -302,7 +302,7 @@ CSchedulerTest::ScheduleRoot
 void
 CSchedulerTest::RunTasks
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CJobFactory *pjf,
 	CScheduler *psched,
 	CEngine *peng,
@@ -311,24 +311,24 @@ CSchedulerTest::RunTasks
 {
 	// create task array
 	CAutoRg<CTask*> a_rgptsk;
-	a_rgptsk = GPOS_NEW_ARRAY(pmp, CTask*, ulWorkers);
+	a_rgptsk = GPOS_NEW_ARRAY(memory_pool, CTask*, ulWorkers);
 
 	// create scheduling contexts
 	CAutoRg<CSchedulerContext> a_rgsc;
-	a_rgsc = GPOS_NEW_ARRAY(pmp, CSchedulerContext, ulWorkers);
+	a_rgsc = GPOS_NEW_ARRAY(memory_pool, CSchedulerContext, ulWorkers);
 
 	// scope for ATP
 	{
-		CWorkerPoolManager *pwpm = CWorkerPoolManager::Pwpm();
-		CAutoTaskProxy atp(pmp, pwpm);
+		CWorkerPoolManager *pwpm = CWorkerPoolManager::WorkerPoolManager();
+		CAutoTaskProxy atp(memory_pool, pwpm);
 
 		for (ULONG i = 0; i < ulWorkers; i++)
 		{
 			// initialize scheduling context
-			a_rgsc[i].Init(pmp, pjf, psched, peng);
+			a_rgsc[i].Init(memory_pool, pjf, psched, peng);
 
 			// create scheduling task
-			a_rgptsk[i] = atp.PtskCreate(CScheduler::Run, &a_rgsc[i]);
+			a_rgptsk[i] = atp.Create(CScheduler::Run, &a_rgsc[i]);
 		}
 
 		// start tasks
@@ -361,7 +361,7 @@ GPOS_RESULT
 CSchedulerTest::EresUnittest_BuildMemo()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
 	// array of relation names
 	CWStringConst rgscRel[] =
@@ -386,10 +386,10 @@ CSchedulerTest::EresUnittest_BuildMemo()
 	// number of relations
 	const ULONG ulRels = GPOS_ARRAY_SIZE(rgscRel);
 
-	CBitSet *pbs = GPOS_NEW(pmp) CBitSet(pmp);
+	CBitSet *pbs = GPOS_NEW(memory_pool) CBitSet(memory_pool);
 	for (ULONG ul = 0; ul < ulRels; ul++)
 	{
-		(void) pbs->FExchangeSet(ul);
+		(void) pbs->ExchangeSet(ul);
 	}
 
 	GPOS_RESULT eres = CEngineTest::EresOptimize(BuildMemoMultiThreaded, rgscRel, rgulRel, ulRels, pbs);
@@ -411,7 +411,7 @@ GPOS_RESULT
 CSchedulerTest::EresUnittest_BuildMemoLargeJoins()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
 	// array of relation names
 	CWStringConst rgscRel[] =
@@ -444,7 +444,7 @@ CSchedulerTest::EresUnittest_BuildMemoLargeJoins()
 	};
 
 	// only optimize the last join expression
-	CBitSet *pbs = GPOS_NEW(pmp) CBitSet(pmp);
+	CBitSet *pbs = GPOS_NEW(memory_pool) CBitSet(memory_pool);
 	const ULONG ulRels =
 #ifdef GPOS_DEBUG
 		GPOS_ARRAY_SIZE(rgscRel) - 4;
@@ -452,7 +452,7 @@ CSchedulerTest::EresUnittest_BuildMemoLargeJoins()
 		GPOS_ARRAY_SIZE(rgscRel);
 #endif // GPOS_DEBUG
 
-	(void) pbs->FExchangeSet(ulRels - 1);
+	(void) pbs->ExchangeSet(ulRels - 1);
 
 	GPOS_RESULT eres = CEngineTest::EresOptimize(BuildMemoMultiThreaded, rgscRel, rgulRel, ulRels, pbs);
 	pbs->Release();
@@ -472,36 +472,36 @@ CSchedulerTest::EresUnittest_BuildMemoLargeJoins()
 void
 CSchedulerTest::BuildMemoMultiThreaded
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpression *pexprInput,
-	 DrgPss *pdrgpss
+	 DrgPss *search_stage_array
 	)
 {
-	CQueryContext *pqc = CTestUtils::PqcGenerate(pmp, pexprInput);
+	CQueryContext *pqc = CTestUtils::PqcGenerate(memory_pool, pexprInput);
 	GPOS_CHECK_ABORT;
 
 	// enable space pruning
-	CAutoTraceFlag atf(EopttraceEnableSpacePruning, true /*fVal*/);
+	CAutoTraceFlag atf(EopttraceEnableSpacePruning, true /*m_bytearray_value*/);
 
-	CWStringDynamic str(pmp);
+	CWStringDynamic str(memory_pool);
 	COstreamString oss(&str);
 	oss << std::endl << std::endl;
 	oss << "INPUT EXPRESSION:" <<std::endl;
 	(void) pexprInput->OsPrint(oss);
 
-	CEngine eng(pmp);
-	eng.Init(pqc, pdrgpss);
+	CEngine eng(memory_pool);
+	eng.Init(pqc, search_stage_array);
 	eng.Optimize();
 
 	CExpression *pexprPlan = eng.PexprExtractPlan();
 
-	(void) pexprPlan->PrppCompute(pmp, pqc->Prpp());
+	(void) pexprPlan->PrppCompute(memory_pool, pqc->Prpp());
 
 	oss << std::endl << "OUTPUT PLAN:" <<std::endl;
 	(void) pexprPlan->OsPrint(oss);
 	oss << std::endl << std::endl;
 
-	GPOS_TRACE(str.Wsz());
+	GPOS_TRACE(str.GetBuffer());
 	pexprPlan->Release();
 	GPOS_DELETE(pqc);
 

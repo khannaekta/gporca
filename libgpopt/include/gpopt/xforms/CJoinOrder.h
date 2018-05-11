@@ -51,7 +51,7 @@ namespace gpopt
 				BOOL m_fUsed;
 
 				// ctor
-				SEdge(IMemoryPool *pmp, CExpression *pexpr);
+				SEdge(IMemoryPool *memory_pool, CExpression *pexpr);
 				
 				// dtor
 				~SEdge();
@@ -81,7 +81,7 @@ namespace gpopt
 				BOOL m_fUsed;
 
 				// ctor
-				SComponent(IMemoryPool *pmp, CExpression *pexpr);
+				SComponent(IMemoryPool *memory_pool, CExpression *pexpr);
 				
 				// ctor
 				SComponent(CExpression *pexpr, CBitSet *pbs);
@@ -96,7 +96,7 @@ namespace gpopt
 		protected:
 				
 			// memory pool
-			IMemoryPool *m_pmp;
+			IMemoryPool *m_memory_pool;
 			
 			// edges
 			SEdge **m_rgpedge;
@@ -130,7 +130,7 @@ namespace gpopt
 			// ctor
 			CJoinOrder
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				DrgPexpr *pdrgpexprComponents,
 				DrgPexpr *pdrgpexprConjuncts
 				);

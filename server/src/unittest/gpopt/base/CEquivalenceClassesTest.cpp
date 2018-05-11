@@ -36,66 +36,66 @@ GPOS_RESULT
 CEquivalenceClassesTest::EresUnittest_NotDisjointEquivalanceClasses()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
-	CColRefSet *pcrs = GPOS_NEW(pmp) CColRefSet(pmp);
+	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 
 	// Setup an MD cache with a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(pmp, CMDCache::Pcache());
+	CMDAccessor mda(memory_pool, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 				(
-				pmp,
+				memory_pool,
 				&mda,
 				NULL, /* pceeval */
-				CTestUtils::Pcm(pmp)
+				CTestUtils::GetCostModel(memory_pool)
 				);
 
 	// get column factory from optimizer context object
-	CColumnFactory *pcf = COptCtxt::PoctxtFromTLS()->Pcf();
+	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
 
 	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
-	ULONG ulCols = 10;
-	for (ULONG i = 0; i < ulCols; i++)
+	ULONG num_cols = 10;
+	for (ULONG i = 0; i < num_cols; i++)
 	{
-		CColRef *pcr = pcf->PcrCreate(pmdtypeint4, IDefaultTypeModifier, name);
-		pcrs->Include(pcr);
+		CColRef *colref = col_factory->PcrCreate(pmdtypeint4, default_type_modifier, name);
+		pcrs->Include(colref);
 
-		GPOS_ASSERT(pcrs->FMember(pcr));
+		GPOS_ASSERT(pcrs->FMember(colref));
 	}
 
-	GPOS_ASSERT(pcrs->CElements() == ulCols);
+	GPOS_ASSERT(pcrs->Size() == num_cols);
 
-	CColRefSet *pcrsTwo = GPOS_NEW(pmp) CColRefSet(pmp, *pcrs);
-	GPOS_ASSERT(pcrsTwo->CElements() == ulCols);
+	CColRefSet *pcrsTwo = GPOS_NEW(memory_pool) CColRefSet(memory_pool, *pcrs);
+	GPOS_ASSERT(pcrsTwo->Size() == num_cols);
 
-	CColRefSet *pcrsThree = GPOS_NEW(pmp) CColRefSet(pmp);
-	GPOS_ASSERT(pcrsThree->CElements() == 0);
-	CColRef *pcrThree = pcf->PcrCreate(pmdtypeint4, IDefaultTypeModifier, name);
+	CColRefSet *pcrsThree = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	GPOS_ASSERT(pcrsThree->Size() == 0);
+	CColRef *pcrThree = col_factory->PcrCreate(pmdtypeint4, default_type_modifier, name);
 	pcrsThree->Include(pcrThree);
-	GPOS_ASSERT(pcrsThree->CElements() == 1);
+	GPOS_ASSERT(pcrsThree->Size() == 1);
 
-	DrgPcrs *pdrgpcrs = GPOS_NEW(pmp) DrgPcrs(pmp);
+	DrgPcrs *pdrgpcrs = GPOS_NEW(memory_pool) DrgPcrs(memory_pool);
 	pcrs->AddRef();
 	pcrsTwo->AddRef();
 	pdrgpcrs->Append(pcrs);
 	pdrgpcrs->Append(pcrsTwo);
-	GPOS_ASSERT(!CUtils::FEquivalanceClassesDisjoint(pmp,pdrgpcrs));
+	GPOS_ASSERT(!CUtils::FEquivalanceClassesDisjoint(memory_pool,pdrgpcrs));
 	
-	DrgPcrs *pdrgpcrsTwo = GPOS_NEW(pmp) DrgPcrs(pmp);
+	DrgPcrs *pdrgpcrsTwo = GPOS_NEW(memory_pool) DrgPcrs(memory_pool);
 	pcrs->AddRef();
 	pcrsThree->AddRef();
 	pdrgpcrsTwo->Append(pcrs);
 	pdrgpcrsTwo->Append(pcrsThree);
-	GPOS_ASSERT(CUtils::FEquivalanceClassesDisjoint(pmp,pdrgpcrsTwo));
+	GPOS_ASSERT(CUtils::FEquivalanceClassesDisjoint(memory_pool,pdrgpcrsTwo));
 	
 	pcrsThree->Release();
 	pcrsTwo->Release();
@@ -111,57 +111,57 @@ GPOS_RESULT
 CEquivalenceClassesTest::EresUnittest_IntersectEquivalanceClasses()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
-	CColRefSet *pcrs = GPOS_NEW(pmp) CColRefSet(pmp);
+	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 
 	// Setup an MD cache with a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(pmp, CMDCache::Pcache());
+	CMDAccessor mda(memory_pool, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 	(
-	 pmp,
+	 memory_pool,
 	 &mda,
 	 NULL, /* pceeval */
-	 CTestUtils::Pcm(pmp)
+	 CTestUtils::GetCostModel(memory_pool)
 	 );
 
 	// get column factory from optimizer context object
-	CColumnFactory *pcf = COptCtxt::PoctxtFromTLS()->Pcf();
+	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
 
 	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
-	ULONG ulCols = 10;
-	for (ULONG i = 0; i < ulCols; i++)
+	ULONG num_cols = 10;
+	for (ULONG i = 0; i < num_cols; i++)
 	{
-		CColRef *pcr = pcf->PcrCreate(pmdtypeint4, IDefaultTypeModifier, name);
-		pcrs->Include(pcr);
+		CColRef *colref = col_factory->PcrCreate(pmdtypeint4, default_type_modifier, name);
+		pcrs->Include(colref);
 
-		GPOS_ASSERT(pcrs->FMember(pcr));
+		GPOS_ASSERT(pcrs->FMember(colref));
 	}
 
-	GPOS_ASSERT(pcrs->CElements() == ulCols);
+	GPOS_ASSERT(pcrs->Size() == num_cols);
 
 	// Generate equivalence classes
 	INT setBoundaryFirst[] = {2,5,7};
-	DrgPcrs *pdrgpFirst = CTestUtils::createEquivalenceClasses(pmp, pcrs, setBoundaryFirst);
+	DrgPcrs *pdrgpFirst = CTestUtils::createEquivalenceClasses(memory_pool, pcrs, setBoundaryFirst);
 
 	INT setBoundarySecond[] = {1,4,5,6};
-	DrgPcrs *pdrgpSecond = CTestUtils::createEquivalenceClasses(pmp, pcrs, setBoundarySecond);
+	DrgPcrs *pdrgpSecond = CTestUtils::createEquivalenceClasses(memory_pool, pcrs, setBoundarySecond);
 
 	INT setBoundaryExpected[] = {1,2,4,5,6,7};
-	DrgPcrs *pdrgpIntersectExpectedOp = CTestUtils::createEquivalenceClasses(pmp, pcrs, setBoundaryExpected);
+	DrgPcrs *pdrgpIntersectExpectedOp = CTestUtils::createEquivalenceClasses(memory_pool, pcrs, setBoundaryExpected);
 
-	DrgPcrs *pdrgpResult = CUtils::PdrgpcrsIntersectEquivClasses(pmp, pdrgpFirst, pdrgpSecond);
-	GPOS_ASSERT(CUtils::FEquivalanceClassesDisjoint(pmp,pdrgpResult));
-	GPOS_ASSERT(CUtils::FEquivalanceClassesEqual(pmp, pdrgpResult, pdrgpIntersectExpectedOp));
+	DrgPcrs *pdrgpResult = CUtils::PdrgpcrsIntersectEquivClasses(memory_pool, pdrgpFirst, pdrgpSecond);
+	GPOS_ASSERT(CUtils::FEquivalanceClassesDisjoint(memory_pool,pdrgpResult));
+	GPOS_ASSERT(CUtils::FEquivalanceClassesEqual(memory_pool, pdrgpResult, pdrgpIntersectExpectedOp));
 
 	pcrs->Release();
 	pdrgpFirst->Release();

@@ -27,10 +27,10 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLPhysicalExternalScan::CDXLPhysicalExternalScan
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
-	CDXLPhysicalTableScan(pmp)
+	CDXLPhysicalTableScan(memory_pool)
 {}
 
 //---------------------------------------------------------------------------
@@ -43,39 +43,39 @@ CDXLPhysicalExternalScan::CDXLPhysicalExternalScan
 //---------------------------------------------------------------------------
 CDXLPhysicalExternalScan::CDXLPhysicalExternalScan
 	(
-	IMemoryPool *pmp,
-	CDXLTableDescr *pdxltabdesc
+	IMemoryPool *memory_pool,
+	CDXLTableDescr *table_descr
 	)
 	:
-	CDXLPhysicalTableScan(pmp, pdxltabdesc)
+	CDXLPhysicalTableScan(memory_pool, table_descr)
 {}
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLPhysicalExternalScan::Edxlop
+//		CDXLPhysicalExternalScan::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLPhysicalExternalScan::Edxlop() const
+CDXLPhysicalExternalScan::GetDXLOperator() const
 {
 	return EdxlopPhysicalExternalScan;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLPhysicalExternalScan::PstrOpName
+//		CDXLPhysicalExternalScan::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLPhysicalExternalScan::PstrOpName() const
+CDXLPhysicalExternalScan::GetOpNameStr() const
 {
-	return CDXLTokens::PstrToken(EdxltokenPhysicalExternalScan);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenPhysicalExternalScan);
 }
 
 // EOF

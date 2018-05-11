@@ -28,10 +28,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalUnionAll::CLogicalUnionAll
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
-	CLogicalUnion(pmp),
+	CLogicalUnion(memory_pool),
 	m_ulScanIdPartialIndex(0)
 {
 	m_fPattern = true;
@@ -47,13 +47,13 @@ CLogicalUnionAll::CLogicalUnionAll
 //---------------------------------------------------------------------------
 CLogicalUnionAll::CLogicalUnionAll
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	DrgPcr *pdrgpcrOutput,
 	DrgDrgPcr *pdrgpdrgpcrInput,
 	ULONG ulScanIdPartialIndex
 	)
 	:
-	CLogicalUnion(pmp, pdrgpcrOutput, pdrgpdrgpcrInput),
+	CLogicalUnion(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput),
 	m_ulScanIdPartialIndex(ulScanIdPartialIndex)
 {
 }
@@ -81,17 +81,17 @@ CLogicalUnionAll::~CLogicalUnionAll()
 CMaxCard
 CLogicalUnionAll::Maxcard
 	(
-	IMemoryPool *, // pmp
+	IMemoryPool *, // memory_pool
 	CExpressionHandle &exprhdl
 	)
 	const
 {
-	const ULONG ulArity = exprhdl.UlArity();
+	const ULONG arity = exprhdl.Arity();
 
-	CMaxCard maxcard = exprhdl.Pdprel(0)->Maxcard();
-	for (ULONG ul = 1; ul < ulArity; ul++)
+	CMaxCard maxcard = exprhdl.GetRelationalProperties(0)->Maxcard();
+	for (ULONG ul = 1; ul < arity; ul++)
 	{
-		maxcard += exprhdl.Pdprel(ul)->Maxcard();
+		maxcard += exprhdl.GetRelationalProperties(ul)->Maxcard();
 	}
 
 	return maxcard;
@@ -108,15 +108,15 @@ CLogicalUnionAll::Maxcard
 COperator *
 CLogicalUnionAll::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *pmp,
-	HMUlCr *phmulcr,
-	BOOL fMustExist
+	IMemoryPool *memory_pool,
+	UlongColRefHashMap *colref_mapping,
+	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcrOutput = CUtils::PdrgpcrRemap(pmp, m_pdrgpcrOutput, phmulcr, fMustExist);
-	DrgDrgPcr *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(pmp, m_pdrgpdrgpcrInput, phmulcr, fMustExist);
+	DrgPcr *pdrgpcrOutput = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrOutput, colref_mapping, must_exist);
+	DrgDrgPcr *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(memory_pool, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
 
-	return GPOS_NEW(pmp) CLogicalUnionAll(pmp, pdrgpcrOutput, pdrgpdrgpcrInput, m_ulScanIdPartialIndex);
+	return GPOS_NEW(memory_pool) CLogicalUnionAll(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput, m_ulScanIdPartialIndex);
 }
 
 //---------------------------------------------------------------------------
@@ -130,7 +130,7 @@ CLogicalUnionAll::PopCopyWithRemappedColumns
 CKeyCollection *
 CLogicalUnionAll::PkcDeriveKeys
 	(
-	IMemoryPool *, //pmp,
+	IMemoryPool *, //memory_pool,
 	CExpressionHandle & // exprhdl
 	)
 	const
@@ -149,14 +149,14 @@ CLogicalUnionAll::PkcDeriveKeys
 CXformSet *
 CLogicalUnionAll::PxfsCandidates
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	const
 {
-	CXformSet *pxfs = GPOS_NEW(pmp) CXformSet(pmp);
-	(void) pxfs->FExchangeSet(CXform::ExfImplementUnionAll);
+	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	(void) xform_set->ExchangeSet(CXform::ExfImplementUnionAll);
 
-	return pxfs;
+	return xform_set;
 }
 
 
@@ -171,7 +171,7 @@ CLogicalUnionAll::PxfsCandidates
 IStatistics *
 CLogicalUnionAll::PstatsDeriveUnionAll
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &exprhdl
 	)
 {
@@ -182,26 +182,26 @@ CLogicalUnionAll::PstatsDeriveUnionAll
 	GPOS_ASSERT(NULL != pdrgpcrOutput);
 	GPOS_ASSERT(NULL != pdrgpdrgpcrInput);
 
-	IStatistics *pstatsResult = exprhdl.Pstats(0);
-	pstatsResult->AddRef();
-	const ULONG ulArity = exprhdl.UlArity();
-	for (ULONG ul = 1; ul < ulArity; ul++)
+	IStatistics *result_stats = exprhdl.Pstats(0);
+	result_stats->AddRef();
+	const ULONG arity = exprhdl.Arity();
+	for (ULONG ul = 1; ul < arity; ul++)
 	{
-		IStatistics *pstatsChild = exprhdl.Pstats(ul);
-		CStatistics *pstats = CUnionAllStatsProcessor::PstatsUnionAll
+		IStatistics *child_stats = exprhdl.Pstats(ul);
+		CStatistics *stats = CUnionAllStatsProcessor::CreateStatsForUnionAll
 											(
-											pmp,
-											dynamic_cast<CStatistics *>(pstatsResult),
-											dynamic_cast<CStatistics *>(pstatsChild),
-											CColRef::Pdrgpul(pmp, pdrgpcrOutput),
-											CColRef::Pdrgpul(pmp, (*pdrgpdrgpcrInput)[0]),
-											CColRef::Pdrgpul(pmp, (*pdrgpdrgpcrInput)[ul])
+											memory_pool,
+											dynamic_cast<CStatistics *>(result_stats),
+											dynamic_cast<CStatistics *>(child_stats),
+											CColRef::Pdrgpul(memory_pool, pdrgpcrOutput),
+											CColRef::Pdrgpul(memory_pool, (*pdrgpdrgpcrInput)[0]),
+											CColRef::Pdrgpul(memory_pool, (*pdrgpdrgpcrInput)[ul])
 											);
-		pstatsResult->Release();
-		pstatsResult = pstats;
+		result_stats->Release();
+		result_stats = stats;
 	}
 
-	return pstatsResult;
+	return result_stats;
 }
 
 //---------------------------------------------------------------------------
@@ -215,15 +215,15 @@ CLogicalUnionAll::PstatsDeriveUnionAll
 IStatistics *
 CLogicalUnionAll::PstatsDerive
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &exprhdl,
-	DrgPstat * // not used
+	StatsArray * // not used
 	)
 	const
 {
 	GPOS_ASSERT(EspNone < Esp(exprhdl));
 
-	return PstatsDeriveUnionAll(pmp, exprhdl);
+	return PstatsDeriveUnionAll(memory_pool, exprhdl);
 }
 
 // EOF

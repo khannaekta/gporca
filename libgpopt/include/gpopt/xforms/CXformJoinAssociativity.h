@@ -37,7 +37,7 @@ namespace gpopt
 			// helper function for creating the new join predicate
 			void CreatePredicates
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpression *pexpr,
 				DrgPexpr *pdrgpexprLower,
 				DrgPexpr *pdrgpexprUpper
@@ -48,7 +48,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformJoinAssociativity(IMemoryPool *pmp);
+			CXformJoinAssociativity(IMemoryPool *memory_pool);
 
 			// dtor
 			virtual

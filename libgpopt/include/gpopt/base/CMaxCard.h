@@ -41,7 +41,7 @@ namespace gpopt
 	
 		private:
 
-			// actual (cropped) value
+			// actual (cropped) m_bytearray_value
 			ULLONG m_ull;
 			
 			// equality

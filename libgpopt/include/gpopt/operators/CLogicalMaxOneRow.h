@@ -41,10 +41,10 @@ namespace gpopt
 			explicit
 			CLogicalMaxOneRow
 				(
-				IMemoryPool *pmp
+				IMemoryPool *memory_pool
 				)
 				:
-				CLogical(pmp)
+				CLogical(memory_pool)
 			{}
 
 
@@ -68,7 +68,7 @@ namespace gpopt
 
 			// match function;
 			virtual
-			BOOL FMatch
+			BOOL Matches
 				(
 				COperator *pop
 				)
@@ -88,9 +88,9 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //pmp,
-						HMUlCr *, //phmulcr,
-						BOOL //fMustExist
+						IMemoryPool *, //memory_pool,
+						UlongColRefHashMap *, //colref_mapping,
+						BOOL //must_exist
 						)
 			{
 				return PopCopyDefault();
@@ -100,7 +100,7 @@ namespace gpopt
 			virtual
 			BOOL FCanPullProjectionsUp
 				(
-				ULONG //ulChildIndex
+				ULONG //child_index
 				) const
 			{
 				return false;
@@ -114,7 +114,7 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsDeriveOutput
 				(
-				IMemoryPool *, // pmp
+				IMemoryPool *, // memory_pool
 				CExpressionHandle &exprhdl
 				)
 			{
@@ -125,19 +125,19 @@ namespace gpopt
 			virtual
 			CPartInfo *PpartinfoDerive
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PpartinfoDeriveCombine(pmp, exprhdl);
+				return PpartinfoDeriveCombine(memory_pool, exprhdl);
 			}
 
 			// dervive keys
 			virtual
 			CKeyCollection *PkcDeriveKeys
 				(
-				IMemoryPool *, // pmp
+				IMemoryPool *, // memory_pool
 				CExpressionHandle &exprhdl
 				)
 				const
@@ -149,7 +149,7 @@ namespace gpopt
 			virtual
 			CMaxCard Maxcard
 				(
-				IMemoryPool *,  // pmp,
+				IMemoryPool *,  // memory_pool,
 				CExpressionHandle & // exprhdl
 				)
 				const
@@ -161,12 +161,12 @@ namespace gpopt
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PpcDeriveConstraintFromPredicates(pmp, exprhdl);
+				return PpcDeriveConstraintFromPredicates(memory_pool, exprhdl);
 			}
 
 			// promise level for stat derivation
@@ -181,10 +181,10 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsStat
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsInput,
-				ULONG ulChildIndex
+				ULONG child_index
 				)
 				const;
 
@@ -196,7 +196,7 @@ namespace gpopt
 			virtual
 			CXformSet *PxfsCandidates
 				(
-				IMemoryPool *pmp
+				IMemoryPool *memory_pool
 				)
 				const;
 
@@ -221,9 +221,9 @@ namespace gpopt
 			virtual
 			IStatistics *PstatsDerive
 						(
-						IMemoryPool *pmp,
+						IMemoryPool *memory_pool,
 						CExpressionHandle &exprhdl,
-						DrgPstat * // pdrgpstatCtxt
+						StatsArray * // stats_ctxt
 						)
 						const;
 

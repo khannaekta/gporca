@@ -28,42 +28,42 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLPhysicalIndexOnlyScan::CDXLPhysicalIndexOnlyScan
 	(
-	IMemoryPool *pmp,
-	CDXLTableDescr *pdxltabdesc,
-	CDXLIndexDescr *pdxlid,
-	EdxlIndexScanDirection edxlisd
+	IMemoryPool *memory_pool,
+	CDXLTableDescr *table_descr,
+	CDXLIndexDescr *index_descr_dxl,
+	EdxlIndexScanDirection idx_scan_direction
 	)
 	:
-	CDXLPhysicalIndexScan(pmp, pdxltabdesc, pdxlid, edxlisd)
+	CDXLPhysicalIndexScan(memory_pool, table_descr, index_descr_dxl, idx_scan_direction)
 {
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLPhysicalIndexOnlyScan::Edxlop
+//		CDXLPhysicalIndexOnlyScan::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLPhysicalIndexOnlyScan::Edxlop() const
+CDXLPhysicalIndexOnlyScan::GetDXLOperator() const
 {
 	return EdxlopPhysicalIndexOnlyScan;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLPhysicalIndexOnlyScan::PstrOpName
+//		CDXLPhysicalIndexOnlyScan::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLPhysicalIndexOnlyScan::PstrOpName() const
+CDXLPhysicalIndexOnlyScan::GetOpNameStr() const
 {
-	return CDXLTokens::PstrToken(EdxltokenPhysicalIndexOnlyScan);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenPhysicalIndexOnlyScan);
 }
 
 // EOF

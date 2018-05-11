@@ -43,15 +43,15 @@ namespace gpopt
 			COperator::EGbAggType m_egbaggtype;
 
 			// compute required distribution of the n-th child of an intermediate aggregate
-			CDistributionSpec *PdsRequiredIntermediateAgg(IMemoryPool *pmp, ULONG  ulOptReq) const;
+			CDistributionSpec *PdsRequiredIntermediateAgg(IMemoryPool *memory_pool, ULONG  ulOptReq) const;
 
 			// compute required distribution of the n-th child of a global aggregate
 			CDistributionSpec *PdsRequiredGlobalAgg
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsInput,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPcr *pdrgpcrGrp,
 				DrgPcr *pdrgpcrGrpMinimal,
 				ULONG  ulOptReq
@@ -61,7 +61,7 @@ namespace gpopt
 			// compute a maximal hashed distribution using the given columns,
 			// if no such distribution can be created, return a Singleton distribution
 			static
-			CDistributionSpec *PdsMaximalHashed(IMemoryPool *pmp, DrgPcr *pdrgpcr);
+			CDistributionSpec *PdsMaximalHashed(IMemoryPool *memory_pool, DrgPcr *colref_array);
 
 		protected:
 
@@ -82,20 +82,20 @@ namespace gpopt
 			// compute required columns of the n-th child
 			CColRefSet *PcrsRequiredAgg
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPcr *pdrgpcrGrp
 				);
 
 			// compute required distribution of the n-th child
 			CDistributionSpec *PdsRequiredAgg
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsInput,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				ULONG  ulOptReq,
 				DrgPcr *pdrgpcgGrp,
 				DrgPcr *pdrgpcrGrpMinimal
@@ -107,8 +107,8 @@ namespace gpopt
 			// ctor
 			CPhysicalAgg
 				(
-				IMemoryPool *pmp,
-				DrgPcr *pdrgpcr,
+				IMemoryPool *memory_pool,
+				DrgPcr *colref_array,
 				DrgPcr *pdrgpcrMinimal, // FD's on grouping columns
 				COperator::EGbAggType egbaggtype,
 				BOOL fGeneratesDuplicates,
@@ -160,11 +160,11 @@ namespace gpopt
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			// hash function
 			virtual
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 
 			// sensitivity to order of inputs
 			virtual
@@ -181,10 +181,10 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				);
@@ -193,10 +193,10 @@ namespace gpopt
 			virtual
 			CCTEReq *PcteRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CCTEReq *pcter,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
@@ -206,26 +206,26 @@ namespace gpopt
 			virtual
 			CDistributionSpec *PdsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *, //pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
 				const
 			{
-				return PdsRequiredAgg(pmp, exprhdl, pdsRequired, ulChildIndex, ulOptReq, m_pdrgpcr, m_pdrgpcrMinimal);
+				return PdsRequiredAgg(memory_pool, exprhdl, pdsRequired, child_index, ulOptReq, m_pdrgpcr, m_pdrgpcrMinimal);
 			}
 
 			// compute required rewindability of the n-th child
 			virtual
 			CRewindabilitySpec *PrsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CRewindabilitySpec *prsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
@@ -240,10 +240,10 @@ namespace gpopt
 			virtual
 			CPartitionPropagationSpec *PppsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CPartitionPropagationSpec *pppsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				);
@@ -254,17 +254,17 @@ namespace gpopt
 
 			// derive distribution
 			virtual
-			CDistributionSpec *PdsDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CDistributionSpec *PdsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			// derive rewindability
 			virtual
-			CRewindabilitySpec *PrsDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CRewindabilitySpec *PrsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			// derive partition index map
 			virtual
 			CPartIndexMap *PpimDerive
 				(
-				IMemoryPool *, // pmp
+				IMemoryPool *, // memory_pool
 				CExpressionHandle &exprhdl,
 				CDrvdPropCtxt * //pdpctxt
 				)
@@ -277,7 +277,7 @@ namespace gpopt
 			virtual
 			CPartFilterMap *PpfmDerive
 				(
-				IMemoryPool *, // pmp
+				IMemoryPool *, // memory_pool
 				CExpressionHandle &exprhdl
 				)
 				const

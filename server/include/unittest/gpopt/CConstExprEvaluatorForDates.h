@@ -41,7 +41,7 @@ namespace gpopt
 	{
 		private:
 			// memory pool, not owned
-			IMemoryPool *m_pmp;
+			IMemoryPool *m_memory_pool;
 
 			// disable copy ctor
 			CConstExprEvaluatorForDates(const CConstExprEvaluatorForDates &);
@@ -51,10 +51,10 @@ namespace gpopt
 			explicit
 			CConstExprEvaluatorForDates
 				(
-				IMemoryPool *pmp
+				IMemoryPool *memory_pool
 				)
 				:
-				m_pmp(pmp)
+				m_memory_pool(memory_pool)
 			{}
 
 			// dtor

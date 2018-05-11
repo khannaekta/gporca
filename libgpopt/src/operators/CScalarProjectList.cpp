@@ -33,24 +33,24 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CScalarProjectList::CScalarProjectList
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
-	CScalar(pmp)
+	CScalar(memory_pool)
 {
 }
 
 	
 //---------------------------------------------------------------------------
 //	@function:
-//		CScalarProjectList::FMatch
+//		CScalarProjectList::Matches
 //
 //	@doc:
 //		Match function on operator level
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarProjectList::FMatch
+CScalarProjectList::Matches
 	(
 	COperator *pop
 	)
@@ -95,8 +95,8 @@ CScalarProjectList::UlDistinctAggs
 	GPOS_ASSERT(COperator::EopScalarProjectList == pexprPrjList->Pop()->Eopid());
 
 	ULONG ulDistinctAggs = 0;
-	const ULONG ulArity = pexprPrjList->UlArity();
-	for (ULONG ul = 0; ul < ulArity; ul++)
+	const ULONG arity = pexprPrjList->Arity();
+	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		CExpression *pexprPrjEl = (*pexprPrjList)[ul];
 		CExpression *pexprChild = (*pexprPrjEl)[0];
@@ -105,7 +105,7 @@ CScalarProjectList::UlDistinctAggs
 		if (COperator::EopScalarAggFunc == eopidChild)
 		{
 			CScalarAggFunc *popScAggFunc = CScalarAggFunc::PopConvert(pexprChild->Pop());
-			if (popScAggFunc->FDistinct())
+			if (popScAggFunc->IsDistinct())
 			{
 				ulDistinctAggs++;
 			}
@@ -113,7 +113,7 @@ CScalarProjectList::UlDistinctAggs
 		else if (COperator::EopScalarWindowFunc == eopidChild)
 		{
 			CScalarWindowFunc *popScWinFunc = CScalarWindowFunc::PopConvert(pexprChild->Pop());
-			if (popScWinFunc->FDistinct() && popScWinFunc->FAgg())
+			if (popScWinFunc->IsDistinct() && popScWinFunc->FAgg())
 			{
 				ulDistinctAggs++;
 			}

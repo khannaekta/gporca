@@ -100,35 +100,35 @@ CReqdPropRelational::~CReqdPropRelational()
 void
 CReqdPropRelational::Compute
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &exprhdl,
 	CReqdProp *prpInput,
-	ULONG ulChildIndex,
+	ULONG child_index,
 	DrgPdp *, // pdrgpdpCtxt
 	ULONG // ulOptReq
 	)
 {
 	GPOS_CHECK_ABORT;
 
-	CReqdPropRelational *prprelInput =  CReqdPropRelational::Prprel(prpInput);
+	CReqdPropRelational *prprelInput =  CReqdPropRelational::GetReqdRelationalProps(prpInput);
 	CLogical *popLogical = CLogical::PopConvert(exprhdl.Pop());
 
-	m_pcrsStat = popLogical->PcrsStat(pmp, exprhdl, prprelInput->PcrsStat(), ulChildIndex);
-	m_pexprPartPred = popLogical->PexprPartPred(pmp, exprhdl, prprelInput->PexprPartPred(), ulChildIndex);
+	m_pcrsStat = popLogical->PcrsStat(memory_pool, exprhdl, prprelInput->PcrsStat(), child_index);
+	m_pexprPartPred = popLogical->PexprPartPred(memory_pool, exprhdl, prprelInput->PexprPartPred(), child_index);
 
-	exprhdl.DeriveProducerStats(ulChildIndex, m_pcrsStat);
+	exprhdl.DeriveProducerStats(child_index, m_pcrsStat);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CReqdPropRelational::Prprel
+//		CReqdPropRelational::GetReqdRelationalProps
 //
 //	@doc:
 //		Short hand for conversion
 //
 //---------------------------------------------------------------------------
 CReqdPropRelational *
-CReqdPropRelational::Prprel
+CReqdPropRelational::GetReqdRelationalProps
 	(
 	CReqdProp *prp
 	)
@@ -148,32 +148,32 @@ CReqdPropRelational::Prprel
 CReqdPropRelational *
 CReqdPropRelational::PrprelDifference
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CReqdPropRelational *prprel
 	)
 {
 	GPOS_ASSERT(NULL != prprel);
 
-	CColRefSet *pcrs = GPOS_NEW(pmp) CColRefSet(pmp);
+	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 	pcrs->Union(m_pcrsStat);
 	pcrs->Difference(prprel->PcrsStat());
 
-	return GPOS_NEW(pmp) CReqdPropRelational(pcrs);
+	return GPOS_NEW(memory_pool) CReqdPropRelational(pcrs);
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CReqdPropRelational::FEmpty
+//		CReqdPropRelational::IsEmpty
 //
 //	@doc:
 //		Return true if property container is empty
 //
 //---------------------------------------------------------------------------
 BOOL
-CReqdPropRelational::FEmpty() const
+CReqdPropRelational::IsEmpty() const
 {
-	return m_pcrsStat->CElements() == 0;
+	return m_pcrsStat->Size() == 0;
 }
 
 //---------------------------------------------------------------------------

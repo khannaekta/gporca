@@ -26,11 +26,11 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalCTEProducer::CLogicalCTEProducer
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
-	CLogical(pmp),
-	m_ulId(0),
+	CLogical(memory_pool),
+	m_id(0),
 	m_pdrgpcr(NULL),
 	m_pcrsOutput(NULL)
 {
@@ -47,19 +47,19 @@ CLogicalCTEProducer::CLogicalCTEProducer
 //---------------------------------------------------------------------------
 CLogicalCTEProducer::CLogicalCTEProducer
 	(
-	IMemoryPool *pmp,
-	ULONG ulId,
-	DrgPcr *pdrgpcr
+	IMemoryPool *memory_pool,
+	ULONG id,
+	DrgPcr *colref_array
 	)
 	:
-	CLogical(pmp),
-	m_ulId(ulId),
-	m_pdrgpcr(pdrgpcr)
+	CLogical(memory_pool),
+	m_id(id),
+	m_pdrgpcr(colref_array)
 {
-	GPOS_ASSERT(NULL != pdrgpcr);
+	GPOS_ASSERT(NULL != colref_array);
 
-	m_pcrsOutput = GPOS_NEW(pmp) CColRefSet(pmp, m_pdrgpcr);
-	GPOS_ASSERT(m_pdrgpcr->UlLength() == m_pcrsOutput->CElements());
+	m_pcrsOutput = GPOS_NEW(memory_pool) CColRefSet(memory_pool, m_pdrgpcr);
+	GPOS_ASSERT(m_pdrgpcr->Size() == m_pcrsOutput->Size());
 
 	m_pcrsLocalUsed->Include(m_pdrgpcr);
 }
@@ -89,7 +89,7 @@ CLogicalCTEProducer::~CLogicalCTEProducer()
 CColRefSet *
 CLogicalCTEProducer::PcrsDeriveOutput
 	(
-	IMemoryPool *, //pmp,
+	IMemoryPool *, //memory_pool,
 	CExpressionHandle & //exprhdl
 	)
 {
@@ -108,13 +108,13 @@ CLogicalCTEProducer::PcrsDeriveOutput
 CColRefSet *
 CLogicalCTEProducer::PcrsDeriveNotNull
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &exprhdl
 	)
 	const
 {
-	CColRefSet *pcrs = GPOS_NEW(pmp) CColRefSet(pmp, m_pdrgpcr);
-	pcrs->Intersection(exprhdl.Pdprel(0)->PcrsNotNull());
+	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool, m_pdrgpcr);
+	pcrs->Intersection(exprhdl.GetRelationalProperties(0)->PcrsNotNull());
 
 	return pcrs;
 }
@@ -130,7 +130,7 @@ CLogicalCTEProducer::PcrsDeriveNotNull
 CKeyCollection *
 CLogicalCTEProducer::PkcDeriveKeys
 	(
-	IMemoryPool *, // pmp
+	IMemoryPool *, // memory_pool
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -149,25 +149,25 @@ CLogicalCTEProducer::PkcDeriveKeys
 CMaxCard
 CLogicalCTEProducer::Maxcard
 	(
-	IMemoryPool *, // pmp
+	IMemoryPool *, // memory_pool
 	CExpressionHandle &exprhdl
 	)
 	const
 {
 	// pass on max card of first child
-	return exprhdl.Pdprel(0)->Maxcard();
+	return exprhdl.GetRelationalProperties(0)->Maxcard();
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CLogicalCTEProducer::FMatch
+//		CLogicalCTEProducer::Matches
 //
 //	@doc:
 //		Match function
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalCTEProducer::FMatch
+CLogicalCTEProducer::Matches
 	(
 	COperator *pop
 	)
@@ -180,23 +180,23 @@ CLogicalCTEProducer::FMatch
 
 	CLogicalCTEProducer *popCTEProducer = CLogicalCTEProducer::PopConvert(pop);
 
-	return m_ulId == popCTEProducer->UlCTEId() &&
-			m_pdrgpcr->FEqual(popCTEProducer->Pdrgpcr());
+	return m_id == popCTEProducer->UlCTEId() &&
+			m_pdrgpcr->Equals(popCTEProducer->Pdrgpcr());
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CLogicalCTEProducer::UlHash
+//		CLogicalCTEProducer::HashValue
 //
 //	@doc:
 //		Hash function
 //
 //---------------------------------------------------------------------------
 ULONG
-CLogicalCTEProducer::UlHash() const
+CLogicalCTEProducer::HashValue() const
 {
-	ULONG ulHash = gpos::UlCombineHashes(COperator::UlHash(), m_ulId);
-	ulHash = gpos::UlCombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcr));
+	ULONG ulHash = gpos::CombineHashes(COperator::HashValue(), m_id);
+	ulHash = gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcr));
 
 	return ulHash;
 }
@@ -212,14 +212,14 @@ CLogicalCTEProducer::UlHash() const
 COperator *
 CLogicalCTEProducer::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *pmp,
-	HMUlCr *phmulcr,
-	BOOL fMustExist
+	IMemoryPool *memory_pool,
+	UlongColRefHashMap *colref_mapping,
+	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcr = CUtils::PdrgpcrRemap(pmp, m_pdrgpcr, phmulcr, fMustExist);
+	DrgPcr *colref_array = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcr, colref_mapping, must_exist);
 
-	return GPOS_NEW(pmp) CLogicalCTEProducer(pmp, m_ulId, pdrgpcr);
+	return GPOS_NEW(memory_pool) CLogicalCTEProducer(memory_pool, m_id, colref_array);
 }
 
 //---------------------------------------------------------------------------
@@ -233,13 +233,13 @@ CLogicalCTEProducer::PopCopyWithRemappedColumns
 CXformSet *
 CLogicalCTEProducer::PxfsCandidates
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	const
 {
-	CXformSet *pxfs = GPOS_NEW(pmp) CXformSet(pmp);
-	(void) pxfs->FExchangeSet(CXform::ExfImplementCTEProducer);
-	return pxfs;
+	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	(void) xform_set->ExchangeSet(CXform::ExfImplementCTEProducer);
+	return xform_set;
 }
 
 //---------------------------------------------------------------------------
@@ -258,7 +258,7 @@ CLogicalCTEProducer::OsPrint
 	const
 {
 	os << SzId() << " (";
-	os << m_ulId;
+	os << m_id;
 	os << "), Columns: [";
 	CUtils::OsPrintDrgPcr(os, m_pdrgpcr);
 	os	<< "]";

@@ -94,7 +94,7 @@ namespace gpopt
 			virtual
 			void AppendEnforcers
 				(
-				IMemoryPool * , // pmp 
+				IMemoryPool * , // memory_pool 
 				CExpressionHandle &, // exprhdl: gives access to child properties
 				CReqdPropPlan *, // prpp
 				DrgPexpr *, // pdrgpexpr 

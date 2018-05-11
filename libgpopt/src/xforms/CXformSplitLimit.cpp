@@ -29,19 +29,19 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformSplitLimit::CXformSplitLimit
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	CXformExploration
 		(
 		 // pattern
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 					(
-					pmp,
-					GPOS_NEW(pmp) CLogicalLimit(pmp),
-					GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)), // relational child
-					GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)),  // scalar child for offset
-					GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp))  // scalar child for number of rows
+					memory_pool,
+					GPOS_NEW(memory_pool) CLogicalLimit(memory_pool),
+					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // relational child
+					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),  // scalar child for offset
+					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))  // scalar child for number of rows
 					)
 		)
 {}
@@ -61,7 +61,7 @@ CXformSplitLimit::Exfp
 	)
 	const
 {
-	if (0 < exprhdl.Pdprel()->PcrsOuter()->CElements())
+	if (0 < exprhdl.GetRelationalProperties()->PcrsOuter()->Size())
 	{
 		return CXform::ExfpNone;
 	}
@@ -98,7 +98,7 @@ CXformSplitLimit::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 	// extract components
 	CLogicalLimit *popLimit = CLogicalLimit::PopConvert(pexpr->Pop());
 	CExpression *pexprRelational = (*pexpr)[0];
@@ -108,10 +108,10 @@ CXformSplitLimit::Transform
 
 	// get relational properties
 	CDrvdPropRelational *pdprel =
-			CDrvdPropRelational::Pdprel(pexprRelational->Pdp(CDrvdProp::EptRelational));
+			CDrvdPropRelational::GetRelationalProperties(pexprRelational->Pdp(CDrvdProp::EptRelational));
 
 	// TODO: , Feb 20, 2012, we currently only split limit with offset 0.
-	if (!CUtils::FHasZeroOffset(pexpr) || 0 < pdprel->PcrsOuter()->CElements())
+	if (!CUtils::FHasZeroOffset(pexpr) || 0 < pdprel->PcrsOuter()->Size())
 	{
 		return;
 	}
@@ -122,27 +122,27 @@ CXformSplitLimit::Transform
 	// assemble local limit operator
 	CExpression *pexprLimitLocal = PexprLimit
 			(
-			pmp,
+			memory_pool,
 			pexprRelational,
 			pexprScalarStart,
 			pexprScalarRows,
 			pos,
 			false, // fGlobal
 			popLimit->FHasCount(),
-			popLimit->FTopLimitUnderDML()
+			popLimit->IsTopLimitUnderDMLorCTAS()
 			);
 
 	// assemble global limit operator
 	CExpression *pexprLimitGlobal = PexprLimit
 			(
-			pmp,
+			memory_pool,
 			pexprLimitLocal,
 			pexprScalarStart,
 			pexprScalarRows,
 			pos,
 			true, // fGlobal
 			popLimit->FHasCount(),
-			popLimit->FTopLimitUnderDML()
+			popLimit->IsTopLimitUnderDMLorCTAS()
 			);
 
 	pxfres->Add(pexprLimitGlobal);
@@ -160,7 +160,7 @@ CXformSplitLimit::Transform
 CExpression *
 CXformSplitLimit::PexprLimit
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpression *pexprRelational,
 	CExpression *pexprScalarStart,
 	CExpression *pexprScalarRows,
@@ -176,10 +176,10 @@ CXformSplitLimit::PexprLimit
 	pos->AddRef();
 
 	// assemble global limit operator
-	CExpression *pexprLimit = GPOS_NEW(pmp) CExpression
+	CExpression *pexprLimit = GPOS_NEW(memory_pool) CExpression
 			(
-			pmp,
-			GPOS_NEW(pmp) CLogicalLimit(pmp, pos, fGlobal, fHasCount, fTopLimitUnderDML),
+			memory_pool,
+			GPOS_NEW(memory_pool) CLogicalLimit(memory_pool, pos, fGlobal, fHasCount, fTopLimitUnderDML),
 			pexprRelational,
 			pexprScalarStart,
 			pexprScalarRows

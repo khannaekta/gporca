@@ -8,36 +8,36 @@ using namespace gpopt;
 
 CStrictHashedDistributions::CStrictHashedDistributions
 (
-IMemoryPool *pmp,
+IMemoryPool *memory_pool,
 DrgPcr *pdrgpcrOutput,
 DrgDrgPcr *pdrgpdrgpcrInput
 )
 :
-DrgPds(pmp)
+DrgPds(memory_pool)
 {
-	const ULONG ulCols = pdrgpcrOutput->UlLength();
-	const ULONG ulArity = pdrgpdrgpcrInput->UlLength();
-	for (ULONG ulChild = 0; ulChild < ulArity; ulChild++)
+	const ULONG num_cols = pdrgpcrOutput->Size();
+	const ULONG arity = pdrgpdrgpcrInput->Size();
+	for (ULONG ulChild = 0; ulChild < arity; ulChild++)
 	{
-		DrgPcr *pdrgpcr = (*pdrgpdrgpcrInput)[ulChild];
-		DrgPexpr *pdrgpexpr = GPOS_NEW(pmp) DrgPexpr(pmp);
-		for (ULONG ulCol = 0; ulCol < ulCols; ulCol++)
+		DrgPcr *colref_array = (*pdrgpdrgpcrInput)[ulChild];
+		DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+		for (ULONG ulCol = 0; ulCol < num_cols; ulCol++)
 		{
-			CColRef *pcr = (*pdrgpcr)[ulCol];
-			if (pcr->Pmdtype()->FRedistributable())
+			CColRef *colref = (*colref_array)[ulCol];
+			if (colref->Pmdtype()->IsRedistributable())
 			{
-				CExpression *pexpr = CUtils::PexprScalarIdent(pmp, pcr);
+				CExpression *pexpr = CUtils::PexprScalarIdent(memory_pool, colref);
 				pdrgpexpr->Append(pexpr);
 			}
 		}
 
 		CDistributionSpec *pdshashed;
-		ULONG ulColumnsToRedistribute = pdrgpexpr->UlLength();
+		ULONG ulColumnsToRedistribute = pdrgpexpr->Size();
 		if (0 < ulColumnsToRedistribute)
 		{
 			// create a hashed distribution on input columns of the current child
 			BOOL fNullsColocated = true;
-			pdshashed = GPOS_NEW(pmp) CDistributionSpecStrictHashed(pdrgpexpr, fNullsColocated);
+			pdshashed = GPOS_NEW(memory_pool) CDistributionSpecStrictHashed(pdrgpexpr, fNullsColocated);
 		}
 		else
 		{
@@ -48,7 +48,7 @@ DrgPds(pmp)
 			// Some databases actually execute it as if it's a random redistribution.
 			// We should not generate such a plan, for clarity and our own sanity
 
-			pdshashed = GPOS_NEW(pmp) CDistributionSpecStrictRandom();
+			pdshashed = GPOS_NEW(memory_pool) CDistributionSpecStrictRandom();
 			pdrgpexpr->Release();
 		}
 		Append(pdshashed);

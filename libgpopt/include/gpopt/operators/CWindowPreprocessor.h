@@ -38,7 +38,7 @@ namespace gpopt
 			static
 			void SplitPrjList
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpression *pexprSeqPrj,
 				DrgPexpr **ppdrgpexprDistinctAggsPrjElems,
 				DrgPexpr **ppdrgpexprOtherPrjElems,
@@ -52,7 +52,7 @@ namespace gpopt
 			static
 			void SplitSeqPrj
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpression *pexprSeqPrj,
 				CExpression **ppexprGbAgg,
 				CExpression **ppexprOutputSeqPrj
@@ -62,7 +62,7 @@ namespace gpopt
 			static
 			void CreateCTE
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpression *pexprSeqPrj,
 				CExpression **ppexprFirstConsumer,
 				CExpression **ppexprSecondConsumer
@@ -74,13 +74,13 @@ namespace gpopt
 
 			// transform sequence project expression into an inner join expression
 			static
-			CExpression *PexprSeqPrj2Join(IMemoryPool *pmp, CExpression *pexprSeqPrj);
+			CExpression *PexprSeqPrj2Join(IMemoryPool *memory_pool, CExpression *pexprSeqPrj);
 
 		public:
 
 			// main driver
 			static
-			CExpression *PexprPreprocess(IMemoryPool *pmp, CExpression *pexpr);
+			CExpression *PexprPreprocess(IMemoryPool *memory_pool, CExpression *pexpr);
 
 	}; // class CWindowPreprocessor
 }

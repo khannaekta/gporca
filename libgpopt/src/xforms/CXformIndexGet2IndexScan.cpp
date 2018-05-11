@@ -29,17 +29,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformIndexGet2IndexScan::CXformIndexGet2IndexScan
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	// pattern
 	CXformImplementation
 		(
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 				(
-				pmp,
-				GPOS_NEW(pmp) CLogicalIndexGet(pmp),
-				GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp))	// index lookup predicate
+				memory_pool,
+				GPOS_NEW(memory_pool) CLogicalIndexGet(memory_pool),
+				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))	// index lookup predicate
 				)
 		)
 {}
@@ -66,7 +66,7 @@ CXformIndexGet2IndexScan::Transform
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CLogicalIndexGet *pop = CLogicalIndexGet::PopConvert(pexpr->Pop());
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 
 	CIndexDescriptor *pindexdesc = pop->Pindexdesc();
 	pindexdesc->AddRef();
@@ -89,16 +89,16 @@ CXformIndexGet2IndexScan::Transform
 	pexprIndexCond->AddRef();
 
 	CExpression *pexprAlt =
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 			(
-			pmp,
-			GPOS_NEW(pmp) CPhysicalIndexScan
+			memory_pool,
+			GPOS_NEW(memory_pool) CPhysicalIndexScan
 				(
-				pmp,
+				memory_pool,
 				pindexdesc,
 				ptabdesc,
 				pexpr->Pop()->UlOpId(),
-				GPOS_NEW(pmp) CName (pmp, pop->NameAlias()),
+				GPOS_NEW(memory_pool) CName (memory_pool, pop->NameAlias()),
 				pdrgpcrOutput,
 				pos
 				),

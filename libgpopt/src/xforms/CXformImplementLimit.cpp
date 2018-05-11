@@ -27,19 +27,19 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformImplementLimit::CXformImplementLimit
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	// pattern
 	CXformImplementation
 		(
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 						(
-						pmp, 
-						GPOS_NEW(pmp) CLogicalLimit(pmp),
-						GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)), // relational child
-						GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)),  // scalar child for offset
-						GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp))  // scalar child for number of rows
+						memory_pool, 
+						GPOS_NEW(memory_pool) CLogicalLimit(memory_pool),
+						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // relational child
+						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),  // scalar child for offset
+						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))  // scalar child for number of rows
 
 						)
 		)
@@ -67,7 +67,7 @@ CXformImplementLimit::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 		
 	// extract components
 	CLogicalLimit *popLimit = CLogicalLimit::PopConvert(pexpr->Pop());
@@ -84,16 +84,16 @@ CXformImplementLimit::Transform
 	
 	// assemble physical operator
 	CExpression *pexprLimit = 
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 					(
-					pmp, 
-					GPOS_NEW(pmp) CPhysicalLimit
+					memory_pool, 
+					GPOS_NEW(memory_pool) CPhysicalLimit
 						(
-						pmp,
+						memory_pool,
 						pos,
 						popLimit->FGlobal(),
 						popLimit->FHasCount(),
-						popLimit->FTopLimitUnderDML()
+						popLimit->IsTopLimitUnderDMLorCTAS()
 						),
 					pexprRelational,
 					pexprScalarStart,

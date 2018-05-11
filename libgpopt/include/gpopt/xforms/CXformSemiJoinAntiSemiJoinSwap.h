@@ -42,10 +42,10 @@ namespace gpopt
 			explicit
 			CXformSemiJoinAntiSemiJoinSwap
 				(
-				IMemoryPool *pmp
+				IMemoryPool *memory_pool
 				)
 				:
-				CXformJoinSwap<CLogicalLeftSemiJoin, CLogicalLeftAntiSemiJoin>(pmp)
+				CXformJoinSwap<CLogicalLeftSemiJoin, CLogicalLeftAntiSemiJoin>(memory_pool)
 			{}
 
 			// dtor

@@ -29,11 +29,11 @@ namespace gpopt
 	typedef CDynamicPtrArray<CColRefSet, CleanupRelease> DrgPcrs;
 
 	// hash map mapping CColRef -> CColRefSet
-	typedef CHashMap<CColRef, CColRefSet, gpos::UlHash<CColRef>, gpos::FEqual<CColRef>,
+	typedef CHashMap<CColRef, CColRefSet, gpos::HashValue<CColRef>, gpos::Equals<CColRef>,
 					CleanupNULL<CColRef>, CleanupRelease<CColRefSet> > HMCrCrs;
 
 	// hash map mapping INT -> CColRef
-	typedef CHashMap<INT, CColRef, gpos::UlHash<INT>, gpos::FEqual<INT>,
+	typedef CHashMap<INT, CColRef, gpos::HashValue<INT>, gpos::Equals<INT>,
 					CleanupDelete<INT>, CleanupNULL<CColRef> > HMICr;
 
 	//---------------------------------------------------------------------------
@@ -55,31 +55,31 @@ namespace gpopt
 		private:
 						
 			// determine if bit is set
-			BOOL FBit(ULONG ulBit) const;
+			BOOL Get(ULONG ulBit) const;
 			
-			// set given bit; return previous value
-			BOOL FExchangeSet(ULONG ulBit);
+			// set given bit; return previous m_bytearray_value
+			BOOL ExchangeSet(ULONG ulBit);
 						
-			// clear given bit; return previous value
-			BOOL FExchangeClear(ULONG ulBit);
+			// clear given bit; return previous m_bytearray_value
+			BOOL ExchangeClear(ULONG ulBit);
 
 		public:
 				
 			// ctor
 			explicit
-			CColRefSet(IMemoryPool *pmp, ULONG ulSizeBits = GPOPT_COLREFSET_SIZE);
+			CColRefSet(IMemoryPool *memory_pool, ULONG ulSizeBits = GPOPT_COLREFSET_SIZE);
 
 			explicit
-			CColRefSet(IMemoryPool *pmp, const CColRefSet &);
+			CColRefSet(IMemoryPool *memory_pool, const CColRefSet &);
 			
 			// ctor, copy from col refs array
-			CColRefSet(IMemoryPool *pmp, const DrgPcr *pdrgpcr, ULONG ulSizeBits = GPOPT_COLREFSET_SIZE);
+			CColRefSet(IMemoryPool *memory_pool, const DrgPcr *colref_array, ULONG ulSizeBits = GPOPT_COLREFSET_SIZE);
 
 			// dtor
 			~CColRefSet();
 			
 			// determine if bit is set
-			BOOL FMember(const CColRef *pcr) const;
+			BOOL FMember(const CColRef *colref) const;
 			
 			// return random member
 			CColRef *PcrAny() const;
@@ -88,19 +88,19 @@ namespace gpopt
 			CColRef *PcrFirst() const;
 
 			// include column
-			void Include(const CColRef *pcr);
+			void Include(const CColRef *colref);
 
 			// include column array
-			void Include(const DrgPcr *pdrgpcr);
+			void Include(const DrgPcr *colref_array);
 
 			// include column set
 			void Include(const CColRefSet *pcrs);
 						
 			// remove column
-			void Exclude(const CColRef *pcr);
+			void Exclude(const CColRef *colref);
 			
 			// remove column array
-			void Exclude(const DrgPcr *pdrgpcr);
+			void Exclude(const DrgPcr *colref_array);
 
 			// remove column set
 			void Exclude(const CColRefSet *pcrs);
@@ -116,17 +116,17 @@ namespace gpopt
 			BOOL FContained(const DrgPcrs *pdrgpcrs);
 
 			// convert to array
-			DrgPcr *Pdrgpcr(IMemoryPool *pmp) const;
+			DrgPcr *Pdrgpcr(IMemoryPool *memory_pool) const;
 
 			// hash function
-			ULONG UlHash();	
+			ULONG HashValue();	
 
 			// debug print
 			IOstream &
 			OsPrint(IOstream &os, ULONG ulLenMax = gpos::ulong_max) const;
 
 			// extract all column ids
-			void ExtractColIds(IMemoryPool *pmp, DrgPul *pdrgpulColIds) const;
+			void ExtractColIds(IMemoryPool *memory_pool, ULongPtrArray *col_ids) const;
 
 			// are the columns in the column reference set covered by the array of column ref sets
 			static

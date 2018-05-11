@@ -7,7 +7,7 @@
 //
 //	@doc:
 //		Scalar CoerceViaIO operator,
-//		the operator captures coercing a value from one type to another, by
+//		the operator captures coercing a m_bytearray_value from one type to another, by
 //		calling the output function of the argument type, and passing the
 //		result to the input function of the result type.
 //
@@ -47,11 +47,11 @@ namespace gpopt
 			// ctor
 			CScalarCoerceViaIO
 				(
-				IMemoryPool *pmp,
-				IMDId *pmdidType,
-				INT iTypeModifier,
-				ECoercionForm edxlcf,
-				INT iLoc
+				IMemoryPool *memory_pool,
+				IMDId *mdid_type,
+				INT type_modifier,
+				ECoercionForm dxl_coerce_format,
+				INT location
 				);
 
 			// dtor
@@ -75,7 +75,7 @@ namespace gpopt
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *) const;
+			BOOL Matches(COperator *) const;
 
 			// sensitivity to order of inputs
 			virtual

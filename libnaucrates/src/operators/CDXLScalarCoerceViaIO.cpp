@@ -32,29 +32,29 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLScalarCoerceViaIO::CDXLScalarCoerceViaIO
 	(
-	IMemoryPool *pmp,
-	IMDId *pmdidType,
-	INT iTypeModifier,
-	EdxlCoercionForm edxlcf,
-	INT iLoc
+	IMemoryPool *memory_pool,
+	IMDId *mdid_type,
+	INT type_modifier,
+	EdxlCoercionForm dxl_coerce_format,
+	INT location
 	)
 	:
-	CDXLScalarCoerceBase(pmp, pmdidType, iTypeModifier, edxlcf, iLoc)
+	CDXLScalarCoerceBase(memory_pool, mdid_type, type_modifier, dxl_coerce_format, location)
 {
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarCoerceViaIO::PstrOpName
+//		CDXLScalarCoerceViaIO::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLScalarCoerceViaIO::PstrOpName() const
+CDXLScalarCoerceViaIO::GetOpNameStr() const
 {
-	return CDXLTokens::PstrToken(EdxltokenScalarCoerceViaIO);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenScalarCoerceViaIO);
 }
 
 // EOF

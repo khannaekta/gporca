@@ -31,7 +31,7 @@ namespace gpnaucrates
 	class CJoinCardinalityTest
 	{
 		// shorthand for functions for generating the join predicates
-		typedef DrgPstatspredjoin *(FnPdrgpstatjoin)(IMemoryPool *pmp);
+		typedef StatsPredJoinArray *(FnPdrgpstatjoin)(IMemoryPool *memory_pool);
 
 		private:
 
@@ -77,7 +77,7 @@ namespace gpnaucrates
 			struct SHistogramTestCase
 			{
 				// number of buckets in the histogram
-				ULONG m_ulBuckets;
+				ULONG m_num_of_buckets;
 
 				// number of distinct values per bucket
 				CDouble m_dNDVPerBucket;
@@ -92,15 +92,15 @@ namespace gpnaucrates
 
 			// helper method to generate a single join predicate
 			static
-			DrgPstatspredjoin *PdrgpstatspredjoinSingleJoinPredicate(IMemoryPool *pmp);
+			StatsPredJoinArray *PdrgpstatspredjoinSingleJoinPredicate(IMemoryPool *memory_pool);
 
 			// helper method to generate generate multiple join predicates
 			static
-			DrgPstatspredjoin *PdrgpstatspredjoinMultiplePredicates(IMemoryPool *pmp);
+			StatsPredJoinArray *PdrgpstatspredjoinMultiplePredicates(IMemoryPool *memory_pool);
 
 			// helper method to generate join predicate over columns that contain null values
 			static
-			DrgPstatspredjoin *PdrgpstatspredjoinNullableCols(IMemoryPool *pmp);
+			StatsPredJoinArray *PdrgpstatspredjoinNullableCols(IMemoryPool *memory_pool);
 
 		public:
 

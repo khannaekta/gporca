@@ -29,15 +29,15 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformGbAgg2StreamAgg::CXformGbAgg2StreamAgg
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	CXformImplementation
 		(
 		 // pattern
-		GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CLogicalGbAgg(pmp),
-							 GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)),
-							 GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)))
+		GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CLogicalGbAgg(memory_pool),
+							 GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),
+							 GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)))
 		)
 {}
 
@@ -75,9 +75,9 @@ CXformGbAgg2StreamAgg::Exfp
 	const
 {
 	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(exprhdl.Pop());
-	if (0 == popAgg->Pdrgpcr()->UlLength() ||
+	if (0 == popAgg->Pdrgpcr()->Size() ||
 		!CUtils::FComparisonPossible(popAgg->Pdrgpcr(), IMDType::EcmptL) ||
-		exprhdl.Pdpscalar(1 /*ulChildIndex*/)->FHasSubquery())
+		exprhdl.GetDrvdScalarProps(1 /*child_index*/)->FHasSubquery())
 	{
 		// no grouping columns, or no sort operators are available for grouping columns, or
 		// agg functions use subquery arguments
@@ -109,9 +109,9 @@ CXformGbAgg2StreamAgg::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
-	IMemoryPool *pmp = pxfctxt->Pmp();
-	DrgPcr *pdrgpcr = popAgg->Pdrgpcr();
-	pdrgpcr->AddRef();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	DrgPcr *colref_array = popAgg->Pdrgpcr();
+	colref_array->AddRef();
 	
 	// extract components
 	CExpression *pexprRel = (*pexpr)[0];
@@ -122,20 +122,20 @@ CXformGbAgg2StreamAgg::Transform
 	pexprScalar->AddRef();
 
 	DrgPcr *pdrgpcrArgDQA = popAgg->PdrgpcrArgDQA();
-	if (pdrgpcrArgDQA != NULL && 0 != pdrgpcrArgDQA->UlLength())
+	if (pdrgpcrArgDQA != NULL && 0 != pdrgpcrArgDQA->Size())
 	{
 		pdrgpcrArgDQA->AddRef();
 	}
 
 	// create alternative expression
 	CExpression *pexprAlt = 
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 			(
-			pmp,
-			GPOS_NEW(pmp) CPhysicalStreamAgg
+			memory_pool,
+			GPOS_NEW(memory_pool) CPhysicalStreamAgg
 						(
-						pmp,
-						pdrgpcr,
+						memory_pool,
+						colref_array,
 						popAgg->PdrgpcrMinimal(),
 						popAgg->Egbaggtype(),
 						popAgg->FGeneratesDuplicates(),

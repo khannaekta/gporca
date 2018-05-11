@@ -37,7 +37,7 @@ namespace gpopt
 			// helper function for creating a limit expression
 			CExpression *PexprLimit
 				(
-				IMemoryPool *pmp , // memory pool
+				IMemoryPool *memory_pool , // memory pool
 				CExpression *pexprRelational, // relational child
 				CExpression *pexprScalarStart, // limit offset
 				CExpression *pexprScalarRows, // limit count
@@ -52,7 +52,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformSplitLimit(IMemoryPool *pmp);
+			CXformSplitLimit(IMemoryPool *memory_pool);
 
 			// dtor
 			virtual

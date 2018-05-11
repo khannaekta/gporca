@@ -27,18 +27,18 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformSequenceProject2Apply::CXformSequenceProject2Apply
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	// pattern
 	CXformSubqueryUnnest
 		(
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 				(
-				pmp,
-				GPOS_NEW(pmp) CLogicalSequenceProject(pmp),
-				GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)),	// relational child
-				GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternTree(pmp))	// project list
+				memory_pool,
+				GPOS_NEW(memory_pool) CLogicalSequenceProject(memory_pool),
+				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),	// relational child
+				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))	// project list
 				)
 		)
 {}

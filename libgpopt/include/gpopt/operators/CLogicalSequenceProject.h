@@ -50,10 +50,10 @@ namespace gpopt
 			BOOL m_fHasFrameSpecs;
 
 			// set the flag indicating that SeqPrj has specified order specs
-			void SetHasOrderSpecs(IMemoryPool *pmp);
+			void SetHasOrderSpecs(IMemoryPool *memory_pool);
 
 			// set the flag indicating that SeqPrj has specified frame specs
-			void SetHasFrameSpecs(IMemoryPool *pmp);
+			void SetHasFrameSpecs(IMemoryPool *memory_pool);
 
 			// private copy ctor
 			CLogicalSequenceProject(const CLogicalSequenceProject &);
@@ -63,7 +63,7 @@ namespace gpopt
 			// ctor
 			CLogicalSequenceProject
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CDistributionSpec *pds,
 				DrgPos *pdrgpos,
 				DrgPwf *pdrgpwf
@@ -71,7 +71,7 @@ namespace gpopt
 
 			// ctor for pattern
 			explicit
-			CLogicalSequenceProject(IMemoryPool *pmp);
+			CLogicalSequenceProject(IMemoryPool *memory_pool);
 
 			// dtor
 			virtual
@@ -123,13 +123,13 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// return true if we can pull projections up past this operator from its given child
 			virtual
 			BOOL FCanPullProjectionsUp
 				(
-				ULONG //ulChildIndex
+				ULONG //child_index
 				) const
 			{
 				return false;
@@ -141,25 +141,25 @@ namespace gpopt
 
 			// derive output columns
 			virtual
-			CColRefSet *PcrsDeriveOutput(IMemoryPool *pmp, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsDeriveOutput(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
 
 			// derive outer references
 			virtual
-			CColRefSet *PcrsDeriveOuter(IMemoryPool *pmp, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsDeriveOuter(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
 
 			// dervive keys
 			virtual
-			CKeyCollection *PkcDeriveKeys(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CKeyCollection *PkcDeriveKeys(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			// derive constraint property
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *, //pmp,
+				IMemoryPool *, //memory_pool,
 				CExpressionHandle &exprhdl
 				)
 				const
@@ -173,7 +173,7 @@ namespace gpopt
 
 			// candidate set of xforms
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *pmp) const;
+			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
 
 			//-------------------------------------------------------------------------------------
 			//-------------------------------------------------------------------------------------
@@ -183,25 +183,25 @@ namespace gpopt
 			virtual
 			IStatistics *PstatsDerive
 						(
-						IMemoryPool *pmp,
+						IMemoryPool *memory_pool,
 						CExpressionHandle &exprhdl,
-						DrgPstat *pdrgpstatCtxt
+						StatsArray *stats_ctxt
 						)
 						const;
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			virtual
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 
 			// print
 			virtual
 			IOstream &OsPrint(IOstream &os) const;
 
 			// remove outer references from Order By/ Partition By clauses, and return a new operator
-			CLogicalSequenceProject *PopRemoveLocalOuterRefs(IMemoryPool *pmp, CExpressionHandle &exprhdl);
+			CLogicalSequenceProject *PopRemoveLocalOuterRefs(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
 
 			// return true if outer references are included in Partition/Order, or window frame edges
 			BOOL FHasLocalOuterRefs(CExpressionHandle &exprhdl) const;

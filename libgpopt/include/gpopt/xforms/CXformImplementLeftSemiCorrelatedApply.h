@@ -43,10 +43,10 @@ namespace gpopt
 			explicit
 			CXformImplementLeftSemiCorrelatedApply
 				(
-				IMemoryPool *pmp
+				IMemoryPool *memory_pool
 				)
 				:
-				CXformImplementCorrelatedApply<CLogicalLeftSemiCorrelatedApply, CPhysicalCorrelatedLeftSemiNLJoin>(pmp)
+				CXformImplementCorrelatedApply<CLogicalLeftSemiCorrelatedApply, CPhysicalCorrelatedLeftSemiNLJoin>(memory_pool)
 			{}
 
 			// dtor

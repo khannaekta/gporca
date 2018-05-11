@@ -27,24 +27,24 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformCollapseProject::CXformCollapseProject
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	CXformExploration
 		(
 		 // pattern
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 					(
-					pmp,
-					GPOS_NEW(pmp) CLogicalProject(pmp),
-					GPOS_NEW(pmp) CExpression
+					memory_pool,
+					GPOS_NEW(memory_pool) CLogicalProject(memory_pool),
+					GPOS_NEW(memory_pool) CExpression
 						(
-						pmp,
-						GPOS_NEW(pmp) CLogicalProject(pmp),
-						GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)),  // relational child
-						GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternTree(pmp))  // scalar project list
+						memory_pool,
+						GPOS_NEW(memory_pool) CLogicalProject(memory_pool),
+						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),  // relational child
+						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))  // scalar project list
 						),
-					GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternTree(pmp))  // scalar project list
+					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))  // scalar project list
 					)
 		)
 {}
@@ -91,9 +91,9 @@ CXformCollapseProject::Transform
 	GPOS_ASSERT(NULL != pxfres);
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 
-	CExpression *pexprCollapsed = CUtils::PexprCollapseProjects(pmp, pexpr);
+	CExpression *pexprCollapsed = CUtils::PexprCollapseProjects(memory_pool, pexpr);
 
 	if (NULL != pexprCollapsed)
 	{

@@ -38,9 +38,9 @@ namespace
 				}
 			}
 
-			const CHAR *SzDxl(const CHAR *szDXLFileName)
+			const CHAR *SzDxl(const CHAR *dxl_filename)
 			{
-				m_szDXL = CDXLUtils::SzRead(Pmp(), szDXLFileName);
+				m_szDXL = CDXLUtils::Read(Pmp(), dxl_filename);
 
 				GPOS_CHECK_ABORT;
 
@@ -52,27 +52,27 @@ namespace
 static void
 SerializeOptimizerConfig
 		(
-		IMemoryPool *pmp,
-		COptimizerConfig *poconf,
+		IMemoryPool *memory_pool,
+		COptimizerConfig *optimizer_config,
 		COstream &oos,
-		BOOL fIndent
+		BOOL indentation
 		)
 {
-	GPOS_ASSERT(NULL != pmp);
-	GPOS_ASSERT(NULL != poconf);
+	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != optimizer_config);
 
-	CXMLSerializer xmlser(pmp, oos, fIndent);
+	CXMLSerializer xml_serializer(memory_pool, oos, indentation);
 
 	// Add XML version and encoding, DXL document header, and namespace
-	CDXLUtils::SerializeHeader(pmp, &xmlser);
+	CDXLUtils::SerializeHeader(memory_pool, &xml_serializer);
 
 	// Make a dummy bitset
-	CBitSet *pbs = GPOS_NEW(pmp) CBitSet(pmp, 256);
+	CBitSet *pbs = GPOS_NEW(memory_pool) CBitSet(memory_pool, 256);
 
-	poconf->Serialize(pmp, &xmlser, pbs);
+	optimizer_config->Serialize(memory_pool, &xml_serializer, pbs);
 
 	// Add DXL document footer
-	CDXLUtils::SerializeFooter(&xmlser);
+	CDXLUtils::SerializeFooter(&xml_serializer);
 
 	pbs->Release();
 	return;
@@ -81,7 +81,7 @@ SerializeOptimizerConfig
 namespace gpdxl
 {
 	// Optimizer Config request file
-	const CHAR *szDXLFileName = "../data/dxl/parse_tests/OptimizerConfig.xml";
+	const CHAR *dxl_filename = "../data/dxl/parse_tests/OptimizerConfig.xml";
 
 	// Parse an optimizer config and verify correctness of serialization.
 	// Serialization of COptimizerConfig is only done for writing to a DXL file as part of creating a minidump
@@ -89,18 +89,18 @@ namespace gpdxl
 	{
 		BOOL fValidate = false;
 		Fixture f;
-		IMemoryPool *pmp = f.Pmp();
+		IMemoryPool *memory_pool = f.Pmp();
 		// Valid input for this test requires DXL in the form of:
 		// Please note that most editors will automatically add a newline at the end of the file
 		// This will cause the test to fail, as we do a byte-wise string comparison as opposed to a
 		// comparison of canonicalized XML
-		const CHAR *szDXL = f.SzDxl(szDXLFileName);
+		const CHAR *dxl_string = f.SzDxl(dxl_filename);
 		const CHAR *szValidationPath = f.SzValidationPath(fValidate);
 
-		CWStringDynamic str(pmp);
+		CWStringDynamic str(memory_pool);
 		COstreamString oss(&str);
 
-		COptimizerConfig *poc = CDXLUtils::PoptimizerConfigParseDXL(pmp, szDXL, szValidationPath);
+		COptimizerConfig *poc = CDXLUtils::ParseDXLToOptimizerConfig(memory_pool, dxl_string, szValidationPath);
 
 		GPOS_ASSERT(NULL != poc);
 
@@ -109,13 +109,13 @@ namespace gpdxl
 		// Though the serialization of an optimizer config will include a traceflags element
 		// This test tests only the serializing of the traceflags element itself and not the traceflag values
 		// The production code calls a method to get the traceflags from a global task context
-		SerializeOptimizerConfig(pmp, poc, oss, false);
+		SerializeOptimizerConfig(memory_pool, poc, oss, false);
 		GPOS_CHECK_ABORT;
 
-		CWStringDynamic strExpected(pmp);
-		strExpected.AppendFormat(GPOS_WSZ_LIT("%s"), szDXL);
+		CWStringDynamic strExpected(memory_pool);
+		strExpected.AppendFormat(GPOS_WSZ_LIT("%s"), dxl_string);
 
-		GPOS_ASSERT(strExpected.FEquals(&str));
+		GPOS_ASSERT(strExpected.Equals(&str));
 
 		poc->Release();
 

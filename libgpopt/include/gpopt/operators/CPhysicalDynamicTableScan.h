@@ -38,13 +38,13 @@ namespace gpopt
 			// ctors
 			CPhysicalDynamicTableScan
 				(
-				IMemoryPool *pmp,
-				BOOL fPartial,
+				IMemoryPool *memory_pool,
+				BOOL is_partial,
 				const CName *pname, 
 				CTableDescriptor *ptabdesc,
 				ULONG ulOriginOpId,
-				ULONG ulScanId,
-				DrgPcr *pdrgpcr,
+				ULONG scan_id,
+				DrgPcr *colref_array,
 				DrgDrgPcr *pdrgpdrgpcrParts,
 				ULONG ulSecondaryScanId,
 				CPartConstraint *ppartcnstr,
@@ -67,11 +67,11 @@ namespace gpopt
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *) const;
+			BOOL Matches(COperator *) const;
 
 			// statistics derivation during costing
 			virtual
-			IStatistics *PstatsDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl, CReqdPropPlan *prpplan, DrgPstat *pdrgpstatCtxt) const;
+			IStatistics *PstatsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CReqdPropPlan *prpplan, StatsArray *stats_ctxt) const;
 
 			// conversion function
 			static

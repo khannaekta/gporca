@@ -43,19 +43,19 @@ namespace gpopt
 			explicit
 			CXformLeftSemiApplyIn2LeftSemiJoinNoCorrelations
 				(
-				IMemoryPool *pmp
+				IMemoryPool *memory_pool
 				)
 				:
 				CXformLeftSemiApply2LeftSemiJoinNoCorrelations
 					(
-						pmp,
-						GPOS_NEW(pmp) CExpression
+						memory_pool,
+						GPOS_NEW(memory_pool) CExpression
 							(
-							pmp,
-							GPOS_NEW(pmp) CLogicalLeftSemiApplyIn(pmp),
-							GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)), // left child
-							GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternTree(pmp)), // right child
-							GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternTree(pmp)) // predicate
+							memory_pool,
+							GPOS_NEW(memory_pool) CLogicalLeftSemiApplyIn(memory_pool),
+							GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // left child
+							GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool)), // right child
+							GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool)) // predicate
 							)
 					)
 			{}

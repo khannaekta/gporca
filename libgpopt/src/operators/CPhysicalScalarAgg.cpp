@@ -31,8 +31,8 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalScalarAgg::CPhysicalScalarAgg
 	(
-	IMemoryPool *pmp,
-	DrgPcr *pdrgpcr,
+	IMemoryPool *memory_pool,
+	DrgPcr *colref_array,
 	DrgPcr *pdrgpcrMinimal,
 	COperator::EGbAggType egbaggtype,
 	BOOL fGeneratesDuplicates,
@@ -40,7 +40,7 @@ CPhysicalScalarAgg::CPhysicalScalarAgg
 	BOOL fMultiStage
 	)
 	:
-	CPhysicalAgg(pmp, pdrgpcr, pdrgpcrMinimal, egbaggtype, fGeneratesDuplicates, pdrgpcrArgDQA, fMultiStage)
+	CPhysicalAgg(memory_pool, colref_array, pdrgpcrMinimal, egbaggtype, fGeneratesDuplicates, pdrgpcrArgDQA, fMultiStage)
 {}
 
 
@@ -67,12 +67,12 @@ CPhysicalScalarAgg::~CPhysicalScalarAgg()
 COrderSpec *
 CPhysicalScalarAgg::PosRequired
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &, // exprhdl
 	COrderSpec *, // posRequired
 	ULONG
 #ifdef GPOS_DEBUG
-	ulChildIndex
+	child_index
 #endif // GPOS_DEBUG
 	,
 	DrgPdp *, // pdrgpdpCtxt
@@ -80,10 +80,10 @@ CPhysicalScalarAgg::PosRequired
 	)
 	const
 {
-	GPOS_ASSERT(0 == ulChildIndex);
+	GPOS_ASSERT(0 == child_index);
 
 	// return empty sort order
-	return GPOS_NEW(pmp) COrderSpec(pmp);
+	return GPOS_NEW(memory_pool) COrderSpec(memory_pool);
 }
 
 
@@ -98,13 +98,13 @@ CPhysicalScalarAgg::PosRequired
 COrderSpec *
 CPhysicalScalarAgg::PosDerive
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle & // exprhdl
 	)
 	const
 {
 	// return empty sort order
-	return GPOS_NEW(pmp) COrderSpec(pmp);
+	return GPOS_NEW(memory_pool) COrderSpec(memory_pool);
 }
 
 
@@ -128,7 +128,7 @@ CPhysicalScalarAgg::EpetOrder
 	const
 {
 	GPOS_ASSERT(NULL != peo);
-	GPOS_ASSERT(!peo->PosRequired()->FEmpty());
+	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());
 
 	// TODO: , 06/20/2012: scalar agg produces one row, and hence it should satisfy any order;
 	// a problem happens if we have a NLJ(R,S) where R is Salar Agg, and we require sorting on the

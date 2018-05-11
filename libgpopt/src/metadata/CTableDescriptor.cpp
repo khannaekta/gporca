@@ -35,36 +35,36 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CTableDescriptor::CTableDescriptor
 	(
-	IMemoryPool *pmp,
-	IMDId *pmdid,
+	IMemoryPool *memory_pool,
+	IMDId *mdid,
 	const CName &name,
-	BOOL fConvertHashToRandom,
-	IMDRelation::Ereldistrpolicy ereldistrpolicy,
+	BOOL convert_hash_to_random,
+	IMDRelation::Ereldistrpolicy rel_distr_policy,
 	IMDRelation::Erelstoragetype erelstoragetype,
 	ULONG ulExecuteAsUser
 	)
 	:
-	m_pmp(pmp),
-	m_pmdid(pmdid),
-	m_name(pmp, name),
+	m_memory_pool(memory_pool),
+	m_mdid(mdid),
+	m_name(memory_pool, name),
 	m_pdrgpcoldesc(NULL),
-	m_ereldistrpolicy(ereldistrpolicy),
+	m_rel_distr_policy(rel_distr_policy),
 	m_erelstoragetype(erelstoragetype),
 	m_pdrgpcoldescDist(NULL),
-	m_fConvertHashToRandom(fConvertHashToRandom),
+	m_convert_hash_to_random(convert_hash_to_random),
 	m_pdrgpulPart(NULL),
 	m_pdrgpbsKeys(NULL),
-	m_ulPartitions(0),
-	m_ulExecuteAsUser(ulExecuteAsUser),
+	m_num_of_partitions(0),
+	m_execute_as_user_id(ulExecuteAsUser),
 	m_fHasPartialIndexes(FDescriptorWithPartialIndexes())
 {
-	GPOS_ASSERT(NULL != pmp);
-	GPOS_ASSERT(pmdid->FValid());
+	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(mdid->IsValid());
 	
-	m_pdrgpcoldesc = GPOS_NEW(m_pmp) DrgPcoldesc(m_pmp);
-	m_pdrgpcoldescDist = GPOS_NEW(m_pmp) DrgPcoldesc(m_pmp);
-	m_pdrgpulPart = GPOS_NEW(m_pmp) DrgPul(m_pmp);
-	m_pdrgpbsKeys = GPOS_NEW(m_pmp) DrgPbs(m_pmp);
+	m_pdrgpcoldesc = GPOS_NEW(m_memory_pool) DrgPcoldesc(m_memory_pool);
+	m_pdrgpcoldescDist = GPOS_NEW(m_memory_pool) DrgPcoldesc(m_memory_pool);
+	m_pdrgpulPart = GPOS_NEW(m_memory_pool) ULongPtrArray(m_memory_pool);
+	m_pdrgpbsKeys = GPOS_NEW(m_memory_pool) DrgPbs(m_memory_pool);
 }
 
 
@@ -78,7 +78,7 @@ CTableDescriptor::CTableDescriptor
 //---------------------------------------------------------------------------
 CTableDescriptor::~CTableDescriptor()
 {
-	m_pmdid->Release();
+	m_mdid->Release();
 	
 	m_pdrgpcoldesc->Release();
 	m_pdrgpcoldescDist->Release();
@@ -89,19 +89,19 @@ CTableDescriptor::~CTableDescriptor()
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CTableDescriptor::UlColumns
+//		CTableDescriptor::ColumnCount
 //
 //	@doc:
 //		number of columns
 //
 //---------------------------------------------------------------------------
 ULONG
-CTableDescriptor::UlColumns() const
+CTableDescriptor::ColumnCount() const
 {
 	// array allocated in ctor
 	GPOS_ASSERT(NULL != m_pdrgpcoldesc);
 	
-	return m_pdrgpcoldesc->UlLength();
+	return m_pdrgpcoldesc->Size();
 }
 
 //---------------------------------------------------------------------------
@@ -124,8 +124,8 @@ CTableDescriptor::UlPos
 	GPOS_ASSERT(NULL != pcoldesc);
 	GPOS_ASSERT(NULL != pdrgpcoldesc);
 	
-	ULONG ulArity = pdrgpcoldesc->UlLength();
-	for (ULONG ul = 0; ul < ulArity; ul++)
+	ULONG arity = pdrgpcoldesc->Size();
+	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		if (pcoldesc == (*pdrgpcoldesc)[ul])
 		{
@@ -133,7 +133,7 @@ CTableDescriptor::UlPos
 		}
 	}
 	
-	return ulArity;
+	return arity;
 }
 
 //---------------------------------------------------------------------------
@@ -147,18 +147,18 @@ CTableDescriptor::UlPos
 ULONG
 CTableDescriptor::UlPosition
 	(
-	INT iAttno
+	INT attno
 	)
 	const
 {
 	GPOS_ASSERT(NULL != m_pdrgpcoldesc);
 	ULONG ulPos = gpos::ulong_max;
-	ULONG ulArity = m_pdrgpcoldesc->UlLength();
+	ULONG arity = m_pdrgpcoldesc->Size();
 
-	for (ULONG ul = 0; ul < ulArity; ul++)
+	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		CColumnDescriptor *pcoldesc = (*m_pdrgpcoldesc)[ul];
-		if (pcoldesc->IAttno() == iAttno)
+		if (pcoldesc->AttrNum() == attno)
 		{
 			ulPos = ul;
 		}
@@ -222,7 +222,7 @@ CTableDescriptor::AddPartitionColumn
 	ULONG ulPos
 	)
 {
-	m_pdrgpulPart->Append(GPOS_NEW(m_pmp) ULONG(ulPos));
+	m_pdrgpulPart->Append(GPOS_NEW(m_memory_pool) ULONG(ulPos));
 }
 
 //---------------------------------------------------------------------------
@@ -240,14 +240,14 @@ CTableDescriptor::FAddKeySet
 	)
 {
 	GPOS_ASSERT(NULL != pbs);
-	GPOS_ASSERT(pbs->CElements() <= m_pdrgpcoldesc->UlLength());
+	GPOS_ASSERT(pbs->Size() <= m_pdrgpcoldesc->Size());
 	
-	const ULONG ulSize = m_pdrgpbsKeys->UlLength();
+	const ULONG size = m_pdrgpbsKeys->Size();
 	BOOL fFound = false;
-	for (ULONG ul = 0; !fFound && ul < ulSize; ul++)
+	for (ULONG ul = 0; !fFound && ul < size; ul++)
 	{
 		CBitSet *pbsCurrent = (*m_pdrgpbsKeys)[ul];
-		fFound = pbsCurrent->FEqual(pbs);
+		fFound = pbsCurrent->Equals(pbs);
 	}
 
 	if (!fFound)
@@ -273,7 +273,7 @@ CTableDescriptor::Pcoldesc
 	)
 	const
 {
-	GPOS_ASSERT(ulCol < UlColumns());
+	GPOS_ASSERT(ulCol < ColumnCount());
 	
 	return (*m_pdrgpcoldesc)[ulCol];
 }
@@ -297,7 +297,7 @@ CTableDescriptor::OsPrint
 {
 	m_name.OsPrint(os);
 	os << ": (";
-	CUtils::OsPrintDrgPcoldesc(os, m_pdrgpcoldesc, m_pdrgpcoldesc->UlLength());
+	CUtils::OsPrintDrgPcoldesc(os, m_pdrgpcoldesc, m_pdrgpcoldesc->Size());
 	os << ")";
 	return os;
 }
@@ -306,7 +306,7 @@ CTableDescriptor::OsPrint
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CTableDescriptor::UlIndices
+//		CTableDescriptor::IndexCount
 //
 //	@doc:
 //		 Returns number of b-tree indices
@@ -314,20 +314,20 @@ CTableDescriptor::OsPrint
 //
 //---------------------------------------------------------------------------
 ULONG
-CTableDescriptor::UlIndices()
+CTableDescriptor::IndexCount()
 {
-	GPOS_ASSERT(NULL != m_pmdid);
+	GPOS_ASSERT(NULL != m_mdid);
 
-	CMDAccessor *pmda = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = pmda->Pmdrel(m_pmdid);
-	const ULONG ulIndices = pmdrel->UlIndices();
+	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
+	const IMDRelation *pmdrel = md_accessor->Pmdrel(m_mdid);
+	const ULONG ulIndices = pmdrel->IndexCount();
 
 	return ulIndices;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CTableDescriptor::UlPartitions
+//		CTableDescriptor::PartitionCount
 //
 //	@doc:
 //		 Returns number of leaf partitions
@@ -335,14 +335,14 @@ CTableDescriptor::UlIndices()
 //
 //---------------------------------------------------------------------------
 ULONG
-CTableDescriptor::UlPartitions()
+CTableDescriptor::PartitionCount()
 	const
 {
-	GPOS_ASSERT(NULL != m_pmdid);
+	GPOS_ASSERT(NULL != m_mdid);
 
-	CMDAccessor *pmda = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = pmda->Pmdrel(m_pmdid);
-	const ULONG ulPartitions = pmdrel->UlPartitions();
+	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
+	const IMDRelation *pmdrel = md_accessor->Pmdrel(m_mdid);
+	const ULONG ulPartitions = pmdrel->PartitionCount();
 
 	return ulPartitions;
 }
@@ -358,17 +358,17 @@ CTableDescriptor::UlPartitions()
 BOOL
 CTableDescriptor::FDescriptorWithPartialIndexes()
 {
-	const ULONG ulIndices = UlIndices();
+	const ULONG ulIndices = IndexCount();
 	if (0 == ulIndices)
 	{
 		return false;
 	}
 
-	CMDAccessor *pmda = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = pmda->Pmdrel(m_pmdid);
+	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
+	const IMDRelation *pmdrel = md_accessor->Pmdrel(m_mdid);
 	for (ULONG ul = 0; ul < ulIndices; ul++)
 	{
-		if (pmdrel->FPartialIndex(pmdrel->PmdidIndex(ul)))
+		if (pmdrel->IsPartialIndex(pmdrel->IndexMDidAt(ul)))
 		{
 			return true;
 		}

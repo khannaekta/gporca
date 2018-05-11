@@ -27,16 +27,16 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformImplementConstTableGet::CXformImplementConstTableGet
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	CXformImplementation
 		(
 		 // pattern
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 				(
-				pmp,
-				GPOS_NEW(pmp) CLogicalConstTableGet(pmp)
+				memory_pool,
+				GPOS_NEW(memory_pool) CLogicalConstTableGet(memory_pool)
 				)
 		)
 {}
@@ -64,7 +64,7 @@ CXformImplementConstTableGet::Transform
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CLogicalConstTableGet *popConstTableGet = CLogicalConstTableGet::PopConvert(pexpr->Pop());
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 
 	// create/extract components for alternative
 	DrgPcoldesc *pdrgpcoldesc = popConstTableGet->Pdrgpcoldesc();
@@ -78,10 +78,10 @@ CXformImplementConstTableGet::Transform
 		
 	// create alternative expression
 	CExpression *pexprAlt = 
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 			(
-			pmp,
-			GPOS_NEW(pmp) CPhysicalConstTableGet(pmp, pdrgpcoldesc, pdrgpdrgpdatum, pdrgpcrOutput)
+			memory_pool,
+			GPOS_NEW(memory_pool) CPhysicalConstTableGet(memory_pool, pdrgpcoldesc, pdrgpdrgpdatum, pdrgpcrOutput)
 			);
 	
 	// add alternative to transformation result

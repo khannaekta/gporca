@@ -27,17 +27,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformUnion2UnionAll::CXformUnion2UnionAll
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	// pattern
 	CXformExploration
 		(
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 						(
-						pmp,
-						GPOS_NEW(pmp) CLogicalUnion(pmp),
-						GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternMultiLeaf(pmp))
+						memory_pool,
+						GPOS_NEW(memory_pool) CLogicalUnion(memory_pool),
+						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternMultiLeaf(memory_pool))
 						)
 		)
 {}
@@ -63,17 +63,17 @@ CXformUnion2UnionAll::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 
 	// extract components
 	CLogicalUnion *popUnion = CLogicalUnion::PopConvert(pexpr->Pop());
 	DrgPcr *pdrgpcrOutput = popUnion->PdrgpcrOutput();
 	DrgDrgPcr *pdrgpdrgpcrInput = popUnion->PdrgpdrgpcrInput();
 
-	DrgPexpr *pdrgpexpr = GPOS_NEW(pmp) DrgPexpr(pmp);
-	const ULONG ulArity = pexpr->UlArity();
+	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	const ULONG arity = pexpr->Arity();
 
-	for (ULONG ul = 0; ul < ulArity; ul++)
+	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		CExpression *pexprChild = (*pexpr)[ul];
 		pexprChild->AddRef();
@@ -84,21 +84,21 @@ CXformUnion2UnionAll::Transform
 	pdrgpdrgpcrInput->AddRef();
 
 	// assemble new logical operator
-	CExpression *pexprUnionAll = GPOS_NEW(pmp) CExpression
+	CExpression *pexprUnionAll = GPOS_NEW(memory_pool) CExpression
 									(
-									pmp,
-									GPOS_NEW(pmp) CLogicalUnionAll(pmp, pdrgpcrOutput, pdrgpdrgpcrInput),
+									memory_pool,
+									GPOS_NEW(memory_pool) CLogicalUnionAll(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput),
 									pdrgpexpr
 									);
 
 	pdrgpcrOutput->AddRef();
 
-	CExpression *pexprProjList = GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CScalarProjectList(pmp), GPOS_NEW(pmp) DrgPexpr(pmp));
+	CExpression *pexprProjList = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CScalarProjectList(memory_pool), GPOS_NEW(memory_pool) DrgPexpr(memory_pool));
 
-	CExpression *pexprAgg = GPOS_NEW(pmp) CExpression
+	CExpression *pexprAgg = GPOS_NEW(memory_pool) CExpression
 										(
-										pmp,
-										GPOS_NEW(pmp) CLogicalGbAgg(pmp, pdrgpcrOutput, COperator::EgbaggtypeGlobal /*egbaggtype*/),
+										memory_pool,
+										GPOS_NEW(memory_pool) CLogicalGbAgg(memory_pool, pdrgpcrOutput, COperator::EgbaggtypeGlobal /*egbaggtype*/),
 										pexprUnionAll,
 										pexprProjList
 										);

@@ -48,12 +48,12 @@ namespace gpopt
 			// ctor
 			CPhysicalDynamicBitmapTableScan
 				(
-				IMemoryPool *pmp,
-				BOOL fPartial,
+				IMemoryPool *memory_pool,
+				BOOL is_partial,
 				CTableDescriptor *ptabdesc,
 				ULONG ulOriginOpId,
 				const CName *pnameAlias,
-				ULONG ulScanId,
+				ULONG scan_id,
 				DrgPcr *pdrgpcrOutput,
 				DrgDrgPcr *pdrgpdrgpcrParts,
 				ULONG ulSecondaryScanId,
@@ -77,11 +77,11 @@ namespace gpopt
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *) const;
+			BOOL Matches(COperator *) const;
 
 			// statistics derivation during costing
 			virtual
-			IStatistics *PstatsDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl, CReqdPropPlan *prpplan, DrgPstat *pdrgpstatCtxt) const;
+			IStatistics *PstatsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CReqdPropPlan *prpplan, StatsArray *stats_ctxt) const;
 
 			// conversion function
 			static

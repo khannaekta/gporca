@@ -43,29 +43,29 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformJoinSwap(IMemoryPool *pmp)
+			CXformJoinSwap(IMemoryPool *memory_pool)
                 :
                 CXformExploration
                 (
                  // pattern
-                 GPOS_NEW(pmp) CExpression
+                 GPOS_NEW(memory_pool) CExpression
                         (
-                         pmp,
-                         GPOS_NEW(pmp) TJoinTop(pmp),
-                         GPOS_NEW(pmp) CExpression  // left child is a join tree
+                         memory_pool,
+                         GPOS_NEW(memory_pool) TJoinTop(memory_pool),
+                         GPOS_NEW(memory_pool) CExpression  // left child is a join tree
                                 (
-                                 pmp,
-                                 GPOS_NEW(pmp) TJoinBottom(pmp),
-                                 GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)), // left child
-                                 GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)), // right child
-                                 GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)) // predicate
+                                 memory_pool,
+                                 GPOS_NEW(memory_pool) TJoinBottom(memory_pool),
+                                 GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // left child
+                                 GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // right child
+                                 GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)) // predicate
                                  ),
-                         GPOS_NEW(pmp) CExpression // right child is a pattern leaf
+                         GPOS_NEW(memory_pool) CExpression // right child is a pattern leaf
                                 (
-                                 pmp,
-                                 GPOS_NEW(pmp) CPatternLeaf(pmp)
+                                 memory_pool,
+                                 GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)
                                  ),
-                         GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)) // top-join predicate
+                         GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)) // top-join predicate
                          )
                 )
             {}
@@ -98,9 +98,9 @@ namespace gpopt
                 GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
                 GPOS_ASSERT(FCheckPattern(pexpr));
 
-                IMemoryPool *pmp = pxfctxt->Pmp();
+                IMemoryPool *memory_pool = pxfctxt->Pmp();
 
-                CExpression *pexprResult = CXformUtils::PexprSwapJoins(pmp, pexpr, (*pexpr)[0]);
+                CExpression *pexprResult = CXformUtils::PexprSwapJoins(memory_pool, pexpr, (*pexpr)[0]);
                 if (NULL == pexprResult)
                 {
                     return;

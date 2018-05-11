@@ -26,10 +26,10 @@ CDXLTokens::SXMLStrMapElem *
 CDXLTokens::m_pxmlszmap = NULL;
 
 IMemoryPool *
-CDXLTokens::m_pmp =  NULL;
+CDXLTokens::m_memory_pool =  NULL;
 
 CDXLMemoryManager *
-CDXLTokens::m_pmm = NULL;
+CDXLTokens::m_memory_manager_dxl = NULL;
 
 
 //---------------------------------------------------------------------------
@@ -43,16 +43,16 @@ CDXLTokens::m_pmm = NULL;
 void
 CDXLTokens::Init
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 {
-	GPOS_ASSERT(NULL != pmp);
-	GPOS_ASSERT(NULL == m_pmm);
-	GPOS_ASSERT(NULL == m_pmp);
+	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL == m_memory_manager_dxl);
+	GPOS_ASSERT(NULL == m_memory_pool);
 
-	m_pmp = pmp;
+	m_memory_pool = memory_pool;
 
-	m_pmm = GPOS_NEW(m_pmp) CDXLMemoryManager(m_pmp);
+	m_memory_manager_dxl = GPOS_NEW(m_memory_pool) CDXLMemoryManager(m_memory_pool);
 
 	SWszMapElem rgStrMap[] = 
 	{
@@ -723,14 +723,14 @@ CDXLTokens::Init
 			{EdxltokenVarTypeModList, GPOS_WSZ_LIT("VarTypeModList")},
 	};
 	
-	m_pstrmap = GPOS_NEW_ARRAY(m_pmp, SStrMapElem, EdxltokenSentinel);
-	m_pxmlszmap = GPOS_NEW_ARRAY(m_pmp, SXMLStrMapElem, EdxltokenSentinel);
+	m_pstrmap = GPOS_NEW_ARRAY(m_memory_pool, SStrMapElem, EdxltokenSentinel);
+	m_pxmlszmap = GPOS_NEW_ARRAY(m_memory_pool, SXMLStrMapElem, EdxltokenSentinel);
 	
 	for (ULONG ul = 0; ul < GPOS_ARRAY_SIZE(rgStrMap); ul++)
 	{
 		SWszMapElem mapelem = rgStrMap[ul];
 		
-		m_pstrmap[mapelem.m_edxlt].m_pstr = GPOS_NEW(m_pmp) CWStringConst(m_pmp, mapelem.m_wsz);
+		m_pstrmap[mapelem.m_edxlt].m_pstr = GPOS_NEW(m_memory_pool) CWStringConst(m_memory_pool, mapelem.m_wsz);
 		m_pxmlszmap[mapelem.m_edxlt].m_xmlsz = XmlstrFromWsz(mapelem.m_wsz);
 	}
 }
@@ -748,30 +748,30 @@ CDXLTokens::Terminate()
 {
 	GPOS_DELETE_ARRAY(m_pstrmap);
 	GPOS_DELETE_ARRAY(m_pxmlszmap);
-	GPOS_DELETE(m_pmm);
+	GPOS_DELETE(m_memory_manager_dxl);
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLTokens::PstrToken
+//		CDXLTokens::GetDXLTokenStr
 //
 //	@doc:
 //		Returns the token with the given token id in CWStringConst format
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLTokens::PstrToken
+CDXLTokens::GetDXLTokenStr
 	(
-	Edxltoken edxltoken
+	Edxltoken token_type
 	)
 {
 	GPOS_ASSERT(NULL != m_pstrmap && "Token map not initialized yet");
 	
-	const CWStringConst *pstr = m_pstrmap[edxltoken].m_pstr;
-	GPOS_ASSERT(NULL != pstr);
+	const CWStringConst *str = m_pstrmap[token_type].m_pstr;
+	GPOS_ASSERT(NULL != str);
 	
-	return pstr;
+	return str;
 }
 
 //---------------------------------------------------------------------------
@@ -785,15 +785,15 @@ CDXLTokens::PstrToken
 const XMLCh*
 CDXLTokens::XmlstrToken
 	(
-	Edxltoken edxltoken
+	Edxltoken token_type
 	)
 {
 	GPOS_ASSERT(NULL != m_pxmlszmap && "Token map not initialized yet");
 	
-	const XMLCh *xmlsz = m_pxmlszmap[edxltoken].m_xmlsz;
-	GPOS_ASSERT(NULL != xmlsz);
+	const XMLCh *xml_val = m_pxmlszmap[token_type].m_xmlsz;
+	GPOS_ASSERT(NULL != xml_val);
 	
-	return xmlsz;
+	return xml_val;
 }
 
 //---------------------------------------------------------------------------
@@ -811,16 +811,16 @@ CDXLTokens::XmlstrFromWsz
 	const WCHAR *wsz
 	)
 {
-	ULONG ulLen = GPOS_WSZ_LENGTH(wsz);
-	CHAR *sz = GPOS_NEW_ARRAY(m_pmp, CHAR, 1 + ulLen);
+	ULONG length = GPOS_WSZ_LENGTH(wsz);
+	CHAR *sz = GPOS_NEW_ARRAY(m_memory_pool, CHAR, 1 + length);
 
 #ifdef GPOS_DEBUG
 	LINT  iLen =
 #endif
-	clib::LWcsToMbs(sz, const_cast<WCHAR *>(wsz), 1 + ulLen);
+	clib::Wcstombs(sz, const_cast<WCHAR *>(wsz), 1 + length);
 	
 	GPOS_ASSERT(0 <= iLen);
-	XMLCh *pxmlsz = XMLString::transcode(sz, m_pmm);
+	XMLCh *pxmlsz = XMLString::transcode(sz, m_memory_manager_dxl);
 	GPOS_DELETE_ARRAY(sz);
 	return pxmlsz;
 }

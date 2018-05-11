@@ -18,7 +18,7 @@ namespace gpopt
 		)
 		: m_popLogicalUnionAll(popLogicalUnionAll) { }
 
-	CPhysicalUnionAll *CPhysicalUnionAllFactory::PopPhysicalUnionAll(IMemoryPool *pmp, BOOL fParallel)
+	CPhysicalUnionAll *CPhysicalUnionAllFactory::PopPhysicalUnionAll(IMemoryPool *memory_pool, BOOL fParallel)
 	{
 
 		DrgPcr *pdrgpcrOutput = m_popLogicalUnionAll->PdrgpcrOutput();
@@ -35,9 +35,9 @@ namespace gpopt
 
 		if (fParallel)
 		{
-			return GPOS_NEW(pmp) CPhysicalParallelUnionAll
+			return GPOS_NEW(memory_pool) CPhysicalParallelUnionAll
 				(
-					pmp,
+					memory_pool,
 					pdrgpcrOutput,
 					pdrgpdrgpcrInput,
 					m_popLogicalUnionAll->UlScanIdPartialIndex()
@@ -45,9 +45,9 @@ namespace gpopt
 		}
 		else
 		{
-			return GPOS_NEW(pmp) CPhysicalSerialUnionAll
+			return GPOS_NEW(memory_pool) CPhysicalSerialUnionAll
 				(
-					pmp,
+					memory_pool,
 					pdrgpcrOutput,
 					pdrgpdrgpcrInput,
 					m_popLogicalUnionAll->UlScanIdPartialIndex()

@@ -33,18 +33,18 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 CXformImplementDynamicBitmapTableGet::CXformImplementDynamicBitmapTableGet
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	// pattern
 	CXformImplementation
 		(
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 				(
-				pmp,
-				GPOS_NEW(pmp) CLogicalDynamicBitmapTableGet(pmp),
-				GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)), // predicate tree
-				GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp))  // bitmap index expression
+				memory_pool,
+				GPOS_NEW(memory_pool) CLogicalDynamicBitmapTableGet(memory_pool),
+				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // predicate tree
+				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))  // bitmap index expression
 				)
 		)
 {}
@@ -70,13 +70,13 @@ CXformImplementDynamicBitmapTableGet::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 	CLogicalDynamicBitmapTableGet *popLogical = CLogicalDynamicBitmapTableGet::PopConvert(pexpr->Pop());
 
 	CTableDescriptor *ptabdesc = popLogical->Ptabdesc();
 	ptabdesc->AddRef();
 
-	CName *pname = GPOS_NEW(pmp) CName(pmp, popLogical->Name());
+	CName *pname = GPOS_NEW(memory_pool) CName(memory_pool, popLogical->Name());
 
 	DrgPcr *pdrgpcrOutput = popLogical->PdrgpcrOutput();
 
@@ -93,14 +93,14 @@ CXformImplementDynamicBitmapTableGet::Transform
 	ppartcnstrRel->AddRef();
 
 	CPhysicalDynamicBitmapTableScan *popPhysical =
-			GPOS_NEW(pmp) CPhysicalDynamicBitmapTableScan
+			GPOS_NEW(memory_pool) CPhysicalDynamicBitmapTableScan
 					(
-					pmp,
-					popLogical->FPartial(),
+					memory_pool,
+					popLogical->IsPartial(),
 					ptabdesc,
 					pexpr->Pop()->UlOpId(),
 					pname,
-					popLogical->UlScanId(),
+					popLogical->ScanId(),
 					pdrgpcrOutput,
 					pdrgpdrgpcrPart,
 					popLogical->UlSecondaryScanId(),
@@ -114,7 +114,7 @@ CXformImplementDynamicBitmapTableGet::Transform
 	pexprIndexPath->AddRef();
 
 	CExpression *pexprPhysical =
-			GPOS_NEW(pmp) CExpression(pmp, popPhysical, pexprCondition, pexprIndexPath);
+			GPOS_NEW(memory_pool) CExpression(memory_pool, popPhysical, pexprCondition, pexprIndexPath);
 	pxfres->Add(pexprPhysical);
 }
 

@@ -52,7 +52,7 @@ namespace gpopt
 		public:
 
 			// ctor
-			CScalarArrayRefIndexList(IMemoryPool *pmp, EIndexListType eilt);
+			CScalarArrayRefIndexList(IMemoryPool *memory_pool, EIndexListType eilt);
 
 			// ident accessors
 			virtual
@@ -76,7 +76,7 @@ namespace gpopt
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			// sensitivity to order of inputs
 			virtual
@@ -89,9 +89,9 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //pmp,
-						HMUlCr *, //phmulcr,
-						BOOL //fMustExist
+						IMemoryPool *, //memory_pool,
+						UlongColRefHashMap *, //colref_mapping,
+						BOOL //must_exist
 						)
 			{
 				return PopCopyDefault();
@@ -99,9 +99,9 @@ namespace gpopt
 
 			// type of expression's result
 			virtual
-			IMDId *PmdidType() const
+			IMDId *MDIdType() const
 			{
-				GPOS_ASSERT(!"Invalid function call: CScalarArrayRefIndexList::PmdidType()");
+				GPOS_ASSERT(!"Invalid function call: CScalarArrayRefIndexList::MDIdType()");
 				return NULL;
 			}
 

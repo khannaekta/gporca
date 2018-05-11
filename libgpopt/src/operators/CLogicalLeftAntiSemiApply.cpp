@@ -31,7 +31,7 @@ using namespace gpopt;
 CKeyCollection *
 CLogicalLeftAntiSemiApply::PkcDeriveKeys
 	(
-	IMemoryPool *, // pmp
+	IMemoryPool *, // memory_pool
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -51,13 +51,13 @@ CLogicalLeftAntiSemiApply::PkcDeriveKeys
 CMaxCard
 CLogicalLeftAntiSemiApply::Maxcard
 	(
-	IMemoryPool *, // pmp
+	IMemoryPool *, // memory_pool
 	CExpressionHandle &exprhdl
 	)
 	const
 {
 	// pass on max card of first child
-	return exprhdl.Pdprel(0)->Maxcard();
+	return exprhdl.GetRelationalProperties(0)->Maxcard();
 }
 
 
@@ -72,16 +72,16 @@ CLogicalLeftAntiSemiApply::Maxcard
 CXformSet *
 CLogicalLeftAntiSemiApply::PxfsCandidates
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	const
 {
-	CXformSet *pxfs = GPOS_NEW(pmp) CXformSet(pmp);
+	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
 
-	(void) pxfs->FExchangeSet(CXform::ExfLeftAntiSemiApply2LeftAntiSemiJoin);
-	(void) pxfs->FExchangeSet(CXform::ExfLeftAntiSemiApply2LeftAntiSemiJoinNoCorrelations);
+	(void) xform_set->ExchangeSet(CXform::ExfLeftAntiSemiApply2LeftAntiSemiJoin);
+	(void) xform_set->ExchangeSet(CXform::ExfLeftAntiSemiApply2LeftAntiSemiJoinNoCorrelations);
 
-	return pxfs;
+	return xform_set;
 }
 
 //---------------------------------------------------------------------------
@@ -95,14 +95,14 @@ CLogicalLeftAntiSemiApply::PxfsCandidates
 COperator *
 CLogicalLeftAntiSemiApply::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *pmp,
-	HMUlCr *phmulcr,
-	BOOL fMustExist
+	IMemoryPool *memory_pool,
+	UlongColRefHashMap *colref_mapping,
+	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcrInner = CUtils::PdrgpcrRemap(pmp, m_pdrgpcrInner, phmulcr, fMustExist);
+	DrgPcr *pdrgpcrInner = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrInner, colref_mapping, must_exist);
 
-	return GPOS_NEW(pmp) CLogicalLeftAntiSemiApply(pmp, pdrgpcrInner, m_eopidOriginSubq);
+	return GPOS_NEW(memory_pool) CLogicalLeftAntiSemiApply(memory_pool, pdrgpcrInner, m_eopidOriginSubq);
 }
 
 // EOF

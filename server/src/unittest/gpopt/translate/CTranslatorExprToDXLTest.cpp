@@ -169,26 +169,26 @@ GPOS_RESULT
 CTranslatorExprToDXLTest::EresUnittest_RunTests()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
 	// setup a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(pmp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(memory_pool, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 					(
-					pmp,
+					memory_pool,
 					&mda,
 					NULL,  /* pceeval */
-					CTestUtils::Pcm(pmp)
+					CTestUtils::GetCostModel(memory_pool)
 					);
 	
 	const ULONG ulTests = GPOS_ARRAY_SIZE(rgtc);
 	for (ULONG ul = m_ulTestCounter; ul < ulTests; ul++)
 	{
-		GPOS_RESULT eres = CTestUtils::EresTranslate(pmp, rgtc[ul].szInputFile, rgtc[ul].szOutputFile, true /*fIgnoreMismatch*/);
+		GPOS_RESULT eres = CTestUtils::EresTranslate(memory_pool, rgtc[ul].szInputFile, rgtc[ul].szOutputFile, true /*fIgnoreMismatch*/);
 		m_ulTestCounter++;
 
 		if (GPOS_OK != eres)
@@ -215,13 +215,13 @@ GPOS_RESULT
 CTranslatorExprToDXLTest::EresUnittest_RunMinidumpTests()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 	const ULONG ulTests = GPOS_ARRAY_SIZE(rgszMinidumpFileNames);
 
 	return
 			CTestUtils::EresRunMinidumps
 						(
-						pmp,
+						memory_pool,
 						rgszMinidumpFileNames,
 						ulTests,
 						&m_ulTestCounter,

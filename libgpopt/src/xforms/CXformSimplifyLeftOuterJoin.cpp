@@ -29,19 +29,19 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformSimplifyLeftOuterJoin::CXformSimplifyLeftOuterJoin
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	CXformExploration
 		(
 		 // pattern
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 					(
-					pmp,
-					GPOS_NEW(pmp) CLogicalLeftOuterJoin(pmp),
-					GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)), // left child
-					GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)),  // right child
-					GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternTree(pmp))  // predicate tree
+					memory_pool,
+					GPOS_NEW(memory_pool) CLogicalLeftOuterJoin(memory_pool),
+					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // left child
+					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),  // right child
+					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))  // predicate tree
 					)
 		)
 {}
@@ -62,7 +62,7 @@ CXformSimplifyLeftOuterJoin::Exfp
 	)
 	const
 {
-	CExpression *pexprScalar = exprhdl.PexprScalarChild(2 /*ulChildIndex*/);
+	CExpression *pexprScalar = exprhdl.PexprScalarChild(2 /*child_index*/);
 	if (CUtils::FScalarConstFalse(pexprScalar))
 	{
 		// if LOJ predicate is False, we can replace inner child with empty table
@@ -95,7 +95,7 @@ CXformSimplifyLeftOuterJoin::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 
 	// extract components
 	CExpression *pexprOuter = (*pexpr)[0];
@@ -110,17 +110,17 @@ CXformSimplifyLeftOuterJoin::Transform
 	GPOS_ASSERT(CUtils::FScalarConstFalse(pexprScalar));
 
 	// extract output columns of inner child
-	DrgPcr *pdrgpcr = CDrvdPropRelational::Pdprel(pexprInner->PdpDerive())->PcrsOutput()->Pdrgpcr(pmp);
+	DrgPcr *colref_array = CDrvdPropRelational::GetRelationalProperties(pexprInner->PdpDerive())->PcrsOutput()->Pdrgpcr(memory_pool);
 
 	// generate empty constant table with the same columns
-	COperator *popCTG = GPOS_NEW(pmp) CLogicalConstTableGet(pmp, pdrgpcr, GPOS_NEW(pmp) DrgPdrgPdatum(pmp));
+	COperator *popCTG = GPOS_NEW(memory_pool) CLogicalConstTableGet(memory_pool, colref_array, GPOS_NEW(memory_pool) DrgPdrgPdatum(memory_pool));
 	pexprResult =
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 			(
-			pmp,
-			GPOS_NEW(pmp) CLogicalLeftOuterJoin(pmp),
+			memory_pool,
+			GPOS_NEW(memory_pool) CLogicalLeftOuterJoin(memory_pool),
 			pexprOuter,
-			GPOS_NEW(pmp) CExpression(pmp, popCTG),
+			GPOS_NEW(memory_pool) CExpression(memory_pool, popCTG),
 			pexprScalar
 			);
 

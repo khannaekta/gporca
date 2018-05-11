@@ -72,29 +72,29 @@ CSearchStrategyTest::EresUnittest()
 void
 CSearchStrategyTest::Optimize
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	Pfpexpr pfnGenerator,
-	DrgPss *pdrgpss,
+	DrgPss *search_stage_array,
 	PfnOptimize pfnOptimize
 	)
 {
 	// setup a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(pmp, CMDCache::Pcache());
+	CMDAccessor mda(memory_pool, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	{
 		CAutoOptCtxt aoc
 						(
-						pmp,
+						memory_pool,
 						&mda,
 						NULL,  /* pceeval */
-						CTestUtils::Pcm(pmp)
+						CTestUtils::GetCostModel(memory_pool)
 						);
-		CExpression *pexpr = pfnGenerator(pmp);
-		pfnOptimize(pmp, pexpr, pdrgpss);
+		CExpression *pexpr = pfnGenerator(memory_pool);
+		pfnOptimize(memory_pool, pexpr, search_stage_array);
 		pexpr->Release();
 	}
 }
@@ -113,8 +113,8 @@ GPOS_RESULT
 CSearchStrategyTest::EresUnittest_RecursiveOptimize()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
-	Optimize(pmp, CTestUtils::PexprLogicalSelectOnOuterJoin, PdrgpssRandom(pmp), CEngineTest::BuildMemoRecursive);
+	IMemoryPool *memory_pool = amp.Pmp();
+	Optimize(memory_pool, CTestUtils::PexprLogicalSelectOnOuterJoin, PdrgpssRandom(memory_pool), CEngineTest::BuildMemoRecursive);
 
 	return GPOS_OK;
 }
@@ -133,8 +133,8 @@ GPOS_RESULT
 CSearchStrategyTest::EresUnittest_MultiThreadedOptimize()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
-	Optimize(pmp, CTestUtils::PexprLogicalSelectOnOuterJoin, PdrgpssRandom(pmp), CSchedulerTest::BuildMemoMultiThreaded);
+	IMemoryPool *memory_pool = amp.Pmp();
+	Optimize(memory_pool, CTestUtils::PexprLogicalSelectOnOuterJoin, PdrgpssRandom(memory_pool), CSchedulerTest::BuildMemoMultiThreaded);
 
 	return GPOS_OK;
 }
@@ -152,17 +152,17 @@ GPOS_RESULT
 CSearchStrategyTest::EresUnittest_Parsing()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
-	CParseHandlerDXL *pphDXL = CDXLUtils::PphdxlParseDXLFile(pmp,"../data/dxl/search/strategy0.xml", NULL);
-	DrgPss *pdrgpss = pphDXL->Pdrgpss();
-	const ULONG ulSize = pdrgpss->UlLength();
-	for (ULONG ul = 0; ul < ulSize; ul++)
+	IMemoryPool *memory_pool = amp.Pmp();
+	CParseHandlerDXL *pphDXL = CDXLUtils::GetParseHandlerForDXLFile(memory_pool,"../data/dxl/search/strategy0.xml", NULL);
+	DrgPss *search_stage_array = pphDXL->GetSearchStageArray();
+	const ULONG size = search_stage_array->Size();
+	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CAutoTrace at(pmp);
-		(*pdrgpss)[ul]->OsPrint(at.Os());
+		CAutoTrace at(memory_pool);
+		(*search_stage_array)[ul]->OsPrint(at.Os());
 	}
-	pdrgpss->AddRef();
-	Optimize(pmp, CTestUtils::PexprLogicalSelectOnOuterJoin, pdrgpss, CSchedulerTest::BuildMemoMultiThreaded);
+	search_stage_array->AddRef();
+	Optimize(memory_pool, CTestUtils::PexprLogicalSelectOnOuterJoin, search_stage_array, CSchedulerTest::BuildMemoMultiThreaded);
 
 	GPOS_DELETE(pphDXL);
 
@@ -183,12 +183,12 @@ GPOS_RESULT
 CSearchStrategyTest::EresUnittest_Timeout()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 	CAutoTraceFlag atf(EopttracePrintOptimizationStatistics, true);
-	CParseHandlerDXL *pphDXL = CDXLUtils::PphdxlParseDXLFile(pmp,"../data/dxl/search/timeout-strategy.xml", NULL);
-	DrgPss *pdrgpss = pphDXL->Pdrgpss();
-	pdrgpss->AddRef();
-	Optimize(pmp, CTestUtils::PexprLogicalNAryJoin, pdrgpss, CSchedulerTest::BuildMemoMultiThreaded);
+	CParseHandlerDXL *pphDXL = CDXLUtils::GetParseHandlerForDXLFile(memory_pool,"../data/dxl/search/timeout-strategy.xml", NULL);
+	DrgPss *search_stage_array = pphDXL->GetSearchStageArray();
+	search_stage_array->AddRef();
+	Optimize(memory_pool, CTestUtils::PexprLogicalNAryJoin, search_stage_array, CSchedulerTest::BuildMemoMultiThreaded);
 
 	GPOS_DELETE(pphDXL);
 
@@ -209,8 +209,8 @@ CSearchStrategyTest::EresUnittest_ParsingWithException()
 {
 
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
-	CParseHandlerDXL *pphDXL = CDXLUtils::PphdxlParseDXLFile(pmp,"../data/dxl/search/wrong-strategy.xml", NULL);
+	IMemoryPool *memory_pool = amp.Pmp();
+	CParseHandlerDXL *pphDXL = CDXLUtils::GetParseHandlerForDXLFile(memory_pool,"../data/dxl/search/wrong-strategy.xml", NULL);
 	GPOS_DELETE(pphDXL);
 
 	return GPOS_OK;
@@ -228,27 +228,27 @@ CSearchStrategyTest::EresUnittest_ParsingWithException()
 DrgPss *
 CSearchStrategyTest::PdrgpssRandom
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 {
-	DrgPss *pdrgpss = GPOS_NEW(pmp) DrgPss(pmp);
-	CXformSet *pxfsFst = GPOS_NEW(pmp) CXformSet(pmp);
-	CXformSet *pxfsSnd = GPOS_NEW(pmp) CXformSet(pmp);
+	DrgPss *search_stage_array = GPOS_NEW(memory_pool) DrgPss(memory_pool);
+	CXformSet *pxfsFst = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *pxfsSnd = GPOS_NEW(memory_pool) CXformSet(memory_pool);
 
 	// first xforms set contains essential rules to produce simple equality join plan
-	(void) pxfsFst->FExchangeSet(CXform::ExfGet2TableScan);
-	(void) pxfsFst->FExchangeSet(CXform::ExfSelect2Filter);
-	(void) pxfsFst->FExchangeSet(CXform::ExfInnerJoin2HashJoin);
+	(void) pxfsFst->ExchangeSet(CXform::ExfGet2TableScan);
+	(void) pxfsFst->ExchangeSet(CXform::ExfSelect2Filter);
+	(void) pxfsFst->ExchangeSet(CXform::ExfInnerJoin2HashJoin);
 
 	// second xforms set contains all other rules
 	pxfsSnd->Union(CXformFactory::Pxff()->PxfsExploration());
 	pxfsSnd->Union(CXformFactory::Pxff()->PxfsImplementation());
 	pxfsSnd->Difference(pxfsFst);
 
-	pdrgpss->Append(GPOS_NEW(pmp) CSearchStage(pxfsFst, 1000 /*ulTimeThreshold*/, CCost(10E4) /*costThreshold*/));
-	pdrgpss->Append(GPOS_NEW(pmp) CSearchStage(pxfsSnd, 10000 /*ulTimeThreshold*/, CCost(10E8) /*costThreshold*/));
+	search_stage_array->Append(GPOS_NEW(memory_pool) CSearchStage(pxfsFst, 1000 /*ulTimeThreshold*/, CCost(10E4) /*costThreshold*/));
+	search_stage_array->Append(GPOS_NEW(memory_pool) CSearchStage(pxfsSnd, 10000 /*ulTimeThreshold*/, CCost(10E8) /*costThreshold*/));
 
-	return pdrgpss;
+	return search_stage_array;
 }
 
 

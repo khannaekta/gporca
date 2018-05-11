@@ -25,22 +25,22 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 CSearchStage::CSearchStage
 	(
-	CXformSet *pxfs,
+	CXformSet *xform_set,
 	ULONG ulTimeThreshold,
 	CCost costThreshold
 	)
 	:
-	m_pxfs(pxfs),
-	m_ulTimeThreshold(ulTimeThreshold),
-	m_costThreshold(costThreshold),
+	m_xforms(xform_set),
+	m_time_threshold(ulTimeThreshold),
+	m_cost_threshold(costThreshold),
 	m_pexprBest(NULL),
 	m_costBest(GPOPT_INVALID_COST)
 {
-	GPOS_ASSERT(NULL != pxfs);
-	GPOS_ASSERT(0 < pxfs->CElements());
+	GPOS_ASSERT(NULL != xform_set);
+	GPOS_ASSERT(0 < xform_set->Size());
 
 	// include all implementation rules in any search strategy
-	m_pxfs->Union(CXformFactory::Pxff()->PxfsImplementation());
+	m_xforms->Union(CXformFactory::Pxff()->PxfsImplementation());
 }
 
 
@@ -54,7 +54,7 @@ CSearchStage::CSearchStage
 //---------------------------------------------------------------------------
 CSearchStage::~CSearchStage()
 {
-	m_pxfs->Release();
+	m_xforms->Release();
 	CRefCount::SafeRelease(m_pexprBest);
 }
 
@@ -75,8 +75,8 @@ CSearchStage::OsPrint
 {
 	os
 		<< "Search Stage" << std::endl
-		<< "\ttime threshold: " << m_ulTimeThreshold
-		<< ", cost threshold:" << m_costThreshold
+		<< "\ttime threshold: " << m_time_threshold
+		<< ", cost threshold:" << m_cost_threshold
 		<< ", best plan found: " << std::endl;
 
 	if (NULL != m_pexprBest)
@@ -123,16 +123,16 @@ CSearchStage::SetBestExpr
 DrgPss *
 CSearchStage::PdrgpssDefault
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 {
-	CXformSet *pxfs = GPOS_NEW(pmp) CXformSet(pmp);
-	pxfs->Union(CXformFactory::Pxff()->PxfsExploration());
-	DrgPss *pdrgpss = GPOS_NEW(pmp) DrgPss(pmp);
+	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	xform_set->Union(CXformFactory::Pxff()->PxfsExploration());
+	DrgPss *search_stage_array = GPOS_NEW(memory_pool) DrgPss(memory_pool);
 
-	pdrgpss->Append(GPOS_NEW(pmp) CSearchStage(pxfs));
+	search_stage_array->Append(GPOS_NEW(memory_pool) CSearchStage(xform_set));
 
-	return pdrgpss;
+	return search_stage_array;
 }
 
 // EOF

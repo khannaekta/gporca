@@ -16,15 +16,15 @@ namespace gpopt
 		public:
 			CColConstraintsArrayMapper
 				(
-				gpos::IMemoryPool *pmp,
+				gpos::IMemoryPool *memory_pool,
 				DrgPcnstr *pdrgpcnstr
 				);
-			virtual DrgPcnstr *PdrgPcnstrLookup(CColRef *pcr);
+			virtual DrgPcnstr *PdrgPcnstrLookup(CColRef *colref);
 
 			virtual ~CColConstraintsArrayMapper();
 
 		private:
-			gpos::IMemoryPool *m_pmp;
+			gpos::IMemoryPool *m_memory_pool;
 			DrgPcnstr *m_pdrgpcnstr;
 	};
 }

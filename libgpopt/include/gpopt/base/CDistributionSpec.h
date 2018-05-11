@@ -90,22 +90,22 @@ namespace gpopt
 			
 			// default hash function for distribution spec
 			virtual
-			ULONG UlHash() const
+			ULONG HashValue() const
 			{
 				ULONG ulEdt = (ULONG) Edt();
-				return gpos::UlHash<ULONG>(&ulEdt);
+				return gpos::HashValue<ULONG>(&ulEdt);
 			}
 			
 			// extract columns used by the distribution spec
 			virtual
 			CColRefSet *PcrsUsed
 				(
-				IMemoryPool *pmp
+				IMemoryPool *memory_pool
 				)
 				const
 			{
 				// by default, return an empty set
-				return GPOS_NEW(pmp) CColRefSet(pmp);
+				return GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 			}
 
 			// property type
@@ -131,7 +131,7 @@ namespace gpopt
 
 			// default match function for distribution specs
 			virtual
-			BOOL FMatch(const CDistributionSpec *pds) const
+			BOOL Matches(const CDistributionSpec *pds) const
 			{
 				return Edt() == pds->Edt();
 			}
@@ -140,9 +140,9 @@ namespace gpopt
 			virtual
 			CDistributionSpec *PdsCopyWithRemappedColumns
 								(
-								IMemoryPool *, //pmp,
-								HMUlCr *, //phmulcr,
-								BOOL //fMustExist
+								IMemoryPool *, //memory_pool,
+								UlongColRefHashMap *, //colref_mapping,
+								BOOL //must_exist
 								)
 			{
 				this->AddRef();

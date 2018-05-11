@@ -22,7 +22,7 @@ namespace gpopt
 		public:
 			CHashedDistributions
 			(
-			IMemoryPool *pmp,
+			IMemoryPool *memory_pool,
 			DrgPcr *pdrgpcrOutput,
 			DrgDrgPcr *pdrgpdrgpcrInput
 			);

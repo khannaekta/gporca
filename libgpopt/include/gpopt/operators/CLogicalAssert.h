@@ -44,9 +44,9 @@ namespace gpopt
 
 			// ctors
 			explicit
-			CLogicalAssert(IMemoryPool *pmp);
+			CLogicalAssert(IMemoryPool *memory_pool);
 			
-			CLogicalAssert(IMemoryPool *pmp, CException *pexc);
+			CLogicalAssert(IMemoryPool *memory_pool, CException *pexc);
 
 			// dtor
 			virtual
@@ -77,7 +77,7 @@ namespace gpopt
 						
 			// match function; 
 			virtual 
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 			
 			//-------------------------------------------------------------------------------------
 			// Derived Relational Properties
@@ -89,22 +89,22 @@ namespace gpopt
 			
 			// dervive keys
 			virtual 
-			CKeyCollection *PkcDeriveKeys(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;		
+			CKeyCollection *PkcDeriveKeys(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;		
 					
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			// derive constraint property
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PpcDeriveConstraintFromPredicates(pmp, exprhdl);
+				return PpcDeriveConstraintFromPredicates(memory_pool, exprhdl);
 			}
 
 			//-------------------------------------------------------------------------------------
@@ -136,9 +136,9 @@ namespace gpopt
 			virtual
 			IStatistics *PstatsDerive
 						(
-						IMemoryPool *pmp,
+						IMemoryPool *memory_pool,
 						CExpressionHandle &exprhdl,
-						DrgPstat *pdrgpstatCtxt
+						StatsArray *stats_ctxt
 						)
 						const;
 			

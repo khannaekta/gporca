@@ -40,10 +40,10 @@ namespace gpopt
 
 			// ctor for patterns
 			explicit
-			CLogicalLeftSemiCorrelatedApply(IMemoryPool *pmp);
+			CLogicalLeftSemiCorrelatedApply(IMemoryPool *memory_pool);
 
 			// ctor
-			CLogicalLeftSemiCorrelatedApply(IMemoryPool *pmp,  DrgPcr *pdrgpcrInner, EOperatorId eopidOriginSubq);
+			CLogicalLeftSemiCorrelatedApply(IMemoryPool *memory_pool,  DrgPcr *pdrgpcrInner, EOperatorId eopidOriginSubq);
 
 			// dtor
 			virtual
@@ -66,7 +66,7 @@ namespace gpopt
 
 			// applicable transformations
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *pmp) const;
+			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
 
 			// return true if operator is a correlated apply
 			virtual
@@ -77,7 +77,7 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// conversion function
 			static

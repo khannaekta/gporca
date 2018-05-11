@@ -42,7 +42,7 @@ namespace gpopt
 
 			// helper for testing engine using an array of expression generators
 			static
-			GPOS_RESULT EresTestEngine(Pfpexpr rgpf[], ULONG ulSize);
+			GPOS_RESULT EresTestEngine(Pfpexpr rgpf[], ULONG size);
 
 #endif // GPOS_DEBUG
 
@@ -70,7 +70,7 @@ namespace gpopt
 			GPOS_RESULT EresOptimize
 				(
 				FnOptimize *pfopt, // optimization function
-				CWStringConst *pstr, // array of relation names
+				CWStringConst *str, // array of relation names
 				ULONG *pul,// array of relation OIDs
 				ULONG ulRels, // number of array entries
 				CBitSet *pbs // if a bit is set, the corresponding join expression will be optimized
@@ -80,7 +80,7 @@ namespace gpopt
 
 			// build memo by recursive optimization
 			static
-			void BuildMemoRecursive(IMemoryPool *pmp, CExpression *pexprInput, DrgPss *pdrgpss);
+			void BuildMemoRecursive(IMemoryPool *memory_pool, CExpression *pexprInput, DrgPss *search_stage_array);
 
 			// test of recursive memo building
 			static

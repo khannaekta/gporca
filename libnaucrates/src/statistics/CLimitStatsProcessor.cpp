@@ -15,32 +15,32 @@ using namespace gpopt;
 
 //	compute the statistics of a limit operation
 CStatistics *
-CLimitStatsProcessor::PstatsLimit
+CLimitStatsProcessor::CalcLimitStats
 	(
-	IMemoryPool *pmp,
-	const CStatistics *pstatsInput,
-	CDouble dLimitCount
+	IMemoryPool *memory_pool,
+	const CStatistics *input_stats,
+	CDouble input_limit_rows
 	)
 {
-	GPOS_ASSERT(NULL != pstatsInput);
+	GPOS_ASSERT(NULL != input_stats);
 
 	// copy the hash map from colid -> histogram for resultant structure
-	HMUlHist *phmulhistLimit = pstatsInput->CopyHistograms(pmp);;
+	UlongHistogramHashMap *colid_histogram = input_stats->CopyHistograms(memory_pool);;
 
-	CDouble dRowsLimit = CStatistics::DMinRows;
-	if (!pstatsInput->FEmpty())
+	CDouble limit_rows = CStatistics::MinRows;
+	if (!input_stats->IsEmpty())
 	{
-		dRowsLimit = std::max(CStatistics::DMinRows, dLimitCount);
+		limit_rows = std::max(CStatistics::MinRows, input_limit_rows);
 	}
 	// create an output stats object
-	CStatistics *pstatsLimit = GPOS_NEW(pmp) CStatistics
+	CStatistics *pstatsLimit = GPOS_NEW(memory_pool) CStatistics
 											(
-											pmp,
-											phmulhistLimit,
-											pstatsInput->CopyWidths(pmp),
-											dRowsLimit,
-											pstatsInput->FEmpty(),
-											pstatsInput->UlNumberOfPredicates()
+											memory_pool,
+											colid_histogram,
+											input_stats->CopyWidths(memory_pool),
+											limit_rows,
+											input_stats->IsEmpty(),
+											input_stats->GetNumberOfPredicates()
 											);
 
 	// In the output statistics object, the upper bound source cardinality of the join column
@@ -50,7 +50,7 @@ CLimitStatsProcessor::PstatsLimit
 	// and estimated limit cardinality.
 
 	// modify source id to upper bound card information
-	CStatisticsUtils::ComputeCardUpperBounds(pmp, pstatsInput, pstatsLimit, dRowsLimit, CStatistics::EcbmMin /* ecbm */);
+	CStatisticsUtils::ComputeCardUpperBounds(memory_pool, input_stats, pstatsLimit, limit_rows, CStatistics::EcbmMin /* card_bounding_method */);
 
 	return pstatsLimit;
 }

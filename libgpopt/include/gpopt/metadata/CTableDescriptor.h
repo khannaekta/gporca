@@ -46,10 +46,10 @@ namespace gpopt
 		private:
 			
 			// memory pool
-			IMemoryPool *m_pmp;
+			IMemoryPool *m_memory_pool;
 			
 			// mdid of the table
-			IMDId *m_pmdid;
+			IMDId *m_mdid;
 			
 			// name of table
 			CName m_name;
@@ -58,7 +58,7 @@ namespace gpopt
 			DrgPcoldesc *m_pdrgpcoldesc;
 			
 			// distribution policy
-			IMDRelation::Ereldistrpolicy m_ereldistrpolicy;
+			IMDRelation::Ereldistrpolicy m_rel_distr_policy;
 			
 			// storage type
 			IMDRelation::Erelstoragetype m_erelstoragetype;
@@ -71,19 +71,19 @@ namespace gpopt
 			// 1. in hawq 2.0, some hash distributed tables need to be considered as random,
 			//	  depending on its bucket number
 			// 2. for a partitioned table, it may contain a part with a different distribution
-			BOOL m_fConvertHashToRandom;
+			BOOL m_convert_hash_to_random;
 			
 			// indexes of partition columns for partitioned tables
-			DrgPul *m_pdrgpulPart;
+			ULongPtrArray *m_pdrgpulPart;
 			
 			// key sets
 			DrgPbs *m_pdrgpbsKeys;
 			
 			// number of leaf partitions
-			ULONG m_ulPartitions;
+			ULONG m_num_of_partitions;
 
 			// id of user the table needs to be accessed with
-			ULONG m_ulExecuteAsUser;
+			ULONG m_execute_as_user_id;
 
 			// if true, it means this descriptor has partial indexes
 			BOOL m_fHasPartialIndexes;
@@ -100,10 +100,10 @@ namespace gpopt
 			CTableDescriptor
 				(
 				IMemoryPool *,
-				IMDId *pmdid,
+				IMDId *mdid,
 				const CName &,
-				BOOL fConvertHashToRandom,
-				IMDRelation::Ereldistrpolicy ereldistrpolicy,
+				BOOL convert_hash_to_random,
+				IMDRelation::Ereldistrpolicy rel_distr_policy,
 				IMDRelation::Erelstoragetype erelstoragetype,
 				ULONG ulExecuteAsUser
 				);
@@ -125,13 +125,13 @@ namespace gpopt
 			BOOL FAddKeySet(CBitSet *pbs);
 			
 			// accessors
-			ULONG UlColumns() const;
+			ULONG ColumnCount() const;
 			const CColumnDescriptor *Pcoldesc(ULONG) const;
 			
 			// mdid accessor
-			IMDId *Pmdid() const
+			IMDId *MDId() const
 			{
-				return m_pmdid;
+				return m_mdid;
 			}
 			
 			// name accessor
@@ -141,13 +141,13 @@ namespace gpopt
 			}
 			
 			// execute as user accessor
-			ULONG UlExecuteAsUser() const
+			ULONG GetExecuteAsUserId() const
 			{
-				return m_ulExecuteAsUser;
+				return m_execute_as_user_id;
 			}
 			
 			// return the position of a particular attribute (identified by attno)
-			ULONG UlPosition(INT iAttno) const;
+			ULONG UlPosition(INT attno) const;
 
 			// column descriptor accessor
 			DrgPcoldesc *Pdrgpcoldesc() const
@@ -162,7 +162,7 @@ namespace gpopt
 			}
 			
 			// partition column indexes accessor
-			const DrgPul *PdrgpulPart() const
+			const ULongPtrArray *PdrgpulPart() const
 			{
 				return m_pdrgpulPart;
 			}
@@ -174,29 +174,29 @@ namespace gpopt
 			}
 
 			// return the number of leaf partitions
-			ULONG UlPartitions() const;
+			ULONG PartitionCount() const;
 
 			// distribution policy
-			IMDRelation::Ereldistrpolicy Ereldistribution() const 
+			IMDRelation::Ereldistrpolicy GetRelDistribution() const 
 			{
-				return m_ereldistrpolicy;
+				return m_rel_distr_policy;
 			}
 			
 			// storage type
-			IMDRelation::Erelstoragetype Erelstorage() const
+			IMDRelation::Erelstoragetype GetRelStorageType() const
 			{
 				return m_erelstoragetype;
 			}
 
-			BOOL FPartitioned() const
+			BOOL IsPartitioned() const
 			{
-				return 0 < m_pdrgpulPart->UlLength();
+				return 0 < m_pdrgpulPart->Size();
 			}
 
 			// true iff a hash distributed table needs to be considered as random
-			BOOL FConvertHashToRandom() const
+			BOOL ConvertHashToRandom() const
 			{
-				return m_fConvertHashToRandom;
+				return m_convert_hash_to_random;
 			}
 			
 			// helper function for finding the index of a column descriptor in
@@ -208,7 +208,7 @@ namespace gpopt
 #endif // GPOS_DEBUG
 
 			// returns number of indices
-			ULONG UlIndices();
+			ULONG IndexCount();
 
 			// true iff this table has partial indexes
 			BOOL FHasPartialIndexes() const

@@ -23,8 +23,8 @@ using namespace gpopt;
 void
 CPropSpec::DbgPrint() const
 {
-	IMemoryPool *pmp = COptCtxt::PoctxtFromTLS()->Pmp();
-	CAutoTrace at(pmp);
+	IMemoryPool *memory_pool = COptCtxt::PoctxtFromTLS()->Pmp();
+	CAutoTrace at(memory_pool);
 	at.Os() << *this;
 }
 #endif // GPOS_DEBUG

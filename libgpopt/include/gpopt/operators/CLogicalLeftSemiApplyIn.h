@@ -41,21 +41,21 @@ namespace gpopt
 			explicit
 			CLogicalLeftSemiApplyIn
 				(
-				IMemoryPool *pmp
+				IMemoryPool *memory_pool
 				)
 				:
-				CLogicalLeftSemiApply(pmp)
+				CLogicalLeftSemiApply(memory_pool)
 			{}
 
 			// ctor
 			CLogicalLeftSemiApplyIn
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				DrgPcr *pdrgpcrInner,
 				EOperatorId eopidOriginSubq
 				)
 				:
-				CLogicalLeftSemiApply(pmp, pdrgpcrInner, eopidOriginSubq)
+				CLogicalLeftSemiApply(memory_pool, pdrgpcrInner, eopidOriginSubq)
 			{}
 
 			// dtor
@@ -83,7 +83,7 @@ namespace gpopt
 
 			// candidate set of xforms
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *pmp) const;
+			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
 
 			//-------------------------------------------------------------------------------------
 			//-------------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// conversion function
 			static

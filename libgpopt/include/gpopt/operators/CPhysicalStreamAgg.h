@@ -41,31 +41,31 @@ namespace gpopt
 			CColRefSet *m_pcrsMinimalGrpCols;
 
 			// construct order spec on grouping column so that it covers required order spec
-			COrderSpec *PosCovering(IMemoryPool *pmp, COrderSpec *posRequired, DrgPcr *pdrgpcrGrp) const;
+			COrderSpec *PosCovering(IMemoryPool *memory_pool, COrderSpec *posRequired, DrgPcr *pdrgpcrGrp) const;
 
 		protected:
 
 			// compute required sort columns of the n-th child
 			COrderSpec *PosRequiredStreamAgg
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				COrderSpec *posRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPcr *pdrgpcrGrp
 				)
 				const;
 
 			// initialize the order spec using the given array of columns
-			void InitOrderSpec(IMemoryPool *pmp, DrgPcr *pdrgpcrOrder);
+			void InitOrderSpec(IMemoryPool *memory_pool, DrgPcr *pdrgpcrOrder);
 
 		public:
 
 			// ctor
 			CPhysicalStreamAgg
 				(
-				IMemoryPool *pmp,
-				DrgPcr *pdrgpcr,
+				IMemoryPool *memory_pool,
+				DrgPcr *colref_array,
 				DrgPcr *pdrgpcrMinimal, // minimal grouping columns based on FD's
 				COperator::EGbAggType egbaggtype,
 				BOOL fGeneratesDuplicates,
@@ -100,16 +100,16 @@ namespace gpopt
 			virtual
 			COrderSpec *PosRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				COrderSpec *posRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *, //pdrgpdpCtxt,
 				ULONG //ulOptReq
 				)
 				const
 			{
-				return PosRequiredStreamAgg(pmp, exprhdl, posRequired, ulChildIndex, m_pdrgpcrMinimal);
+				return PosRequiredStreamAgg(memory_pool, exprhdl, posRequired, child_index, m_pdrgpcrMinimal);
 			}
 
 			//-------------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ namespace gpopt
 
 			// derive sort order
 			virtual
-			COrderSpec *PosDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			COrderSpec *PosDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			//-------------------------------------------------------------------------------------
 			// Enforced Properties

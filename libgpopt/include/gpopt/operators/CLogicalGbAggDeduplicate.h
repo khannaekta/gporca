@@ -53,13 +53,13 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CLogicalGbAggDeduplicate(IMemoryPool *pmp);
+			CLogicalGbAggDeduplicate(IMemoryPool *memory_pool);
 
 			// ctor
 			CLogicalGbAggDeduplicate
 				(
-				IMemoryPool *pmp,
-				DrgPcr *pdrgpcr,
+				IMemoryPool *memory_pool,
+				DrgPcr *colref_array,
 				COperator::EGbAggType egbaggtype,
 				DrgPcr *pdrgpcrKeys = NULL
 				);
@@ -67,8 +67,8 @@ namespace gpopt
 			// ctor
 			CLogicalGbAggDeduplicate
 				(
-				IMemoryPool *pmp,
-				DrgPcr *pdrgpcr,
+				IMemoryPool *memory_pool,
+				DrgPcr *colref_array,
 				DrgPcr *pdrgpcrMinimal,
 				COperator::EGbAggType egbaggtype,
 				DrgPcr *pdrgpcrKeys = NULL
@@ -100,15 +100,15 @@ namespace gpopt
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			// hash function
 			virtual
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			//-------------------------------------------------------------------------------------
 			// Derived Relational Properties
@@ -116,7 +116,7 @@ namespace gpopt
 
 			// derive key collections
 			virtual
-			CKeyCollection *PkcDeriveKeys(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CKeyCollection *PkcDeriveKeys(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			// compute required stats columns of the n-th child
 			//-------------------------------------------------------------------------------------
@@ -127,10 +127,10 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsStat
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsInput,
-				ULONG ulChildIndex
+				ULONG child_index
 				)
 				const;
 
@@ -140,15 +140,15 @@ namespace gpopt
 
 			// candidate set of xforms
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *pmp) const;
+			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
 
 			// derive statistics
 			virtual
 			IStatistics *PstatsDerive
 						(
-						IMemoryPool *pmp,
+						IMemoryPool *memory_pool,
 						CExpressionHandle &exprhdl,
-						DrgPstat *pdrgpstatCtxt
+						StatsArray *stats_ctxt
 						)
 						const;
 

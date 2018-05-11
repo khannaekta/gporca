@@ -45,12 +45,12 @@ namespace gpopt
 			// ctor
 			CPhysicalCorrelatedLeftOuterNLJoin
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				DrgPcr *pdrgpcrInner,
 				EOperatorId eopidOriginSubq
 				)
 				:
-				CPhysicalLeftOuterNLJoin(pmp),
+				CPhysicalLeftOuterNLJoin(memory_pool),
 				m_pdrgpcrInner(pdrgpcrInner),
 				m_eopidOriginSubq(eopidOriginSubq)
 			{
@@ -83,7 +83,7 @@ namespace gpopt
 
 			// match function
 			virtual
-			BOOL FMatch
+			BOOL Matches
 				(
 				COperator *pop
 				)
@@ -91,7 +91,7 @@ namespace gpopt
 			{
 				if (pop->Eopid() == Eopid())
 				{
-					return m_pdrgpcrInner->FEqual(CPhysicalCorrelatedLeftOuterNLJoin::PopConvert(pop)->PdrgPcrInner());
+					return m_pdrgpcrInner->Equals(CPhysicalCorrelatedLeftOuterNLJoin::PopConvert(pop)->PdrgPcrInner());
 				}
 
 				return false;
@@ -101,32 +101,32 @@ namespace gpopt
 			virtual
 			CDistributionSpec *PdsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG  ulOptReq
 				)
 				const
 			{
-				return PdsRequiredCorrelatedJoin(pmp, exprhdl, pdsRequired, ulChildIndex, pdrgpdpCtxt, ulOptReq);
+				return PdsRequiredCorrelatedJoin(memory_pool, exprhdl, pdsRequired, child_index, pdrgpdpCtxt, ulOptReq);
 			}
 
 			// compute required rewindability of the n-th child
 			virtual
 			CRewindabilitySpec *PrsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CRewindabilitySpec *prsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
 				const
 			{
-				return PrsRequiredCorrelatedJoin(pmp, exprhdl, prsRequired, ulChildIndex, pdrgpdpCtxt, ulOptReq);
+				return PrsRequiredCorrelatedJoin(memory_pool, exprhdl, prsRequired, child_index, pdrgpdpCtxt, ulOptReq);
 			}
 
 			// distribution matching type
@@ -134,7 +134,7 @@ namespace gpopt
 			CEnfdDistribution::EDistributionMatching Edm
 				(
 				CReqdPropPlan *, // prppInput
-				ULONG,  // ulChildIndex
+				ULONG,  // child_index
 				DrgPdp *, //pdrgpdpCtxt
 				ULONG // ulOptReq
 				)

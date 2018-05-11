@@ -46,14 +46,14 @@ CRewindabilitySpec::~CRewindabilitySpec()
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CRewindabilitySpec::FMatch
+//		CRewindabilitySpec::Matches
 //
 //	@doc:
 //		Check for equality between rewindability specs
 //
 //---------------------------------------------------------------------------
 BOOL
-CRewindabilitySpec::FMatch
+CRewindabilitySpec::Matches
 	(
 	const CRewindabilitySpec *prs
 	)
@@ -81,7 +81,7 @@ CRewindabilitySpec::FSatisfies
 	const
 {
 	return
-		FMatch(prs) ||
+		Matches(prs) ||
 		ErtNone == prs->Ert() ||
 		(ErtMarkRestore == Ert() && ErtGeneral == prs->Ert());
 }
@@ -89,16 +89,16 @@ CRewindabilitySpec::FSatisfies
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CRewindabilitySpec::UlHash
+//		CRewindabilitySpec::HashValue
 //
 //	@doc:
 //		Hash of components
 //
 //---------------------------------------------------------------------------
 ULONG
-CRewindabilitySpec::UlHash() const
+CRewindabilitySpec::HashValue() const
 {
-	return gpos::UlHash<ERewindabilityType>(&m_ert);
+	return gpos::HashValue<ERewindabilityType>(&m_ert);
 }
 
 
@@ -113,7 +113,7 @@ CRewindabilitySpec::UlHash() const
 void
 CRewindabilitySpec::AppendEnforcers
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &, // exprhdl
 	CReqdPropPlan *
 #ifdef GPOS_DEBUG
@@ -125,17 +125,17 @@ CRewindabilitySpec::AppendEnforcers
 	)
 {
 	GPOS_ASSERT(NULL != prpp);
-	GPOS_ASSERT(NULL != pmp);
+	GPOS_ASSERT(NULL != memory_pool);
 	GPOS_ASSERT(NULL != pdrgpexpr);
 	GPOS_ASSERT(NULL != pexpr);
 	GPOS_ASSERT(this == prpp->Per()->PrsRequired() &&
 				"required plan properties don't match enforced rewindability spec");
 
 	pexpr->AddRef();
-	CExpression *pexprSpool = GPOS_NEW(pmp) CExpression
+	CExpression *pexprSpool = GPOS_NEW(memory_pool) CExpression
 									(
-									pmp, 
-									GPOS_NEW(pmp) CPhysicalSpool(pmp),
+									memory_pool, 
+									GPOS_NEW(memory_pool) CPhysicalSpool(memory_pool),
 									pexpr
 									);
 	pdrgpexpr->Append(pexprSpool);

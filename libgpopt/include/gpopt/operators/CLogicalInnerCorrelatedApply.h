@@ -39,11 +39,11 @@ namespace gpopt
 		public:
 
 			// ctor
-			CLogicalInnerCorrelatedApply(IMemoryPool *pmp,  DrgPcr *pdrgpcrInner, EOperatorId eopidOriginSubq);
+			CLogicalInnerCorrelatedApply(IMemoryPool *memory_pool,  DrgPcr *pdrgpcrInner, EOperatorId eopidOriginSubq);
 
 			// ctor for patterns
 			explicit
-			CLogicalInnerCorrelatedApply(IMemoryPool *pmp);
+			CLogicalInnerCorrelatedApply(IMemoryPool *memory_pool);
 
 			// dtor
 			virtual
@@ -66,15 +66,15 @@ namespace gpopt
 
 			// applicable transformations
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *pmp) const;
+			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// return true if operator is a correlated apply
 			virtual

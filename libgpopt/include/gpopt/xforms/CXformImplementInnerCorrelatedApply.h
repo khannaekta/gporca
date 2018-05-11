@@ -41,10 +41,10 @@ namespace gpopt
 			explicit
 			CXformImplementInnerCorrelatedApply
 				(
-				IMemoryPool *pmp
+				IMemoryPool *memory_pool
 				)
 				:
-				CXformImplementCorrelatedApply<CLogicalInnerCorrelatedApply, CPhysicalCorrelatedInnerNLJoin>(pmp)
+				CXformImplementCorrelatedApply<CLogicalInnerCorrelatedApply, CPhysicalCorrelatedInnerNLJoin>(memory_pool)
 			{}
 
 			// dtor

@@ -42,18 +42,18 @@ namespace gpopt
 
 			// ctors
 			explicit
-			CLogicalExternalGet(IMemoryPool *pmp);
+			CLogicalExternalGet(IMemoryPool *memory_pool);
 
 			CLogicalExternalGet
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				const CName *pnameAlias,
 				CTableDescriptor *ptabdesc
 				);
 
 			CLogicalExternalGet
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				const CName *pnameAlias,
 				CTableDescriptor *ptabdesc,
 				DrgPcr *pdrgpcrOutput
@@ -75,11 +75,11 @@ namespace gpopt
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			//-------------------------------------------------------------------------------------
 			// Required Relational Properties
@@ -89,10 +89,10 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsStat
 				(
-				IMemoryPool *, // pmp,
+				IMemoryPool *, // memory_pool,
 				CExpressionHandle &, // exprhdl
 				CColRefSet *, // pcrsInput
-				ULONG // ulChildIndex
+				ULONG // child_index
 				)
 				const
 			{
@@ -106,7 +106,7 @@ namespace gpopt
 
 			// candidate set of xforms
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *pmp) const;
+			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
 
 			//-------------------------------------------------------------------------------------
 			//-------------------------------------------------------------------------------------

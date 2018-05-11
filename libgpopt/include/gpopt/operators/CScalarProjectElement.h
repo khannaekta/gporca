@@ -46,14 +46,14 @@ namespace gpopt
 			// ctor
 			CScalarProjectElement
 				(
-				IMemoryPool *pmp,
-				CColRef *pcr
+				IMemoryPool *memory_pool,
+				CColRef *colref
 				)
 				:
-				CScalar(pmp),
-				m_pcr(pcr)
+				CScalar(memory_pool),
+				m_pcr(colref)
 			{
-				GPOS_ASSERT(NULL != pcr);
+				GPOS_ASSERT(NULL != colref);
 			}
 
 			// dtor
@@ -81,27 +81,27 @@ namespace gpopt
 			}
 
 			// operator specific hash function
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 
 			// match function
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			// sensitivity to order of inputs
 			BOOL FInputOrderSensitive() const;
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// return locally defined columns
 			virtual
 			CColRefSet *PcrsDefined
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle & // exprhdl
 				)
 			{
-				CColRefSet *pcrs = GPOS_NEW(pmp) CColRefSet(pmp);
+				CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 				pcrs->Include(m_pcr);
 
 				return pcrs;
@@ -121,7 +121,7 @@ namespace gpopt
 			}
 
 			virtual
-			IMDId *PmdidType() const
+			IMDId *MDIdType() const
 			{
 				GPOS_ASSERT(!"Invalid function call: CScalarProjectElemet::MdidType()");
 				return NULL;

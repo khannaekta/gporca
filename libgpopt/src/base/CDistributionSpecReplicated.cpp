@@ -35,7 +35,7 @@ CDistributionSpecReplicated::FSatisfies
 	)
 	const
 {
-	if (FMatch(pdss))
+	if (Matches(pdss))
 	{
 		// exact match implies satisfaction
 		return true;
@@ -66,7 +66,7 @@ CDistributionSpecReplicated::FSatisfies
 void
 CDistributionSpecReplicated::AppendEnforcers
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &, // exprhdl
 	CReqdPropPlan *
 	#ifdef GPOS_DEBUG
@@ -77,7 +77,7 @@ CDistributionSpecReplicated::AppendEnforcers
 	CExpression *pexpr
 	)
 {
-	GPOS_ASSERT(NULL != pmp);
+	GPOS_ASSERT(NULL != memory_pool);
 	GPOS_ASSERT(NULL != prpp);
 	GPOS_ASSERT(NULL != pdrgpexpr);
 	GPOS_ASSERT(NULL != pexpr);
@@ -92,10 +92,10 @@ CDistributionSpecReplicated::AppendEnforcers
 	}
 
 	pexpr->AddRef();
-	CExpression *pexprMotion = GPOS_NEW(pmp) CExpression
+	CExpression *pexprMotion = GPOS_NEW(memory_pool) CExpression
 										(
-										pmp,
-										GPOS_NEW(pmp) CPhysicalMotionBroadcast(pmp),
+										memory_pool,
+										GPOS_NEW(memory_pool) CPhysicalMotionBroadcast(memory_pool),
 										pexpr
 										);
 	pdrgpexpr->Append(pexprMotion);

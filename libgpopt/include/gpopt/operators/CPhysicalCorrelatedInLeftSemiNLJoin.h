@@ -47,12 +47,12 @@ namespace gpopt
 			// ctor
 			CPhysicalCorrelatedInLeftSemiNLJoin
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				DrgPcr *pdrgpcrInner,
 				EOperatorId eopidOriginSubq
 				)
 				:
-				CPhysicalLeftSemiNLJoin(pmp),
+				CPhysicalLeftSemiNLJoin(memory_pool),
 				m_pdrgpcrInner(pdrgpcrInner),
 				m_eopidOriginSubq(eopidOriginSubq)
 			{
@@ -85,7 +85,7 @@ namespace gpopt
 
 			// match function
 			virtual
-			BOOL FMatch
+			BOOL Matches
 				(
 				COperator *pop
 				)
@@ -93,7 +93,7 @@ namespace gpopt
 			{
 				if (pop->Eopid() == Eopid())
 				{
-					return m_pdrgpcrInner->FEqual(CPhysicalCorrelatedInLeftSemiNLJoin::PopConvert(pop)->PdrgPcrInner());
+					return m_pdrgpcrInner->Equals(CPhysicalCorrelatedInLeftSemiNLJoin::PopConvert(pop)->PdrgPcrInner());
 				}
 
 				return false;
@@ -104,7 +104,7 @@ namespace gpopt
 			CEnfdDistribution::EDistributionMatching Edm
 				(
 				CReqdPropPlan *, // prppInput
-				ULONG,  // ulChildIndex
+				ULONG,  // child_index
 				DrgPdp *, //pdrgpdpCtxt
 				ULONG // ulOptReq
 				)
@@ -116,32 +116,32 @@ namespace gpopt
 			virtual
 			CDistributionSpec *PdsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG  ulOptReq
 				)
 				const
 			{
-				return PdsRequiredCorrelatedJoin(pmp, exprhdl, pdsRequired, ulChildIndex, pdrgpdpCtxt, ulOptReq);
+				return PdsRequiredCorrelatedJoin(memory_pool, exprhdl, pdsRequired, child_index, pdrgpdpCtxt, ulOptReq);
 			}
 
 			// compute required rewindability of the n-th child
 			virtual
 			CRewindabilitySpec *PrsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CRewindabilitySpec *prsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
 				const
 			{
-				return PrsRequiredCorrelatedJoin(pmp, exprhdl, prsRequired, ulChildIndex, pdrgpdpCtxt, ulOptReq);
+				return PrsRequiredCorrelatedJoin(memory_pool, exprhdl, prsRequired, child_index, pdrgpdpCtxt, ulOptReq);
 			}
 
 			// conversion function

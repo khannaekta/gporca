@@ -27,7 +27,7 @@ namespace gpopt
 		public:
 
 			// ctor
-			CPhysicalLeftOuterIndexNLJoin(IMemoryPool *pmp, DrgPcr *pdrgpcr);
+			CPhysicalLeftOuterIndexNLJoin(IMemoryPool *memory_pool, DrgPcr *colref_array);
 
 			// dtor
 			virtual
@@ -49,7 +49,7 @@ namespace gpopt
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			// outer column references accessor
 			DrgPcr *PdrgPcrOuterRefs() const
@@ -61,10 +61,10 @@ namespace gpopt
 			virtual
 			CDistributionSpec *PdsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)

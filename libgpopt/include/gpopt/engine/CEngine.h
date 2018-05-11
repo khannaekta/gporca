@@ -49,13 +49,13 @@ namespace gpopt
 		private:
 
 			// memory pool
-			IMemoryPool *m_pmp;
+			IMemoryPool *m_memory_pool;
 			
 			// query context
 			CQueryContext *m_pqc;
 
 			// search strategy
-			DrgPss *m_pdrgpss;
+			DrgPss *m_search_stage_array;
 
 			// index of current search stage
 			ULONG m_ulCurrSearchStage;
@@ -69,7 +69,7 @@ namespace gpopt
 			// the following variables are used for maintaining optimization statistics
 
 			// set of activated xforms
-			CXformSet *m_pxfs;
+			CXformSet *m_xforms;
 
 			// number of calls to each xform
 			DrgPulp *m_pdrgpulpXformCalls;
@@ -89,7 +89,7 @@ namespace gpopt
 			void ApplyTransformations
 				(
 				IMemoryPool *pmpLocal,
-				CXformSet *pxfs,
+				CXformSet *xform_set,
 				CGroupExpression *pgexpr
 				);
 
@@ -117,8 +117,8 @@ namespace gpopt
 				CExpressionHandle &exprhdlPlan, // handle to compute required plan properties
 				CExpressionHandle &exprhdlRel, // handle to compute required relational properties
 				DrgPdp *pdrgpdpChildren, // derived plan properties of optimized children
-				DrgPstat *pdrgpstatCurrentCtxt,
-				ULONG ulChildIndex,
+				StatsArray *pdrgpstatCurrentCtxt,
+				ULONG child_index,
 				ULONG ulOptReq
 				);
 
@@ -129,8 +129,8 @@ namespace gpopt
 				CExpressionHandle &exprhdlRel,
 				COptimizationContext *pocOrigin,
 				DrgPdp *pdrgpdp,
-				DrgPstat *pdrgpstatCurrentCtxt,
-				ULONG ulChildIndex,
+				StatsArray *pdrgpstatCurrentCtxt,
+				ULONG child_index,
 				ULONG ulOptReq
 				);
 
@@ -180,10 +180,10 @@ namespace gpopt
 			}
 
 			// generate random plan id
-			ULLONG UllRandomPlanId(ULONG *pulSeed);
+			ULLONG UllRandomPlanId(ULONG *seed);
 
 			// extract a plan sample and handle exceptions according to enumerator configurations
-			BOOL FValidPlanSample(CEnumeratorConfig *pec, ULLONG ullPlanId, CExpression **ppexpr);
+			BOOL FValidPlanSample(CEnumeratorConfig *pec, ULLONG plan_id, CExpression **ppexpr);
 
 			// sample possible plans uniformly
 			void SamplePlans();
@@ -221,12 +221,12 @@ namespace gpopt
 			static
 			BOOL FCheckReqdPartPropagation(CPhysical *pop, CEnfdPartitionPropagation *pepp);
 
-			// unrank the plan with the given 'ullPlanId' from the memo
-			CExpression *PexprUnrank(ULLONG ullPlanId);
+			// unrank the plan with the given 'plan_id' from the memo
+			CExpression *PexprUnrank(ULLONG plan_id);
 
 			// determine if a plan, rooted by given group expression, can be safely pruned based on cost bounds
 			// when stats for Dynamic Partition Elimination are derived
-			BOOL FSafeToPruneWithDPEStats(CGroupExpression *pgexpr, CReqdPropPlan *prpp, CCostContext *pccChild, ULONG ulChildIndex);
+			BOOL FSafeToPruneWithDPEStats(CGroupExpression *pgexpr, CReqdPropPlan *prpp, CCostContext *pccChild, ULONG child_index);
 
 			// print current memory consumption
 			IOstream &OsPrintMemoryConsumption(IOstream &os, const CHAR *szHeader) const;
@@ -238,7 +238,7 @@ namespace gpopt
 		
 			// ctor
 			explicit
-			CEngine(IMemoryPool *pmp);
+			CEngine(IMemoryPool *memory_pool);
 						
 			// dtor
 			~CEngine();
@@ -247,7 +247,7 @@ namespace gpopt
 			void Init
 				(
 				CQueryContext *pqc,
-				DrgPss *pdrgpss
+				DrgPss *search_stage_array
 				);
 
 			// accessor of memo's root group
@@ -303,7 +303,7 @@ namespace gpopt
 			// return false if it's impossible for the operator to satisfy one or more
 			BOOL FCheckEnfdProps
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CGroupExpression *pgexpr,
 				COptimizationContext *poc,
 				ULONG ulOptReq,
@@ -314,7 +314,7 @@ namespace gpopt
 			// with respect to the given requirements
 			BOOL FValidCTEAndPartitionProperties
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CReqdPropPlan *prpp
 				);
@@ -331,7 +331,7 @@ namespace gpopt
 #endif // GPOS_DEBUG
 
 			// derive statistics
-			void DeriveStats(IMemoryPool *pmp);
+			void DeriveStats(IMemoryPool *memory_pool);
 
 			// execute operations after exploration completes
 			void FinalizeExploration();
@@ -366,7 +366,7 @@ namespace gpopt
 			// return current search stage
 			CSearchStage *PssCurrent() const
 			{
-				return (*m_pdrgpss)[m_ulCurrSearchStage];
+				return (*m_search_stage_array)[m_ulCurrSearchStage];
 			}
 
 			// current search stage index accessor
@@ -383,23 +383,23 @@ namespace gpopt
 					return NULL;
 				}
 
-				return (*m_pdrgpss)[m_ulCurrSearchStage - 1];
+				return (*m_search_stage_array)[m_ulCurrSearchStage - 1];
 			}
 
 			// number of search stages accessor
 			ULONG UlSearchStages() const
 			{
-				return m_pdrgpss->UlLength();
+				return m_search_stage_array->Size();
 			}
 
 			// set of xforms of current stage
 			CXformSet *PxfsCurrentStage() const
 			{
-				return (*m_pdrgpss)[m_ulCurrSearchStage]->Pxfs();
+				return (*m_search_stage_array)[m_ulCurrSearchStage]->GetXformSet();
 			}
 
 			// return array of child optimization contexts corresponding to handle requirements
-			DrgPoc *PdrgpocChildren(IMemoryPool *pmp, CExpressionHandle &exprhdl);
+			DrgPoc *PdrgpocChildren(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
 
 			// build tree map on memo
 			MemoTreeMap *Pmemotmap();
@@ -414,7 +414,7 @@ namespace gpopt
 			BOOL FOptimizeChild(CGroupExpression *pgexprParent, CGroupExpression *pgexprChild, COptimizationContext *pocChild, EOptimizationLevel eol);
 
 			// determine if a plan, rooted by given group expression, can be safely pruned based on cost bounds
-			BOOL FSafeToPrune(CGroupExpression *pgexpr, CReqdPropPlan *prpp, CCostContext *pccChild, ULONG ulChildIndex, CCost *pcostLowerBound);
+			BOOL FSafeToPrune(CGroupExpression *pgexpr, CReqdPropPlan *prpp, CCostContext *pccChild, ULONG child_index, CCost *pcostLowerBound);
 
 			// print
 			IOstream &

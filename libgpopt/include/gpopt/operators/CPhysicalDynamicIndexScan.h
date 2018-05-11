@@ -51,14 +51,14 @@ namespace gpopt
 			// ctors
 			CPhysicalDynamicIndexScan
 				(
-				IMemoryPool *pmp,
-				BOOL fPartial,
+				IMemoryPool *memory_pool,
+				BOOL is_partial,
 				CIndexDescriptor *pindexdesc,
 				CTableDescriptor *ptabdesc,
 				ULONG ulOriginOpId,
 				const CName *pnameAlias,
 				DrgPcr *pdrgpcrOutput,
-				ULONG ulScanId,
+				ULONG scan_id,
 				DrgDrgPcr *pdrgpdrgpcrPart,
 				ULONG ulSecondaryScanId,
 				CPartConstraint *ppartcnstr,
@@ -93,11 +93,11 @@ namespace gpopt
 
 			// operator specific hash function
 			virtual
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			//-------------------------------------------------------------------------------------
 			// Derived Plan Properties
@@ -107,7 +107,7 @@ namespace gpopt
 			virtual
 			COrderSpec *PosDerive
 							(
-							IMemoryPool *,//pmp
+							IMemoryPool *,//memory_pool
 							CExpressionHandle &//exprhdl
 							)
 							const
@@ -145,10 +145,10 @@ namespace gpopt
 			virtual
 			IStatistics *PstatsDerive
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CReqdPropPlan *prpplan,
-				DrgPstat *pdrgpstatCtxt
+				StatsArray *stats_ctxt
 				)
 				const;
 

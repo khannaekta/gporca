@@ -46,7 +46,7 @@ namespace gpopt
 		public:
 
 			// ctor
-			CConstraintDisjunction(IMemoryPool *pmp, DrgPcnstr *pdrgpcnstr);
+			CConstraintDisjunction(IMemoryPool *memory_pool, DrgPcnstr *pdrgpcnstr);
 
 			// dtor
 			virtual
@@ -71,27 +71,27 @@ namespace gpopt
 
 			// return a copy of the constraint with remapped columns
 			virtual
-			CConstraint *PcnstrCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist);
+			CConstraint *PcnstrCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// scalar expression
 			virtual
-			CExpression *PexprScalar(IMemoryPool *pmp);
+			CExpression *PexprScalar(IMemoryPool *memory_pool);
 
 			// check if there is a constraint on the given column
 			virtual
-			BOOL FConstraint(const CColRef *pcr) const;
+			BOOL FConstraint(const CColRef *colref) const;
 
 			// return constraint on a given column
 			virtual
-			CConstraint *Pcnstr(IMemoryPool *pmp, const CColRef *pcr);
+			CConstraint *Pcnstr(IMemoryPool *memory_pool, const CColRef *colref);
 
 			// return constraint on a given column set
 			virtual
-			CConstraint *Pcnstr(IMemoryPool *pmp, CColRefSet *pcrs);
+			CConstraint *Pcnstr(IMemoryPool *memory_pool, CColRefSet *pcrs);
 
 			// return a clone of the constraint for a different column
 			virtual
-			CConstraint *PcnstrRemapForColumn(IMemoryPool *pmp, CColRef *pcr) const;
+			CConstraint *PcnstrRemapForColumn(IMemoryPool *memory_pool, CColRef *colref) const;
 
 			// print
 			virtual

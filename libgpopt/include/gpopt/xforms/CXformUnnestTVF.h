@@ -38,20 +38,20 @@ namespace gpopt
 			static
 			DrgPcr *PdrgpcrSubqueries
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpression *pexprCTEProducer,
 				CExpression *pexprCTEConsumer
 				);
 
 			//	collect subquery arguments and return a Project expression
 			static
-			CExpression *PexprProjectSubqueries(IMemoryPool *pmp, CExpression *pexprTVF);
+			CExpression *PexprProjectSubqueries(IMemoryPool *memory_pool, CExpression *pexprTVF);
 
 		public:
 
 			// ctor
 			explicit
-			CXformUnnestTVF(IMemoryPool *pmp);
+			CXformUnnestTVF(IMemoryPool *memory_pool);
 
 			// dtor
 			virtual

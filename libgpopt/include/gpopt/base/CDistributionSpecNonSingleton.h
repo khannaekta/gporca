@@ -68,7 +68,7 @@ namespace gpopt
 
 			// append enforcers to dynamic array for the given plan properties
 			virtual
-			void AppendEnforcers(IMemoryPool *pmp, CExpressionHandle &exprhdl, CReqdPropPlan *prpp, DrgPexpr *pdrgpexpr, CExpression *pexpr);
+			void AppendEnforcers(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CReqdPropPlan *prpp, DrgPexpr *pdrgpexpr, CExpression *pexpr);
 
 			// return distribution partitioning type
 			virtual

@@ -32,27 +32,27 @@ namespace gpnaucrates
 		private:
 			// create an oid datum
 			static
-			IDatum *PdatumOid(IMemoryPool *pmp, BOOL fNull);
+			IDatum *CreateOidDatum(IMemoryPool *memory_pool, BOOL is_null);
 
 			// create an int2 datum
 			static
-			IDatum *PdatumInt2(IMemoryPool *pmp, BOOL fNull);
+			IDatum *CreateInt2Datum(IMemoryPool *memory_pool, BOOL is_null);
 
 			// create an int4 datum
 			static
-			IDatum *PdatumInt4(IMemoryPool *pmp, BOOL fNull);
+			IDatum *CreateInt4Datum(IMemoryPool *memory_pool, BOOL is_null);
 		
 			// create an int8 datum
 			static
-			IDatum *PdatumInt8(IMemoryPool *pmp, BOOL fNull);
+			IDatum *CreateInt8Datum(IMemoryPool *memory_pool, BOOL is_null);
 
 			// create a bool datum
 			static
-			IDatum *PdatumBool(IMemoryPool *pmp, BOOL fNull);
+			IDatum *CreateBoolDatum(IMemoryPool *memory_pool, BOOL is_null);
 
 			// create a generic datum
 			static
-			IDatum *PdatumGeneric(IMemoryPool *pmp, BOOL fNull);
+			IDatum *CreateGenericDatum(IMemoryPool *memory_pool, BOOL is_null);
 
 		public:
 

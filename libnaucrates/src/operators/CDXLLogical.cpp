@@ -25,23 +25,23 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLLogical::CDXLLogical
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
-	CDXLOperator(pmp)
+	CDXLOperator(memory_pool)
 {
 }
 
 //---------------------------------------------------------------------------
 //      @function:
-//              CDXLLogical::Edxloperatortype
+//              CDXLLogical::GetDXLOperatorType
 //
 //      @doc:
 //              Operator Type
 //
 //---------------------------------------------------------------------------
 Edxloptype
-CDXLLogical::Edxloperatortype() const
+CDXLLogical::GetDXLOperatorType() const
 {
 	return EdxloptypeLogical;
 }

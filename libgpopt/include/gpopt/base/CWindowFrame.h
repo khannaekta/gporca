@@ -87,10 +87,10 @@ namespace gpopt
 			// type of trailing edge
 			const EFrameBoundary m_efbTrailing;
 
-			// scalar value of leading edge, memory owned by this class
+			// scalar m_bytearray_value of leading edge, memory owned by this class
 			CExpression *m_pexprLeading;
 
-			// scalar value of trailing edge, memory owned by this class
+			// scalar m_bytearray_value of trailing edge, memory owned by this class
 			CExpression *m_pexprTrailing;
 
 			// exclusion strategy
@@ -114,7 +114,7 @@ namespace gpopt
 			// ctor
 			CWindowFrame
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				EFrameSpec efs,
 				EFrameBoundary efbLeading,
 				EFrameBoundary efbTrailing,
@@ -145,13 +145,13 @@ namespace gpopt
 				return m_efbTrailing;
 			}
 
-			// scalar value of leading edge
+			// scalar m_bytearray_value of leading edge
 			CExpression *PexprLeading() const
 			{
 				return m_pexprLeading;
 			}
 
-			// scalar value of trailing edge
+			// scalar m_bytearray_value of trailing edge
 			CExpression *PexprTrailing() const
 			{
 				return m_pexprTrailing;
@@ -164,15 +164,15 @@ namespace gpopt
 			}
 
 			// matching function
- 			BOOL FMatch(const CWindowFrame *pwf) const;
+ 			BOOL Matches(const CWindowFrame *pwf) const;
 
 			// hash function
 			virtual
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 
 			// return a copy of the window frame with remapped columns
 			virtual
-			CWindowFrame *PwfCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist);
+			CWindowFrame *PwfCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// return columns used by frame edges
 			CColRefSet *PcrsUsed() const
@@ -186,11 +186,11 @@ namespace gpopt
 
 			// matching function over frame arrays
 			static
-			BOOL FEqual(const DrgPwf *pdrgpwfFirst, const DrgPwf *pdrgpwfSecond);
+			BOOL Equals(const DrgPwf *pdrgpwfFirst, const DrgPwf *pdrgpwfSecond);
 
 			// combine hash values of a maximum number of entries
 			static
-			ULONG UlHash(const DrgPwf *pdrgpwfFirst, ULONG ulMaxSize);
+			ULONG HashValue(const DrgPwf *pdrgpwfFirst, ULONG ulMaxSize);
 
 			// print array of window frame objects
 			static
@@ -198,7 +198,7 @@ namespace gpopt
 
 			// check if a given window frame is empty
 			static
-			BOOL FEmpty
+			BOOL IsEmpty
 				(
 				CWindowFrame *pwf
 				)

@@ -26,15 +26,15 @@ using namespace gpopt;
 CXformSet *
 CLogicalLeftAntiSemiApplyNotIn::PxfsCandidates
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	const
 {
-	CXformSet *pxfs = GPOS_NEW(pmp) CXformSet(pmp);
-	(void) pxfs->FExchangeSet(CXform::ExfLeftAntiSemiApplyNotIn2LeftAntiSemiJoinNotIn);
-	(void) pxfs->FExchangeSet(CXform::ExfLeftAntiSemiApplyNotIn2LeftAntiSemiJoinNotInNoCorrelations);
+	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	(void) xform_set->ExchangeSet(CXform::ExfLeftAntiSemiApplyNotIn2LeftAntiSemiJoinNotIn);
+	(void) xform_set->ExchangeSet(CXform::ExfLeftAntiSemiApplyNotIn2LeftAntiSemiJoinNotInNoCorrelations);
 
-	return pxfs;
+	return xform_set;
 }
 
 
@@ -49,14 +49,14 @@ CLogicalLeftAntiSemiApplyNotIn::PxfsCandidates
 COperator *
 CLogicalLeftAntiSemiApplyNotIn::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *pmp,
-	HMUlCr *phmulcr,
-	BOOL fMustExist
+	IMemoryPool *memory_pool,
+	UlongColRefHashMap *colref_mapping,
+	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcrInner = CUtils::PdrgpcrRemap(pmp, m_pdrgpcrInner, phmulcr, fMustExist);
+	DrgPcr *pdrgpcrInner = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrInner, colref_mapping, must_exist);
 
-	return GPOS_NEW(pmp) CLogicalLeftAntiSemiApplyNotIn(pmp, pdrgpcrInner, m_eopidOriginSubq);
+	return GPOS_NEW(memory_pool) CLogicalLeftAntiSemiApplyNotIn(memory_pool, pdrgpcrInner, m_eopidOriginSubq);
 }
 
 // EOF

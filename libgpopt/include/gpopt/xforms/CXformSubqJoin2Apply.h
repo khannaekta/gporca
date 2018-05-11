@@ -32,7 +32,7 @@ namespace gpopt
 		private:
 
 			// hash map between expression and a column reference
-			typedef CHashMap<CExpression, CColRef, UlHashPtr<CExpression>, FEqualPtr<CExpression>,
+			typedef CHashMap<CExpression, CColRef, HashPtr<CExpression>, EqualPtr<CExpression>,
 					CleanupRelease<CExpression>, CleanupNULL<CColRef> > HMExprCr;
 
 			// private copy ctor
@@ -45,7 +45,7 @@ namespace gpopt
 			static
 			void CollectSubqueries
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpression *pexpr,
 				DrgPcrs *pdrgpcrs,
 				DrgPdrgPexpr *pdrgpdrgpexprSubqs
@@ -53,17 +53,17 @@ namespace gpopt
 
 			// replace subqueries with scalar identifier based on given map
 			static
-			CExpression *PexprReplaceSubqueries(IMemoryPool *pmp, CExpression *pexprScalar, HMExprCr *phmexprcr);
+			CExpression *PexprReplaceSubqueries(IMemoryPool *memory_pool, CExpression *pexprScalar, HMExprCr *phmexprcr);
 
 			// push down subquery below join
 			static
-			CExpression *PexprSubqueryPushDown(IMemoryPool *pmp, CExpression *pexpr, BOOL fEnforceCorrelatedApply);
+			CExpression *PexprSubqueryPushDown(IMemoryPool *memory_pool, CExpression *pexpr, BOOL fEnforceCorrelatedApply);
 
 		public:
 
 			// ctor
 			explicit
-			CXformSubqJoin2Apply(IMemoryPool *pmp);
+			CXformSubqJoin2Apply(IMemoryPool *memory_pool);
 
 			// ctor
 			explicit

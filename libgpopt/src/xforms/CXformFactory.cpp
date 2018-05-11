@@ -29,24 +29,24 @@ CXformFactory* CXformFactory::m_pxff = NULL;
 //---------------------------------------------------------------------------
 CXformFactory::CXformFactory
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
-	m_pmp(pmp),
+	m_memory_pool(memory_pool),
 	m_phmszxform(NULL),
 	m_pxfsExploration(NULL),
 	m_pxfsImplementation(NULL)
 {
-	GPOS_ASSERT(NULL != pmp);
+	GPOS_ASSERT(NULL != memory_pool);
 	
 	// null out array so dtor can be called prematurely
 	for (ULONG i = 0; i < CXform::ExfSentinel; i++)
 	{
 		m_rgpxf[i] = NULL;
 	}
-	m_phmszxform = GPOS_NEW(pmp) HMSzXform(pmp);
-	m_pxfsExploration = GPOS_NEW(pmp) CXformSet(pmp);
-	m_pxfsImplementation = GPOS_NEW(pmp) CXformSet(pmp);
+	m_phmszxform = GPOS_NEW(memory_pool) HMSzXform(memory_pool);
+	m_pxfsExploration = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	m_pxfsImplementation = GPOS_NEW(memory_pool) CXformSet(memory_pool);
 }
 
 
@@ -107,27 +107,27 @@ CXformFactory::Add
 	m_rgpxf[exfid] = pxform;
 
 	// create name -> xform mapping
-	ULONG ulLen = clib::UlStrLen(pxform->SzId());
-	CHAR *szXformName = GPOS_NEW_ARRAY(m_pmp, CHAR, ulLen + 1);
-	clib::SzStrNCpy(szXformName, pxform->SzId(), ulLen + 1);
+	ULONG length = clib::Strlen(pxform->SzId());
+	CHAR *szXformName = GPOS_NEW_ARRAY(m_memory_pool, CHAR, length + 1);
+	clib::Strncpy(szXformName, pxform->SzId(), length + 1);
 
 #ifdef GPOS_DEBUG
 		BOOL fInserted =
 #endif
-		m_phmszxform->FInsert(szXformName, pxform);
+		m_phmszxform->Insert(szXformName, pxform);
 	GPOS_ASSERT(fInserted);
 
-	CXformSet *pxfs = m_pxfsExploration;
+	CXformSet *xform_set = m_pxfsExploration;
 	if (pxform->FImplementation())
 	{
-		pxfs = m_pxfsImplementation;
+		xform_set = m_pxfsImplementation;
 	}
 #ifdef GPOS_DEBUG
-	GPOS_ASSERT_IMP(pxform->FExploration(), pxfs == m_pxfsExploration);
-	GPOS_ASSERT_IMP(pxform->FImplementation(), pxfs == m_pxfsImplementation);
+	GPOS_ASSERT_IMP(pxform->FExploration(), xform_set == m_pxfsExploration);
+	GPOS_ASSERT_IMP(pxform->FImplementation(), xform_set == m_pxfsImplementation);
 	BOOL fSet =
 #endif // GPOS_DEBUG
-		pxfs->FExchangeSet(exfid);
+		xform_set->ExchangeSet(exfid);
 
 	GPOS_ASSERT(!fSet);
 }
@@ -144,151 +144,151 @@ CXformFactory::Add
 void
 CXformFactory::Instantiate()
 {	
-	Add(GPOS_NEW(m_pmp) CXformProject2ComputeScalar(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformExpandNAryJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformExpandNAryJoinMinCard(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformExpandNAryJoinDP(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformGet2TableScan(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformIndexGet2IndexScan(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformDynamicGet2DynamicTableScan(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformDynamicIndexGet2DynamicIndexScan(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementSequence(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementConstTableGet(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformUnnestTVF(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementTVF(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementTVFNoArgs(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSelect2Filter(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSelect2IndexGet(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSelect2DynamicIndexGet(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSelect2PartialDynamicIndexGet(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSimplifySelectWithSubquery(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSimplifyProjectWithSubquery(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSelect2Apply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformProject2Apply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformGbAgg2Apply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSubqJoin2Apply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSubqNAryJoin2Apply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerJoin2IndexGetApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerJoin2DynamicIndexGetApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerApplyWithOuterKey2InnerJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerJoin2NLJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementIndexApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerJoin2HashJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerApply2InnerJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerApply2InnerJoinNoCorrelations(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementInnerCorrelatedApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftOuterApply2LeftOuterJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftOuterApply2LeftOuterJoinNoCorrelations(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementLeftOuterCorrelatedApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftSemiApply2LeftSemiJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftSemiApplyWithExternalCorrs2InnerJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftSemiApply2LeftSemiJoinNoCorrelations(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftAntiSemiApply2LeftAntiSemiJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftAntiSemiApply2LeftAntiSemiJoinNoCorrelations(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftAntiSemiApplyNotIn2LeftAntiSemiJoinNotIn(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftAntiSemiApplyNotIn2LeftAntiSemiJoinNotInNoCorrelations(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformPushDownLeftOuterJoin (m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSimplifyLeftOuterJoin (m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftOuterJoin2NLJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftOuterJoin2HashJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftSemiJoin2NLJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftSemiJoin2HashJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftAntiSemiJoin2CrossProduct(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftAntiSemiJoinNotIn2CrossProduct(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftAntiSemiJoin2NLJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftAntiSemiJoinNotIn2NLJoinNotIn(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftAntiSemiJoin2HashJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftAntiSemiJoinNotIn2HashJoinNotIn(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformGbAgg2HashAgg(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformGbAgg2StreamAgg(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformGbAgg2ScalarAgg(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformGbAggDedup2HashAggDedup(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformGbAggDedup2StreamAggDedup(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementLimit(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformIntersectAll2LeftSemiJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformIntersect2Join(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformDifference2LeftAntiSemiJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformDifferenceAll2LeftAntiSemiJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformUnion2UnionAll(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementUnionAll(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInsert2DML(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformDelete2DML(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformUpdate2DML(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementDML(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementRowTrigger(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementSplit(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformJoinCommutativity(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformJoinAssociativity(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSemiJoinSemiJoinSwap(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSemiJoinAntiSemiJoinSwap(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSemiJoinAntiSemiJoinNotInSwap(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSemiJoinInnerJoinSwap(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformAntiSemiJoinAntiSemiJoinSwap(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformAntiSemiJoinAntiSemiJoinNotInSwap(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformAntiSemiJoinSemiJoinSwap(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformAntiSemiJoinInnerJoinSwap(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformAntiSemiJoinNotInAntiSemiJoinSwap(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformAntiSemiJoinNotInAntiSemiJoinNotInSwap(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformAntiSemiJoinNotInSemiJoinSwap(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformAntiSemiJoinNotInInnerJoinSwap(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerJoinSemiJoinSwap(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerJoinAntiSemiJoinSwap(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerJoinAntiSemiJoinNotInSwap(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftSemiJoin2InnerJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftSemiJoin2InnerJoinUnderGb(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftSemiJoin2CrossProduct(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSplitLimit(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSimplifyGbAgg(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformCollapseGbAgg(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformPushGbBelowJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformPushGbDedupBelowJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformPushGbWithHavingBelowJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformPushGbBelowUnion(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformPushGbBelowUnionAll(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSplitGbAgg(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSplitGbAggDedup(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSplitDQA(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSequenceProject2Apply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementSequenceProject(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementAssert(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformCTEAnchor2Sequence(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformCTEAnchor2TrivialSelect(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInlineCTEConsumer(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInlineCTEConsumerUnderSelect(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementCTEProducer(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementCTEConsumer(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformExpandFullOuterJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformExternalGet2ExternalScan(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSelect2BitmapBoolOp(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformSelect2DynamicBitmapBoolOp(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementBitmapTableGet(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementDynamicBitmapTableGet(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerJoin2PartialDynamicIndexGetApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementLeftSemiCorrelatedApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementLeftSemiCorrelatedApplyIn(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementLeftAntiSemiCorrelatedApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementLeftAntiSemiCorrelatedApplyNotIn(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftSemiApplyIn2LeftSemiJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftSemiApplyInWithExternalCorrs2InnerJoin(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftSemiApplyIn2LeftSemiJoinNoCorrelations(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerJoin2BitmapIndexGetApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformImplementPartitionSelector(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformMaxOneRow2Assert(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerJoinWithInnerSelect2IndexGetApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerJoinWithInnerSelect2DynamicIndexGetApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerJoinWithInnerSelect2PartialDynamicIndexGetApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerJoin2DynamicBitmapIndexGetApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerJoinWithInnerSelect2BitmapIndexGetApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformInnerJoinWithInnerSelect2DynamicBitmapIndexGetApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformGbAggWithMDQA2Join(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformCollapseProject(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformRemoveSubqDistinct(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftOuterJoin2BitmapIndexGetApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftOuterJoin2IndexGetApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftOuterJoinWithInnerSelect2BitmapIndexGetApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformLeftOuterJoinWithInnerSelect2IndexGetApply(m_pmp));
-	Add(GPOS_NEW(m_pmp) CXformExpandNAryJoinGreedy(m_pmp));
+	Add(GPOS_NEW(m_memory_pool) CXformProject2ComputeScalar(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformExpandNAryJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformExpandNAryJoinMinCard(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformExpandNAryJoinDP(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformGet2TableScan(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformIndexGet2IndexScan(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformDynamicGet2DynamicTableScan(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformDynamicIndexGet2DynamicIndexScan(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementSequence(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementConstTableGet(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformUnnestTVF(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementTVF(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementTVFNoArgs(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSelect2Filter(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSelect2IndexGet(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSelect2DynamicIndexGet(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSelect2PartialDynamicIndexGet(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSimplifySelectWithSubquery(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSimplifyProjectWithSubquery(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSelect2Apply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformProject2Apply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformGbAgg2Apply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSubqJoin2Apply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSubqNAryJoin2Apply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerJoin2IndexGetApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerJoin2DynamicIndexGetApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerApplyWithOuterKey2InnerJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerJoin2NLJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementIndexApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerJoin2HashJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerApply2InnerJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerApply2InnerJoinNoCorrelations(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementInnerCorrelatedApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftOuterApply2LeftOuterJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftOuterApply2LeftOuterJoinNoCorrelations(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementLeftOuterCorrelatedApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftSemiApply2LeftSemiJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftSemiApplyWithExternalCorrs2InnerJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftSemiApply2LeftSemiJoinNoCorrelations(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftAntiSemiApply2LeftAntiSemiJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftAntiSemiApply2LeftAntiSemiJoinNoCorrelations(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftAntiSemiApplyNotIn2LeftAntiSemiJoinNotIn(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftAntiSemiApplyNotIn2LeftAntiSemiJoinNotInNoCorrelations(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformPushDownLeftOuterJoin (m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSimplifyLeftOuterJoin (m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftOuterJoin2NLJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftOuterJoin2HashJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftSemiJoin2NLJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftSemiJoin2HashJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftAntiSemiJoin2CrossProduct(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftAntiSemiJoinNotIn2CrossProduct(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftAntiSemiJoin2NLJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftAntiSemiJoinNotIn2NLJoinNotIn(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftAntiSemiJoin2HashJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftAntiSemiJoinNotIn2HashJoinNotIn(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformGbAgg2HashAgg(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformGbAgg2StreamAgg(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformGbAgg2ScalarAgg(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformGbAggDedup2HashAggDedup(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformGbAggDedup2StreamAggDedup(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementLimit(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformIntersectAll2LeftSemiJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformIntersect2Join(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformDifference2LeftAntiSemiJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformDifferenceAll2LeftAntiSemiJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformUnion2UnionAll(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementUnionAll(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInsert2DML(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformDelete2DML(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformUpdate2DML(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementDML(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementRowTrigger(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementSplit(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformJoinCommutativity(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformJoinAssociativity(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSemiJoinSemiJoinSwap(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSemiJoinAntiSemiJoinSwap(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSemiJoinAntiSemiJoinNotInSwap(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSemiJoinInnerJoinSwap(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformAntiSemiJoinAntiSemiJoinSwap(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformAntiSemiJoinAntiSemiJoinNotInSwap(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformAntiSemiJoinSemiJoinSwap(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformAntiSemiJoinInnerJoinSwap(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformAntiSemiJoinNotInAntiSemiJoinSwap(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformAntiSemiJoinNotInAntiSemiJoinNotInSwap(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformAntiSemiJoinNotInSemiJoinSwap(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformAntiSemiJoinNotInInnerJoinSwap(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerJoinSemiJoinSwap(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerJoinAntiSemiJoinSwap(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerJoinAntiSemiJoinNotInSwap(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftSemiJoin2InnerJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftSemiJoin2InnerJoinUnderGb(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftSemiJoin2CrossProduct(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSplitLimit(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSimplifyGbAgg(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformCollapseGbAgg(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformPushGbBelowJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformPushGbDedupBelowJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformPushGbWithHavingBelowJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformPushGbBelowUnion(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformPushGbBelowUnionAll(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSplitGbAgg(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSplitGbAggDedup(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSplitDQA(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSequenceProject2Apply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementSequenceProject(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementAssert(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformCTEAnchor2Sequence(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformCTEAnchor2TrivialSelect(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInlineCTEConsumer(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInlineCTEConsumerUnderSelect(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementCTEProducer(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementCTEConsumer(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformExpandFullOuterJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformExternalGet2ExternalScan(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSelect2BitmapBoolOp(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformSelect2DynamicBitmapBoolOp(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementBitmapTableGet(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementDynamicBitmapTableGet(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerJoin2PartialDynamicIndexGetApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementLeftSemiCorrelatedApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementLeftSemiCorrelatedApplyIn(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementLeftAntiSemiCorrelatedApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementLeftAntiSemiCorrelatedApplyNotIn(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftSemiApplyIn2LeftSemiJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftSemiApplyInWithExternalCorrs2InnerJoin(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftSemiApplyIn2LeftSemiJoinNoCorrelations(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerJoin2BitmapIndexGetApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformImplementPartitionSelector(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformMaxOneRow2Assert(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerJoinWithInnerSelect2IndexGetApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerJoinWithInnerSelect2DynamicIndexGetApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerJoinWithInnerSelect2PartialDynamicIndexGetApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerJoin2DynamicBitmapIndexGetApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerJoinWithInnerSelect2BitmapIndexGetApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformInnerJoinWithInnerSelect2DynamicBitmapIndexGetApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformGbAggWithMDQA2Join(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformCollapseProject(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformRemoveSubqDistinct(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftOuterJoin2BitmapIndexGetApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftOuterJoin2IndexGetApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftOuterJoinWithInnerSelect2BitmapIndexGetApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformLeftOuterJoinWithInnerSelect2IndexGetApply(m_memory_pool));
+	Add(GPOS_NEW(m_memory_pool) CXformExpandNAryJoinGreedy(m_memory_pool));
 
 	GPOS_ASSERT(NULL != m_rgpxf[CXform::ExfSentinel - 1] &&
 				"Not all xforms have been instantiated");
@@ -332,20 +332,20 @@ CXformFactory::Pxf
 	)
 	const
 {
-	return m_phmszxform->PtLookup(szXformName);
+	return m_phmszxform->Find(szXformName);
 }
 
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CXformFactory::EresInit
+//		CXformFactory::Init
 //
 //	@doc:
 //		Initializes global instance
 //
 //---------------------------------------------------------------------------
 GPOS_RESULT
-CXformFactory::EresInit()
+CXformFactory::Init()
 {
 	GPOS_ASSERT(NULL == Pxff() &&
 			    "Xform factory was already initialized");
@@ -353,17 +353,21 @@ CXformFactory::EresInit()
 	GPOS_RESULT eres = GPOS_OK;
 
 	// create xform factory memory pool
-	IMemoryPool *pmp = CMemoryPoolManager::Pmpm()->PmpCreate(
-		CMemoryPoolManager::EatTracker, true /*fThreadSafe*/, gpos::ullong_max);
+	IMemoryPool *memory_pool = CMemoryPoolManager::GetMemoryPoolMgr()->Create
+							(
+							CMemoryPoolManager::EatTracker,
+							true /*fThreadSafe*/,
+							gpos::ullong_max
+							);
 	GPOS_TRY
 	{
 		// create xform factory instance
-		m_pxff = GPOS_NEW(pmp) CXformFactory(pmp);
+		m_pxff = GPOS_NEW(memory_pool) CXformFactory(memory_pool);
 	}
 	GPOS_CATCH_EX(ex)
 	{
 		// destroy memory pool if global instance was not created
-		CMemoryPoolManager::Pmpm()->Destroy(pmp);
+		CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(memory_pool);
 		m_pxff = NULL;
 
 		if (GPOS_MATCH_EX(ex, CException::ExmaSystem, CException::ExmiOOM))
@@ -402,14 +406,14 @@ CXformFactory::Shutdown()
 	GPOS_ASSERT(NULL != pxff &&
 			    "Xform factory has not been initialized");
 
-	IMemoryPool *pmp = pxff->m_pmp;
+	IMemoryPool *memory_pool = pxff->m_memory_pool;
 
 	// destroy xform factory
 	CXformFactory::m_pxff = NULL;
 	GPOS_DELETE(pxff);
 
 	// release allocated memory pool
-	CMemoryPoolManager::Pmpm()->Destroy(pmp);
+	CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(memory_pool);
 }
 
 

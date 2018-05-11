@@ -41,18 +41,18 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformImplementCorrelatedApply(IMemoryPool *pmp)
+			CXformImplementCorrelatedApply(IMemoryPool *memory_pool)
                 :
                 // pattern
                 CXformImplementation
                 (
-                 GPOS_NEW(pmp) CExpression
+                 GPOS_NEW(memory_pool) CExpression
                  (
-                  pmp,
-                  GPOS_NEW(pmp) TLogicalApply(pmp),
-                  GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)), // left child
-                  GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)), // right child
-                  GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)) // predicate
+                  memory_pool,
+                  GPOS_NEW(memory_pool) TLogicalApply(memory_pool),
+                  GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // left child
+                  GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // right child
+                  GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)) // predicate
                   )
                  )
             {}
@@ -76,16 +76,16 @@ namespace gpopt
                 GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
                 GPOS_ASSERT(FCheckPattern(pexpr));
 
-                IMemoryPool *pmp = pxfctxt->Pmp();
+                IMemoryPool *memory_pool = pxfctxt->Pmp();
 
                 // extract components
                 CExpression *pexprLeft = (*pexpr)[0];
                 CExpression *pexprRight = (*pexpr)[1];
                 CExpression *pexprScalar = (*pexpr)[2];
                 TLogicalApply *popApply = TLogicalApply::PopConvert(pexpr->Pop());
-                DrgPcr *pdrgpcr = popApply->PdrgPcrInner();
+                DrgPcr *colref_array = popApply->PdrgPcrInner();
 
-                pdrgpcr->AddRef();
+                colref_array->AddRef();
 
                 // addref all children
                 pexprLeft->AddRef();
@@ -94,10 +94,10 @@ namespace gpopt
 
                 // assemble physical operator
                 CExpression *pexprPhysicalApply =
-                GPOS_NEW(pmp) CExpression
+                GPOS_NEW(memory_pool) CExpression
                 (
-                 pmp,
-                 GPOS_NEW(pmp) TPhysicalJoin(pmp, pdrgpcr, popApply->EopidOriginSubq()),
+                 memory_pool,
+                 GPOS_NEW(memory_pool) TPhysicalJoin(memory_pool, colref_array, popApply->EopidOriginSubq()),
                  pexprLeft,
                  pexprRight,
                  pexprScalar

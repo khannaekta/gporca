@@ -47,14 +47,14 @@ namespace gpopt
 	class CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin : public CXformExploration
 	{
 		private:
-			// if ratio of the cardinalities outer/inner is below this value, we apply the xform
+			// if ratio of the cardinalities outer/inner is below this m_bytearray_value, we apply the xform
 			static const DOUBLE m_dOuterInnerRatioThreshold;
 
 			// disable copy ctor
 			CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin(const CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin &);
 
 			// check the stats ratio to decide whether to apply the xform or not
-			BOOL FApplyXformUsingStatsInfo(const IStatistics *pstatsOuter, const IStatistics *pstatsInner) const;
+			BOOL FApplyXformUsingStatsInfo(const IStatistics *outer_stats, const IStatistics *inner_side_stats) const;
 
 			// check if the inner expression is of a type which should be considered by this xform
 			static
@@ -65,7 +65,7 @@ namespace gpopt
 			static
 			CExpression *PexprLeftAntiSemiJoinWithInnerGroupBy
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				DrgPcr *pdrgpcrOuter,
 				DrgPcr *pdrgpcrOuterCopy,
 				CColRefSet *pcrsScalar,
@@ -80,7 +80,7 @@ namespace gpopt
 			static
 			CExpression *PexprProjectOverLeftAntiSemiJoin
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				DrgPcr *pdrgpcrOuter,
 				CColRefSet *pcrsScalar,
 				CColRefSet *pcrsInner,
@@ -93,7 +93,7 @@ namespace gpopt
 		public:
 			// ctor
 			explicit
-			CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin(IMemoryPool *pmp);
+			CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin(IMemoryPool *memory_pool);
 
 			// dtor
 			virtual

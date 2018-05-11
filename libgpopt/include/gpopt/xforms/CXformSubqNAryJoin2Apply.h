@@ -44,18 +44,18 @@ namespace gpopt
 			explicit
 			CXformSubqNAryJoin2Apply
 				(
-				IMemoryPool *pmp
+				IMemoryPool *memory_pool
 				)
 				:
 				CXformSubqJoin2Apply
 					(
 					 // pattern
-					GPOS_NEW(pmp) CExpression
+					GPOS_NEW(memory_pool) CExpression
 						(
-						pmp,
-						GPOS_NEW(pmp) CLogicalNAryJoin(pmp),
-						GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternMultiLeaf(pmp)),
-						GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternTree(pmp))
+						memory_pool,
+						GPOS_NEW(memory_pool) CLogicalNAryJoin(memory_pool),
+						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternMultiLeaf(memory_pool)),
+						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))
 						)
 					)
 			{}

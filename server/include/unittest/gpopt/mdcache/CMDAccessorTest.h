@@ -52,15 +52,15 @@ namespace gpopt
 			struct SMDCacheTaskParams
 			{
 				// memory pool
-				IMemoryPool *m_pmp;
+				IMemoryPool *m_memory_pool;
 				
 				// MD accessor
 				CMDAccessor *m_pmda;
 								
-				SMDCacheTaskParams(IMemoryPool *pmp, CMDAccessor *pmda)
+				SMDCacheTaskParams(IMemoryPool *memory_pool, CMDAccessor *md_accessor)
 					:
-					m_pmp(pmp),
-					m_pmda(pmda)
+					m_memory_pool(memory_pool),
+					m_pmda(md_accessor)
 				{}
 			};
 

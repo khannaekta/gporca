@@ -73,10 +73,10 @@ namespace gpopt
 			// derived plan properties in the passed context
 			CPartFilterMap *PpfmCombineDerived
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CReqdPropPlan *prppInput,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt
 				);
 
@@ -130,10 +130,10 @@ namespace gpopt
 			virtual
 			void Compute
 					(
-					IMemoryPool *pmp,
+					IMemoryPool *memory_pool,
 					CExpressionHandle &exprhdl,
 					CReqdProp *prpInput,
-					ULONG ulChildIndex,
+					ULONG child_index,
 					DrgPdp *pdrgpdpCtxt,
 					ULONG ulOptReq
 					);
@@ -141,20 +141,20 @@ namespace gpopt
 			// required columns computation function
 			void ComputeReqdCols
 					(
-					IMemoryPool *pmp,
+					IMemoryPool *memory_pool,
 					CExpressionHandle &exprhdl,
 					CReqdProp *prpInput,
-					ULONG ulChildIndex,
+					ULONG child_index,
 					DrgPdp *pdrgpdpCtxt
 					);
 
 			// required ctes computation function
 			void ComputeReqdCTEs
 					(
-					IMemoryPool *pmp,
+					IMemoryPool *memory_pool,
 					CExpressionHandle &exprhdl,
 					CReqdProp *prpInput,
-					ULONG ulChildIndex,
+					ULONG child_index,
 					DrgPdp *pdrgpdpCtxt
 					);
 
@@ -198,10 +198,10 @@ namespace gpopt
 			CPropSpec *Pps(ULONG ul) const;
 
 			// equality function
-			BOOL FEqual(const CReqdPropPlan *prpp) const;
+			BOOL Equals(const CReqdPropPlan *prpp) const;
 
 			// hash function
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 
 			// check if plan properties are satisfied by the given derived properties
 			BOOL FSatisfied(const CDrvdPropRelational *pdprel, const CDrvdPropPlan *pdpplan) const;
@@ -217,10 +217,10 @@ namespace gpopt
 				const;
 
 			// initialize partition propagation requirements
-			void InitReqdPartitionPropagation(IMemoryPool *pmp, CPartInfo *ppartinfo);
+			void InitReqdPartitionPropagation(IMemoryPool *memory_pool, CPartInfo *ppartinfo);
 			
 			// check if expression attached to handle provides required columns by all plan properties
-			BOOL FProvidesReqdCols(IMemoryPool *pmp, CExpressionHandle &exprhdl, ULONG ulOptReq) const;
+			BOOL FProvidesReqdCols(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, ULONG ulOptReq) const;
 
 			// shorthand for conversion
 			static
@@ -233,7 +233,7 @@ namespace gpopt
 
 			//generate empty required properties
 			static
-			CReqdPropPlan *PrppEmpty(IMemoryPool *pmp);
+			CReqdPropPlan *PrppEmpty(IMemoryPool *memory_pool);
 
 			// hash function used for cost bounding
 			static
@@ -245,7 +245,7 @@ namespace gpopt
 
 			// map input required and derived plan properties into new required plan properties
 			static
-			CReqdPropPlan *PrppRemap(IMemoryPool *pmp, CReqdPropPlan *prppInput, CDrvdPropPlan *pdpplanInput, HMUlCr *phmulcr);
+			CReqdPropPlan *PrppRemap(IMemoryPool *memory_pool, CReqdPropPlan *prppInput, CDrvdPropPlan *pdpplanInput, UlongColRefHashMap *colref_mapping);
 
 			// print function
 			virtual

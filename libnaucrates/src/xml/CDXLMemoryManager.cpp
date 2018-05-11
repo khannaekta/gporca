@@ -25,11 +25,11 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLMemoryManager::CDXLMemoryManager
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
-	:m_pmp(pmp)
+	:m_memory_pool(memory_pool)
 {
-	GPOS_ASSERT(NULL != m_pmp);
+	GPOS_ASSERT(NULL != m_memory_pool);
 }
 
 //---------------------------------------------------------------------------
@@ -46,8 +46,8 @@ CDXLMemoryManager::allocate
 	XMLSize_t xmlsize
 	)
 {
-	GPOS_ASSERT(NULL != m_pmp);
-	return GPOS_NEW_ARRAY(m_pmp, BYTE, xmlsize);
+	GPOS_ASSERT(NULL != m_memory_pool);
+	return GPOS_NEW_ARRAY(m_memory_pool, BYTE, xmlsize);
 }
 
 //---------------------------------------------------------------------------

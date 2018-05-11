@@ -19,12 +19,12 @@ namespace gpnaucrates
 	{
 		public:
 			static
-			CStatistics *PstatsLSJoinStatic
+			CStatistics *CalcLSJoinStatsStatic
 					(
-					IMemoryPool *pmp,
-					const IStatistics *pstatsOuter,
-					const IStatistics *pstatsInner,
-					DrgPstatspredjoin *pdrgpstatspredjoin
+					IMemoryPool *memory_pool,
+					const IStatistics *outer_stats,
+					const IStatistics *inner_side_stats,
+					StatsPredJoinArray *join_preds_stats
 					);
 	};
 }

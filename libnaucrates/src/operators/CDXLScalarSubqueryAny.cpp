@@ -30,41 +30,41 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CDXLScalarSubqueryAny::CDXLScalarSubqueryAny
 	(
-	IMemoryPool *pmp,
-	IMDId *pmdidScalarOp,
-	CMDName *pmdnameScalarOp,
-	ULONG ulColId
+	IMemoryPool *memory_pool,
+	IMDId *scalar_op_mdid,
+	CMDName *scalar_op_mdname,
+	ULONG col_id
 	)
 	:
-	CDXLScalarSubqueryQuantified(pmp, pmdidScalarOp, pmdnameScalarOp, ulColId)
+	CDXLScalarSubqueryQuantified(memory_pool, scalar_op_mdid, scalar_op_mdname, col_id)
 {}
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarSubqueryAny::Edxlop
+//		CDXLScalarSubqueryAny::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLScalarSubqueryAny::Edxlop() const
+CDXLScalarSubqueryAny::GetDXLOperator() const
 {
 	return EdxlopScalarSubqueryAny;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarSubqueryAny::PstrOpName
+//		CDXLScalarSubqueryAny::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLScalarSubqueryAny::PstrOpName() const
+CDXLScalarSubqueryAny::GetOpNameStr() const
 {
-	return CDXLTokens::PstrToken(EdxltokenScalarSubqueryAny);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenScalarSubqueryAny);
 }
 
 // EOF

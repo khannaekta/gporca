@@ -29,17 +29,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformInsert2DML::CXformInsert2DML
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	CXformExploration
 		(
 		 // pattern
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 				(
-				pmp,
-				GPOS_NEW(pmp) CLogicalInsert(pmp),
-				GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp))
+				memory_pool,
+				GPOS_NEW(memory_pool) CLogicalInsert(memory_pool),
+				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))
 				)
 		)
 {}
@@ -84,7 +84,7 @@ CXformInsert2DML::Transform
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CLogicalInsert *popInsert = CLogicalInsert::PopConvert(pexpr->Pop());
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 
 	// extract components for alternative
 
@@ -102,7 +102,7 @@ CXformInsert2DML::Transform
 	CExpression *pexprAlt =
 		CXformUtils::PexprLogicalDMLOverProject
 						(
-						pmp,
+						memory_pool,
 						pexprChild,
 						CLogicalDML::EdmlInsert,
 						ptabdesc,

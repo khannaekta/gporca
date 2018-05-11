@@ -32,10 +32,10 @@ namespace gpopt
 		private:
 		
 			// function mdid
-			IMDId *m_pmdidFunc;
+			IMDId *m_func_mdid;
 			
 			// return type
-			IMDId *m_pmdidRetType;
+			IMDId *m_return_type_mdid;
 
 			// function name
 			CWStringConst *m_pstr;
@@ -53,7 +53,7 @@ namespace gpopt
 			IMDFunction::EFuncDataAcc m_efda;
 
 			// does this function return a set of rows
-			BOOL m_fReturnsSet;
+			BOOL m_returns_set;
 
 			// private copy ctor
 			CLogicalTVF(const CLogicalTVF &);
@@ -62,23 +62,23 @@ namespace gpopt
 		
 			// ctors
 			explicit
-			CLogicalTVF(IMemoryPool *pmp);
+			CLogicalTVF(IMemoryPool *memory_pool);
 
 			CLogicalTVF
 				(
-				IMemoryPool *pmp,
-				IMDId *pmdidFunc,
-				IMDId *pmdidRetType,
-				CWStringConst *pstr,
+				IMemoryPool *memory_pool,
+				IMDId *mdid_func,
+				IMDId *mdid_return_type,
+				CWStringConst *str,
 				DrgPcoldesc *pdrgpcoldesc
 				);
 
 			CLogicalTVF
 				(
-				IMemoryPool *pmp,
-				IMDId *pmdidFunc,
-				IMDId *pmdidRetType,
-				CWStringConst *pstr,
+				IMemoryPool *memory_pool,
+				IMDId *mdid_func,
+				IMDId *mdid_return_type,
+				CWStringConst *str,
 				DrgPcoldesc *pdrgpcoldesc,
 				DrgPcr *pdrgpcrOutput
 				);
@@ -102,15 +102,15 @@ namespace gpopt
 			}
 			
 			// function mdid
-			IMDId *PmdidFunc() const
+			IMDId *FuncMdId() const
 			{
-				return m_pmdidFunc;
+				return m_func_mdid;
 			}
 			
 			// return type
-			IMDId *PmdidRetType() const
+			IMDId *ReturnTypeMdId() const
 			{
-				return m_pmdidRetType;
+				return m_return_type_mdid;
 			}
 
 			// function name
@@ -136,15 +136,15 @@ namespace gpopt
 
 			// operator specific hash function
 			virtual
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 			
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			//-------------------------------------------------------------------------------------
 			// Derived Relational Properties
@@ -158,33 +158,33 @@ namespace gpopt
 			virtual
 			CPartInfo *PpartinfoDerive
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle & //exprhdl
 				) 
 				const
 			{
-				return GPOS_NEW(pmp) CPartInfo(pmp);
+				return GPOS_NEW(memory_pool) CPartInfo(memory_pool);
 			}
 			
 			// derive constraint property
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle & //exprhdl
 				)
 				const
 			{
-				return GPOS_NEW(pmp) CPropConstraint(pmp, GPOS_NEW(pmp) DrgPcrs(pmp), NULL /*pcnstr*/);
+				return GPOS_NEW(memory_pool) CPropConstraint(memory_pool, GPOS_NEW(memory_pool) DrgPcrs(memory_pool), NULL /*pcnstr*/);
 			}
 
 			// derive function properties
 			virtual
-			CFunctionProp *PfpDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CFunctionProp *PfpDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			//-------------------------------------------------------------------------------------
 			// Required Relational Properties
@@ -194,10 +194,10 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsStat
 				(
-				IMemoryPool *,// pmp
+				IMemoryPool *,// memory_pool
 				CExpressionHandle &,// exprhdl
 				CColRefSet *,// pcrsInput
-				ULONG // ulChildIndex
+				ULONG // child_index
 				)
 				const
 			{
@@ -210,7 +210,7 @@ namespace gpopt
 
 			// candidate set of xforms
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *pmp) const;
+			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
 
 			// stat promise
 			virtual
@@ -221,7 +221,7 @@ namespace gpopt
 
 			// derive statistics
 			virtual
-			IStatistics *PstatsDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl, DrgPstat *pdrgpstatCtxt) const;
+			IStatistics *PstatsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, StatsArray *stats_ctxt) const;
 
 			//-------------------------------------------------------------------------------------
 			//-------------------------------------------------------------------------------------

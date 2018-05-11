@@ -27,18 +27,18 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformGbAgg2Apply::CXformGbAgg2Apply
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	// pattern
 	CXformSubqueryUnnest
 		(
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 				(
-				pmp,
-				GPOS_NEW(pmp) CLogicalGbAgg(pmp),
-				GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)),	// relational child
-				GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternTree(pmp))	// project list
+				memory_pool,
+				GPOS_NEW(memory_pool) CLogicalGbAgg(memory_pool),
+				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),	// relational child
+				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))	// project list
 				)
 		)
 {}
@@ -60,7 +60,7 @@ CXformGbAgg2Apply::Exfp
 	const
 {
 	CLogicalGbAgg *popGbAgg = CLogicalGbAgg::PopConvert(exprhdl.Pop());
-	if (popGbAgg->FGlobal() && exprhdl.Pdpscalar(1)->FHasSubquery())
+	if (popGbAgg->FGlobal() && exprhdl.GetDrvdScalarProps(1)->FHasSubquery())
 	{
 		return CXform::ExfpHigh;
 	}

@@ -28,16 +28,16 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformImplementCTEConsumer::CXformImplementCTEConsumer
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	CXformImplementation
 		(
 		 // pattern
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 				(
-				pmp,
-				GPOS_NEW(pmp) CLogicalCTEConsumer(pmp)
+				memory_pool,
+				GPOS_NEW(memory_pool) CLogicalCTEConsumer(memory_pool)
 				)
 		)
 {}
@@ -83,24 +83,24 @@ CXformImplementCTEConsumer::Transform
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CLogicalCTEConsumer *popCTEConsumer = CLogicalCTEConsumer::PopConvert(pexpr->Pop());
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 
 	// extract components for alternative
-	ULONG ulId = popCTEConsumer->UlCTEId();
+	ULONG id = popCTEConsumer->UlCTEId();
 
-	DrgPcr *pdrgpcr = popCTEConsumer->Pdrgpcr();
-	pdrgpcr->AddRef();
+	DrgPcr *colref_array = popCTEConsumer->Pdrgpcr();
+	colref_array->AddRef();
 
-	HMUlCr *phmulcr = popCTEConsumer->Phmulcr();
-	GPOS_ASSERT(NULL != phmulcr);
-	phmulcr->AddRef();
+	UlongColRefHashMap *colref_mapping = popCTEConsumer->Phmulcr();
+	GPOS_ASSERT(NULL != colref_mapping);
+	colref_mapping->AddRef();
 
 	// create physical CTE Consumer
 	CExpression *pexprAlt =
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 			(
-			pmp,
-			GPOS_NEW(pmp) CPhysicalCTEConsumer(pmp, ulId, pdrgpcr, phmulcr)
+			memory_pool,
+			GPOS_NEW(memory_pool) CPhysicalCTEConsumer(memory_pool, id, colref_array, colref_mapping)
 			);
 
 	// add alternative to transformation result

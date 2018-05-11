@@ -42,25 +42,25 @@ namespace gpopt
 		
 			// ctors
 			explicit
-			CLogicalDynamicGet(IMemoryPool *pmp);
+			CLogicalDynamicGet(IMemoryPool *memory_pool);
 
 			CLogicalDynamicGet
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				const CName *pnameAlias,
 				CTableDescriptor *ptabdesc,
 				ULONG ulPartIndex,
-				DrgPcr *pdrgpcr,
+				DrgPcr *colref_array,
 				DrgDrgPcr *pdrgpdrgpcrPart,
 				ULONG ulSecondaryPartIndexId,
-				BOOL fPartial,
+				BOOL is_partial,
 				CPartConstraint *ppartcnstr,
 				CPartConstraint *ppartcnstrRel
 				);
 			
 			CLogicalDynamicGet
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				const CName *pnameAlias,
 				CTableDescriptor *ptabdesc,
 				ULONG ulPartIndex
@@ -86,17 +86,17 @@ namespace gpopt
 			
 			// operator specific hash function
 			virtual
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 
 			// match function
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			// sensitivity to order of inputs
 			BOOL FInputOrderSensitive() const;
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			//-------------------------------------------------------------------------------------
 			// Derived Relational Properties
@@ -105,9 +105,9 @@ namespace gpopt
 
 			// derive join depth
 			virtual
-			ULONG UlJoinDepth
+			ULONG JoinDepth
 				(
-				IMemoryPool *, // pmp
+				IMemoryPool *, // memory_pool
 				CExpressionHandle & // exprhdl
 				)
 				const
@@ -123,10 +123,10 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsStat
 				(
-				IMemoryPool *, // pmp,
+				IMemoryPool *, // memory_pool,
 				CExpressionHandle &, // exprhdl
 				CColRefSet *, //pcrsInput
-				ULONG // ulChildIndex
+				ULONG // child_index
 				)
 				const
 			{
@@ -139,7 +139,7 @@ namespace gpopt
 			//-------------------------------------------------------------------------------------
 		
 			// candidate set of xforms
-			CXformSet *PxfsCandidates(IMemoryPool *pmp) const;
+			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
 
 			//-------------------------------------------------------------------------------------
 			// Statistics
@@ -149,9 +149,9 @@ namespace gpopt
 			virtual
 			IStatistics *PstatsDerive
 						(
-						IMemoryPool *pmp,
+						IMemoryPool *memory_pool,
 						CExpressionHandle &exprhdl,
-						DrgPstat *pdrgpstatCtxt
+						StatsArray *stats_ctxt
 						)
 						const;
 

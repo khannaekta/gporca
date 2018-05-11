@@ -34,10 +34,10 @@ const WCHAR CScalarBooleanTest::m_rgwszBoolTest[EbtSentinel][30] =
 };
 
 
-// mapping operator type and child value to the corresponding result value for Boolean expression evaluation,
+// mapping operator type and child m_bytearray_value to the corresponding result m_bytearray_value for Boolean expression evaluation,
 // in each entry, we have three values:
 // (1) operator type: IS_TRUE / IS_NOT_TRUE / IS_FALSE / IS_NOT_FALSE / IS_UNKNOWN / IS_NOT_UNKNOWN
-// (2) child value: EberTrue / EberFalse / EberNull / EberUnknown
+// (2) child m_bytearray_value: EberTrue / EberFalse / EberNull / EberUnknown
 // (3) expected result:  EberTrue / EberFalse / EberNull / EberUnknown
 
 const BYTE CScalarBooleanTest::m_rgBoolEvalMap [][3] =
@@ -75,14 +75,14 @@ const BYTE CScalarBooleanTest::m_rgBoolEvalMap [][3] =
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CScalarBooleanTest::FMatch
+//		CScalarBooleanTest::Matches
 //
 //	@doc:
 //		Match function on operator level
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarBooleanTest::FMatch
+CScalarBooleanTest::Matches
 	(
 	COperator *pop
 	)
@@ -99,18 +99,18 @@ CScalarBooleanTest::FMatch
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CScalarBooleanTest::PmdidType
+//		CScalarBooleanTest::MDIdType
 //
 //	@doc:
 //		Expression type
 //
 //---------------------------------------------------------------------------
 IMDId *
-CScalarBooleanTest::PmdidType() const
+CScalarBooleanTest::MDIdType() const
 {
-	CMDAccessor *pmda = COptCtxt::PoctxtFromTLS()->Pmda();
+	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	return pmda->PtMDType<IMDTypeBool>()->Pmdid();
+	return md_accessor->PtMDType<IMDTypeBool>()->MDId();
 }
 
 //---------------------------------------------------------------------------
@@ -124,12 +124,12 @@ CScalarBooleanTest::PmdidType() const
 CScalar::EBoolEvalResult
 CScalarBooleanTest::Eber
 	(
-	DrgPul *pdrgpulChildren
+	ULongPtrArray *pdrgpulChildren
 	)
 	const
 {
 	GPOS_ASSERT(NULL != pdrgpulChildren);
-	GPOS_ASSERT(1 == pdrgpulChildren->UlLength());
+	GPOS_ASSERT(1 == pdrgpulChildren->Size());
 
 	EBoolEvalResult eber = (EBoolEvalResult) *((*pdrgpulChildren)[0]);
 	for (ULONG ul = 0; ul < GPOS_ARRAY_SIZE(m_rgBoolEvalMap); ul++)

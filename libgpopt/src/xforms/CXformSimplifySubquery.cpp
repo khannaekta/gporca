@@ -69,7 +69,7 @@ CXformSimplifySubquery::Exfp
 	const
 {
 	// consider this transformation only if subqueries exist
-	if (exprhdl.Pdpscalar(1)->FHasSubquery())
+	if (exprhdl.GetDrvdScalarProps(1)->FHasSubquery())
 	{
 		return CXform::ExfpHigh;
 	}
@@ -91,7 +91,7 @@ CXformSimplifySubquery::Exfp
 BOOL
 CXformSimplifySubquery::FSimplifyQuantified
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpression *pexprScalar,
 	CExpression **ppexprNewScalar
 	)
@@ -100,16 +100,16 @@ CXformSimplifySubquery::FSimplifyQuantified
 
 	CExpression *pexprNewSubquery = NULL;
 	CExpression *pexprCmp = NULL;
-	CXformUtils::QuantifiedToAgg(pmp, pexprScalar, &pexprNewSubquery, &pexprCmp);
+	CXformUtils::QuantifiedToAgg(memory_pool, pexprScalar, &pexprNewSubquery, &pexprCmp);
 
 	// create a comparison predicate involving subquery expression
-	DrgPexpr *pdrgpexpr = GPOS_NEW(pmp) DrgPexpr(pmp);
+	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
 	(*pexprCmp)[1]->AddRef();
 	pdrgpexpr->Append(pexprNewSubquery);
 	pdrgpexpr->Append((*pexprCmp)[1]);
 	pexprCmp->Pop()->AddRef();
 
-	*ppexprNewScalar = GPOS_NEW(pmp) CExpression(pmp, pexprCmp->Pop(), pdrgpexpr);
+	*ppexprNewScalar = GPOS_NEW(memory_pool) CExpression(memory_pool, pexprCmp->Pop(), pdrgpexpr);
 	pexprCmp->Release();
 
 	return true;
@@ -129,7 +129,7 @@ CXformSimplifySubquery::FSimplifyQuantified
 BOOL
 CXformSimplifySubquery::FSimplifyExistential
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpression *pexprScalar,
 	CExpression **ppexprNewScalar
 	)
@@ -138,16 +138,16 @@ CXformSimplifySubquery::FSimplifyExistential
 
 	CExpression *pexprNewSubquery = NULL;
 	CExpression *pexprCmp = NULL;
-	CXformUtils::ExistentialToAgg(pmp, pexprScalar, &pexprNewSubquery, &pexprCmp);
+	CXformUtils::ExistentialToAgg(memory_pool, pexprScalar, &pexprNewSubquery, &pexprCmp);
 
 	// create a comparison predicate involving subquery expression
-	DrgPexpr *pdrgpexpr = GPOS_NEW(pmp) DrgPexpr(pmp);
+	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
 	(*pexprCmp)[1]->AddRef();
 	pdrgpexpr->Append(pexprNewSubquery);
 	pdrgpexpr->Append((*pexprCmp)[1]);
 	pexprCmp->Pop()->AddRef();
 
-	*ppexprNewScalar = GPOS_NEW(pmp) CExpression(pmp, pexprCmp->Pop(), pdrgpexpr);
+	*ppexprNewScalar = GPOS_NEW(memory_pool) CExpression(memory_pool, pexprCmp->Pop(), pdrgpexpr);
 	pexprCmp->Release();
 
 	return true;
@@ -166,7 +166,7 @@ CXformSimplifySubquery::FSimplifyExistential
 BOOL
 CXformSimplifySubquery::FSimplify
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpression *pexprScalar,
 	CExpression **ppexprNewScalar,
 	FnSimplify *pfnsimplify,
@@ -175,18 +175,18 @@ CXformSimplifySubquery::FSimplify
 {
 	// protect against stack overflow during recursion
 	GPOS_CHECK_STACK_SIZE;
-	GPOS_ASSERT(NULL != pmp);
+	GPOS_ASSERT(NULL != memory_pool);
 	GPOS_ASSERT(NULL != pexprScalar);
 
 	if (pfnmatch(pexprScalar->Pop()))
 	{
-		return pfnsimplify(pmp, pexprScalar, ppexprNewScalar);
+		return pfnsimplify(memory_pool, pexprScalar, ppexprNewScalar);
 	}
 
 	// for all other types of subqueries, or if no other subqueries are
 	// below this point, we add-ref root node and return immediately
 	if (CUtils::FSubquery(pexprScalar->Pop()) ||
-		!CDrvdPropScalar::Pdpscalar(pexprScalar->PdpDerive())->FHasSubquery())
+		!CDrvdPropScalar::GetDrvdScalarProps(pexprScalar->PdpDerive())->FHasSubquery())
 	{
 		pexprScalar->AddRef();
 		*ppexprNewScalar = pexprScalar;
@@ -195,13 +195,13 @@ CXformSimplifySubquery::FSimplify
 	}
 
 	// otherwise, recursively process children
-	const ULONG ulArity = pexprScalar->UlArity();
-	DrgPexpr *pdrgpexprChildren = GPOS_NEW(pmp) DrgPexpr(pmp);
+	const ULONG arity = pexprScalar->Arity();
+	DrgPexpr *pdrgpexprChildren = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
 	BOOL fSuccess = true;
-	for (ULONG ul = 0; fSuccess && ul < ulArity; ul++)
+	for (ULONG ul = 0; fSuccess && ul < arity; ul++)
 	{
 		CExpression *pexprChild = NULL;
-		fSuccess = FSimplify(pmp, (*pexprScalar)[ul], &pexprChild, pfnsimplify, pfnmatch);
+		fSuccess = FSimplify(memory_pool, (*pexprScalar)[ul], &pexprChild, pfnsimplify, pfnmatch);
 		if (fSuccess)
 		{
 			pdrgpexprChildren->Append(pexprChild);
@@ -216,7 +216,7 @@ CXformSimplifySubquery::FSimplify
 	{
 		COperator *pop = pexprScalar->Pop();
 		pop->AddRef();
-		*ppexprNewScalar = GPOS_NEW(pmp) CExpression(pmp, pop, pdrgpexprChildren);
+		*ppexprNewScalar = GPOS_NEW(memory_pool) CExpression(memory_pool, pop, pdrgpexprChildren);
 	}
 	else
 	{
@@ -249,16 +249,16 @@ CXformSimplifySubquery::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 	CExpression *pexprInput = pexpr;
-	const ULONG ulSize = GPOS_ARRAY_SIZE(m_rgssm);
-	for (ULONG ul = 0; ul < ulSize; ul++)
+	const ULONG size = GPOS_ARRAY_SIZE(m_rgssm);
+	for (ULONG ul = 0; ul < size; ul++)
 	{
 		CExpression *pexprOuter = (*pexprInput)[0];
 		CExpression *pexprScalar = (*pexprInput)[1];
 		CExpression *pexprNewScalar = NULL;
 
-		if (!FSimplify(pmp, pexprScalar, &pexprNewScalar, m_rgssm[ul].m_pfnsimplify, m_rgssm[ul].m_pfnmatch))
+		if (!FSimplify(memory_pool, pexprScalar, &pexprNewScalar, m_rgssm[ul].m_pfnsimplify, m_rgssm[ul].m_pfnmatch))
 		{
 			CRefCount::SafeRelease(pexprNewScalar);
 			continue;
@@ -268,17 +268,17 @@ CXformSimplifySubquery::Transform
 		CExpression *pexprResult = NULL;
 		if (COperator::EopLogicalSelect == pexprInput->Pop()->Eopid())
 		{
-			pexprResult = CUtils::PexprLogicalSelect(pmp, pexprOuter, pexprNewScalar);
+			pexprResult = CUtils::PexprLogicalSelect(memory_pool, pexprOuter, pexprNewScalar);
 		}
 		else
 		{
 			GPOS_ASSERT(COperator::EopLogicalProject == pexprInput->Pop()->Eopid());
 
-			pexprResult = CUtils::PexprLogicalProject(pmp, pexprOuter, pexprNewScalar, false /*fNewComputedCol*/);
+			pexprResult = CUtils::PexprLogicalProject(memory_pool, pexprOuter, pexprNewScalar, false /*fNewComputedCol*/);
 		}
 
 		// normalize resulting expression
-		CExpression *pexprNormalized = CNormalizer::PexprNormalize(pmp, pexprResult);
+		CExpression *pexprNormalized = CNormalizer::PexprNormalize(memory_pool, pexprResult);
 		pexprResult->Release();
 
 		pxfres->Add(pexprNormalized);

@@ -33,7 +33,7 @@ namespace gpopt
 		private:
 
 			// mdid of partitioned table
-			IMDId *m_pmdid;
+			IMDId *m_mdid;
 
 			// filter expressions corresponding to various levels
 			DrgPexpr *m_pdrgpexprFilters;
@@ -48,12 +48,12 @@ namespace gpopt
 
 			// ctors
 			explicit
-			CLogicalPartitionSelector(IMemoryPool *pmp);
+			CLogicalPartitionSelector(IMemoryPool *memory_pool);
 
 			CLogicalPartitionSelector
 				(
-				IMemoryPool *pmp,
-				IMDId *pmdid,
+				IMemoryPool *memory_pool,
+				IMDId *mdid,
 				DrgPexpr *pdrgpexprFilters,
 				CColRef *pcrOid
 				);
@@ -77,9 +77,9 @@ namespace gpopt
 			}
 
 			// partitioned table mdid
-			IMDId *Pmdid() const
+			IMDId *MDId() const
 			{
-				return m_pmdid;
+				return m_mdid;
 			}
 
 			// oid column
@@ -91,7 +91,7 @@ namespace gpopt
 			// number of partitioning levels
 			ULONG UlPartLevels() const
 			{
-				return m_pdrgpexprFilters->UlLength();
+				return m_pdrgpexprFilters->Size();
 			}
 
 			// filter expression for a given level
@@ -102,11 +102,11 @@ namespace gpopt
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			// hash function
 			virtual
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 
 			// sensitivity to order of inputs
 			virtual
@@ -118,7 +118,7 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			//-------------------------------------------------------------------------------------
 			// Derived Relational Properties
@@ -126,13 +126,13 @@ namespace gpopt
 
 			// derive output columns
 			virtual
-			CColRefSet *PcrsDeriveOutput(IMemoryPool *pmp, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsDeriveOutput(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
 
 			// derive constraint property
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *, //pmp,
+				IMemoryPool *, //memory_pool,
 				CExpressionHandle &exprhdl
 				)
 				const
@@ -142,13 +142,13 @@ namespace gpopt
 
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			// derive partition consumer info
 			virtual
 			CPartInfo *PpartinfoDerive
 				(
-				IMemoryPool *, // pmp,
+				IMemoryPool *, // memory_pool,
 				CExpressionHandle &exprhdl
 				)
 				const
@@ -160,10 +160,10 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsStat
 				(
-				IMemoryPool *,// pmp
+				IMemoryPool *,// memory_pool
 				CExpressionHandle &,// exprhdl
 				CColRefSet *pcrsInput,
-				ULONG // ulChildIndex
+				ULONG // child_index
 				)
 				const
 			{
@@ -176,13 +176,13 @@ namespace gpopt
 
 			// candidate set of xforms
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *pmp) const;
+			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
 
 			// derive key collections
 			virtual
 			CKeyCollection *PkcDeriveKeys
 				(
-				IMemoryPool *, // pmp
+				IMemoryPool *, // memory_pool
 				CExpressionHandle &exprhdl
 				)
 				const
@@ -195,9 +195,9 @@ namespace gpopt
 			virtual
 			IStatistics *PstatsDerive
 				(
-				IMemoryPool *, //pmp,
+				IMemoryPool *, //memory_pool,
 				CExpressionHandle &exprhdl,
-				DrgPstat * //pdrgpstatCtxt
+				StatsArray * //stats_ctxt
 				)
 				const
 			{

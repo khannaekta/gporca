@@ -61,7 +61,7 @@ namespace gpopt
 				)
 				const
 			{
-				return (m_fDuplicateSensitive || !pds->m_fDuplicateSensitive);
+				return (m_is_duplicate_sensitive || !pds->m_is_duplicate_sensitive);
 			}
 
 			// exact match against given hashed distribution
@@ -115,15 +115,15 @@ namespace gpopt
 
 			// columns used by distribution expressions
 			virtual
-			CColRefSet *PcrsUsed(IMemoryPool *pmp) const;
+			CColRefSet *PcrsUsed(IMemoryPool *memory_pool) const;
 
 			// return a copy of the distribution spec after excluding the given columns
 			virtual
-			CDistributionSpecHashed *PdshashedExcludeColumns(IMemoryPool *pmp, CColRefSet *pcrs);
+			CDistributionSpecHashed *PdshashedExcludeColumns(IMemoryPool *memory_pool, CColRefSet *pcrs);
 
 			// does this distribution match the given one
 			virtual 
-			BOOL FMatch(const CDistributionSpec *pds) const;
+			BOOL Matches(const CDistributionSpec *pds) const;
 
 			// does this distribution satisfy the given one
 			virtual 
@@ -134,19 +134,19 @@ namespace gpopt
 			BOOL FMatchSubset(const CDistributionSpecHashed *pds) const;
 
 			// equality function
-			BOOL FEqual(const CDistributionSpecHashed *pds) const;
+			BOOL Equals(const CDistributionSpecHashed *pds) const;
 
 			// return a copy of the distribution spec with remapped columns
 			virtual
-			CDistributionSpec *PdsCopyWithRemappedColumns(IMemoryPool *pmp, HMUlCr *phmulcr, BOOL fMustExist);
+			CDistributionSpec *PdsCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// append enforcers to dynamic array for the given plan properties
 			virtual
-			void AppendEnforcers(IMemoryPool *pmp, CExpressionHandle &exprhdl, CReqdPropPlan *prpp, DrgPexpr *pdrgpexpr, CExpression *pexpr);
+			void AppendEnforcers(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CReqdPropPlan *prpp, DrgPexpr *pdrgpexpr, CExpression *pexpr);
 
 			// hash function for hashed distribution spec
 			virtual
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 
 			// return distribution partitioning type
 			virtual
@@ -163,8 +163,8 @@ namespace gpopt
 			static
 			CDistributionSpecHashed *PdshashedMaximal
 				(
-				IMemoryPool *pmp,
-				DrgPcr *pdrgpcr,
+				IMemoryPool *memory_pool,
+				DrgPcr *colref_array,
 				BOOL fNullsColocated
 				);
 

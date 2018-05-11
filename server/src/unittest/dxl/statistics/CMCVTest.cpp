@@ -49,15 +49,15 @@ CMCVTest::EresUnittest()
 		};
 
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
 	// setup a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(pmp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(memory_pool, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
-	CAutoOptCtxt aoc(pmp, &mda, NULL /* pceeval */, CTestUtils::Pcm(pmp));
+	CAutoOptCtxt aoc(memory_pool, &mda, NULL /* pceeval */, CTestUtils::GetCostModel(memory_pool));
 
 	return CUnittest::EresExecute(rgutSharedOptCtxt, GPOS_ARRAY_SIZE(rgutSharedOptCtxt));
 }
@@ -68,76 +68,76 @@ CMCVTest::EresUnittest_SortInt4MCVs()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
-	CMDAccessor *pmda = COptCtxt::PoctxtFromTLS()->Pmda();
-	CMDIdGPDB *pmdid = GPOS_NEW(pmp) CMDIdGPDB(CMDIdGPDB::m_mdidInt4);
-	const IMDType *pmdtype = pmda->Pmdtype(pmdid);
+	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
+	CMDIdGPDB *mdid = GPOS_NEW(memory_pool) CMDIdGPDB(CMDIdGPDB::m_mdid_int4);
+	const IMDType *pmdtype = md_accessor->Pmdtype(mdid);
 
 	// create three integer MCVs
-	CPoint *ppoint1 = CTestUtils::PpointInt4(pmp, 5);
-	CPoint *ppoint2 = CTestUtils::PpointInt4(pmp, 1);
-	CPoint *ppoint3 = CTestUtils::PpointInt4(pmp, 10);
-	DrgPdatum *pdrgpdatumMCV = GPOS_NEW(pmp) DrgPdatum(pmp);
-	IDatum *pdatum1 = ppoint1->Pdatum();
-	IDatum *pdatum2 = ppoint2->Pdatum();
-	IDatum *pdatum3 = ppoint3->Pdatum();
-	pdatum1->AddRef();
-	pdatum2->AddRef();
-	pdatum3->AddRef();
-	pdrgpdatumMCV->Append(pdatum1);
-	pdrgpdatumMCV->Append(pdatum2);
-	pdrgpdatumMCV->Append(pdatum3);
+	CPoint *point1 = CTestUtils::PpointInt4(memory_pool, 5);
+	CPoint *point2 = CTestUtils::PpointInt4(memory_pool, 1);
+	CPoint *point3 = CTestUtils::PpointInt4(memory_pool, 10);
+	DrgPdatum *pdrgpdatumMCV = GPOS_NEW(memory_pool) DrgPdatum(memory_pool);
+	IDatum *datum1 = point1->GetDatum();
+	IDatum *datum2 = point2->GetDatum();
+	IDatum *datum3 = point3->GetDatum();
+	datum1->AddRef();
+	datum2->AddRef();
+	datum3->AddRef();
+	pdrgpdatumMCV->Append(datum1);
+	pdrgpdatumMCV->Append(datum2);
+	pdrgpdatumMCV->Append(datum3);
 
 	// create corresponding frequencies
-	DrgPdouble *pdrgpdFreq = GPOS_NEW(pmp) DrgPdouble(pmp);
+	DrgPdouble *pdrgpdFreq = GPOS_NEW(memory_pool) DrgPdouble(memory_pool);
 	// in GPDB, MCVs are stored in descending frequencies
-	pdrgpdFreq->Append(GPOS_NEW(pmp) CDouble(0.4));
-	pdrgpdFreq->Append(GPOS_NEW(pmp) CDouble(0.2));
-	pdrgpdFreq->Append(GPOS_NEW(pmp) CDouble(0.1));
+	pdrgpdFreq->Append(GPOS_NEW(memory_pool) CDouble(0.4));
+	pdrgpdFreq->Append(GPOS_NEW(memory_pool) CDouble(0.2));
+	pdrgpdFreq->Append(GPOS_NEW(memory_pool) CDouble(0.1));
 
 	// exercise MCV sorting function
-	CHistogram *phistMCV = CStatisticsUtils::PhistTransformMCV
+	CHistogram *phistMCV = CStatisticsUtils::TransformMCVToHist
 								(
-								pmp,
+								memory_pool,
 								pmdtype,
 								pdrgpdatumMCV,
 								pdrgpdFreq,
-								pdrgpdatumMCV->UlLength()
+								pdrgpdatumMCV->Size()
 								);
 
 	// create hash map from colid -> histogram
-	HMUlHist *phmulhist = GPOS_NEW(pmp) HMUlHist(pmp);
+	UlongHistogramHashMap *col_histogram_mapping = GPOS_NEW(memory_pool) UlongHistogramHashMap(memory_pool);
 
 	// generate int histogram for column 1
-	phmulhist->FInsert(GPOS_NEW(pmp) ULONG(1), phistMCV);
+	col_histogram_mapping->Insert(GPOS_NEW(memory_pool) ULONG(1), phistMCV);
 
 	// column width for int4
-	HMUlDouble *phmuldoubleWidth = GPOS_NEW(pmp) HMUlDouble(pmp);
-	phmuldoubleWidth->FInsert(GPOS_NEW(pmp) ULONG(1), GPOS_NEW(pmp) CDouble(4.0));
+	UlongDoubleHashMap *col_id_width_mapping = GPOS_NEW(memory_pool) UlongDoubleHashMap(memory_pool);
+	col_id_width_mapping->Insert(GPOS_NEW(memory_pool) ULONG(1), GPOS_NEW(memory_pool) CDouble(4.0));
 
-	CStatistics *pstats = GPOS_NEW(pmp) CStatistics
+	CStatistics *stats = GPOS_NEW(memory_pool) CStatistics
 									(
-									pmp,
-									phmulhist,
-									phmuldoubleWidth,
-									1000.0 /* dRows */,
-									false /* fEmpty */
+									memory_pool,
+									col_histogram_mapping,
+									col_id_width_mapping,
+									1000.0 /* rows */,
+									false /* is_empty */
 									);
 
 	// put stats object in an array in order to serialize
-	DrgPstats *pdrgpstats = GPOS_NEW(pmp) DrgPstats(pmp);
-	pdrgpstats->Append(pstats);
+	CStatisticsArray *pdrgpstats = GPOS_NEW(memory_pool) CStatisticsArray(memory_pool);
+	pdrgpstats->Append(stats);
 
 	// serialize stats object
-	CWStringDynamic *pstrOutput = CDXLUtils::PstrSerializeStatistics(pmp, pmda, pdrgpstats, true, true);
-	GPOS_TRACE(pstrOutput->Wsz());
+	CWStringDynamic *pstrOutput = CDXLUtils::SerializeStatistics(memory_pool, md_accessor, pdrgpstats, true, true);
+	GPOS_TRACE(pstrOutput->GetBuffer());
 
 	// get expected output
-	CWStringDynamic str(pmp);
+	CWStringDynamic str(memory_pool);
 	COstreamString oss(&str);
-	CHAR *szDXLExpected = CDXLUtils::SzRead(pmp, szMCVSortExpectedFileName);
-	CWStringDynamic dstrExpected(pmp);
+	CHAR *szDXLExpected = CDXLUtils::Read(memory_pool, szMCVSortExpectedFileName);
+	CWStringDynamic dstrExpected(memory_pool);
 	dstrExpected.AppendFormat(GPOS_WSZ_LIT("%s"), szDXLExpected);
 
 	GPOS_RESULT eres = CTestUtils::EresCompare
@@ -154,10 +154,10 @@ CMCVTest::EresUnittest_SortInt4MCVs()
 	pdrgpdatumMCV->Release();
 	pdrgpdFreq->Release();
 	pdrgpstats->Release();
-	ppoint1->Release();
-	ppoint2->Release();
-	ppoint3->Release();
-	pmdid->Release();
+	point1->Release();
+	point2->Release();
+	point3->Release();
+	mdid->Release();
 
 	return eres;
 }
@@ -189,77 +189,77 @@ CMCVTest::EresUnittest_MergeHistMCV()
 
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
-	ULONG ulLen = GPOS_ARRAY_SIZE(rgMergeTestElem);
-	for (ULONG ul = 0; ul < ulLen; ul++)
+	ULONG length = GPOS_ARRAY_SIZE(rgMergeTestElem);
+	for (ULONG ul = 0; ul < length; ul++)
 	{
 		// read input MCVs DXL file
-		CHAR *szDXLInputMCV = CDXLUtils::SzRead(pmp, rgMergeTestElem[ul].szInputMCVFile);
+		CHAR *szDXLInputMCV = CDXLUtils::Read(memory_pool, rgMergeTestElem[ul].szInputMCVFile);
 		// read input histogram DXL file
-		CHAR *szDXLInputHist = CDXLUtils::SzRead(pmp, rgMergeTestElem[ul].szInputHistFile);
+		CHAR *szDXLInputHist = CDXLUtils::Read(memory_pool, rgMergeTestElem[ul].szInputHistFile);
 
 		GPOS_CHECK_ABORT;
 
-		CMDAccessor *pmda = COptCtxt::PoctxtFromTLS()->Pmda();
+		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 		// parse the stats objects
-		DrgPdxlstatsderrel *pdrgpdxlstatsderrelMCV = CDXLUtils::PdrgpdxlstatsderrelParseDXL(pmp, szDXLInputMCV, NULL);
-		DrgPdxlstatsderrel *pdrgpdxlstatsderrelHist = CDXLUtils::PdrgpdxlstatsderrelParseDXL(pmp, szDXLInputHist, NULL);
+		DXLStatsDerivedRelArray *pdrgpdxlstatsderrelMCV = CDXLUtils::ParseDXLToStatsDerivedRelArray(memory_pool, szDXLInputMCV, NULL);
+		DXLStatsDerivedRelArray *pdrgpdxlstatsderrelHist = CDXLUtils::ParseDXLToStatsDerivedRelArray(memory_pool, szDXLInputHist, NULL);
 
 		GPOS_CHECK_ABORT;
 
 		CDXLStatsDerivedRelation *pdxlstatsderrelMCV = (*pdrgpdxlstatsderrelMCV)[0];
-		const DrgPdxlstatsdercol *pdrgpdxlstatsdercolMCV = pdxlstatsderrelMCV->Pdrgpdxlstatsdercol();
+		const DXLStatsDerivedColArray *pdrgpdxlstatsdercolMCV = pdxlstatsderrelMCV->GetDXLStatsDerivedColArray();
 		CDXLStatsDerivedColumn *pdxlstatsdercolMCV = (*pdrgpdxlstatsdercolMCV)[0];
-		DrgPbucket *pdrgppbucketMCV = CDXLUtils::Pdrgpbucket(pmp, pmda, pdxlstatsdercolMCV);
-		CHistogram *phistMCV =  GPOS_NEW(pmp) CHistogram(pdrgppbucketMCV);
+		BucketArray *pdrgppbucketMCV = CDXLUtils::ParseDXLToBucketsArray(memory_pool, md_accessor, pdxlstatsdercolMCV);
+		CHistogram *phistMCV =  GPOS_NEW(memory_pool) CHistogram(pdrgppbucketMCV);
 
 		CDXLStatsDerivedRelation *pdxlstatsderrelHist = (*pdrgpdxlstatsderrelHist)[0];
-		const DrgPdxlstatsdercol *pdrgpdxlstatsdercolHist = pdxlstatsderrelHist->Pdrgpdxlstatsdercol();
+		const DXLStatsDerivedColArray *pdrgpdxlstatsdercolHist = pdxlstatsderrelHist->GetDXLStatsDerivedColArray();
 		CDXLStatsDerivedColumn *pdxlstatsdercolHist = (*pdrgpdxlstatsdercolHist)[0];
-		DrgPbucket *pdrgppbucketHist = CDXLUtils::Pdrgpbucket(pmp, pmda, pdxlstatsdercolHist);
-		CHistogram *phistHist =  GPOS_NEW(pmp) CHistogram(pdrgppbucketHist);
+		BucketArray *pdrgppbucketHist = CDXLUtils::ParseDXLToBucketsArray(memory_pool, md_accessor, pdxlstatsdercolHist);
+		CHistogram *phistHist =  GPOS_NEW(memory_pool) CHistogram(pdrgppbucketHist);
 
 		GPOS_CHECK_ABORT;
 
 		// exercise the merge
-		CHistogram *phistMerged = CStatisticsUtils::PhistMergeMcvHist(pmp, phistMCV, phistHist);
+		CHistogram *phistMerged = CStatisticsUtils::MergeMCVHist(memory_pool, phistMCV, phistHist);
 
 		// create hash map from colid -> histogram
-		HMUlHist *phmulhist = GPOS_NEW(pmp) HMUlHist(pmp);
+		UlongHistogramHashMap *col_histogram_mapping = GPOS_NEW(memory_pool) UlongHistogramHashMap(memory_pool);
 
 		// generate int histogram for column 1
-		ULONG ulColId = pdxlstatsdercolMCV->UlColId();
-		phmulhist->FInsert(GPOS_NEW(pmp) ULONG(ulColId), phistMerged);
+		ULONG col_id = pdxlstatsdercolMCV->GetColId();
+		col_histogram_mapping->Insert(GPOS_NEW(memory_pool) ULONG(col_id), phistMerged);
 
 		// column width for int4
-		HMUlDouble *phmuldoubleWidth = GPOS_NEW(pmp) HMUlDouble(pmp);
-		CDouble dWidth = pdxlstatsdercolMCV->DWidth();
-		phmuldoubleWidth->FInsert(GPOS_NEW(pmp) ULONG(ulColId), GPOS_NEW(pmp) CDouble(dWidth));
+		UlongDoubleHashMap *col_id_width_mapping = GPOS_NEW(memory_pool) UlongDoubleHashMap(memory_pool);
+		CDouble width = pdxlstatsdercolMCV->Width();
+		col_id_width_mapping->Insert(GPOS_NEW(memory_pool) ULONG(col_id), GPOS_NEW(memory_pool) CDouble(width));
 
-		CStatistics *pstats = GPOS_NEW(pmp) CStatistics
+		CStatistics *stats = GPOS_NEW(memory_pool) CStatistics
 										(
-										pmp,
-										phmulhist,
-										phmuldoubleWidth,
-										pdxlstatsderrelMCV->DRows(),
-										pdxlstatsderrelMCV->FEmpty()
+										memory_pool,
+										col_histogram_mapping,
+										col_id_width_mapping,
+										pdxlstatsderrelMCV->Rows(),
+										pdxlstatsderrelMCV->IsEmpty()
 										);
 
 		// put stats object in an array in order to serialize
-		DrgPstats *pdrgpstats = GPOS_NEW(pmp) DrgPstats(pmp);
-		pdrgpstats->Append(pstats);
+		CStatisticsArray *pdrgpstats = GPOS_NEW(memory_pool) CStatisticsArray(memory_pool);
+		pdrgpstats->Append(stats);
 
 		// serialize stats object
-		CWStringDynamic *pstrOutput = CDXLUtils::PstrSerializeStatistics(pmp, pmda, pdrgpstats, true, true);
-		GPOS_TRACE(pstrOutput->Wsz());
+		CWStringDynamic *pstrOutput = CDXLUtils::SerializeStatistics(memory_pool, md_accessor, pdrgpstats, true, true);
+		GPOS_TRACE(pstrOutput->GetBuffer());
 
 		// get expected output
-		CWStringDynamic str(pmp);
+		CWStringDynamic str(memory_pool);
 		COstreamString oss(&str);
-		CHAR *szDXLExpected = CDXLUtils::SzRead(pmp, rgMergeTestElem[ul].szMergedFile);
-		CWStringDynamic dstrExpected(pmp);
+		CHAR *szDXLExpected = CDXLUtils::Read(memory_pool, rgMergeTestElem[ul].szMergedFile);
+		CWStringDynamic dstrExpected(memory_pool);
 		dstrExpected.AppendFormat(GPOS_WSZ_LIT("%s"), szDXLExpected);
 
 		GPOS_RESULT eres = CTestUtils::EresCompare

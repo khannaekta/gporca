@@ -9,10 +9,10 @@ using namespace gpopt;
 DrgPcnstr *
 CColConstraintsHashMapper::PdrgPcnstrLookup
 	(
-		CColRef *pcr
+		CColRef *colref
 	)
 {
-	DrgPcnstr *pdrgpcnstrCol = m_phmColConstr->PtLookup(pcr);
+	DrgPcnstr *pdrgpcnstrCol = m_phmColConstr->Find(colref);
 	pdrgpcnstrCol->AddRef();
 	return pdrgpcnstrCol;
 }
@@ -22,28 +22,28 @@ static
 HMColConstr *
 PhmcolconstrSingleColConstr
 	(
-		IMemoryPool *pmp,
+		IMemoryPool *memory_pool,
 		DrgPcnstr *drgPcnstr
 	)
 {
 	CAutoRef<DrgPcnstr> arpdrgpcnstr(drgPcnstr);
-	HMColConstr *phmcolconstr = GPOS_NEW(pmp) HMColConstr(pmp);
+	HMColConstr *phmcolconstr = GPOS_NEW(memory_pool) HMColConstr(memory_pool);
 
-	const ULONG ulLen = arpdrgpcnstr->UlLength();
+	const ULONG length = arpdrgpcnstr->Size();
 
-	for (ULONG ul = 0; ul < ulLen; ul++)
+	for (ULONG ul = 0; ul < length; ul++)
 	{
 		CConstraint *pcnstrChild = (*arpdrgpcnstr)[ul];
 		CColRefSet *pcrs = pcnstrChild->PcrsUsed();
 
-		if (1 == pcrs->CElements())
+		if (1 == pcrs->Size())
 		{
-			CColRef *pcr = pcrs->PcrFirst();
-			DrgPcnstr *pcnstrMapped = phmcolconstr->PtLookup(pcr);
+			CColRef *colref = pcrs->PcrFirst();
+			DrgPcnstr *pcnstrMapped = phmcolconstr->Find(colref);
 			if (NULL == pcnstrMapped)
 			{
-				pcnstrMapped = GPOS_NEW(pmp) DrgPcnstr(pmp);
-				phmcolconstr->FInsert(pcr, pcnstrMapped);
+				pcnstrMapped = GPOS_NEW(memory_pool) DrgPcnstr(memory_pool);
+				phmcolconstr->Insert(colref, pcnstrMapped);
 			}
 			pcnstrChild->AddRef();
 			pcnstrMapped->Append(pcnstrChild);
@@ -55,10 +55,10 @@ PhmcolconstrSingleColConstr
 
 CColConstraintsHashMapper::CColConstraintsHashMapper
 	(
-		IMemoryPool *pmp,
+		IMemoryPool *memory_pool,
 		DrgPcnstr *pdrgpcnstr
 	) :
-	m_phmColConstr(PhmcolconstrSingleColConstr(pmp, pdrgpcnstr))
+	m_phmColConstr(PhmcolconstrSingleColConstr(memory_pool, pdrgpcnstr))
 {
 }
 

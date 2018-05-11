@@ -59,25 +59,25 @@ namespace gpopt
 			
 			// helper for combining partition consumer arrays of scalar children
 			static
-			CPartInfo *PpartinfoDeriveCombineScalar(IMemoryPool *pmp, CExpressionHandle &exprhdl);
+			CPartInfo *PpartinfoDeriveCombineScalar(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
 
 		protected:
 
 			// perform conjunction of child boolean evaluation results
 			static
-			EBoolEvalResult EberConjunction(DrgPul *pdrgpulChildren);
+			EBoolEvalResult EberConjunction(ULongPtrArray *pdrgpulChildren);
 
 			// perform disjunction of child boolean evaluation results
 			static
-			EBoolEvalResult EberDisjunction(DrgPul *pdrgpulChildren);
+			EBoolEvalResult EberDisjunction(ULongPtrArray *pdrgpulChildren);
 
 			// return Null if any child is Null
 			static
-			EBoolEvalResult EberNullOnAnyNullChild(DrgPul *pdrgpulChildren);
+			EBoolEvalResult EberNullOnAnyNullChild(ULongPtrArray *pdrgpulChildren);
 
 			// return Null if all children are Null
 			static
-			EBoolEvalResult EberNullOnAllNullChildren(DrgPul *pdrgpulChildren);
+			EBoolEvalResult EberNullOnAllNullChildren(ULongPtrArray *pdrgpulChildren);
 
 		public:
 		
@@ -85,10 +85,10 @@ namespace gpopt
 			explicit
 			CScalar
 				(
-				IMemoryPool *pmp
+				IMemoryPool *memory_pool
 				)
 				: 
-				COperator(pmp)
+				COperator(memory_pool)
 			{}
 
 			// dtor
@@ -105,72 +105,72 @@ namespace gpopt
 
 			// create derived properties container
 			virtual
-			CDrvdProp *PdpCreate(IMemoryPool *pmp) const;
+			CDrvdProp *PdpCreate(IMemoryPool *memory_pool) const;
 
 			// create required properties container
 			virtual
-			CReqdProp *PrpCreate(IMemoryPool *pmp) const;
+			CReqdProp *PrpCreate(IMemoryPool *memory_pool) const;
 
 			// return locally defined columns
 			virtual
 			CColRefSet *PcrsDefined
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle & // exprhdl
 				)
 			{
 				// return an empty set of column refs
-				return GPOS_NEW(pmp) CColRefSet(pmp);
+				return GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 			}
 
 			// return columns containing set-returning function
 			virtual
 			CColRefSet *PcrsSetReturningFunction
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle & // exprhdl
 				)
 			{
 				// return an empty set of column refs
-				return GPOS_NEW(pmp) CColRefSet(pmp);
+				return GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 			}
 
 			// return locally used columns
 			virtual
 			CColRefSet *PcrsUsed
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle & // exprhdl
 				)
 			{
 				// return an empty set of column refs
-				return GPOS_NEW(pmp) CColRefSet(pmp);
+				return GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 			}
 
 			// derive partition consumer info
 			virtual
 			CPartInfo *PpartinfoDerive
 				(
-				IMemoryPool *pmp, 
+				IMemoryPool *memory_pool, 
 				CExpressionHandle &exprhdl
 				) 
 				const
 			{
-				return PpartinfoDeriveCombineScalar(pmp, exprhdl);
+				return PpartinfoDeriveCombineScalar(memory_pool, exprhdl);
 			}
 
 			// derive function properties
 			virtual
 			CFunctionProp *PfpDerive
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
 				return PfpDeriveFromChildren
 							(
-							pmp,
+							memory_pool,
 							exprhdl,
 							IMDFunction::EfsImmutable, // efsDefault
 							IMDFunction::EfdaNoSQL, // efdaDefault
@@ -194,7 +194,7 @@ namespace gpopt
 			virtual
 			EBoolEvalResult Eber
 				(
-				DrgPul * // pdrgpulChildren
+				ULongPtrArray * // pdrgpulChildren
 				)
 				const
 			{
@@ -204,7 +204,7 @@ namespace gpopt
 
 			// perform boolean evaluation of the given expression tree
 			static
-			EBoolEvalResult EberEvaluate(IMemoryPool *pmp, CExpression *pexprScalar);
+			EBoolEvalResult EberEvaluate(IMemoryPool *memory_pool, CExpression *pexprScalar);
 
 			// conversion function
 			static
@@ -221,13 +221,13 @@ namespace gpopt
 		
 			// the type of the scalar expression
 			virtual 
-			IMDId *PmdidType() const = 0;
+			IMDId *MDIdType() const = 0;
 
 			// the type modifier of the scalar expression
 			virtual
-			INT ITypeModifier() const
+			INT TypeModifier() const
 			{
-				return IDefaultTypeModifier;
+				return default_type_modifier;
 			}
 			
 	}; // class CScalar

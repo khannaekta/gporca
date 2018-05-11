@@ -36,7 +36,7 @@ namespace gpopt
 			// definition of push through function
 			typedef void(FnPushThru)
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpression *pexprLogical,
 				CExpression *pexprConj,
 				CExpression **ppexprResult
@@ -70,11 +70,11 @@ namespace gpopt
 
 			// simplify outer joins
 			static
-			BOOL FSimplifySelectOnOuterJoin(IMemoryPool *pmp, CExpression *pexprOuterJoin, CExpression *pexprPred, CExpression **ppexprResult);
+			BOOL FSimplifySelectOnOuterJoin(IMemoryPool *memory_pool, CExpression *pexprOuterJoin, CExpression *pexprPred, CExpression **ppexprResult);
 
 			// call normalizer recursively on expression children
 			static
-			CExpression *PexprRecursiveNormalize(IMemoryPool *pmp, CExpression *pexpr);
+			CExpression *PexprRecursiveNormalize(IMemoryPool *memory_pool, CExpression *pexpr);
 
 			// check if a scalar predicate can be pushed through a logical expression
 			static
@@ -90,53 +90,53 @@ namespace gpopt
 
 			// return a Select expression, if needed, with a scalar condition made of given array of conjuncts
 			static
-			CExpression *PexprSelect(IMemoryPool *pmp, CExpression *pexpr, DrgPexpr *pdrgpexpr);
+			CExpression *PexprSelect(IMemoryPool *memory_pool, CExpression *pexpr, DrgPexpr *pdrgpexpr);
 
 			// push scalar expression through an expression with unary operator with scalar child
 			static
-			void PushThruUnaryWithScalarChild(IMemoryPool *pmp, CExpression *pexprLogical, CExpression *pexprConj, CExpression **ppexprResult);
+			void PushThruUnaryWithScalarChild(IMemoryPool *memory_pool, CExpression *pexprLogical, CExpression *pexprConj, CExpression **ppexprResult);
 
 			// push scalar expression through a sequence project expression
 			static
-			void PushThruSeqPrj(IMemoryPool *pmp, CExpression *pexprSeqPrj, CExpression *pexprConj, CExpression **ppexprResult);
+			void PushThruSeqPrj(IMemoryPool *memory_pool, CExpression *pexprSeqPrj, CExpression *pexprConj, CExpression **ppexprResult);
 
 			// push scalar expression through a set operation
 			static
-			void PushThruSetOp(IMemoryPool *pmp, CExpression *pexprSetOp, CExpression *pexprConj, CExpression **ppexprResult);
+			void PushThruSetOp(IMemoryPool *memory_pool, CExpression *pexprSetOp, CExpression *pexprConj, CExpression **ppexprResult);
 
 			// push a conjunct through a CTE anchor operator
 			static
-			void PushThruUnaryWithoutScalarChild(IMemoryPool *pmp, CExpression *pexprLogical, CExpression *pexprConj, CExpression **ppexprResult);
+			void PushThruUnaryWithoutScalarChild(IMemoryPool *memory_pool, CExpression *pexprLogical, CExpression *pexprConj, CExpression **ppexprResult);
 
 			// push scalar expression through a select expression
 			static
-			void PushThruSelect(IMemoryPool *pmp, CExpression *pexprSelect, CExpression *pexprConj, CExpression **ppexprResult);
+			void PushThruSelect(IMemoryPool *memory_pool, CExpression *pexprSelect, CExpression *pexprConj, CExpression **ppexprResult);
 
 			// split the given conjunct into pushable and unpushable predicates
 			static
-			void SplitConjunct(IMemoryPool *pmp, CExpression *pexpr, CExpression *pexprConj, DrgPexpr **ppdrgpexprPushable, DrgPexpr **ppdrgpexprUnpushable);
+			void SplitConjunct(IMemoryPool *memory_pool, CExpression *pexpr, CExpression *pexprConj, DrgPexpr **ppdrgpexprPushable, DrgPexpr **ppdrgpexprUnpushable);
 
 			// split the given conjunct into pushable and unpushable predicates for a sequence project expression
 			static
-			void SplitConjunctForSeqPrj(IMemoryPool *pmp, CExpression *pexprSeqPrj, CExpression *pexprConj, DrgPexpr **ppdrgpexprPushable, DrgPexpr **ppdrgpexprUnpushable);
+			void SplitConjunctForSeqPrj(IMemoryPool *memory_pool, CExpression *pexprSeqPrj, CExpression *pexprConj, DrgPexpr **ppdrgpexprPushable, DrgPexpr **ppdrgpexprUnpushable);
 
 			// push scalar expression through left outer join children
 			static
-			void PushThruOuterChild(IMemoryPool *pmp, CExpression *pexpr, CExpression *pexprConj, CExpression **ppexprResult);
+			void PushThruOuterChild(IMemoryPool *memory_pool, CExpression *pexpr, CExpression *pexprConj, CExpression **ppexprResult);
 
 			// push scalar expression through a join expression
 			static
-			void PushThruJoin(IMemoryPool *pmp, CExpression *pexprJoin, CExpression *pexprConj, CExpression **ppexprResult);
+			void PushThruJoin(IMemoryPool *memory_pool, CExpression *pexprJoin, CExpression *pexprConj, CExpression **ppexprResult);
 
 			// push scalar expression through logical expression
 			static
-			void PushThru(IMemoryPool *pmp, CExpression *pexprLogical, CExpression *pexprConj, CExpression **ppexprResult);
+			void PushThru(IMemoryPool *memory_pool, CExpression *pexprLogical, CExpression *pexprConj, CExpression **ppexprResult);
 
 			// push an array of conjuncts through logical expression, and compute an array of remaining conjuncts
 			static
 			void PushThru
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpression *pexprLogical,
 				DrgPexpr *pdrgpexprConjuncts,
 				CExpression **ppexprResult,
@@ -149,14 +149,14 @@ namespace gpopt
 			// pull logical projects as far up the logical tree as possible, and
 			// combine consecutive projects if possible
 			static
-			CExpression *PexprPullUpAndCombineProjects(IMemoryPool *pmp, CExpression *pexpr, BOOL *pfSuccess);
+			CExpression *PexprPullUpAndCombineProjects(IMemoryPool *memory_pool, CExpression *pexpr, BOOL *pfSuccess);
 
 			// pull up project elements from the given projection expression that do not
 			// exist in the given used columns set
 			static
 			CExpression *PexprPullUpProjectElements
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpression *pexpr,
 				CColRefSet *pcrsUsed,
 				CColRefSet *pcrsOutput,
@@ -166,23 +166,23 @@ namespace gpopt
 #ifdef GPOS_DEBUG
 			// check if the columns used by the operator are a subset of its input columns
 			static
-			BOOL FLocalColsSubsetOfInputCols(IMemoryPool *pmp, CExpression *pexpr);
+			BOOL FLocalColsSubsetOfInputCols(IMemoryPool *memory_pool, CExpression *pexpr);
 #endif //GPOS_DEBUG
 
 		public:
 
 			// main driver
 			static
-			CExpression *PexprNormalize(IMemoryPool *pmp, CExpression *pexpr);
+			CExpression *PexprNormalize(IMemoryPool *memory_pool, CExpression *pexpr);
 
 			// normalize joins so that they are on colrefs
 			static
-			CExpression *PexprNormalizeJoins(IMemoryPool *pmp, CExpression *pexpr);
+			CExpression *PexprNormalizeJoins(IMemoryPool *memory_pool, CExpression *pexpr);
 
 			// pull logical projects as far up the logical tree as possible, and
 			// combine consecutive projects if possible
 			static
-			CExpression *PexprPullUpProjections(IMemoryPool *pmp, CExpression *pexpr);
+			CExpression *PexprPullUpProjections(IMemoryPool *memory_pool, CExpression *pexpr);
 
 	}; // class CNormalizer
 }

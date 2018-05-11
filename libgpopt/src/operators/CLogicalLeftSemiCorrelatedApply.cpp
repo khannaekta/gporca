@@ -25,10 +25,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalLeftSemiCorrelatedApply::CLogicalLeftSemiCorrelatedApply
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
-	CLogicalLeftSemiApply(pmp)
+	CLogicalLeftSemiApply(memory_pool)
 {}
 
 //---------------------------------------------------------------------------
@@ -41,12 +41,12 @@ CLogicalLeftSemiCorrelatedApply::CLogicalLeftSemiCorrelatedApply
 //---------------------------------------------------------------------------
 CLogicalLeftSemiCorrelatedApply::CLogicalLeftSemiCorrelatedApply
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	DrgPcr *pdrgpcrInner,
 	EOperatorId eopidOriginSubq
 	)
 	:
-	CLogicalLeftSemiApply(pmp, pdrgpcrInner, eopidOriginSubq)
+	CLogicalLeftSemiApply(memory_pool, pdrgpcrInner, eopidOriginSubq)
 {}
 
 //---------------------------------------------------------------------------
@@ -60,14 +60,14 @@ CLogicalLeftSemiCorrelatedApply::CLogicalLeftSemiCorrelatedApply
 CXformSet *
 CLogicalLeftSemiCorrelatedApply::PxfsCandidates
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	const
 {
-	CXformSet *pxfs = GPOS_NEW(pmp) CXformSet(pmp);
-	(void) pxfs->FExchangeSet(CXform::ExfImplementLeftSemiCorrelatedApply);
+	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	(void) xform_set->ExchangeSet(CXform::ExfImplementLeftSemiCorrelatedApply);
 
-	return pxfs;
+	return xform_set;
 }
 
 //---------------------------------------------------------------------------
@@ -81,14 +81,14 @@ CLogicalLeftSemiCorrelatedApply::PxfsCandidates
 COperator *
 CLogicalLeftSemiCorrelatedApply::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *pmp,
-	HMUlCr *phmulcr,
-	BOOL fMustExist
+	IMemoryPool *memory_pool,
+	UlongColRefHashMap *colref_mapping,
+	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcrInner = CUtils::PdrgpcrRemap(pmp, m_pdrgpcrInner, phmulcr, fMustExist);
+	DrgPcr *pdrgpcrInner = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrInner, colref_mapping, must_exist);
 
-	return GPOS_NEW(pmp) CLogicalLeftSemiCorrelatedApply(pmp, pdrgpcrInner, m_eopidOriginSubq);
+	return GPOS_NEW(memory_pool) CLogicalLeftSemiCorrelatedApply(memory_pool, pdrgpcrInner, m_eopidOriginSubq);
 }
 
 

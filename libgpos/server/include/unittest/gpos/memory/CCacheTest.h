@@ -92,7 +92,7 @@ namespace gpos
 
 			static void* PvLookupTask(void *);
 
-			// inserts one SSimpleObject with key and value set to ulKey
+			// inserts one SSimpleObject with key and m_bytearray_value set to ulKey
 			static ULLONG InsertOneElement(CCache<SSimpleObject*, ULONG*> *pCache, ULONG ulKey);
 
 			// inserts as many SSimpleObjects as needed (starting with the key ulKeyStart and
@@ -122,7 +122,7 @@ namespace gpos
 						// entry's key
 						ULONG m_ulKey;
 
-						// entry's value
+						// entry's m_bytearray_value
 						ULONG m_ulValue;
 
 						// ctor
@@ -162,7 +162,7 @@ namespace gpos
 						);
 
 					// key accessor
-					CDeepObjectList *PKey()
+					CDeepObjectList *Key()
 					{
 						return &m_list;
 					}
@@ -170,7 +170,7 @@ namespace gpos
 					// add a new entry to the linked list
 					void AddEntry
 						(
-						IMemoryPool *pmp,
+						IMemoryPool *memory_pool,
 						ULONG ulKey,
 						ULONG ulVal
 						);

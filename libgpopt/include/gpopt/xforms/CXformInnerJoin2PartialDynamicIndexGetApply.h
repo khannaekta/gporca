@@ -41,16 +41,16 @@ namespace gpopt
 	//---------------------------------------------------------------------------
 	class CXformInnerJoin2PartialDynamicIndexGetApply : public CXformJoin2IndexApplyBase
 		<CLogicalInnerJoin, CLogicalIndexApply, CLogicalDynamicGet,
-		false /*fWithSelect*/, true /*fPartial*/, IMDIndex::EmdindBtree>
+		false /*fWithSelect*/, true /*is_partial*/, IMDIndex::EmdindBtree>
 	{
 		public:
 			// ctor
 			explicit
-			CXformInnerJoin2PartialDynamicIndexGetApply(IMemoryPool *pmp)
+			CXformInnerJoin2PartialDynamicIndexGetApply(IMemoryPool *memory_pool)
 				: CXformJoin2IndexApplyBase
 				 <CLogicalInnerJoin, CLogicalIndexApply, CLogicalDynamicGet,
-				 false /*fWithSelect*/, true /*fPartial*/, IMDIndex::EmdindBtree>
-				(pmp)
+				 false /*fWithSelect*/, true /*is_partial*/, IMDIndex::EmdindBtree>
+				(memory_pool)
 			{}
 
 			// dtor
@@ -67,7 +67,7 @@ namespace gpopt
 					return CXform::ExfpNone;
 				}
 
-				if (exprhdl.Pdprel(1 /*ulChildIndex*/)->FHasPartialIndexes())
+				if (exprhdl.GetRelationalProperties(1 /*child_index*/)->FHasPartialIndexes())
 				{
 					return CXform::ExfpHigh;
 				}

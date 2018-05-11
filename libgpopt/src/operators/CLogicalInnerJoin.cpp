@@ -33,12 +33,12 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalInnerJoin::CLogicalInnerJoin
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
-	CLogicalJoin(pmp)
+	CLogicalJoin(memory_pool)
 {
-	GPOS_ASSERT(NULL != pmp);
+	GPOS_ASSERT(NULL != memory_pool);
 }
 
 
@@ -53,7 +53,7 @@ CLogicalInnerJoin::CLogicalInnerJoin
 CMaxCard
 CLogicalInnerJoin::Maxcard
 	(
-	IMemoryPool *, // pmp
+	IMemoryPool *, // memory_pool
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -72,33 +72,33 @@ CLogicalInnerJoin::Maxcard
 CXformSet *
 CLogicalInnerJoin::PxfsCandidates
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	) 
 	const
 {
-	CXformSet *pxfs = GPOS_NEW(pmp) CXformSet(pmp);
+	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
 	
-	(void) pxfs->FExchangeSet(CXform::ExfInnerJoin2NLJoin);
-	(void) pxfs->FExchangeSet(CXform::ExfInnerJoin2HashJoin);
-	(void) pxfs->FExchangeSet(CXform::ExfSubqJoin2Apply);
-	(void) pxfs->FExchangeSet(CXform::ExfInnerJoin2IndexGetApply);
-	(void) pxfs->FExchangeSet(CXform::ExfInnerJoin2DynamicIndexGetApply);
-	(void) pxfs->FExchangeSet(CXform::ExfInnerJoin2PartialDynamicIndexGetApply);
-	(void) pxfs->FExchangeSet(CXform::ExfInnerJoin2BitmapIndexGetApply);
-	(void) pxfs->FExchangeSet(CXform::ExfInnerJoinWithInnerSelect2IndexGetApply);
-	(void) pxfs->FExchangeSet(CXform::ExfInnerJoinWithInnerSelect2DynamicIndexGetApply);
-	(void) pxfs->FExchangeSet(CXform::ExfInnerJoinWithInnerSelect2PartialDynamicIndexGetApply);
-	(void) pxfs->FExchangeSet(CXform::ExfInnerJoin2DynamicBitmapIndexGetApply);
-	(void) pxfs->FExchangeSet(CXform::ExfInnerJoinWithInnerSelect2BitmapIndexGetApply);
-	(void) pxfs->FExchangeSet(CXform::ExfInnerJoinWithInnerSelect2DynamicBitmapIndexGetApply);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerJoin2NLJoin);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerJoin2HashJoin);
+	(void) xform_set->ExchangeSet(CXform::ExfSubqJoin2Apply);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerJoin2IndexGetApply);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerJoin2DynamicIndexGetApply);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerJoin2PartialDynamicIndexGetApply);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerJoin2BitmapIndexGetApply);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerJoinWithInnerSelect2IndexGetApply);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerJoinWithInnerSelect2DynamicIndexGetApply);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerJoinWithInnerSelect2PartialDynamicIndexGetApply);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerJoin2DynamicBitmapIndexGetApply);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerJoinWithInnerSelect2BitmapIndexGetApply);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerJoinWithInnerSelect2DynamicBitmapIndexGetApply);
 
-	(void) pxfs->FExchangeSet(CXform::ExfJoinCommutativity);
-	(void) pxfs->FExchangeSet(CXform::ExfJoinAssociativity);
-	(void) pxfs->FExchangeSet(CXform::ExfInnerJoinSemiJoinSwap);
-	(void) pxfs->FExchangeSet(CXform::ExfInnerJoinAntiSemiJoinSwap);
-	(void) pxfs->FExchangeSet(CXform::ExfInnerJoinAntiSemiJoinNotInSwap);
+	(void) xform_set->ExchangeSet(CXform::ExfJoinCommutativity);
+	(void) xform_set->ExchangeSet(CXform::ExfJoinAssociativity);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerJoinSemiJoinSwap);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerJoinAntiSemiJoinSwap);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerJoinAntiSemiJoinNotInSwap);
 	
-	return pxfs;
+	return xform_set;
 }
 
 
@@ -115,7 +115,7 @@ CLogicalInnerJoin::PxfsCandidates
 BOOL
 CLogicalInnerJoin::FFewerConj
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CGroupExpression *pgexprFst,
 	CGroupExpression *pgexprSnd
 	)
@@ -137,11 +137,11 @@ CLogicalInnerJoin::FFewerConj
 	GPOS_ASSERT(pgroupScalarFst->FScalar());
 	GPOS_ASSERT(pgroupScalarSnd->FScalar());
 
-	DrgPexpr *pdrgpexprConjFst = CPredicateUtils::PdrgpexprConjuncts(pmp, pgroupScalarFst->PexprScalar());
-	DrgPexpr *pdrgpexprConjSnd = CPredicateUtils::PdrgpexprConjuncts(pmp, pgroupScalarSnd->PexprScalar());
+	DrgPexpr *pdrgpexprConjFst = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pgroupScalarFst->PexprScalar());
+	DrgPexpr *pdrgpexprConjSnd = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pgroupScalarSnd->PexprScalar());
 
-	ULONG ulConjFst = pdrgpexprConjFst->UlLength();
-	ULONG ulConjSnd = pdrgpexprConjSnd->UlLength();
+	ULONG ulConjFst = pdrgpexprConjFst->Size();
+	ULONG ulConjSnd = pdrgpexprConjSnd->Size();
 
 	pdrgpexprConjFst->Release();
 	pdrgpexprConjSnd->Release();

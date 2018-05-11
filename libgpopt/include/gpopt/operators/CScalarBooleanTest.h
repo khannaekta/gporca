@@ -47,7 +47,7 @@ namespace gpopt
 			static
 			const WCHAR m_rgwszBoolTest[EbtSentinel][30];
 
-			// mapping operator type and child value into the corresponding result value
+			// mapping operator type and child m_bytearray_value into the corresponding result m_bytearray_value
 			static
 			const BYTE m_rgBoolEvalMap[][3];
 
@@ -64,11 +64,11 @@ namespace gpopt
 			// ctor
 			CScalarBooleanTest
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				EBoolTest ebt
 				)
 				:
-				CScalar(pmp),
+				CScalar(memory_pool),
 				m_ebt(ebt)
 			{
 				GPOS_ASSERT(0 <= ebt && EbtSentinel > ebt);
@@ -99,7 +99,7 @@ namespace gpopt
 			}
 
 			// match function
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			// sensitivity to order of inputs
 			BOOL FInputOrderSensitive() const
@@ -111,9 +111,9 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //pmp,
-						HMUlCr *, //phmulcr,
-						BOOL //fMustExist
+						IMemoryPool *, //memory_pool,
+						UlongColRefHashMap *, //colref_mapping,
+						BOOL //must_exist
 						)
 			{
 				return PopCopyDefault();
@@ -121,11 +121,11 @@ namespace gpopt
 
 			// the type of the scalar expression
 			virtual
-			IMDId *PmdidType() const;
+			IMDId *MDIdType() const;
 
 			// boolean expression evaluation
 			virtual
-			EBoolEvalResult Eber(DrgPul *pdrgpulChildren) const;
+			EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const;
 
 			// print
 			virtual

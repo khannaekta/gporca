@@ -26,12 +26,12 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalInnerApply::CLogicalInnerApply
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
-	CLogicalApply(pmp)
+	CLogicalApply(memory_pool)
 {
-	GPOS_ASSERT(NULL != pmp);
+	GPOS_ASSERT(NULL != memory_pool);
 
 	m_fPattern = true;
 }
@@ -47,14 +47,14 @@ CLogicalInnerApply::CLogicalInnerApply
 //---------------------------------------------------------------------------
 CLogicalInnerApply::CLogicalInnerApply
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	DrgPcr *pdrgpcrInner,
 	EOperatorId eopidOriginSubq
 	)
 	:
-	CLogicalApply(pmp, pdrgpcrInner, eopidOriginSubq)
+	CLogicalApply(memory_pool, pdrgpcrInner, eopidOriginSubq)
 {
-	GPOS_ASSERT(0 < pdrgpcrInner->UlLength());
+	GPOS_ASSERT(0 < pdrgpcrInner->Size());
 }
 
 
@@ -82,7 +82,7 @@ CLogicalInnerApply::~CLogicalInnerApply()
 CMaxCard
 CLogicalInnerApply::Maxcard
 	(
-	IMemoryPool *, // pmp
+	IMemoryPool *, // memory_pool
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -101,17 +101,17 @@ CLogicalInnerApply::Maxcard
 CXformSet *
 CLogicalInnerApply::PxfsCandidates
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	) 
 	const
 {
-	CXformSet *pxfs = GPOS_NEW(pmp) CXformSet(pmp);
+	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
 	
-	(void) pxfs->FExchangeSet(CXform::ExfInnerApply2InnerJoin);
-	(void) pxfs->FExchangeSet(CXform::ExfInnerApply2InnerJoinNoCorrelations);
-	(void) pxfs->FExchangeSet(CXform::ExfInnerApplyWithOuterKey2InnerJoin);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerApply2InnerJoin);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerApply2InnerJoinNoCorrelations);
+	(void) xform_set->ExchangeSet(CXform::ExfInnerApplyWithOuterKey2InnerJoin);
 	
-	return pxfs;
+	return xform_set;
 }
 
 
@@ -126,14 +126,14 @@ CLogicalInnerApply::PxfsCandidates
 COperator *
 CLogicalInnerApply::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *pmp,
-	HMUlCr *phmulcr,
-	BOOL fMustExist
+	IMemoryPool *memory_pool,
+	UlongColRefHashMap *colref_mapping,
+	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcrInner = CUtils::PdrgpcrRemap(pmp, m_pdrgpcrInner, phmulcr, fMustExist);
+	DrgPcr *pdrgpcrInner = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrInner, colref_mapping, must_exist);
 
-	return GPOS_NEW(pmp) CLogicalInnerApply(pmp, pdrgpcrInner, m_eopidOriginSubq);
+	return GPOS_NEW(memory_pool) CLogicalInnerApply(memory_pool, pdrgpcrInner, m_eopidOriginSubq);
 }
 
 // EOF

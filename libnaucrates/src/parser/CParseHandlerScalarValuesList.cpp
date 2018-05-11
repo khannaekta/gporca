@@ -6,7 +6,7 @@
 //		CParseHandlerScalarValuesList.cpp
 //
 //	@doc:
-//		Implementation of the SAX parse handler class for parsing value list.
+//		Implementation of the SAX parse handler class for parsing m_bytearray_value list.
 //---------------------------------------------------------------------------
 
 #include "naucrates/dxl/parser/CParseHandlerScalarValuesList.h"
@@ -26,12 +26,12 @@ XERCES_CPP_NAMESPACE_USE
 // ctor
 CParseHandlerScalarValuesList::CParseHandlerScalarValuesList
 	(
-	IMemoryPool *pmp,
-	CParseHandlerManager *pphm,
-	CParseHandlerBase *pphRoot
+	IMemoryPool *memory_pool,
+	CParseHandlerManager *parse_handler_mgr,
+	CParseHandlerBase *parse_handler_root
 	)
 	:
-	CParseHandlerOp(pmp, pphm, pphRoot)
+	CParseHandlerOp(memory_pool, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -39,30 +39,30 @@ CParseHandlerScalarValuesList::CParseHandlerScalarValuesList
 void
 CParseHandlerScalarValuesList::StartElement
 	(
-	const XMLCh* const xmlszUri,
-	const XMLCh* const xmlszLocalname,
-	const XMLCh* const xmlszQname,
+	const XMLCh* const element_uri,
+	const XMLCh* const element_local_name,
+	const XMLCh* const element_qname,
 	const Attributes& attrs
 	)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarValuesList), xmlszLocalname))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarValuesList), element_local_name))
 	{
-		CDXLScalarValuesList *pdxlop = GPOS_NEW(m_pmp) CDXLScalarValuesList(m_pmp);
-		m_pdxln = GPOS_NEW(m_pmp) CDXLNode(m_pmp, pdxlop);
+		CDXLScalarValuesList *dxl_op = GPOS_NEW(m_memory_pool) CDXLScalarValuesList(m_memory_pool);
+		m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, dxl_op);
 	}
-	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarConstValue), xmlszLocalname))
+	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarConstValue), element_local_name))
 	{
-		CParseHandlerBase *pphScConstValue = CParseHandlerFactory::Pph(m_pmp, xmlszLocalname, m_pphm, this);
-		m_pphm->ActivateParseHandler(pphScConstValue);
+		CParseHandlerBase *parse_handler_const_value = CParseHandlerFactory::GetParseHandler(m_memory_pool, element_local_name, m_parse_handler_mgr, this);
+		m_parse_handler_mgr->ActivateParseHandler(parse_handler_const_value);
 
-		this->Append(pphScConstValue);
+		this->Append(parse_handler_const_value);
 
-		pphScConstValue->startElement(xmlszUri, xmlszLocalname, xmlszQname, attrs);
+		parse_handler_const_value->startElement(element_uri, element_local_name, element_qname, attrs);
 	}
 	else
 	{
-		CWStringDynamic *pstr = CDXLUtils::PstrFromXMLCh(m_pphm->Pmm(), xmlszLocalname);
-		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, pstr->Wsz());
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 }
 
@@ -70,19 +70,19 @@ CParseHandlerScalarValuesList::StartElement
 void
 CParseHandlerScalarValuesList::EndElement
 	(
-	const XMLCh* const, // xmlszUri,
-	const XMLCh* const, //xmlszLocalname,
-	const XMLCh* const // xmlszQname
+	const XMLCh* const, // element_uri,
+	const XMLCh* const, //element_local_name,
+	const XMLCh* const // element_qname
 	)
 {
 
-	const ULONG ulArity = this->UlLength();
-	for (ULONG ul = 0; ul < ulArity; ul++)
+	const ULONG arity = this->Length();
+	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CParseHandlerScalarOp *pphChild = dynamic_cast<CParseHandlerScalarOp *>((*this)[ul]);
-		AddChildFromParseHandler(pphChild);
+		CParseHandlerScalarOp *child_parse_handler = dynamic_cast<CParseHandlerScalarOp *>((*this)[ul]);
+		AddChildFromParseHandler(child_parse_handler);
 	}
-	m_pphm->DeactivateHandler();
+	m_parse_handler_mgr->DeactivateHandler();
 
 }
 // EOF

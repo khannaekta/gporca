@@ -95,7 +95,7 @@ CTreeMapTest::CNode::OsPrint
 	}
 	os << "node: " << m_ulData << std::endl;
 	
-	for (ULONG ulChild = 0; ulChild < m_pdrgpnd->UlLength(); ulChild++)
+	for (ULONG ulChild = 0; ulChild < m_pdrgpnd->Size(); ulChild++)
 	{
 		(void) (*m_pdrgpnd)[ulChild]->OsPrint(os, ulIndent + 2);
 	}
@@ -114,7 +114,7 @@ CTreeMapTest::CNode::OsPrint
 //---------------------------------------------------------------------------
 CTreeMapTest::CNode::CNode
 	(
-	IMemoryPool *, // pmp
+	IMemoryPool *, // memory_pool
 	ULONG *pulData,
 	DrgPnd *pdrgpnd
 	)
@@ -154,7 +154,7 @@ CTreeMapTest::CNode::~CNode()
 CTreeMapTest::CNode*
 CTreeMapTest::Pnd
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	ULONG *pul,
 	DrgPnd *pdrgpnd,
 	BOOL *fTestTrue
@@ -164,7 +164,7 @@ CTreeMapTest::Pnd
 	GPOS_ASSERT(NULL != fTestTrue);
 	GPOS_ASSERT(*fTestTrue && "Flag is expected to be true");
 	*fTestTrue = true;
-	return GPOS_NEW(pmp) CNode(pmp, pul, pdrgpnd);
+	return GPOS_NEW(memory_pool) CNode(memory_pool, pul, pdrgpnd);
 }
 
 	
@@ -180,15 +180,15 @@ CTreeMapTest::Pnd
 CTreeMapTest::TestMap *
 CTreeMapTest::PtmapLoad
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 {
-	TestMap *ptmap = GPOS_NEW(pmp) TestMap(pmp, &Pnd);
+	TestMap *ptmap = GPOS_NEW(memory_pool) TestMap(memory_pool, &Pnd);
 	
 	// init raw data
-	for (ULONG ulPos = 0; ulPos < ulElems; ulPos++)
+	for (ULONG pos = 0; pos < ulElems; pos++)
 	{
-		rgul[ulPos] = ulPos;
+		rgul[pos] = pos;
 	}
 
 	
@@ -244,17 +244,17 @@ GPOS_RESULT
 CTreeMapTest::EresUnittest_Basic()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
 	TestMap *ptmap = NULL;
 	
 	// create blank map
-	ptmap = GPOS_NEW(pmp) TestMap(pmp, &Pnd);
+	ptmap = GPOS_NEW(memory_pool) TestMap(memory_pool, &Pnd);
 	GPOS_ASSERT(0 == ptmap->UllCount());
 	GPOS_DELETE(ptmap);
 	
 	// create map with test data
-	ptmap = PtmapLoad(pmp);
+	ptmap = PtmapLoad(memory_pool);
 	GPOS_DELETE(ptmap);
 	
 	return GPOS_OK;
@@ -273,12 +273,12 @@ GPOS_RESULT
 CTreeMapTest::EresUnittest_Count()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 	
-	TestMap *ptmap = PtmapLoad(pmp);	
+	TestMap *ptmap = PtmapLoad(memory_pool);	
 	
 	// debug print
-	CWStringDynamic str(pmp);
+	CWStringDynamic str(memory_pool);
 	COstreamString oss(&str);
 
 	ULLONG ullCount = ptmap->UllCount();
@@ -297,7 +297,7 @@ CTreeMapTest::EresUnittest_Count()
 
 #endif // GPOS_DEBUG
 
-	GPOS_TRACE(str.Wsz());
+	GPOS_TRACE(str.GetBuffer());
 	GPOS_DELETE(ptmap);
 
 	return GPOS_OK;
@@ -316,12 +316,12 @@ GPOS_RESULT
 CTreeMapTest::EresUnittest_Unrank()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 	
-	TestMap *ptmap = PtmapLoad(pmp);	
+	TestMap *ptmap = PtmapLoad(memory_pool);	
 	
 	// debug print
-	CWStringDynamic str(pmp);
+	CWStringDynamic str(memory_pool);
 	COstreamString oss(&str);
 	
 	ULLONG ullCount = ptmap->UllCount();
@@ -330,13 +330,13 @@ CTreeMapTest::EresUnittest_Unrank()
 	{
 		oss << "=== tree rank: " << ulRank << " ===" << std::endl;
 		BOOL fFlag = true;
-		CNode *pnd = ptmap->PrUnrank(pmp, &fFlag, ulRank);
+		CNode *pnd = ptmap->PrUnrank(memory_pool, &fFlag, ulRank);
 		(void) pnd->OsPrint(oss);
 		
 		pnd->Release();
 	}
 	
-	GPOS_TRACE(str.Wsz());
+	GPOS_TRACE(str.GetBuffer());
 	GPOS_DELETE(ptmap);
 
 	return GPOS_OK;
@@ -357,12 +357,12 @@ CTreeMapTest::EresUnittest_Memo()
 	GPOS_SET_TRACE(EtraceDisablePrintMemoryLeak);
 
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
 	// setup a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(pmp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(memory_pool, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	CEngine *peng = NULL;
 	CExpression *pexpr = NULL;
@@ -372,24 +372,24 @@ CTreeMapTest::EresUnittest_Memo()
 		// install opt context in TLS
 		CAutoOptCtxt aoc
 				(
-				pmp,
+				memory_pool,
 				&mda,
 				NULL,  /* pceeval */
-				CTestUtils::Pcm(pmp)
+				CTestUtils::GetCostModel(memory_pool)
 				);
 
 		CAutoTraceFlag atf(EopttraceEnumeratePlans, true);
 
-		peng = GPOS_NEW(pmp) CEngine(pmp);
+		peng = GPOS_NEW(memory_pool) CEngine(memory_pool);
 
 		// generate join expression
-		pexpr = CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(pmp);
+		pexpr = CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(memory_pool);
 
 		// generate query context
-		pqc = CTestUtils::PqcGenerate(pmp, pexpr);
+		pqc = CTestUtils::PqcGenerate(memory_pool, pexpr);
 
 		// Initialize engine
-		peng->Init(pqc, NULL /*pdrgpss*/);
+		peng->Init(pqc, NULL /*search_stage_array*/);
 
 		// optimize query
 		peng->Optimize();
@@ -400,7 +400,7 @@ CTreeMapTest::EresUnittest_Memo()
 
 		peng->Trace();
 		{
-			CAutoTrace at(pmp);
+			CAutoTrace at(memory_pool);
 			ULLONG ullCount = peng->Pmemotmap()->UllCount();
 #ifdef GPOS_DEBUG
 			// test resetting map and re-creating it
@@ -411,11 +411,11 @@ CTreeMapTest::EresUnittest_Memo()
 
 			for (ULONG ulRank = 0; ulRank < ullCount; ulRank++)
 			{
-				CDrvdPropCtxtPlan *pdpctxtplan = GPOS_NEW(pmp) CDrvdPropCtxtPlan(pmp, false /*fUpdateCTEMap*/);
+				CDrvdPropCtxtPlan *pdpctxtplan = GPOS_NEW(memory_pool) CDrvdPropCtxtPlan(memory_pool, false /*fUpdateCTEMap*/);
 				CExpression *pexprAlt = NULL;
 				GPOS_TRY
 				{
-					pexprAlt = peng->Pmemotmap()->PrUnrank(pmp, pdpctxtplan, ulRank);
+					pexprAlt = peng->Pmemotmap()->PrUnrank(memory_pool, pdpctxtplan, ulRank);
 					at.Os() << std::endl << "ALTERNATIVE ["<< ulRank <<"]:" << std::endl << *pexprAlt << std::endl;
 				}
 				GPOS_CATCH_EX(ex)
@@ -424,8 +424,8 @@ CTreeMapTest::EresUnittest_Memo()
 					{
 						GPOS_RETHROW(ex);
 					}
-					IErrorContext *perrctxt = CTask::PtskSelf()->Perrctxt();
-					at.Os() << perrctxt->WszMsg() << std::endl;
+					IErrorContext *perrctxt = CTask::Self()->GetErrCtxt();
+					at.Os() << perrctxt->GetErrorMsg() << std::endl;
 					GPOS_RESET_EX;
 				}
 				GPOS_CATCH_END;
@@ -459,7 +459,7 @@ GPOS_RESULT
 CTreeMapTest::EresUnittest_FailedPlanEnumerationTests()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
 	BOOL fMatchPlans = false;
 	BOOL fTestSpacePruning = false;
@@ -474,7 +474,7 @@ CTreeMapTest::EresUnittest_FailedPlanEnumerationTests()
 	CAutoTraceFlag atf1(EopttraceEnumeratePlans, fMatchPlans);
 
 	// enable stats derivation for DPE
-	CAutoTraceFlag atf2(EopttraceDeriveStatsForDPE, true /*fVal*/);
+	CAutoTraceFlag atf2(EopttraceDeriveStatsForDPE, true /*m_bytearray_value*/);
 
 	const ULONG ulTests = GPOS_ARRAY_SIZE(rgszFailedPlanEnumerationTests);
 	GPOS_RESULT eres = GPOS_OK;
@@ -485,7 +485,7 @@ CTreeMapTest::EresUnittest_FailedPlanEnumerationTests()
 			eres =
 				CTestUtils::EresRunMinidumps
 								(
-								pmp,
+								memory_pool,
 								&rgszFailedPlanEnumerationTests[ul],
 								1, // ulTests
 								&m_ulTestCounter,
@@ -531,9 +531,9 @@ GPOS_RESULT
 CTreeMapTest::EresUnittest_Cycle()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
-	TestMap *ptmap = GPOS_NEW(pmp) TestMap(pmp, &Pnd);
+	TestMap *ptmap = GPOS_NEW(memory_pool) TestMap(memory_pool, &Pnd);
 
 	CAutoP<TestMap> a_ptmap;
 	a_ptmap = ptmap;

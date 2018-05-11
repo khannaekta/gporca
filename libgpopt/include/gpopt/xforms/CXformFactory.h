@@ -32,11 +32,11 @@ namespace gpopt
 		private:
 
 			// definition of hash map to maintain mappings
-			typedef CHashMap<CHAR, CXform, gpos::UlHash<CHAR>, CXform::FEqualIds,
-						CleanupDeleteRg<CHAR>, CleanupNULL<CXform> > HMSzXform;
+			typedef CHashMap<CHAR, CXform, gpos::HashValue<CHAR>, CXform::FEqualIds,
+						CleanupDeleteArray<CHAR>, CleanupNULL<CXform> > HMSzXform;
 
 			// memory pool
-			IMemoryPool *m_pmp;
+			IMemoryPool *m_memory_pool;
 		
 			// range of all xforms
 			CXform *m_rgpxf[CXform::ExfSentinel];
@@ -55,7 +55,7 @@ namespace gpopt
 
 			// private ctor
 			explicit
-			CXformFactory(IMemoryPool *pmp);
+			CXformFactory(IMemoryPool *memory_pool);
 
 			// private copy ctor
 			CXformFactory(const CXformFactory &);
@@ -99,7 +99,7 @@ namespace gpopt
 
 			// initialize global factory instance
 			static
-			GPOS_RESULT EresInit();
+			GPOS_RESULT Init();
 
 			// destroy global factory instance
 			void Shutdown();

@@ -38,7 +38,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CLogicalInnerJoin(IMemoryPool *pmp);
+			CLogicalInnerJoin(IMemoryPool *memory_pool);
 
 			// dtor
 			virtual ~CLogicalInnerJoin() 
@@ -67,28 +67,28 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsDeriveNotNull
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PcrsDeriveNotNullCombineLogical(pmp, exprhdl);
+				return PcrsDeriveNotNullCombineLogical(memory_pool, exprhdl);
 			}
 
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			// derive constraint property
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PpcDeriveConstraintFromPredicates(pmp, exprhdl);
+				return PpcDeriveConstraintFromPredicates(memory_pool, exprhdl);
 			}
 
 			//-------------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ namespace gpopt
 			//-------------------------------------------------------------------------------------
 
 			// candidate set of xforms
-			CXformSet *PxfsCandidates(IMemoryPool *pmp) const;
+			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
 
 			//-------------------------------------------------------------------------------------
 			//-------------------------------------------------------------------------------------
@@ -120,7 +120,7 @@ namespace gpopt
 			static
 			BOOL FFewerConj
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CGroupExpression *pgexprFst,
 				CGroupExpression *pgexprSnd
 				);

@@ -49,7 +49,7 @@ namespace gpopt
 				(
 				CDouble d
 				)
-				: CDouble(d.DVal())
+				: CDouble(d.Get())
 			{}
 
 			// ctor
@@ -57,7 +57,7 @@ namespace gpopt
 				(
 				const CCost &cost
 				)
-				: CDouble(cost.DVal())
+				: CDouble(cost.Get())
 			{}
 
 			// assignment

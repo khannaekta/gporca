@@ -50,12 +50,12 @@ namespace gpopt
 			CPropConstraint(const CPropConstraint&);
 
 			// initialize mapping from columns to equivalence classes
-			void InitHashMap(IMemoryPool *pmp);
+			void InitHashMap(IMemoryPool *memory_pool);
 
 		public:
 
 			// ctor
-			CPropConstraint(IMemoryPool *pmp, DrgPcrs *pdrgpcrs, CConstraint *pcnstr);
+			CPropConstraint(IMemoryPool *memory_pool, DrgPcrs *pdrgpcrs, CConstraint *pcnstr);
 
 			// dtor
 			virtual
@@ -70,11 +70,11 @@ namespace gpopt
 			// mapping
 			CColRefSet *PcrsEquivClass
 				(
-				CColRef *pcr
+				CColRef *colref
 				)
 				const
 			{
-				return m_phmcrcrs->PtLookup(pcr);
+				return m_phmcrcrs->Find(colref);
 			}
 
 			// constraint
@@ -88,7 +88,7 @@ namespace gpopt
 
 			// scalar expression on given column mapped from all constraints
 			// on its equivalent columns
-			CExpression *PexprScalarMappedFromEquivCols(IMemoryPool *pmp, CColRef *pcr) const;
+			CExpression *PexprScalarMappedFromEquivCols(IMemoryPool *memory_pool, CColRef *colref) const;
 
 			// print
 			IOstream &OsPrint(IOstream &) const;

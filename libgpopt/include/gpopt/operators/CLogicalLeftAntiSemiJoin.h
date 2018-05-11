@@ -36,7 +36,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CLogicalLeftAntiSemiJoin(IMemoryPool *pmp);
+			CLogicalLeftAntiSemiJoin(IMemoryPool *memory_pool);
 
 			// dtor
 			virtual
@@ -61,10 +61,10 @@ namespace gpopt
 			virtual
 			BOOL FCanPullProjectionsUp
 				(
-				ULONG ulChildIndex
+				ULONG child_index
 				) const
 			{
-				return (0 == ulChildIndex);
+				return (0 == child_index);
 			}
 
 			//-------------------------------------------------------------------------------------
@@ -73,13 +73,13 @@ namespace gpopt
 
 			// derive output columns
 			virtual
-			CColRefSet *PcrsDeriveOutput(IMemoryPool *pmp, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsDeriveOutput(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
 
 			// derive not nullable output columns
 			virtual
 			CColRefSet *PcrsDeriveNotNull
 				(
-				IMemoryPool *,// pmp
+				IMemoryPool *,// memory_pool
 				CExpressionHandle &exprhdl
 				)
 				const
@@ -89,17 +89,17 @@ namespace gpopt
 				
 			// dervive keys
 			virtual 
-			CKeyCollection *PkcDeriveKeys(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;		
+			CKeyCollection *PkcDeriveKeys(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;		
 					
 			// derive max card
 			virtual
-			CMaxCard MaxCard(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CMaxCard MaxCard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			// derive constraint property
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *, //pmp,
+				IMemoryPool *, //memory_pool,
 				CExpressionHandle &exprhdl
 				)
 				const
@@ -112,15 +112,15 @@ namespace gpopt
 			//-------------------------------------------------------------------------------------
 
 			// candidate set of xforms
-			CXformSet *PxfsCandidates(IMemoryPool *pmp) const;
+			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
 
 			// derive statistics
 			virtual
 			IStatistics *PstatsDerive
 						(
-						IMemoryPool *pmp,
+						IMemoryPool *memory_pool,
 						CExpressionHandle &exprhdl,
-						DrgPstat *pdrgpstatCtxt
+						StatsArray *stats_ctxt
 						)
 						const;
 

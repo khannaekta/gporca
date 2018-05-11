@@ -27,20 +27,20 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPartInfo::CPartInfoEntry::CPartInfoEntry
 	(
-	ULONG ulScanId,
-	IMDId *pmdid,
+	ULONG scan_id,
+	IMDId *mdid,
 	DrgPpartkeys *pdrgppartkeys,
 	CPartConstraint *ppartcnstrRel
 	)
 	:
-	m_ulScanId(ulScanId),
-	m_pmdid(pmdid),
+	m_scan_id(scan_id),
+	m_mdid(mdid),
 	m_pdrgppartkeys(pdrgppartkeys),
 	m_ppartcnstrRel(ppartcnstrRel)
 {
-	GPOS_ASSERT(pmdid->FValid());
+	GPOS_ASSERT(mdid->IsValid());
 	GPOS_ASSERT(pdrgppartkeys != NULL);
-	GPOS_ASSERT(0 < pdrgppartkeys->UlLength());
+	GPOS_ASSERT(0 < pdrgppartkeys->Size());
 	GPOS_ASSERT(NULL != ppartcnstrRel);
 }
 
@@ -54,7 +54,7 @@ CPartInfo::CPartInfoEntry::CPartInfoEntry
 //---------------------------------------------------------------------------
 CPartInfo::CPartInfoEntry::~CPartInfoEntry()
 {
-	m_pmdid->Release();
+	m_mdid->Release();
 	m_pdrgppartkeys->Release();
 	m_ppartcnstrRel->Release();
 }
@@ -71,32 +71,32 @@ CPartInfo::CPartInfoEntry::~CPartInfoEntry()
 CPartInfo::CPartInfoEntry *
 CPartInfo::CPartInfoEntry::PpartinfoentryAddRemappedKeys
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CColRefSet *pcrs,
-	HMUlCr *phmulcr
+	UlongColRefHashMap *colref_mapping
 	)
 {
 	GPOS_ASSERT(NULL != pcrs);
-	GPOS_ASSERT(NULL != phmulcr);
+	GPOS_ASSERT(NULL != colref_mapping);
 
-    DrgPpartkeys *pdrgppartkeys = CPartKeys::PdrgppartkeysCopy(pmp, m_pdrgppartkeys);
+    DrgPpartkeys *pdrgppartkeys = CPartKeys::PdrgppartkeysCopy(memory_pool, m_pdrgppartkeys);
 
-	const ULONG ulSize = m_pdrgppartkeys->UlLength();
-	for (ULONG ul = 0; ul < ulSize; ul++)
+	const ULONG size = m_pdrgppartkeys->Size();
+	for (ULONG ul = 0; ul < size; ul++)
 	{
 		CPartKeys *ppartkeys = (*m_pdrgppartkeys)[ul];
 
 		if (ppartkeys->FOverlap(pcrs))
 		{
-			pdrgppartkeys->Append(ppartkeys->PpartkeysRemap(pmp, phmulcr));
+			pdrgppartkeys->Append(ppartkeys->PpartkeysRemap(memory_pool, colref_mapping));
 			break;
 		}
 	}
 
-	m_pmdid->AddRef();
-	CPartConstraint *ppartcnstrRel = m_ppartcnstrRel->PpartcnstrCopyWithRemappedColumns(pmp, phmulcr, false /*fMustExist*/);
+	m_mdid->AddRef();
+	CPartConstraint *ppartcnstrRel = m_ppartcnstrRel->PpartcnstrCopyWithRemappedColumns(memory_pool, colref_mapping, false /*must_exist*/);
 
-	return GPOS_NEW(pmp) CPartInfoEntry(m_ulScanId, m_pmdid, pdrgppartkeys, ppartcnstrRel);
+	return GPOS_NEW(memory_pool) CPartInfoEntry(m_scan_id, m_mdid, pdrgppartkeys, ppartcnstrRel);
 }
 
 //---------------------------------------------------------------------------
@@ -114,7 +114,7 @@ CPartInfo::CPartInfoEntry::OsPrint
 	)
 	const
 {
-	os << m_ulScanId;
+	os << m_scan_id;
 
 	return os;
 }
@@ -123,8 +123,8 @@ CPartInfo::CPartInfoEntry::OsPrint
 void
 CPartInfo::CPartInfoEntry::DbgPrint() const
 {
-	IMemoryPool *pmp = COptCtxt::PoctxtFromTLS()->Pmp();
-	CAutoTrace at(pmp);
+	IMemoryPool *memory_pool = COptCtxt::PoctxtFromTLS()->Pmp();
+	CAutoTrace at(memory_pool);
 	(void) this->OsPrint(at.Os());
 }
 #endif // GPOS_DEBUG
@@ -141,21 +141,21 @@ CPartInfo::CPartInfoEntry::DbgPrint() const
 CPartInfo::CPartInfoEntry *
 CPartInfo::CPartInfoEntry::PpartinfoentryCopy
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 {
-	IMDId *pmdid = Pmdid();
-	pmdid->AddRef();
+	IMDId *mdid = MDId();
+	mdid->AddRef();
 
 	// copy part keys
-	DrgPpartkeys *pdrgppartkeysCopy = CPartKeys::PdrgppartkeysCopy(pmp, Pdrgppartkeys());
+	DrgPpartkeys *pdrgppartkeysCopy = CPartKeys::PdrgppartkeysCopy(memory_pool, Pdrgppartkeys());
 
 	// copy part constraint using empty remapping to get exact copy
-	HMUlCr *phmulcr = GPOS_NEW(pmp) HMUlCr(pmp);
-	CPartConstraint *ppartcnstrRel = PpartcnstrRel()->PpartcnstrCopyWithRemappedColumns(pmp, phmulcr, false /*fMustExist*/);
-	phmulcr->Release();
+	UlongColRefHashMap *colref_mapping = GPOS_NEW(memory_pool) UlongColRefHashMap(memory_pool);
+	CPartConstraint *ppartcnstrRel = PpartcnstrRel()->PpartcnstrCopyWithRemappedColumns(memory_pool, colref_mapping, false /*must_exist*/);
+	colref_mapping->Release();
 
-	return GPOS_NEW(pmp) CPartInfoEntry(UlScanId(), pmdid, pdrgppartkeysCopy, ppartcnstrRel);
+	return GPOS_NEW(memory_pool) CPartInfoEntry(ScanId(), mdid, pdrgppartkeysCopy, ppartcnstrRel);
 }
 
 
@@ -187,10 +187,10 @@ CPartInfo::CPartInfo
 //---------------------------------------------------------------------------
 CPartInfo::CPartInfo
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 {
-	m_pdrgppartentries = GPOS_NEW(pmp) DrgPpartentries(pmp);
+	m_pdrgppartentries = GPOS_NEW(memory_pool) DrgPpartentries(memory_pool);
 }
 
 //---------------------------------------------------------------------------
@@ -217,17 +217,17 @@ CPartInfo::~CPartInfo()
 void
 CPartInfo::AddPartConsumer
 	(
-	IMemoryPool *pmp,
-	ULONG ulScanId,
-	IMDId *pmdid,
+	IMemoryPool *memory_pool,
+	ULONG scan_id,
+	IMDId *mdid,
 	DrgDrgPcr *pdrgpdrgpcrPart,
 	CPartConstraint *ppartcnstrRel
 	)
 {
-	DrgPpartkeys *pdrgppartkeys = GPOS_NEW(pmp) DrgPpartkeys(pmp);
-	pdrgppartkeys->Append(GPOS_NEW(pmp) CPartKeys(pdrgpdrgpcrPart));
+	DrgPpartkeys *pdrgppartkeys = GPOS_NEW(memory_pool) DrgPpartkeys(memory_pool);
+	pdrgppartkeys->Append(GPOS_NEW(memory_pool) CPartKeys(pdrgpdrgpcrPart));
 
-	m_pdrgppartentries->Append(GPOS_NEW(pmp) CPartInfoEntry(ulScanId, pmdid, pdrgppartkeys, ppartcnstrRel));
+	m_pdrgppartentries->Append(GPOS_NEW(memory_pool) CPartInfoEntry(scan_id, mdid, pdrgppartkeys, ppartcnstrRel));
 }
 
 //---------------------------------------------------------------------------
@@ -241,16 +241,16 @@ CPartInfo::AddPartConsumer
 BOOL
 CPartInfo::FContainsScanId
 	(
-	ULONG ulScanId
+	ULONG scan_id
 	)
 	const
 {
-	const ULONG ulSize = m_pdrgppartentries->UlLength();
+	const ULONG size = m_pdrgppartentries->Size();
 
-	for (ULONG ul = 0; ul < ulSize; ul++)
+	for (ULONG ul = 0; ul < size; ul++)
 	{
 		CPartInfoEntry *ppartinfoentry = (*m_pdrgppartentries)[ul];
-		if (ulScanId == ppartinfoentry->UlScanId())
+		if (scan_id == ppartinfoentry->ScanId())
 		{
 			return true;
 		}
@@ -261,38 +261,38 @@ CPartInfo::FContainsScanId
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CPartInfo::UlScanId
+//		CPartInfo::ScanId
 //
 //	@doc:
 //		Return scan id of the entry at the given position
 //
 //---------------------------------------------------------------------------
 ULONG
-CPartInfo::UlScanId
+CPartInfo::ScanId
 	(
 	ULONG ulPos
 	)
 	const
 {
-	return (*m_pdrgppartentries)[ulPos]->UlScanId();
+	return (*m_pdrgppartentries)[ulPos]->ScanId();
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CPartInfo::PmdidRel
+//		CPartInfo::GetRelMdId
 //
 //	@doc:
 //		Return relation mdid of the entry at the given position
 //
 //---------------------------------------------------------------------------
 IMDId *
-CPartInfo::PmdidRel
+CPartInfo::GetRelMdId
 	(
 	ULONG ulPos
 	)
 	const
 {
-	return (*m_pdrgppartentries)[ulPos]->Pmdid();
+	return (*m_pdrgppartentries)[ulPos]->MDId();
 }
 
 //---------------------------------------------------------------------------
@@ -342,16 +342,16 @@ CPartInfo::Ppartcnstr
 DrgPpartkeys *
 CPartInfo::PdrgppartkeysByScanId
 	(
-	ULONG ulScanId
+	ULONG scan_id
 	)
 	const
 {
-	const ULONG ulSize = m_pdrgppartentries->UlLength();
+	const ULONG size = m_pdrgppartentries->Size();
 
-	for (ULONG ul = 0; ul < ulSize; ul++)
+	for (ULONG ul = 0; ul < size; ul++)
 	{
 		CPartInfoEntry *ppartinfoentry = (*m_pdrgppartentries)[ul];
-		if (ulScanId == ppartinfoentry->UlScanId())
+		if (scan_id == ppartinfoentry->ScanId())
 		{
 			return ppartinfoentry->Pdrgppartkeys();
 		}
@@ -371,7 +371,7 @@ CPartInfo::PdrgppartkeysByScanId
 CPartInfo *
 CPartInfo::PpartinfoWithRemappedKeys
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	DrgPcr *pdrgpcrSrc,
 	DrgPcr *pdrgpcrDest
 	)
@@ -380,26 +380,26 @@ CPartInfo::PpartinfoWithRemappedKeys
 	GPOS_ASSERT(NULL != pdrgpcrSrc);
 	GPOS_ASSERT(NULL != pdrgpcrDest);
 
-	CColRefSet *pcrs = GPOS_NEW(pmp) CColRefSet(pmp, pdrgpcrSrc);
-	HMUlCr *phmulcr = CUtils::PhmulcrMapping(pmp, pdrgpcrSrc, pdrgpcrDest);
+	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool, pdrgpcrSrc);
+	UlongColRefHashMap *colref_mapping = CUtils::PhmulcrMapping(memory_pool, pdrgpcrSrc, pdrgpcrDest);
 
-	DrgPpartentries *pdrgppartentries = GPOS_NEW(pmp) DrgPpartentries(pmp);
+	DrgPpartentries *pdrgppartentries = GPOS_NEW(memory_pool) DrgPpartentries(memory_pool);
 
-	const ULONG ulSize = m_pdrgppartentries->UlLength();
-	for (ULONG ul = 0; ul < ulSize; ul++)
+	const ULONG size = m_pdrgppartentries->Size();
+	for (ULONG ul = 0; ul < size; ul++)
 	{
 		CPartInfoEntry *ppartinfoentry = (*m_pdrgppartentries)[ul];
 
 		// if this entry has keys that overlap with the source columns then
 		// add another set of keys to it using the destination columns
-		CPartInfoEntry *ppartinfoentryNew = ppartinfoentry->PpartinfoentryAddRemappedKeys(pmp, pcrs, phmulcr);
+		CPartInfoEntry *ppartinfoentryNew = ppartinfoentry->PpartinfoentryAddRemappedKeys(memory_pool, pcrs, colref_mapping);
 		pdrgppartentries->Append(ppartinfoentryNew);
 	}
 
 	pcrs->Release();
-	phmulcr->Release();
+	colref_mapping->Release();
 
-	return GPOS_NEW(pmp) CPartInfo(pdrgppartentries);
+	return GPOS_NEW(memory_pool) CPartInfo(pdrgppartentries);
 }
 
 //---------------------------------------------------------------------------
@@ -413,7 +413,7 @@ CPartInfo::PpartinfoWithRemappedKeys
 CPartInfo *
 CPartInfo::PpartinfoCombine
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CPartInfo *ppartinfoFst,
 	CPartInfo *ppartinfoSnd
 	)
@@ -421,34 +421,34 @@ CPartInfo::PpartinfoCombine
 	GPOS_ASSERT(NULL != ppartinfoFst);
 	GPOS_ASSERT(NULL != ppartinfoSnd);
 
-	DrgPpartentries *pdrgppartentries = GPOS_NEW(pmp) DrgPpartentries(pmp);
+	DrgPpartentries *pdrgppartentries = GPOS_NEW(memory_pool) DrgPpartentries(memory_pool);
 
 	// copy part entries from first part info object
 	CUtils::AddRefAppend(pdrgppartentries, ppartinfoFst->m_pdrgppartentries);
 
 	// copy part entries from second part info object, except those which already exist
-	const ULONG ulLen = ppartinfoSnd->m_pdrgppartentries->UlLength();
-	for (ULONG ul = 0; ul < ulLen; ul++)
+	const ULONG length = ppartinfoSnd->m_pdrgppartentries->Size();
+	for (ULONG ul = 0; ul < length; ul++)
 	{
 		CPartInfoEntry *ppartinfoentry = (*(ppartinfoSnd->m_pdrgppartentries))[ul];
-		DrgPpartkeys *pdrgppartkeys = ppartinfoFst->PdrgppartkeysByScanId(ppartinfoentry->UlScanId());
+		DrgPpartkeys *pdrgppartkeys = ppartinfoFst->PdrgppartkeysByScanId(ppartinfoentry->ScanId());
 
 		if (NULL != pdrgppartkeys)
 		{
 			// there is already an entry with the same scan id; need to add to it
 			// the keys from the current entry
-			DrgPpartkeys *pdrgppartkeysCopy = CPartKeys::PdrgppartkeysCopy(pmp, ppartinfoentry->Pdrgppartkeys());
+			DrgPpartkeys *pdrgppartkeysCopy = CPartKeys::PdrgppartkeysCopy(memory_pool, ppartinfoentry->Pdrgppartkeys());
 			CUtils::AddRefAppend(pdrgppartkeys, pdrgppartkeysCopy);
 			pdrgppartkeysCopy->Release();
 		}
 		else
 		{
-			CPartInfoEntry *ppartinfoentryCopy = ppartinfoentry->PpartinfoentryCopy(pmp);
+			CPartInfoEntry *ppartinfoentryCopy = ppartinfoentry->PpartinfoentryCopy(memory_pool);
 			pdrgppartentries->Append(ppartinfoentryCopy);
 		}
 	}
 
-	return GPOS_NEW(pmp) CPartInfo(pdrgppartentries);
+	return GPOS_NEW(memory_pool) CPartInfo(pdrgppartentries);
 }
 
 //---------------------------------------------------------------------------
@@ -466,30 +466,30 @@ CPartInfo::OsPrint
 	)
 	const
 {
-	const ULONG ulLength = m_pdrgppartentries->UlLength();
+	const ULONG length = m_pdrgppartentries->Size();
 	os << "Part Consumers: ";
-	for (ULONG ul = 0; ul < ulLength; ul++)
+	for (ULONG ul = 0; ul < length; ul++)
 	{
 		CPartInfoEntry *ppartinfoentry = (*m_pdrgppartentries)[ul];
 		ppartinfoentry->OsPrint(os);
 
 		// separator
-		os << (ul == ulLength - 1 ? "" : ", ");
+		os << (ul == length - 1 ? "" : ", ");
 	}
 
 	os << ", Part Keys: ";
-	for (ULONG ulCons = 0; ulCons < ulLength; ulCons++)
+	for (ULONG ulCons = 0; ulCons < length; ulCons++)
 	{
 		DrgPpartkeys *pdrgppartkeys = Pdrgppartkeys(ulCons);
 		os << "(";
-		const ULONG ulPartKeys = pdrgppartkeys->UlLength();;
+		const ULONG ulPartKeys = pdrgppartkeys->Size();;
 		for (ULONG ulPartKey = 0; ulPartKey < ulPartKeys; ulPartKey++)
 		{
 			os << *(*pdrgppartkeys)[ulPartKey];
 			os << (ulPartKey == ulPartKeys - 1 ? "" : ", ");
 		}
 		os << ")";
-		os << (ulCons == ulLength - 1 ? "" : ", ");
+		os << (ulCons == length - 1 ? "" : ", ");
 	}
 
 	return os;
@@ -499,8 +499,8 @@ CPartInfo::OsPrint
 void
 CPartInfo::DbgPrint() const
 {
-	IMemoryPool *pmp = COptCtxt::PoctxtFromTLS()->Pmp();
-	CAutoTrace at(pmp);
+	IMemoryPool *memory_pool = COptCtxt::PoctxtFromTLS()->Pmp();
+	CAutoTrace at(memory_pool);
 	(void) this->OsPrint(at.Os());
 }
 #endif // GPOS_DEBUG

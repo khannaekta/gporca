@@ -40,10 +40,10 @@ namespace gpopt
 			// spec for the children of a nested loop join
 			CPartitionPropagationSpec *PppsRequiredNLJoinChild
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CPartitionPropagationSpec *pppsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				);
@@ -52,7 +52,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CPhysicalNLJoin(IMemoryPool *pmp);
+			CPhysicalNLJoin(IMemoryPool *memory_pool);
 
 			// dtor
 			virtual
@@ -66,10 +66,10 @@ namespace gpopt
 			virtual
 			COrderSpec *PosRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				COrderSpec *posInput,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
@@ -79,10 +79,10 @@ namespace gpopt
 			virtual
 			CRewindabilitySpec *PrsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CRewindabilitySpec *prsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
@@ -92,10 +92,10 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *, // pdrgpdpCtxt
 				ULONG // ulOptReq
 				);
@@ -104,17 +104,17 @@ namespace gpopt
 			virtual
 			CPartitionPropagationSpec *PppsRequired
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CPartitionPropagationSpec *pppsRequired,
-				ULONG ulChildIndex,
+				ULONG child_index,
 				DrgPdp *pdrgpdpCtxt,
 				ULONG ulOptReq
 				)
 			{
 				GPOS_ASSERT(ulOptReq < UlPartPropagateRequests());
 
-				return PppsRequiredNLJoinChild(pmp, exprhdl, pppsRequired, ulChildIndex, pdrgpdpCtxt, ulOptReq);
+				return PppsRequiredNLJoinChild(memory_pool, exprhdl, pppsRequired, child_index, pdrgpdpCtxt, ulOptReq);
 			}
 
 			//-------------------------------------------------------------------------------------

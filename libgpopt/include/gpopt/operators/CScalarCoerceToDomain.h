@@ -7,11 +7,11 @@
 //
 //	@doc:
 //		Scalar CoerceToDomain operator,
-//		the operator captures coercing a value to a domain type,
+//		the operator captures coercing a m_bytearray_value to a domain type,
 //
 //		at runtime, the precise set of constraints to be checked against
-//		value are determined,
-//		if the value passes, it is returned as the result, otherwise an error
+//		m_bytearray_value are determined,
+//		if the m_bytearray_value passes, it is returned as the result, otherwise an error
 //		is raised.
 
 //---------------------------------------------------------------------------
@@ -38,7 +38,7 @@ namespace gpopt
 
 		private:
 			// does operator return NULL on NULL input?
-			BOOL m_fReturnsNullOnNullInput;
+			BOOL m_returns_null_on_null_input;
 
 			// private copy ctor
 			CScalarCoerceToDomain(const CScalarCoerceToDomain &);
@@ -48,11 +48,11 @@ namespace gpopt
 			// ctor
 			CScalarCoerceToDomain
 				(
-				IMemoryPool *pmp,
-				IMDId *pmdidType,
-				INT iTypeModifier,
-				ECoercionForm edxlcf,
-				INT iLoc
+				IMemoryPool *memory_pool,
+				IMDId *mdid_type,
+				INT type_modifier,
+				ECoercionForm dxl_coerce_format,
+				INT location
 				);
 
 			// dtor
@@ -76,7 +76,7 @@ namespace gpopt
 
 			// match function
 			virtual
-			BOOL FMatch(COperator *) const;
+			BOOL Matches(COperator *) const;
 
 			// sensitivity to order of inputs
 			virtual
@@ -87,7 +87,7 @@ namespace gpopt
 
 			// boolean expression evaluation
 			virtual
-			EBoolEvalResult Eber(DrgPul *pdrgpulChildren) const;
+			EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const;
 
 			// conversion function
 			static

@@ -53,9 +53,9 @@ namespace gpopt
 			~CGroupProxy();
 
 			// set group id
-			void SetId(ULONG ulId)
+			void SetId(ULONG id)
 			{
-				m_pgroup->SetId(ulId);
+				m_pgroup->SetId(id);
 			}
 
 			// set group state
@@ -87,7 +87,7 @@ namespace gpopt
 			void InitProperties(CDrvdProp *pdp);
 
 			// initialize group's stat;
-			void InitStats(IStatistics *pstats);
+			void InitStats(IStatistics *stats);
 
 			// retrieve first group expression
 			CGroupExpression *PgexprFirst();

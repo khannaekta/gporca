@@ -28,13 +28,13 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalMotionBroadcast::CPhysicalMotionBroadcast
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
-	CPhysicalMotion(pmp),
+	CPhysicalMotion(memory_pool),
 	m_pdsReplicated(NULL)
 {
-	m_pdsReplicated = GPOS_NEW(pmp) CDistributionSpecReplicated();
+	m_pdsReplicated = GPOS_NEW(memory_pool) CDistributionSpecReplicated();
 }
 
 
@@ -54,14 +54,14 @@ CPhysicalMotionBroadcast::~CPhysicalMotionBroadcast()
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CPhysicalMotionBroadcast::FMatch
+//		CPhysicalMotionBroadcast::Matches
 //
 //	@doc:
 //		Match operators
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionBroadcast::FMatch
+CPhysicalMotionBroadcast::Matches
 	(
 	COperator *pop
 	)
@@ -81,20 +81,20 @@ CPhysicalMotionBroadcast::FMatch
 CColRefSet *
 CPhysicalMotionBroadcast::PcrsRequired
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &exprhdl,
 	CColRefSet *pcrsRequired,
-	ULONG ulChildIndex,
+	ULONG child_index,
 	DrgPdp *, // pdrgpdpCtxt
 	ULONG // ulOptReq
 	)
 {
-	GPOS_ASSERT(0 == ulChildIndex);
+	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrs = GPOS_NEW(pmp) CColRefSet(pmp, *pcrsRequired);
+	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool, *pcrsRequired);
 
 	CColRefSet *pcrsChildReqd =
-		PcrsChildReqd(pmp, exprhdl, pcrs, ulChildIndex, gpos::ulong_max);
+		PcrsChildReqd(memory_pool, exprhdl, pcrs, child_index, gpos::ulong_max);
 	pcrs->Release();
 
 	return pcrsChildReqd;
@@ -152,12 +152,12 @@ CPhysicalMotionBroadcast::EpetOrder
 COrderSpec *
 CPhysicalMotionBroadcast::PosRequired
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &, // exprhdl
 	COrderSpec *,//posInput
 	ULONG 
 #ifdef GPOS_DEBUG
-	ulChildIndex
+	child_index
 #endif // GPOS_DEBUG
 	,
 	DrgPdp *, // pdrgpdpCtxt
@@ -165,10 +165,10 @@ CPhysicalMotionBroadcast::PosRequired
 	)
 	const
 {
-	GPOS_ASSERT(0 == ulChildIndex);
+	GPOS_ASSERT(0 == child_index);
 
 	// no order required from child expression
-	return GPOS_NEW(pmp) COrderSpec(pmp);
+	return GPOS_NEW(memory_pool) COrderSpec(memory_pool);
 }
 
 //---------------------------------------------------------------------------
@@ -182,13 +182,13 @@ CPhysicalMotionBroadcast::PosRequired
 COrderSpec *
 CPhysicalMotionBroadcast::PosDerive
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle & // exprhdl
 	)
 	const
 {
 	// broadcast motion is not order-preserving
-	return GPOS_NEW(pmp) COrderSpec(pmp);
+	return GPOS_NEW(memory_pool) COrderSpec(memory_pool);
 }
 
 

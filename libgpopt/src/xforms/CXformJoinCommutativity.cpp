@@ -28,19 +28,19 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformJoinCommutativity::CXformJoinCommutativity
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	CXformExploration
 		(
 		 // pattern
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 					(
-					pmp,
-					GPOS_NEW(pmp) CLogicalInnerJoin(pmp),
-					GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)), // left child
-					GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)), // right child
-					GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp))
+					memory_pool,
+					GPOS_NEW(memory_pool) CLogicalInnerJoin(memory_pool),
+					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // left child
+					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // right child
+					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))
 					) // predicate
 		)
 {}
@@ -92,7 +92,7 @@ CXformJoinCommutativity::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 
 	// extract components
 	CExpression *pexprLeft = (*pexpr)[0];
@@ -106,7 +106,7 @@ CXformJoinCommutativity::Transform
 
 	// assemble transformed expression
 	CExpression *pexprAlt =
-		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(pmp, pexprRight, pexprLeft, pexprScalar);
+		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(memory_pool, pexprRight, pexprLeft, pexprScalar);
 
 	// add alternative to transformation result
 	pxfres->Add(pexprAlt);

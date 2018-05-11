@@ -155,7 +155,7 @@ namespace gpopt
 				public:
 
 					// ctor
-					SContextLink(CCostContext *pccParent, ULONG ulChildIndex, COptimizationContext *poc);
+					SContextLink(CCostContext *pccParent, ULONG child_index, COptimizationContext *poc);
 
 					// dtor
 					virtual
@@ -163,11 +163,11 @@ namespace gpopt
 
 					// hash function
 					static
-					ULONG UlHash(const SContextLink *pclink);
+					ULONG HashValue(const SContextLink *pclink);
 
 					// equality function
 					static
-					BOOL FEqual
+					BOOL Equals
 						(
 						const SContextLink *pclink1,
 						const SContextLink *pclink2
@@ -176,7 +176,7 @@ namespace gpopt
 			}; // struct SContextLink
 
 			// map of processed links in TreeMap structure
-			typedef CHashMap<SContextLink, BOOL, SContextLink::UlHash, SContextLink::FEqual,
+			typedef CHashMap<SContextLink, BOOL, SContextLink::HashValue, SContextLink::Equals,
 							CleanupDelete<SContextLink>, CleanupDelete<BOOL> > LinkMap;
 
 			// map of computed stats objects during costing
@@ -184,10 +184,10 @@ namespace gpopt
 							CleanupRelease<COptimizationContext>, CleanupRelease<IStatistics> > StatsMap;
 
 			// memory pool
-			IMemoryPool *m_pmp;
+			IMemoryPool *m_memory_pool;
 
 			// id is used when printing memo contents
-			ULONG m_ulId;
+			ULONG m_id;
 
 			// true if group hold scalar expressions
 			BOOL m_fScalar;
@@ -234,7 +234,7 @@ namespace gpopt
 			ShtOC m_sht;
 
 			// spin lock to protect operations on expression list
-			CSpinlockGroup m_slock;
+			CSpinlockGroup m_lock;
 
 			// number of group expressions
 			ULONG m_ulGExprs;
@@ -275,13 +275,13 @@ namespace gpopt
 			// increment number of optimization contexts
 			ULONG_PTR UlpIncOptCtxts()
 			{
-				return UlpExchangeAdd(&m_ulpOptCtxts, 1);
+				return ExchangeAddUlongPtrWithInt(&m_ulpOptCtxts, 1);
 			}
 
 			// the following functions are only accessed through group proxy
 
 			// setter of group id
-			void SetId(ULONG ulId);
+			void SetId(ULONG id);
 
 			// setter of group state
 			void SetState(EState estNewState);
@@ -299,7 +299,7 @@ namespace gpopt
 			void InitProperties(CDrvdProp *pdp);
 
 			// initialize group's stats
-			void InitStats(IStatistics *pstats);
+			void InitStats(IStatistics *stats);
 
 			// retrieve first group expression
 			CGroupExpression *PgexprFirst();
@@ -310,7 +310,7 @@ namespace gpopt
 			// return true if first promise is better than second promise
 			BOOL FBetterPromise
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CLogical::EStatPromise espFst,
 				CGroupExpression *pgexprFst,
 				CLogical::EStatPromise espSnd,
@@ -325,7 +325,7 @@ namespace gpopt
 				IMemoryPool *pmpGlobal,
 				CGroupExpression *pgexpr,
 				CReqdPropRelational *prprel,
-				DrgPstat *pdrgpstatCtxt,
+				StatsArray *stats_ctxt,
 				BOOL fDeriveChildStats
 				);
 
@@ -335,12 +335,12 @@ namespace gpopt
 			// helper function to add links in child groups
 			void RecursiveBuildTreeMap
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				COptimizationContext *poc,
 				CCostContext *pccParent,
 				CGroupExpression *pgexprCurrent,
-				ULONG ulChildIndex,
-				CTreeMap<CCostContext, CExpression, CDrvdPropCtxtPlan, CCostContext::UlHash, CCostContext::FEqual> *ptmap
+				ULONG child_index,
+				CTreeMap<CCostContext, CExpression, CDrvdPropCtxtPlan, CCostContext::HashValue, CCostContext::Equals> *ptmap
 				);
 
 			// print scalar group properties
@@ -361,21 +361,21 @@ namespace gpopt
 				IMemoryPool *pmpLocal,
 				IMemoryPool *pmpGlobal,
 				CReqdPropRelational *prprelInput,
-				DrgPstat *pdrgpstatCtxt
+				StatsArray *stats_ctxt
 				);
 
 		public:
 
 			// ctor
-			CGroup(IMemoryPool *pmp, BOOL fScalar = false);
+			CGroup(IMemoryPool *memory_pool, BOOL fScalar = false);
 			
 			// dtor
 			~CGroup();
 			
 			// id accessor
-			ULONG UlId() const
+			ULONG Id() const
 			{
-				return m_ulId;
+				return m_id;
 			}
 			
 			// group properties accessor
@@ -388,10 +388,10 @@ namespace gpopt
 			IStatistics *Pstats() const;
 
 			// attempt initializing stats with the given stat object
-			BOOL FInitStats(IStatistics *pstats);
+			BOOL FInitStats(IStatistics *stats);
 
 			// append given stats object to group stats
-			void AppendStats(IMemoryPool *pmp, IStatistics *pstats);
+			void AppendStats(IMemoryPool *memory_pool, IStatistics *stats);
 			
 			// accessor of maximum optimization level of member group expressions
 			EOptimizationLevel EolMax() const
@@ -432,7 +432,7 @@ namespace gpopt
 			}
 
 			// hash function
-			ULONG UlHash() const;
+			ULONG HashValue() const;
 			
 			// number of group expressions accessor
 			ULONG UlGExprs() const
@@ -495,7 +495,7 @@ namespace gpopt
 			BOOL FResetStats();
 
 			// returns true if stats can be derived on this group
-			BOOL FStatsDerivable(IMemoryPool *pmp);
+			BOOL FStatsDerivable(IMemoryPool *memory_pool);
 
 			// reset group job queues
 			void ResetGroupJobQueues();
@@ -523,10 +523,10 @@ namespace gpopt
 			void MergeGroup();
 
 			// lookup a given context in contexts hash table
-			COptimizationContext *PocLookup(IMemoryPool *pmp, CReqdPropPlan *prpp, ULONG ulSearchStageIndex);
+			COptimizationContext *PocLookup(IMemoryPool *memory_pool, CReqdPropPlan *prpp, ULONG ulSearchStageIndex);
 
 			// lookup the best context across all stages for the given required properties
-			COptimizationContext *PocLookupBest(IMemoryPool *pmp, ULONG ulSearchStages, CReqdPropPlan *prpp);
+			COptimizationContext *PocLookupBest(IMemoryPool *memory_pool, ULONG ulSearchStages, CReqdPropPlan *prpp);
 
 			// insert given context into contexts hash table
 			COptimizationContext *PocInsert(COptimizationContext *poc);
@@ -567,20 +567,20 @@ namespace gpopt
 				IMemoryPool *pmpLocal,
 				IMemoryPool *pmpGlobal,
 				CReqdPropRelational *prprel,
-				DrgPstat *pdrgpstatCtxt
+				StatsArray *stats_ctxt
 				);
 
 			// find group expression with best stats promise and the same given children
-			CGroupExpression *PgexprBestPromise(IMemoryPool *pmp, CGroupExpression *pgexprToMatch);
+			CGroupExpression *PgexprBestPromise(IMemoryPool *memory_pool, CGroupExpression *pgexprToMatch);
 
 			// link parent group expression to group members
 			void BuildTreeMap
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				COptimizationContext *poc,
 				CCostContext *pccParent,
-				ULONG ulChildIndex,
-				CTreeMap<CCostContext, CExpression, CDrvdPropCtxtPlan, CCostContext::UlHash, CCostContext::FEqual> *ptmap
+				ULONG child_index,
+				CTreeMap<CCostContext, CExpression, CDrvdPropCtxtPlan, CCostContext::HashValue, CCostContext::Equals> *ptmap
 				);
 
 			// reset link map used in plan enumeration
@@ -593,7 +593,7 @@ namespace gpopt
 			IStatistics *PstatsCompute(COptimizationContext *poc, CExpressionHandle &exprhdl, CGroupExpression *pgexpr);
 
 			// compute cost lower bound for the plan satisfying given required properties
-			CCost CostLowerBound(IMemoryPool *pmp, CReqdPropPlan *prppInput);
+			CCost CostLowerBound(IMemoryPool *memory_pool, CReqdPropPlan *prppInput);
 
 			// matching of pairs of arrays of groups
 			static

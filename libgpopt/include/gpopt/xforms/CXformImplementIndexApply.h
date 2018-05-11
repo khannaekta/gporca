@@ -26,18 +26,18 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformImplementIndexApply(IMemoryPool *pmp)
+			CXformImplementIndexApply(IMemoryPool *memory_pool)
 			:
 			// pattern
 			CXformImplementation
 				(
-				GPOS_NEW(pmp) CExpression
+				GPOS_NEW(memory_pool) CExpression
 								(
-								pmp,
-								GPOS_NEW(pmp) CLogicalIndexApply(pmp),
-								GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)), // outer child
-								GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)),  // inner child
-								GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp))  // predicate
+								memory_pool,
+								GPOS_NEW(memory_pool) CLogicalIndexApply(memory_pool),
+								GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // outer child
+								GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),  // inner child
+								GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))  // predicate
 								)
 				)
 			{}
@@ -79,14 +79,14 @@ namespace gpopt
 				GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 				GPOS_ASSERT(FCheckPattern(pexpr));
 
-				IMemoryPool *pmp = pxfctxt->Pmp();
+				IMemoryPool *memory_pool = pxfctxt->Pmp();
 
 				// extract components
 				CExpression *pexprOuter = (*pexpr)[0];
 				CExpression *pexprInner = (*pexpr)[1];
 				CExpression *pexprScalar = (*pexpr)[2];
-				DrgPcr *pdrgpcr = CLogicalIndexApply::PopConvert(pexpr->Pop())->PdrgPcrOuterRefs();
-				pdrgpcr->AddRef();
+				DrgPcr *colref_array = CLogicalIndexApply::PopConvert(pexpr->Pop())->PdrgPcrOuterRefs();
+				colref_array->AddRef();
 
 				// addref all components
 				pexprOuter->AddRef();
@@ -97,14 +97,14 @@ namespace gpopt
 				CPhysicalNLJoin *pop = NULL;
 
 				if (CLogicalIndexApply::PopConvert(pexpr->Pop())->FouterJoin())
-					pop = GPOS_NEW(pmp) CPhysicalLeftOuterIndexNLJoin(pmp, pdrgpcr);
+					pop = GPOS_NEW(memory_pool) CPhysicalLeftOuterIndexNLJoin(memory_pool, colref_array);
 				else
-					pop = GPOS_NEW(pmp) CPhysicalInnerIndexNLJoin(pmp, pdrgpcr);
+					pop = GPOS_NEW(memory_pool) CPhysicalInnerIndexNLJoin(memory_pool, colref_array);
 
 				CExpression *pexprResult =
-						GPOS_NEW(pmp) CExpression
+						GPOS_NEW(memory_pool) CExpression
 								(
-								pmp,
+								memory_pool,
 								pop,
 								pexprOuter,
 								pexprInner,

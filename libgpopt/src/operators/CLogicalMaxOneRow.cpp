@@ -36,7 +36,7 @@ CLogicalMaxOneRow::Esp
 {
 	// low promise for stat derivation if logical expression has outer-refs
 	// or is part of an Apply expression
-	if (exprhdl.FHasOuterRefs() ||
+	if (exprhdl.HasOuterRefs() ||
 		 (NULL != exprhdl.Pgexpr() &&
 			CXformUtils::FGenerateApply(exprhdl.Pgexpr()->ExfidOrigin()))
 		)
@@ -58,20 +58,20 @@ CLogicalMaxOneRow::Esp
 CColRefSet *
 CLogicalMaxOneRow::PcrsStat
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &exprhdl,
 	CColRefSet *pcrsInput,
-	ULONG ulChildIndex
+	ULONG child_index
 	)
 	const
 {
-	GPOS_ASSERT(0 == ulChildIndex);
+	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrs = GPOS_NEW(pmp) CColRefSet(pmp);
+	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 	pcrs->Union(pcrsInput);
 
 	// intersect with the output columns of relational child
-	pcrs->Intersection(exprhdl.Pdprel(ulChildIndex)->PcrsOutput());
+	pcrs->Intersection(exprhdl.GetRelationalProperties(child_index)->PcrsOutput());
 
 	return pcrs;
 }
@@ -87,13 +87,13 @@ CLogicalMaxOneRow::PcrsStat
 CXformSet *
 CLogicalMaxOneRow::PxfsCandidates
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	const
 {
-	CXformSet *pxfs = GPOS_NEW(pmp) CXformSet(pmp);
-	(void) pxfs->FExchangeSet(CXform::ExfMaxOneRow2Assert);
-	return pxfs;
+	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	(void) xform_set->ExchangeSet(CXform::ExfMaxOneRow2Assert);
+	return xform_set;
 }
 
 
@@ -108,15 +108,15 @@ CLogicalMaxOneRow::PxfsCandidates
 IStatistics *
 CLogicalMaxOneRow::PstatsDerive
 			(
-			IMemoryPool *pmp,
+			IMemoryPool *memory_pool,
 			CExpressionHandle &exprhdl,
-			DrgPstat * // pdrgpstatCtxt
+			StatsArray * // stats_ctxt
 			)
 			const
 {
 	// no more than one row can be produced by operator, scale down input statistics accordingly
-	IStatistics *pstats = exprhdl.Pstats(0);
-	return  pstats->PstatsScale(pmp, CDouble(1.0 / pstats->DRows()));
+	IStatistics *stats = exprhdl.Pstats(0);
+	return  stats->ScaleStats(memory_pool, CDouble(1.0 / stats->Rows()));
 }
 
 

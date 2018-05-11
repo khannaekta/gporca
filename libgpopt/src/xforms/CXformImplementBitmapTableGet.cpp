@@ -33,18 +33,18 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 CXformImplementBitmapTableGet::CXformImplementBitmapTableGet
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	// pattern
 	CXformImplementation
 		(
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 				(
-				pmp,
-				GPOS_NEW(pmp) CLogicalBitmapTableGet(pmp),
-				GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)), // predicate tree
-				GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp))  // bitmap index expression
+				memory_pool,
+				GPOS_NEW(memory_pool) CLogicalBitmapTableGet(memory_pool),
+				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // predicate tree
+				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))  // bitmap index expression
 				)
 		)
 {}
@@ -70,7 +70,7 @@ CXformImplementBitmapTableGet::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 	CLogicalBitmapTableGet *popLogical = CLogicalBitmapTableGet::PopConvert(pexpr->Pop());
 
 	CTableDescriptor *ptabdesc = popLogical->Ptabdesc();
@@ -80,12 +80,12 @@ CXformImplementBitmapTableGet::Transform
 	pdrgpcrOutput->AddRef();
 
 	CPhysicalBitmapTableScan *popPhysical =
-			GPOS_NEW(pmp) CPhysicalBitmapTableScan
+			GPOS_NEW(memory_pool) CPhysicalBitmapTableScan
 					(
-					pmp,
+					memory_pool,
 					ptabdesc,
 					pexpr->Pop()->UlOpId(),
-					GPOS_NEW(pmp) CName(pmp, *popLogical->PnameTableAlias()),
+					GPOS_NEW(memory_pool) CName(memory_pool, *popLogical->PnameTableAlias()),
 					pdrgpcrOutput
 					);
 
@@ -95,7 +95,7 @@ CXformImplementBitmapTableGet::Transform
 	pexprIndexPath->AddRef();
 
 	CExpression *pexprPhysical =
-			GPOS_NEW(pmp) CExpression(pmp, popPhysical, pexprCondition, pexprIndexPath);
+			GPOS_NEW(memory_pool) CExpression(memory_pool, popPhysical, pexprCondition, pexprIndexPath);
 	pxfres->Add(pexprPhysical);
 }
 

@@ -47,18 +47,18 @@ namespace gpopt
 			CLogicalSetOp(const CLogicalSetOp &);
 
 			// build set representation of input/output columns for faster set operations
-			void BuildColumnSets(IMemoryPool *pmp);
+			void BuildColumnSets(IMemoryPool *memory_pool);
 
 			// output equivalence classes
-			DrgPcrs *PdrgpcrsOutputEquivClasses(IMemoryPool *pmp, CExpressionHandle &exprhdl, BOOL fIntersect) const;
+			DrgPcrs *PdrgpcrsOutputEquivClasses(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, BOOL fIntersect) const;
 
 			// equivalence classes from one input child, mapped to output columns
-			DrgPcrs *PdrgpcrsInputMapped(IMemoryPool *pmp, CExpressionHandle &exprhdl, ULONG ulChild) const;
+			DrgPcrs *PdrgpcrsInputMapped(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, ULONG ulChild) const;
 
 			// constraints for a given output column from all children
 			DrgPcnstr *PdrgpcnstrColumn
 						(
-						IMemoryPool *pmp,
+						IMemoryPool *memory_pool,
 						CExpressionHandle &exprhdl,
 						ULONG ulColIndex,
 						ULONG ulStart
@@ -68,7 +68,7 @@ namespace gpopt
 			// get constraint for a given output column from a given children
 			CConstraint *PcnstrColumn
 						(
-						IMemoryPool *pmp,
+						IMemoryPool *memory_pool,
 						CExpressionHandle &exprhdl,
 						ULONG ulColIndex,
 						ULONG ulChild
@@ -78,7 +78,7 @@ namespace gpopt
 			// derive constraint property for intersect and union operators
 			CPropConstraint *PpcDeriveConstraintIntersectUnion
 							(
-							IMemoryPool *pmp,
+							IMemoryPool *memory_pool,
 							CExpressionHandle &exprhdl,
 							BOOL fIntersect
 							)
@@ -88,11 +88,11 @@ namespace gpopt
 		
 			// ctor
 			explicit
-			CLogicalSetOp(IMemoryPool *pmp);
+			CLogicalSetOp(IMemoryPool *memory_pool);
 
 			CLogicalSetOp
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				DrgPcr *pdrgOutput,
 				DrgPcr *pdrgpcrLeft,
 				DrgPcr *pdrgpcrRight
@@ -100,7 +100,7 @@ namespace gpopt
 
 			CLogicalSetOp
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				DrgPcr *pdrgpcrOutput,
 				DrgDrgPcr *pdrgpdrgpcrInput
 				);
@@ -134,14 +134,14 @@ namespace gpopt
 			virtual
 			BOOL FCanPullProjectionsUp
 				(
-				ULONG //ulChildIndex
+				ULONG //child_index
 				) const
 			{
 				return false;
 			}
 
 			// match function
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			virtual
 			IOstream& OsPrint(IOstream &os) const;
@@ -156,11 +156,11 @@ namespace gpopt
 			
 			// derive key collections
 			virtual
-			CKeyCollection *PkcDeriveKeys(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;		
+			CKeyCollection *PkcDeriveKeys(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;		
 
 			// derive partition consumer info
 			virtual
-			CPartInfo *PpartinfoDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CPartInfo *PpartinfoDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			//-------------------------------------------------------------------------------------
 			// Required Relational Properties
@@ -170,10 +170,10 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsStat
 				(
-				IMemoryPool *,// pmp
+				IMemoryPool *,// memory_pool
 				CExpressionHandle &,// exprhdl
 				CColRefSet *pcrsInput,
-				ULONG // ulChildIndex
+				ULONG // child_index
 				)
 				const;
 

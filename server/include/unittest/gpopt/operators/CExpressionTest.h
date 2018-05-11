@@ -38,10 +38,10 @@ namespace gpopt
 	{			
 		private:
 			static
-			CReqdPropPlan *PrppCreateRequiredProperties(IMemoryPool *pmp, CColRefSet *pcrs);
+			CReqdPropPlan *PrppCreateRequiredProperties(IMemoryPool *memory_pool, CColRefSet *pcrs);
 
 			static
-			CExpression *PexprCreateGbyWithColumnFormat(IMemoryPool *pmp, const WCHAR *wszColNameFormat);
+			CExpression *PexprCreateGbyWithColumnFormat(IMemoryPool *memory_pool, const WCHAR *wszColNameFormat);
 
 			// helper for testing required column computation
 			static
@@ -51,7 +51,7 @@ namespace gpopt
 			static
 			GPOS_RESULT EresCheckCachedReqdCols
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpression *pexpr,
 				CReqdPropPlan *prppInput
 				);
@@ -60,7 +60,7 @@ namespace gpopt
 			static
 			void SetupPlanForFValidPlanTest
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpression **ppexprGby,
 				CColRefSet **ppcrs,
 				CExpression **ppexprPlan,
@@ -69,7 +69,7 @@ namespace gpopt
 
 			// return an expression with several joins
 			static
-			CExpression *PexprComplexJoinTree(IMemoryPool *pmp);
+			CExpression *PexprComplexJoinTree(IMemoryPool *memory_pool);
 
 		public:
 			// unittests

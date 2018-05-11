@@ -29,31 +29,31 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformPushGbWithHavingBelowJoin::CXformPushGbWithHavingBelowJoin
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	// pattern
 	CXformExploration
 		(
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 			(
-			pmp,
-			GPOS_NEW(pmp) CLogicalSelect(pmp),
-			GPOS_NEW(pmp) CExpression
+			memory_pool,
+			GPOS_NEW(memory_pool) CLogicalSelect(memory_pool),
+			GPOS_NEW(memory_pool) CExpression
 				(
-				pmp,
-				GPOS_NEW(pmp) CLogicalGbAgg(pmp),
-				GPOS_NEW(pmp) CExpression
+				memory_pool,
+				GPOS_NEW(memory_pool) CLogicalGbAgg(memory_pool),
+				GPOS_NEW(memory_pool) CExpression
 					(
-					pmp,
-					GPOS_NEW(pmp) CLogicalInnerJoin(pmp),
-					GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)),  // join outer child
-					GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp)), // join inner child
-					GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternTree(pmp)) // join predicate
+					memory_pool,
+					GPOS_NEW(memory_pool) CLogicalInnerJoin(memory_pool),
+					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),  // join outer child
+					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // join inner child
+					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool)) // join predicate
 					),
-				GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternTree(pmp))	// scalar project list
+				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))	// scalar project list
 				),
-			GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp))	// Having clause
+			GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))	// Having clause
 			)
 		)
 {}
@@ -100,7 +100,7 @@ CXformPushGbWithHavingBelowJoin::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 
 	CExpression *pexprGb = (*pexpr)[0];
 	CLogicalGbAgg *popGbAgg = CLogicalGbAgg::PopConvert(pexprGb->Pop());
@@ -110,7 +110,7 @@ CXformPushGbWithHavingBelowJoin::Transform
 		return;
 	}
 
-	CExpression *pexprResult = CXformUtils::PexprPushGbBelowJoin(pmp, pexpr);
+	CExpression *pexprResult = CXformUtils::PexprPushGbBelowJoin(memory_pool, pexpr);
 
 	if (NULL != pexprResult)
 	{

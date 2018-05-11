@@ -53,7 +53,7 @@ namespace gpopt
 		private:
 
 			// memory pool
-			IMemoryPool *m_pmp;
+			IMemoryPool *m_memory_pool;
 
 			// required plan properties in optimizer's produced plan
 			CReqdPropPlan *m_prpp;
@@ -74,7 +74,7 @@ namespace gpopt
 			BOOL m_fDeriveStats;
 
 			// collect system columns from output columns
-			void SetSystemCols(IMemoryPool *pmp);
+			void SetSystemCols(IMemoryPool *memory_pool);
 
 			// return top level operator in the given expression
 			static
@@ -88,10 +88,10 @@ namespace gpopt
 			// ctor
 			CQueryContext
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpression *pexpr,
 				CReqdPropPlan *prpp,
-				DrgPcr *pdrgpcr,
+				DrgPcr *colref_array,
 				DrgPmdname *pdrgpmdname,
 				BOOL fDeriveStats
 				);
@@ -139,9 +139,9 @@ namespace gpopt
 			static
 			CQueryContext *PqcGenerate
 							(
-							IMemoryPool *pmp, // memory pool
+							IMemoryPool *memory_pool, // memory pool
 							CExpression *pexpr, // expression representing the query
-							DrgPul *pdrgpulQueryOutputColRefId, // array of output column reference id
+							ULongPtrArray *pdrgpulQueryOutputColRefId, // array of output column reference id
 							DrgPmdname *pdrgpmdname, // array of output column names
 							BOOL fDeriveStats
 							);
@@ -157,7 +157,7 @@ namespace gpopt
 			// walk the expression and add the mapping between computed column
 			// and their corresponding used column(s)
 			static
-			void MapComputedToUsedCols(CColumnFactory *pcf, CExpression *pexpr);
+			void MapComputedToUsedCols(CColumnFactory *col_factory, CExpression *pexpr);
 
 	}; // class CQueryContext
 }

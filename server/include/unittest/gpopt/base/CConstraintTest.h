@@ -37,9 +37,9 @@ namespace gpopt
 		struct SRangeInfo
 		{
 			CRange::ERangeInclusion eriLeft;	// inclusion for left end
-			INT iLeft;							// left end value
+			INT iLeft;							// left end m_bytearray_value
 			CRange::ERangeInclusion eriRight;	// inclusion for right end
-			INT iRight;							// right end value
+			INT iRight;							// right end m_bytearray_value
 		};
 
 		private:
@@ -83,8 +83,8 @@ namespace gpopt
 			static
 			DrgPrng *Pdrgprng
 						(
-						IMemoryPool *pmp,
-						IMDId *pmdid,
+						IMemoryPool *memory_pool,
+						IMDId *mdid,
 						const SRangeInfo rgRangeInfo[],
 						ULONG ulRanges
 						);
@@ -92,67 +92,67 @@ namespace gpopt
 			static
 			CConstraintInterval *PciFirstInterval
 									(
-									IMemoryPool *pmp,
-									IMDId *pmdid,
-									CColRef *pcr
+									IMemoryPool *memory_pool,
+									IMDId *mdid,
+									CColRef *colref
 									);
 
 			static
 			CConstraintInterval *PciSecondInterval
 									(
-									IMemoryPool *pmp,
-									IMDId *pmdid,
-									CColRef *pcr
+									IMemoryPool *memory_pool,
+									IMDId *mdid,
+									CColRef *colref
 									);
 
 			// interval from scalar comparison
 			static
 			GPOS_RESULT EresUnittest_CIntervalFromScalarCmp
 							(
-							IMemoryPool *pmp,
-							CMDAccessor *pmda,
-							CColRef *pcr
+							IMemoryPool *memory_pool,
+							CMDAccessor *md_accessor,
+							CColRef *colref
 							);
 
 			// generate comparison expression
 			static
 			CExpression *PexprScalarCmp
 							(
-							IMemoryPool *pmp,
-							CMDAccessor *pmda,
-							CColRef *pcr,
-							IMDType::ECmpType ecmpt,
-							LINT lVal
+							IMemoryPool *memory_pool,
+							CMDAccessor *md_accessor,
+							CColRef *colref,
+							IMDType::ECmpType cmp_type,
+							LINT val
 							);
 
 			// interval from scalar bool op
 			static
 			GPOS_RESULT EresUnittest_CIntervalFromScalarBoolOp
 							(
-							IMemoryPool *pmp,
-							CMDAccessor *pmda,
-							CColRef *pcr
+							IMemoryPool *memory_pool,
+							CMDAccessor *md_accessor,
+							CColRef *colref
 							);
 
 			// debug print
-			static void PrintConstraint (IMemoryPool *pmp, CConstraint *pcnstr);
+			static void PrintConstraint (IMemoryPool *memory_pool, CConstraint *pcnstr);
 
 			// build a conjunction
 			static
 			CConstraintConjunction *Pcstconjunction
 									(
-									IMemoryPool *pmp,
-									IMDId *pmdid,
-									CColRef *pcr
+									IMemoryPool *memory_pool,
+									IMDId *mdid,
+									CColRef *colref
 									);
 
 			// build a disjunction
 			static
 			CConstraintDisjunction *Pcstdisjunction
 									(
-									IMemoryPool *pmp,
-									IMDId *pmdid,
-									CColRef *pcr
+									IMemoryPool *memory_pool,
+									IMDId *mdid,
+									CColRef *colref
 									);
 
 		public:
@@ -180,7 +180,7 @@ namespace gpopt
 			GPOS_RESULT EresUnittest_ConstraintsOnDates();
 
 			// print equivalence classes
-			static void PrintEquivClasses(IMemoryPool *pmp, DrgPcrs *pdrgpcrs, BOOL fExpected = false);
+			static void PrintEquivClasses(IMemoryPool *memory_pool, DrgPcrs *pdrgpcrs, BOOL fExpected = false);
 	}; // class CConstraintTest
 }
 

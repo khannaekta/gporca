@@ -33,7 +33,6 @@
 
 #include "gpopt/xforms/CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin.h"
 
-#include "gpos/common/CDynamicPtrArrayUtils.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 
 #include "gpopt/base/CColRefSetIter.h"
@@ -45,7 +44,7 @@
 
 using namespace gpopt;
 
-// if ratio of the cardinalities outer/inner is below this value, we apply the xform
+// if ratio of the cardinalities outer/inner is below this m_bytearray_value, we apply the xform
 const DOUBLE
 CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::m_dOuterInnerRatioThreshold = 0.001;
 
@@ -59,19 +58,19 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::m_dOuterInnerRatioThreshold = 0.0
 //---------------------------------------------------------------------------
 CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	// pattern
 	CXformExploration
 		(
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 				(
-				pmp,
-				GPOS_NEW(pmp) CLogicalLeftOuterJoin(pmp),
-				GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternTree(pmp)), // left child
-				GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternTree(pmp)), // right child
-				GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternTree(pmp))  // predicate
+				memory_pool,
+				GPOS_NEW(memory_pool) CLogicalLeftOuterJoin(memory_pool),
+				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool)), // left child
+				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool)), // right child
+				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))  // predicate
 				)
 		)
 {}
@@ -91,12 +90,12 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::Exfp
 	)
 	const
 {
-	CColRefSet *pcrsInner = exprhdl.Pdprel(1 /*ulChildIndex*/)->PcrsOutput();
-	CExpression *pexprScalar = exprhdl.PexprScalarChild(2 /*ulChildIndex*/);
+	CColRefSet *pcrsInner = exprhdl.GetRelationalProperties(1 /*child_index*/)->PcrsOutput();
+	CExpression *pexprScalar = exprhdl.PexprScalarChild(2 /*child_index*/);
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
-	if (!CPredicateUtils::FSimpleEqualityUsingCols(pmp, pexprScalar, pcrsInner))
+	if (!CPredicateUtils::FSimpleEqualityUsingCols(memory_pool, pexprScalar, pcrsInner))
 	{
 		return ExfpNone;
 	}
@@ -108,11 +107,11 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::Exfp
 	}
 
 	// check if stats are derivable on child groups
-	const ULONG ulArity = exprhdl.UlArity();
-	for (ULONG ul = 0; ul < ulArity; ul++)
+	const ULONG arity = exprhdl.Arity();
+	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		CGroup *pgroupChild = (*exprhdl.Pgexpr())[ul];
-		if (!pgroupChild->FScalar() && !pgroupChild->FStatsDerivable(pmp))
+		if (!pgroupChild->FScalar() && !pgroupChild->FStatsDerivable(memory_pool))
 		{
 			// stats must be derivable on every child
 			return CXform::ExfpNone;
@@ -133,8 +132,8 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::Exfp
 BOOL
 CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::FApplyXformUsingStatsInfo
 	(
-	const IStatistics *pstatsOuter,
-	const IStatistics *pstatsInner
+	const IStatistics *outer_stats,
+	const IStatistics *inner_side_stats
 	)
 	const
 {
@@ -143,16 +142,16 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::FApplyXformUsingStatsInfo
 		return true;
 	}
 
-	if (NULL == pstatsOuter || NULL == pstatsInner)
+	if (NULL == outer_stats || NULL == inner_side_stats)
 	{
 		return false;
 	}
 
-	DOUBLE dRowsOuter = pstatsOuter->DRows().DVal();
-	DOUBLE dRowsInner = pstatsInner->DRows().DVal();
+	DOUBLE num_rows_outer = outer_stats->Rows().Get();
+	DOUBLE dRowsInner = inner_side_stats->Rows().Get();
 	GPOS_ASSERT(0 < dRowsInner);
 
-	return dRowsOuter / dRowsInner <= m_dOuterInnerRatioThreshold;
+	return num_rows_outer / dRowsInner <= m_dOuterInnerRatioThreshold;
 }
 
 //---------------------------------------------------------------------------
@@ -178,7 +177,7 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::FApplyXformUsingStatsInfo
 //           +--CLogicalProject
 //              |--CLogicalLeftAntiSemiJoin
 //              |  |--CLogicalCTEConsumer (2), Columns: ["i_item_sk" (342)]
-//              |  |--CLogicalGbAgg( Global ) Grp Cols: ["i_item_sk" (343)][Global], Minimal Grp Cols: [], Generates Duplicates :[ 0 ]
+//              |  |--CLogicalGbAgg( GetGlobalMemoryPool ) Grp Cols: ["i_item_sk" (343)][Global], Minimal Grp Cols: [], Generates Duplicates :[ 0 ]
 //              |  |  |--CLogicalCTEConsumer (3), Columns: ["i_item_sk" (343), "ss_item_sk" (344)]
 //              |  |  +--CScalarProjectList
 //              |  +--CScalarBoolOp (EboolopNot)
@@ -214,7 +213,7 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 	// extract components
 	CExpression *pexprOuter = (*pexpr)[0];
 	CExpression *pexprInner = (*pexpr)[1];
@@ -230,36 +229,36 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::Transform
 		return;
 	}
 
-	const ULONG ulCTEOuterId = COptCtxt::PoctxtFromTLS()->Pcteinfo()->UlNextId();
-	CColRefSet *pcrsOuter = CDrvdPropRelational::Pdprel(pexprOuter->PdpDerive())->PcrsOutput();
-	DrgPcr *pdrgpcrOuter = pcrsOuter->Pdrgpcr(pmp);
-	(void) CXformUtils::PexprAddCTEProducer(pmp, ulCTEOuterId, pdrgpcrOuter, pexprOuter);
+	const ULONG ulCTEOuterId = COptCtxt::PoctxtFromTLS()->Pcteinfo()->next_id();
+	CColRefSet *outer_refs = CDrvdPropRelational::GetRelationalProperties(pexprOuter->PdpDerive())->PcrsOutput();
+	DrgPcr *pdrgpcrOuter = outer_refs->Pdrgpcr(memory_pool);
+	(void) CXformUtils::PexprAddCTEProducer(memory_pool, ulCTEOuterId, pdrgpcrOuter, pexprOuter);
 
 	// invert the order of the branches of the original join, so that the small one becomes
 	// inner
 	pexprInner->AddRef();
 	pexprScalar->AddRef();
-	CExpression *pexprInnerJoin = GPOS_NEW(pmp) CExpression
+	CExpression *pexprInnerJoin = GPOS_NEW(memory_pool) CExpression
 									(
-									pmp,
-									GPOS_NEW(pmp) CLogicalInnerJoin(pmp),
+									memory_pool,
+									GPOS_NEW(memory_pool) CLogicalInnerJoin(memory_pool),
 									pexprInner,
-									CXformUtils::PexprCTEConsumer(pmp, ulCTEOuterId, pdrgpcrOuter),
+									CXformUtils::PexprCTEConsumer(memory_pool, ulCTEOuterId, pdrgpcrOuter),
 									pexprScalar
 									);
 
-	CColRefSet *pcrsJoinOutput = CDrvdPropRelational::Pdprel(pexpr->PdpDerive())->PcrsOutput();
-	DrgPcr *pdrgpcrJoinOutput = pcrsJoinOutput->Pdrgpcr(pmp);
-	const ULONG ulCTEJoinId = COptCtxt::PoctxtFromTLS()->Pcteinfo()->UlNextId();
-	(void) CXformUtils::PexprAddCTEProducer(pmp, ulCTEJoinId, pdrgpcrJoinOutput, pexprInnerJoin);
+	CColRefSet *pcrsJoinOutput = CDrvdPropRelational::GetRelationalProperties(pexpr->PdpDerive())->PcrsOutput();
+	DrgPcr *pdrgpcrJoinOutput = pcrsJoinOutput->Pdrgpcr(memory_pool);
+	const ULONG ulCTEJoinId = COptCtxt::PoctxtFromTLS()->Pcteinfo()->next_id();
+	(void) CXformUtils::PexprAddCTEProducer(memory_pool, ulCTEJoinId, pdrgpcrJoinOutput, pexprInnerJoin);
 
-	CColRefSet *pcrsScalar = CDrvdPropScalar::Pdpscalar(pexprScalar->PdpDerive())->PcrsUsed();
-	CColRefSet *pcrsInner = CDrvdPropRelational::Pdprel(pexprInner->PdpDerive())->PcrsOutput();
+	CColRefSet *pcrsScalar = CDrvdPropScalar::GetDrvdScalarProps(pexprScalar->PdpDerive())->PcrsUsed();
+	CColRefSet *pcrsInner = CDrvdPropRelational::GetRelationalProperties(pexprInner->PdpDerive())->PcrsOutput();
 
 	DrgPcr *pdrgpcrProjectOutput = NULL;
 	CExpression *pexprProjectAppendNulls = PexprProjectOverLeftAntiSemiJoin
 											(
-											pmp,
+											memory_pool,
 											pdrgpcrOuter,
 											pcrsScalar,
 											pcrsInner,
@@ -270,30 +269,30 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::Transform
 											);
 	GPOS_ASSERT(NULL != pdrgpcrProjectOutput);
 
-	DrgDrgPcr *pdrgpdrgpcrUnionInput = GPOS_NEW(pmp) DrgDrgPcr(pmp);
+	DrgDrgPcr *pdrgpdrgpcrUnionInput = GPOS_NEW(memory_pool) DrgDrgPcr(memory_pool);
 	pdrgpcrJoinOutput->AddRef();
 	pdrgpdrgpcrUnionInput->Append(pdrgpcrJoinOutput);
 	pdrgpdrgpcrUnionInput->Append(pdrgpcrProjectOutput);
 	pdrgpcrJoinOutput->AddRef();
 
 	CExpression *pexprUnionAll =
-			GPOS_NEW(pmp) CExpression
+			GPOS_NEW(memory_pool) CExpression
 					(
-					pmp,
-					GPOS_NEW(pmp) CLogicalUnionAll(pmp, pdrgpcrJoinOutput, pdrgpdrgpcrUnionInput),
-					CXformUtils::PexprCTEConsumer(pmp, ulCTEJoinId, pdrgpcrJoinOutput),
+					memory_pool,
+					GPOS_NEW(memory_pool) CLogicalUnionAll(memory_pool, pdrgpcrJoinOutput, pdrgpdrgpcrUnionInput),
+					CXformUtils::PexprCTEConsumer(memory_pool, ulCTEJoinId, pdrgpcrJoinOutput),
 					pexprProjectAppendNulls
 					);
-	CExpression *pexprJoinAnchor = GPOS_NEW(pmp) CExpression
+	CExpression *pexprJoinAnchor = GPOS_NEW(memory_pool) CExpression
 									(
-									pmp,
-									GPOS_NEW(pmp) CLogicalCTEAnchor(pmp, ulCTEJoinId),
+									memory_pool,
+									GPOS_NEW(memory_pool) CLogicalCTEAnchor(memory_pool, ulCTEJoinId),
 									pexprUnionAll
 									);
-	CExpression *pexprOuterAnchor = GPOS_NEW(pmp) CExpression
+	CExpression *pexprOuterAnchor = GPOS_NEW(memory_pool) CExpression
 									(
-									pmp,
-									GPOS_NEW(pmp) CLogicalCTEAnchor(pmp, ulCTEOuterId),
+									memory_pool,
+									GPOS_NEW(memory_pool) CLogicalCTEAnchor(memory_pool, ulCTEOuterId),
 									pexprJoinAnchor
 									);
 	pexprInnerJoin->Release();
@@ -327,10 +326,10 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::FValidInnerExpr
 		COperator::EopLogicalLimit,
 	};
 
-	const COperator::EOperatorId eopid = pexprInner->Pop()->Eopid();
+	const COperator::EOperatorId op_id = pexprInner->Pop()->Eopid();
 	for (ULONG ul = 0; ul < GPOS_ARRAY_SIZE(rgeopids); ++ul)
 	{
-		if (rgeopids[ul] == eopid)
+		if (rgeopids[ul] == op_id)
 		{
 			return false;
 		}
@@ -351,7 +350,7 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::FValidInnerExpr
 CExpression *
 CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::PexprLeftAntiSemiJoinWithInnerGroupBy
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	DrgPcr *pdrgpcrOuter,
 	DrgPcr *pdrgpcrOuterCopy,
 	CColRefSet *pcrsScalar,
@@ -363,34 +362,33 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::PexprLeftAntiSemiJoinWithInnerGro
 {
 	// compute the original outer keys and their correspondent keys on the two branches
 	// of the LASJ
-	CColRefSet *pcrsOuterKeys = GPOS_NEW(pmp) CColRefSet(pmp);
+	CColRefSet *pcrsOuterKeys = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 	pcrsOuterKeys->Include(pcrsScalar);
 	pcrsOuterKeys->Difference(pcrsInner);
-	DrgPcr *pdrgpcrOuterKeys = pcrsOuterKeys->Pdrgpcr(pmp);
+	DrgPcr *pdrgpcrOuterKeys = pcrsOuterKeys->Pdrgpcr(memory_pool);
 
-	DrgPcr *pdrgpcrConsumer2Output = CUtils::PdrgpcrCopy(pmp, pdrgpcrJoinOutput);
-	DrgPul *pdrgpulIndexesOfOuterInGby =
-			CDynamicPtrArrayUtils::PdrgpulSubsequenceIndexes(pmp, pdrgpcrOuterKeys, pdrgpcrJoinOutput);
+	DrgPcr *pdrgpcrConsumer2Output = CUtils::PdrgpcrCopy(memory_pool, pdrgpcrJoinOutput);
+	ULongPtrArray *pdrgpulIndexesOfOuterInGby = pdrgpcrJoinOutput->IndexesOfSubsequence(pdrgpcrOuterKeys);
+
 	GPOS_ASSERT(NULL != pdrgpulIndexesOfOuterInGby);
 	DrgPcr *pdrgpcrGbyKeys =
-			CXformUtils::PdrgpcrReorderedSubsequence(pmp, pdrgpcrConsumer2Output, pdrgpulIndexesOfOuterInGby);
+			CXformUtils::PdrgpcrReorderedSubsequence(memory_pool, pdrgpcrConsumer2Output, pdrgpulIndexesOfOuterInGby);
 
 	CExpression *pexprGby =
-			GPOS_NEW(pmp) CExpression
+			GPOS_NEW(memory_pool) CExpression
 				(
-				pmp,
-				GPOS_NEW(pmp) CLogicalGbAgg(pmp, pdrgpcrGbyKeys, COperator::EgbaggtypeGlobal),
-				CXformUtils::PexprCTEConsumer(pmp, ulCTEJoinId, pdrgpcrConsumer2Output),
-				GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CScalarProjectList(pmp))
+				memory_pool,
+				GPOS_NEW(memory_pool) CLogicalGbAgg(memory_pool, pdrgpcrGbyKeys, COperator::EgbaggtypeGlobal),
+				CXformUtils::PexprCTEConsumer(memory_pool, ulCTEJoinId, pdrgpcrConsumer2Output),
+				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CScalarProjectList(memory_pool))
 				);
 
-	DrgPul *pdrgpulIndexesOfOuterKeys =
-			CDynamicPtrArrayUtils::PdrgpulSubsequenceIndexes(pmp, pdrgpcrOuterKeys, pdrgpcrOuter);
+	ULongPtrArray *pdrgpulIndexesOfOuterKeys = pdrgpcrOuter->IndexesOfSubsequence(pdrgpcrOuterKeys);
 	GPOS_ASSERT(NULL != pdrgpulIndexesOfOuterKeys);
 	DrgPcr *pdrgpcrKeysInOuterCopy =
-			CXformUtils::PdrgpcrReorderedSubsequence(pmp, pdrgpcrOuterCopy, pdrgpulIndexesOfOuterKeys);
+			CXformUtils::PdrgpcrReorderedSubsequence(memory_pool, pdrgpcrOuterCopy, pdrgpulIndexesOfOuterKeys);
 
-	DrgDrgPcr *pdrgpdrgpcrLASJInput = GPOS_NEW(pmp) DrgDrgPcr(pmp);
+	DrgDrgPcr *pdrgpdrgpcrLASJInput = GPOS_NEW(memory_pool) DrgDrgPcr(memory_pool);
 	pdrgpdrgpcrLASJInput->Append(pdrgpcrKeysInOuterCopy);
 	pdrgpcrGbyKeys->AddRef();
 	pdrgpdrgpcrLASJInput->Append(pdrgpcrGbyKeys);
@@ -399,13 +397,13 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::PexprLeftAntiSemiJoinWithInnerGro
 	pdrgpcrOuterKeys->Release();
 
 	CExpression *pexprLeftAntiSemi =
-			GPOS_NEW(pmp) CExpression
+			GPOS_NEW(memory_pool) CExpression
 					(
-					pmp,
-					GPOS_NEW(pmp) CLogicalLeftAntiSemiJoin(pmp),
-					CXformUtils::PexprCTEConsumer(pmp, ulCTEOuterId, pdrgpcrOuterCopy),
+					memory_pool,
+					GPOS_NEW(memory_pool) CLogicalLeftAntiSemiJoin(memory_pool),
+					CXformUtils::PexprCTEConsumer(memory_pool, ulCTEOuterId, pdrgpcrOuterCopy),
 					pexprGby,
-					CUtils::PexprConjINDFCond(pmp, pdrgpdrgpcrLASJInput)
+					CUtils::PexprConjINDFCond(memory_pool, pdrgpdrgpcrLASJInput)
 					);
 
 	pdrgpdrgpcrLASJInput->Release();
@@ -427,7 +425,7 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::PexprLeftAntiSemiJoinWithInnerGro
 CExpression *
 CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::PexprProjectOverLeftAntiSemiJoin
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	DrgPcr *pdrgpcrOuter,
 	CColRefSet *pcrsScalar,
 	CColRefSet *pcrsInner,
@@ -443,11 +441,11 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::PexprProjectOverLeftAntiSemiJoin
 	GPOS_ASSERT(NULL != pdrgpcrJoinOutput);
 
 	// make a copy of outer for the second CTE consumer (outer of LASJ)
-	DrgPcr *pdrgpcrOuterCopy = CUtils::PdrgpcrCopy(pmp, pdrgpcrOuter);
+	DrgPcr *pdrgpcrOuterCopy = CUtils::PdrgpcrCopy(memory_pool, pdrgpcrOuter);
 
 	CExpression *pexprLeftAntiSemi = PexprLeftAntiSemiJoinWithInnerGroupBy
 									(
-									pmp,
+									memory_pool,
 									pdrgpcrOuter,
 									pdrgpcrOuterCopy,
 									pcrsScalar,
@@ -457,12 +455,11 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::PexprProjectOverLeftAntiSemiJoin
 									ulCTEOuterId
 									);
 
-	DrgPul *pdrgpulIndexesOfOuter =
-			CDynamicPtrArrayUtils::PdrgpulSubsequenceIndexes(pmp, pdrgpcrOuter, pdrgpcrJoinOutput);
+	ULongPtrArray *pdrgpulIndexesOfOuter = pdrgpcrJoinOutput->IndexesOfSubsequence(pdrgpcrOuter);
 	GPOS_ASSERT(NULL != pdrgpulIndexesOfOuter);
 
-	HMUlCr *phmulcr = GPOS_NEW(pmp) HMUlCr(pmp);
-	const ULONG ulOuterCopyLength = pdrgpcrOuterCopy->UlLength();
+	UlongColRefHashMap *colref_mapping = GPOS_NEW(memory_pool) UlongColRefHashMap(memory_pool);
+	const ULONG ulOuterCopyLength = pdrgpcrOuterCopy->Size();
 
 	for (ULONG ul = 0; ul < ulOuterCopyLength; ++ul)
 	{
@@ -471,20 +468,20 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::PexprProjectOverLeftAntiSemiJoin
 #ifdef GPOS_DEBUG
 		BOOL fInserted =
 #endif
-		phmulcr->FInsert(GPOS_NEW(pmp) ULONG(pcrOriginal->UlId()), (*pdrgpcrOuterCopy)[ul]);
+		colref_mapping->Insert(GPOS_NEW(memory_pool) ULONG(pcrOriginal->Id()), (*pdrgpcrOuterCopy)[ul]);
 		GPOS_ASSERT(fInserted);
 	}
 
-	DrgPcr *pdrgpcrInner = pcrsInner->Pdrgpcr(pmp);
+	DrgPcr *pdrgpcrInner = pcrsInner->Pdrgpcr(memory_pool);
 	CExpression *pexprProject =
-			CUtils::PexprLogicalProjectNulls(pmp, pdrgpcrInner, pexprLeftAntiSemi, phmulcr);
+			CUtils::PexprLogicalProjectNulls(memory_pool, pdrgpcrInner, pexprLeftAntiSemi, colref_mapping);
 
 	// compute the output array in the order needed by the union-all above the projection
 	*ppdrgpcrProjectOutput =
-			CUtils::PdrgpcrRemap(pmp, pdrgpcrJoinOutput, phmulcr, true /*fMustExist*/);
+			CUtils::PdrgpcrRemap(memory_pool, pdrgpcrJoinOutput, colref_mapping, true /*must_exist*/);
 
 	pdrgpcrInner->Release();
-	phmulcr->Release();
+	colref_mapping->Release();
 	pdrgpulIndexesOfOuter->Release();
 
 	return pexprProject;

@@ -27,14 +27,14 @@ namespace gpdxl
 	//		CDXLScalarConstValue
 	//
 	//	@doc:
-	//		Class for representing DXL scalar Const value
+	//		Class for representing DXL scalar Const m_bytearray_value
 	//
 	//---------------------------------------------------------------------------
 	class CDXLScalarConstValue : public CDXLScalar
 	{
 		private:
 
-			CDXLDatum *m_pdxldatum;
+			CDXLDatum *m_dxl_datum;
 
 			// private copy ctor
 			CDXLScalarConstValue(const CDXLScalarConstValue&);
@@ -44,49 +44,49 @@ namespace gpdxl
 			// ctor/dtor
 			CDXLScalarConstValue
 				(
-				IMemoryPool *pmp,
-				CDXLDatum *pdxldatum
+				IMemoryPool *memory_pool,
+				CDXLDatum *datum_dxl
 				);
 
 			virtual
 			~CDXLScalarConstValue();
 
 			// name of the operator
-			const CWStringConst *PstrOpName() const;
+			const CWStringConst *GetOpNameStr() const;
 
-			// return the datum value
-			const CDXLDatum* Pdxldatum() const
+			// return the datum m_bytearray_value
+			const CDXLDatum* GetDatumVal() const
 			{
-				return m_pdxldatum;
+				return m_dxl_datum;
 			}
 
 			// DXL Operator ID
-			Edxlopid Edxlop() const;
+			Edxlopid GetDXLOperator() const;
 			
 			// serialize operator in DXL format
 			virtual
-			void SerializeToDXL(CXMLSerializer *pxmlser, const CDXLNode *pdxln) const;
+			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
 
 			// conversion function
 			static
-			CDXLScalarConstValue *PdxlopConvert
+			CDXLScalarConstValue *Cast
 				(
-				CDXLOperator *pdxlop
+				CDXLOperator *dxl_op
 				)
 			{
-				GPOS_ASSERT(NULL != pdxlop);
-				GPOS_ASSERT(EdxlopScalarConstValue == pdxlop->Edxlop());
+				GPOS_ASSERT(NULL != dxl_op);
+				GPOS_ASSERT(EdxlopScalarConstValue == dxl_op->GetDXLOperator());
 
-				return dynamic_cast<CDXLScalarConstValue*>(pdxlop);
+				return dynamic_cast<CDXLScalarConstValue*>(dxl_op);
 			}
 
 			// does the operator return a boolean result
 			virtual
-			BOOL FBoolean(CMDAccessor *pmda) const;
+			BOOL HasBoolResult(CMDAccessor *md_accessor) const;
 
 #ifdef GPOS_DEBUG
 			// checks whether the operator has valid structure
-			void AssertValid(const CDXLNode *pdxln, BOOL fValidateChildren) const;
+			void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
 #endif // GPOS_DEBUG
 	};
 }

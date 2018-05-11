@@ -27,17 +27,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformImplementRowTrigger::CXformImplementRowTrigger
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	CXformImplementation
 		(
 		 // pattern
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 				(
-				pmp,
-				GPOS_NEW(pmp) CLogicalRowTrigger(pmp),
-				GPOS_NEW(pmp) CExpression(pmp, GPOS_NEW(pmp) CPatternLeaf(pmp))
+				memory_pool,
+				GPOS_NEW(memory_pool) CLogicalRowTrigger(memory_pool),
+				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))
 				)
 		)
 {}
@@ -83,13 +83,13 @@ CXformImplementRowTrigger::Transform
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CLogicalRowTrigger *popRowTrigger = CLogicalRowTrigger::PopConvert(pexpr->Pop());
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 
 	// extract components for alternative
-	IMDId *pmdidRel = popRowTrigger->PmdidRel();
-	pmdidRel->AddRef();
+	IMDId *rel_mdid = popRowTrigger->GetRelMdId();
+	rel_mdid->AddRef();
 
-	INT iType = popRowTrigger->IType();
+	INT type = popRowTrigger->GetType();
 
 	DrgPcr *pdrgpcrOld = popRowTrigger->PdrgpcrOld();
 	if (NULL != pdrgpcrOld)
@@ -109,10 +109,10 @@ CXformImplementRowTrigger::Transform
 
 	// create physical RowTrigger
 	CExpression *pexprAlt =
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 			(
-			pmp,
-			GPOS_NEW(pmp) CPhysicalRowTrigger(pmp, pmdidRel, iType, pdrgpcrOld, pdrgpcrNew),
+			memory_pool,
+			GPOS_NEW(memory_pool) CPhysicalRowTrigger(memory_pool, rel_mdid, type, pdrgpcrOld, pdrgpcrNew),
 			pexprChild
 			);
 	// add alternative to transformation result

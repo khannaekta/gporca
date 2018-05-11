@@ -38,7 +38,7 @@ namespace gpopt
 		public:
 
 			// ctor
-			CScalarSubqueryExistential(IMemoryPool *pmp);
+			CScalarSubqueryExistential(IMemoryPool *memory_pool);
 
 			// dtor
 			virtual
@@ -46,10 +46,10 @@ namespace gpopt
 
 			// return the type of the scalar expression
 			virtual 
-			IMDId *PmdidType() const;
+			IMDId *MDIdType() const;
 
 			// match function
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 			// sensitivity to order of inputs
 			BOOL FInputOrderSensitive() const
@@ -61,9 +61,9 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //pmp,
-						HMUlCr *, //phmulcr,
-						BOOL //fMustExist
+						IMemoryPool *, //memory_pool,
+						UlongColRefHashMap *, //colref_mapping,
+						BOOL //must_exist
 						)
 			{
 				return PopCopyDefault();
@@ -73,7 +73,7 @@ namespace gpopt
 			virtual
 			CPartInfo *PpartinfoDerive
 				(
-				IMemoryPool *pmp, 
+				IMemoryPool *memory_pool, 
 				CExpressionHandle &exprhdl
 				) 
 				const;

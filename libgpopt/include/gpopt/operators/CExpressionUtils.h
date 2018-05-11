@@ -43,7 +43,7 @@ namespace gpopt
 			static
 			void UnnestChild
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpression *pexpr,
 				ULONG UlChildIndex,
 				BOOL fAnd,
@@ -54,24 +54,24 @@ namespace gpopt
 
 			// append the unnested children of given expression to given array
 			static
-			void AppendChildren(IMemoryPool *pmp, CExpression *pexpr, DrgPexpr *pdrgpexpr);
+			void AppendChildren(IMemoryPool *memory_pool, CExpression *pexpr, DrgPexpr *pdrgpexpr);
 
 			// return an array of expression children after being unnested
 			static
-			DrgPexpr *PdrgpexprUnnestChildren(IMemoryPool *pmp, CExpression *pexpr);
+			DrgPexpr *PdrgpexprUnnestChildren(IMemoryPool *memory_pool, CExpression *pexpr);
 
 			// push not expression one level down the given expression
 			static
-			CExpression *PexprPushNotOneLevel(IMemoryPool *pmp, CExpression *pexpr);
+			CExpression *PexprPushNotOneLevel(IMemoryPool *memory_pool, CExpression *pexpr);
 
 		public:
 			// remove duplicate AND/OR children
 			static
-			CExpression *PexprDedupChildren(IMemoryPool *pmp, CExpression *pexpr);
+			CExpression *PexprDedupChildren(IMemoryPool *memory_pool, CExpression *pexpr);
 
 			// unnest AND/OR/NOT predicates
 			static
-			CExpression *PexprUnnest(IMemoryPool *pmp, CExpression *pexpr);
+			CExpression *PexprUnnest(IMemoryPool *memory_pool, CExpression *pexpr);
 	};
 }
 

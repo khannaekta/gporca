@@ -43,7 +43,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformInnerApplyWithOuterKey2InnerJoin(IMemoryPool *pmp);
+			CXformInnerApplyWithOuterKey2InnerJoin(IMemoryPool *memory_pool);
 
 			// dtor
 			virtual

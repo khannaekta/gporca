@@ -27,7 +27,7 @@ using namespace gpos;
 GPOS_RESULT
 gpopt::EresExceptionInit
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 {
 	//---------------------------------------------------------------------------
@@ -102,11 +102,11 @@ gpopt::EresExceptionInit
 	{
 		// copy exception array into heap
 		CMessage *rgpmsg[gpopt::ExmiSentinel];
-		CMessageRepository *pmr = CMessageRepository::Pmr();
+		CMessageRepository *pmr = CMessageRepository::GetMessageRepository();
 
 		for (ULONG i = 0; i < GPOS_ARRAY_SIZE(rgpmsg); i++)
 		{
-			rgpmsg[i] = GPOS_NEW(pmp) CMessage(rgmsg[i]);
+			rgpmsg[i] = GPOS_NEW(memory_pool) CMessage(rgmsg[i]);
 			pmr->AddMessage(ElocEnUS_Utf8, rgpmsg[i]);
 		}
 

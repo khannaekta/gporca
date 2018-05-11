@@ -30,12 +30,12 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalLeftAntiSemiJoinNotIn::CLogicalLeftAntiSemiJoinNotIn
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
-	CLogicalLeftAntiSemiJoin(pmp)
+	CLogicalLeftAntiSemiJoin(memory_pool)
 {
-	GPOS_ASSERT(NULL != pmp);
+	GPOS_ASSERT(NULL != memory_pool);
 }
 
 //---------------------------------------------------------------------------
@@ -49,20 +49,20 @@ CLogicalLeftAntiSemiJoinNotIn::CLogicalLeftAntiSemiJoinNotIn
 CXformSet *
 CLogicalLeftAntiSemiJoinNotIn::PxfsCandidates
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	const
 {
-	CXformSet *pxfs = GPOS_NEW(pmp) CXformSet(pmp);
+	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
 
-	(void) pxfs->FExchangeSet(CXform::ExfAntiSemiJoinNotInAntiSemiJoinNotInSwap);
-	(void) pxfs->FExchangeSet(CXform::ExfAntiSemiJoinNotInAntiSemiJoinSwap);
-	(void) pxfs->FExchangeSet(CXform::ExfAntiSemiJoinNotInSemiJoinSwap);
-	(void) pxfs->FExchangeSet(CXform::ExfAntiSemiJoinNotInInnerJoinSwap);
-	(void) pxfs->FExchangeSet(CXform::ExfLeftAntiSemiJoinNotIn2CrossProduct);
-	(void) pxfs->FExchangeSet(CXform::ExfLeftAntiSemiJoinNotIn2NLJoinNotIn);
-	(void) pxfs->FExchangeSet(CXform::ExfLeftAntiSemiJoinNotIn2HashJoinNotIn);
-	return pxfs;
+	(void) xform_set->ExchangeSet(CXform::ExfAntiSemiJoinNotInAntiSemiJoinNotInSwap);
+	(void) xform_set->ExchangeSet(CXform::ExfAntiSemiJoinNotInAntiSemiJoinSwap);
+	(void) xform_set->ExchangeSet(CXform::ExfAntiSemiJoinNotInSemiJoinSwap);
+	(void) xform_set->ExchangeSet(CXform::ExfAntiSemiJoinNotInInnerJoinSwap);
+	(void) xform_set->ExchangeSet(CXform::ExfLeftAntiSemiJoinNotIn2CrossProduct);
+	(void) xform_set->ExchangeSet(CXform::ExfLeftAntiSemiJoinNotIn2NLJoinNotIn);
+	(void) xform_set->ExchangeSet(CXform::ExfLeftAntiSemiJoinNotIn2HashJoinNotIn);
+	return xform_set;
 }
 
 // EOF

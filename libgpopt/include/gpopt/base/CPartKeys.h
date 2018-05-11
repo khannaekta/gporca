@@ -41,7 +41,7 @@ namespace gpopt
 			DrgDrgPcr *m_pdrgpdrgpcr;
 
 			// number of levels
-			ULONG m_ulLevels;
+			ULONG m_num_of_part_levels;
 
 			// private copy ctor
 			CPartKeys(const CPartKeys &);
@@ -65,27 +65,27 @@ namespace gpopt
 			}
 
 			// number of levels
-			ULONG UlLevels() const
+			ULONG GetPartitioningLevel() const
 			{
-				return m_ulLevels;
+				return m_num_of_part_levels;
 			}
 
 			// copy part key into the given memory pool
-			CPartKeys *PpartkeysCopy(IMemoryPool *pmp);
+			CPartKeys *PpartkeysCopy(IMemoryPool *memory_pool);
 
 			// check whether the key columns overlap the given column
 			BOOL FOverlap(CColRefSet *pcrs) const;
 
 			// create a new PartKeys object from the current one by remapping the
 			// keys using the given hashmap
-			CPartKeys *PpartkeysRemap(IMemoryPool *pmp, HMUlCr *phmulcr) const;
+			CPartKeys *PpartkeysRemap(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping) const;
 
 			// print
 			IOstream &OsPrint(IOstream &) const;
 
 			// copy array of part keys into given memory pool
 			static
-			DrgPpartkeys *PdrgppartkeysCopy(IMemoryPool *pmp, const DrgPpartkeys *pdrgppartkeys);
+			DrgPpartkeys *PdrgppartkeysCopy(IMemoryPool *memory_pool, const DrgPpartkeys *pdrgppartkeys);
 
 #ifdef GPOS_DEBUG
 			// debug print for interactive debugging sessions only

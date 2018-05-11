@@ -84,7 +84,7 @@ CDistributionSpecNonSingleton::FSatisfies
 void
 CDistributionSpecNonSingleton::AppendEnforcers
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &, // exprhdl
 	CReqdPropPlan *
 #ifdef GPOS_DEBUG
@@ -95,7 +95,7 @@ CDistributionSpecNonSingleton::AppendEnforcers
 	CExpression *pexpr
 	)
 {
-	GPOS_ASSERT(NULL != pmp);
+	GPOS_ASSERT(NULL != memory_pool);
 	GPOS_ASSERT(NULL != prpp);
 	GPOS_ASSERT(NULL != pdrgpexpr);
 	GPOS_ASSERT(NULL != pexpr);
@@ -111,12 +111,12 @@ CDistributionSpecNonSingleton::AppendEnforcers
 	}
 
 	// add a random distribution enforcer
-	CDistributionSpecRandom *pdsrandom = GPOS_NEW(pmp) CDistributionSpecRandom();
+	CDistributionSpecRandom *pdsrandom = GPOS_NEW(memory_pool) CDistributionSpecRandom();
 	pexpr->AddRef();
-	CExpression *pexprMotion = GPOS_NEW(pmp) CExpression
+	CExpression *pexprMotion = GPOS_NEW(memory_pool) CExpression
 										(
-										pmp,
-										GPOS_NEW(pmp) CPhysicalMotionRandom(pmp, pdsrandom),
+										memory_pool,
+										GPOS_NEW(memory_pool) CPhysicalMotionRandom(memory_pool, pdsrandom),
 										pexpr
 										);
 	pdrgpexpr->Append(pexprMotion);

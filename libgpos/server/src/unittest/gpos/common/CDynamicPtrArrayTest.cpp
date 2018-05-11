@@ -11,7 +11,6 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
-#include "gpos/common/CDynamicPtrArrayUtils.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 #include "gpos/test/CUnittest.h"
 
@@ -56,7 +55,7 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
 	// test with CHAR array
 
@@ -64,13 +63,13 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 	const CHAR *szMissingElem = "missing";
 	
 	CDynamicPtrArray<CHAR, CleanupNULL<CHAR> > *pdrg =
-		GPOS_NEW(pmp) CDynamicPtrArray<CHAR, CleanupNULL<CHAR> > (pmp, 2);
+		GPOS_NEW(memory_pool) CDynamicPtrArray<CHAR, CleanupNULL<CHAR> > (memory_pool, 2);
 
 	// add elements incl trigger resize of array
 	for (ULONG i = 0; i < 9; i++)
 	{
 		pdrg->Append(rgsz[i]);
-		GPOS_ASSERT(i + 1 == pdrg->UlLength());
+		GPOS_ASSERT(i + 1 == pdrg->Size());
 		GPOS_ASSERT(rgsz[i] == (*pdrg)[i]);
 	}
 
@@ -78,23 +77,22 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 #ifdef GPOS_DEBUG
 	const CHAR *szElem = 
 #endif // GPOS_DEBUG
-	pdrg->PtLookup(rgsz[0]);
+	pdrg->Find(rgsz[0]);
 	GPOS_ASSERT(NULL != szElem);
 	
 #ifdef GPOS_DEBUG
 	ULONG ulPos = 
 #endif // GPOS_DEBUG
-	pdrg->UlPos(rgsz[0]);
+	pdrg->IndexOf(rgsz[0]);
 	GPOS_ASSERT(0 == ulPos);
 	
 #ifdef GPOS_DEBUG
 	ULONG ulPosMissing = 
 #endif // GPOS_DEBUG
-	pdrg->UlPos(szMissingElem);
+	pdrg->IndexOf(szMissingElem);
 	GPOS_ASSERT(gpos::ulong_max == ulPosMissing);
-
 	// all elements were inserted in ascending order
-	GPOS_ASSERT(pdrg->FSorted());
+	GPOS_ASSERT(pdrg->IsSorted());
 
 	pdrg->Release();
 
@@ -102,7 +100,7 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 	// test with ULONG array
 
 	typedef CDynamicPtrArray<ULONG, CleanupNULL<ULONG> > DrgULONG;
-	DrgULONG *pdrgULONG = GPOS_NEW(pmp) DrgULONG(pmp, 1);
+	DrgULONG *pdrgULONG = GPOS_NEW(memory_pool) DrgULONG(memory_pool, 1);
 	ULONG c = 256;
 
 	// add elements incl trigger resize of array
@@ -112,13 +110,13 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 		pdrgULONG->Append(pul);
 	}
 
-	GPOS_ASSERT(c == pdrgULONG->UlLength());
+	GPOS_ASSERT(c == pdrgULONG->Size());
 
 	// all elements were inserted in descending order
-	GPOS_ASSERT(!pdrgULONG->FSorted());
+	GPOS_ASSERT(!pdrgULONG->IsSorted());
 
 	pdrgULONG->Sort();
-	GPOS_ASSERT(pdrgULONG->FSorted());
+	GPOS_ASSERT(pdrgULONG->IsSorted());
 
 	// test that all positions got copied and sorted properly
 	for (ULONG_PTR ulpJ = 0; ulpJ < c; ulpJ++)
@@ -145,39 +143,39 @@ CDynamicPtrArrayTest::EresUnittest_Ownership()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
 	// test with ULONGs
 
 	typedef CDynamicPtrArray<ULONG, CleanupDelete<ULONG> > DrgULONG;
-	DrgULONG *pdrgULONG = GPOS_NEW(pmp) DrgULONG(pmp, 1);
+	DrgULONG *pdrgULONG = GPOS_NEW(memory_pool) DrgULONG(memory_pool, 1);
 
 	// add elements incl trigger resize of array
 	for (ULONG k = 0; k < 256; k++)
 	{
-		ULONG *pul = GPOS_NEW(pmp) ULONG;
+		ULONG *pul = GPOS_NEW(memory_pool) ULONG;
 		pdrgULONG->Append(pul);
-		GPOS_ASSERT(k + 1 == pdrgULONG->UlLength());
+		GPOS_ASSERT(k + 1 == pdrgULONG->Size());
 		GPOS_ASSERT(pul == (*pdrgULONG)[k]);
 	}
 	pdrgULONG->Release();
 
 	// test with CHAR array
 
-	typedef CDynamicPtrArray<CHAR, CleanupDeleteRg<CHAR> > DrgCHAR;
-	DrgCHAR *pdrgCHAR = GPOS_NEW(pmp) DrgCHAR(pmp, 2);
+	typedef CDynamicPtrArray<CHAR, CleanupDeleteArray<CHAR> > DrgCHAR;
+	DrgCHAR *pdrgCHAR = GPOS_NEW(memory_pool) DrgCHAR(memory_pool, 2);
 
 	// add elements incl trigger resize of array
 	for (ULONG i = 0; i < 3; i++)
 	{
-		CHAR *sz = GPOS_NEW_ARRAY(pmp, CHAR, 5);
+		CHAR *sz = GPOS_NEW_ARRAY(memory_pool, CHAR, 5);
 		pdrgCHAR->Append(sz);
-		GPOS_ASSERT(i + 1 == pdrgCHAR->UlLength());
+		GPOS_ASSERT(i + 1 == pdrgCHAR->Size());
 		GPOS_ASSERT(sz == (*pdrgCHAR)[i]);
 	}
 
 	pdrgCHAR->Clear();
-	GPOS_ASSERT(0 == pdrgCHAR->UlLength());
+	GPOS_ASSERT(0 == pdrgCHAR->Size());
 
 	pdrgCHAR->Release();
 
@@ -198,30 +196,30 @@ CDynamicPtrArrayTest::EresUnittest_ArrayAppend()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
 	typedef CDynamicPtrArray<ULONG, CleanupNULL<ULONG> > DrgULONG;
 
 	ULONG cVal = 0;
 
 	// array with 1 element
-	DrgULONG *pdrgULONG1 = GPOS_NEW(pmp) DrgULONG(pmp, 1);
+	DrgULONG *pdrgULONG1 = GPOS_NEW(memory_pool) DrgULONG(memory_pool, 1);
 	pdrgULONG1->Append(&cVal);
-	GPOS_ASSERT(1 == pdrgULONG1->UlLength());
+	GPOS_ASSERT(1 == pdrgULONG1->Size());
 
 	// array with x elements
 	ULONG cX = 1000;
-	DrgULONG *pdrgULONG2 = GPOS_NEW(pmp) DrgULONG(pmp, 1);
+	DrgULONG *pdrgULONG2 = GPOS_NEW(memory_pool) DrgULONG(memory_pool, 1);
 	for(ULONG i = 0; i < cX; i++)
 	{
 		pdrgULONG2->Append(&cX);
 	}
-	GPOS_ASSERT(cX == pdrgULONG2->UlLength());
+	GPOS_ASSERT(cX == pdrgULONG2->Size());
 
 	// add one to another
 	pdrgULONG1->AppendArray(pdrgULONG2);
-	GPOS_ASSERT(cX + 1 == pdrgULONG1->UlLength());
-	for (ULONG j = 0; j < pdrgULONG2->UlLength(); j++)
+	GPOS_ASSERT(cX + 1 == pdrgULONG1->Size());
+	for (ULONG j = 0; j < pdrgULONG2->Size(); j++)
 	{
 		GPOS_ASSERT((*pdrgULONG1)[j + 1] == (*pdrgULONG2)[j]);
 	}
@@ -247,37 +245,37 @@ CDynamicPtrArrayTest::EresUnittest_ArrayAppendExactFit()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
 	typedef CDynamicPtrArray<ULONG, CleanupNULL<ULONG> > DrgULONG;
 
 	ULONG cVal = 0;
 
 	// array with 1 element
-	DrgULONG *pdrgULONG1 = GPOS_NEW(pmp) DrgULONG(pmp, 10);
+	DrgULONG *pdrgULONG1 = GPOS_NEW(memory_pool) DrgULONG(memory_pool, 10);
 	pdrgULONG1->Append(&cVal);
-	GPOS_ASSERT(1 == pdrgULONG1->UlLength());
+	GPOS_ASSERT(1 == pdrgULONG1->Size());
 
 	// array with x elements
 	ULONG cX = 9;
-	DrgULONG *pdrgULONG2 = GPOS_NEW(pmp) DrgULONG(pmp, 15);
+	DrgULONG *pdrgULONG2 = GPOS_NEW(memory_pool) DrgULONG(memory_pool, 15);
 	for(ULONG i = 0; i < cX; i++)
 	{
 		pdrgULONG2->Append(&cX);
 	}
-	GPOS_ASSERT(cX == pdrgULONG2->UlLength());
+	GPOS_ASSERT(cX == pdrgULONG2->Size());
 
 	// add one to another
 	pdrgULONG1->AppendArray(pdrgULONG2);
-	GPOS_ASSERT(cX + 1 == pdrgULONG1->UlLength());
-	for (ULONG j = 0; j < pdrgULONG2->UlLength(); j++)
+	GPOS_ASSERT(cX + 1 == pdrgULONG1->Size());
+	for (ULONG j = 0; j < pdrgULONG2->Size(); j++)
 	{
 		GPOS_ASSERT((*pdrgULONG1)[j + 1] == (*pdrgULONG2)[j]);
 	}
 
-	DrgULONG *pdrgULONG3 = GPOS_NEW(pmp) DrgULONG(pmp, 15);
+	DrgULONG *pdrgULONG3 = GPOS_NEW(memory_pool) DrgULONG(memory_pool, 15);
 	pdrgULONG1->AppendArray(pdrgULONG3);
-	GPOS_ASSERT(cX + 1 == pdrgULONG1->UlLength());
+	GPOS_ASSERT(cX + 1 == pdrgULONG1->Size());
 
 	pdrgULONG1->Release();
 	pdrgULONG2->Release();
@@ -301,17 +299,17 @@ CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes()
 	typedef CDynamicPtrArray<ULONG, CleanupNULL<ULONG> > DrgULONG;
 
 	CAutoMemoryPool amp;
-	IMemoryPool *pmp = amp.Pmp();
+	IMemoryPool *memory_pool = amp.Pmp();
 
 	// the array containing elements to look up
-	DrgULONG *pdrgULONGLookup = GPOS_NEW(pmp) DrgULONG(pmp);
+	DrgULONG *pdrgULONGLookup = GPOS_NEW(memory_pool) DrgULONG(memory_pool);
 
 	// the array containing the target elements that will give the positions
-	DrgULONG *pdrgULONGTarget = GPOS_NEW(pmp) DrgULONG(pmp);
+	DrgULONG *pdrgULONGTarget = GPOS_NEW(memory_pool) DrgULONG(memory_pool);
 
-	ULONG *pul1 = GPOS_NEW(pmp) ULONG(10);
-	ULONG *pul2 = GPOS_NEW(pmp) ULONG(20);
-	ULONG *pul3 = GPOS_NEW(pmp) ULONG(30);
+	ULONG *pul1 = GPOS_NEW(memory_pool) ULONG(10);
+	ULONG *pul2 = GPOS_NEW(memory_pool) ULONG(20);
+	ULONG *pul3 = GPOS_NEW(memory_pool) ULONG(30);
 
 	pdrgULONGLookup->Append(pul1);
 	pdrgULONGLookup->Append(pul2);
@@ -320,8 +318,7 @@ CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes()
 
 	// since target is empty, there are elements in lookup with no match, so the function
 	// should return NULL
-	GPOS_ASSERT(NULL ==
-			CDynamicPtrArrayUtils::PdrgpulSubsequenceIndexes(pmp, pdrgULONGLookup, pdrgULONGTarget));
+	GPOS_ASSERT(NULL == pdrgULONGTarget->IndexesOfSubsequence(pdrgULONGLookup));
 
 	pdrgULONGTarget->Append(pul1);
 	pdrgULONGTarget->Append(pul3);
@@ -329,10 +326,10 @@ CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes()
 	pdrgULONGTarget->Append(pul3);
 	pdrgULONGTarget->Append(pul2);
 
-	DrgPul *pdrgpulIndexes =
-			CDynamicPtrArrayUtils::PdrgpulSubsequenceIndexes(pmp, pdrgULONGLookup, pdrgULONGTarget);
+	ULongPtrArray *pdrgpulIndexes = pdrgULONGTarget->IndexesOfSubsequence(pdrgULONGLookup);
+
 	GPOS_ASSERT(NULL != pdrgpulIndexes);
-	GPOS_ASSERT(4 == pdrgpulIndexes->UlLength());
+	GPOS_ASSERT(4 == pdrgpulIndexes->Size());
 	GPOS_ASSERT(0 == *(*pdrgpulIndexes)[0]);
 	GPOS_ASSERT(4 == *(*pdrgpulIndexes)[1]);
 	GPOS_ASSERT(1 == *(*pdrgpulIndexes)[2]);

@@ -39,8 +39,8 @@ namespace gpdxl
 	class CDXLDatumOid : public CDXLDatum
 	{
 		private:
-			// oid value
-			OID m_oidVal;
+			// oid m_bytearray_value
+			OID m_oid_val;
 
 			// private copy ctor
 			CDXLDatumOid(const CDXLDatumOid &);
@@ -49,48 +49,48 @@ namespace gpdxl
 			// ctor
 			CDXLDatumOid
 				(
-				IMemoryPool *pmp,
-				IMDId *pmdidType,
-				BOOL fNull,
-				OID oidVal
+				IMemoryPool *memory_pool,
+				IMDId *mdid_type,
+				BOOL is_null,
+				OID oid_val
 				);
 
 			// dtor
 			virtual
 			~CDXLDatumOid(){};
 
-			// accessor of oid value
+			// accessor of oid m_bytearray_value
 			OID OidValue() const;
 
 			// serialize the datum as the given element
 			virtual
-			void Serialize(CXMLSerializer *pxmlser);
+			void Serialize(CXMLSerializer *xml_serializer);
 
 			// datum type
 			virtual
-			EdxldatumType Edxldt() const
+			EdxldatumType GetDatumType() const
 			{
 				return CDXLDatum::EdxldatumOid;
 			}
 
-			// is type passed by value
+			// is type passed by m_bytearray_value
 			virtual
-			BOOL FByValue() const
+			BOOL IsPassedByValue() const
 			{
 				return true;
 			}
 
 			// conversion function
 			static
-			CDXLDatumOid *PdxldatumConvert
+			CDXLDatumOid *Cast
 				(
-				CDXLDatum *pdxldatum
+				CDXLDatum *datum_dxl
 				)
 			{
-				GPOS_ASSERT(NULL != pdxldatum);
-				GPOS_ASSERT(CDXLDatum::EdxldatumOid == pdxldatum->Edxldt());
+				GPOS_ASSERT(NULL != datum_dxl);
+				GPOS_ASSERT(CDXLDatum::EdxldatumOid == datum_dxl->GetDatumType());
 
-				return dynamic_cast<CDXLDatumOid*>(pdxldatum);
+				return dynamic_cast<CDXLDatumOid*>(datum_dxl);
 			}
 	};
 }

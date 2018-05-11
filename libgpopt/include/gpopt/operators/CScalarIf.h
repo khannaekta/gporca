@@ -28,8 +28,8 @@ namespace gpopt
 	//		Scalar if operator. A case statement in SQL is represented as as
 	//		cascaded if statements. The format of if statement is:
 	//				if ------ condition
-	//				|-------- true value
-	//				|-------- false value
+	//				|-------- true m_bytearray_value
+	//				|-------- false m_bytearray_value
 	//		For example: (case when r.a < r.b then 10 when r.a > r.b then 20 else 15 end)
 	//		Is represented as if ---- r.a < r.b
 	//						   |----- 10
@@ -44,7 +44,7 @@ namespace gpopt
 		private:
 
 			// metadata id in the catalog
-			IMDId *m_pmdidType;
+			IMDId *m_mdid_type;
 
 			// is operator return type BOOL?
 			BOOL m_fBoolReturnType;
@@ -57,15 +57,15 @@ namespace gpopt
 			// ctor
 			CScalarIf
 				(
-				IMemoryPool *pmp,
-				IMDId *pmdid
+				IMemoryPool *memory_pool,
+				IMDId *mdid
 				);
 
 			// dtor
 			virtual
 			~CScalarIf() 
 			{
-				m_pmdidType->Release();
+				m_mdid_type->Release();
 			}
 
 
@@ -85,16 +85,16 @@ namespace gpopt
 
 			// the type of the scalar expression
 			virtual 
-			IMDId *PmdidType() const
+			IMDId *MDIdType() const
 			{
-				return m_pmdidType;
+				return m_mdid_type;
 			}
 
 			// operator specific hash function
-			virtual ULONG UlHash() const;
+			virtual ULONG HashValue() const;
 
 			// match function
-			virtual BOOL FMatch(COperator *) const;
+			virtual BOOL Matches(COperator *) const;
 
 			// sensitivity to order of inputs
 			virtual BOOL FInputOrderSensitive() const
@@ -106,9 +106,9 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //pmp,
-						HMUlCr *, //phmulcr,
-						BOOL //fMustExist
+						IMemoryPool *, //memory_pool,
+						UlongColRefHashMap *, //colref_mapping,
+						BOOL //must_exist
 						)
 			{
 				return PopCopyDefault();
@@ -119,7 +119,7 @@ namespace gpopt
 			virtual
 			EBoolEvalResult Eber
 				(
-				DrgPul *pdrgpulChildren
+				ULongPtrArray *pdrgpulChildren
 				)
 				const
 			{

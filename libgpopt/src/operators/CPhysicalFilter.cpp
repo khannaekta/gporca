@@ -32,10 +32,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalFilter::CPhysicalFilter
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
-	CPhysical(pmp)
+	CPhysical(memory_pool)
 {
 	// when Filter includes outer references, correlated execution has to be enforced,
 	// in this case, we create two child optimization requests to guarantee correct evaluation of parameters
@@ -69,17 +69,17 @@ CPhysicalFilter::~CPhysicalFilter()
 CColRefSet *
 CPhysicalFilter::PcrsRequired
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &exprhdl,
 	CColRefSet *pcrsRequired,
-	ULONG ulChildIndex,
+	ULONG child_index,
 	DrgPdp *, // pdrgpdpCtxt
 	ULONG // ulOptReq
 	)
 {
-	GPOS_ASSERT(0 == ulChildIndex && "Required properties can only be computed on the relational child");
+	GPOS_ASSERT(0 == child_index && "Required properties can only be computed on the relational child");
 
-	return PcrsChildReqd(pmp, exprhdl, pcrsRequired, ulChildIndex, 1 /*ulScalarIndex*/);
+	return PcrsChildReqd(memory_pool, exprhdl, pcrsRequired, child_index, 1 /*ulScalarIndex*/);
 }
 
 
@@ -94,18 +94,18 @@ CPhysicalFilter::PcrsRequired
 COrderSpec *
 CPhysicalFilter::PosRequired
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &exprhdl,
 	COrderSpec *posRequired,
-	ULONG ulChildIndex,
+	ULONG child_index,
 	DrgPdp *, // pdrgpdpCtxt
 	ULONG // ulOptReq
 	)
 	const
 {
-	GPOS_ASSERT(0 == ulChildIndex);
+	GPOS_ASSERT(0 == child_index);
 
-	return PosPassThru(pmp, exprhdl, posRequired, ulChildIndex);
+	return PosPassThru(memory_pool, exprhdl, posRequired, child_index);
 }
 
 
@@ -120,10 +120,10 @@ CPhysicalFilter::PosRequired
 CDistributionSpec *
 CPhysicalFilter::PdsRequired
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &exprhdl,
 	CDistributionSpec *pdsRequired,
-	ULONG ulChildIndex,
+	ULONG child_index,
 	DrgPdp *, // pdrgpdpCtxt
 	ULONG ulOptReq
 	)
@@ -140,7 +140,7 @@ CPhysicalFilter::PdsRequired
 		return pdsRequired;
 	}
 
-	return CPhysical::PdsUnary(pmp, exprhdl, pdsRequired, ulChildIndex, ulOptReq);
+	return CPhysical::PdsUnary(memory_pool, exprhdl, pdsRequired, child_index, ulOptReq);
 }
 
 
@@ -155,28 +155,28 @@ CPhysicalFilter::PdsRequired
 CRewindabilitySpec *
 CPhysicalFilter::PrsRequired
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &exprhdl,
 	CRewindabilitySpec *prsRequired,
-	ULONG ulChildIndex,
+	ULONG child_index,
 	DrgPdp *, // pdrgpdpCtxt
 	ULONG // ulOptReq
 	)
 	const
 {
-	GPOS_ASSERT(0 == ulChildIndex);
+	GPOS_ASSERT(0 == child_index);
 
 	// If there are outer references in the Filter (but none coming from the
 	// child), we can optimize by adding a materialize in between. However, if
 	// there are outer references in the child, we should *not* add a materialize
 	// here.  Otherwise the child will not get rescanned leading to wrong
 	// results.
-	if (exprhdl.FHasOuterRefs() && !exprhdl.FHasOuterRefs(0))
+	if (exprhdl.HasOuterRefs() && !exprhdl.HasOuterRefs(0))
 	{
-		return GPOS_NEW(pmp) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral);
+		return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral);
 	}
 
-	return PrsPassThru(pmp, exprhdl, prsRequired, ulChildIndex);
+	return PrsPassThru(memory_pool, exprhdl, prsRequired, child_index);
 }
 
 
@@ -191,54 +191,54 @@ CPhysicalFilter::PrsRequired
 CPartitionPropagationSpec *
 CPhysicalFilter::PppsRequired
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &exprhdl,
 	CPartitionPropagationSpec *pppsRequired,
 	ULONG 
 #ifdef GPOS_DEBUG
-	ulChildIndex
+	child_index
 #endif
 	,
 	DrgPdp *, //pdrgpdpCtxt,
 	ULONG // ulOptReq
 	)
 {
-	GPOS_ASSERT(0 == ulChildIndex);
+	GPOS_ASSERT(0 == child_index);
 	GPOS_ASSERT(NULL != pppsRequired);
 	
 	CPartIndexMap *ppimReqd = pppsRequired->Ppim();
 	CPartFilterMap *ppfmReqd = pppsRequired->Ppfm();
 	
-	DrgPul *pdrgpul = ppimReqd->PdrgpulScanIds(pmp);
+	ULongPtrArray *pdrgpul = ppimReqd->PdrgpulScanIds(memory_pool);
 	
-	CPartIndexMap *ppimResult = GPOS_NEW(pmp) CPartIndexMap(pmp);
-	CPartFilterMap *ppfmResult = GPOS_NEW(pmp) CPartFilterMap(pmp);
+	CPartIndexMap *ppimResult = GPOS_NEW(memory_pool) CPartIndexMap(memory_pool);
+	CPartFilterMap *ppfmResult = GPOS_NEW(memory_pool) CPartFilterMap(memory_pool);
 	
 	/// get derived part consumers
-	CPartInfo *ppartinfo = exprhdl.Pdprel(0)->Ppartinfo();
+	CPartInfo *ppartinfo = exprhdl.GetRelationalProperties(0)->Ppartinfo();
 	
-	const ULONG ulPartIndexIds = pdrgpul->UlLength();
-	BOOL fUseConstraints = (1 == exprhdl.Pdprel()->UlJoinDepth());
+	const ULONG ulPartIndexIds = pdrgpul->Size();
+	BOOL fUseConstraints = (1 == exprhdl.GetRelationalProperties()->JoinDepth());
 	
 	for (ULONG ul = 0; ul < ulPartIndexIds; ul++)
 	{
-		ULONG ulPartIndexId = *((*pdrgpul)[ul]);
+		ULONG part_idx_id = *((*pdrgpul)[ul]);
 
-		if (!ppartinfo->FContainsScanId(ulPartIndexId))
+		if (!ppartinfo->FContainsScanId(part_idx_id))
 		{
 			// part index id does not exist in child nodes: no need to push through
 			// the request
 			continue;
 		}
 
-		ppimResult->AddRequiredPartPropagation(ppimReqd, ulPartIndexId, CPartIndexMap::EppraPreservePropagators);
+		ppimResult->AddRequiredPartPropagation(ppimReqd, part_idx_id, CPartIndexMap::EppraPreservePropagators);
 		
 		// look for a filter on the part key
-		CExpression *pexprScalar = exprhdl.PexprScalarChild(1 /*ulChildIndex*/);
+		CExpression *pexprScalar = exprhdl.PexprScalarChild(1 /*child_index*/);
 
 		CExpression *pexprCmp = NULL;
-		DrgPpartkeys *pdrgppartkeys = ppimReqd->Pdrgppartkeys(ulPartIndexId);
-		const ULONG ulKeysets = pdrgppartkeys->UlLength();
+		DrgPpartkeys *pdrgppartkeys = ppimReqd->Pdrgppartkeys(part_idx_id);
+		const ULONG ulKeysets = pdrgppartkeys->Size();
 		for (ULONG ulKey = 0; NULL == pexprCmp && ulKey < ulKeysets; ulKey++)
 		{
 			// get partition key
@@ -247,7 +247,7 @@ CPhysicalFilter::PppsRequired
 			// try to generate a request with dynamic partition selection		
 			pexprCmp = CPredicateUtils::PexprExtractPredicatesOnPartKeys
 									(
-									pmp,
+									memory_pool,
 									pexprScalar,
 									pdrgpdrgpcrPartKeys,
 									NULL, /*pcrsAllowedRefs*/
@@ -259,9 +259,9 @@ CPhysicalFilter::PppsRequired
 		{
 			// no comparison found in filter: check if a comparison was already
 			// specified in the required partition propagation
-			if (ppfmReqd->FContainsScanId(ulPartIndexId))
+			if (ppfmReqd->FContainsScanId(part_idx_id))
 			{
-				pexprCmp = ppfmReqd->Pexpr(ulPartIndexId);
+				pexprCmp = ppfmReqd->Pexpr(part_idx_id);
 				pexprCmp->AddRef();
 			}
 			
@@ -272,13 +272,13 @@ CPhysicalFilter::PppsRequired
 		if (NULL != pexprCmp)
 		{
 			// interesting filter found
-			ppfmResult->AddPartFilter(pmp, ulPartIndexId, pexprCmp, NULL /*pstats */);
+			ppfmResult->AddPartFilter(memory_pool, part_idx_id, pexprCmp, NULL /*stats */);
 		}
 	}
 	
 	pdrgpul->Release();
 
-	return GPOS_NEW(pmp) CPartitionPropagationSpec(ppimResult, ppfmResult);
+	return GPOS_NEW(memory_pool) CPartitionPropagationSpec(ppimResult, ppfmResult);
 }
 
 //---------------------------------------------------------------------------
@@ -292,12 +292,12 @@ CPhysicalFilter::PppsRequired
 CCTEReq *
 CPhysicalFilter::PcteRequired
 	(
-	IMemoryPool *, //pmp,
+	IMemoryPool *, //memory_pool,
 	CExpressionHandle &, //exprhdl,
 	CCTEReq *pcter,
 	ULONG
 #ifdef GPOS_DEBUG
-	ulChildIndex
+	child_index
 #endif
 	,
 	DrgPdp *, //pdrgpdpCtxt,
@@ -305,7 +305,7 @@ CPhysicalFilter::PcteRequired
 	)
 	const
 {
-	GPOS_ASSERT(0 == ulChildIndex);
+	GPOS_ASSERT(0 == child_index);
 	return PcterPushThru(pcter);
 }
 
@@ -320,7 +320,7 @@ CPhysicalFilter::PcteRequired
 COrderSpec *
 CPhysicalFilter::PosDerive
 	(
-	IMemoryPool *, // pmp
+	IMemoryPool *, // memory_pool
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -340,7 +340,7 @@ CPhysicalFilter::PosDerive
 CDistributionSpec *
 CPhysicalFilter::PdsDerive
 	(
-	IMemoryPool *, // pmp
+	IMemoryPool *, // memory_pool
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -360,7 +360,7 @@ CPhysicalFilter::PdsDerive
 CRewindabilitySpec *
 CPhysicalFilter::PrsDerive
 	(
-	IMemoryPool *, // pmp
+	IMemoryPool *, // memory_pool
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -371,14 +371,14 @@ CPhysicalFilter::PrsDerive
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CPhysicalFilter::FMatch
+//		CPhysicalFilter::Matches
 //
 //	@doc:
 //		Match operators
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalFilter::FMatch
+CPhysicalFilter::Matches
 	(
 	COperator *pop
 	)
@@ -430,7 +430,7 @@ CPhysicalFilter::EpetOrder
 	const
 {
 	GPOS_ASSERT(NULL != peo);
-	GPOS_ASSERT(!peo->PosRequired()->FEmpty());
+	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());
 
 	// always force sort to be on top of filter
 	return CEnfdProp::EpetRequired;

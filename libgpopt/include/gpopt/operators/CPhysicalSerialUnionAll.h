@@ -33,7 +33,7 @@ namespace gpopt
 			// ctor
 			CPhysicalSerialUnionAll
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				DrgPcr *pdrgpcrOutput,
 				DrgDrgPcr *pdrgpdrgpcrInput,
 				ULONG ulScanIdPartialIndex
@@ -61,7 +61,7 @@ namespace gpopt
 			CEnfdDistribution::EDistributionMatching Edm
 				(
 				CReqdPropPlan *prppInput,
-				ULONG , // ulChildIndex
+				ULONG , // child_index
 				DrgPdp *, //pdrgpdpCtxt
 				ULONG ulOptReq
 				)
@@ -81,10 +81,10 @@ namespace gpopt
 			virtual
 			CDistributionSpec *PdsRequired
 				(
-					IMemoryPool *pmp,
+					IMemoryPool *memory_pool,
 					CExpressionHandle &exprhdl,
 					CDistributionSpec *pdsRequired,
-					ULONG ulChildIndex,
+					ULONG child_index,
 					DrgPdp *pdrgpdpCtxt,
 					ULONG ulOptReq
 				)

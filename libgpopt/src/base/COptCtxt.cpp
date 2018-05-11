@@ -23,7 +23,7 @@
 
 using namespace gpopt;
 
-// value of the first value part id
+// m_bytearray_value of the first m_bytearray_value part id
 ULONG COptCtxt::m_ulFirstValidPartId = 1;
 
 //---------------------------------------------------------------------------
@@ -36,35 +36,35 @@ ULONG COptCtxt::m_ulFirstValidPartId = 1;
 //---------------------------------------------------------------------------
 COptCtxt::COptCtxt
 	(
-	IMemoryPool *pmp,
-	CColumnFactory *pcf,
-	CMDAccessor *pmda,
+	IMemoryPool *memory_pool,
+	CColumnFactory *col_factory,
+	CMDAccessor *md_accessor,
 	IConstExprEvaluator *pceeval,
-	COptimizerConfig *poconf
+	COptimizerConfig *optimizer_config
 	)
 	:
 	CTaskLocalStorageObject(CTaskLocalStorage::EtlsidxOptCtxt),
-	m_pmp(pmp),
-	m_pcf(pcf),
-	m_pmda(pmda),
+	m_memory_pool(memory_pool),
+	m_pcf(col_factory),
+	m_pmda(md_accessor),
 	m_pceeval(pceeval),
-	m_pcomp(GPOS_NEW(m_pmp) CDefaultComparator(pceeval)),
+	m_pcomp(GPOS_NEW(m_memory_pool) CDefaultComparator(pceeval)),
 	m_auPartId(m_ulFirstValidPartId),
 	m_pcteinfo(NULL),
 	m_pdrgpcrSystemCols(NULL),
-	m_poconf(poconf),
+	m_optimizer_config(optimizer_config),
 	m_fDMLQuery(false)
 {
-	GPOS_ASSERT(NULL != pmp);
-	GPOS_ASSERT(NULL != pcf);
-	GPOS_ASSERT(NULL != pmda);
+	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != col_factory);
+	GPOS_ASSERT(NULL != md_accessor);
 	GPOS_ASSERT(NULL != pceeval);
 	GPOS_ASSERT(NULL != m_pcomp);
-	GPOS_ASSERT(NULL != poconf);
-	GPOS_ASSERT(NULL != poconf->Pcm());
+	GPOS_ASSERT(NULL != optimizer_config);
+	GPOS_ASSERT(NULL != optimizer_config->GetCostModel());
 	
-	m_pcteinfo = GPOS_NEW(m_pmp) CCTEInfo(m_pmp);
-	m_pcm = poconf->Pcm();
+	m_pcteinfo = GPOS_NEW(m_memory_pool) CCTEInfo(m_memory_pool);
+	m_cost_model = optimizer_config->GetCostModel();
 }
 
 
@@ -83,7 +83,7 @@ COptCtxt::~COptCtxt()
 	GPOS_DELETE(m_pcomp);
 	m_pceeval->Release();
 	m_pcteinfo->Release();
-	m_poconf->Release();
+	m_optimizer_config->Release();
 	CRefCount::SafeRelease(m_pdrgpcrSystemCols);
 }
 
@@ -99,30 +99,30 @@ COptCtxt::~COptCtxt()
 COptCtxt *
 COptCtxt::PoctxtCreate
 	(
-	IMemoryPool *pmp,
-	CMDAccessor *pmda,
+	IMemoryPool *memory_pool,
+	CMDAccessor *md_accessor,
 	IConstExprEvaluator *pceeval,
-	COptimizerConfig *poconf
+	COptimizerConfig *optimizer_config
 	)
 {
-	GPOS_ASSERT(NULL != poconf);
+	GPOS_ASSERT(NULL != optimizer_config);
 
 	// CONSIDER:  - 1/5/09; allocate column factory out of given mem pool
 	// instead of having it create its own;
-	CColumnFactory *pcf = GPOS_NEW(pmp) CColumnFactory;
+	CColumnFactory *col_factory = GPOS_NEW(memory_pool) CColumnFactory;
 
 	COptCtxt *poctxt = NULL;
 	{
 		// safe handling of column factory; since it owns a pool that would be
 		// leaked if below allocation fails
 		CAutoP<CColumnFactory> a_pcf;
-		a_pcf = pcf;
-		a_pcf.Pt()->Initialize();
+		a_pcf = col_factory;
+		a_pcf.Value()->Initialize();
 
-		poctxt = GPOS_NEW(pmp) COptCtxt(pmp, pcf, pmda, pceeval, poconf);
+		poctxt = GPOS_NEW(memory_pool) COptCtxt(memory_pool, col_factory, md_accessor, pceeval, optimizer_config);
 
 		// detach safety
-		(void) a_pcf.PtReset();
+		(void) a_pcf.Reset();
 	}
 	return poctxt;
 }

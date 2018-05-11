@@ -63,7 +63,7 @@ namespace gpopt
 			CGroupExpression *m_pgexpr;
 
 			// xform to apply to group expression
-			CXform *m_pxform;
+			CXform *m_xform;
 
 			// job state machine
 			JSM m_jsm;
@@ -111,13 +111,13 @@ namespace gpopt
 			virtual
 			IOstream &OsDiagramToGraphviz
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				IOstream &os,
 				const WCHAR *wszTitle
 				)
 				const
 			{
-				(void) m_jsm.OsDiagramToGraphviz(pmp, os, wszTitle);
+				(void) m_jsm.OsDiagramToGraphviz(memory_pool, os, wszTitle);
 
 				return os;
 			}
@@ -125,13 +125,13 @@ namespace gpopt
 			// compute unreachable states
 			void Unreachable
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				EState **ppestate,
 				ULONG *pulSize
 				)
 				const
 			{
-				m_jsm.Unreachable(pmp, ppestate, pulSize);
+				m_jsm.Unreachable(memory_pool, ppestate, pulSize);
 			}
 
 #endif // GPOS_DEBUG

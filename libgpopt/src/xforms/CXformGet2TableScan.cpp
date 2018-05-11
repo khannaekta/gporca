@@ -28,16 +28,16 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformGet2TableScan::CXformGet2TableScan
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
 	CXformImplementation
 		(
 		 // pattern
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 				(
-				pmp,
-				GPOS_NEW(pmp) CLogicalGet(pmp)
+				memory_pool,
+				GPOS_NEW(memory_pool) CLogicalGet(memory_pool)
 				)
 		)
 {}
@@ -60,7 +60,7 @@ CXformGet2TableScan::Exfp
 	CLogicalGet *popGet = CLogicalGet::PopConvert(exprhdl.Pop());
 	
 	CTableDescriptor *ptabdesc = popGet->Ptabdesc();
-	if (ptabdesc->FPartitioned())
+	if (ptabdesc->IsPartitioned())
 	{
 		return CXform::ExfpNone;
 	}
@@ -91,10 +91,10 @@ CXformGet2TableScan::Transform
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CLogicalGet *popGet = CLogicalGet::PopConvert(pexpr->Pop());
-	IMemoryPool *pmp = pxfctxt->Pmp();
+	IMemoryPool *memory_pool = pxfctxt->Pmp();
 
 	// create/extract components for alternative
-	CName *pname = GPOS_NEW(pmp) CName(pmp, popGet->Name());
+	CName *pname = GPOS_NEW(memory_pool) CName(memory_pool, popGet->Name());
 	
 	CTableDescriptor *ptabdesc = popGet->Ptabdesc();
 	ptabdesc->AddRef();
@@ -106,10 +106,10 @@ CXformGet2TableScan::Transform
 	
 	// create alternative expression
 	CExpression *pexprAlt = 
-		GPOS_NEW(pmp) CExpression
+		GPOS_NEW(memory_pool) CExpression
 			(
-			pmp,
-			GPOS_NEW(pmp) CPhysicalTableScan(pmp, pname, ptabdesc, pdrgpcrOutput)
+			memory_pool,
+			GPOS_NEW(memory_pool) CPhysicalTableScan(memory_pool, pname, ptabdesc, pdrgpcrOutput)
 			);
 	// add alternative to transformation result
 	pxfres->Add(pexprAlt);

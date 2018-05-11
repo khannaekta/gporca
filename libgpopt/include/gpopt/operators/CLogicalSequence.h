@@ -36,7 +36,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CLogicalSequence(IMemoryPool *pmp);
+			CLogicalSequence(IMemoryPool *memory_pool);
 
 			// dtor
 			virtual
@@ -59,7 +59,7 @@ namespace gpopt
 		
 			// match function
 			virtual
-			BOOL FMatch(COperator *pop) const;
+			BOOL Matches(COperator *pop) const;
 
 
 			// sensitivity to order of inputs
@@ -72,9 +72,9 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //pmp,
-						HMUlCr *, //phmulcr,
-						BOOL //fMustExist
+						IMemoryPool *, //memory_pool,
+						UlongColRefHashMap *, //colref_mapping,
+						BOOL //must_exist
 						)
 			{
 				return PopCopyDefault();
@@ -86,30 +86,30 @@ namespace gpopt
 
 			// derive output columns
 			virtual
-			CColRefSet *PcrsDeriveOutput(IMemoryPool *pmp, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsDeriveOutput(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
 
 			// dervive keys
 			virtual 
-			CKeyCollection *PkcDeriveKeys(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CKeyCollection *PkcDeriveKeys(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			// derive partition consumer info
 			virtual
-			CPartInfo *PpartinfoDerive(IMemoryPool *pmp, CExpressionHandle &exprhdl) const;
+			CPartInfo *PpartinfoDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
 
 			// derive constraint property
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *, //pmp,
+				IMemoryPool *, //memory_pool,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PpcDeriveConstraintPassThru(exprhdl, exprhdl.UlArity() - 1);
+				return PpcDeriveConstraintPassThru(exprhdl, exprhdl.Arity() - 1);
 			}
 
 			//-------------------------------------------------------------------------------------
@@ -120,39 +120,39 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsStat
 				(
-				IMemoryPool *pmp,
+				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsInput,
-				ULONG ulChildIndex
+				ULONG child_index
 				)
 				const
 			{
-				const ULONG ulLastChildIndex = exprhdl.UlArity() - 1;
-				if (ulChildIndex == ulLastChildIndex)
+				const ULONG ulLastChildIndex = exprhdl.Arity() - 1;
+				if (child_index == ulLastChildIndex)
 				{
 					// only pass through the required stats column to the last child since
 					// the output of the sequence operator is the output of the last child
 					return PcrsStatsPassThru(pcrsInput);
 				}
 
-				return GPOS_NEW(pmp) CColRefSet(pmp);
+				return GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 			}
 
 			// derive statistics
 			virtual
 			IStatistics *PstatsDerive
 				(
-				IMemoryPool *, //pmp,
+				IMemoryPool *, //memory_pool,
 				CExpressionHandle &exprhdl,
-				DrgPstat * //pdrgpstatCtxt
+				StatsArray * //stats_ctxt
 				)
 				const
 			{
 				// pass through stats from last child
-				IStatistics *pstats = exprhdl.Pstats(exprhdl.UlArity() - 1);
-				pstats->AddRef();
+				IStatistics *stats = exprhdl.Pstats(exprhdl.Arity() - 1);
+				stats->AddRef();
 
-				return pstats;
+				return stats;
 			}
 
 			//-------------------------------------------------------------------------------------
@@ -161,7 +161,7 @@ namespace gpopt
 
 			// candidate set of xforms
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *pmp) const;
+			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
 
 			// stat promise
 			virtual

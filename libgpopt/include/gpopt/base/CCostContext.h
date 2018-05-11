@@ -22,7 +22,7 @@
 // infinite plan cost
 #define GPOPT_INFINITE_COST CCost(1e+100)
 
-// invalid cost value
+// invalid cost m_bytearray_value
 #define GPOPT_INVALID_COST	CCost(-0.5)
 
 
@@ -70,7 +70,7 @@ namespace gpopt
 		private:
 
 			// memory pool
-			IMemoryPool *m_pmp;
+			IMemoryPool *m_memory_pool;
 
 			// cost of group expression under optimization context
 			CCost m_cost;
@@ -124,7 +124,7 @@ namespace gpopt
 			SLink m_link;
 
 			// ctor
-			CCostContext(IMemoryPool *pmp, COptimizationContext *poc, ULONG ulOptReq, CGroupExpression *pgexpr);
+			CCostContext(IMemoryPool *memory_pool, COptimizationContext *poc, ULONG ulOptReq, CGroupExpression *pgexpr);
 
 			// dtor
 			virtual
@@ -204,7 +204,7 @@ namespace gpopt
 				return m_pdpplan;
 			}
 
-			// set cost value
+			// set cost m_bytearray_value
 			void SetCost
 				(
 				CCost cost
@@ -215,7 +215,7 @@ namespace gpopt
 			}
 
 			// derive properties of the plan carried by cost context
-			void DerivePlanProps(IMemoryPool *pmp);
+			void DerivePlanProps(IMemoryPool *memory_pool);
 
 			// set cost context state
 			void SetState
@@ -242,20 +242,20 @@ namespace gpopt
 
 
 			// check validity by comparing derived and required properties
-			BOOL FValid(IMemoryPool *pmp);
+			BOOL IsValid(IMemoryPool *memory_pool);
 
 			// comparison operator
 			BOOL operator == (const CCostContext &cc) const;
 
 			// compute cost
-			CCost CostCompute(IMemoryPool *pmp, DrgPcost *pdrgpcostChildren);
+			CCost CostCompute(IMemoryPool *memory_pool, DrgPcost *pdrgpcostChildren);
 
 			// is current context better than the given equivalent context based on cost?
 			BOOL FBetterThan(const CCostContext *pcc) const;
 
 			// equality function
 			static
-			BOOL FEqual
+			BOOL Equals
 				(
 				const CCostContext &ccLeft,
 				const CCostContext &ccRight
@@ -269,38 +269,38 @@ namespace gpopt
 
 				return ccLeft.UlOptReq() == ccRight.UlOptReq() &&
 					ccLeft.Pgexpr() == ccRight.Pgexpr() &&
-					ccLeft.Poc()->FMatch(ccRight.Poc());
+					ccLeft.Poc()->Matches(ccRight.Poc());
 			}
 
 			// equality function
 			static
-			BOOL FEqual
+			BOOL Equals
 				(
 				const CCostContext *pccLeft,
 				const CCostContext *pccRight
 				)
 			{
-				return FEqual(*pccLeft, *pccRight);
+				return Equals(*pccLeft, *pccRight);
 			}
 
 			// hash function
 			static
-			ULONG UlHash
+			ULONG HashValue
 				(
 				const CCostContext &cc
 				)
 			{
-				return COptimizationContext::UlHash(*(cc.Poc()));
+				return COptimizationContext::HashValue(*(cc.Poc()));
 			}
 
 			// hash function
 			static
-			ULONG UlHash
+			ULONG HashValue
 				(
 				const CCostContext *pcc
 				)
 			{
-				return UlHash(*pcc);
+				return HashValue(*pcc);
 			}
 
 			// debug print

@@ -29,10 +29,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	:
-	CLogicalGbAgg(pmp),
+	CLogicalGbAgg(memory_pool),
 	m_pdrgpcrKeys(NULL)
 {
 	m_fPattern = true;
@@ -48,13 +48,13 @@ CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate
 //---------------------------------------------------------------------------
 CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate
 	(
-	IMemoryPool *pmp,
-	DrgPcr *pdrgpcr,
+	IMemoryPool *memory_pool,
+	DrgPcr *colref_array,
 	COperator::EGbAggType egbaggtype,
 	DrgPcr *pdrgpcrKeys
 	)
 	:
-	CLogicalGbAgg(pmp, pdrgpcr, egbaggtype),
+	CLogicalGbAgg(memory_pool, colref_array, egbaggtype),
 	m_pdrgpcrKeys(pdrgpcrKeys)
 {
 	GPOS_ASSERT(NULL != pdrgpcrKeys);
@@ -70,14 +70,14 @@ CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate
 //---------------------------------------------------------------------------
 CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate
 	(
-	IMemoryPool *pmp,
-	DrgPcr *pdrgpcr,
+	IMemoryPool *memory_pool,
+	DrgPcr *colref_array,
 	DrgPcr *pdrgpcrMinimal,
 	COperator::EGbAggType egbaggtype,
 	DrgPcr *pdrgpcrKeys
 	)
 	:
-	CLogicalGbAgg(pmp, pdrgpcr, pdrgpcrMinimal, egbaggtype),
+	CLogicalGbAgg(memory_pool, colref_array, pdrgpcrMinimal, egbaggtype),
 	m_pdrgpcrKeys(pdrgpcrKeys)
 {
 	GPOS_ASSERT(NULL != pdrgpcrKeys);
@@ -108,22 +108,22 @@ CLogicalGbAggDeduplicate::~CLogicalGbAggDeduplicate()
 COperator *
 CLogicalGbAggDeduplicate::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *pmp,
-	HMUlCr *phmulcr,
-	BOOL fMustExist
+	IMemoryPool *memory_pool,
+	UlongColRefHashMap *colref_mapping,
+	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcr = CUtils::PdrgpcrRemap(pmp, Pdrgpcr(), phmulcr, fMustExist);
+	DrgPcr *colref_array = CUtils::PdrgpcrRemap(memory_pool, Pdrgpcr(), colref_mapping, must_exist);
 
 	DrgPcr *pdrgpcrMinimal = PdrgpcrMinimal();
 	if (NULL != pdrgpcrMinimal)
 	{
-		pdrgpcrMinimal = CUtils::PdrgpcrRemap(pmp, pdrgpcrMinimal, phmulcr, fMustExist);
+		pdrgpcrMinimal = CUtils::PdrgpcrRemap(memory_pool, pdrgpcrMinimal, colref_mapping, must_exist);
 	}
 
-	DrgPcr *pdrgpcrKeys = CUtils::PdrgpcrRemap(pmp, m_pdrgpcrKeys, phmulcr, fMustExist);
+	DrgPcr *pdrgpcrKeys = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrKeys, colref_mapping, must_exist);
 
-	return GPOS_NEW(pmp) CLogicalGbAggDeduplicate(pmp, pdrgpcr, pdrgpcrMinimal, Egbaggtype(), pdrgpcrKeys);
+	return GPOS_NEW(memory_pool) CLogicalGbAggDeduplicate(memory_pool, colref_array, pdrgpcrMinimal, Egbaggtype(), pdrgpcrKeys);
 }
 
 //---------------------------------------------------------------------------
@@ -137,35 +137,35 @@ CLogicalGbAggDeduplicate::PopCopyWithRemappedColumns
 CColRefSet *
 CLogicalGbAggDeduplicate::PcrsStat
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &exprhdl,
 	CColRefSet *pcrsInput,
-	ULONG ulChildIndex
+	ULONG child_index
 	)
 	const
 {
-	return PcrsStatGbAgg(pmp, exprhdl, pcrsInput, ulChildIndex, m_pdrgpcrKeys);
+	return PcrsStatGbAgg(memory_pool, exprhdl, pcrsInput, child_index, m_pdrgpcrKeys);
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CLogicalGbAggDeduplicate::UlHash
+//		CLogicalGbAggDeduplicate::HashValue
 //
 //	@doc:
 //		Operator specific hash function
 //
 //---------------------------------------------------------------------------
 ULONG
-CLogicalGbAggDeduplicate::UlHash() const
+CLogicalGbAggDeduplicate::HashValue() const
 {
-	ULONG ulHash = gpos::UlCombineHashes(COperator::UlHash(), CUtils::UlHashColArray(Pdrgpcr()));
-	ulHash = gpos::UlCombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrKeys));
+	ULONG ulHash = gpos::CombineHashes(COperator::HashValue(), CUtils::UlHashColArray(Pdrgpcr()));
+	ulHash = gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrKeys));
 
 	ULONG ulGbaggtype = (ULONG) Egbaggtype();
 
-	ulHash = gpos::UlCombineHashes(ulHash, gpos::UlHash<ULONG>(&ulGbaggtype));
+	ulHash = gpos::CombineHashes(ulHash, gpos::HashValue<ULONG>(&ulGbaggtype));
 
-	return  gpos::UlCombineHashes(ulHash, gpos::UlHash<BOOL>(&m_fGeneratesDuplicates));
+	return  gpos::CombineHashes(ulHash, gpos::HashValue<BOOL>(&m_fGeneratesDuplicates));
 }
 
 //---------------------------------------------------------------------------
@@ -179,7 +179,7 @@ CLogicalGbAggDeduplicate::UlHash() const
 CKeyCollection *
 CLogicalGbAggDeduplicate::PkcDeriveKeys
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle & //exprhdl
 	)
 	const
@@ -191,7 +191,7 @@ CLogicalGbAggDeduplicate::PkcDeriveKeys
 	{
 		// keys from join child are still keys
 		m_pdrgpcrKeys->AddRef();
-		pkc = GPOS_NEW(pmp) CKeyCollection(pmp, m_pdrgpcrKeys);
+		pkc = GPOS_NEW(memory_pool) CKeyCollection(memory_pool, m_pdrgpcrKeys);
 	}
 
 	return pkc;
@@ -199,14 +199,14 @@ CLogicalGbAggDeduplicate::PkcDeriveKeys
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CLogicalGbAggDeduplicate::FMatch
+//		CLogicalGbAggDeduplicate::Matches
 //
 //	@doc:
 //		Match function on operator level
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalGbAggDeduplicate::FMatch
+CLogicalGbAggDeduplicate::Matches
 	(
 	COperator *pop
 	)
@@ -225,9 +225,9 @@ CLogicalGbAggDeduplicate::FMatch
 	}
 
 	return popAgg->Egbaggtype() == Egbaggtype() &&
-			Pdrgpcr()->FEqual(popAgg->Pdrgpcr()) &&
-			m_pdrgpcrKeys->FEqual(popAgg->PdrgpcrKeys()) &&
-			CColRef::FEqual(PdrgpcrMinimal(), popAgg->PdrgpcrMinimal());
+			Pdrgpcr()->Equals(popAgg->Pdrgpcr()) &&
+			m_pdrgpcrKeys->Equals(popAgg->PdrgpcrKeys()) &&
+			CColRef::Equals(PdrgpcrMinimal(), popAgg->PdrgpcrMinimal());
 }
 
 //---------------------------------------------------------------------------
@@ -241,16 +241,16 @@ CLogicalGbAggDeduplicate::FMatch
 CXformSet *
 CLogicalGbAggDeduplicate::PxfsCandidates
 	(
-	IMemoryPool *pmp
+	IMemoryPool *memory_pool
 	)
 	const
 {
-	CXformSet *pxfs = GPOS_NEW(pmp) CXformSet(pmp);
-	(void) pxfs->FExchangeSet(CXform::ExfPushGbDedupBelowJoin);
-	(void) pxfs->FExchangeSet(CXform::ExfSplitGbAggDedup);
-	(void) pxfs->FExchangeSet(CXform::ExfGbAggDedup2HashAggDedup);
-	(void) pxfs->FExchangeSet(CXform::ExfGbAggDedup2StreamAggDedup);
-	return pxfs;
+	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	(void) xform_set->ExchangeSet(CXform::ExfPushGbDedupBelowJoin);
+	(void) xform_set->ExchangeSet(CXform::ExfSplitGbAggDedup);
+	(void) xform_set->ExchangeSet(CXform::ExfGbAggDedup2HashAggDedup);
+	(void) xform_set->ExchangeSet(CXform::ExfGbAggDedup2StreamAggDedup);
+	return xform_set;
 }
 
 //---------------------------------------------------------------------------
@@ -264,33 +264,33 @@ CLogicalGbAggDeduplicate::PxfsCandidates
 IStatistics *
 CLogicalGbAggDeduplicate::PstatsDerive
 	(
-	IMemoryPool *pmp,
+	IMemoryPool *memory_pool,
 	CExpressionHandle &exprhdl,
-	DrgPstat * // not used
+	StatsArray * // not used
 	)
 	const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	IStatistics *pstatsChild = exprhdl.Pstats(0);
+	IStatistics *child_stats = exprhdl.Pstats(0);
 
 	// extract computed columns
-	DrgPul *pdrgpulComputedCols = GPOS_NEW(pmp) DrgPul(pmp);
-	exprhdl.Pdpscalar(1 /*ulChildIndex*/)->PcrsDefined()->ExtractColIds(pmp, pdrgpulComputedCols);
+	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(memory_pool) ULongPtrArray(memory_pool);
+	exprhdl.GetDrvdScalarProps(1 /*child_index*/)->PcrsDefined()->ExtractColIds(memory_pool, pdrgpulComputedCols);
 
 	// construct bitset with keys of join child
-	CBitSet *pbsKeys = GPOS_NEW(pmp) CBitSet(pmp);
-	const ULONG ulKeys = m_pdrgpcrKeys->UlLength();
+	CBitSet *keys = GPOS_NEW(memory_pool) CBitSet(memory_pool);
+	const ULONG ulKeys = m_pdrgpcrKeys->Size();
 	for (ULONG ul = 0; ul < ulKeys; ul++)
 	{
-		CColRef *pcr = (*m_pdrgpcrKeys)[ul];
-		pbsKeys->FExchangeSet(pcr->UlId());
+		CColRef *colref = (*m_pdrgpcrKeys)[ul];
+		keys->ExchangeSet(colref->Id());
 	}
 
-	IStatistics *pstats = CLogicalGbAgg::PstatsDerive(pmp, pstatsChild, Pdrgpcr(), pdrgpulComputedCols, pbsKeys);
-	pbsKeys->Release();
+	IStatistics *stats = CLogicalGbAgg::PstatsDerive(memory_pool, child_stats, Pdrgpcr(), pdrgpulComputedCols, keys);
+	keys->Release();
 	pdrgpulComputedCols->Release();
 
-	return pstats;
+	return stats;
 }
 
 

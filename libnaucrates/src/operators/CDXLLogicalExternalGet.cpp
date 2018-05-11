@@ -25,39 +25,39 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLLogicalExternalGet::CDXLLogicalExternalGet
 	(
-	IMemoryPool *pmp,
-	CDXLTableDescr *pdxltabdesc
+	IMemoryPool *memory_pool,
+	CDXLTableDescr *table_descr
 	)
 	:
-	CDXLLogicalGet(pmp, pdxltabdesc)
+	CDXLLogicalGet(memory_pool, table_descr)
 {}
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLLogicalExternalGet::Edxlop
+//		CDXLLogicalExternalGet::GetDXLOperator
 //
 //	@doc:
 //		Operator type
 //
 //---------------------------------------------------------------------------
 Edxlopid
-CDXLLogicalExternalGet::Edxlop() const
+CDXLLogicalExternalGet::GetDXLOperator() const
 {
 	return EdxlopLogicalExternalGet;
 }
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLLogicalExternalGet::PstrOpName
+//		CDXLLogicalExternalGet::GetOpNameStr
 //
 //	@doc:
 //		Operator name
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLLogicalExternalGet::PstrOpName() const
+CDXLLogicalExternalGet::GetOpNameStr() const
 {
-	return CDXLTokens::PstrToken(EdxltokenLogicalExternalGet);
+	return CDXLTokens::GetDXLTokenStr(EdxltokenLogicalExternalGet);
 }
 
 // EOF

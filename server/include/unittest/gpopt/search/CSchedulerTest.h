@@ -55,7 +55,7 @@ namespace gpopt
 			static
 			void RunTasks
 					(
-					IMemoryPool *pmp,
+					IMemoryPool *memory_pool,
 					CJobFactory *pjf,
 					CScheduler *psched,
 					CEngine *peng,
@@ -66,7 +66,7 @@ namespace gpopt
 
 			// build memo using multiple threads
 			static
-			void BuildMemoMultiThreaded(IMemoryPool *pmp, CExpression *pexprInput, DrgPss *pdrgpss);
+			void BuildMemoMultiThreaded(IMemoryPool *memory_pool, CExpression *pexprInput, DrgPss *search_stage_array);
 
 			// unittests
 			static GPOS_RESULT EresUnittest();

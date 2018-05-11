@@ -19,24 +19,24 @@ using namespace gpmd;
 
 //---------------------------------------------------------------------------
 //	@function:
-//		IMDRelation::PstrDistrPolicy
+//		IMDRelation::GetDistrPolicyStr
 //
 //	@doc:
-//		Return relation distribution policy as a string value
+//		Return relation distribution policy as a string m_bytearray_value
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-IMDIndex::PstrIndexType
+IMDIndex::GetDXLStr
 	(
-	EmdindexType emdindt
+	EmdindexType index_type
 	)
 {
-	switch (emdindt)
+	switch (index_type)
 	{
 		case EmdindBtree:
-			return CDXLTokens::PstrToken(EdxltokenIndexTypeBtree);
+			return CDXLTokens::GetDXLTokenStr(EdxltokenIndexTypeBtree);
 		case EmdindBitmap:
-			return CDXLTokens::PstrToken(EdxltokenIndexTypeBitmap);
+			return CDXLTokens::GetDXLTokenStr(EdxltokenIndexTypeBitmap);
 		default:
 			GPOS_ASSERT(!"Unrecognized index type");
 			return NULL;

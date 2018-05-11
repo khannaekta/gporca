@@ -38,7 +38,7 @@ namespace gpopt
 
 			// helper for subquery unnesting
 			static
-			CExpression *PexprSubqueryUnnest(IMemoryPool *pmp, CExpression *pexpr, BOOL fEnforceCorrelatedApply);
+			CExpression *PexprSubqueryUnnest(IMemoryPool *memory_pool, CExpression *pexpr, BOOL fEnforceCorrelatedApply);
 
 			// actual transform
 			virtual

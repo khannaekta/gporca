@@ -36,7 +36,7 @@ namespace gpopt
 		private:
 		
 			// memory pool
-			IMemoryPool *m_pmp;
+			IMemoryPool *m_memory_pool;
 		
 			// array of key sets
 			DrgPcrs *m_pdrgpcrs;
@@ -48,9 +48,9 @@ namespace gpopt
 
 			// ctors
 			explicit
-			CKeyCollection(IMemoryPool *pmp);
-			CKeyCollection(IMemoryPool *pmp, CColRefSet *pcrs);
-			CKeyCollection(IMemoryPool *pmp, DrgPcr *pdrgpcr);
+			CKeyCollection(IMemoryPool *memory_pool);
+			CKeyCollection(IMemoryPool *memory_pool, CColRefSet *pcrs);
+			CKeyCollection(IMemoryPool *memory_pool, DrgPcr *colref_array);
 
 			// dtor
 			virtual 
@@ -63,27 +63,27 @@ namespace gpopt
 			BOOL FKey(const CColRefSet *pcrs, BOOL fExactMatch = true) const;
 
 			// check if an array of columns constitutes a key
-			BOOL FKey(IMemoryPool *pmp, const DrgPcr *pdrgpcr) const;
+			BOOL FKey(IMemoryPool *memory_pool, const DrgPcr *colref_array) const;
 			
 			// trim off non-key columns
-			DrgPcr *PdrgpcrTrim(IMemoryPool *pmp, const DrgPcr *pdrgpcr) const;
+			DrgPcr *PdrgpcrTrim(IMemoryPool *memory_pool, const DrgPcr *colref_array) const;
 			
 			// extract a key
-			DrgPcr *PdrgpcrKey(IMemoryPool *pmp) const;
+			DrgPcr *PdrgpcrKey(IMemoryPool *memory_pool) const;
 
 			// extract a hashable key
-			DrgPcr *PdrgpcrHashableKey(IMemoryPool *pmp) const;
+			DrgPcr *PdrgpcrHashableKey(IMemoryPool *memory_pool) const;
 
 			// extract key at given position
-			DrgPcr *PdrgpcrKey(IMemoryPool *pmp, ULONG ul) const;
+			DrgPcr *PdrgpcrKey(IMemoryPool *memory_pool, ULONG ul) const;
 
 			// extract key at given position
-			CColRefSet *PcrsKey(IMemoryPool *pmp, ULONG ul) const;
+			CColRefSet *PcrsKey(IMemoryPool *memory_pool, ULONG ul) const;
 			
 			// number of keys
-			ULONG UlKeys() const
+			ULONG Keys() const
 			{
-				return m_pdrgpcrs->UlLength();
+				return m_pdrgpcrs->Size();
 			}
 
 			// print
