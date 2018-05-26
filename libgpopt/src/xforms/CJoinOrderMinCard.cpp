@@ -215,17 +215,22 @@ CJoinOrderMinCard::GetStartingJoins()
 	CDouble dMinRows(0.0);
 	ULONG ul1Counter = 0;
 	ULONG ul2Counter = 0;
-	CJoinOrder::SComponent *pcompBest = GPOS_NEW(m_pmp) SComponent(m_pmp, NULL /*pexpr*/);;
+	CJoinOrder::SComponent *pcompBest = GPOS_NEW(m_pmp) SComponent(m_pmp, NULL /*pexpr*/);
+
 	for (ULONG ul1 = 0; ul1 < m_ulComps; ul1++)
 	{
-		for (ULONG ul2 = 0; ul2 != ul1; ul2++)
+		for (ULONG ul2 = ul1+1; ul2 < m_ulComps; ul2++)
 		{
 			CJoinOrder::SComponent *pcompTemp = PcompCombine(m_rgpcomp[ul1], m_rgpcomp[ul2]);
+			if(CUtils::FCrossJoin(pcompTemp->m_pexpr))
+			{
+				pcompTemp->Release();
+				continue;
+			}
 			DeriveStats(m_pmp, pcompTemp);
+
 			CDouble dRows = pcompTemp->m_pexpr->Pstats()->DRows();
-			CAutoTrace at(m_pmp);
-			at.Os() << *(pcompTemp->m_pexpr) << std::endl;
-			at.Os() << "Rows here:" << dRows << std::endl;
+
 			if (dMinRows <= 0 || dRows <= dMinRows)
 			{
 				ul1Counter = ul1;
@@ -238,12 +243,21 @@ CJoinOrderMinCard::GetStartingJoins()
 			pcompTemp->Release();
 		}
 	}
+	
+	if((ul1Counter == 0) && (ul2Counter==0))
+	{
+		pcompBest->Release();
+		return NULL;
+	}
+	
 	SComponent *comp1 = m_rgpcomp[ul1Counter];
 	comp1->m_fUsed = true;
 	SComponent *comp2 = m_rgpcomp[ul2Counter];
 	comp2->m_fUsed = true;
 	pcompBest->m_fUsed = true;
+
 	return pcompBest;
+	
 }
 
 
@@ -253,8 +267,18 @@ CJoinOrderMinCard::PexprExpand()
 {
 	GPOS_ASSERT(NULL == m_pcompResult && "join order is already expanded");
 
+	ULONG ulCoveredComps = 0;
 	m_pcompResult = GetStartingJoins();
-	ULONG ulCoveredComps = 2;
+	
+	if(NULL != m_pcompResult)
+	{
+		ulCoveredComps = 2;
+	}
+	else
+	{
+		m_pcompResult = GPOS_NEW(m_pmp) SComponent(m_pmp, NULL /*pexpr*/);
+	}
+
 	while (ulCoveredComps < m_ulComps)
 	{
 		CDouble dMinRows(0.0);
