@@ -79,6 +79,8 @@ namespace gpopt
 				// a flag to component edge as used
 				BOOL m_fUsed;
 
+				INT m_connected_edges;
+
 				// ctor
 				SComponent(IMemoryPool *pmp, CExpression *pexpr);
 				

@@ -1264,12 +1264,12 @@ CExpression::OsPrint
 
 	CPrintPrefix pfx(ppfx, szChildPrefix);
 
-#ifdef GPOS_DEBUG
-	if (GPOS_FTRACE(EopttracePrintExpressionProperties))
-	{
-		PrintProperties(os, pfx);
-	}
-#endif // GPOS_DEBUG
+//#ifdef GPOS_DEBUG
+//	if (GPOS_FTRACE(EopttracePrintExpressionProperties))
+//	{
+//		PrintProperties(os, pfx);
+//	}
+//#endif // GPOS_DEBUG
 		
 	const ULONG ulChildren = this->UlArity();
 	for (ULONG i = 0; i < ulChildren; i++)

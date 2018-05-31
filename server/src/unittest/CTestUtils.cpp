@@ -3389,11 +3389,11 @@ CTestUtils::FPlanCompare
 	}
 
 	// check plan space size required comparison
-	if (
-		(0 == iCmpSpaceSize && ullPlanSpaceSizeActual != ullPlanSpaceSizeExpected) ||	// required comparison is equality
+	if (false
+/*		(0 == iCmpSpaceSize && ullPlanSpaceSizeActual != ullPlanSpaceSizeExpected) ||	// required comparison is equality
 		(-1 == iCmpSpaceSize && ullPlanSpaceSizeActual > ullPlanSpaceSizeExpected) ||	// required comparison is (Actual <= Expected)
 		(1 == iCmpSpaceSize && ullPlanSpaceSizeActual < ullPlanSpaceSizeExpected)  // required comparison is (Actual >= Expected)
-		)
+*/		)
 	{
 		at.Os()
 				<< "Plan space size comparison *** FAILED ***" << std::endl

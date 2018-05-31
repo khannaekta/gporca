@@ -74,7 +74,8 @@ CJoinOrder::SComponent::SComponent
 	m_pbs(NULL),
 	m_pexpr(pexpr),
 	m_fUsed(false)
-{	
+{
+	m_connected_edges = 0;
 	m_pbs = GPOS_NEW(pmp) CBitSet(pmp);
 }
 
@@ -97,6 +98,7 @@ CJoinOrder::SComponent::SComponent
 	m_pexpr(pexpr),
 	m_fUsed(false)
 {
+	m_connected_edges = 0;
 	GPOS_ASSERT(NULL != pbs);
 }
 
@@ -304,6 +306,7 @@ CJoinOrder::ComputeEdgeCover()
 			if (!pcrsUsed->FDisjoint(pcrsOutput))
 			{
 				(void) m_rgpedge[ulEdge]->m_pbs->FExchangeSet(ulComp);
+				m_rgpcomp[ulComp]->m_connected_edges++;
 			}
 		}
 	}

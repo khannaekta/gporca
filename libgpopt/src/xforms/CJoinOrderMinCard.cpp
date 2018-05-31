@@ -219,6 +219,11 @@ CJoinOrderMinCard::GetStartingJoins()
 
 	for (ULONG ul1 = 0; ul1 < m_ulComps; ul1++)
 	{
+		/*if (m_rgpcomp[ul1]->m_connected_edges > iMaxEdges)
+		{
+
+		}*/
+		/*
 		for (ULONG ul2 = ul1+1; ul2 < m_ulComps; ul2++)
 		{
 			CJoinOrder::SComponent *pcompTemp = PcompCombine(m_rgpcomp[ul1], m_rgpcomp[ul2]);
@@ -227,11 +232,12 @@ CJoinOrderMinCard::GetStartingJoins()
 				pcompTemp->Release();
 				continue;
 			}
+
 			DeriveStats(m_pmp, pcompTemp);
 
 			CDouble dRows = pcompTemp->m_pexpr->Pstats()->DRows();
 
-			if (dMinRows <= 0 || dRows <= dMinRows)
+			if (dMinRows <= 0 || dRows < dMinRows)
 			{
 				ul1Counter = ul1;
 				ul2Counter = ul2;
@@ -242,6 +248,7 @@ CJoinOrderMinCard::GetStartingJoins()
 			}
 			pcompTemp->Release();
 		}
+		*/
 	}
 	
 	if((ul1Counter == 0) && (ul2Counter==0))
@@ -268,26 +275,39 @@ CJoinOrderMinCard::PexprExpand()
 	GPOS_ASSERT(NULL == m_pcompResult && "join order is already expanded");
 
 	ULONG ulCoveredComps = 0;
-	m_pcompResult = GetStartingJoins();
+	/*m_pcompResult = GetStartingJoins();
 	
 	if(NULL != m_pcompResult)
 	{
 		ulCoveredComps = 2;
+		MarkUsedEdges();
 	}
 	else
-	{
+	{*/
 		m_pcompResult = GPOS_NEW(m_pmp) SComponent(m_pmp, NULL /*pexpr*/);
-	}
+	//}
 
 	while (ulCoveredComps < m_ulComps)
 	{
 		CDouble dMinRows(0.0);
 		SComponent *pcompBest = NULL; // best component to be added to current result
 		SComponent *pcompBestResult = NULL; // result after adding best component
+		INT iMaxEdges = 0;
 
 		for (ULONG ul = 0; ul < m_ulComps; ul++)
 		{
 			SComponent *pcompCurrent = m_rgpcomp[ul];
+			if (ulCoveredComps == 0)
+			{
+				if (pcompCurrent->m_connected_edges > iMaxEdges)
+				{
+					iMaxEdges = pcompCurrent->m_connected_edges;
+					pcompBest = pcompCurrent;
+					CRefCount::SafeRelease(pcompBestResult);
+					pcompBestResult = PcompCombine(m_pcompResult, pcompCurrent);
+				}
+				continue;
+			}
 			if (pcompCurrent->m_fUsed)
 			{
 				// used components are already included in current result
@@ -296,8 +316,15 @@ CJoinOrderMinCard::PexprExpand()
 
 			// combine component with current result and derive stats
 			CJoinOrder::SComponent *pcompTemp = PcompCombine(m_pcompResult, pcompCurrent);
+			/*if(CUtils::FCrossJoin(pcompTemp->m_pexpr) && 1 < m_num_edges)
+			{
+				pcompTemp->Release();
+				continue;
+			}*/
+
 			DeriveStats(m_pmp, pcompTemp);
 			CDouble dRows = pcompTemp->m_pexpr->Pstats()->DRows();
+
 
 			if (NULL == pcompBestResult || dRows < dMinRows)
 			{
