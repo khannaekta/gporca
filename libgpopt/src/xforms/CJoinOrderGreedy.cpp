@@ -74,67 +74,6 @@ CJoinOrderGreedy::~CJoinOrderGreedy()
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CJoinOrder::PcompCombine
-//
-//	@doc:
-//		Combine the two given components using applicable edges
-//
-//
-//---------------------------------------------------------------------------
-CJoinOrder::SComponent *
-CJoinOrderGreedy::PcompCombine
-(
-	SComponent *pcompOuter,
-	SComponent *pcompInner
-	)
-{
-	CBitSet *pbs = GPOS_NEW(m_pmp) CBitSet(m_pmp);
-	pbs->Union(pcompOuter->m_pbs);
-	pbs->Union(pcompInner->m_pbs);
-	DrgPexpr *pdrgpexpr = GPOS_NEW(m_pmp) DrgPexpr(m_pmp);
-	for (ULONG ul = 0; ul < m_ulEdges; ul++)
-	{
-		SEdge *pedge = m_rgpedge[ul];
-		if (pedge->m_fUsed)
-		{
-			// edge is already used in result component
-			continue;
-		}
-
-		if (pbs->FSubset(pedge->m_pbs))
-		{
-			// edge is subsumed by the cover of the combined component
-			CExpression *pexpr = pedge->m_pexpr;
-			pexpr->AddRef();
-			pdrgpexpr->Append(pexpr);
-		}
-	}
-
-	CExpression *pexprOuter = pcompOuter->m_pexpr;
-	CExpression *pexprInner = pcompInner->m_pexpr;
-	CExpression *pexprScalar = CPredicateUtils::PexprConjunction(m_pmp, pdrgpexpr);
-
-	CExpression *pexpr = NULL;
-	if (NULL == pexprOuter)
-	{
-		// first call to this function, we create a Select node
-		pexpr = CUtils::PexprCollapseSelect(m_pmp, pexprInner, pexprScalar);
-		pexprScalar->Release();
-	}
-	else
-	{
-		// not first call, we create an Inner Join
-		pexprInner->AddRef();
-		pexprOuter->AddRef();
-		pexpr = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(m_pmp, pexprOuter, pexprInner, pexprScalar);
-	}
-
-	return GPOS_NEW(m_pmp) SComponent(pexpr, pbs);
-}
-
-
-//---------------------------------------------------------------------------
-//	@function:
 //		CJoinOrder::MarkUsedEdges
 //
 //	@doc:
@@ -180,36 +119,6 @@ CJoinOrderGreedy::MarkUsedEdges()
 }
 
 
-//---------------------------------------------------------------------------
-//	@function:
-//		CJoinOrderGreedy::DeriveStats
-//
-//	@doc:
-//		Helper function to derive stats on a given component
-//
-//---------------------------------------------------------------------------
-void
-CJoinOrderGreedy::DeriveStats
-	(
-	IMemoryPool *pmp,
-	SComponent *pcomp
-	)
-{
-	GPOS_ASSERT(NULL != pcomp);
-	GPOS_ASSERT(NULL != pcomp->m_pexpr);
-
-	CExpression *pexpr = pcomp->m_pexpr;
-	if (NULL != pexpr->Pstats())
-	{
-		// stats have been already derived
-		return;
-	}
-
-	CExpressionHandle exprhdl(pmp);
-	exprhdl.Attach(pexpr);
-	exprhdl.DeriveStats(pmp, pmp, NULL /*prprel*/, NULL /*pdrgpstatCtxt*/);
-}
-
 // function to get the minimal cardinality join pair as the starting pair
 CJoinOrder::SComponent *
 CJoinOrderGreedy::GetStartingJoins()
@@ -231,7 +140,7 @@ CJoinOrderGreedy::GetStartingJoins()
 				pcompTemp->Release();
 				continue;
 			}
-			DeriveStats(m_pmp, pcompTemp);
+			DeriveStats(pcompTemp->m_pexpr);
 			CDouble dRows = pcompTemp->m_pexpr->Pstats()->DRows();
 			if (dMinRows <= 0 || dRows < dMinRows)
 			{
@@ -311,7 +220,7 @@ CJoinOrderGreedy::PexprExpand()
 				pcompTemp->Release();
 				continue;
 			}
-			DeriveStats(m_pmp, pcompTemp);
+			DeriveStats(pcompTemp->m_pexpr);
 			CDouble dRows = pcompTemp->m_pexpr->Pstats()->DRows();
 
 			if (NULL == pcompBestResult || dRows < dMinRows)
@@ -341,30 +250,6 @@ CJoinOrderGreedy::PexprExpand()
 	pexprResult->AddRef();
 
 	return pexprResult;
-}
-
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CJoinOrderGreedy::OsPrint
-//
-//	@doc:
-//		Print created join order
-//
-//---------------------------------------------------------------------------
-IOstream &
-CJoinOrderGreedy::OsPrint
-	(
-	IOstream &os
-	)
-	const
-{
-	if (NULL != m_pcompResult->m_pexpr)
-	{
-		os << *m_pcompResult->m_pexpr;
-	}
-
-	return os;
 }
 
 // EOF

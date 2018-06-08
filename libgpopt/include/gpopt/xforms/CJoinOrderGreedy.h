@@ -37,13 +37,6 @@ namespace gpopt
 
 			ULONG m_ulNumUsedEdges;
 
-			// derive stats on a given component
-			static
-			void DeriveStats(IMemoryPool *pmp, SComponent *pcomp);
-
-			// combine the two given components using applicable edges
-			SComponent *PcompCombine(SComponent *pcompOuter, SComponent *pcompInner);
-
 			// mark edges used by result component
 			void MarkUsedEdges();
 
@@ -67,10 +60,6 @@ namespace gpopt
 			// main handler
 			virtual
 			CExpression *PexprExpand();
-
-			// print function
-			virtual
-			IOstream &OsPrint(IOstream &) const;
 
 	}; // class CJoinOrderGreedy
 

@@ -72,67 +72,6 @@ CJoinOrderMinCard::~CJoinOrderMinCard()
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CJoinOrderMinCard::PcompCombine
-//
-//	@doc:
-//		Combine the two given components using applicable edges
-//
-//
-//---------------------------------------------------------------------------
-CJoinOrder::SComponent *
-CJoinOrderMinCard::PcompCombine
-	(
-	SComponent *pcompOuter,
-	SComponent *pcompInner
-	)
-{
-	CBitSet *pbs = GPOS_NEW(m_pmp) CBitSet(m_pmp);
-	pbs->Union(pcompOuter->m_pbs);
-	pbs->Union(pcompInner->m_pbs);
-	DrgPexpr *pdrgpexpr = GPOS_NEW(m_pmp) DrgPexpr(m_pmp);
-	for (ULONG ul = 0; ul < m_ulEdges; ul++)
-	{
-		SEdge *pedge = m_rgpedge[ul];
-		if (pedge->m_fUsed)
-		{
-			// edge is already used in result component
-			continue;
-		}
-
-		if (pbs->FSubset(pedge->m_pbs))
-		{
-			// edge is subsumed by the cover of the combined component
-			CExpression *pexpr = pedge->m_pexpr;
-			pexpr->AddRef();
-			pdrgpexpr->Append(pexpr);
-		}
-	}
-
-	CExpression *pexprOuter = pcompOuter->m_pexpr;
-	CExpression *pexprInner = pcompInner->m_pexpr;
-	CExpression *pexprScalar = CPredicateUtils::PexprConjunction(m_pmp, pdrgpexpr);
-
-	CExpression *pexpr = NULL;
-	if (NULL == pexprOuter)
-	{
-		// first call to this function, we create a Select node
-		pexpr = CUtils::PexprCollapseSelect(m_pmp, pexprInner, pexprScalar);
-		pexprScalar->Release();
-	}
-	else
-	{
-		// not first call, we create an Inner Join
-		pexprInner->AddRef();
-		pexprOuter->AddRef();
-		pexpr = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(m_pmp, pexprOuter, pexprInner, pexprScalar);
-	}
-
-	return GPOS_NEW(m_pmp) SComponent(pexpr, pbs);
-}
-
-
-//---------------------------------------------------------------------------
-//	@function:
 //		CJoinOrderMinCard::MarkUsedEdges
 //
 //	@doc:
@@ -176,38 +115,6 @@ CJoinOrderMinCard::MarkUsedEdges()
 	pdrgpexpr->Release();
 }
 
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CJoinOrderMinCard::DeriveStats
-//
-//	@doc:
-//		Helper function to derive stats on a given component
-//
-//---------------------------------------------------------------------------
-void
-CJoinOrderMinCard::DeriveStats
-	(
-	IMemoryPool *pmp,
-	SComponent *pcomp
-	)
-{
-	GPOS_ASSERT(NULL != pcomp);
-	GPOS_ASSERT(NULL != pcomp->m_pexpr);
-
-	CExpression *pexpr = pcomp->m_pexpr;
-	if (NULL != pexpr->Pstats())
-	{
-		// stats have been already derived
-		return;
-	}
-
-	CExpressionHandle exprhdl(pmp);
-	exprhdl.Attach(pexpr);
-	exprhdl.DeriveStats(pmp, pmp, NULL /*prprel*/, NULL /*pdrgpstatCtxt*/);
-}
-
-
 //---------------------------------------------------------------------------
 //	@function:
 //		CJoinOrderMinCard::PexprExpand
@@ -240,7 +147,7 @@ CJoinOrderMinCard::PexprExpand()
 
 			// combine component with current result and derive stats
 			CJoinOrder::SComponent *pcompTemp = PcompCombine(m_pcompResult, pcompCurrent);
-			DeriveStats(m_pmp, pcompTemp);
+			DeriveStats(pcompTemp->m_pexpr);
 			CDouble dRows = pcompTemp->m_pexpr->Pstats()->DRows();
 
 			if (NULL == pcompBestResult || dRows < dMinRows)

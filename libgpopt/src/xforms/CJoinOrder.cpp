@@ -311,6 +311,95 @@ CJoinOrder::ComputeEdgeCover()
 
 //---------------------------------------------------------------------------
 //	@function:
+//		CJoinOrder::PcompCombine
+//
+//	@doc:
+//		Combine the two given components using applicable edges
+//
+//
+//---------------------------------------------------------------------------
+CJoinOrder::SComponent *
+CJoinOrder::PcompCombine
+	(
+	SComponent *pcompOuter,
+	SComponent *pcompInner
+	)
+{
+	CBitSet *pbs = GPOS_NEW(m_pmp) CBitSet(m_pmp);
+	pbs->Union(pcompOuter->m_pbs);
+	pbs->Union(pcompInner->m_pbs);
+	DrgPexpr *pdrgpexpr = GPOS_NEW(m_pmp) DrgPexpr(m_pmp);
+	for (ULONG ul = 0; ul < m_ulEdges; ul++)
+	{
+		SEdge *pedge = m_rgpedge[ul];
+		if (pedge->m_fUsed)
+		{
+			// edge is already used in result component
+			continue;
+		}
+
+		if (pbs->FSubset(pedge->m_pbs))
+		{
+			// edge is subsumed by the cover of the combined component
+			CExpression *pexpr = pedge->m_pexpr;
+			pexpr->AddRef();
+			pdrgpexpr->Append(pexpr);
+		}
+	}
+
+	CExpression *pexprOuter = pcompOuter->m_pexpr;
+	CExpression *pexprInner = pcompInner->m_pexpr;
+	CExpression *pexprScalar = CPredicateUtils::PexprConjunction(m_pmp, pdrgpexpr);
+
+	CExpression *pexpr = NULL;
+	if (NULL == pexprOuter)
+	{
+		// first call to this function, we create a Select node
+		pexpr = CUtils::PexprCollapseSelect(m_pmp, pexprInner, pexprScalar);
+		pexprScalar->Release();
+	}
+	else
+	{
+		// not first call, we create an Inner Join
+		pexprInner->AddRef();
+		pexprOuter->AddRef();
+		pexpr = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(m_pmp, pexprOuter, pexprInner, pexprScalar);
+	}
+
+	return GPOS_NEW(m_pmp) SComponent(pexpr, pbs);
+}
+
+
+//---------------------------------------------------------------------------
+//	@function:
+//		CJoinOrder::DeriveStats
+//
+//	@doc:
+//		Helper function to derive stats on a given component
+//
+//---------------------------------------------------------------------------
+void
+CJoinOrder::DeriveStats
+	(
+	CExpression *pexpr
+	)
+{
+	GPOS_ASSERT(NULL != pexpr);
+
+	if (NULL != pexpr->Pstats())
+	{
+		// stats have been already derived
+		return;
+	}
+
+	CExpressionHandle exprhdl(m_pmp);
+	exprhdl.Attach(pexpr);
+	exprhdl.DeriveStats(m_pmp, m_pmp, NULL /*prprel*/, NULL /*pdrgpstatCtxt*/);
+}
+
+
+//---------------------------------------------------------------------------
+//	@function:
 //		CJoinOrder::OsPrint
 //
 //	@doc:

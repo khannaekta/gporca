@@ -112,6 +112,13 @@ namespace gpopt
 			// compute cover of each edge
 			void ComputeEdgeCover();
 
+			// combine the two given components using applicable edges
+			SComponent *PcompCombine(SComponent *pcompOuter, SComponent *pcompInner);
+
+			// derive stats on a given component
+			virtual
+			void DeriveStats(CExpression *pexpr);
+
 		private:
 
 			// private copy ctor

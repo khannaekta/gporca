@@ -35,15 +35,8 @@ namespace gpopt
 			// result component
 			SComponent *m_pcompResult;
 
-			// combine the two given components using applicable edges
-			SComponent *PcompCombine(SComponent *pcompOuter, SComponent *pcompInner);
-
 			// mark edges used by result component
 			void MarkUsedEdges();
-
-			// derive stats on a given component
-			static
-			void DeriveStats(IMemoryPool *pmp, SComponent *pcomp);
 
 		public:
 
