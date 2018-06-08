@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 Objective:
-Test pre-processing step does not convert a left outer join to an inner join when the predicate includes "IS DISTINCT FROM" with a column from the outer side and NULL.
+Make sure that the plan picked up is the one produced via the Greedy Xform and
+not MinCard Xform when DP and NAryJoin Xforms are disabled.
+
 CREATE TABLE t1 (a int);
 CREATE TABLE t2 (b int);
 CREATE TABLE t3 (c int);
-INSERT INTO t1 VALUES SELECT i%98 FROM generate_series(1,10000)i;
+INSERT INTO t1 SELECT i%98 FROM generate_series(1,10000)i;
 INSERT INTO t1 VALUES(98);
 INSERT INTO t2 SELECT (i%100)+99 FROM generate_series(1,1000)i;
 INSERT INTO t2 VALUES(98);
@@ -1141,7 +1143,7 @@ EXPLAIN SELECT * FROM t1 INNER JOIN t2 ON a =b INNER JOIN t3 ON b = c;
         </dxl:Comparison>
       </dxl:LogicalJoin>
     </dxl:Query>
-    <dxl:Plan Id="0" SpaceSize="0">
+    <dxl:Plan Id="0" SpaceSize="121">
       <dxl:GatherMotion InputSegments="0,1,2" OutputSegments="-1">
         <dxl:Properties>
           <dxl:Cost StartupCost="0" TotalCost="1293.748282" Rows="1.000000" Width="12"/>
