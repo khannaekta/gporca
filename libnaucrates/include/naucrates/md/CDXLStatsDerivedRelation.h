@@ -37,64 +37,58 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class CDXLStatsDerivedRelation : public CRefCount
 	{
-		private:
+	private:
+		// number of rows
+		CDouble m_rows;
 
-			// number of rows
-			CDouble m_rows;
+		// flag to indicate if input relation is empty
+		BOOL m_empty;
 
-			// flag to indicate if input relation is empty
-			BOOL m_empty;
+		// array of derived column statistics
+		DXLStatsDerivedColArray *m_dxl_stats_derived_col_array;
 
-			// array of derived column statistics
-			DXLStatsDerivedColArray *m_dxl_stats_derived_col_array;
+		// private copy ctor
+		CDXLStatsDerivedRelation(const CDXLStatsDerivedRelation &);
 
-			// private copy ctor
-			CDXLStatsDerivedRelation(const CDXLStatsDerivedRelation &);
+	public:
+		// ctor
+		CDXLStatsDerivedRelation(CDouble rows,
+								 BOOL is_empty,
+								 DXLStatsDerivedColArray *dxl_stats_derived_col_array);
 
-		public:
+		// dtor
+		virtual ~CDXLStatsDerivedRelation();
 
-			// ctor
-			CDXLStatsDerivedRelation
-				(
-				CDouble rows,
-				BOOL is_empty,
-				DXLStatsDerivedColArray *dxl_stats_derived_col_array
-				);
+		// number of rows
+		CDouble
+		Rows() const
+		{
+			return m_rows;
+		}
 
-			// dtor
-			virtual
-			~CDXLStatsDerivedRelation();
+		// is statistics on an empty input
+		virtual BOOL
+		IsEmpty() const
+		{
+			return m_empty;
+		}
 
-			// number of rows
-			CDouble Rows() const
-			{
-				return m_rows;
-			}
+		// derived column statistics
+		const DXLStatsDerivedColArray *GetDXLStatsDerivedColArray() const;
 
-			// is statistics on an empty input
-			virtual
-			BOOL IsEmpty() const
-			{
-				return m_empty;
-			}
-
-			// derived column statistics
-			const DXLStatsDerivedColArray *GetDXLStatsDerivedColArray() const;
-
-			// serialize bucket in DXL format
-			void Serialize(gpdxl::CXMLSerializer *) const;
+		// serialize bucket in DXL format
+		void Serialize(gpdxl::CXMLSerializer *) const;
 
 #ifdef GPOS_DEBUG
-			// debug print of the bucket
-			void DebugPrint(IOstream &os) const;
+		// debug print of the bucket
+		void DebugPrint(IOstream &os) const;
 #endif
-
 	};
 
 	// array of dxl buckets
 	typedef CDynamicPtrArray<CDXLStatsDerivedRelation, CleanupRelease> DXLStatsDerivedRelArray;
-}
+}  // namespace gpmd
 
-#endif // !GPMD_CDXLStatsDerivedRelation_H
+#endif  // !GPMD_CDXLStatsDerivedRelation_H
 
 // EOF

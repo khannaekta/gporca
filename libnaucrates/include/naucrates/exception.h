@@ -52,15 +52,15 @@ namespace gpdxl
 		ExmiQuery2DXLNotNullViolation,
 		ExmiQuery2DXLError,
 		ExmiExpr2DXLUnsupportedFeature,
- 		ExmiExpr2DXLAttributeNotFound,
-		ExmiDXL2PlStmtAttributeNotFound,		
+		ExmiExpr2DXLAttributeNotFound,
+		ExmiDXL2PlStmtAttributeNotFound,
 		ExmiDXL2ExprAttributeNotFound,
-		
+
 		// MD related errors
 		ExmiMDCacheEntryDuplicate,
 		ExmiMDCacheEntryNotFound,
 		ExmiMDObjUnsupported,
-		
+
 		// communication related errors
 		ExmiCommPropagateError,
 		ExmiCommUnexpectedMessage,
@@ -82,9 +82,9 @@ namespace gpdxl
 	// message initialization for GPOS exceptions
 	gpos::GPOS_RESULT EresExceptionInit(gpos::IMemoryPool *memory_pool);
 
-}
+}  // namespace gpdxl
 
-#endif // !DXL_exception_H
+#endif  // !DXL_exception_H
 
 
 // EOF

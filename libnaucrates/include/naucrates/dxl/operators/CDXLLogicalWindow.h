@@ -29,58 +29,50 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLLogicalWindow : public CDXLLogical
 	{
-		private:
-			// array of window specifications
-			DXLWindowSpecArray *m_window_spec_array;
+	private:
+		// array of window specifications
+		DXLWindowSpecArray *m_window_spec_array;
 
-			// private copy ctor
-			CDXLLogicalWindow(CDXLLogicalWindow&);
+		// private copy ctor
+		CDXLLogicalWindow(CDXLLogicalWindow &);
 
-		public:
+	public:
+		//ctor
+		CDXLLogicalWindow(IMemoryPool *memory_pool, DXLWindowSpecArray *pdrgpdxlwinspec);
 
-			//ctor
-			CDXLLogicalWindow(IMemoryPool *memory_pool, DXLWindowSpecArray *pdrgpdxlwinspec);
+		//dtor
+		virtual ~CDXLLogicalWindow();
 
-			//dtor
-			virtual
-			~CDXLLogicalWindow();
+		// accessors
+		Edxlopid GetDXLOperator() const;
+		const CWStringConst *GetOpNameStr() const;
 
-			// accessors
-			Edxlopid GetDXLOperator() const;
-			const CWStringConst *GetOpNameStr() const;
+		// number of window specs
+		ULONG NumOfWindowSpecs() const;
 
-			// number of window specs
-			ULONG NumOfWindowSpecs() const;
+		// return the window key at a given position
+		CDXLWindowSpec *GetWindowKeyAt(ULONG idx) const;
 
-			// return the window key at a given position
-			CDXLWindowSpec *GetWindowKeyAt(ULONG idx) const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
+		// conversion function
+		static CDXLLogicalWindow *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopLogicalWindow == dxl_op->GetDXLOperator());
 
-			// conversion function
-			static
-			CDXLLogicalWindow *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopLogicalWindow == dxl_op->GetDXLOperator());
-
-				return dynamic_cast<CDXLLogicalWindow*>(dxl_op);
-			}
+			return dynamic_cast<CDXLLogicalWindow *>(dxl_op);
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL validate_children) const;
-#endif // GPOS_DEBUG
-
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
-#endif // !GPDXL_CDXLLogicalWindow_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLLogicalWindow_H
 
 // EOF
-

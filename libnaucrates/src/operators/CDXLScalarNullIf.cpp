@@ -26,16 +26,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarNullIf::CDXLScalarNullIf
-	(
-	IMemoryPool *memory_pool,
-	IMDId *mdid_op,
-	IMDId *mdid_type
-	)
-	:
-	CDXLScalar(memory_pool),
-	m_mdid_op(mdid_op),
-	m_mdid_type(mdid_type)
+CDXLScalarNullIf::CDXLScalarNullIf(IMemoryPool *memory_pool, IMDId *mdid_op, IMDId *mdid_type)
+	: CDXLScalar(memory_pool), m_mdid_op(mdid_op), m_mdid_type(mdid_type)
 {
 	GPOS_ASSERT(mdid_op->IsValid());
 	GPOS_ASSERT(mdid_type->IsValid());
@@ -108,7 +100,8 @@ CDXLScalarNullIf::MDIdType() const
 const CWStringConst *
 CDXLScalarNullIf::GetOpNameStr() const
 {
-	return CDXLTokens::GetDXLTokenStr(EdxltokenScalarNullIf);;
+	return CDXLTokens::GetDXLTokenStr(EdxltokenScalarNullIf);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -120,11 +113,7 @@ CDXLScalarNullIf::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDXLScalarNullIf::HasBoolResult
-	(
-	CMDAccessor *md_accessor
-	)
-	const
+CDXLScalarNullIf::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	return (IMDType::EtiBool == md_accessor->Pmdtype(m_mdid_type)->GetDatumType());
 }
@@ -138,12 +127,7 @@ CDXLScalarNullIf::HasBoolResult
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarNullIf::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *dxlnode
-	)
-	const
+CDXLScalarNullIf::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -153,7 +137,8 @@ CDXLScalarNullIf::SerializeToDXL
 	m_mdid_type->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenTypeId));
 
 	dxlnode->SerializeChildrenToDXL(xml_serializer);
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -166,12 +151,7 @@ CDXLScalarNullIf::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarNullIf::AssertValid
-	(
-	const CDXLNode *dxlnode,
-	BOOL validate_children
-	)
-	const
+CDXLScalarNullIf::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
 	GPOS_ASSERT(2 == arity);
@@ -187,6 +167,6 @@ CDXLScalarNullIf::AssertValid
 		}
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

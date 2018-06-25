@@ -7,7 +7,7 @@
 //
 //	@doc:
 //		Class for representing DXL logical group by operators
-//		
+//
 //---------------------------------------------------------------------------
 #ifndef GPDXL_CDXLLogicalGroupBy_H
 #define GPDXL_CDXLLogicalGroupBy_H
@@ -18,7 +18,6 @@
 
 namespace gpdxl
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDXLLogicalGroupBy
@@ -29,60 +28,52 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLLogicalGroupBy : public CDXLLogical
 	{
-		private:
+	private:
+		// grouping column ids
+		ULongPtrArray *m_grouping_colid_array;
 
-			// grouping column ids
-			ULongPtrArray *m_grouping_colid_array;
+		// private copy ctor
+		CDXLLogicalGroupBy(CDXLLogicalGroupBy &);
 
-			// private copy ctor
-			CDXLLogicalGroupBy(CDXLLogicalGroupBy&);
+		// serialize output grouping columns indices in DXL
+		void SerializeGrpColsToDXL(CXMLSerializer *) const;
 
-			// serialize output grouping columns indices in DXL
-			void SerializeGrpColsToDXL(CXMLSerializer *) const;
+	public:
+		// ctors
+		explicit CDXLLogicalGroupBy(IMemoryPool *memory_pool);
+		CDXLLogicalGroupBy(IMemoryPool *memory_pool, ULongPtrArray *pdrgpulGrpColIds);
 
-		public:
-			// ctors
-			explicit
-			CDXLLogicalGroupBy(IMemoryPool *memory_pool);
-			CDXLLogicalGroupBy(IMemoryPool *memory_pool, ULongPtrArray *pdrgpulGrpColIds);
+		// dtor
+		virtual ~CDXLLogicalGroupBy();
 
-			// dtor
-			virtual
-			~CDXLLogicalGroupBy();
+		// accessors
+		Edxlopid GetDXLOperator() const;
+		const CWStringConst *GetOpNameStr() const;
+		const ULongPtrArray *GetGroupingColidArray() const;
 
-			// accessors
-			Edxlopid GetDXLOperator() const;
-			const CWStringConst *GetOpNameStr() const;
-			const ULongPtrArray *GetGroupingColidArray() const;
+		// set grouping column indices
+		void SetGroupingColumns(ULongPtrArray *);
 
-			// set grouping column indices
-			void SetGroupingColumns(ULongPtrArray *);
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+		// conversion function
+		static CDXLLogicalGroupBy *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopLogicalGrpBy == dxl_op->GetDXLOperator());
 
-			// conversion function
-			static
-			CDXLLogicalGroupBy *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopLogicalGrpBy == dxl_op->GetDXLOperator());
-
-				return dynamic_cast<CDXLLogicalGroupBy*>(dxl_op);
-			}
+			return dynamic_cast<CDXLLogicalGroupBy *>(dxl_op);
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL validate_children) const;
-#endif // GPOS_DEBUG
-
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
-#endif // !GPDXL_CDXLLogicalGroupBy_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLLogicalGroupBy_H
 
 // EOF

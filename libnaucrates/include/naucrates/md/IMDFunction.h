@@ -22,7 +22,7 @@ namespace gpmd
 {
 	using namespace gpos;
 
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		IMDFunction
@@ -32,62 +32,55 @@ namespace gpmd
 	//
 	//---------------------------------------------------------------------------
 	class IMDFunction : public IMDCacheObject
-	{	
-		public:
+	{
+	public:
+		// function stability property
+		enum EFuncStbl
+		{
+			EfsImmutable, /* never changes for given input */
+			EfsStable,	/* does not change within a scan */
+			EfsVolatile,  /* can change even within a scan */
+			EfsSentinel
+		};
 
-			// function stability property
-			enum EFuncStbl
-			{
-				EfsImmutable, /* never changes for given input */
-				EfsStable, /* does not change within a scan */
-				EfsVolatile, /* can change even within a scan */
-				EfsSentinel
-			};
+		// function data access property
+		enum EFuncDataAcc
+		{
+			EfdaNoSQL,
+			EfdaContainsSQL,
+			EfdaReadsSQLData,
+			EfdaModifiesSQLData,
+			EfdaSentinel
+		};
 
-			// function data access property
-			enum EFuncDataAcc
-			{
-				EfdaNoSQL,
-				EfdaContainsSQL,
-				EfdaReadsSQLData,
-				EfdaModifiesSQLData,
-				EfdaSentinel
-			};
+		// object type
+		virtual Emdtype
+		MDType() const
+		{
+			return EmdtFunc;
+		}
 
-			// object type
-			virtual
-			Emdtype MDType() const
-			{
-				return EmdtFunc;
-			}
+		// does function return NULL on NULL input
+		virtual BOOL IsStrict() const = 0;
 
-			// does function return NULL on NULL input
-			virtual 
-			BOOL IsStrict() const = 0;
-			
-			// does function return a set of values
-			virtual 
-			BOOL ReturnsSet() const = 0;
+		// does function return a set of values
+		virtual BOOL ReturnsSet() const = 0;
 
-			// function stability
-			virtual
-			EFuncStbl GetFuncStability() const = 0;
+		// function stability
+		virtual EFuncStbl GetFuncStability() const = 0;
 
-			// function data access
-			virtual
-			EFuncDataAcc GetFuncDataAccess() const = 0;
+		// function data access
+		virtual EFuncDataAcc GetFuncDataAccess() const = 0;
 
-			// result type
-			virtual 
-			IMDId *GetResultTypeMdid() const = 0;
-			
-			// output argument types
-			virtual
-			MdidPtrArray *OutputArgTypesMdidArray() const = 0;
+		// result type
+		virtual IMDId *GetResultTypeMdid() const = 0;
+
+		// output argument types
+		virtual MdidPtrArray *OutputArgTypesMdidArray() const = 0;
 	};
-		
-}
 
-#endif // !GPMD_IMDFunction_H
+}  // namespace gpmd
+
+#endif  // !GPMD_IMDFunction_H
 
 // EOF

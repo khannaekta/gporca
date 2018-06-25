@@ -27,7 +27,7 @@ namespace gpmd
 	using namespace gpos;
 	using namespace gpnaucrates;
 
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		IMDTypeInt4
@@ -38,25 +38,28 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class IMDTypeInt4 : public IMDType
 	{
-		public:
-			// type id
-			static ETypeInfo GetTypeInfo()
-			{
-				return EtiInt4;
-			}
-			
-			virtual ETypeInfo GetDatumType() const
-			{
-				return IMDTypeInt4::GetTypeInfo();
-			} 
-			
-			// factory function for INT4 datums
-			virtual IDatumInt4 *CreateInt4Datum(IMemoryPool *memory_pool, INT value, BOOL is_null) const = 0;
-		
+	public:
+		// type id
+		static ETypeInfo
+		GetTypeInfo()
+		{
+			return EtiInt4;
+		}
+
+		virtual ETypeInfo
+		GetDatumType() const
+		{
+			return IMDTypeInt4::GetTypeInfo();
+		}
+
+		// factory function for INT4 datums
+		virtual IDatumInt4 *CreateInt4Datum(IMemoryPool *memory_pool,
+											INT value,
+											BOOL is_null) const = 0;
 	};
 
-}
+}  // namespace gpmd
 
-#endif // !GPMD_IMDTypeInt4_H
+#endif  // !GPMD_IMDTypeInt4_H
 
 // EOF

@@ -34,46 +34,37 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerLogicalConstTable : public CParseHandlerLogicalOp
 	{
-		private:
+	private:
+		// array of datum arrays
+		DXLDatumArrays *m_const_tuples_datum_array;
 
-			// array of datum arrays
-			DXLDatumArrays *m_const_tuples_datum_array;
+		// array of datums
+		DXLDatumArray *m_datum_dxl_array;
 
-			// array of datums
-			DXLDatumArray *m_datum_dxl_array;
+		// private copy ctor
+		CParseHandlerLogicalConstTable(const CParseHandlerLogicalConstTable &);
 
-			// private copy ctor
-			CParseHandlerLogicalConstTable(const CParseHandlerLogicalConstTable &);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the start of an element
-			void StartElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
- 				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname,		// element's qname
-				const Attributes& attr				// element's attributes
-				);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the end of an element
-			void EndElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
-				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname		// element's qname
-				);
-
-		public:
-			// ctor/dtor
-			CParseHandlerLogicalConstTable
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
-
+	public:
+		// ctor/dtor
+		CParseHandlerLogicalConstTable(IMemoryPool *memory_pool,
+									   CParseHandlerManager *parse_handler_mgr,
+									   CParseHandlerBase *parse_handler_root);
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerLogicalConstTable_H
+#endif  // !GPDXL_CParseHandlerLogicalConstTable_H
 
 // EOF

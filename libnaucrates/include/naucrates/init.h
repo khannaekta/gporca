@@ -14,26 +14,26 @@
 #ifdef __cplusplus
 extern "C"
 {
-#endif // __cplusplus
+#endif  // __cplusplus
 
 
-// initialize DXL library support
-void InitDXL();
+	// initialize DXL library support
+	void InitDXL();
 
-// shutdown DXL library support
-void ShutdownDXL();
+	// shutdown DXL library support
+	void ShutdownDXL();
 
-// initialize Xerces parser utils
-void gpdxl_init(void);
+	// initialize Xerces parser utils
+	void gpdxl_init(void);
 
-// terminate Xerces parser utils
-void gpdxl_terminate(void);
+	// terminate Xerces parser utils
+	void gpdxl_terminate(void);
 
 #ifdef __cplusplus
 }
-#endif // __cplusplus
+#endif  // __cplusplus
 
-#endif // !GPDXL_init_H
+#endif  // !GPDXL_init_H
 
 
 // EOF

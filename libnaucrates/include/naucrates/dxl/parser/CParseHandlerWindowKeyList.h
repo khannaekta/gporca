@@ -32,48 +32,41 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerWindowKeyList : public CParseHandlerBase
 	{
-		private:
+	private:
+		// list of window keys
+		CDXLWindowKeyArray *m_dxl_window_key_array;
 
-			// list of window keys
-			CDXLWindowKeyArray *m_dxl_window_key_array;
+		// private copy ctor
+		CParseHandlerWindowKeyList(const CParseHandlerWindowKeyList &);
 
-			// private copy ctor
-			CParseHandlerWindowKeyList(const CParseHandlerWindowKeyList&);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the start of an element
-			void StartElement
-					(
-					const XMLCh* const element_uri, 		// URI of element's namespace
- 					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-					);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the end of an element
-			void EndElement
-					(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-					);
+	public:
+		// ctor
+		CParseHandlerWindowKeyList(IMemoryPool *memory_pool,
+								   CParseHandlerManager *parse_handler_mgr,
+								   CParseHandlerBase *parse_handler_root);
 
-		public:
-			// ctor
-			CParseHandlerWindowKeyList
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
-
-			// list of window keys
-			CDXLWindowKeyArray *GetDxlWindowKeyArray() const
-			{
-				return m_dxl_window_key_array;
-			}
+		// list of window keys
+		CDXLWindowKeyArray *
+		GetDxlWindowKeyArray() const
+		{
+			return m_dxl_window_key_array;
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerWindowKeyList_H
+#endif  // !GPDXL_CParseHandlerWindowKeyList_H
 
 // EOF

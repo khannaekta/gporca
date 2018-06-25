@@ -7,7 +7,7 @@
 //
 //	@doc:
 //		SAX parse handler class for parsing logical operators.
-//		
+//
 //---------------------------------------------------------------------------
 
 #ifndef GPDXL_CParseHandlerLogicalOp_H
@@ -33,41 +33,34 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerLogicalOp : public CParseHandlerOp
 	{
-		private:
+	private:
+		// private copy ctor
+		CParseHandlerLogicalOp(const CParseHandlerLogicalOp &);
 
-			// private copy ctor
-			CParseHandlerLogicalOp(const CParseHandlerLogicalOp&);
+	protected:
+		// process the start of an element
+		virtual void StartElement(
+			const XMLCh *const element_uri,			// URI of element's namespace
+			const XMLCh *const element_local_name,  // local part of element's name
+			const XMLCh *const element_qname,		// element's qname
+			const Attributes &attr					// element's attributes
+		);
 
-		protected:
+		// process the end of an element
+		virtual void EndElement(
+			const XMLCh *const element_uri,			// URI of element's namespace
+			const XMLCh *const element_local_name,  // local part of element's name
+			const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the start of an element
-			virtual void StartElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
- 					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
-
-			// process the end of an element
-			virtual void EndElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-				);
-
-		public:
-			// ctor/dtor
-			CParseHandlerLogicalOp
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
+	public:
+		// ctor/dtor
+		CParseHandlerLogicalOp(IMemoryPool *memory_pool,
+							   CParseHandlerManager *parse_handler_mgr,
+							   CParseHandlerBase *parse_handler_root);
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerLogicalOp_H
+#endif  // !GPDXL_CParseHandlerLogicalOp_H
 
 // EOF

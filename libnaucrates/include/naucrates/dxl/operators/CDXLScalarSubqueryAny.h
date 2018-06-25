@@ -22,7 +22,6 @@
 
 namespace gpdxl
 {
-
 	using namespace gpmd;
 
 	//---------------------------------------------------------------------------
@@ -34,56 +33,45 @@ namespace gpdxl
 	//
 	//---------------------------------------------------------------------------
 	class CDXLScalarSubqueryAny : public CDXLScalarSubqueryQuantified
-	{			
+	{
+	private:
+		// private copy ctor
+		CDXLScalarSubqueryAny(CDXLScalarSubqueryAny &);
 
-		private:	
-			
-			// private copy ctor
-			CDXLScalarSubqueryAny(CDXLScalarSubqueryAny&);
-			
-		public:
-			// ctor
-			CDXLScalarSubqueryAny
-				(
-				IMemoryPool *memory_pool,
-				IMDId *scalar_op_mdid,
-				CMDName *mdname,
-				ULONG col_id
-				);
+	public:
+		// ctor
+		CDXLScalarSubqueryAny(IMemoryPool *memory_pool,
+							  IMDId *scalar_op_mdid,
+							  CMDName *mdname,
+							  ULONG col_id);
 
-			// ident accessors
-			Edxlopid GetDXLOperator() const;
-			
-			// name of the operator
-			const CWStringConst *GetOpNameStr() const;
-			
-			// conversion function
-			static
-			CDXLScalarSubqueryAny *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopScalarSubqueryAny == dxl_op->GetDXLOperator());
+		// ident accessors
+		Edxlopid GetDXLOperator() const;
 
-				return dynamic_cast<CDXLScalarSubqueryAny*>(dxl_op);
-			}
+		// name of the operator
+		const CWStringConst *GetOpNameStr() const;
 
-			// does the operator return a boolean result
-			virtual
-			BOOL HasBoolResult
-					(
-					CMDAccessor *//md_accessor
-					)
-					const
-			{
-				return true;
-			}
+		// conversion function
+		static CDXLScalarSubqueryAny *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarSubqueryAny == dxl_op->GetDXLOperator());
+
+			return dynamic_cast<CDXLScalarSubqueryAny *>(dxl_op);
+		}
+
+		// does the operator return a boolean result
+		virtual BOOL
+		HasBoolResult(CMDAccessor *  //md_accessor
+					  ) const
+		{
+			return true;
+		}
 	};
-}
+}  // namespace gpdxl
 
 
-#endif // !GPDXL_CDXLScalarSubqueryAny_H
+#endif  // !GPDXL_CDXLScalarSubqueryAny_H
 
 // EOF

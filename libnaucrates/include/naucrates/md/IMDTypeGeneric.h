@@ -24,7 +24,7 @@ namespace gpmd
 {
 	using namespace gpos;
 
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		IMDTypeGeneric
@@ -34,23 +34,24 @@ namespace gpmd
 	//
 	//---------------------------------------------------------------------------
 	class IMDTypeGeneric : public IMDType
-	{		
-		public:
+	{
+	public:
+		// type id
+		static ETypeInfo
+		GetTypeInfo()
+		{
+			return EtiGeneric;
+		}
 
-			// type id
-			static ETypeInfo GetTypeInfo()
-			{
-				return EtiGeneric;
-			}
-
-			// type id
-			virtual ETypeInfo GetDatumType() const
-			{
-				return IMDTypeGeneric::GetTypeInfo();
-			}
+		// type id
+		virtual ETypeInfo
+		GetDatumType() const
+		{
+			return IMDTypeGeneric::GetTypeInfo();
+		}
 	};
-}
+}  // namespace gpmd
 
-#endif // !GPMD_IMDTypeGeneric_H
+#endif  // !GPMD_IMDTypeGeneric_H
 
 // EOF

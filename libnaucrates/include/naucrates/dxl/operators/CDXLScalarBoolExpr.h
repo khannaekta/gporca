@@ -21,12 +21,12 @@ namespace gpdxl
 	using namespace gpos;
 
 	enum EdxlBoolExprType
-		{
-			Edxland,
-			Edxlor,
-			Edxlnot,
-			EdxlBoolExprTypeSentinel
-		};
+	{
+		Edxland,
+		Edxlor,
+		Edxlnot,
+		EdxlBoolExprTypeSentinel
+	};
 
 
 	//---------------------------------------------------------------------------
@@ -39,70 +39,56 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarBoolExpr : public CDXLScalar
 	{
+	private:
+		// operator type
+		const EdxlBoolExprType m_bool_type;
 
-		private:
+		// private copy ctor
+		CDXLScalarBoolExpr(const CDXLScalarBoolExpr &);
 
-			// operator type
-			const EdxlBoolExprType m_bool_type;
-
-			// private copy ctor
-			CDXLScalarBoolExpr(const CDXLScalarBoolExpr&);
-
-		public:
-			// ctor/dtor
-			explicit
-			CDXLScalarBoolExpr
-				(
-				IMemoryPool *memory_pool,
-				const EdxlBoolExprType bool_type
-				);
+	public:
+		// ctor/dtor
+		explicit CDXLScalarBoolExpr(IMemoryPool *memory_pool, const EdxlBoolExprType bool_type);
 
 
-			// ident accessors
-			Edxlopid GetDXLOperator() const;
+		// ident accessors
+		Edxlopid GetDXLOperator() const;
 
-			// BoolExpr operator type
-			EdxlBoolExprType GetDxlBoolTypeStr() const;
+		// BoolExpr operator type
+		EdxlBoolExprType GetDxlBoolTypeStr() const;
 
-			// name of the DXL operator name
-			const CWStringConst *GetOpNameStr() const;
+		// name of the DXL operator name
+		const CWStringConst *GetOpNameStr() const;
 
-			// serialize operator in DXL format
-			void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const;
+		// serialize operator in DXL format
+		void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const;
 
-			// conversion function
-			static
-			CDXLScalarBoolExpr *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopScalarBoolExpr == dxl_op->GetDXLOperator());
+		// conversion function
+		static CDXLScalarBoolExpr *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarBoolExpr == dxl_op->GetDXLOperator());
 
-				return dynamic_cast<CDXLScalarBoolExpr*>(dxl_op);
-			}
+			return dynamic_cast<CDXLScalarBoolExpr *>(dxl_op);
+		}
 
-			// does the operator return a boolean result
-			virtual
-			BOOL HasBoolResult
-					(
-					CMDAccessor *//md_accessor
-					)
-					const
-			{
-				return true;
-			}
+		// does the operator return a boolean result
+		virtual BOOL
+		HasBoolResult(CMDAccessor *  //md_accessor
+					  ) const
+		{
+			return true;
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
-#endif // GPOS_DEBUG
-
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLScalarBoolExpr_H
+#endif  // !GPDXL_CDXLScalarBoolExpr_H
 
 // EOF

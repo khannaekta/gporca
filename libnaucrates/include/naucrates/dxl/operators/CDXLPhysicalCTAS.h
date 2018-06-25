@@ -19,10 +19,9 @@
 
 namespace gpdxl
 {
-
 	// fwd decl
 	class CDXLCtasStorageOptions;
-	
+
 	using namespace gpmd;
 
 	//---------------------------------------------------------------------------
@@ -35,149 +34,149 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalCTAS : public CDXLPhysical
 	{
-		private:
+	private:
+		// schema name
+		CMDName *m_mdname_schema;
 
-			// schema name
-			CMDName *m_mdname_schema;
-		
-			// table name
-			CMDName *m_mdname_rel;
-			
-			// list of columns
-			ColumnDescrDXLArray *m_col_descr_array;
-			
-			// storage options
-			CDXLCtasStorageOptions *m_dxl_ctas_storage_option;
-			
-			// distribution policy
-			IMDRelation::Ereldistrpolicy m_rel_distr_policy;
-	
-			// list of distribution column positions		
-			ULongPtrArray *m_distr_column_pos_array;
-			
-			// is this a temporary table
-			BOOL m_is_temp_table;
-			
-			// does table have oids
-			BOOL m_has_oids;
-			
-			// storage type
-			IMDRelation::Erelstoragetype m_rel_storage_type;
-			
-			// list of source column ids		
-			ULongPtrArray *m_src_colids_array;
+		// table name
+		CMDName *m_mdname_rel;
 
-			// list of vartypmod
-			IntPtrArray *m_vartypemod_array;
+		// list of columns
+		ColumnDescrDXLArray *m_col_descr_array;
 
-			// private copy ctor
-			CDXLPhysicalCTAS(CDXLPhysicalCTAS&);
+		// storage options
+		CDXLCtasStorageOptions *m_dxl_ctas_storage_option;
 
-		public:
-			// ctor
-			CDXLPhysicalCTAS
-				(
-				IMemoryPool *memory_pool, 
-				CMDName *mdname_schema, 
-				CMDName *mdname_rel, 
-				ColumnDescrDXLArray *col_descr_dxl_array,
-				CDXLCtasStorageOptions *dxl_ctas_storage_options,
-				IMDRelation::Ereldistrpolicy rel_distr_policy,
-				ULongPtrArray *distr_column_pos_array, 
-				BOOL is_temporary,
-				BOOL has_oids,
-				IMDRelation::Erelstoragetype rel_storage_type,
-				ULongPtrArray *src_col_ids_array,
-				IntPtrArray *vartypemod_array
-				);
+		// distribution policy
+		IMDRelation::Ereldistrpolicy m_rel_distr_policy;
 
-			// dtor
-			virtual
-			~CDXLPhysicalCTAS();
+		// list of distribution column positions
+		ULongPtrArray *m_distr_column_pos_array;
 
-			// operator type
-			Edxlopid GetDXLOperator() const;
+		// is this a temporary table
+		BOOL m_is_temp_table;
 
-			// operator name
-			const CWStringConst *GetOpNameStr() const;
+		// does table have oids
+		BOOL m_has_oids;
 
-			// column descriptors
-			ColumnDescrDXLArray *GetColumnDescrDXLArray() const
-			{
-				return m_col_descr_array;
-			}
-			
-			// distribution type
-			IMDRelation::Ereldistrpolicy Ereldistrpolicy() const
-			{
-				return m_rel_distr_policy;
-			}
-			
-			// distribution column positions
-			ULongPtrArray *GetDistrColPosArray() const
-			{
-				return m_distr_column_pos_array;
-			}
-		
-			// source column ids
-			ULongPtrArray *GetSrcColidsArray() const
-			{
-				return m_src_colids_array;
-			} 
-			
-			// list of vartypmod for target expressions
-			IntPtrArray *GetVarTypeModArray() const
-			{
-				return m_vartypemod_array;
-			}
+		// storage type
+		IMDRelation::Erelstoragetype m_rel_storage_type;
 
-			// table name
-			CMDName *GetMdNameSchema() const
-			{
-				return m_mdname_schema;
-			}
-			
-			// table name
-			CMDName *MdName() const
-			{
-				return m_mdname_rel;
-			}
-			
-			// is temporary
-			BOOL IsTemporary() const
-			{
-				return m_is_temp_table;
-			}
+		// list of source column ids
+		ULongPtrArray *m_src_colids_array;
 
-			// CTAS storage options
-			CDXLCtasStorageOptions *GetDxlCtasStorageOption() const
-			{
-				return m_dxl_ctas_storage_option;
-			}
-			
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+		// list of vartypmod
+		IntPtrArray *m_vartypemod_array;
+
+		// private copy ctor
+		CDXLPhysicalCTAS(CDXLPhysicalCTAS &);
+
+	public:
+		// ctor
+		CDXLPhysicalCTAS(IMemoryPool *memory_pool,
+						 CMDName *mdname_schema,
+						 CMDName *mdname_rel,
+						 ColumnDescrDXLArray *col_descr_dxl_array,
+						 CDXLCtasStorageOptions *dxl_ctas_storage_options,
+						 IMDRelation::Ereldistrpolicy rel_distr_policy,
+						 ULongPtrArray *distr_column_pos_array,
+						 BOOL is_temporary,
+						 BOOL has_oids,
+						 IMDRelation::Erelstoragetype rel_storage_type,
+						 ULongPtrArray *src_col_ids_array,
+						 IntPtrArray *vartypemod_array);
+
+		// dtor
+		virtual ~CDXLPhysicalCTAS();
+
+		// operator type
+		Edxlopid GetDXLOperator() const;
+
+		// operator name
+		const CWStringConst *GetOpNameStr() const;
+
+		// column descriptors
+		ColumnDescrDXLArray *
+		GetColumnDescrDXLArray() const
+		{
+			return m_col_descr_array;
+		}
+
+		// distribution type
+		IMDRelation::Ereldistrpolicy
+		Ereldistrpolicy() const
+		{
+			return m_rel_distr_policy;
+		}
+
+		// distribution column positions
+		ULongPtrArray *
+		GetDistrColPosArray() const
+		{
+			return m_distr_column_pos_array;
+		}
+
+		// source column ids
+		ULongPtrArray *
+		GetSrcColidsArray() const
+		{
+			return m_src_colids_array;
+		}
+
+		// list of vartypmod for target expressions
+		IntPtrArray *
+		GetVarTypeModArray() const
+		{
+			return m_vartypemod_array;
+		}
+
+		// table name
+		CMDName *
+		GetMdNameSchema() const
+		{
+			return m_mdname_schema;
+		}
+
+		// table name
+		CMDName *
+		MdName() const
+		{
+			return m_mdname_rel;
+		}
+
+		// is temporary
+		BOOL
+		IsTemporary() const
+		{
+			return m_is_temp_table;
+		}
+
+		// CTAS storage options
+		CDXLCtasStorageOptions *
+		GetDxlCtasStorageOption() const
+		{
+			return m_dxl_ctas_storage_option;
+		}
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 
-			// conversion function
-			static
-			CDXLPhysicalCTAS *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopPhysicalCTAS == dxl_op->GetDXLOperator());
-				return dynamic_cast<CDXLPhysicalCTAS*>(dxl_op);
-			}
+		// conversion function
+		static CDXLPhysicalCTAS *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopPhysicalCTAS == dxl_op->GetDXLOperator());
+			return dynamic_cast<CDXLPhysicalCTAS *>(dxl_op);
+		}
 	};
-}
-#endif // !GPDXL_CDXLPhysicalCTAS_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLPhysicalCTAS_H
 
 // EOF

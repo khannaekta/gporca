@@ -33,26 +33,23 @@ namespace gpmd
 	//
 	//---------------------------------------------------------------------------
 	class IMDRelStats : public IMDCacheObject
-	{		
-		public:
-		
-			// object type
-			virtual
-			Emdtype MDType() const
-			{
-				return EmdtRelStats;
-			}
-		
-			// number of rows
-			virtual
-			CDouble Rows() const = 0;			
+	{
+	public:
+		// object type
+		virtual Emdtype
+		MDType() const
+		{
+			return EmdtRelStats;
+		}
 
-			// is statistics on an empty input
-			virtual
-			BOOL IsEmpty() const = 0;
+		// number of rows
+		virtual CDouble Rows() const = 0;
+
+		// is statistics on an empty input
+		virtual BOOL IsEmpty() const = 0;
 	};
-}
+}  // namespace gpmd
 
-#endif // !GPMD_IMDRelStats_H
+#endif  // !GPMD_IMDRelStats_H
 
 // EOF

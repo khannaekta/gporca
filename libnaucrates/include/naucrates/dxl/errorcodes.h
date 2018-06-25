@@ -6,7 +6,7 @@
 //		errorcodes.h
 //
 //	@doc:
-//		Enum of errorcodes 
+//		Enum of errorcodes
 //---------------------------------------------------------------------------
 #ifndef GPOPT_errorcodes_H
 #define GPOPT_errorcodes_H
@@ -22,7 +22,6 @@ namespace gpdxl
 	};
 }
 
-#endif // ! GPOPT_errorcodes_H
+#endif  // ! GPOPT_errorcodes_H
 
 // EOF
-

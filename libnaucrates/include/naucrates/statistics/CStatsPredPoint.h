@@ -37,88 +37,75 @@ namespace gpnaucrates
 	//---------------------------------------------------------------------------
 	class CStatsPredPoint : public CStatsPred
 	{
-		private:
+	private:
+		// private copy ctor
+		CStatsPredPoint(const CStatsPredPoint &);
 
-			// private copy ctor
-			CStatsPredPoint(const CStatsPredPoint &);
+		// private assignment operator
+		CStatsPredPoint &operator=(CStatsPredPoint &);
 
-			// private assignment operator
-			CStatsPredPoint& operator=(CStatsPredPoint &);
+		// comparison type
+		CStatsPred::EStatsCmpType m_stats_cmp_type;
 
-			// comparison type
-			CStatsPred::EStatsCmpType m_stats_cmp_type;
+		// point to be used for comparison
+		CPoint *m_pred_point;
 
-			// point to be used for comparison
-			CPoint *m_pred_point;
+		// add padding to datums when needed
+		static IDatum *PreprocessDatum(IMemoryPool *memory_pool,
+									   const CColRef *colref,
+									   IDatum *datum);
 
-			// add padding to datums when needed
-			static
-			IDatum *PreprocessDatum(IMemoryPool *memory_pool, const CColRef *colref, IDatum *datum);
+	public:
+		// ctor
+		CStatsPredPoint(ULONG col_id, CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point);
 
-		public:
+		// ctor
+		CStatsPredPoint(IMemoryPool *memory_pool,
+						const CColRef *colref,
+						CStatsPred::EStatsCmpType stats_cmp_type,
+						IDatum *datum);
 
-			// ctor
-			CStatsPredPoint
-				(
-				ULONG col_id,
-				CStatsPred::EStatsCmpType stats_cmp_type,
-				CPoint *point
-				);
+		// dtor
+		virtual ~CStatsPredPoint()
+		{
+			m_pred_point->Release();
+		}
 
-			// ctor
-			CStatsPredPoint
-				(
-				IMemoryPool *memory_pool,
-				const CColRef *colref,
-				CStatsPred::EStatsCmpType stats_cmp_type,
-				IDatum *datum
-				);
+		// comparison types for stats computation
+		virtual CStatsPred::EStatsCmpType
+		GetCmpType() const
+		{
+			return m_stats_cmp_type;
+		}
 
-			// dtor
-			virtual
-			~CStatsPredPoint()
-			{
-				m_pred_point->Release();
-			}
+		// filter point
+		virtual CPoint *
+		GetPredPoint() const
+		{
+			return m_pred_point;
+		}
 
-			// comparison types for stats computation
-			virtual
-			CStatsPred::EStatsCmpType GetCmpType() const
-			{
-				return m_stats_cmp_type;
-			}
+		// filter type id
+		virtual EStatsPredType
+		GetPredStatsType() const
+		{
+			return CStatsPred::EsptPoint;
+		}
 
-			// filter point
-			virtual
-			CPoint *GetPredPoint() const
-			{
-				return m_pred_point;
-			}
+		// conversion function
+		static CStatsPredPoint *
+		ConvertPredStats(CStatsPred *pred_stats)
+		{
+			GPOS_ASSERT(NULL != pred_stats);
+			GPOS_ASSERT(CStatsPred::EsptPoint == pred_stats->GetPredStatsType());
 
-			// filter type id
-			virtual
-			EStatsPredType GetPredStatsType() const
-			{
-				return CStatsPred::EsptPoint;
-			}
+			return dynamic_cast<CStatsPredPoint *>(pred_stats);
+		}
 
-			// conversion function
-			static
-			CStatsPredPoint *ConvertPredStats
-				(
-				CStatsPred *pred_stats
-				)
-			{
-				GPOS_ASSERT(NULL != pred_stats);
-				GPOS_ASSERT(CStatsPred::EsptPoint == pred_stats->GetPredStatsType());
+	};  // class CStatsPredPoint
 
-				return dynamic_cast<CStatsPredPoint*>(pred_stats);
-			}
+}  // namespace gpnaucrates
 
-	}; // class CStatsPredPoint
-
-}
-
-#endif // !GPNAUCRATES_CStatsPredPoint_H
+#endif  // !GPNAUCRATES_CStatsPredPoint_H
 
 // EOF

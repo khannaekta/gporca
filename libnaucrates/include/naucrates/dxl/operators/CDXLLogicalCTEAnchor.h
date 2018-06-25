@@ -16,7 +16,6 @@
 
 namespace gpdxl
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDXLLogicalCTEAnchor
@@ -27,54 +26,50 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLLogicalCTEAnchor : public CDXLLogical
 	{
-		private:
+	private:
+		// cte id
+		ULONG m_id;
 
-			// cte id
-			ULONG m_id;
-			
-			// private copy ctor
-			CDXLLogicalCTEAnchor(CDXLLogicalCTEAnchor&);
+		// private copy ctor
+		CDXLLogicalCTEAnchor(CDXLLogicalCTEAnchor &);
 
-		public:
-			// ctor
-			CDXLLogicalCTEAnchor(IMemoryPool *memory_pool, ULONG id);
-			
-			// operator type
-			Edxlopid GetDXLOperator() const;
+	public:
+		// ctor
+		CDXLLogicalCTEAnchor(IMemoryPool *memory_pool, ULONG id);
 
-			// operator name
-			const CWStringConst *GetOpNameStr() const;
+		// operator type
+		Edxlopid GetDXLOperator() const;
 
-			// cte identifier
-			ULONG Id() const
-			{
-				return m_id;
-			}
-			
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+		// operator name
+		const CWStringConst *GetOpNameStr() const;
+
+		// cte identifier
+		ULONG
+		Id() const
+		{
+			return m_id;
+		}
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL validate_children) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 
-			// conversion function
-			static
-			CDXLLogicalCTEAnchor *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopLogicalCTEAnchor == dxl_op->GetDXLOperator());
-				return dynamic_cast<CDXLLogicalCTEAnchor*>(dxl_op);
-			}
+		// conversion function
+		static CDXLLogicalCTEAnchor *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopLogicalCTEAnchor == dxl_op->GetDXLOperator());
+			return dynamic_cast<CDXLLogicalCTEAnchor *>(dxl_op);
+		}
 	};
-}
-#endif // !GPDXL_CDXLLogicalCTEAnchor_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLLogicalCTEAnchor_H
 
 // EOF

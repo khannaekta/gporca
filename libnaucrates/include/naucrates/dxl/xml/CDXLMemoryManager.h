@@ -24,7 +24,7 @@ namespace gpdxl
 	using namespace gpos;
 
 	XERCES_CPP_NAMESPACE_USE
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDXLMemoryManager
@@ -36,52 +36,43 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLMemoryManager : public MemoryManager
 	{
-		private:
-			// memory pool
-			IMemoryPool *m_memory_pool;
-			
-			// private copy ctor
-			CDXLMemoryManager
-				(
-				const CDXLMemoryManager&
-				);
-			
-		public:
-			// ctor
-			CDXLMemoryManager
-				(
-				IMemoryPool *memory_pool
-				);
-			
-			// MemoryManager interface functions
-			
-			// allocates memory
-			void *allocate
-				(
-				XMLSize_t // size
-				);
-			
-			// deallocates memory
-			void deallocate
-				(
-				void *pv
-				);
-			
-			// accessor to the underlying memory pool
-			IMemoryPool *Pmp()
-			{
-				return m_memory_pool;
-			}
-			
-			// returns the memory manager responsible for memory allocation
-			// during exceptions
-		    MemoryManager* getExceptionMemoryManager()
-			{
-		    	return (MemoryManager*) this;
-			}
-	};
-}
+	private:
+		// memory pool
+		IMemoryPool *m_memory_pool;
 
-#endif // GPDXL_CDXLMemoryManager_H
+		// private copy ctor
+		CDXLMemoryManager(const CDXLMemoryManager &);
+
+	public:
+		// ctor
+		CDXLMemoryManager(IMemoryPool *memory_pool);
+
+		// MemoryManager interface functions
+
+		// allocates memory
+		void *allocate(XMLSize_t  // size
+		);
+
+		// deallocates memory
+		void deallocate(void *pv);
+
+		// accessor to the underlying memory pool
+		IMemoryPool *
+		Pmp()
+		{
+			return m_memory_pool;
+		}
+
+		// returns the memory manager responsible for memory allocation
+		// during exceptions
+		MemoryManager *
+		getExceptionMemoryManager()
+		{
+			return (MemoryManager *) this;
+		}
+	};
+}  // namespace gpdxl
+
+#endif  // GPDXL_CDXLMemoryManager_H
 
 // EOF

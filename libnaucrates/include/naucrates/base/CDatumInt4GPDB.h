@@ -18,7 +18,6 @@
 
 namespace gpnaucrates
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDatumInt4GPDB
@@ -27,14 +26,12 @@ namespace gpnaucrates
 	//		GPDB-specific int4 representation
 	//
 	//---------------------------------------------------------------------------
-class CDatumInt4GPDB : public IDatumInt4
-{
-
+	class CDatumInt4GPDB : public IDatumInt4
+	{
 	private:
-
 		// type information
 		IMDId *m_mdid;
-	
+
 		// integer m_bytearray_value
 		INT m_val;
 
@@ -43,58 +40,47 @@ class CDatumInt4GPDB : public IDatumInt4
 
 		// private copy ctor
 		CDatumInt4GPDB(const CDatumInt4GPDB &);
-		
-	public:
 
+	public:
 		// ctors
 		CDatumInt4GPDB(CSystemId sysid, INT val, BOOL is_null = false);
 		CDatumInt4GPDB(IMDId *mdid, INT val, BOOL is_null = false);
 
 		// dtor
-		virtual
-		~CDatumInt4GPDB();
+		virtual ~CDatumInt4GPDB();
 
 		// accessor of metadata type id
-		virtual
-		IMDId *MDId() const;
+		virtual IMDId *MDId() const;
 
 		// accessor of size
-		virtual
-		ULONG Size() const;
+		virtual ULONG Size() const;
 
 		// accessor of integer m_bytearray_value
-		virtual
-		INT Value() const;
+		virtual INT Value() const;
 
 		// accessor of is null
-		virtual
-		BOOL IsNull() const;
+		virtual BOOL IsNull() const;
 
 		// return string representation
-		virtual
-		const CWStringConst *GetStrRepr(IMemoryPool *memory_pool) const;
+		virtual const CWStringConst *GetStrRepr(IMemoryPool *memory_pool) const;
 
 		// hash function
-		virtual
-		ULONG HashValue() const;
+		virtual ULONG HashValue() const;
 
 		// match function for datums
-		virtual
-		BOOL Matches(const IDatum *) const;
+		virtual BOOL Matches(const IDatum *) const;
 
 		// copy datum
-		virtual
-		IDatum *MakeCopy(IMemoryPool *memory_pool) const;
-		
+		virtual IDatum *MakeCopy(IMemoryPool *memory_pool) const;
+
 		// print function
-		virtual
-		IOstream &OsPrint(IOstream &os) const;
+		virtual IOstream &OsPrint(IOstream &os) const;
 
-	}; // class CDatumInt4GPDB
+	};  // class CDatumInt4GPDB
 
-}
+}  // namespace gpnaucrates
 
 
-#endif // !GPNAUCRATES_CDatumInt4GPDB_H
+#endif  // !GPNAUCRATES_CDatumInt4GPDB_H
 
 // EOF

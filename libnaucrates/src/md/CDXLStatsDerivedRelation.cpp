@@ -25,16 +25,9 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLStatsDerivedRelation::CDXLStatsDerivedRelation
-	(
-	CDouble rows,
-	BOOL is_empty,
-	DXLStatsDerivedColArray *dxl_stats_derived_col_array
-	)
-	:
-	m_rows(rows),
-	m_empty(is_empty),
-	m_dxl_stats_derived_col_array(dxl_stats_derived_col_array)
+CDXLStatsDerivedRelation::CDXLStatsDerivedRelation(
+	CDouble rows, BOOL is_empty, DXLStatsDerivedColArray *dxl_stats_derived_col_array)
+	: m_rows(rows), m_empty(is_empty), m_dxl_stats_derived_col_array(dxl_stats_derived_col_array)
 {
 	GPOS_ASSERT(NULL != dxl_stats_derived_col_array);
 }
@@ -75,14 +68,10 @@ CDXLStatsDerivedRelation::GetDXLStatsDerivedColArray() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLStatsDerivedRelation::Serialize
-	(
-	CXMLSerializer *xml_serializer
-	)
-	const
+CDXLStatsDerivedRelation::Serialize(CXMLSerializer *xml_serializer) const
 {
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
-						CDXLTokens::GetDXLTokenStr(EdxltokenStatsDerivedRelation));
+								CDXLTokens::GetDXLTokenStr(EdxltokenStatsDerivedRelation));
 
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenRows), m_rows);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenEmptyRelation), m_empty);
@@ -99,7 +88,7 @@ CDXLStatsDerivedRelation::Serialize
 	}
 
 	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
-						CDXLTokens::GetDXLTokenStr(EdxltokenStatsDerivedRelation));
+								 CDXLTokens::GetDXLTokenStr(EdxltokenStatsDerivedRelation));
 }
 
 #ifdef GPOS_DEBUG
@@ -112,18 +101,13 @@ CDXLStatsDerivedRelation::Serialize
 //
 //---------------------------------------------------------------------------
 void
-CDXLStatsDerivedRelation::DebugPrint
-	(
-	IOstream &os
-	)
-	const
+CDXLStatsDerivedRelation::DebugPrint(IOstream &os) const
 {
 	os << "Rows: " << Rows() << std::endl;
 
 	os << "Empty: " << IsEmpty() << std::endl;
 }
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF
-

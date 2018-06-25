@@ -23,11 +23,7 @@ using namespace gpdxl;
 //		Constructs a memory manager around a given memory pool.
 //
 //---------------------------------------------------------------------------
-CDXLMemoryManager::CDXLMemoryManager
-	(
-	IMemoryPool *memory_pool
-	)
-	:m_memory_pool(memory_pool)
+CDXLMemoryManager::CDXLMemoryManager(IMemoryPool *memory_pool) : m_memory_pool(memory_pool)
 {
 	GPOS_ASSERT(NULL != m_memory_pool);
 }
@@ -41,10 +37,7 @@ CDXLMemoryManager::CDXLMemoryManager
 //
 //---------------------------------------------------------------------------
 void *
-CDXLMemoryManager::allocate
-	(
-	XMLSize_t xmlsize
-	)
+CDXLMemoryManager::allocate(XMLSize_t xmlsize)
 {
 	GPOS_ASSERT(NULL != m_memory_pool);
 	return GPOS_NEW_ARRAY(m_memory_pool, BYTE, xmlsize);
@@ -59,12 +52,9 @@ CDXLMemoryManager::allocate
 //
 //---------------------------------------------------------------------------
 void
-CDXLMemoryManager::deallocate
-	(
-	void *pv
-	)
+CDXLMemoryManager::deallocate(void *pv)
 {
-	GPOS_DELETE_ARRAY(reinterpret_cast<BYTE*>(pv));
+	GPOS_DELETE_ARRAY(reinterpret_cast<BYTE *>(pv));
 }
 
 

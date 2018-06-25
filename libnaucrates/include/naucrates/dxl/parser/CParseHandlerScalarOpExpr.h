@@ -6,7 +6,7 @@
 //		CParseHandlerScalarOpExpr.h
 //
 //	@doc:
-//		
+//
 //		SAX parse handler class for parsing scalar OpExpr.
 //---------------------------------------------------------------------------
 
@@ -35,41 +35,32 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerScalarOpExpr : public CParseHandlerScalarOp
 	{
-		private:
-	
-			ULONG m_num_of_children;
-			// private copy ctor
-			CParseHandlerScalarOpExpr(const CParseHandlerScalarOpExpr &);
-	
-			// process the start of an element
-			void StartElement
-					(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-					);
-	
-			// process the end of an element
-			void EndElement
-					(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-					);
-	
-		public:
-			// ctor/dtor
-			CParseHandlerScalarOpExpr
-			(
-					IMemoryPool *memory_pool,
-					CParseHandlerManager *parse_handler_mgr,
-					CParseHandlerBase *parse_handler_root
-			);
+	private:
+		ULONG m_num_of_children;
+		// private copy ctor
+		CParseHandlerScalarOpExpr(const CParseHandlerScalarOpExpr &);
 
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
+
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+	public:
+		// ctor/dtor
+		CParseHandlerScalarOpExpr(IMemoryPool *memory_pool,
+								  CParseHandlerManager *parse_handler_mgr,
+								  CParseHandlerBase *parse_handler_root);
 	};
 
-}
-#endif // GPDXL_CParseHandlerScalarOpExpr_H
+}  // namespace gpdxl
+#endif  // GPDXL_CParseHandlerScalarOpExpr_H
 
 //EOF

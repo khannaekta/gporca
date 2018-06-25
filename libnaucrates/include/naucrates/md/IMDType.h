@@ -24,7 +24,7 @@ namespace gpdxl
 {
 	class CDXLScalarConstValue;
 	class CDXLDatum;
-}
+}  // namespace gpdxl
 
 namespace gpnaucrates
 {
@@ -36,7 +36,7 @@ namespace gpmd
 	using namespace gpos;
 	using namespace gpnaucrates;
 	using namespace gpdxl;
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		IMDType
@@ -46,147 +46,126 @@ namespace gpmd
 	//
 	//---------------------------------------------------------------------------
 	class IMDType : public IMDCacheObject
-	{		
-		public:
-			
-			enum ETypeInfo
-			{
-				EtiInt2,
-				EtiInt4,
-				EtiInt8,
-				EtiBool,
-				EtiOid,
-				EtiGeneric // should be the last in this enum
-			};
-			
-			// comparison type
-			enum ECmpType
-			{
-				EcmptEq,	// equals
-				EcmptNEq,	// not equals
-				EcmptL,		// less than
-				EcmptLEq,	// less or equal to
-				EcmptG,		// greater than
-				EcmptGEq,	// greater or equal to
-				EcmptIDF,	// is distinct from
-				EcmptOther
-			};
-		
-			// aggregate type
-			enum EAggType
-			{
-				EaggMin,
-				EaggMax,
-				EaggAvg,
-				EaggSum,
-				EaggCount,
-				EaggGeneric
-			};
-			
-			// object type
-			virtual
-			Emdtype MDType() const
-			{
-				return EmdtType;
-			}
-			
-			// md id of cache object
-			virtual 
-			IMDId *MDId() const = 0;
-			
-			// id of specified specified comparison operator type
-			virtual 
-			IMDId *GetMdidForCmpType(ECmpType cmp_type) const = 0;
-						
-			// id of specified specified aggregate type
-			virtual 
-			IMDId *GetMdidForAggType(EAggType agg_type) const = 0;
+	{
+	public:
+		enum ETypeInfo
+		{
+			EtiInt2,
+			EtiInt4,
+			EtiInt8,
+			EtiBool,
+			EtiOid,
+			EtiGeneric  // should be the last in this enum
+		};
 
-			// id of comparison operator for type used in btree lookups
-			virtual 
-			const IMDId *CmpOpMdid() const = 0;
-			
-			// id of hash operator for type
-			virtual 
-			BOOL IsHashable() const = 0;
+		// comparison type
+		enum ECmpType
+		{
+			EcmptEq,   // equals
+			EcmptNEq,  // not equals
+			EcmptL,	// less than
+			EcmptLEq,  // less or equal to
+			EcmptG,	// greater than
+			EcmptGEq,  // greater or equal to
+			EcmptIDF,  // is distinct from
+			EcmptOther
+		};
 
-			// is type redistributable
-			virtual
-			BOOL IsRedistributable() const = 0;
+		// aggregate type
+		enum EAggType
+		{
+			EaggMin,
+			EaggMax,
+			EaggAvg,
+			EaggSum,
+			EaggCount,
+			EaggGeneric
+		};
 
-			// id of the array type for the type
-			virtual 
-			IMDId *GetArrayTypeMdid() const = 0;
-			
-			// type id
-			virtual 
-			ETypeInfo GetDatumType() const = 0;
+		// object type
+		virtual Emdtype
+		MDType() const
+		{
+			return EmdtType;
+		}
 
-			// transformation function for datums
-			virtual 
-			IDatum* GetDatumForDXLConstVal(const CDXLScalarConstValue *dxl_op) const = 0;
+		// md id of cache object
+		virtual IMDId *MDId() const = 0;
 
-			// construct a datum from a DXL datum
-			virtual 
-			IDatum* GetDatumForDXLDatum(IMemoryPool *memory_pool, const CDXLDatum *datum_dxl) const = 0;
+		// id of specified specified comparison operator type
+		virtual IMDId *GetMdidForCmpType(ECmpType cmp_type) const = 0;
 
-			// is type fixed length
-			virtual
-			BOOL IsFixedLength() const = 0;
+		// id of specified specified aggregate type
+		virtual IMDId *GetMdidForAggType(EAggType agg_type) const = 0;
 
-			// is type composite
-			virtual
-			BOOL IsComposite() const = 0;
+		// id of comparison operator for type used in btree lookups
+		virtual const IMDId *CmpOpMdid() const = 0;
 
-			// id of the relation corresponding to a composite type
-			virtual
-			IMDId *GetBaseRelMdid() const = 0;
+		// id of hash operator for type
+		virtual BOOL IsHashable() const = 0;
 
-			// type length
-			virtual
-			ULONG Length() const = 0;
+		// is type redistributable
+		virtual BOOL IsRedistributable() const = 0;
 
-			// is type passed by m_bytearray_value
-			virtual
-			BOOL IsPassedByValue() const = 0;
+		// id of the array type for the type
+		virtual IMDId *GetArrayTypeMdid() const = 0;
 
-			// return the null constant for this type
-			virtual
-			IDatum *DatumNull() const = 0;
+		// type id
+		virtual ETypeInfo GetDatumType() const = 0;
 
-			// generate the DXL scalar constant from IDatum
-			virtual
-			CDXLScalarConstValue* GetDXLOpScConst(IMemoryPool *memory_pool, IDatum *datum) const = 0;
+		// transformation function for datums
+		virtual IDatum *GetDatumForDXLConstVal(const CDXLScalarConstValue *dxl_op) const = 0;
 
-			// generate the DXL datum from IDatum
-			virtual
-			CDXLDatum* GetDatumVal(IMemoryPool *memory_pool, IDatum *datum) const = 0;
+		// construct a datum from a DXL datum
+		virtual IDatum *GetDatumForDXLDatum(IMemoryPool *memory_pool,
+											const CDXLDatum *datum_dxl) const = 0;
 
-			// generate the DXL datum representing null m_bytearray_value
-			virtual
-			CDXLDatum* GetDXLDatumNull(IMemoryPool *memory_pool) const = 0;
-			
-			// is type an ambiguous one? e.g., AnyElement in GPDB
-			virtual
-			BOOL IsAmbiguous() const
-			{
-				return false;
-			}
+		// is type fixed length
+		virtual BOOL IsFixedLength() const = 0;
 
-			// string representation of comparison types
-			static
-			const CWStringConst *GetCmpTypeStr(IMDType::ECmpType cmp_type);
+		// is type composite
+		virtual BOOL IsComposite() const = 0;
 
-			// return true if we can perform statistical comparison between datums of these two types; else return false
-			static
-			BOOL StatsAreComparable(const IMDType *mdtype_first, const IMDType *mdtype_second);
+		// id of the relation corresponding to a composite type
+		virtual IMDId *GetBaseRelMdid() const = 0;
 
-			// return true if we can perform statistical comparison between datum of the given type and a given datum; else return false
-			static
-			BOOL StatsAreComparable(const IMDType *mdtype_first, const IDatum *datum_second);
+		// type length
+		virtual ULONG Length() const = 0;
+
+		// is type passed by m_bytearray_value
+		virtual BOOL IsPassedByValue() const = 0;
+
+		// return the null constant for this type
+		virtual IDatum *DatumNull() const = 0;
+
+		// generate the DXL scalar constant from IDatum
+		virtual CDXLScalarConstValue *GetDXLOpScConst(IMemoryPool *memory_pool,
+													  IDatum *datum) const = 0;
+
+		// generate the DXL datum from IDatum
+		virtual CDXLDatum *GetDatumVal(IMemoryPool *memory_pool, IDatum *datum) const = 0;
+
+		// generate the DXL datum representing null m_bytearray_value
+		virtual CDXLDatum *GetDXLDatumNull(IMemoryPool *memory_pool) const = 0;
+
+		// is type an ambiguous one? e.g., AnyElement in GPDB
+		virtual BOOL
+		IsAmbiguous() const
+		{
+			return false;
+		}
+
+		// string representation of comparison types
+		static const CWStringConst *GetCmpTypeStr(IMDType::ECmpType cmp_type);
+
+		// return true if we can perform statistical comparison between datums of these two types; else return false
+		static BOOL StatsAreComparable(const IMDType *mdtype_first, const IMDType *mdtype_second);
+
+		// return true if we can perform statistical comparison between datum of the given type and a given datum; else return false
+		static BOOL StatsAreComparable(const IMDType *mdtype_first, const IDatum *datum_second);
 	};
-}
+}  // namespace gpmd
 
-#endif // !GPMD_IMDCacheType_H
+#endif  // !GPMD_IMDCacheType_H
 
 // EOF

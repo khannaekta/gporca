@@ -38,7 +38,7 @@ namespace gpopt
 	class CStatisticsConfig;
 	class COptimizerConfig;
 	class ICostModel;
-}
+}  // namespace gpopt
 
 namespace gpdxl
 {
@@ -52,9 +52,9 @@ namespace gpdxl
 	class CParseHandlerDXL;
 	class CDXLMemoryManager;
 	class CQueryToDXLResult;
-	
+
 	typedef CDynamicPtrArray<CStatistics, CleanupRelease> CStatisticsArray;
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDXLUtils
@@ -63,445 +63,266 @@ namespace gpdxl
 	//		Entry point for parsing and serializing DXL documents.
 	//
 	//---------------------------------------------------------------------------
-	class CDXLUtils 
+	class CDXLUtils
 	{
-			
-		private:
-
-			// same as above but with a wide string parameter for the DXL document
-			static 
-			CParseHandlerDXL *GetParseHandlerForDXLString
-				(
-				IMemoryPool *,
-				const CWStringBase *dxl_string,
-				const CHAR *xsd_file_path
-				);
-			
+	private:
+		// same as above but with a wide string parameter for the DXL document
+		static CParseHandlerDXL *GetParseHandlerForDXLString(IMemoryPool *,
+															 const CWStringBase *dxl_string,
+															 const CHAR *xsd_file_path);
 
 
-		public:
-			// helper functions for serializing DXL document header and footer, respectively
-			static void SerializeHeader(IMemoryPool *, CXMLSerializer *);
-			static void SerializeFooter(CXMLSerializer *);
-			// helper routine which initializes and starts the xerces parser, 
-			// and returns the top-level parse handler which can be used to
-			// retrieve the parsed elements
-			static 
-			CParseHandlerDXL *GetParseHandlerForDXLString
-				(
-				IMemoryPool *,
-				const CHAR *dxl_string,
-				const CHAR *xsd_file_path
-				);
-			
-			// same as above but with DXL file name specified instead of the file contents
-			static 
-			CParseHandlerDXL *GetParseHandlerForDXLFile
-				(
-				IMemoryPool *,
-				const CHAR *dxl_filename,
-				const CHAR *xsd_file_path
-				);
 
-			// parse a DXL document containing a DXL plan
-			static 
-			CDXLNode *GetPlanDXLNode
-				(
-				IMemoryPool *,
-				const CHAR *dxl_string,
-				const CHAR *xsd_file_path,
-				ULLONG *plan_id,
-				ULLONG *plan_space_size
-				);
-			
-			// parse a DXL document representing a query
-			// to return the DXL tree representing the query and
-			// a DXL tree representing the query output
-			static 
-			CQueryToDXLResult *ParseQueryToQueryDXLTree
-				(
-				IMemoryPool *,
-				const CHAR *dxl_string,
-				const CHAR *xsd_file_path
-				);
-			
-			// parse a DXL document containing a scalar expression
-			static
-			CDXLNode *ParseDXLToScalarExprDXLNode
-				(
-				IMemoryPool *,
-				const CHAR *dxl_string,
-				const CHAR *xsd_file_path
-				);
+	public:
+		// helper functions for serializing DXL document header and footer, respectively
+		static void SerializeHeader(IMemoryPool *, CXMLSerializer *);
+		static void SerializeFooter(CXMLSerializer *);
+		// helper routine which initializes and starts the xerces parser,
+		// and returns the top-level parse handler which can be used to
+		// retrieve the parsed elements
+		static CParseHandlerDXL *GetParseHandlerForDXLString(IMemoryPool *,
+															 const CHAR *dxl_string,
+															 const CHAR *xsd_file_path);
 
-			// parse an MD request
-			static 
-			CMDRequest *ParseDXLToMDRequest
-				(
-				IMemoryPool *memory_pool,
-				const CHAR *dxl_string,
-				const CHAR *xsd_file_path
-				);
-			
-			// parse a list of mdids from a MD request message
-			static 
-			CMDRequest *ParseDXLToMDRequest
-				(
-				IMemoryPool *memory_pool,
-				const WCHAR *dxl_string,
-				const CHAR *xsd_file_path
-				);
+		// same as above but with DXL file name specified instead of the file contents
+		static CParseHandlerDXL *GetParseHandlerForDXLFile(IMemoryPool *,
+														   const CHAR *dxl_filename,
+														   const CHAR *xsd_file_path);
 
-			// parse optimizer config DXL
-			static
-			COptimizerConfig *ParseDXLToOptimizerConfig
-				(
-				IMemoryPool *memory_pool,
-				const CHAR *dxl_string,
-				const CHAR *xsd_file_path
-				);
+		// parse a DXL document containing a DXL plan
+		static CDXLNode *GetPlanDXLNode(IMemoryPool *,
+										const CHAR *dxl_string,
+										const CHAR *xsd_file_path,
+										ULLONG *plan_id,
+										ULLONG *plan_space_size);
 
-			static 
-			IMDCachePtrArray *ParseDXLToIMDObjectArray
-				(
-				IMemoryPool *,
-				const CHAR *dxl_string,
-				const CHAR *xsd_file_path
-				);
-			
-			static 
-			IMDCachePtrArray *ParseDXLToIMDObjectArray
-				(
-				IMemoryPool *,
-				const CWStringBase *dxl_string,
-				const CHAR *xsd_file_path
-				);
-			
-			// parse mdid from a metadata document
-			static 
-			IMDId *ParseDXLToMDId
-				(
-				IMemoryPool *,
-				const CWStringBase *dxl_string,
-				const CHAR *xsd_file_path
-				);
+		// parse a DXL document representing a query
+		// to return the DXL tree representing the query and
+		// a DXL tree representing the query output
+		static CQueryToDXLResult *ParseQueryToQueryDXLTree(IMemoryPool *,
+														   const CHAR *dxl_string,
+														   const CHAR *xsd_file_path);
 
-			static 
-			IMDCacheObject *ParseDXLToIMDIdCacheObj
-				(
-				IMemoryPool *,
-				const CWStringBase *dxl_string,
-				const CHAR *xsd_file_path
-				);
+		// parse a DXL document containing a scalar expression
+		static CDXLNode *ParseDXLToScalarExprDXLNode(IMemoryPool *,
+													 const CHAR *dxl_string,
+													 const CHAR *xsd_file_path);
 
-			// parse statistics object from the statistics document
-			static 
-			DXLStatsDerivedRelArray *ParseDXLToStatsDerivedRelArray
-				(
-				IMemoryPool *,
-				const CHAR *dxl_string,
-				const CHAR *xsd_file_path
-				);
+		// parse an MD request
+		static CMDRequest *ParseDXLToMDRequest(IMemoryPool *memory_pool,
+											   const CHAR *dxl_string,
+											   const CHAR *xsd_file_path);
 
-			// parse statistics object from the statistics document
-			static 
-			DXLStatsDerivedRelArray *ParseDXLToStatsDerivedRelArray
-				(
-				IMemoryPool *,
-				const CWStringBase *dxl_string,
-				const CHAR *xsd_file_path
-				);
-			
-			// translate the dxl statistics object to optimizer statistics object
-			static
-			CStatisticsArray *ParseDXLToOptimizerStatisticObjArray
-				(
-				IMemoryPool *memory_pool,
-				CMDAccessor *md_accessor,
-				DXLStatsDerivedRelArray *dxl_derived_rel_stats_array
-				);
+		// parse a list of mdids from a MD request message
+		static CMDRequest *ParseDXLToMDRequest(IMemoryPool *memory_pool,
+											   const WCHAR *dxl_string,
+											   const CHAR *xsd_file_path);
 
-			// extract the array of optimizer buckets from the dxl representation of
-			// dxl buckets in the dxl derived column statistics object
-			static
-			BucketArray *ParseDXLToBucketsArray
-				(
-				IMemoryPool *memory_pool,
-				CMDAccessor *md_accessor,
-				CDXLStatsDerivedColumn *dxl_derived_col_stats
-				);
+		// parse optimizer config DXL
+		static COptimizerConfig *ParseDXLToOptimizerConfig(IMemoryPool *memory_pool,
+														   const CHAR *dxl_string,
+														   const CHAR *xsd_file_path);
 
-			// serialize a DXL query tree into DXL Document
-			static 
-			void SerializeQuery
-				(
-				IMemoryPool *memory_pool,
-				IOstream& os,
-				const CDXLNode *dxl_query_node,
-				const DXLNodeArray *query_output_dxlnode_array,
-				const DXLNodeArray *cte_producers,
-				BOOL serialize_document_header_footer,
-				BOOL indentation
-				);
-			
-			// serialize a ULLONG m_bytearray_value
-			static
-			CWStringDynamic *SerializeULLONG
-				(
-				IMemoryPool *memory_pool,
-				ULLONG value
-				);
+		static IMDCachePtrArray *ParseDXLToIMDObjectArray(IMemoryPool *,
+														  const CHAR *dxl_string,
+														  const CHAR *xsd_file_path);
 
-			// serialize a plan into DXL
-			static 
-			void SerializePlan
-				(
-				IMemoryPool *memory_pool,
-				IOstream &os,
-				const CDXLNode *node,
-				ULLONG plan_id,
-				ULLONG plan_space_size,
-				BOOL serialize_document_header_footer,
-				BOOL indentation
-				);
+		static IMDCachePtrArray *ParseDXLToIMDObjectArray(IMemoryPool *,
+														  const CWStringBase *dxl_string,
+														  const CHAR *xsd_file_path);
 
-			static 
-			CWStringDynamic *SerializeStatistics
-				(
-				IMemoryPool *memory_pool,
-				CMDAccessor *md_accessor,
-				const CStatisticsArray *statistics_array,
-				BOOL serialize_header_footer,
-				BOOL indentation
-				);
+		// parse mdid from a metadata document
+		static IMDId *ParseDXLToMDId(IMemoryPool *,
+									 const CWStringBase *dxl_string,
+									 const CHAR *xsd_file_path);
 
-			// serialize statistics objects into DXL and write to stream
-			static 
-			void SerializeStatistics
-				(
-				IMemoryPool *memory_pool,
-				CMDAccessor *md_accessor,
-				const CStatisticsArray *statistics_array,
-				IOstream &os,
-				BOOL serialize_document_header_footer,
-				BOOL indentation
-				);
+		static IMDCacheObject *ParseDXLToIMDIdCacheObj(IMemoryPool *,
+													   const CWStringBase *dxl_string,
+													   const CHAR *xsd_file_path);
 
-			// serialize metadata objects into DXL and write to stream
-			static 
-			void SerializeMetadata
-				(
-				IMemoryPool *memory_pool,
-				const IMDCachePtrArray *imd_obj_array,
-				IOstream &os,
-				BOOL serialize_document_header_footer,
-				BOOL indentation
-				);
+		// parse statistics object from the statistics document
+		static DXLStatsDerivedRelArray *ParseDXLToStatsDerivedRelArray(IMemoryPool *,
+																	   const CHAR *dxl_string,
+																	   const CHAR *xsd_file_path);
 
-			// serialize metadata ids into a MD request message
-			static 
-			void SerializeMDRequest
-				(
-				IMemoryPool *memory_pool,
-				CMDRequest *md_request,
-				IOstream &os,
-				BOOL serialize_document_header_footer,
-				BOOL indentation
-				);
-			
-			// serialize a metadata id into a MD request message
-			static 
-			void SerializeMDRequest
-				(
-				IMemoryPool *memory_pool,
-				const IMDId *mdid,
-				IOstream &os,
-				BOOL serialize_document_header_footer,
-				BOOL indentation
-				);
+		// parse statistics object from the statistics document
+		static DXLStatsDerivedRelArray *ParseDXLToStatsDerivedRelArray(
+			IMemoryPool *, const CWStringBase *dxl_string, const CHAR *xsd_file_path);
 
-			// serialize a list of metadata objects into DXL
-			static 
-			CWStringDynamic *SerializeMetadata
-				(
-				IMemoryPool *,
-				const IMDCachePtrArray *,
-				BOOL serialize_document_header_footer,
-				BOOL indentation
-				);
-			
-			// serialize a metadata id into DXL
-			static 
-			CWStringDynamic *SerializeMetadata
-				(
-				IMemoryPool *memory_pool,
-				const IMDId *mdid,
-				BOOL serialize_document_header_footer,
-				BOOL indentation
-				);
+		// translate the dxl statistics object to optimizer statistics object
+		static CStatisticsArray *ParseDXLToOptimizerStatisticObjArray(
+			IMemoryPool *memory_pool,
+			CMDAccessor *md_accessor,
+			DXLStatsDerivedRelArray *dxl_derived_rel_stats_array);
 
-			// serialize sample plans
-			static
-			CWStringDynamic *SerializeSamplePlans
-				(
-				IMemoryPool *memory_pool,
-				CEnumeratorConfig *enumerator_cfg,
-				BOOL indentation
-				);
+		// extract the array of optimizer buckets from the dxl representation of
+		// dxl buckets in the dxl derived column statistics object
+		static BucketArray *ParseDXLToBucketsArray(IMemoryPool *memory_pool,
+												   CMDAccessor *md_accessor,
+												   CDXLStatsDerivedColumn *dxl_derived_col_stats);
 
-			// serialize cost distribution plans
-			static
-			CWStringDynamic *SerializeCostDistr
-				(
-				IMemoryPool *memory_pool,
-				CEnumeratorConfig *enumerator_cfg,
-				BOOL indentation
-				);
+		// serialize a DXL query tree into DXL Document
+		static void SerializeQuery(IMemoryPool *memory_pool,
+								   IOstream &os,
+								   const CDXLNode *dxl_query_node,
+								   const DXLNodeArray *query_output_dxlnode_array,
+								   const DXLNodeArray *cte_producers,
+								   BOOL serialize_document_header_footer,
+								   BOOL indentation);
 
-			// serialize a metadata object into DXL
-			static 
-			CWStringDynamic *SerializeMDObj
-				(
-				IMemoryPool *,
-				const IMDCacheObject *,
-				BOOL serialize_document_header_footer,
-				BOOL indentation
-				);
-			
-			// serialize a scalar expression into DXL
-			static
-			CWStringDynamic *SerializeScalarExpr
-				(
-				IMemoryPool *memory_pool,
-				const CDXLNode *node,
-				BOOL serialize_document_header_footer,
-				BOOL indentation
-				);
+		// serialize a ULLONG m_bytearray_value
+		static CWStringDynamic *SerializeULLONG(IMemoryPool *memory_pool, ULLONG value);
 
-			// create a GPOS dynamic string from a Xerces XMLCh array
-			static 
-			CWStringDynamic *CreateDynamicStringFromXMLChArray
-				(
-				CDXLMemoryManager *memory_manager,
-				const XMLCh *
-				);
-			
-			// create a GPOS string object from a base 64 encoded XML string
-			static
-			BYTE *CreateStringFrom64XMLStr
-				(
-				CDXLMemoryManager *memory_manager,
-				const XMLCh *xml_string,
-				ULONG *length
-				);
+		// serialize a plan into DXL
+		static void SerializePlan(IMemoryPool *memory_pool,
+								  IOstream &os,
+								  const CDXLNode *node,
+								  ULLONG plan_id,
+								  ULLONG plan_space_size,
+								  BOOL serialize_document_header_footer,
+								  BOOL indentation);
 
-			// create a GPOS dynamic string from a regular character array
-			static 
-			CWStringDynamic *CreateDynamicStringFromCharArray
-				(
-				IMemoryPool *memory_pool,
-				const CHAR *c
-				);
-			
-			// create an MD name from a character array
-			static 
-			CMDName *CreateMDNameFromCharArray(IMemoryPool *memory_pool, const CHAR *c);
-			
-			// create an MD name from a Xerces character array
-			static 
-			CMDName *CreateMDNameFromXMLChar(CDXLMemoryManager *memory_manager, const XMLCh *xml_string);
-		
-			// encode a byte array to a string
-			static 
-			CWStringDynamic *EncodeByteArrayToString
-				(
-				IMemoryPool *memory_pool,
-				const BYTE *byte,
-				ULONG length
-				);
+		static CWStringDynamic *SerializeStatistics(IMemoryPool *memory_pool,
+													CMDAccessor *md_accessor,
+													const CStatisticsArray *statistics_array,
+													BOOL serialize_header_footer,
+													BOOL indentation);
 
-			// serialize a list of integers into a comma-separate string
-			template <typename T, void (*CleanupFn)(T*)>
-			static 
-			CWStringDynamic *Serialize
-				(
-				IMemoryPool *memory_pool,
-				const CDynamicPtrArray<T, CleanupFn> *arr
-				);
+		// serialize statistics objects into DXL and write to stream
+		static void SerializeStatistics(IMemoryPool *memory_pool,
+										CMDAccessor *md_accessor,
+										const CStatisticsArray *statistics_array,
+										IOstream &os,
+										BOOL serialize_document_header_footer,
+										BOOL indentation);
 
-			// serialize a list of lists of integers into a comma-separate string
-			static
-			CWStringDynamic *Serialize
-				(
-				IMemoryPool *memory_pool,
-				const ULongPtrArray2D *pdrgpul
-				);
+		// serialize metadata objects into DXL and write to stream
+		static void SerializeMetadata(IMemoryPool *memory_pool,
+									  const IMDCachePtrArray *imd_obj_array,
+									  IOstream &os,
+									  BOOL serialize_document_header_footer,
+									  BOOL indentation);
 
-			// serialize a list of chars into a comma-separate string
-			static
-			CWStringDynamic *SerializeToCommaSeparatedString
-				(
-				IMemoryPool *memory_pool,
-				const CharPtrArray *pdrgpsz
-				);
+		// serialize metadata ids into a MD request message
+		static void SerializeMDRequest(IMemoryPool *memory_pool,
+									   CMDRequest *md_request,
+									   IOstream &os,
+									   BOOL serialize_document_header_footer,
+									   BOOL indentation);
 
-			// decode a byte array from a string
-			static 
-			BYTE *DecodeByteArrayFromString
-				(
-				IMemoryPool *memory_pool,
-				const CWStringDynamic *dxl_string,
-				ULONG *length
-				);
-			
-			static 
-			CHAR *Read(IMemoryPool *memory_pool, const CHAR *filename);
-			
-			// create a multi-byte character string from a wide character string
-			static 
-			CHAR *CreateMultiByteCharStringFromWCString(IMemoryPool *memory_pool, const WCHAR *wc_string);
-			
-			// serialize a double m_bytearray_value in a string
-			static 
-			CWStringDynamic *SerializeDouble
-				(
-				CDXLMemoryManager *memory_manager,
-				CDouble value
-				);
+		// serialize a metadata id into a MD request message
+		static void SerializeMDRequest(IMemoryPool *memory_pool,
+									   const IMDId *mdid,
+									   IOstream &os,
+									   BOOL serialize_document_header_footer,
+									   BOOL indentation);
 
-			// translate the optimizer datum from dxl datum object
-			static
-			IDatum *GetDatum
-				(
-				IMemoryPool *memory_pool,
-				CMDAccessor *md_accessor,
-				const CDXLDatum *datum_dxl
-				);
+		// serialize a list of metadata objects into DXL
+		static CWStringDynamic *SerializeMetadata(IMemoryPool *,
+												  const IMDCachePtrArray *,
+												  BOOL serialize_document_header_footer,
+												  BOOL indentation);
 
-			// serialize Datum with given tag
-			static
-			void SerializeBound
-					(
-					IDatum *new_length,
-					const CWStringConst *dxl_string,
-					CXMLSerializer *xml_serializer
-					);
+		// serialize a metadata id into DXL
+		static CWStringDynamic *SerializeMetadata(IMemoryPool *memory_pool,
+												  const IMDId *mdid,
+												  BOOL serialize_document_header_footer,
+												  BOOL indentation);
+
+		// serialize sample plans
+		static CWStringDynamic *SerializeSamplePlans(IMemoryPool *memory_pool,
+													 CEnumeratorConfig *enumerator_cfg,
+													 BOOL indentation);
+
+		// serialize cost distribution plans
+		static CWStringDynamic *SerializeCostDistr(IMemoryPool *memory_pool,
+												   CEnumeratorConfig *enumerator_cfg,
+												   BOOL indentation);
+
+		// serialize a metadata object into DXL
+		static CWStringDynamic *SerializeMDObj(IMemoryPool *,
+											   const IMDCacheObject *,
+											   BOOL serialize_document_header_footer,
+											   BOOL indentation);
+
+		// serialize a scalar expression into DXL
+		static CWStringDynamic *SerializeScalarExpr(IMemoryPool *memory_pool,
+													const CDXLNode *node,
+													BOOL serialize_document_header_footer,
+													BOOL indentation);
+
+		// create a GPOS dynamic string from a Xerces XMLCh array
+		static CWStringDynamic *CreateDynamicStringFromXMLChArray(CDXLMemoryManager *memory_manager,
+																  const XMLCh *);
+
+		// create a GPOS string object from a base 64 encoded XML string
+		static BYTE *CreateStringFrom64XMLStr(CDXLMemoryManager *memory_manager,
+											  const XMLCh *xml_string,
+											  ULONG *length);
+
+		// create a GPOS dynamic string from a regular character array
+		static CWStringDynamic *CreateDynamicStringFromCharArray(IMemoryPool *memory_pool,
+																 const CHAR *c);
+
+		// create an MD name from a character array
+		static CMDName *CreateMDNameFromCharArray(IMemoryPool *memory_pool, const CHAR *c);
+
+		// create an MD name from a Xerces character array
+		static CMDName *CreateMDNameFromXMLChar(CDXLMemoryManager *memory_manager,
+												const XMLCh *xml_string);
+
+		// encode a byte array to a string
+		static CWStringDynamic *EncodeByteArrayToString(IMemoryPool *memory_pool,
+														const BYTE *byte,
+														ULONG length);
+
+		// serialize a list of integers into a comma-separate string
+		template <typename T, void (*CleanupFn)(T *)>
+		static CWStringDynamic *Serialize(IMemoryPool *memory_pool,
+										  const CDynamicPtrArray<T, CleanupFn> *arr);
+
+		// serialize a list of lists of integers into a comma-separate string
+		static CWStringDynamic *Serialize(IMemoryPool *memory_pool, const ULongPtrArray2D *pdrgpul);
+
+		// serialize a list of chars into a comma-separate string
+		static CWStringDynamic *SerializeToCommaSeparatedString(IMemoryPool *memory_pool,
+																const CharPtrArray *pdrgpsz);
+
+		// decode a byte array from a string
+		static BYTE *DecodeByteArrayFromString(IMemoryPool *memory_pool,
+											   const CWStringDynamic *dxl_string,
+											   ULONG *length);
+
+		static CHAR *Read(IMemoryPool *memory_pool, const CHAR *filename);
+
+		// create a multi-byte character string from a wide character string
+		static CHAR *CreateMultiByteCharStringFromWCString(IMemoryPool *memory_pool,
+														   const WCHAR *wc_string);
+
+		// serialize a double m_bytearray_value in a string
+		static CWStringDynamic *SerializeDouble(CDXLMemoryManager *memory_manager, CDouble value);
+
+		// translate the optimizer datum from dxl datum object
+		static IDatum *GetDatum(IMemoryPool *memory_pool,
+								CMDAccessor *md_accessor,
+								const CDXLDatum *datum_dxl);
+
+		// serialize Datum with given tag
+		static void SerializeBound(IDatum *new_length,
+								   const CWStringConst *dxl_string,
+								   CXMLSerializer *xml_serializer);
 
 #ifdef GPOS_DEBUG
-			// debug print of the metadata relation
-			static
-			void DebugPrintMDIdArray(IOstream &os, MdidPtrArray *mdid_array);
+		// debug print of the metadata relation
+		static void DebugPrintMDIdArray(IOstream &os, MdidPtrArray *mdid_array);
 #endif
 	};
 
 	// serialize a list of integers into a comma-separate string
-	template <typename T, void (*CleanupFn)(T*)>
+	template <typename T, void (*CleanupFn)(T *)>
 	CWStringDynamic *
-	CDXLUtils::Serialize
-		(
-		IMemoryPool *memory_pool,
-		const CDynamicPtrArray<T, CleanupFn> *dynamic_ptr_array
-		)
+	CDXLUtils::Serialize(IMemoryPool *memory_pool,
+						 const CDynamicPtrArray<T, CleanupFn> *dynamic_ptr_array)
 	{
 		CAutoP<CWStringDynamic> string_var(GPOS_NEW(memory_pool) CWStringDynamic(memory_pool));
 
@@ -516,15 +337,17 @@ namespace gpdxl
 			}
 			else
 			{
-				string_var->AppendFormat(GPOS_WSZ_LIT("%d%ls"), value, CDXLTokens::GetDXLTokenStr(EdxltokenComma)->GetBuffer());
+				string_var->AppendFormat(GPOS_WSZ_LIT("%d%ls"),
+										 value,
+										 CDXLTokens::GetDXLTokenStr(EdxltokenComma)->GetBuffer());
 			}
 		}
 
 		return string_var.Reset();
 	}
 
-}
+}  // namespace gpdxl
 
-#endif // GPDXL_CDXLUtils_H
+#endif  // GPDXL_CDXLUtils_H
 
 // EOF

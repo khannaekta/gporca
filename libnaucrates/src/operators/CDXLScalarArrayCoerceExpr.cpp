@@ -31,20 +31,16 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarArrayCoerceExpr::CDXLScalarArrayCoerceExpr
-	(
-	IMemoryPool *memory_pool,
-	IMDId *coerce_func_mdid,
-	IMDId *result_type_mdid,
-	INT type_modifier,
-	BOOL is_explicit,
-	EdxlCoercionForm coerce_format,
-	INT location
-	)
-	:
-	CDXLScalarCoerceBase(memory_pool, result_type_mdid, type_modifier, coerce_format, location),
-	m_coerce_func_mdid(coerce_func_mdid),
-	m_explicit(is_explicit)
+CDXLScalarArrayCoerceExpr::CDXLScalarArrayCoerceExpr(IMemoryPool *memory_pool,
+													 IMDId *coerce_func_mdid,
+													 IMDId *result_type_mdid,
+													 INT type_modifier,
+													 BOOL is_explicit,
+													 EdxlCoercionForm coerce_format,
+													 INT location)
+	: CDXLScalarCoerceBase(memory_pool, result_type_mdid, type_modifier, coerce_format, location),
+	  m_coerce_func_mdid(coerce_func_mdid),
+	  m_explicit(is_explicit)
 {
 	GPOS_ASSERT(NULL != coerce_func_mdid);
 }
@@ -72,12 +68,8 @@ CDXLScalarArrayCoerceExpr::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarArrayCoerceExpr::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *node
-	)
-	const
+CDXLScalarArrayCoerceExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
+										  const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -91,11 +83,13 @@ CDXLScalarArrayCoerceExpr::SerializeToDXL
 		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenTypeMod), TypeModifier());
 	}
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenIsExplicit), m_explicit);
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenCoercionForm), (ULONG) GetDXLCoercionForm());
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenCoercionForm),
+								 (ULONG) GetDXLCoercionForm());
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenLocation), GetLocation());
 
 	node->SerializeChildrenToDXL(xml_serializer);
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 // EOF

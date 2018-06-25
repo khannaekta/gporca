@@ -7,7 +7,7 @@
 //
 //	@doc:
 //		Parse handler for parsing a logical window operator
-//		
+//
 //---------------------------------------------------------------------------
 #ifndef GPDXL_CParseHandlerLogicalWindow_H
 #define GPDXL_CParseHandlerLogicalWindow_H
@@ -31,41 +31,34 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerLogicalWindow : public CParseHandlerLogicalOp
 	{
-		private:
-			// list of window specification
-			DXLWindowSpecArray *m_window_spec_array;
+	private:
+		// list of window specification
+		DXLWindowSpecArray *m_window_spec_array;
 
-			// private copy ctor
-			CParseHandlerLogicalWindow(const CParseHandlerLogicalWindow &);
+		// private copy ctor
+		CParseHandlerLogicalWindow(const CParseHandlerLogicalWindow &);
 
-			// process the start of an element
-			void StartElement
-					(
-					const XMLCh* const element_uri, 		// URI of element's namespace
- 					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-					);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the end of an element
-			void EndElement
-					(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-					);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-		public:
-			// ctor
-			CParseHandlerLogicalWindow
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
+	public:
+		// ctor
+		CParseHandlerLogicalWindow(IMemoryPool *memory_pool,
+								   CParseHandlerManager *parse_handler_mgr,
+								   CParseHandlerBase *parse_handler_root);
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerLogicalWindow_H
+#endif  // !GPDXL_CParseHandlerLogicalWindow_H
 
 // EOF

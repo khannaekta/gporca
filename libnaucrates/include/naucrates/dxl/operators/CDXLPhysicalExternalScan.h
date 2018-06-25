@@ -28,42 +28,33 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalExternalScan : public CDXLPhysicalTableScan
 	{
-		private:
+	private:
+		// private copy ctor
+		CDXLPhysicalExternalScan(CDXLPhysicalExternalScan &);
 
-			// private copy ctor
-			CDXLPhysicalExternalScan(CDXLPhysicalExternalScan&);
+	public:
+		// ctors
+		explicit CDXLPhysicalExternalScan(IMemoryPool *memory_pool);
 
-		public:
-			// ctors
-			explicit
-			CDXLPhysicalExternalScan(IMemoryPool *memory_pool);
+		CDXLPhysicalExternalScan(IMemoryPool *memory_pool, CDXLTableDescr *table_descr);
 
-			CDXLPhysicalExternalScan(IMemoryPool *memory_pool, CDXLTableDescr *table_descr);
+		// operator type
+		virtual Edxlopid GetDXLOperator() const;
 
-			// operator type
-			virtual
-			Edxlopid GetDXLOperator() const;
+		// operator name
+		virtual const CWStringConst *GetOpNameStr() const;
 
-			// operator name
-			virtual
-			const CWStringConst *GetOpNameStr() const;
+		// conversion function
+		static CDXLPhysicalExternalScan *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopPhysicalExternalScan == dxl_op->GetDXLOperator());
 
-			// conversion function
-			static
-			CDXLPhysicalExternalScan *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopPhysicalExternalScan == dxl_op->GetDXLOperator());
-
-				return dynamic_cast<CDXLPhysicalExternalScan*>(dxl_op);
-			}
-
+			return dynamic_cast<CDXLPhysicalExternalScan *>(dxl_op);
+		}
 	};
-}
-#endif // !GPDXL_CDXLPhysicalExternalScan_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLPhysicalExternalScan_H
 
 // EOF
-

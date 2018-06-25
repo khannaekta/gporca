@@ -17,7 +17,7 @@
 
 namespace gpdxl
 {
-	using namespace gpos;	
+	using namespace gpos;
 
 	//---------------------------------------------------------------------------
 	//	@class:
@@ -30,51 +30,45 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalProperties : public CDXLProperties
 	{
-		private:
-			// cost estimate
-			CDXLOperatorCost *m_operator_cost_dxl;
+	private:
+		// cost estimate
+		CDXLOperatorCost *m_operator_cost_dxl;
 
-			// private copy ctor
-			CDXLPhysicalProperties(const CDXLPhysicalProperties&);
-			
-		public:
+		// private copy ctor
+		CDXLPhysicalProperties(const CDXLPhysicalProperties &);
 
-			// ctor
-			explicit
-			CDXLPhysicalProperties(CDXLOperatorCost *cost);
-			
-			// dtor
-			virtual
-			~CDXLPhysicalProperties();
+	public:
+		// ctor
+		explicit CDXLPhysicalProperties(CDXLOperatorCost *cost);
 
-			// serialize properties in DXL format
-			void SerializePropertiesToDXL(CXMLSerializer *xml_serializer) const;
+		// dtor
+		virtual ~CDXLPhysicalProperties();
 
-			// accessors
-			// the cost estimates for the operator node
-			CDXLOperatorCost *GetDXLOperatorCost() const;
+		// serialize properties in DXL format
+		void SerializePropertiesToDXL(CXMLSerializer *xml_serializer) const;
 
-			virtual
-			Edxlproperty GetDXLPropertyType() const
-			{
-				return EdxlpropertyPhysical;
-			}
+		// accessors
+		// the cost estimates for the operator node
+		CDXLOperatorCost *GetDXLOperatorCost() const;
 
-			// conversion function
-			static
-			CDXLPhysicalProperties *PdxlpropConvert
-				(
-				CDXLProperties *dxl_properties
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_properties);
-				GPOS_ASSERT(EdxlpropertyPhysical == dxl_properties->GetDXLPropertyType());
-				return dynamic_cast<CDXLPhysicalProperties *>(dxl_properties);
-			}
+		virtual Edxlproperty
+		GetDXLPropertyType() const
+		{
+			return EdxlpropertyPhysical;
+		}
+
+		// conversion function
+		static CDXLPhysicalProperties *
+		PdxlpropConvert(CDXLProperties *dxl_properties)
+		{
+			GPOS_ASSERT(NULL != dxl_properties);
+			GPOS_ASSERT(EdxlpropertyPhysical == dxl_properties->GetDXLPropertyType());
+			return dynamic_cast<CDXLPhysicalProperties *>(dxl_properties);
+		}
 	};
 
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLPhysicalProperties_H
+#endif  // !GPDXL_CDXLPhysicalProperties_H
 
 // EOF

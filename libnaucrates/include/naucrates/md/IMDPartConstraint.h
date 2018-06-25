@@ -24,7 +24,7 @@ namespace gpopt
 {
 	class CExpression;
 	class CMDAccessor;
-}
+}  // namespace gpopt
 
 namespace gpmd
 {
@@ -39,31 +39,27 @@ namespace gpmd
 	//
 	//---------------------------------------------------------------------------
 	class IMDPartConstraint : public IMDInterface
-	{		
-		public:
-			
-			// extract the scalar expression of the constraint with the given
-			// column mappings
-			virtual
-			CExpression *GetPartConstraintExpr(IMemoryPool *memory_pool, CMDAccessor *md_accessor, DrgPcr *colref_array) const = 0;
-			
-			// included default partitions
-			virtual
-			ULongPtrArray *GetDefaultPartsArray() const = 0;
+	{
+	public:
+		// extract the scalar expression of the constraint with the given
+		// column mappings
+		virtual CExpression *GetPartConstraintExpr(IMemoryPool *memory_pool,
+												   CMDAccessor *md_accessor,
+												   DrgPcr *colref_array) const = 0;
 
-			// is constraint unbounded
-			virtual
-			BOOL IsConstraintUnbounded() const = 0;
-			
-			// serialize constraint in DXL format
-			virtual
-			void Serialize(CXMLSerializer *xml_serializer) const = 0;
+		// included default partitions
+		virtual ULongPtrArray *GetDefaultPartsArray() const = 0;
 
+		// is constraint unbounded
+		virtual BOOL IsConstraintUnbounded() const = 0;
+
+		// serialize constraint in DXL format
+		virtual void Serialize(CXMLSerializer *xml_serializer) const = 0;
 	};
-}
+}  // namespace gpmd
 
 
 
-#endif // !GPMD_IMDPartConstraint_H
+#endif  // !GPMD_IMDPartConstraint_H
 
 // EOF

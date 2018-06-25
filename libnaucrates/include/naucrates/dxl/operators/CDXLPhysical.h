@@ -33,32 +33,27 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysical : public CDXLOperator
 	{
-		private:
-		
-			// private copy ctor
-			CDXLPhysical(const CDXLPhysical&);
+	private:
+		// private copy ctor
+		CDXLPhysical(const CDXLPhysical &);
 
-		public:
-			// ctor/dtor
-			explicit
-			CDXLPhysical(IMemoryPool *memory_pool);
-			
-			virtual
-			~CDXLPhysical();
-			
-			// Get operator type
-			Edxloptype GetDXLOperatorType() const;
-			
+	public:
+		// ctor/dtor
+		explicit CDXLPhysical(IMemoryPool *memory_pool);
+
+		virtual ~CDXLPhysical();
+
+		// Get operator type
+		Edxloptype GetDXLOperatorType() const;
+
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			virtual void AssertValid(const CDXLNode *, BOOL validate_children) const;
-#endif // GPOS_DEBUG
-					
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		virtual void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLPhysical_H
+#endif  // !GPDXL_CDXLPhysical_H
 
 // EOF
-

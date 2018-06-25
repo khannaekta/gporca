@@ -6,7 +6,7 @@
 //		CParseHandlerScalarCast.h
 //
 //	@doc:
-//		
+//
 //		SAX parse handler class for parsing relabel node to a CDXLScalarCast operator.
 //---------------------------------------------------------------------------
 
@@ -35,43 +35,33 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerScalarCast : public CParseHandlerScalarOp
 	{
-		private:
-	
-			// private copy ctor
-			CParseHandlerScalarCast(const CParseHandlerScalarCast &);
-	
-			// process the start of an element
-			void StartElement
-					(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-					);
-	
-			// process the end of an element
-			void EndElement
-					(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-					);
-	
-		public:
-			// ctor/dtor
-			CParseHandlerScalarCast
-					(
-					IMemoryPool *memory_pool,
-					CParseHandlerManager *parse_handler_mgr,
-					CParseHandlerBase *parse_handler_root
-					);
-	
-			virtual
-			~CParseHandlerScalarCast(){};
+	private:
+		// private copy ctor
+		CParseHandlerScalarCast(const CParseHandlerScalarCast &);
 
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
+
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+	public:
+		// ctor/dtor
+		CParseHandlerScalarCast(IMemoryPool *memory_pool,
+								CParseHandlerManager *parse_handler_mgr,
+								CParseHandlerBase *parse_handler_root);
+
+		virtual ~CParseHandlerScalarCast(){};
 	};
 
-}
-#endif // GPDXL_CParseHandlerScalarCast_H
+}  // namespace gpdxl
+#endif  // GPDXL_CParseHandlerScalarCast_H
 
 //EOF

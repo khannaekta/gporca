@@ -30,14 +30,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerScalarDMLAction::CParseHandlerScalarDMLAction
-	(
-	IMemoryPool *memory_pool,
-	CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root
-	)
-	:
-	CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+CParseHandlerScalarDMLAction::CParseHandlerScalarDMLAction(IMemoryPool *memory_pool,
+														   CParseHandlerManager *parse_handler_mgr,
+														   CParseHandlerBase *parse_handler_root)
+	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -51,21 +47,22 @@ CParseHandlerScalarDMLAction::CParseHandlerScalarDMLAction
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerScalarDMLAction::StartElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const, // element_qname
-	const Attributes& // attrs
-	)
+CParseHandlerScalarDMLAction::StartElement(const XMLCh *const,  // element_uri,
+										   const XMLCh *const element_local_name,
+										   const XMLCh *const,  // element_qname
+										   const Attributes &   // attrs
+)
 {
-	if(0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarDMLAction), element_local_name))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarDMLAction),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
-	
-	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarDMLAction(m_memory_pool));
+
+	m_dxl_node = GPOS_NEW(m_memory_pool)
+		CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarDMLAction(m_memory_pool));
 }
 
 //---------------------------------------------------------------------------
@@ -77,16 +74,16 @@ CParseHandlerScalarDMLAction::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerScalarDMLAction::EndElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const // element_qname
-	)
+CParseHandlerScalarDMLAction::EndElement(const XMLCh *const,  // element_uri,
+										 const XMLCh *const element_local_name,
+										 const XMLCh *const  // element_qname
+)
 {
-	if(0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarDMLAction), element_local_name))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarDMLAction),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
@@ -94,4 +91,3 @@ CParseHandlerScalarDMLAction::EndElement
 }
 
 // EOF
-

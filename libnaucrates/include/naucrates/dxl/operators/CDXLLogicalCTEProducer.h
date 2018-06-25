@@ -16,7 +16,6 @@
 
 namespace gpdxl
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDXLLogicalCTEProducer
@@ -27,67 +26,63 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLLogicalCTEProducer : public CDXLLogical
 	{
-		private:
+	private:
+		// cte id
+		ULONG m_id;
 
-			// cte id
-			ULONG m_id;
+		// output column ids
+		ULongPtrArray *m_output_colids_array;
 
-			// output column ids
-			ULongPtrArray *m_output_colids_array;
-			
-			// private copy ctor
-			CDXLLogicalCTEProducer(CDXLLogicalCTEProducer&);
+		// private copy ctor
+		CDXLLogicalCTEProducer(CDXLLogicalCTEProducer &);
 
-		public:
-			// ctor
-			CDXLLogicalCTEProducer(IMemoryPool *memory_pool, ULONG id, ULongPtrArray *output_colids_array);
-			
-			// dtor
-			virtual
-			~CDXLLogicalCTEProducer();
+	public:
+		// ctor
+		CDXLLogicalCTEProducer(IMemoryPool *memory_pool,
+							   ULONG id,
+							   ULongPtrArray *output_colids_array);
 
-			// operator type
-			virtual
-			Edxlopid GetDXLOperator() const;
+		// dtor
+		virtual ~CDXLLogicalCTEProducer();
 
-			// operator name
-			virtual
-			const CWStringConst *GetOpNameStr() const;
+		// operator type
+		virtual Edxlopid GetDXLOperator() const;
 
-			// cte identifier
-			ULONG Id() const
-			{
-				return m_id;
-			}
-			
-			ULongPtrArray *GetOutputColIdsArray() const
-			{
-				return m_output_colids_array;
-			}
+		// operator name
+		virtual const CWStringConst *GetOpNameStr() const;
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+		// cte identifier
+		ULONG
+		Id() const
+		{
+			return m_id;
+		}
+
+		ULongPtrArray *
+		GetOutputColIdsArray() const
+		{
+			return m_output_colids_array;
+		}
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL validate_children) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 
-			// conversion function
-			static
-			CDXLLogicalCTEProducer *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopLogicalCTEProducer == dxl_op->GetDXLOperator());
-				return dynamic_cast<CDXLLogicalCTEProducer*>(dxl_op);
-			}
+		// conversion function
+		static CDXLLogicalCTEProducer *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopLogicalCTEProducer == dxl_op->GetDXLOperator());
+			return dynamic_cast<CDXLLogicalCTEProducer *>(dxl_op);
+		}
 	};
-}
-#endif // !GPDXL_CDXLLogicalCTEProducer_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLLogicalCTEProducer_H
 
 // EOF

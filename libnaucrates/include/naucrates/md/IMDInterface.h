@@ -30,16 +30,16 @@ namespace gpmd
 	//
 	//---------------------------------------------------------------------------
 	class IMDInterface : public CRefCount
-	{		
-		public:
-			virtual ~IMDInterface(){}
-			
-		
+	{
+	public:
+		virtual ~IMDInterface()
+		{
+		}
 	};
-}
+}  // namespace gpmd
 
 
 
-#endif // !GPMD_IMDInterface_H
+#endif  // !GPMD_IMDInterface_H
 
 // EOF

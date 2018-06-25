@@ -29,15 +29,11 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerLogicalWindow::CParseHandlerLogicalWindow
-	(
-	IMemoryPool *memory_pool,
-	CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root
-	)
-	:
-	CParseHandlerLogicalOp(memory_pool, parse_handler_mgr, parse_handler_root),
-	m_window_spec_array(NULL)
+CParseHandlerLogicalWindow::CParseHandlerLogicalWindow(IMemoryPool *memory_pool,
+													   CParseHandlerManager *parse_handler_mgr,
+													   CParseHandlerBase *parse_handler_root)
+	: CParseHandlerLogicalOp(memory_pool, parse_handler_mgr, parse_handler_root),
+	  m_window_spec_array(NULL)
 {
 }
 
@@ -50,27 +46,35 @@ CParseHandlerLogicalWindow::CParseHandlerLogicalWindow
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerLogicalWindow::StartElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const, // element_qname
-	const Attributes& //attrs
-	)
+CParseHandlerLogicalWindow::StartElement(const XMLCh *const,  // element_uri,
+										 const XMLCh *const element_local_name,
+										 const XMLCh *const,  // element_qname
+										 const Attributes &   //attrs
+)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenLogicalWindow), element_local_name))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenLogicalWindow),
+									  element_local_name))
 	{
 		// create child node parsers
 		// parse handler for logical operator
-		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenLogical), m_parse_handler_mgr, this);
+		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
+			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenLogical), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
 		// parse handler for the proj list
-		CParseHandlerBase *proj_list_parse_handler = CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalarProjList), m_parse_handler_mgr, this);
+		CParseHandlerBase *proj_list_parse_handler =
+			CParseHandlerFactory::GetParseHandler(m_memory_pool,
+												  CDXLTokens::XmlstrToken(EdxltokenScalarProjList),
+												  m_parse_handler_mgr,
+												  this);
 		m_parse_handler_mgr->ActivateParseHandler(proj_list_parse_handler);
 
 		// parse handler for window specification list
-		CParseHandlerBase *window_speclist_parse_handler = CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenWindowSpecList), m_parse_handler_mgr, this);
+		CParseHandlerBase *window_speclist_parse_handler =
+			CParseHandlerFactory::GetParseHandler(m_memory_pool,
+												  CDXLTokens::XmlstrToken(EdxltokenWindowSpecList),
+												  m_parse_handler_mgr,
+												  this);
 		m_parse_handler_mgr->ActivateParseHandler(window_speclist_parse_handler);
 
 		// store child parse handler in array
@@ -80,7 +84,8 @@ CParseHandlerLogicalWindow::StartElement
 	}
 	else
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 }
@@ -94,27 +99,31 @@ CParseHandlerLogicalWindow::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerLogicalWindow::EndElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const // element_qname
-	)
+CParseHandlerLogicalWindow::EndElement(const XMLCh *const,  // element_uri,
+									   const XMLCh *const element_local_name,
+									   const XMLCh *const  // element_qname
+)
 {
-	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenLogicalWindow), element_local_name))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenLogicalWindow),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
-	CParseHandlerWindowSpecList *window_speclist_parse_handler = dynamic_cast<CParseHandlerWindowSpecList*>((*this)[0]);
-	CParseHandlerProjList *proj_list_parse_handler = dynamic_cast<CParseHandlerProjList*>((*this)[1]);
-	CParseHandlerLogicalOp *lg_op_parse_handler = dynamic_cast<CParseHandlerLogicalOp*>((*this)[2]);
+	CParseHandlerWindowSpecList *window_speclist_parse_handler =
+		dynamic_cast<CParseHandlerWindowSpecList *>((*this)[0]);
+	CParseHandlerProjList *proj_list_parse_handler =
+		dynamic_cast<CParseHandlerProjList *>((*this)[1]);
+	CParseHandlerLogicalOp *lg_op_parse_handler =
+		dynamic_cast<CParseHandlerLogicalOp *>((*this)[2]);
 
 	DXLWindowSpecArray *window_spec_array = window_speclist_parse_handler->GetDxlWindowSpecArray();
 	GPOS_ASSERT(NULL != window_spec_array);
 
-	CDXLLogicalWindow *lg_window = GPOS_NEW(m_memory_pool) CDXLLogicalWindow(m_memory_pool, window_spec_array);
+	CDXLLogicalWindow *lg_window =
+		GPOS_NEW(m_memory_pool) CDXLLogicalWindow(m_memory_pool, window_spec_array);
 	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, lg_window);
 	GPOS_ASSERT(NULL != proj_list_parse_handler->CreateDXLNode());
 	GPOS_ASSERT(NULL != lg_op_parse_handler->CreateDXLNode());
@@ -124,7 +133,7 @@ CParseHandlerLogicalWindow::EndElement
 
 #ifdef GPOS_DEBUG
 	m_dxl_node->GetOperator()->AssertValid(m_dxl_node, false /* validate_children */);
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

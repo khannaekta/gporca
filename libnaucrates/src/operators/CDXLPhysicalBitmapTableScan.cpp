@@ -42,12 +42,8 @@ CDXLPhysicalBitmapTableScan::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalBitmapTableScan::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *dxlnode
-	)
-	const
+CDXLPhysicalBitmapTableScan::SerializeToDXL(CXMLSerializer *xml_serializer,
+											const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -62,7 +58,8 @@ CDXLPhysicalBitmapTableScan::SerializeToDXL
 	// serialize table descriptor
 	m_table_descr_dxl->SerializeToDXL(xml_serializer);
 
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 // EOF

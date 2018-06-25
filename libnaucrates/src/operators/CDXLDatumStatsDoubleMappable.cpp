@@ -7,9 +7,9 @@
 //
 //	@doc:
 //		Implementation of DXL datum of types having double mapping
-//		
-//	@owner: 
-//		
+//
+//	@owner:
+//
 //
 //	@test:
 //
@@ -30,20 +30,17 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLDatumStatsDoubleMappable::CDXLDatumStatsDoubleMappable
-	(
-	IMemoryPool *memory_pool,
-	IMDId *mdid_type,
-	INT type_modifier,
-	BOOL is_passed_by_value,
-	BOOL is_null,
-	BYTE *data,
-	ULONG length,
-	CDouble val
-	)
-	:
-	CDXLDatumGeneric(memory_pool, mdid_type, type_modifier, is_passed_by_value, is_null, data, length),
-	m_val(val)
+CDXLDatumStatsDoubleMappable::CDXLDatumStatsDoubleMappable(IMemoryPool *memory_pool,
+														   IMDId *mdid_type,
+														   INT type_modifier,
+														   BOOL is_passed_by_value,
+														   BOOL is_null,
+														   BYTE *data,
+														   ULONG length,
+														   CDouble val)
+	: CDXLDatumGeneric(
+		  memory_pool, mdid_type, type_modifier, is_passed_by_value, is_null, data, length),
+	  m_val(val)
 {
 }
 //---------------------------------------------------------------------------
@@ -55,10 +52,7 @@ CDXLDatumStatsDoubleMappable::CDXLDatumStatsDoubleMappable
 //
 //---------------------------------------------------------------------------
 void
-CDXLDatumStatsDoubleMappable::Serialize
-	(
-	CXMLSerializer *xml_serializer
-	)
+CDXLDatumStatsDoubleMappable::Serialize(CXMLSerializer *xml_serializer)
 {
 	m_mdid_type->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenTypeId));
 	if (default_type_modifier != TypeModifier())
@@ -66,9 +60,12 @@ CDXLDatumStatsDoubleMappable::Serialize
 		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenTypeMod), TypeModifier());
 	}
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenIsNull), m_is_null);
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenIsByValue), m_is_passed_by_value);
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenValue), m_is_null, GetByteArray(), Length());
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenDoubleValue), GetDoubleMapping());
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenIsByValue),
+								 m_is_passed_by_value);
+	xml_serializer->AddAttribute(
+		CDXLTokens::GetDXLTokenStr(EdxltokenValue), m_is_null, GetByteArray(), Length());
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenDoubleValue),
+								 GetDoubleMapping());
 }
 
 // EOF

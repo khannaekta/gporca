@@ -29,55 +29,52 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLWindowKey : public CRefCount
 	{
-		private:
+	private:
+		// memory pool;
+		IMemoryPool *m_memory_pool;
 
-			// memory pool;
-			IMemoryPool *m_memory_pool;
+		// window frame associated with the window key
+		CDXLWindowFrame *m_window_frame_dxl;
 
-			// window frame associated with the window key
-			CDXLWindowFrame *m_window_frame_dxl;
+		// private copy ctor
+		CDXLWindowKey(const CDXLWindowKey &);
 
-			// private copy ctor
-			CDXLWindowKey(const CDXLWindowKey&);
+		// sorting columns
+		CDXLNode *m_sort_col_list_dxl;
 
-			// sorting columns
-			CDXLNode *m_sort_col_list_dxl;
+	public:
+		// ctor
+		explicit CDXLWindowKey(IMemoryPool *memory_pool);
 
-		public:
+		// dtor
+		virtual ~CDXLWindowKey();
 
-			// ctor
-			explicit
-			CDXLWindowKey(IMemoryPool *memory_pool);
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *) const;
 
-			// dtor
-			virtual
-			~CDXLWindowKey();
+		// set window frame definition
+		void SetWindowFrame(CDXLWindowFrame *window_frame);
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *) const;
+		// return window frame
+		CDXLWindowFrame *
+		GetWindowFrame() const
+		{
+			return m_window_frame_dxl;
+		}
 
-			// set window frame definition
-			void SetWindowFrame(CDXLWindowFrame *window_frame);
+		// set the list of sort columns
+		void SetSortColList(CDXLNode *sort_col_list_dxl);
 
-			// return window frame
-			CDXLWindowFrame *GetWindowFrame() const
-			{
-				return m_window_frame_dxl;
-			}
-
-			// set the list of sort columns
-			void SetSortColList(CDXLNode *sort_col_list_dxl);
-
-			// sort columns
-			CDXLNode *GetSortColListDXL() const
-			{
-				return m_sort_col_list_dxl;
-			}
+		// sort columns
+		CDXLNode *
+		GetSortColListDXL() const
+		{
+			return m_sort_col_list_dxl;
+		}
 	};
 
 	typedef CDynamicPtrArray<CDXLWindowKey, CleanupRelease> CDXLWindowKeyArray;
-}
-#endif // !GPDXL_CDXLWindowKey_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLWindowKey_H
 
 // EOF

@@ -31,58 +31,49 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerCostParams : public CParseHandlerBase
 	{
+	private:
+		// cost params
+		ICostModelParams *m_cost_model_params;
 
-		private:
+		// private ctor
+		CParseHandlerCostParams(const CParseHandlerCostParams &);
 
-			// cost params
-			ICostModelParams *m_cost_model_params;
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// private ctor
-			CParseHandlerCostParams(const CParseHandlerCostParams&);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the start of an element
-			void StartElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
- 				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname,		// element's qname
-				const Attributes& attr				// element's attributes
-				);
+	public:
+		// ctor/dtor
+		CParseHandlerCostParams(IMemoryPool *memory_pool,
+								CParseHandlerManager *parse_handler_mgr,
+								CParseHandlerBase *parse_handler_root);
 
-			// process the end of an element
-			void EndElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
-				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname		// element's qname
-				);
+		virtual ~CParseHandlerCostParams();
 
-		public:
-			// ctor/dtor
-			CParseHandlerCostParams
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
+		// returns the dxl representation of cost parameters
+		ICostModelParams *
+		GetCostModelParams()
+		{
+			return m_cost_model_params;
+		}
 
-			virtual
-			~CParseHandlerCostParams();
-
-			// returns the dxl representation of cost parameters
-			ICostModelParams *GetCostModelParams()
-			{
-				return m_cost_model_params;
-			}
-
-			EDxlParseHandlerType GetParseHandlerType() const
-			{
-				return EdxlphCostParams;
-			}
-
+		EDxlParseHandlerType
+		GetParseHandlerType() const
+		{
+			return EdxlphCostParams;
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerCostParams_H
+#endif  // !GPDXL_CParseHandlerCostParams_H
 
 // EOF

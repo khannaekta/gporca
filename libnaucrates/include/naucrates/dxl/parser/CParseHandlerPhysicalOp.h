@@ -30,48 +30,39 @@ namespace gpdxl
 	//
 	//
 	//---------------------------------------------------------------------------
-	class CParseHandlerPhysicalOp : public CParseHandlerOp 
+	class CParseHandlerPhysicalOp : public CParseHandlerOp
 	{
-		private:
+	private:
+		// private copy ctor
+		CParseHandlerPhysicalOp(const CParseHandlerPhysicalOp &);
 
-			// private copy ctor
-			CParseHandlerPhysicalOp(const CParseHandlerPhysicalOp&);
-			
-			
-		protected:
 
-			// process the start of an element
-			virtual void StartElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
- 					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
-				
-			// process the end of an element
-			virtual void EndElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-				);
-						
-		public:
-			// ctor/dtor
-			CParseHandlerPhysicalOp
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
+	protected:
+		// process the start of an element
+		virtual void StartElement(
+			const XMLCh *const element_uri,			// URI of element's namespace
+			const XMLCh *const element_local_name,  // local part of element's name
+			const XMLCh *const element_qname,		// element's qname
+			const Attributes &attr					// element's attributes
+		);
 
-			virtual
-			~CParseHandlerPhysicalOp();
+		// process the end of an element
+		virtual void EndElement(
+			const XMLCh *const element_uri,			// URI of element's namespace
+			const XMLCh *const element_local_name,  // local part of element's name
+			const XMLCh *const element_qname		// element's qname
+		);
 
+	public:
+		// ctor/dtor
+		CParseHandlerPhysicalOp(IMemoryPool *memory_pool,
+								CParseHandlerManager *parse_handler_mgr,
+								CParseHandlerBase *parse_handler_root);
+
+		virtual ~CParseHandlerPhysicalOp();
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerPhysicalOp_H
+#endif  // !GPDXL_CParseHandlerPhysicalOp_H
 
 // EOF

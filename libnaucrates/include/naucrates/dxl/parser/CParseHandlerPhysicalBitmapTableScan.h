@@ -34,42 +34,36 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerPhysicalBitmapTableScan : public CParseHandlerPhysicalAbstractBitmapScan
 	{
-		private:
-			// private copy ctor
-			CParseHandlerPhysicalBitmapTableScan(const CParseHandlerPhysicalBitmapTableScan &);
+	private:
+		// private copy ctor
+		CParseHandlerPhysicalBitmapTableScan(const CParseHandlerPhysicalBitmapTableScan &);
 
-			// process the start of an element
-			virtual
-			void StartElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
- 					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
+		// process the start of an element
+		virtual void StartElement(
+			const XMLCh *const element_uri,			// URI of element's namespace
+			const XMLCh *const element_local_name,  // local part of element's name
+			const XMLCh *const element_qname,		// element's qname
+			const Attributes &attr					// element's attributes
+		);
 
-			// process the end of an element
-			virtual
-			void EndElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-				);
+		// process the end of an element
+		virtual void EndElement(
+			const XMLCh *const element_uri,			// URI of element's namespace
+			const XMLCh *const element_local_name,  // local part of element's name
+			const XMLCh *const element_qname		// element's qname
+		);
 
-		public:
-			// ctor
-			CParseHandlerPhysicalBitmapTableScan
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				)
-				:
-				CParseHandlerPhysicalAbstractBitmapScan(memory_pool, parse_handler_mgr, parse_handler_root)
-			{}
+	public:
+		// ctor
+		CParseHandlerPhysicalBitmapTableScan(IMemoryPool *memory_pool,
+											 CParseHandlerManager *parse_handler_mgr,
+											 CParseHandlerBase *parse_handler_root)
+			: CParseHandlerPhysicalAbstractBitmapScan(
+				  memory_pool, parse_handler_mgr, parse_handler_root)
+		{
+		}
 	};
-}
+}  // namespace gpdxl
 
 #endif  // !GPDXL_CParseHandlerPhysicalBitmapTableScan_H
 

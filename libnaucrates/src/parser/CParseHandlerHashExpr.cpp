@@ -28,15 +28,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerHashExpr::CParseHandlerHashExpr
-	(
-	IMemoryPool *memory_pool,
-	CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root
-	)
-	:
-	CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root),
-	m_dxl_op(NULL)
+CParseHandlerHashExpr::CParseHandlerHashExpr(IMemoryPool *memory_pool,
+											 CParseHandlerManager *parse_handler_mgr,
+											 CParseHandlerBase *parse_handler_root)
+	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root), m_dxl_op(NULL)
 {
 }
 
@@ -50,28 +45,29 @@ CParseHandlerHashExpr::CParseHandlerHashExpr
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerHashExpr::StartElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const, // element_qname
-	const Attributes& attrs
-	)
+CParseHandlerHashExpr::StartElement(const XMLCh *const,  // element_uri,
+									const XMLCh *const element_local_name,
+									const XMLCh *const,  // element_qname
+									const Attributes &attrs)
 {
-	if(0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarHashExpr), element_local_name))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarHashExpr),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
-	
+
 	// parse and create hash expr operator
-	m_dxl_op = (CDXLScalarHashExpr *) CDXLOperatorFactory::MakeDXLHashExpr(m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
-	
+	m_dxl_op = (CDXLScalarHashExpr *) CDXLOperatorFactory::MakeDXLHashExpr(
+		m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+
 	// create and activate the parse handler for the child scalar expression node
-	
-	CParseHandlerBase *op_parse_handler = CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+
+	CParseHandlerBase *op_parse_handler = CParseHandlerFactory::GetParseHandler(
+		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(op_parse_handler);
-	
+
 	// store child parse handler
 	this->Append(op_parse_handler);
 }
@@ -85,29 +81,28 @@ CParseHandlerHashExpr::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerHashExpr::EndElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const // element_qname
-	)
+CParseHandlerHashExpr::EndElement(const XMLCh *const,  // element_uri,
+								  const XMLCh *const element_local_name,
+								  const XMLCh *const  // element_qname
+)
 {
-	
-	if(0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarHashExpr), element_local_name))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarHashExpr),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
-	
+
 	CParseHandlerScalarOp *op_parse_handler = dynamic_cast<CParseHandlerScalarOp *>((*this)[0]);
-	
+
 	GPOS_ASSERT(NULL != op_parse_handler->CreateDXLNode());
-	
+
 	// construct node from the parsed expression node
-	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, m_dxl_op);	
-			
+	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, m_dxl_op);
+
 	AddChildFromParseHandler(op_parse_handler);
-	
+
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();
 }

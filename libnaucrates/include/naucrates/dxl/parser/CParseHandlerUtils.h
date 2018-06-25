@@ -32,14 +32,12 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerUtils
 	{
-		public:
-
-			// parse and the set operator's costing and statistical properties
-			static
-			void SetProperties(CDXLNode *dxlnode, CParseHandlerProperties *prop_parse_handler);
+	public:
+		// parse and the set operator's costing and statistical properties
+		static void SetProperties(CDXLNode *dxlnode, CParseHandlerProperties *prop_parse_handler);
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerUtils_H
+#endif  // !GPDXL_CParseHandlerUtils_H
 
 // EOF

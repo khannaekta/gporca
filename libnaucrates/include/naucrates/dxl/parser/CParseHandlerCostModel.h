@@ -33,50 +33,43 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerCostModel : public CParseHandlerBase
 	{
-		private:
-			ICostModel::ECostModelType m_cost_model_type;
-			ULONG m_num_of_segments;
-			// cost model
-			ICostModel *m_cost_model;
+	private:
+		ICostModel::ECostModelType m_cost_model_type;
+		ULONG m_num_of_segments;
+		// cost model
+		ICostModel *m_cost_model;
 
-			CParseHandlerCostParams *m_parse_handler_cost_params;
+		CParseHandlerCostParams *m_parse_handler_cost_params;
 
-			// private copy ctor
-			CParseHandlerCostModel(const CParseHandlerCostModel&);
+		// private copy ctor
+		CParseHandlerCostModel(const CParseHandlerCostModel &);
 
-			// process the start of an element
-			void StartElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
- 					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the end of an element
-			void EndElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-				);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-		public:
-			// ctor/dtor
-			CParseHandlerCostModel
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
+	public:
+		// ctor/dtor
+		CParseHandlerCostModel(IMemoryPool *memory_pool,
+							   CParseHandlerManager *parse_handler_mgr,
+							   CParseHandlerBase *parse_handler_root);
 
-			virtual ~CParseHandlerCostModel();
+		virtual ~CParseHandlerCostModel();
 
-			// cost model
-			ICostModel *GetCostModel() const;
+		// cost model
+		ICostModel *GetCostModel() const;
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerCostModel_H
+#endif  // !GPDXL_CParseHandlerCostModel_H
 
 // EOF

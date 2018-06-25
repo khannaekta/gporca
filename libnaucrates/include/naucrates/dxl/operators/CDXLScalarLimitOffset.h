@@ -30,58 +30,49 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarLimitOffset : public CDXLScalar
 	{
-		private:
-				// private copy ctor
-			CDXLScalarLimitOffset(const CDXLScalarLimitOffset&);
+	private:
+		// private copy ctor
+		CDXLScalarLimitOffset(const CDXLScalarLimitOffset &);
 
-		public:
+	public:
+		// ctor/dtor
+		explicit CDXLScalarLimitOffset(IMemoryPool *memory_pool);
 
-			// ctor/dtor
-			explicit
-			CDXLScalarLimitOffset(IMemoryPool *memory_pool);
+		// ident accessors
+		Edxlopid GetDXLOperator() const;
 
-			// ident accessors
-			Edxlopid GetDXLOperator() const;
+		// name of the DXL operator
+		const CWStringConst *GetOpNameStr() const;
 
-			// name of the DXL operator
-			const CWStringConst *GetOpNameStr() const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const;
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const;
+		// conversion function
+		static CDXLScalarLimitOffset *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarLimitOffset == dxl_op->GetDXLOperator());
 
-			// conversion function
-			static
-			CDXLScalarLimitOffset *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopScalarLimitOffset == dxl_op->GetDXLOperator());
+			return dynamic_cast<CDXLScalarLimitOffset *>(dxl_op);
+		}
 
-				return dynamic_cast<CDXLScalarLimitOffset*>(dxl_op);
-			}
-
-			// does the operator return a boolean result
-			virtual
-			BOOL HasBoolResult
-					(
-					CMDAccessor *//md_accessor
-					)
-					const
-			{
-				GPOS_ASSERT(!"Invalid function call for a container operator");
-				return false;
-			}
+		// does the operator return a boolean result
+		virtual BOOL
+		HasBoolResult(CMDAccessor *  //md_accessor
+					  ) const
+		{
+			GPOS_ASSERT(!"Invalid function call for a container operator");
+			return false;
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *node, BOOL validate_children) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *node, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
-#endif // !GPDXL_CDXLScalarLimitOffset_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLScalarLimitOffset_H
 
 // EOF

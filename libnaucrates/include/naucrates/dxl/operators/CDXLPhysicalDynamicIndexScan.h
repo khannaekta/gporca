@@ -20,8 +20,6 @@
 
 namespace gpdxl
 {
-
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDXLPhysicalDynamicIndexScan
@@ -32,101 +30,87 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalDynamicIndexScan : public CDXLPhysical
 	{
-		private:
+	private:
+		// table descriptor for the scanned table
+		CDXLTableDescr *m_table_descr_dxl;
 
-			// table descriptor for the scanned table
-			CDXLTableDescr *m_table_descr_dxl;
+		// part index id
+		ULONG m_part_index_id;
 
-			// part index id
-			ULONG m_part_index_id;
-			
-			// printable partition index id
-			ULONG m_part_index_id_printable;
+		// printable partition index id
+		ULONG m_part_index_id_printable;
 
-			// index descriptor associated with the scanned table
-			CDXLIndexDescr *m_index_descr_dxl;
+		// index descriptor associated with the scanned table
+		CDXLIndexDescr *m_index_descr_dxl;
 
-			// scan direction of the index
-			EdxlIndexScanDirection m_index_scan_dir;
+		// scan direction of the index
+		EdxlIndexScanDirection m_index_scan_dir;
 
-			// private copy ctor
-			CDXLPhysicalDynamicIndexScan(CDXLPhysicalDynamicIndexScan&);
+		// private copy ctor
+		CDXLPhysicalDynamicIndexScan(CDXLPhysicalDynamicIndexScan &);
 
-		public:
+	public:
+		// indices of dynamic index scan elements in the children array
+		enum Edxldis
+		{
+			EdxldisIndexProjList = 0,
+			EdxldisIndexFilter,
+			EdxldisIndexCondition,
+			EdxldisSentinel
+		};
 
-			// indices of dynamic index scan elements in the children array
-			enum Edxldis
-			{
-				EdxldisIndexProjList = 0,
-				EdxldisIndexFilter,
-				EdxldisIndexCondition,
-				EdxldisSentinel
-			};
-			
-			//ctor
-			CDXLPhysicalDynamicIndexScan
-				(
-				IMemoryPool *memory_pool,
-				CDXLTableDescr *table_descr,
-				ULONG part_idx_id,
-				ULONG part_idx_id_printable,
-				CDXLIndexDescr *index_descr_dxl,
-				EdxlIndexScanDirection idx_scan_direction
-				);
+		//ctor
+		CDXLPhysicalDynamicIndexScan(IMemoryPool *memory_pool,
+									 CDXLTableDescr *table_descr,
+									 ULONG part_idx_id,
+									 ULONG part_idx_id_printable,
+									 CDXLIndexDescr *index_descr_dxl,
+									 EdxlIndexScanDirection idx_scan_direction);
 
-			//dtor
-			virtual
-			~CDXLPhysicalDynamicIndexScan();
+		//dtor
+		virtual ~CDXLPhysicalDynamicIndexScan();
 
-			// operator type
-			virtual
-			Edxlopid GetDXLOperator() const;
+		// operator type
+		virtual Edxlopid GetDXLOperator() const;
 
-			// operator name
-			virtual
-			const CWStringConst *GetOpNameStr() const;
+		// operator name
+		virtual const CWStringConst *GetOpNameStr() const;
 
-			// index descriptor
-			const CDXLIndexDescr *GetDXLIndexDescr() const;
+		// index descriptor
+		const CDXLIndexDescr *GetDXLIndexDescr() const;
 
-			//table descriptor
-			const CDXLTableDescr *GetDXLTableDescr() const;
+		//table descriptor
+		const CDXLTableDescr *GetDXLTableDescr() const;
 
-			// partition index id
-			ULONG GetPartIndexId() const;
-			
-			// printable partition index id
-			ULONG GetPartIndexIdPrintable() const;
+		// partition index id
+		ULONG GetPartIndexId() const;
 
-			// scan direction
-			EdxlIndexScanDirection GetIndexScanDir() const;
+		// printable partition index id
+		ULONG GetPartIndexIdPrintable() const;
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
+		// scan direction
+		EdxlIndexScanDirection GetIndexScanDir() const;
 
-			// conversion function
-			static
-			CDXLPhysicalDynamicIndexScan *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopPhysicalDynamicIndexScan == dxl_op->GetDXLOperator());
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
 
-				return dynamic_cast<CDXLPhysicalDynamicIndexScan*>(dxl_op);
-			}
+		// conversion function
+		static CDXLPhysicalDynamicIndexScan *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopPhysicalDynamicIndexScan == dxl_op->GetDXLOperator());
+
+			return dynamic_cast<CDXLPhysicalDynamicIndexScan *>(dxl_op);
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL validate_children) const;
-#endif // GPOS_DEBUG
-
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
-#endif // !GPDXL_CDXLPhysicalDynamicIndexScan_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLPhysicalDynamicIndexScan_H
 
 // EOF
-

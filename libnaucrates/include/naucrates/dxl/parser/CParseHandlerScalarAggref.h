@@ -6,7 +6,7 @@
 //		CParseHandlerScalarAggref.h
 //
 //	@doc:
-//		
+//
 //		SAX parse handler class for parsing scalar AggRef.
 //---------------------------------------------------------------------------
 
@@ -35,41 +35,31 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerScalarAggref : public CParseHandlerScalarOp
 	{
-		private:
-	
-			// private copy ctor
-			CParseHandlerScalarAggref(const CParseHandlerScalarAggref &);
-	
-			// process the start of an element
-			void StartElement
-					(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-					);
-	
-			// process the end of an element
-			void EndElement
-					(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-					);
-	
-		public:
-			// ctor
-			CParseHandlerScalarAggref
-			(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-			);
+	private:
+		// private copy ctor
+		CParseHandlerScalarAggref(const CParseHandlerScalarAggref &);
 
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+	public:
+		// ctor
+		CParseHandlerScalarAggref(IMemoryPool *memory_pool,
+								  CParseHandlerManager *parse_handler_mgr,
+								  CParseHandlerBase *parse_handler_root);
 	};
 
-}
-#endif // !GPDXL_CParseHandlerScalarAggref_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CParseHandlerScalarAggref_H
 
 //EOF

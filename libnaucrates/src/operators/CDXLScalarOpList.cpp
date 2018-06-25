@@ -26,14 +26,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarOpList::CDXLScalarOpList
-	(
-	IMemoryPool *memory_pool,
-	EdxlOpListType dxl_op_list_type
-	)
-	:
-	CDXLScalar(memory_pool),
-	m_dxl_op_list_type(dxl_op_list_type)
+CDXLScalarOpList::CDXLScalarOpList(IMemoryPool *memory_pool, EdxlOpListType dxl_op_list_type)
+	: CDXLScalar(memory_pool), m_dxl_op_list_type(dxl_op_list_type)
 {
 	GPOS_ASSERT(EdxloplistSentinel > dxl_op_list_type);
 }
@@ -95,18 +89,14 @@ CDXLScalarOpList::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarOpList::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *dxlnode
-	)
-	const
+CDXLScalarOpList::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 	dxlnode->SerializeChildrenToDXL(xml_serializer);
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -119,12 +109,7 @@ CDXLScalarOpList::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarOpList::AssertValid
-	(
-	const CDXLNode *dxlnode,
-	BOOL validate_children
-	)
-	const
+CDXLScalarOpList::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG idx = 0; idx < arity; ++idx)
@@ -138,6 +123,6 @@ CDXLScalarOpList::AssertValid
 		}
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

@@ -24,7 +24,7 @@ namespace gpmd
 {
 	using namespace gpos;
 
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CMDAggregateGPDB
@@ -35,22 +35,22 @@ namespace gpmd
 	//
 	//---------------------------------------------------------------------------
 	class CMDAggregateGPDB : public IMDAggregate
-	{		
+	{
 		// memory pool
 		IMemoryPool *m_memory_pool;
-		
+
 		// DXL for object
 		const CWStringDynamic *m_dxl_str;
-		
+
 		// aggregate id
 		IMDId *m_mdid;
-		
+
 		// aggregate name
 		CMDName *m_mdname;
-		
+
 		// result type
 		IMDId *m_mdid_type_result;
-		
+
 		// type of intermediate results
 		IMDId *m_mdid_type_intermediate;
 
@@ -59,85 +59,77 @@ namespace gpmd
 
 		// is aggregate splittable
 		BOOL m_is_splittable;
-		
+
 		// is aggregate hash capable
 		BOOL m_hash_agg_capable;
 
 		// private copy ctor
 		CMDAggregateGPDB(const CMDAggregateGPDB &);
-		
+
 	public:
 		// ctor
-		CMDAggregateGPDB
-			(
-			IMemoryPool *memory_pool,
-			IMDId *mdid,
-			CMDName *mdname,
-			IMDId *result_type_mdid,
-			IMDId *intermediate_result_type_mdid,
-			BOOL is_ordered_agg,
-			BOOL is_splittable,
-			BOOL is_hash_agg_capable
-			);
-		
+		CMDAggregateGPDB(IMemoryPool *memory_pool,
+						 IMDId *mdid,
+						 CMDName *mdname,
+						 IMDId *result_type_mdid,
+						 IMDId *intermediate_result_type_mdid,
+						 BOOL is_ordered_agg,
+						 BOOL is_splittable,
+						 BOOL is_hash_agg_capable);
+
 		//dtor
 		~CMDAggregateGPDB();
-		
+
 		// string representation of object
-		virtual const CWStringDynamic *GetStrRepr() const
+		virtual const CWStringDynamic *
+		GetStrRepr() const
 		{
 			return m_dxl_str;
 		}
-		
+
 		// aggregate id
-		virtual 
-		IMDId *MDId() const;
-		
+		virtual IMDId *MDId() const;
+
 		// aggregate name
-		virtual 
-		CMDName Mdname() const;
-		
+		virtual CMDName Mdname() const;
+
 		// result id
-		virtual 
-		IMDId *GetResultTypeMdid() const;
-		
+		virtual IMDId *GetResultTypeMdid() const;
+
 		// intermediate result id
-		virtual 
-		IMDId *GetIntermediateResultTypeMdid() const;
-		
+		virtual IMDId *GetIntermediateResultTypeMdid() const;
+
 		// serialize object in DXL format
-		virtual 
-		void Serialize(gpdxl::CXMLSerializer *xml_serializer) const;
-		
+		virtual void Serialize(gpdxl::CXMLSerializer *xml_serializer) const;
+
 		// is an ordered aggregate
-		virtual
-		BOOL IsOrdered() const
+		virtual BOOL
+		IsOrdered() const
 		{
 			return m_is_ordered;
 		}
-		
+
 		// is aggregate splittable
-		virtual
-		BOOL IsSplittable() const
+		virtual BOOL
+		IsSplittable() const
 		{
 			return m_is_splittable;
 		}
 
 		// is aggregate hash capable
-		virtual
-		BOOL IsHashAggCapable() const
+		virtual BOOL
+		IsHashAggCapable() const
 		{
 			return m_hash_agg_capable;
 		}
 
 #ifdef GPOS_DEBUG
 		// debug print of the type in the provided stream
-		virtual
-		void DebugPrint(IOstream &os) const;
-#endif	
+		virtual void DebugPrint(IOstream &os) const;
+#endif
 	};
-}
+}  // namespace gpmd
 
-#endif // !GPMD_CMDAggregateGPDB_H
+#endif  // !GPMD_CMDAggregateGPDB_H
 
 // EOF

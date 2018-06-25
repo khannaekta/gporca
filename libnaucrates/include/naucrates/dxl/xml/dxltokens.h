@@ -24,12 +24,12 @@
 namespace gpdxl
 {
 	using namespace gpos;
-	
+
 	XERCES_CPP_NAMESPACE_USE
-	
+
 	//fwd decl
 	class CDXLMemoryManager;
-	
+
 	enum Edxltoken
 	{
 		EdxltokenDXLMessage,
@@ -45,7 +45,7 @@ namespace gpdxl
 		EdxltokenRelativeCost,
 		EdxltokenX,
 		EdxltokenY,
-		
+
 		EdxltokenOptimizerConfig,
 		EdxltokenEnumeratorConfig,
 		EdxltokenStatisticsConfig,
@@ -73,14 +73,14 @@ namespace gpdxl
 		EdxltokenMetadata,
 		EdxltokenTraceFlags,
 		EdxltokenMDRequest,
-		
+
 		EdxltokenSysids,
 		EdxltokenSysid,
-		
+
 		EdxltokenThread,
-		
+
 		EdxltokenPhysical,
-		
+
 		EdxltokenPhysicalTableScan,
 		EdxltokenPhysicalBitmapTableScan,
 		EdxltokenPhysicalDynamicBitmapTableScan,
@@ -117,13 +117,13 @@ namespace gpdxl
 		EdxltokenPhysicalCTEConsumer,
 
 		EdxltokenDuplicateSensitive,
-		
+
 		EdxltokenPartIndexId,
 		EdxltokenPartIndexIdPrintable,
 		EdxltokenSegmentIdCol,
-		
+
 		EdxltokenScalar,
-		
+
 		EdxltokenScalarProjList,
 		EdxltokenScalarFilter,
 		EdxltokenScalarAggref,
@@ -172,10 +172,10 @@ namespace gpdxl
 		EdxltokenScalarSortCol,
 		EdxltokenScalarSortColList,
 		EdxltokenScalarGroupingColList,
-		
+
 		EdxltokenScalarBitmapAnd,
 		EdxltokenScalarBitmapOr,
-		
+
 		EdxltokenScalarArray,
 		EdxltokenScalarArrayRef,
 		EdxltokenScalarArrayRefIndexList,
@@ -184,7 +184,7 @@ namespace gpdxl
 		EdxltokenScalarArrayRefIndexListUpper,
 		EdxltokenScalarArrayRefExpr,
 		EdxltokenScalarArrayRefAssignExpr,
-		
+
 		EdxltokenScalarAssertConstraint,
 		EdxltokenScalarAssertConstraintList,
 
@@ -267,7 +267,7 @@ namespace gpdxl
 		EdxltokenValue,
 		EdxltokenTypeId,
 		EdxltokenTypeIds,
-		
+
 		EdxltokenConstTuple,
 		EdxltokenDatum,
 
@@ -286,15 +286,15 @@ namespace gpdxl
 		EdxltokenJoinIn,
 		EdxltokenJoinLeftAntiSemiJoin,
 		EdxltokenJoinLeftAntiSemiJoinNotIn,
-		
+
 		EdxltokenMergeJoinUniqueOuter,
-		
+
 		EdxltokenAggStrategy,
 		EdxltokenAggStrategyPlain,
 		EdxltokenAggStrategySorted,
 		EdxltokenAggStrategyHashed,
 		EdxltokenAggStreamSafe,
-		
+
 		EdxltokenAggrefOid,
 		EdxltokenAggrefDistinct,
 		EdxltokenAggrefStage,
@@ -303,11 +303,11 @@ namespace gpdxl
 		EdxltokenAggrefStagePartial,
 		EdxltokenAggrefStageIntermediate,
 		EdxltokenAggrefStageFinal,
-		
+
 		EdxltokenArrayType,
 		EdxltokenArrayElementType,
 		EdxltokenArrayMultiDim,
-		
+
 		EdxltokenTableDescr,
 		EdxltokenProperties,
 		EdxltokenOutputCols,
@@ -318,16 +318,16 @@ namespace gpdxl
 		EdxltokenWidth,
 		EdxltokenCTASOptions,
 		EdxltokenCTASOption,
-		
+
 		EdxltokenExecuteAsUser,
-		
+
 		EdxltokenAlias,
 		EdxltokenTableName,
 		EdxltokenDerivedTableName,
 
 		EdxltokenColDescr,
 		EdxltokenColRef,
-		
+
 		EdxltokenColumns,
 		EdxltokenColumn,
 		EdxltokenColName,
@@ -349,7 +349,7 @@ namespace gpdxl
 		EdxltokenCmaxColName,
 		EdxltokenTableOidColName,
 		EdxltokenGpSegmentIdColName,
-		
+
 		EdxltokenActionColId,
 		EdxltokenOidColId,
 		EdxltokenCtidColId,
@@ -357,39 +357,39 @@ namespace gpdxl
 		EdxltokenTupleOidColId,
 		EdxltokenUpdatePreservesOids,
 		EdxltokenInputSorted,
-		
+
 		EdxltokenInputSegments,
 		EdxltokenOutputSegments,
 		EdxltokenSegment,
 		EdxltokenSegId,
-		
+
 		EdxltokenGroupingCols,
 		EdxltokenGroupingCol,
-		
+
 		EdxltokenParamKind,
-		
+
 		EdxltokenAppendIsTarget,
 		EdxltokenAppendIsZapped,
-		
+
 		EdxltokenOpNo,
 		EdxltokenOpName,
-		
+
 		EdxltokenOpType,
 		EdxltokenOpTypeAny,
 		EdxltokenOpTypeAll,
-		
+
 		EdxltokenTypeName,
 		EdxltokenUnknown,
 
 		EdxltokenFuncId,
 		EdxltokenFuncRetSet,
-		
+
 
 		EdxltokenSortOpId,
 		EdxltokenSortOpName,
 		EdxltokenSortDiscardDuplicates,
 		EdxltokenSortNullsFirst,
-		
+
 		EdxltokenMaterializeEager,
 		EdxltokenSpoolId,
 		EdxltokenSpoolType,
@@ -398,14 +398,14 @@ namespace gpdxl
 		EdxltokenSpoolMultiSlice,
 		EdxltokenExecutorSliceId,
 		EdxltokenConsumerSliceCount,
-		
+
 		EdxltokenComparisonOp,
 
 		EdxltokenXMLDocHeader,
 		EdxltokenNamespaceAttr,
 		EdxltokenNamespacePrefix,
 		EdxltokenNamespaceURI,
-		
+
 		EdxltokenBracketOpenTag,
 		EdxltokenBracketCloseTag,
 		EdxltokenBracketOpenEndTag,
@@ -413,16 +413,16 @@ namespace gpdxl
 		EdxltokenColon,
 		EdxltokenSemicolon,
 		EdxltokenComma,
-		EdxltokenDot,		
+		EdxltokenDot,
 		EdxltokenDotSemicolon,
 		EdxltokenSpace,
 		EdxltokenQuote,
 		EdxltokenEq,
 		EdxltokenIndent,
-		
+
 		EdxltokenTrue,
 		EdxltokenFalse,
-		
+
 		// metadata-related constants
 		EdxltokenRelation,
 		EdxltokenRelationExternal,
@@ -445,10 +445,10 @@ namespace gpdxl
 		EdxltokenIsNull,
 		EdxltokenLintValue,
 		EdxltokenDoubleValue,
-		
+
 		EdxltokenRelTemporary,
 		EdxltokenRelHasOids,
-		
+
 		EdxltokenRelStorageType,
 		EdxltokenRelStorageHeap,
 		EdxltokenRelStorageAppendOnlyCols,
@@ -456,17 +456,17 @@ namespace gpdxl
 		EdxltokenRelStorageAppendOnlyParquet,
 		EdxltokenRelStorageVirtual,
 		EdxltokenRelStorageExternal,
-		
+
 		EdxltokenPartKeys,
 		EdxltokenPartTypes,
 		EdxltokenNumLeafPartitions,
-		
+
 		EdxltokenRelDistrPolicy,
 		EdxltokenRelDistrMasterOnly,
 		EdxltokenRelDistrHash,
 		EdxltokenRelDistrRandom,
 		EdxltokenConvertHashToRandom,
-		
+
 		EdxltokenExtRelRejLimit,
 		EdxltokenExtRelRejLimitInRows,
 		EdxltokenExtRelFmtErrRel,
@@ -475,10 +475,10 @@ namespace gpdxl
 		EdxltokenMetadataColumn,
 		EdxltokenColumnNullable,
 		EdxltokenColumnDefaultValue,
-		
+
 		EdxltokenKeys,
 		EdxltokenDistrColumns,
-		
+
 		EdxltokenIndexKeyCols,
 		EdxltokenIndexIncludedCols,
 		EdxltokenIndexClustered,
@@ -487,13 +487,13 @@ namespace gpdxl
 		EdxltokenIndexTypeBtree,
 		EdxltokenIndexTypeBitmap,
 		EdxltokenIndexItemType,
-		
+
 		EdxltokenOpClass,
 		EdxltokenOpClasses,
-		
+
 		EdxltokenTypeInt4,
 		EdxltokenTypeBool,
-		
+
 		EdxltokenMetadataIdList,
 		EdxltokenIndexInfoList,
 		EdxltokenIndexInfo,
@@ -501,16 +501,16 @@ namespace gpdxl
 		EdxltokenIndex,
 		EdxltokenPartitions,
 		EdxltokenPartition,
-		
+
 		EdxltokenConstraints,
 		EdxltokenConstraint,
-		
+
 		EdxltokenCheckConstraints,
 		EdxltokenCheckConstraint,
 		EdxltokenPartConstraint,
 		EdxltokenDefaultPartition,
 		EdxltokenPartConstraintUnbounded,
-		
+
 		EdxltokenMDType,
 		EdxltokenMDTypeRedistributable,
 		EdxltokenMDTypeHashable,
@@ -528,13 +528,13 @@ namespace gpdxl
 		EdxltokenMDTypeHashOp,
 		EdxltokenMDTypeArray,
 		EdxltokenMDTypeRelid,
-		
+
 		EdxltokenMDTypeAggMin,
 		EdxltokenMDTypeAggMax,
 		EdxltokenMDTypeAggAvg,
 		EdxltokenMDTypeAggSum,
 		EdxltokenMDTypeAggCount,
-		
+
 		EdxltokenGPDBScalarOp,
 		EdxltokenGPDBScalarOpLeftTypeId,
 		EdxltokenGPDBScalarOpRightTypeId,
@@ -545,16 +545,16 @@ namespace gpdxl
 		EdxltokenGPDBScalarOpLTOpId,
 		EdxltokenGPDBScalarOpGTOpId,
 		EdxltokenGPDBScalarOpCmpType,
-		
-		EdxltokenCmpEq, 
-		EdxltokenCmpNeq,	
-		EdxltokenCmpLt, 
-		EdxltokenCmpLeq, 
-		EdxltokenCmpGt, 
-		EdxltokenCmpGeq, 
-		EdxltokenCmpIDF, 
+
+		EdxltokenCmpEq,
+		EdxltokenCmpNeq,
+		EdxltokenCmpLt,
+		EdxltokenCmpLeq,
+		EdxltokenCmpGt,
+		EdxltokenCmpGeq,
+		EdxltokenCmpIDF,
 		EdxltokenCmpOther,
-		
+
 		EdxltokenReturnsNullOnNullInput,
 
 		EdxltokenTriggers,
@@ -581,7 +581,7 @@ namespace gpdxl
 		EdxltokenGPDBFuncResultTypeId,
 		EdxltokenGPDBFuncReturnsSet,
 		EdxltokenGPDBFuncStrict,
-		
+
 		EdxltokenGPDBCast,
 		EdxltokenGPDBCastBinaryCoercible,
 		EdxltokenGPDBCastSrcType,
@@ -589,16 +589,16 @@ namespace gpdxl
 		EdxltokenGPDBCastFuncId,
 		EdxltokenGPDBCastCoercePathType,
 		EdxltokenGPDBArrayCoerceCast,
-		
+
 		EdxltokenGPDBMDScCmp,
-		
+
 		EdxltokenGPDBAgg,
 		EdxltokenGPDBIsAggOrdered,
 		EdxltokenGPDBAggResultTypeId,
 		EdxltokenGPDBAggIntermediateResultTypeId,
 		EdxltokenGPDBAggSplittable,
 		EdxltokenGPDBAggHashAggCapable,
-		
+
 		EdxltokenEntireRow,
 
 		EdxltokenScalarExpr,  // top level scalar expression
@@ -621,7 +621,7 @@ namespace gpdxl
 		EdxltokenLogicalSetOperation,
 		EdxltokenLogicalTVF,
 		EdxltokenLogicalWindow,
-		
+
 		EdxltokenLogicalInsert,
 		EdxltokenLogicalDelete,
 		EdxltokenLogicalUpdate,
@@ -635,16 +635,16 @@ namespace gpdxl
 		EdxltokenPhysicalSplit,
 		EdxltokenPhysicalRowTrigger,
 		EdxltokenPhysicalAssert,
-		
+
 		EdxltokenErrorCode,
 		EdxltokenErrorMessage,
-		
+
 		EdxltokenOnCommitAction,
 		EdxltokenOnCommitNOOP,
 		EdxltokenOnCommitPreserve,
 		EdxltokenOnCommitDelete,
 		EdxltokenOnCommitDrop,
-		
+
 		EdxltokenInsertCols,
 		EdxltokenDeleteCols,
 		EdxltokenNewCols,
@@ -673,7 +673,7 @@ namespace gpdxl
 		EdxltokenScalarIndexCondList,
 
 		EdxltokenStackTrace,
-		
+
 		EdxltokenStatistics,
 		EdxltokenStatsBaseRelation,
 		EdxltokenStatsDerivedRelation,
@@ -715,124 +715,94 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLTokens
 	{
-		private:
-		
-			// element for mapping Edxltoken to WCHARs
-			struct SWszMapElem
+	private:
+		// element for mapping Edxltoken to WCHARs
+		struct SWszMapElem
+		{
+			Edxltoken m_edxlt;
+			const WCHAR *m_wsz;
+		};
+
+		// element for mapping Edxltoken to CWStringConst
+		struct SStrMapElem
+		{
+			Edxltoken m_edxlt;
+			CWStringConst *m_pstr;
+
+			// ctor
+			SStrMapElem() : m_edxlt(EdxltokenSentinel), m_pstr(NULL)
 			{
-				Edxltoken m_edxlt;
-				const WCHAR *m_wsz;				
-			};
-			
-			// element for mapping Edxltoken to CWStringConst
-			struct SStrMapElem
+			}
+
+			// ctor
+			SStrMapElem(Edxltoken edxlt, CWStringConst *str) : m_edxlt(edxlt), m_pstr(str)
 			{
-				Edxltoken m_edxlt;
-				CWStringConst *m_pstr;
+				GPOS_ASSERT(edxlt < EdxltokenSentinel);
+				GPOS_ASSERT(str->IsValid());
+			}
 
-				// ctor
-				SStrMapElem()
-					:
-					m_edxlt(EdxltokenSentinel),
-					m_pstr(NULL)
-				{}
-				
-				// ctor
-				SStrMapElem
-					(
-					Edxltoken edxlt,
-					CWStringConst *str
-					)
-					:
-					m_edxlt(edxlt),
-					m_pstr(str)
-				{
-					GPOS_ASSERT(edxlt < EdxltokenSentinel);
-					GPOS_ASSERT(str->IsValid());
-				}
-				
-				//dtor
-				~SStrMapElem()
-				{
-					GPOS_DELETE(m_pstr);
-				}
-			};
-			
-			// element for mapping Edxltoken to XML string
-			struct SXMLStrMapElem
+			//dtor
+			~SStrMapElem()
 			{
-				Edxltoken m_edxlt;
-				XMLCh *m_xmlsz;
-				
-				// ctor
-				SXMLStrMapElem()
-					:
-					m_edxlt(EdxltokenSentinel),
-					m_xmlsz(NULL)
-				{}
-				
-				// ctor
-				SXMLStrMapElem
-					(
-					Edxltoken edxlt,
-					XMLCh *xml_val
-					)
-					:
-					m_edxlt(edxlt),
-					m_xmlsz(xml_val)
-				{
-					GPOS_ASSERT(edxlt < EdxltokenSentinel);
-					GPOS_ASSERT(NULL != xml_val);
-				}
-				
-				//dtor
-				~SXMLStrMapElem()
-				{
-					GPOS_DELETE_ARRAY(reinterpret_cast<BYTE*>(m_xmlsz));
-				}				
-			};
-			
-			// array maintaining the mapping Edxltoken -> CWStringConst
-			static
-			SStrMapElem *m_pstrmap;
-			
-			// array maintaining the mapping Edxltoken -> XML string
-			static
-			SXMLStrMapElem *m_pxmlszmap;
+				GPOS_DELETE(m_pstr);
+			}
+		};
 
-			// memory pool -- not owned
-			static
-			IMemoryPool *m_memory_pool;
+		// element for mapping Edxltoken to XML string
+		struct SXMLStrMapElem
+		{
+			Edxltoken m_edxlt;
+			XMLCh *m_xmlsz;
 
-			// local dxl memory manager
-			static
-			CDXLMemoryManager *m_memory_manager_dxl;
+			// ctor
+			SXMLStrMapElem() : m_edxlt(EdxltokenSentinel), m_xmlsz(NULL)
+			{
+			}
 
-			// create a string in Xerces XMLCh* format
-			static 
-			XMLCh *XmlstrFromWsz(const WCHAR *wsz);
-			
-		public:
-			
-			// retrieve a token in CWStringConst and XMLCh* format, respectively
-			static 
-			const CWStringConst *GetDXLTokenStr(Edxltoken token_type);
-			
-			static 
-			const XMLCh *XmlstrToken(Edxltoken token_type);
-		
-			// initialize constants. Must be called before constants are accessed.
-			static 
-			void Init(IMemoryPool *memory_pool);
+			// ctor
+			SXMLStrMapElem(Edxltoken edxlt, XMLCh *xml_val) : m_edxlt(edxlt), m_xmlsz(xml_val)
+			{
+				GPOS_ASSERT(edxlt < EdxltokenSentinel);
+				GPOS_ASSERT(NULL != xml_val);
+			}
 
-			// cleanup tokens
-			static 
-			void Terminate();
-			
+			//dtor
+			~SXMLStrMapElem()
+			{
+				GPOS_DELETE_ARRAY(reinterpret_cast<BYTE *>(m_xmlsz));
+			}
+		};
+
+		// array maintaining the mapping Edxltoken -> CWStringConst
+		static SStrMapElem *m_pstrmap;
+
+		// array maintaining the mapping Edxltoken -> XML string
+		static SXMLStrMapElem *m_pxmlszmap;
+
+		// memory pool -- not owned
+		static IMemoryPool *m_memory_pool;
+
+		// local dxl memory manager
+		static CDXLMemoryManager *m_memory_manager_dxl;
+
+		// create a string in Xerces XMLCh* format
+		static XMLCh *XmlstrFromWsz(const WCHAR *wsz);
+
+	public:
+		// retrieve a token in CWStringConst and XMLCh* format, respectively
+		static const CWStringConst *GetDXLTokenStr(Edxltoken token_type);
+
+		static const XMLCh *XmlstrToken(Edxltoken token_type);
+
+		// initialize constants. Must be called before constants are accessed.
+		static void Init(IMemoryPool *memory_pool);
+
+		// cleanup tokens
+		static void Terminate();
 	};
-	 
-}
 
-#endif // !GPDXL_dxltokens_H
+}  // namespace gpdxl
+
+#endif  // !GPDXL_dxltokens_H
 
 // EOF

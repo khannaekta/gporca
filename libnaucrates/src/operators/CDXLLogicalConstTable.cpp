@@ -7,7 +7,7 @@
 //
 //	@doc:
 //		Implementation of DXL logical constant tables
-//		
+//
 //---------------------------------------------------------------------------
 
 #include "naucrates/dxl/operators/CDXLLogicalConstTable.h"
@@ -28,16 +28,12 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLLogicalConstTable::CDXLLogicalConstTable
-	(
-	IMemoryPool *memory_pool,		
-	ColumnDescrDXLArray *col_descr_array,
-	DXLDatumArrays *const_tuples_datum_array
-	)
-	:
-	CDXLLogical(memory_pool),
-	m_col_descr_array(col_descr_array),
-	m_const_tuples_datum_array(const_tuples_datum_array)
+CDXLLogicalConstTable::CDXLLogicalConstTable(IMemoryPool *memory_pool,
+											 ColumnDescrDXLArray *col_descr_array,
+											 DXLDatumArrays *const_tuples_datum_array)
+	: CDXLLogical(memory_pool),
+	  m_col_descr_array(col_descr_array),
+	  m_const_tuples_datum_array(const_tuples_datum_array)
 {
 	GPOS_ASSERT(NULL != col_descr_array);
 	GPOS_ASSERT(NULL != const_tuples_datum_array);
@@ -103,11 +99,7 @@ CDXLLogicalConstTable::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 CDXLColDescr *
-CDXLLogicalConstTable::GetColumnDescrAt
-	(
-	ULONG idx
-	) 
-	const
+CDXLLogicalConstTable::GetColumnDescrAt(ULONG idx) const
 {
 	GPOS_ASSERT(m_col_descr_array->Size() > idx);
 	return (*m_col_descr_array)[idx];
@@ -137,28 +129,27 @@ CDXLLogicalConstTable::Arity() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalConstTable::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *//dxlnode
-	)
-	const
+CDXLLogicalConstTable::SerializeToDXL(CXMLSerializer *xml_serializer,
+									  const CDXLNode *  //dxlnode
+									  ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
 	// serialize columns
-	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), CDXLTokens::GetDXLTokenStr(EdxltokenColumns));
-	
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								CDXLTokens::GetDXLTokenStr(EdxltokenColumns));
+
 	for (ULONG idx = 0; idx < Arity(); idx++)
 	{
 		CDXLColDescr *col_descr = (*m_col_descr_array)[idx];
 		col_descr->SerializeToDXL(xml_serializer);
 	}
 
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), CDXLTokens::GetDXLTokenStr(EdxltokenColumns));
-	
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 CDXLTokens::GetDXLTokenStr(EdxltokenColumns));
+
 	const CWStringConst *pstrElemNameConstTuple = CDXLTokens::GetDXLTokenStr(EdxltokenConstTuple);
 	const CWStringConst *pstrElemNameDatum = CDXLTokens::GetDXLTokenStr(EdxltokenDatum);
 
@@ -166,7 +157,8 @@ CDXLLogicalConstTable::SerializeToDXL
 	for (ULONG tuple_idx = 0; tuple_idx < num_of_tuples; tuple_idx++)
 	{
 		// serialize a const tuple
-		xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), pstrElemNameConstTuple);
+		xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+									pstrElemNameConstTuple);
 		DXLDatumArray *pdrgpdxldatum = (*m_const_tuples_datum_array)[tuple_idx];
 
 		const ULONG num_of_cols = pdrgpdxldatum->Size();
@@ -176,10 +168,12 @@ CDXLLogicalConstTable::SerializeToDXL
 			datum_dxl->Serialize(xml_serializer, pstrElemNameDatum);
 		}
 
-		xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), pstrElemNameConstTuple);
+		xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+									 pstrElemNameConstTuple);
 	}
 
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 //---------------------------------------------------------------------------
@@ -191,11 +185,7 @@ CDXLLogicalConstTable::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 BOOL
-CDXLLogicalConstTable::IsColDefined
-	(
-	ULONG col_id
-	)
-	const
+CDXLLogicalConstTable::IsColDefined(ULONG col_id) const
 {
 	const ULONG size = Arity();
 	for (ULONG descr_idx = 0; descr_idx < size; descr_idx++)
@@ -220,17 +210,15 @@ CDXLLogicalConstTable::IsColDefined
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalConstTable::AssertValid
-	(
-	const CDXLNode *node,
-	BOOL //validate_children
-	) const
+CDXLLogicalConstTable::AssertValid(const CDXLNode *node,
+								   BOOL  //validate_children
+								   ) const
 {
 	// assert validity of col descr
 	GPOS_ASSERT(m_col_descr_array != NULL);
 	GPOS_ASSERT(0 < m_col_descr_array->Size());
 	GPOS_ASSERT(0 == node->Arity());
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

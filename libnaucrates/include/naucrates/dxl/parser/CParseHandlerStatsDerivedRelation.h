@@ -34,58 +34,50 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerStatsDerivedRelation : public CParseHandlerBase
 	{
-		private:
+	private:
+		// number of rows in the relation
+		CDouble m_rows;
 
-			// number of rows in the relation
-			CDouble m_rows;
+		// flag to express that the statistics is on an empty input
+		BOOL m_empty;
 
-			// flag to express that the statistics is on an empty input
-			BOOL m_empty;
+		// relation stats
+		CDXLStatsDerivedRelation *m_dxl_stats_derived_relation;
 
-			// relation stats
-			CDXLStatsDerivedRelation *m_dxl_stats_derived_relation;
+		// private copy ctor
+		CParseHandlerStatsDerivedRelation(const CParseHandlerStatsDerivedRelation &);
 
-			// private copy ctor
-			CParseHandlerStatsDerivedRelation(const CParseHandlerStatsDerivedRelation&);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the start of an element
-			void StartElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
- 					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the end of an element
-			void EndElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-				);
+	public:
+		// ctor
+		CParseHandlerStatsDerivedRelation(IMemoryPool *memory_pool,
+										  CParseHandlerManager *parse_handler_mgr,
+										  CParseHandlerBase *parse_handler_root);
 
-		public:
+		// dtor
+		virtual ~CParseHandlerStatsDerivedRelation();
 
-			// ctor
-			CParseHandlerStatsDerivedRelation
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
-
-			// dtor
-			virtual ~CParseHandlerStatsDerivedRelation();
-
-			// the derived relation stats
-			CDXLStatsDerivedRelation *GetDxlStatsDrvdRelation() const
-			{
-				return m_dxl_stats_derived_relation;
-			}
+		// the derived relation stats
+		CDXLStatsDerivedRelation *
+		GetDxlStatsDrvdRelation() const
+		{
+			return m_dxl_stats_derived_relation;
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerStatsDerivedRelation_H
+#endif  // !GPDXL_CParseHandlerStatsDerivedRelation_H
 
 // EOF

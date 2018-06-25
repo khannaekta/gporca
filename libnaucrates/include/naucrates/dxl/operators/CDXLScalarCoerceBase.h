@@ -36,79 +36,74 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarCoerceBase : public CDXLScalar
 	{
+	private:
+		// catalog MDId of the result type
+		IMDId *m_result_type_mdid;
 
-		private:
+		// output type modifier
+		INT m_type_modifier;
 
-			// catalog MDId of the result type
-			IMDId *m_result_type_mdid;
+		// coercion form
+		EdxlCoercionForm m_dxl_coerce_format;
 
-			// output type modifier
-			INT m_type_modifier;
+		// location of token to be coerced
+		INT m_location;
 
-			// coercion form
-			EdxlCoercionForm m_dxl_coerce_format;
+		// private copy ctor
+		CDXLScalarCoerceBase(const CDXLScalarCoerceBase &);
 
-			// location of token to be coerced
-			INT m_location;
+	public:
+		// ctor/dtor
+		CDXLScalarCoerceBase(IMemoryPool *memory_pool,
+							 IMDId *mdid_type,
+							 INT type_modifier,
+							 EdxlCoercionForm dxl_coerce_format,
+							 INT location);
 
-			// private copy ctor
-			CDXLScalarCoerceBase(const CDXLScalarCoerceBase&);
+		virtual ~CDXLScalarCoerceBase();
 
-		public:
-			// ctor/dtor
-			CDXLScalarCoerceBase
-				(
-				IMemoryPool *memory_pool,
-				IMDId *mdid_type,
-				INT type_modifier,
-				EdxlCoercionForm dxl_coerce_format,
-				INT location
-				);
+		// return result type
+		IMDId *
+		GetResultTypeMdId() const
+		{
+			return m_result_type_mdid;
+		}
 
-			virtual
-			~CDXLScalarCoerceBase();
+		// return type modifier
+		INT
+		TypeModifier() const
+		{
+			return m_type_modifier;
+		}
 
-			// return result type
-			IMDId *GetResultTypeMdId() const
-			{
-				return m_result_type_mdid;
-			}
+		// return coercion form
+		EdxlCoercionForm
+		GetDXLCoercionForm() const
+		{
+			return m_dxl_coerce_format;
+		}
 
-			// return type modifier
-			INT TypeModifier() const
-			{
-				return m_type_modifier;
-			}
+		// return token location
+		INT
+		GetLocation() const
+		{
+			return m_location;
+		}
 
-			// return coercion form
-			EdxlCoercionForm GetDXLCoercionForm() const
-			{
-				return m_dxl_coerce_format;
-			}
-
-			// return token location
-			INT GetLocation() const
-			{
-				return m_location;
-			}
-
-			// does the operator return a boolean result
-			virtual
-			BOOL HasBoolResult(CMDAccessor *md_accessor) const;
+		// does the operator return a boolean result
+		virtual BOOL HasBoolResult(CMDAccessor *md_accessor) const;
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			virtual
-			void AssertValid(const CDXLNode *node, BOOL validate_children) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		virtual void AssertValid(const CDXLNode *node, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLScalarCoerceBase_H
+#endif  // !GPDXL_CDXLScalarCoerceBase_H
 
 // EOF

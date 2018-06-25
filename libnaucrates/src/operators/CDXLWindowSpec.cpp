@@ -9,8 +9,8 @@
 //		Implementation of DXL window specification in the DXL
 //		representation of the logical query tree
 //
-//	@owner: 
-//		
+//	@owner:
+//
 //
 //	@test:
 //
@@ -32,20 +32,16 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLWindowSpec::CDXLWindowSpec
-	(
-	IMemoryPool *memory_pool,
-	ULongPtrArray *partition_by_col_id_array,
-	CMDName *mdname,
-	CDXLNode *sort_col_list_dxl,
-	CDXLWindowFrame *window_frame
-	)
-	:
-	m_memory_pool(memory_pool),
-	m_partition_by_col_id_array(partition_by_col_id_array),
-	m_mdname(mdname),
-	m_sort_col_list_dxl(sort_col_list_dxl),
-	m_window_frame(window_frame)
+CDXLWindowSpec::CDXLWindowSpec(IMemoryPool *memory_pool,
+							   ULongPtrArray *partition_by_col_id_array,
+							   CMDName *mdname,
+							   CDXLNode *sort_col_list_dxl,
+							   CDXLWindowFrame *window_frame)
+	: m_memory_pool(memory_pool),
+	  m_partition_by_col_id_array(partition_by_col_id_array),
+	  m_mdname(mdname),
+	  m_sort_col_list_dxl(sort_col_list_dxl),
+	  m_window_frame(window_frame)
 {
 	GPOS_ASSERT(NULL != m_memory_pool);
 	GPOS_ASSERT(NULL != m_partition_by_col_id_array);
@@ -76,11 +72,7 @@ CDXLWindowSpec::~CDXLWindowSpec()
 //
 //---------------------------------------------------------------------------
 void
-CDXLWindowSpec::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer
-	)
-	const
+CDXLWindowSpec::SerializeToDXL(CXMLSerializer *xml_serializer) const
 {
 	const CWStringConst *element_name = CDXLTokens::GetDXLTokenStr(EdxltokenWindowSpec);
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
@@ -88,13 +80,16 @@ CDXLWindowSpec::SerializeToDXL
 	GPOS_ASSERT(NULL != m_partition_by_col_id_array);
 
 	// serialize partition keys
-	CWStringDynamic *partition_by_col_id_string = CDXLUtils::Serialize(m_memory_pool, m_partition_by_col_id_array);
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenPartKeys), partition_by_col_id_string);
+	CWStringDynamic *partition_by_col_id_string =
+		CDXLUtils::Serialize(m_memory_pool, m_partition_by_col_id_array);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenPartKeys),
+								 partition_by_col_id_string);
 	GPOS_DELETE(partition_by_col_id_string);
 
 	if (NULL != m_mdname)
 	{
-		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenAlias), m_mdname->GetMDName());
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenAlias),
+									 m_mdname->GetMDName());
 	}
 
 	// serialize sorting columns
@@ -109,7 +104,8 @@ CDXLWindowSpec::SerializeToDXL
 		m_window_frame->SerializeToDXL(xml_serializer);
 	}
 
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 // EOF

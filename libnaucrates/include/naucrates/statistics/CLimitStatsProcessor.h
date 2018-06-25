@@ -22,15 +22,14 @@ namespace gpnaucrates
 
 	class CLimitStatsProcessor
 	{
-		public:
-
+	public:
 		// limit
-		static
-		CStatistics *CalcLimitStats(IMemoryPool *memory_pool, const CStatistics *input_stats, CDouble input_limit_rows);
+		static CStatistics *CalcLimitStats(IMemoryPool *memory_pool,
+										   const CStatistics *input_stats,
+										   CDouble input_limit_rows);
 	};
-}
+}  // namespace gpnaucrates
 
-#endif // !GPNAUCRATES_CLimitStatsProcessor_H
+#endif  // !GPNAUCRATES_CLimitStatsProcessor_H
 
 // EOF
-

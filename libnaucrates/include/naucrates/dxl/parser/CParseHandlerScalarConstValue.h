@@ -34,38 +34,30 @@ namespace gpdxl
 	class CParseHandlerScalarConstValue : public CParseHandlerScalarOp
 	{
 	private:
-
 		// private copy ctor
 		CParseHandlerScalarConstValue(const CParseHandlerScalarConstValue &);
 
 		// process the start of an element
-		void StartElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
-				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname,		// element's qname
-				const Attributes& attr				// element's attributes
-				);
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
 		// process the end of an element
-		void EndElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
-				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname		// element's qname
-				);
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
 	public:
 		// ctor
-		CParseHandlerScalarConstValue
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
+		CParseHandlerScalarConstValue(IMemoryPool *memory_pool,
+									  CParseHandlerManager *parse_handler_mgr,
+									  CParseHandlerBase *parse_handler_root);
 	};
-}
+}  // namespace gpdxl
 
-#endif // GPDXL_CParseHandlerScalarConst_H
+#endif  // GPDXL_CParseHandlerScalarConst_H
 
 // EOF

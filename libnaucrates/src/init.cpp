@@ -24,22 +24,17 @@
 using namespace gpos;
 using namespace gpdxl;
 
-static
-CDXLMemoryManager *memory_manager_dxl = NULL;
+static CDXLMemoryManager *memory_manager_dxl = NULL;
 
-static
-IMemoryPool *pmpXerces = NULL;
+static IMemoryPool *pmpXerces = NULL;
 
-static
-IMemoryPool *pmpDXL = NULL;
+static IMemoryPool *pmpDXL = NULL;
 
 // safe-guard to prevent initializing DXL support more than once
-static
-volatile ULONG_PTR m_ulpInitDXL = 0;
+static volatile ULONG_PTR m_ulpInitDXL = 0;
 
 // safe-guard to prevent shutting DXL support down more than once
-static
-volatile ULONG_PTR m_ulpShutdownDXL = 0;
+static volatile ULONG_PTR m_ulpShutdownDXL = 0;
 
 
 //---------------------------------------------------------------------------
@@ -52,7 +47,8 @@ volatile ULONG_PTR m_ulpShutdownDXL = 0;
 //
 //
 //---------------------------------------------------------------------------
-void InitDXL()
+void
+InitDXL()
 {
 	if (0 < ExchangeAddUlongPtrWithInt(&m_ulpInitDXL, 1))
 	{
@@ -69,12 +65,11 @@ void InitDXL()
 	memory_manager_dxl = GPOS_NEW(pmpXerces) CDXLMemoryManager(pmpXerces);
 
 	// initialize Xerces, if this fails library initialization should crash here
-	XMLPlatformUtils::Initialize(
-			XMLUni::fgXercescDefaultLocale, // locale
-			NULL, // nlsHome: location for message files
-			NULL, // panicHandler
-			memory_manager_dxl // memoryManager
-			);
+	XMLPlatformUtils::Initialize(XMLUni::fgXercescDefaultLocale,  // locale
+								 NULL,				 // nlsHome: location for message files
+								 NULL,				 // panicHandler
+								 memory_manager_dxl  // memoryManager
+	);
 
 	// initialize DXL tokens
 	CDXLTokens::Init(pmpDXL);
@@ -92,7 +87,8 @@ void InitDXL()
 //				Shutdown DXL support; called only at library termination
 //
 //---------------------------------------------------------------------------
-void ShutdownDXL()
+void
+ShutdownDXL()
 {
 	if (0 < ExchangeAddUlongPtrWithInt(&m_ulpShutdownDXL, 1))
 	{
@@ -121,7 +117,8 @@ void ShutdownDXL()
 //              Initialize Xerces parser utils
 //
 //---------------------------------------------------------------------------
-void gpdxl_init()
+void
+gpdxl_init()
 {
 	// create memory pool for Xerces global allocations
 	{
@@ -130,7 +127,7 @@ void gpdxl_init()
 		// detach safety
 		pmpXerces = amp.Detach();
 	}
-	
+
 	// create memory pool for DXL global allocations
 	{
 		CAutoMemoryPool amp;
@@ -152,7 +149,8 @@ void gpdxl_init()
 //              Terminate Xerces parser utils and destroy memory pool
 //
 //---------------------------------------------------------------------------
-void gpdxl_terminate()
+void
+gpdxl_terminate()
 {
 #ifdef GPOS_DEBUG
 	ShutdownDXL();
@@ -168,7 +166,7 @@ void gpdxl_terminate()
 		(CMemoryPoolManager::GetMemoryPoolMgr())->Destroy(pmpXerces);
 		pmpXerces = NULL;
 	}
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 }
 
 // EOF

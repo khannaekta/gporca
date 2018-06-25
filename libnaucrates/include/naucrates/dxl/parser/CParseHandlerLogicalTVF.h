@@ -32,48 +32,40 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerLogicalTVF : public CParseHandlerLogicalOp
 	{
-		private:
+	private:
+		// catalog id of the function
+		IMDId *m_func_mdid;
 
-			// catalog id of the function
-			IMDId *m_func_mdid;
+		// return type
+		IMDId *m_return_type_mdid;
 
-			// return type
-			IMDId *m_return_type_mdid;
+		// function name
+		CMDName *m_mdname;
 
-			// function name
-			CMDName *m_mdname;
+		// private copy ctor
+		CParseHandlerLogicalTVF(const CParseHandlerLogicalTVF &);
 
-			// private copy ctor
-			CParseHandlerLogicalTVF(const CParseHandlerLogicalTVF &);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the start of an element
-			void StartElement
-					(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-					);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the end of an element
-			void EndElement
-					(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-					);
-
-		public:
-			// ctor
-			CParseHandlerLogicalTVF
-					(
-					IMemoryPool *memory_pool,
-					CParseHandlerManager *parse_handler_mgr,
-					CParseHandlerBase *parse_handler_root
-					);
+	public:
+		// ctor
+		CParseHandlerLogicalTVF(IMemoryPool *memory_pool,
+								CParseHandlerManager *parse_handler_mgr,
+								CParseHandlerBase *parse_handler_root);
 	};
 
-}
-#endif // GPDXL_CParseHandlerLogicalTVF_H
+}  // namespace gpdxl
+#endif  // GPDXL_CParseHandlerLogicalTVF_H
 
 // EOF

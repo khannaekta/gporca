@@ -38,88 +38,86 @@ namespace gpmd
 	//
 	//---------------------------------------------------------------------------
 	class CDXLBucket : public CRefCount
-	{		
-		private:
-		
-			// lower bound m_bytearray_value for the bucket
-			CDXLDatum *m_lower_bound_datum_dxl;
-			
-			// max m_bytearray_value for the bucket
-			CDXLDatum *m_upper_bound_datum_dxl;
+	{
+	private:
+		// lower bound m_bytearray_value for the bucket
+		CDXLDatum *m_lower_bound_datum_dxl;
 
-			// is lower bound closed (i.e., the boundary point is included in the bucket)
-			BOOL m_is_lower_closed;
+		// max m_bytearray_value for the bucket
+		CDXLDatum *m_upper_bound_datum_dxl;
 
-			// is upper bound closed (i.e., the boundary point is included in the bucket)
-			BOOL m_is_upper_closed;
+		// is lower bound closed (i.e., the boundary point is included in the bucket)
+		BOOL m_is_lower_closed;
 
-			// frequency
-			CDouble m_frequency;
-			
-			// distinct values
-			CDouble m_distinct;
+		// is upper bound closed (i.e., the boundary point is included in the bucket)
+		BOOL m_is_upper_closed;
 
-			// private copy ctor
-			CDXLBucket(const CDXLBucket &);
-		
-			// serialize the bucket boundary
-			void SerializeBoundaryValue(CXMLSerializer *xml_serializer, const CWStringConst *elem_str, CDXLDatum *datum_dxl, BOOL is_bound_closed) const;
+		// frequency
+		CDouble m_frequency;
 
-		public:
-			
-			// ctor
-			CDXLBucket
-				(
-				CDXLDatum *dxl_datum_lower,
-				CDXLDatum *dxl_datum_upper,
-				BOOL is_lower_closed,
-				BOOL is_upper_closed,
-				CDouble frequency,
-				CDouble distinct
-				);
-			
-			// dtor
-			virtual
-			~CDXLBucket();
-			
-			// is lower bound closed
-			BOOL IsLowerClosed() const
-			{
-				return m_is_lower_closed;
-			}
+		// distinct values
+		CDouble m_distinct;
 
-			// is upper bound closed
-			BOOL IsUpperClosed() const
-			{
-				return m_is_upper_closed;
-			}
+		// private copy ctor
+		CDXLBucket(const CDXLBucket &);
 
-			// min m_bytearray_value for the bucket
-			const CDXLDatum *GetDXLDatumLower() const;
-			
-			// max m_bytearray_value for the bucket
-			const CDXLDatum *GetDXLDatumUpper() const;
-						
-			// frequency
-			CDouble GetFrequency() const;
-			
-			// distinct values
-			CDouble GetNumDistinct() const;
+		// serialize the bucket boundary
+		void SerializeBoundaryValue(CXMLSerializer *xml_serializer,
+									const CWStringConst *elem_str,
+									CDXLDatum *datum_dxl,
+									BOOL is_bound_closed) const;
 
-			// serialize bucket in DXL format
-			void Serialize(gpdxl::CXMLSerializer *) const;
+	public:
+		// ctor
+		CDXLBucket(CDXLDatum *dxl_datum_lower,
+				   CDXLDatum *dxl_datum_upper,
+				   BOOL is_lower_closed,
+				   BOOL is_upper_closed,
+				   CDouble frequency,
+				   CDouble distinct);
+
+		// dtor
+		virtual ~CDXLBucket();
+
+		// is lower bound closed
+		BOOL
+		IsLowerClosed() const
+		{
+			return m_is_lower_closed;
+		}
+
+		// is upper bound closed
+		BOOL
+		IsUpperClosed() const
+		{
+			return m_is_upper_closed;
+		}
+
+		// min m_bytearray_value for the bucket
+		const CDXLDatum *GetDXLDatumLower() const;
+
+		// max m_bytearray_value for the bucket
+		const CDXLDatum *GetDXLDatumUpper() const;
+
+		// frequency
+		CDouble GetFrequency() const;
+
+		// distinct values
+		CDouble GetNumDistinct() const;
+
+		// serialize bucket in DXL format
+		void Serialize(gpdxl::CXMLSerializer *) const;
 
 #ifdef GPOS_DEBUG
-			// debug print of the bucket
-			void DebugPrint(IOstream &os) const;
+		// debug print of the bucket
+		void DebugPrint(IOstream &os) const;
 #endif
-			
 	};
 
 	// array of dxl buckets
 	typedef CDynamicPtrArray<CDXLBucket, CleanupRelease> DXLBucketPtrArray;
-}
+}  // namespace gpmd
 
-#endif // !GPMD_CDXLBucket_H
+#endif  // !GPMD_CDXLBucket_H
 
 // EOF

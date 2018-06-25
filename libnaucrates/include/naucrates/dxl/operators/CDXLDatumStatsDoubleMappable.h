@@ -8,8 +8,8 @@
 //	@doc:
 //		Class for representing DXL datum of types having double mapping
 //
-//	@owner: 
-//		
+//	@owner:
+//
 //
 //	@test:
 //
@@ -37,76 +37,67 @@ namespace gpdxl
 	//		Class for representing DXL datum of types having double mapping
 	//
 	//---------------------------------------------------------------------------
-	class CDXLDatumStatsDoubleMappable: public CDXLDatumGeneric
+	class CDXLDatumStatsDoubleMappable : public CDXLDatumGeneric
 	{
-		private:
+	private:
+		// for statistics computation, map to double
+		CDouble m_val;
 
-			// for statistics computation, map to double
-			CDouble m_val;
+		// private copy ctor
+		CDXLDatumStatsDoubleMappable(const CDXLDatumStatsDoubleMappable &);
 
-			// private copy ctor
-			CDXLDatumStatsDoubleMappable(const CDXLDatumStatsDoubleMappable &);
+	public:
+		// ctor
+		CDXLDatumStatsDoubleMappable(IMemoryPool *memory_pool,
+									 IMDId *mdid_type,
+									 INT type_modifier,
+									 BOOL is_passed_by_value,
+									 BOOL is_null,
+									 BYTE *data,
+									 ULONG length,
+									 CDouble val);
 
-		public:
-			// ctor
-			CDXLDatumStatsDoubleMappable
-				(
-				IMemoryPool *memory_pool,
-				IMDId *mdid_type,
-				INT type_modifier,
-				BOOL is_passed_by_value,
-				BOOL is_null,
-				BYTE *data,
-				ULONG length,
-				CDouble val
-				);
+		// dtor
+		virtual ~CDXLDatumStatsDoubleMappable(){};
 
-			// dtor
-			virtual
-			~CDXLDatumStatsDoubleMappable(){};
+		// serialize the datum as the given element
+		virtual void Serialize(CXMLSerializer *xml_serializer);
 
-			// serialize the datum as the given element
-			virtual
-			void Serialize(CXMLSerializer *xml_serializer);
+		// datum type
+		virtual EdxldatumType
+		GetDatumType() const
+		{
+			return CDXLDatum::EdxldatumStatsDoubleMappable;
+		}
 
-			// datum type
-			virtual
-			EdxldatumType GetDatumType() const
-			{
-				return CDXLDatum::EdxldatumStatsDoubleMappable;
-			}
+		// statistics related APIs
 
-			// statistics related APIs
+		// can datum be mapped to double
+		virtual BOOL
+		IsDatumMappableToDouble() const
+		{
+			return true;
+		}
 
-			// can datum be mapped to double
-			virtual
-			BOOL IsDatumMappableToDouble() const
-			{
-				return true;
-			}
+		// return the double mapping needed for statistics computation
+		virtual CDouble
+		GetDoubleMapping() const
+		{
+			return m_val;
+		}
 
-			// return the double mapping needed for statistics computation
-			virtual
-			CDouble GetDoubleMapping() const
-			{
-				return m_val;
-			}
+		// conversion function
+		static CDXLDatumStatsDoubleMappable *
+		Cast(CDXLDatum *datum_dxl)
+		{
+			GPOS_ASSERT(NULL != datum_dxl);
+			GPOS_ASSERT(CDXLDatum::EdxldatumStatsDoubleMappable == datum_dxl->GetDatumType());
 
-			// conversion function
-			static
-			CDXLDatumStatsDoubleMappable *Cast
-				(
-				CDXLDatum *datum_dxl
-				)
-			{
-				GPOS_ASSERT(NULL != datum_dxl);
-				GPOS_ASSERT(CDXLDatum::EdxldatumStatsDoubleMappable == datum_dxl->GetDatumType());
-
-				return dynamic_cast<CDXLDatumStatsDoubleMappable*>(datum_dxl);
-			}
+			return dynamic_cast<CDXLDatumStatsDoubleMappable *>(datum_dxl);
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLDatumStatsDoubleMappable_H
+#endif  // !GPDXL_CDXLDatumStatsDoubleMappable_H
 
 // EOF

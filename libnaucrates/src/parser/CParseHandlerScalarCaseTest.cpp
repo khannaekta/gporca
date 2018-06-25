@@ -27,15 +27,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerScalarCaseTest::CParseHandlerScalarCaseTest
-	(
-	IMemoryPool *memory_pool,
-	CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root
-	)
-	:
-	CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root),
-	m_mdid_type(NULL)
+CParseHandlerScalarCaseTest::CParseHandlerScalarCaseTest(IMemoryPool *memory_pool,
+														 CParseHandlerManager *parse_handler_mgr,
+														 CParseHandlerBase *parse_handler_root)
+	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root), m_mdid_type(NULL)
 {
 }
 
@@ -48,22 +43,25 @@ CParseHandlerScalarCaseTest::CParseHandlerScalarCaseTest
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerScalarCaseTest::StartElement
-	(
-	const XMLCh* const, //element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const, //element_qname,
-	const Attributes& attrs
-	)
+CParseHandlerScalarCaseTest::StartElement(const XMLCh *const,  //element_uri,
+										  const XMLCh *const element_local_name,
+										  const XMLCh *const,  //element_qname,
+										  const Attributes &attrs)
 {
-	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarCaseTest), element_local_name))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarCaseTest),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
 	// parse type id
-	m_mdid_type = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenTypeId, EdxltokenScalarCaseTest);
+	m_mdid_type = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+		m_parse_handler_mgr->GetDXLMemoryManager(),
+		attrs,
+		EdxltokenTypeId,
+		EdxltokenScalarCaseTest);
 }
 
 //---------------------------------------------------------------------------
@@ -75,21 +73,22 @@ CParseHandlerScalarCaseTest::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerScalarCaseTest::EndElement
-	(
-	const XMLCh* const ,// element_uri
-	const XMLCh* const element_local_name,
-	const XMLCh* const // element_qname
-	)
+CParseHandlerScalarCaseTest::EndElement(const XMLCh *const,  // element_uri
+										const XMLCh *const element_local_name,
+										const XMLCh *const  // element_qname
+)
 {
-	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarCaseTest), element_local_name))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarCaseTest),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
 	// construct node
-	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarCaseTest(m_memory_pool, m_mdid_type));
+	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(
+		m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarCaseTest(m_memory_pool, m_mdid_type));
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

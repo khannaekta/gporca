@@ -22,7 +22,7 @@ namespace gpmd
 {
 	using namespace gpos;
 
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		IMDAggregate
@@ -32,39 +32,35 @@ namespace gpmd
 	//
 	//---------------------------------------------------------------------------
 	class IMDAggregate : public IMDCacheObject
-	{		
-		public:
+	{
+	public:
+		// object type
+		virtual Emdtype
+		MDType() const
+		{
+			return EmdtAgg;
+		}
 
-			// object type
-			virtual
-			Emdtype MDType() const
-			{
-				return EmdtAgg;
-			}
-			
-			// type of intermediate results computed by the aggregate's 
-			// transformation function
-			virtual 
-			IMDId *GetIntermediateResultTypeMdid() const = 0;
+		// type of intermediate results computed by the aggregate's
+		// transformation function
+		virtual IMDId *GetIntermediateResultTypeMdid() const = 0;
 
-			// result type
-			virtual 
-			IMDId *GetResultTypeMdid() const = 0;
+		// result type
+		virtual IMDId *GetResultTypeMdid() const = 0;
 
-			// is aggregate ordered
-			virtual
-			BOOL IsOrdered() const = 0;
-			
-			// is aggregate splittable
-			virtual
-			BOOL IsSplittable() const = 0;
+		// is aggregate ordered
+		virtual BOOL IsOrdered() const = 0;
 
-			virtual
+		// is aggregate splittable
+		virtual BOOL IsSplittable() const = 0;
+
+		virtual
 			// is aggregate hash capable
-			BOOL IsHashAggCapable() const = 0;
+			BOOL
+			IsHashAggCapable() const = 0;
 	};
-}
+}  // namespace gpmd
 
-#endif // !GPMD_IMDAggregate_H
+#endif  // !GPMD_IMDAggregate_H
 
 // EOF

@@ -40,56 +40,49 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalNLJoin : public CDXLPhysicalJoin
 	{
+	private:
+		// flag to indicate whether operator is an index nested loops,
+		// i.e., inner side is an index scan that uses values from outer side
+		BOOL m_is_index_nlj;
 
-		private:
+		// private copy ctor
+		CDXLPhysicalNLJoin(const CDXLPhysicalNLJoin &);
 
-			// flag to indicate whether operator is an index nested loops,
-			// i.e., inner side is an index scan that uses values from outer side
-			BOOL m_is_index_nlj;
+	public:
+		// ctor/dtor
+		CDXLPhysicalNLJoin(IMemoryPool *memory_pool, EdxlJoinType join_type, BOOL is_index_nlj);
 
-			// private copy ctor
-			CDXLPhysicalNLJoin(const CDXLPhysicalNLJoin&);
+		// accessors
+		Edxlopid GetDXLOperator() const;
+		const CWStringConst *GetOpNameStr() const;
 
-		public:
-			// ctor/dtor
-			CDXLPhysicalNLJoin(IMemoryPool *memory_pool, EdxlJoinType join_type, BOOL is_index_nlj);
-			
-			// accessors
-			Edxlopid GetDXLOperator() const;
-			const CWStringConst *GetOpNameStr() const;
-			
-			// is operator an index nested loops?
-			BOOL IsIndexNLJ() const
-			{
-				return m_is_index_nlj;
-			}
+		// is operator an index nested loops?
+		BOOL
+		IsIndexNLJ() const
+		{
+			return m_is_index_nlj;
+		}
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
-			// conversion function
-			static
-			CDXLPhysicalNLJoin *PdxlConvert
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopPhysicalNLJoin == dxl_op->GetDXLOperator());
+		// conversion function
+		static CDXLPhysicalNLJoin *
+		PdxlConvert(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopPhysicalNLJoin == dxl_op->GetDXLOperator());
 
-				return dynamic_cast<CDXLPhysicalNLJoin*>(dxl_op);
-			}
+			return dynamic_cast<CDXLPhysicalNLJoin *>(dxl_op);
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL validate_children) const;
-#endif // GPOS_DEBUG
-			
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
-#endif // !GPDXL_CDXLPhysicalNLJoin_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLPhysicalNLJoin_H
 
 // EOF
-

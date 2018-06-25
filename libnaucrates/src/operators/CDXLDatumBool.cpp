@@ -24,16 +24,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLDatumBool::CDXLDatumBool
-	(
-	IMemoryPool *memory_pool,
-	IMDId *mdid_type,
-	BOOL is_null,
-	BOOL value
-	)
-	:
-	CDXLDatum(memory_pool, mdid_type, default_type_modifier, is_null, 1 /*length*/),
-	m_value(value)
+CDXLDatumBool::CDXLDatumBool(IMemoryPool *memory_pool, IMDId *mdid_type, BOOL is_null, BOOL value)
+	: CDXLDatum(memory_pool, mdid_type, default_type_modifier, is_null, 1 /*length*/),
+	  m_value(value)
 {
 }
 
@@ -46,10 +39,7 @@ CDXLDatumBool::CDXLDatumBool
 //
 //---------------------------------------------------------------------------
 void
-CDXLDatumBool::Serialize
-	(
-	CXMLSerializer *xml_serializer
-	)
+CDXLDatumBool::Serialize(CXMLSerializer *xml_serializer)
 {
 	m_mdid_type->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenTypeId));
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenIsNull), m_is_null);
@@ -57,13 +47,15 @@ CDXLDatumBool::Serialize
 
 	if (!m_is_null)
 	{
-		if(m_value)
+		if (m_value)
 		{
-			xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenValue), CDXLTokens::GetDXLTokenStr(EdxltokenTrue));
+			xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenValue),
+										 CDXLTokens::GetDXLTokenStr(EdxltokenTrue));
 		}
 		else
 		{
-			xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenValue), CDXLTokens::GetDXLTokenStr(EdxltokenFalse));
+			xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenValue),
+										 CDXLTokens::GetDXLTokenStr(EdxltokenFalse));
 		}
 	}
 }

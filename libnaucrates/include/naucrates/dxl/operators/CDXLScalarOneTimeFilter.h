@@ -18,7 +18,6 @@
 
 namespace gpdxl
 {
-	
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDXLScalarOneTimeFilter
@@ -29,50 +28,41 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarOneTimeFilter : public CDXLScalarFilter
 	{
-		private:
-			// private copy ctor
-		CDXLScalarOneTimeFilter(CDXLScalarOneTimeFilter&);
-			
-		public:
-			// ctor
-			explicit
-			CDXLScalarOneTimeFilter(IMemoryPool *memory_pool);
-			
-			// accessors
-			Edxlopid GetDXLOperator() const;
-			const CWStringConst *GetOpNameStr() const;
-			
-			// conversion function
-			static
-			CDXLScalarOneTimeFilter *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopScalarOneTimeFilter == dxl_op->GetDXLOperator());
+	private:
+		// private copy ctor
+		CDXLScalarOneTimeFilter(CDXLScalarOneTimeFilter &);
 
-				return dynamic_cast<CDXLScalarOneTimeFilter*>(dxl_op);
-			}
+	public:
+		// ctor
+		explicit CDXLScalarOneTimeFilter(IMemoryPool *memory_pool);
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const;
+		// accessors
+		Edxlopid GetDXLOperator() const;
+		const CWStringConst *GetOpNameStr() const;
 
-			// does the operator return a boolean result
-			virtual
-			BOOL HasBoolResult
-					(
-					CMDAccessor *//md_accessor
-					)
-					const
-			{
-				GPOS_ASSERT(!"Invalid function call for a container operator");
-				return false;
-			}
+		// conversion function
+		static CDXLScalarOneTimeFilter *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarOneTimeFilter == dxl_op->GetDXLOperator());
+
+			return dynamic_cast<CDXLScalarOneTimeFilter *>(dxl_op);
+		}
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const;
+
+		// does the operator return a boolean result
+		virtual BOOL
+		HasBoolResult(CMDAccessor *  //md_accessor
+					  ) const
+		{
+			GPOS_ASSERT(!"Invalid function call for a container operator");
+			return false;
+		}
 	};
-}
-#endif // !GPDXL_CDXLScalarOneTimeFilter_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLScalarOneTimeFilter_H
 
 // EOF
-

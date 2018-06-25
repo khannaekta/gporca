@@ -39,86 +39,72 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarComp : public CDXLScalar
 	{
-		
-		protected:
-						
-			// operator number in the catalog
-			IMDId *m_mdid;
-					
-			// comparison operator name
-			const CWStringConst *m_comparison_operator_name;
+	protected:
+		// operator number in the catalog
+		IMDId *m_mdid;
 
-		private:
+		// comparison operator name
+		const CWStringConst *m_comparison_operator_name;
 
-			// private copy ctor
-			CDXLScalarComp(CDXLScalarComp&);
-			
-		public:
-			// ctor/dtor		
-			CDXLScalarComp
-				(
-				IMemoryPool *memory_pool,
-				IMDId *operator_mdid,
-				const CWStringConst *comparison_operator_name
-				);
-			
-			virtual
-			~CDXLScalarComp();
-			
-			// accessor
+	private:
+		// private copy ctor
+		CDXLScalarComp(CDXLScalarComp &);
 
-			// ident accessors
-			Edxlopid GetDXLOperator() const;
-			
-			// name of the DXL operator
-			const CWStringConst *GetOpNameStr() const;
+	public:
+		// ctor/dtor
+		CDXLScalarComp(IMemoryPool *memory_pool,
+					   IMDId *operator_mdid,
+					   const CWStringConst *comparison_operator_name);
 
-			// name of the comparison operator
-			const CWStringConst *GetComparisonOpName() const;
-			
-			// operator id
-			IMDId *MDId() const;
-						
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
+		virtual ~CDXLScalarComp();
 
-			// conversion function
-			static
-			CDXLScalarComp *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopScalarCmp == dxl_op->GetDXLOperator()
-						|| EdxlopScalarDistinct == dxl_op->GetDXLOperator()
-						|| EdxlopScalarArrayComp == dxl_op->GetDXLOperator());
+		// accessor
 
-				return dynamic_cast<CDXLScalarComp*>(dxl_op);
-			}
+		// ident accessors
+		Edxlopid GetDXLOperator() const;
 
-			// does the operator return a boolean result
-			virtual
-			BOOL HasBoolResult
-					(
-					CMDAccessor *//md_accessor
-					)
-					const
+		// name of the DXL operator
+		const CWStringConst *GetOpNameStr() const;
 
-			{
-				return true;
-			}
+		// name of the comparison operator
+		const CWStringConst *GetComparisonOpName() const;
+
+		// operator id
+		IMDId *MDId() const;
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
+
+		// conversion function
+		static CDXLScalarComp *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarCmp == dxl_op->GetDXLOperator() ||
+						EdxlopScalarDistinct == dxl_op->GetDXLOperator() ||
+						EdxlopScalarArrayComp == dxl_op->GetDXLOperator());
+
+			return dynamic_cast<CDXLScalarComp *>(dxl_op);
+		}
+
+		// does the operator return a boolean result
+		virtual BOOL
+		HasBoolResult(CMDAccessor *  //md_accessor
+					  ) const
+
+		{
+			return true;
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *node, BOOL validate_children) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *node, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLScalarComp_H
+#endif  // !GPDXL_CDXLScalarComp_H
 
 
 // EOF

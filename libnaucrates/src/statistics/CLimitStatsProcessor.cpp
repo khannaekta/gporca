@@ -15,17 +15,15 @@ using namespace gpopt;
 
 //	compute the statistics of a limit operation
 CStatistics *
-CLimitStatsProcessor::CalcLimitStats
-	(
-	IMemoryPool *memory_pool,
-	const CStatistics *input_stats,
-	CDouble input_limit_rows
-	)
+CLimitStatsProcessor::CalcLimitStats(IMemoryPool *memory_pool,
+									 const CStatistics *input_stats,
+									 CDouble input_limit_rows)
 {
 	GPOS_ASSERT(NULL != input_stats);
 
 	// copy the hash map from colid -> histogram for resultant structure
-	UlongHistogramHashMap *colid_histogram = input_stats->CopyHistograms(memory_pool);;
+	UlongHistogramHashMap *colid_histogram = input_stats->CopyHistograms(memory_pool);
+	;
 
 	CDouble limit_rows = CStatistics::MinRows;
 	if (!input_stats->IsEmpty())
@@ -33,15 +31,13 @@ CLimitStatsProcessor::CalcLimitStats
 		limit_rows = std::max(CStatistics::MinRows, input_limit_rows);
 	}
 	// create an output stats object
-	CStatistics *pstatsLimit = GPOS_NEW(memory_pool) CStatistics
-											(
-											memory_pool,
-											colid_histogram,
-											input_stats->CopyWidths(memory_pool),
-											limit_rows,
-											input_stats->IsEmpty(),
-											input_stats->GetNumberOfPredicates()
-											);
+	CStatistics *pstatsLimit =
+		GPOS_NEW(memory_pool) CStatistics(memory_pool,
+										  colid_histogram,
+										  input_stats->CopyWidths(memory_pool),
+										  limit_rows,
+										  input_stats->IsEmpty(),
+										  input_stats->GetNumberOfPredicates());
 
 	// In the output statistics object, the upper bound source cardinality of the join column
 	// cannot be greater than the upper bound source cardinality information maintained in the input
@@ -50,7 +46,11 @@ CLimitStatsProcessor::CalcLimitStats
 	// and estimated limit cardinality.
 
 	// modify source id to upper bound card information
-	CStatisticsUtils::ComputeCardUpperBounds(memory_pool, input_stats, pstatsLimit, limit_rows, CStatistics::EcbmMin /* card_bounding_method */);
+	CStatisticsUtils::ComputeCardUpperBounds(memory_pool,
+											 input_stats,
+											 pstatsLimit,
+											 limit_rows,
+											 CStatistics::EcbmMin /* card_bounding_method */);
 
 	return pstatsLimit;
 }

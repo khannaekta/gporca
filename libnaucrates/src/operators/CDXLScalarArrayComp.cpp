@@ -25,16 +25,11 @@ using namespace gpdxl;
 //		Constructs a ScalarArrayComp node
 //
 //---------------------------------------------------------------------------
-CDXLScalarArrayComp::CDXLScalarArrayComp
-	(
-	IMemoryPool *memory_pool,
-	IMDId *mdid_op,
-	const CWStringConst *str_opname,
-	EdxlArrayCompType comparison_type
-	)
-	:
-	CDXLScalarComp(memory_pool, mdid_op, str_opname),
-	m_comparison_type(comparison_type)
+CDXLScalarArrayComp::CDXLScalarArrayComp(IMemoryPool *memory_pool,
+										 IMDId *mdid_op,
+										 const CWStringConst *str_opname,
+										 EdxlArrayCompType comparison_type)
+	: CDXLScalarComp(memory_pool, mdid_op, str_opname), m_comparison_type(comparison_type)
 {
 }
 
@@ -112,22 +107,20 @@ CDXLScalarArrayComp::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarArrayComp::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *dxlnode
-	)
-	const
+CDXLScalarArrayComp::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenOpName), m_comparison_operator_name);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenOpName),
+								 m_comparison_operator_name);
 	m_mdid->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenOpNo));
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenOpType), GetDXLStrArrayCmpType());
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenOpType),
+								 GetDXLStrArrayCmpType());
 
 	dxlnode->SerializeChildrenToDXL(xml_serializer);
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -140,12 +133,7 @@ CDXLScalarArrayComp::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarArrayComp::AssertValid
-	(
-	const CDXLNode *dxlnode,
-	BOOL validate_children
-	) 
-	const
+CDXLScalarArrayComp::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
 	GPOS_ASSERT(2 == arity);
@@ -154,14 +142,14 @@ CDXLScalarArrayComp::AssertValid
 	{
 		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar == dxlnode_arg->GetOperator()->GetDXLOperatorType());
-		
+
 		if (validate_children)
 		{
 			dxlnode_arg->GetOperator()->AssertValid(dxlnode_arg, validate_children);
 		}
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 
 // EOF

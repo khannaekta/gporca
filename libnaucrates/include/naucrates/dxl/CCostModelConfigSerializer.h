@@ -14,12 +14,13 @@ namespace gpdxl
 	class CXMLSerializer;
 	class CCostModelConfigSerializer
 	{
-		private:
-			const gpopt::ICostModel *m_cost_model;
-		public:
-			CCostModelConfigSerializer(const gpopt::ICostModel *cost_model);
+	private:
+		const gpopt::ICostModel *m_cost_model;
 
-			void Serialize(CXMLSerializer &xml_serializer) const;
+	public:
+		CCostModelConfigSerializer(const gpopt::ICostModel *cost_model);
+
+		void Serialize(CXMLSerializer &xml_serializer) const;
 	};
-}
+}  // namespace gpdxl
 #endif

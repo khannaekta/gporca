@@ -23,12 +23,7 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLOperator::CDXLOperator
-	(
-	IMemoryPool *memory_pool
-	)
-	:
-	m_memory_pool(memory_pool)
+CDXLOperator::CDXLOperator(IMemoryPool *memory_pool) : m_memory_pool(memory_pool)
 {
 }
 
@@ -53,10 +48,7 @@ CDXLOperator::~CDXLOperator()
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLOperator::GetJoinTypeNameStr
-	(
-	EdxlJoinType join_type
-	)
+CDXLOperator::GetJoinTypeNameStr(EdxlJoinType join_type)
 {
 	GPOS_ASSERT(EdxljtSentinel > join_type);
 
@@ -97,10 +89,7 @@ CDXLOperator::GetJoinTypeNameStr
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLOperator::GetIdxScanDirectionStr
-	(
-	EdxlIndexScanDirection idx_scan_direction
-	)
+CDXLOperator::GetIdxScanDirectionStr(EdxlIndexScanDirection idx_scan_direction)
 {
 	switch (idx_scan_direction)
 	{

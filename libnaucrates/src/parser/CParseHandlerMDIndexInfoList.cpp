@@ -24,15 +24,11 @@ using namespace gpmd;
 XERCES_CPP_NAMESPACE_USE
 
 // ctor
-CParseHandlerMDIndexInfoList::CParseHandlerMDIndexInfoList
-	(
-	IMemoryPool *memory_pool,
-	CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root
-	)
-	:
-	CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
-	m_mdindex_info_array(NULL)
+CParseHandlerMDIndexInfoList::CParseHandlerMDIndexInfoList(IMemoryPool *memory_pool,
+														   CParseHandlerManager *parse_handler_mgr,
+														   CParseHandlerBase *parse_handler_root)
+	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	  m_mdindex_info_array(NULL)
 {
 }
 
@@ -51,57 +47,59 @@ CParseHandlerMDIndexInfoList::GetMdIndexInfoArray()
 
 // invoked by Xerces to process an opening tag
 void
-CParseHandlerMDIndexInfoList::StartElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const, // element_qname,
-	const Attributes& attrs
-	)
+CParseHandlerMDIndexInfoList::StartElement(const XMLCh *const,  // element_uri,
+										   const XMLCh *const element_local_name,
+										   const XMLCh *const,  // element_qname,
+										   const Attributes &attrs)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenIndexInfoList), element_local_name))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenIndexInfoList),
+									  element_local_name))
 	{
 		m_mdindex_info_array = GPOS_NEW(m_memory_pool) MDIndexInfoPtrArray(m_memory_pool);
 	}
-	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenIndexInfo), element_local_name))
+	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenIndexInfo),
+										   element_local_name))
 	{
 		// parse mdid
-		IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid, EdxltokenIndexInfo);
+		IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid, EdxltokenIndexInfo);
 
 		// parse index partial info
-		BOOL is_partial = CDXLOperatorFactory::ExtractConvertAttrValueToBool(m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenIndexPartial, EdxltokenIndexInfo);
+		BOOL is_partial = CDXLOperatorFactory::ExtractConvertAttrValueToBool(
+			m_parse_handler_mgr->GetDXLMemoryManager(),
+			attrs,
+			EdxltokenIndexPartial,
+			EdxltokenIndexInfo);
 
-		CMDIndexInfo *md_index_info = GPOS_NEW(m_memory_pool) CMDIndexInfo
-								(
-								mdid,
-								is_partial
-								);
+		CMDIndexInfo *md_index_info = GPOS_NEW(m_memory_pool) CMDIndexInfo(mdid, is_partial);
 		m_mdindex_info_array->Append(md_index_info);
 	}
 	else
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 }
 
 // invoked by Xerces to process a closing tag
 void
-CParseHandlerMDIndexInfoList::EndElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const // element_qname
-	)
+CParseHandlerMDIndexInfoList::EndElement(const XMLCh *const,  // element_uri,
+										 const XMLCh *const element_local_name,
+										 const XMLCh *const  // element_qname
+)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenIndexInfoList), element_local_name))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenIndexInfoList),
+									  element_local_name))
 	{
 		// deactivate handler
 		m_parse_handler_mgr->DeactivateHandler();
 	}
-	else if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenIndexInfo), element_local_name))
+	else if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenIndexInfo),
+										   element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 }

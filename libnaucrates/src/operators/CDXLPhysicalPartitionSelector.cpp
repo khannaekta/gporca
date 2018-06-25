@@ -25,18 +25,14 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalPartitionSelector::CDXLPhysicalPartitionSelector
-	(
-	IMemoryPool *memory_pool,
-	IMDId *mdid_rel,
-	ULONG num_of_part_levels,
-	ULONG scan_id
-	)
-	:
-	CDXLPhysical(memory_pool),
-	m_rel_mdid(mdid_rel),
-	m_num_of_part_levels(num_of_part_levels),
-	m_scan_id(scan_id)
+CDXLPhysicalPartitionSelector::CDXLPhysicalPartitionSelector(IMemoryPool *memory_pool,
+															 IMDId *mdid_rel,
+															 ULONG num_of_part_levels,
+															 ULONG scan_id)
+	: CDXLPhysical(memory_pool),
+	  m_rel_mdid(mdid_rel),
+	  m_num_of_part_levels(num_of_part_levels),
+	  m_scan_id(scan_id)
 {
 	GPOS_ASSERT(mdid_rel->IsValid());
 	GPOS_ASSERT(0 < num_of_part_levels);
@@ -92,19 +88,17 @@ CDXLPhysicalPartitionSelector::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalPartitionSelector::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *dxlnode
-	)
-	const
+CDXLPhysicalPartitionSelector::SerializeToDXL(CXMLSerializer *xml_serializer,
+											  const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 	m_rel_mdid->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenRelationMdid));
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenPhysicalPartitionSelectorLevels), m_num_of_part_levels);
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenPhysicalPartitionSelectorScanId), m_scan_id);
+	xml_serializer->AddAttribute(
+		CDXLTokens::GetDXLTokenStr(EdxltokenPhysicalPartitionSelectorLevels), m_num_of_part_levels);
+	xml_serializer->AddAttribute(
+		CDXLTokens::GetDXLTokenStr(EdxltokenPhysicalPartitionSelectorScanId), m_scan_id);
 	dxlnode->SerializePropertiesToDXL(xml_serializer);
 
 	// serialize project list and filter lists
@@ -113,19 +107,25 @@ CDXLPhysicalPartitionSelector::SerializeToDXL
 	(*dxlnode)[EdxlpsIndexFilters]->SerializeToDXL(xml_serializer);
 
 	// serialize residual filter
-	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), CDXLTokens::GetDXLTokenStr(EdxltokenScalarResidualFilter));
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								CDXLTokens::GetDXLTokenStr(EdxltokenScalarResidualFilter));
 	(*dxlnode)[EdxlpsIndexResidualFilter]->SerializeToDXL(xml_serializer);
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), CDXLTokens::GetDXLTokenStr(EdxltokenScalarResidualFilter));
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 CDXLTokens::GetDXLTokenStr(EdxltokenScalarResidualFilter));
 
 	// serialize propagation expression
-	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), CDXLTokens::GetDXLTokenStr(EdxltokenScalarPropagationExpr));
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								CDXLTokens::GetDXLTokenStr(EdxltokenScalarPropagationExpr));
 	(*dxlnode)[EdxlpsIndexPropExpr]->SerializeToDXL(xml_serializer);
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), CDXLTokens::GetDXLTokenStr(EdxltokenScalarPropagationExpr));
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 CDXLTokens::GetDXLTokenStr(EdxltokenScalarPropagationExpr));
 
 	// serialize printable filter
-	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), CDXLTokens::GetDXLTokenStr(EdxltokenScalarPrintableFilter));
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								CDXLTokens::GetDXLTokenStr(EdxltokenScalarPrintableFilter));
 	(*dxlnode)[EdxlpsIndexPrintableFilter]->SerializeToDXL(xml_serializer);
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), CDXLTokens::GetDXLTokenStr(EdxltokenScalarPrintableFilter));
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 CDXLTokens::GetDXLTokenStr(EdxltokenScalarPrintableFilter));
 
 	// serialize relational child, if any
 	if (7 == dxlnode->Arity())
@@ -133,7 +133,8 @@ CDXLPhysicalPartitionSelector::SerializeToDXL
 		(*dxlnode)[EdxlpsIndexChild]->SerializeToDXL(xml_serializer);
 	}
 
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -146,12 +147,7 @@ CDXLPhysicalPartitionSelector::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalPartitionSelector::AssertValid
-	(
-	const CDXLNode *dxlnode,
-	BOOL validate_children
-	)
-	const
+CDXLPhysicalPartitionSelector::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
 	GPOS_ASSERT(6 == arity || 7 == arity);
@@ -164,6 +160,6 @@ CDXLPhysicalPartitionSelector::AssertValid
 		}
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

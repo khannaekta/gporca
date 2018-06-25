@@ -19,7 +19,6 @@
 
 namespace gpopt
 {
-
 	using namespace gpos;
 
 	//---------------------------------------------------------------------------
@@ -32,193 +31,170 @@ namespace gpopt
 	//---------------------------------------------------------------------------
 	class CStatsPredUtils
 	{
+	private:
+		// type of predicate expression
+		enum EPredicateType
+		{
+			EptPoint,		 // filter with literals
+			EptScIdent,		 // scalar ident that is convert into an equals true/false filter
+			EptConj,		 // conjunctive filter
+			EptDisj,		 // disjunctive filter
+			EptLike,		 // LIKE filter
+			EptNullTest,	 // null test, including IS NULL and IS NOT NULL
+			EptUnsupported,  // unsupported filter for statistics calculation
 
-		private:
+			EptSentinel
+		};
 
-			// type of predicate expression
-			enum EPredicateType
-			{
-				EptPoint, // filter with literals
-				EptScIdent, // scalar ident that is convert into an equals true/false filter
-				EptConj, // conjunctive filter
-				EptDisj, // disjunctive filter
-				EptLike, // LIKE filter
-				EptNullTest, // null test, including IS NULL and IS NOT NULL
-				EptUnsupported, // unsupported filter for statistics calculation
+		// shorthand for functions for extracting statistics filter from predicate expressions
+		typedef CStatsPred *(FuncPtrStatsFilterFromPredExpr)(IMemoryPool *memory_pool,
+															 CExpression *predicate_expr,
+															 CColRefSet *outer_refs);
 
-				EptSentinel
-			};
+		// pair of predicate type and the corresponding function to extracts is statistics filter
+		struct SScStatsfilterMapping
+		{
+			// type
+			CStatsPredUtils::EPredicateType predicate_type;
 
-			// shorthand for functions for extracting statistics filter from predicate expressions
-			typedef CStatsPred * (FuncPtrStatsFilterFromPredExpr)(IMemoryPool *memory_pool, CExpression *predicate_expr, CColRefSet *outer_refs);
+			// extractor function pointer
+			FuncPtrStatsFilterFromPredExpr *function_ptr;
+		};
 
-			// pair of predicate type and the corresponding function to extracts is statistics filter
-			struct SScStatsfilterMapping
-			{
-				// type
-				CStatsPredUtils::EPredicateType predicate_type;
+		// return the comparison type of an operator for the purpose of statistics computation
+		static CStatsPred::EStatsCmpType StatsCmpType(IMDId *mdid);
 
-				// extractor function pointer
-				FuncPtrStatsFilterFromPredExpr *function_ptr;
-			};
+		// return the comparison type of an operator for the purpose of statistics computation
+		static CStatsPred::EStatsCmpType StatsCmpType(const CWStringConst *str_opname);
 
-			// return the comparison type of an operator for the purpose of statistics computation
-			static
-			CStatsPred::EStatsCmpType StatsCmpType(IMDId *mdid);
+		// extract statistics filtering information from boolean expression
+		static CStatsPred *GetStatsPredFromBoolExpr(IMemoryPool *memory_pool,
+													CExpression *predicate_expr,
+													CColRefSet *outer_refs);
 
-			// return the comparison type of an operator for the purpose of statistics computation
-			static
-			CStatsPred::EStatsCmpType StatsCmpType(const CWStringConst *str_opname);
+		// extract statistics filtering information from a scalar array compare operator
+		static void ProcessArrayCmp(IMemoryPool *memory_pool,
+									CExpression *predicate_expr,
+									StatsPredPtrArry *pdrgpstatspred);
 
-			// extract statistics filtering information from boolean expression
-			static
-			CStatsPred *GetStatsPredFromBoolExpr(IMemoryPool *memory_pool, CExpression *predicate_expr, CColRefSet *outer_refs);
+		// create and add statistics filtering information for supported filters
+		static void AddSupportedStatsFilters(IMemoryPool *memory_pool,
+											 StatsPredPtrArry *pdrgpstatspred,
+											 CExpression *predicate_expr,
+											 CColRefSet *outer_refs);
 
-			// extract statistics filtering information from a scalar array compare operator
-			static
-			void ProcessArrayCmp(IMemoryPool *memory_pool, CExpression *predicate_expr, StatsPredPtrArry *pdrgpstatspred);
+		// create a conjunctive statistics filter composed of the extracted components of the conjunction
+		static CStatsPred *CreateStatsPredConj(IMemoryPool *memory_pool,
+											   CExpression *scalar_expr,
+											   CColRefSet *outer_refs);
 
-			// create and add statistics filtering information for supported filters
-			static
-			void AddSupportedStatsFilters
-				(
-				IMemoryPool *memory_pool,
-				StatsPredPtrArry *pdrgpstatspred,
-				CExpression *predicate_expr,
-				CColRefSet *outer_refs
-				);
+		// create a disjunction statistics filter composed of the extracted components of the disjunction
+		static CStatsPred *CreateStatsPredDisj(IMemoryPool *memory_pool,
+											   CExpression *predicate_expr,
+											   CColRefSet *outer_refs);
 
-			// create a conjunctive statistics filter composed of the extracted components of the conjunction
-			static
-			CStatsPred *CreateStatsPredConj(IMemoryPool *memory_pool, CExpression *scalar_expr, CColRefSet *outer_refs);
+		// return statistics filter type for the given expression
+		static CStatsPredUtils::EPredicateType GetPredTypeForExpr(IMemoryPool *memory_pool,
+																  CExpression *predicate_expr);
 
-			// create a disjunction statistics filter composed of the extracted components of the disjunction
-			static
-			CStatsPred *CreateStatsPredDisj(IMemoryPool *memory_pool, CExpression *predicate_expr, CColRefSet *outer_refs);
+		// is the condition a conjunctive predicate
+		static BOOL IsConjunction(IMemoryPool *memory_pool, CExpression *predicate_expr);
 
-			// return statistics filter type for the given expression
-			static
-			CStatsPredUtils::EPredicateType GetPredTypeForExpr(IMemoryPool *memory_pool, CExpression *predicate_expr);
+		// is the condition a boolean predicate
+		static BOOL IsPredBooleanScIdent(CExpression *predicate_expr);
 
-			// is the condition a conjunctive predicate
-			static
-			BOOL IsConjunction(IMemoryPool *memory_pool, CExpression *predicate_expr);
+		// is the condition a point predicate
+		static BOOL IsPointPredicate(CExpression *predicate_expr);
 
-			// is the condition a boolean predicate
-			static
-			BOOL IsPredBooleanScIdent(CExpression *predicate_expr);
+		// is the condition an IDF point predicate
+		static BOOL IsPredPointIDF(CExpression *predicate_expr);
 
-			// is the condition a point predicate
-			static
-			BOOL IsPointPredicate(CExpression *predicate_expr);
+		// is the condition an INDF point predicate
+		static BOOL IsPredPointINDF(CExpression *predicate_expr);
 
-			// is the condition an IDF point predicate
-			static
-			BOOL IsPredPointIDF(CExpression *predicate_expr);
+		// is the condition 'is null' on a scalar ident
+		static BOOL IsPredScalarIdentIsNull(CExpression *predicate_expr);
 
-			// is the condition an INDF point predicate
-			static
-			BOOL IsPredPointINDF(CExpression *predicate_expr);
+		// is the condition 'is not null' on a scalar ident
+		static BOOL IsPredScalarIdentIsNotNull(CExpression *predicate_expr);
 
-			// is the condition 'is null' on a scalar ident
-			static
-			BOOL IsPredScalarIdentIsNull(CExpression *predicate_expr);
+		// extract statistics filtering information from a point comparison
+		static CStatsPred *GetStatsPredPoint(IMemoryPool *memory_pool,
+											 CExpression *predicate_expr,
+											 CColRefSet *outer_refs);
 
-			// is the condition 'is not null' on a scalar ident
-			static
-			BOOL IsPredScalarIdentIsNotNull(CExpression *predicate_expr);
+		// extract statistics filtering information from a LIKE comparison
+		static CStatsPred *GetStatsPredLike(IMemoryPool *memory_pool,
+											CExpression *predicate_expr,
+											CColRefSet *outer_refs);
 
-			// extract statistics filtering information from a point comparison
-			static
-			CStatsPred *GetStatsPredPoint(IMemoryPool *memory_pool, CExpression *predicate_expr, CColRefSet *outer_refs);
+		// extract statistics filtering information from a null test
+		static CStatsPred *GetStatsPredNullTest(IMemoryPool *memory_pool,
+												CExpression *predicate_expr,
+												CColRefSet *outer_refs);
 
-			// extract statistics filtering information from a LIKE comparison
-			static
-			CStatsPred *GetStatsPredLike(IMemoryPool *memory_pool, CExpression *predicate_expr, CColRefSet *outer_refs);
+		// create an unsupported statistics predicate
+		static CStatsPred *CreateStatsPredUnsupported(IMemoryPool *memory_pool,
+													  CExpression *predicate_expr,
+													  CColRefSet *outer_refs);
 
-			// extract statistics filtering information from a null test
-			static
-			CStatsPred *GetStatsPredNullTest(IMemoryPool *memory_pool, CExpression *predicate_expr, CColRefSet *outer_refs);
+		// generate a point predicate for expressions of the form colid CMP constant for which we support stats calculation;
+		// else return an unsupported stats predicate
+		static CStatsPred *GetPredStats(IMemoryPool *memory_pool, CExpression *expr);
 
-			// create an unsupported statistics predicate
-			static
-			CStatsPred *CreateStatsPredUnsupported(IMemoryPool *memory_pool, CExpression *predicate_expr, CColRefSet *outer_refs);
+		// return the statistics predicate comparison type based on the md identifier
+		static CStatsPred::EStatsCmpType GetStatsCmpType(IMDId *mdid);
 
-			// generate a point predicate for expressions of the form colid CMP constant for which we support stats calculation;
-			// else return an unsupported stats predicate
-			static
-			CStatsPred *GetPredStats(IMemoryPool *memory_pool, CExpression *expr);
+		// helper function to extract statistics join filter from a given join predicate
+		static CStatsPredJoin *ExtractJoinStatsFromJoinPred(
+			IMemoryPool *memory_pool,
+			CExpression *join_predicate_expr,
+			DrgPcrs *join_output_col_refset,  // array of output columns of join's relational inputs
+			CColRefSet *outer_refs,
+			DrgPexpr *unsupported_predicates_expr);
 
-			// return the statistics predicate comparison type based on the md identifier
-			static
-			CStatsPred::EStatsCmpType GetStatsCmpType(IMDId *mdid);
+		// is the expression a comparison of scalar idents (or casted scalar idents).
+		// If so, extract relevant info.
+		static BOOL IsPredCmpColsOrIgnoreCast(CExpression *expr,
+											  const CColRef **col_ref1,
+											  CStatsPred::EStatsCmpType *stats_pred_cmp_type,
+											  const CColRef **col_ref2);
 
-			// helper function to extract statistics join filter from a given join predicate
-			static
-			CStatsPredJoin *ExtractJoinStatsFromJoinPred
-								(
-								IMemoryPool *memory_pool,
-								CExpression *join_predicate_expr,
-								DrgPcrs *join_output_col_refset, // array of output columns of join's relational inputs
-								CColRefSet *outer_refs,
-								DrgPexpr *unsupported_predicates_expr
-								);
+	public:
+		// extract statistics filter from scalar expression
+		static CStatsPred *ExtractPredStats(IMemoryPool *memory_pool,
+											CExpression *scalar_expr,
+											CColRefSet *outer_refs);
 
-			// is the expression a comparison of scalar idents (or casted scalar idents).
-			// If so, extract relevant info.
-			static
-			BOOL IsPredCmpColsOrIgnoreCast
-				(
-				CExpression *expr,
-				const CColRef **col_ref1,
-				CStatsPred::EStatsCmpType *stats_pred_cmp_type,
-				const CColRef **col_ref2
-				);
+		// helper function to extract array of statistics join filter from an array of join predicates
+		static StatsPredJoinArray *ExtractJoinStatsFromJoinPredArray(
+			IMemoryPool *memory_pool,
+			CExpression *scalar_expr,
+			DrgPcrs *output_col_refset,  // array of output columns of join's relational inputs
+			CColRefSet *outer_refs,
+			CStatsPred **unsupported_pred_stats);
 
-		public:
+		// helper function to extract array of statistics join filter from an expression handle
+		static StatsPredJoinArray *ExtractJoinStatsFromExprHandle(IMemoryPool *memory_pool,
+																  CExpressionHandle &expr_handle);
 
-			// extract statistics filter from scalar expression
-			static
-			CStatsPred *ExtractPredStats(IMemoryPool *memory_pool, CExpression *scalar_expr, CColRefSet *outer_refs);
+		// helper function to extract array of statistics join filter from an expression
+		static StatsPredJoinArray *ExtractJoinStatsFromExpr(IMemoryPool *memory_pool,
+															CExpressionHandle &expr_handle,
+															CExpression *scalar_expression,
+															DrgPcrs *output_col_refset,
+															CColRefSet *outer_refs);
 
-			// helper function to extract array of statistics join filter from an array of join predicates
-			static
-			StatsPredJoinArray *ExtractJoinStatsFromJoinPredArray
-								(
-								IMemoryPool *memory_pool,
-								CExpression *scalar_expr,
-								DrgPcrs *output_col_refset, // array of output columns of join's relational inputs
-								CColRefSet *outer_refs,
-								CStatsPred **unsupported_pred_stats
-								);
+		// is the predicate a conjunctive or disjunctive predicate
+		static BOOL IsConjOrDisjPred(CStatsPred *pred_stats);
 
-			// helper function to extract array of statistics join filter from an expression handle
-			static
-			StatsPredJoinArray *ExtractJoinStatsFromExprHandle(IMemoryPool *memory_pool, CExpressionHandle &expr_handle);
+		// is unsupported predicate on unknown column
+		static BOOL IsUnsupportedPredOnDefinedCol(CStatsPred *pred_stats);
 
-			// helper function to extract array of statistics join filter from an expression
-			static
-			StatsPredJoinArray *ExtractJoinStatsFromExpr
-								(
-								IMemoryPool *memory_pool,
-								CExpressionHandle &expr_handle,
-								CExpression *scalar_expression,
-								DrgPcrs *output_col_refset,
-								CColRefSet *outer_refs
-								);
-
-			// is the predicate a conjunctive or disjunctive predicate
-			static
-			BOOL IsConjOrDisjPred(CStatsPred *pred_stats);
-
-			// is unsupported predicate on unknown column
-			static
-			BOOL IsUnsupportedPredOnDefinedCol(CStatsPred *pred_stats);
-
-	}; // class CStatsPredUtils
-}
+	};  // class CStatsPredUtils
+}  // namespace gpopt
 
 
-#endif // !GPOPT_CStatsPredUtils_H
+#endif  // !GPOPT_CStatsPredUtils_H
 
 // EOF

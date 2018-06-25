@@ -23,21 +23,18 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 IMDId *
-IMDProvider::GetGPDBTypeMdid
-	(
-	IMemoryPool *memory_pool,
-	CSystemId
+IMDProvider::GetGPDBTypeMdid(IMemoryPool *memory_pool,
+							 CSystemId
 #ifdef GPOS_DEBUG
-	sysid
-#endif // GPOS_DEBUG
-	,
-	IMDType::ETypeInfo type_info
-	)
+								 sysid
+#endif  // GPOS_DEBUG
+							 ,
+							 IMDType::ETypeInfo type_info)
 {
 	GPOS_ASSERT(IMDId::EmdidGPDB == sysid.MdidType());
 	GPOS_ASSERT(IMDType::EtiGeneric > type_info);
 
-	switch(type_info)
+	switch (type_info)
 	{
 		case IMDType::EtiInt2:
 			return GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT2);

@@ -24,7 +24,7 @@ namespace gpdxl
 	using namespace gpnaucrates;
 
 	XERCES_CPP_NAMESPACE_USE
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CParseHandlerMDIndex
@@ -35,74 +35,65 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerMDIndex : public CParseHandlerMetadataObject
 	{
-		private:
-		
-			// mdid of the index
-			IMDId *m_mdid;
-			
-			// name of the index
-			CMDName *m_mdname;
+	private:
+		// mdid of the index
+		IMDId *m_mdid;
 
-			// mdid of the indexed relation
-			IMDId *m_rel_mdid;
-			
-			// is the index clustered
-			BOOL m_clustered;
+		// name of the index
+		CMDName *m_mdname;
 
-			// index type
-			IMDIndex::EmdindexType m_index_type;
-			
-			// type id of index items
-			// for instance, for bitmap indexes, this is the type id of the bitmap
-			IMDId *m_mdid_item_type;
+		// mdid of the indexed relation
+		IMDId *m_rel_mdid;
 
-			// index keys
-			ULongPtrArray *m_index_key_cols_array;
+		// is the index clustered
+		BOOL m_clustered;
 
-			// included columns
-			ULongPtrArray *m_included_cols_array;
-			
-			// index part constraint
-			CMDPartConstraintGPDB *m_part_constraint;
-			
-			// levels that include default partitions
-			ULongPtrArray *m_level_with_default_part_array;
-			
-			// is constraint unbounded
-			BOOL m_part_constraint_unbounded; 
-			
-			// private copy ctor
-			CParseHandlerMDIndex(const CParseHandlerMDIndex&);
+		// index type
+		IMDIndex::EmdindexType m_index_type;
 
-			// process the start of an element
-			void StartElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
- 				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname,		// element's qname
-				const Attributes& attr				// element's attributes
-				);
+		// type id of index items
+		// for instance, for bitmap indexes, this is the type id of the bitmap
+		IMDId *m_mdid_item_type;
 
-			// process the end of an element
-			void EndElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
-				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname		// element's qname
-				);
+		// index keys
+		ULongPtrArray *m_index_key_cols_array;
 
-		public:
+		// included columns
+		ULongPtrArray *m_included_cols_array;
 
-			// ctor
-			CParseHandlerMDIndex
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
+		// index part constraint
+		CMDPartConstraintGPDB *m_part_constraint;
+
+		// levels that include default partitions
+		ULongPtrArray *m_level_with_default_part_array;
+
+		// is constraint unbounded
+		BOOL m_part_constraint_unbounded;
+
+		// private copy ctor
+		CParseHandlerMDIndex(const CParseHandlerMDIndex &);
+
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
+
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+	public:
+		// ctor
+		CParseHandlerMDIndex(IMemoryPool *memory_pool,
+							 CParseHandlerManager *parse_handler_mgr,
+							 CParseHandlerBase *parse_handler_root);
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerMDIndex_H
+#endif  // !GPDXL_CParseHandlerMDIndex_H
 
 // EOF

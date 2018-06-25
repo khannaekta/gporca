@@ -24,12 +24,7 @@ using namespace gpdxl;
 //		ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarIndexCondList::CDXLScalarIndexCondList
-	(
-	IMemoryPool *memory_pool
-	)
-	:
-	CDXLScalar(memory_pool)
+CDXLScalarIndexCondList::CDXLScalarIndexCondList(IMemoryPool *memory_pool) : CDXLScalar(memory_pool)
 {
 }
 
@@ -71,17 +66,13 @@ CDXLScalarIndexCondList::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarIndexCondList::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *node
-	)
-	const
+CDXLScalarIndexCondList::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 	node->SerializeChildrenToDXL(xml_serializer);
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -94,12 +85,7 @@ CDXLScalarIndexCondList::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarIndexCondList::AssertValid
-	(
-	const CDXLNode *node,
-	BOOL validate_children
-	)
-	const
+CDXLScalarIndexCondList::AssertValid(const CDXLNode *node, BOOL validate_children) const
 {
 	GPOS_ASSERT(NULL != node);
 
@@ -114,6 +100,6 @@ CDXLScalarIndexCondList::AssertValid
 		}
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

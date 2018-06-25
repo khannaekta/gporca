@@ -123,7 +123,7 @@ namespace gpos
 
 		// Disable partition selection
 		EopttraceDisablePartSelection = 103012,
-		
+
 		// Disable outer-join To inner-join rewrite
 		EopttraceDisableOuterJoin2InnerJoinRewrite = 103013,
 
@@ -205,19 +205,21 @@ namespace gpos
 #ifdef __cplusplus
 extern "C"
 {
-#endif // __cplusplus
+#endif  // __cplusplus
 
-// set trace flags based on given bit set, and return two output bit sets of old trace flags values
-void SetTraceflags(gpos::IMemoryPool *memory_pool, const gpos::CBitSet *input_bitset, gpos::CBitSet **enable_bitset, gpos::CBitSet **disabled_bitset);
+	// set trace flags based on given bit set, and return two output bit sets of old trace flags values
+	void SetTraceflags(gpos::IMemoryPool *memory_pool,
+					   const gpos::CBitSet *input_bitset,
+					   gpos::CBitSet **enable_bitset,
+					   gpos::CBitSet **disabled_bitset);
 
-// restore trace flags values based on given bit sets
-void ResetTraceflags(gpos::CBitSet *enable_bitset, gpos::CBitSet *disabled_bitset);
+	// restore trace flags values based on given bit sets
+	void ResetTraceflags(gpos::CBitSet *enable_bitset, gpos::CBitSet *disabled_bitset);
 
 #ifdef __cplusplus
 }
-#endif // __cplusplus
+#endif  // __cplusplus
 
-#endif // ! GPOPT_traceflags_H
+#endif  // ! GPOPT_traceflags_H
 
 // EOF
-

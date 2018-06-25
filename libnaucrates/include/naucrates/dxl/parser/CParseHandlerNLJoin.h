@@ -22,7 +22,7 @@ namespace gpdxl
 	using namespace gpos;
 
 	XERCES_CPP_NAMESPACE_USE
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CParseHandlerNLJoin
@@ -33,44 +33,34 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerNLJoin : public CParseHandlerPhysicalOp
 	{
-		private:
+	private:
+		// the nested loop join operator
+		CDXLPhysicalNLJoin *m_dxl_op;
 
+		// private copy ctor
+		CParseHandlerNLJoin(const CParseHandlerNLJoin &);
 
-			// the nested loop join operator
-			CDXLPhysicalNLJoin *m_dxl_op;
-			
-			// private copy ctor
-			CParseHandlerNLJoin(const CParseHandlerNLJoin &);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the start of an element
-			void StartElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
- 					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the end of an element
-			void EndElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-				);
-			
-		public:
-			// ctor/dtor
-			CParseHandlerNLJoin
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
-			
+	public:
+		// ctor/dtor
+		CParseHandlerNLJoin(IMemoryPool *memory_pool,
+							CParseHandlerManager *parse_handler_mgr,
+							CParseHandlerBase *parse_handler_root);
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerNLJoin_H
+#endif  // !GPDXL_CParseHandlerNLJoin_H
 
 // EOF

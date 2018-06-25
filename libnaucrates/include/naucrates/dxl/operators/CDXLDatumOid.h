@@ -9,7 +9,7 @@
 //		Class for representing DXL oid datum
 //
 //	@owner:
-//		
+//
 //
 //	@test:
 //
@@ -38,63 +38,52 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLDatumOid : public CDXLDatum
 	{
-		private:
-			// oid m_bytearray_value
-			OID m_oid_val;
+	private:
+		// oid m_bytearray_value
+		OID m_oid_val;
 
-			// private copy ctor
-			CDXLDatumOid(const CDXLDatumOid &);
+		// private copy ctor
+		CDXLDatumOid(const CDXLDatumOid &);
 
-		public:
-			// ctor
-			CDXLDatumOid
-				(
-				IMemoryPool *memory_pool,
-				IMDId *mdid_type,
-				BOOL is_null,
-				OID oid_val
-				);
+	public:
+		// ctor
+		CDXLDatumOid(IMemoryPool *memory_pool, IMDId *mdid_type, BOOL is_null, OID oid_val);
 
-			// dtor
-			virtual
-			~CDXLDatumOid(){};
+		// dtor
+		virtual ~CDXLDatumOid(){};
 
-			// accessor of oid m_bytearray_value
-			OID OidValue() const;
+		// accessor of oid m_bytearray_value
+		OID OidValue() const;
 
-			// serialize the datum as the given element
-			virtual
-			void Serialize(CXMLSerializer *xml_serializer);
+		// serialize the datum as the given element
+		virtual void Serialize(CXMLSerializer *xml_serializer);
 
-			// datum type
-			virtual
-			EdxldatumType GetDatumType() const
-			{
-				return CDXLDatum::EdxldatumOid;
-			}
+		// datum type
+		virtual EdxldatumType
+		GetDatumType() const
+		{
+			return CDXLDatum::EdxldatumOid;
+		}
 
-			// is type passed by m_bytearray_value
-			virtual
-			BOOL IsPassedByValue() const
-			{
-				return true;
-			}
+		// is type passed by m_bytearray_value
+		virtual BOOL
+		IsPassedByValue() const
+		{
+			return true;
+		}
 
-			// conversion function
-			static
-			CDXLDatumOid *Cast
-				(
-				CDXLDatum *datum_dxl
-				)
-			{
-				GPOS_ASSERT(NULL != datum_dxl);
-				GPOS_ASSERT(CDXLDatum::EdxldatumOid == datum_dxl->GetDatumType());
+		// conversion function
+		static CDXLDatumOid *
+		Cast(CDXLDatum *datum_dxl)
+		{
+			GPOS_ASSERT(NULL != datum_dxl);
+			GPOS_ASSERT(CDXLDatum::EdxldatumOid == datum_dxl->GetDatumType());
 
-				return dynamic_cast<CDXLDatumOid*>(datum_dxl);
-			}
+			return dynamic_cast<CDXLDatumOid *>(datum_dxl);
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLDatumOid_H
+#endif  // !GPDXL_CDXLDatumOid_H
 
 // EOF

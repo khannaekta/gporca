@@ -17,19 +17,14 @@ namespace gpnaucrates
 {
 	class CLeftSemiJoinStatsProcessor : public CJoinStatsProcessor
 	{
-		public:
-			static
-			CStatistics *CalcLSJoinStatsStatic
-					(
-					IMemoryPool *memory_pool,
-					const IStatistics *outer_stats,
-					const IStatistics *inner_side_stats,
-					StatsPredJoinArray *join_preds_stats
-					);
+	public:
+		static CStatistics *CalcLSJoinStatsStatic(IMemoryPool *memory_pool,
+												  const IStatistics *outer_stats,
+												  const IStatistics *inner_side_stats,
+												  StatsPredJoinArray *join_preds_stats);
 	};
-}
+}  // namespace gpnaucrates
 
-#endif // !GPNAUCRATES_CLeftSemiJoinStatsProcessor_H
+#endif  // !GPNAUCRATES_CLeftSemiJoinStatsProcessor_H
 
 // EOF
-

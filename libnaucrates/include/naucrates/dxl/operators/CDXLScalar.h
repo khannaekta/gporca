@@ -36,31 +36,27 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalar : public CDXLOperator
 	{
-		private:
-			// private copy ctor
-			CDXLScalar(CDXLScalar&);
+	private:
+		// private copy ctor
+		CDXLScalar(CDXLScalar &);
 
-		public:
-			// ctor/dtor
-			explicit
-			CDXLScalar(IMemoryPool *memory_pool);
-			
-			virtual
-			~CDXLScalar(){};
-			
-			Edxloptype GetDXLOperatorType() const;
-			
-			// does the operator return a boolean result
-			virtual
-			BOOL HasBoolResult(CMDAccessor *md_accessor) const = 0;
+	public:
+		// ctor/dtor
+		explicit CDXLScalar(IMemoryPool *memory_pool);
+
+		virtual ~CDXLScalar(){};
+
+		Edxloptype GetDXLOperatorType() const;
+
+		// does the operator return a boolean result
+		virtual BOOL HasBoolResult(CMDAccessor *md_accessor) const = 0;
 
 #ifdef GPOS_DEBUG
-			virtual
-			void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const = 0;
-#endif // GPOS_DEBUG
+		virtual void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const = 0;
+#endif  // GPOS_DEBUG
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLScalar_H
+#endif  // !GPDXL_CDXLScalar_H
 
 // EOF

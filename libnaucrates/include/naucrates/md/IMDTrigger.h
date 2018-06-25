@@ -31,50 +31,40 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class IMDTrigger : public IMDCacheObject
 	{
+	public:
+		// object type
+		virtual Emdtype
+		MDType() const
+		{
+			return EmdtTrigger;
+		}
 
-		public:
+		// does trigger execute on a row-level
+		virtual BOOL ExecutesOnRowLevel() const = 0;
 
-			// object type
-			virtual
-			Emdtype MDType() const
-			{
-				return EmdtTrigger;
-			}
+		// is this a before trigger
+		virtual BOOL IsBefore() const = 0;
 
-			// does trigger execute on a row-level
-			virtual
-			BOOL ExecutesOnRowLevel() const = 0;
+		// is this an insert trigger
+		virtual BOOL IsInsert() const = 0;
 
-			// is this a before trigger
-			virtual
-			BOOL IsBefore() const = 0;
+		// is this a delete trigger
+		virtual BOOL IsDelete() const = 0;
 
-			// is this an insert trigger
-			virtual
-			BOOL IsInsert() const = 0;
+		// is this an update trigger
+		virtual BOOL IsUpdate() const = 0;
 
-			// is this a delete trigger
-			virtual
-			BOOL IsDelete() const = 0;
+		// relation mdid
+		virtual IMDId *GetRelMdId() const = 0;
 
-			// is this an update trigger
-			virtual
-			BOOL IsUpdate() const = 0;
+		// function mdid
+		virtual IMDId *FuncMdId() const = 0;
 
-			// relation mdid
-			virtual
-			IMDId *GetRelMdId() const = 0;
-
-			// function mdid
-			virtual
-			IMDId *FuncMdId() const = 0;
-
-			// is trigger enabled
-			virtual
-			BOOL IsEnabled() const = 0;
+		// is trigger enabled
+		virtual BOOL IsEnabled() const = 0;
 	};
-}
+}  // namespace gpmd
 
-#endif // !GPMD_IMDTrigger_H
+#endif  // !GPMD_IMDTrigger_H
 
 // EOF

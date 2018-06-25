@@ -21,11 +21,11 @@ namespace gpdxl
 {
 	using namespace gpos;
 	using namespace gpmd;
-	
+
 	// fwd decl
 	class CDXLNode;
 	class CXMLSerializer;
-	
+
 	enum Edxlopid
 	{
 		EdxlopLogicalGet,
@@ -48,10 +48,10 @@ namespace gpdxl
 		EdxlopLogicalInsert,
 		EdxlopLogicalDelete,
 		EdxlopLogicalUpdate,
-		
+
 		EdxlopLogicalCTAS,
 		EdxlopPhysicalCTAS,
-		
+
 		EdxlopScalarCmp,
 		EdxlopScalarDistinct,
 		EdxlopScalarIdent,
@@ -73,12 +73,12 @@ namespace gpdxl
 		EdxlopScalarAssertConstraint,
 
 		EdxlopScalarMergeCondList,
-		
+
 		EdxlopScalarIndexCondList,
 
 		EdxlopScalarSortColList,
 		EdxlopScalarSortCol,
-		
+
 		EdxlopScalarQueryOutput,
 
 		EdxlopScalarOpExpr,
@@ -86,7 +86,7 @@ namespace gpdxl
 		EdxlopScalarCaseTest,
 		EdxlopScalarCoalesce,
 		EdxlopScalarConstValue,
-		EdxlopScalarIfStmt,		
+		EdxlopScalarIfStmt,
 		EdxlopScalarSwitch,
 		EdxlopScalarSwitchCase,
 		EdxlopScalarLimitCount,
@@ -112,7 +112,7 @@ namespace gpdxl
 		EdxlopScalarSubqueryExists,
 		EdxlopScalarSubqueryNotExists,
 		EdxlopScalarBitmapBoolOp,
-		
+
 		EdxlopScalarDMLAction,
 		EdxlopScalarOpList,
 		EdxlopScalarPartOid,
@@ -155,26 +155,26 @@ namespace gpdxl
 		EdxlopPhysicalPartitionSelector,
 		EdxlopPhysicalTVF,
 		EdxlopPhysicalWindow,
-		
+
 		EdxlopPhysicalCTEProducer,
 		EdxlopPhysicalCTEConsumer,
 
 		EdxlopPhysicalDML,
 		EdxlopPhysicalSplit,
 		EdxlopPhysicalRowTrigger,
-		
+
 		EdxlopPhysicalAssert,
-		
+
 		EdxlopSentinel
 	};
-	
+
 	enum Edxloptype
 	{
 		EdxloptypeLogical,
 		EdxloptypePhysical,
 		EdxloptypeScalar
 	};
-	
+
 	// Join types
 	enum EdxlJoinType
 	{
@@ -201,10 +201,10 @@ namespace gpdxl
 	// coercion form
 	enum EdxlCoercionForm
 	{
-		EdxlcfExplicitCall,		// display as a function call
-		EdxlcfExplicitCast,		// display as an explicit cast
-		EdxlcfImplicitCast,		// implicit cast, so hide it
-		EdxlcfDontCare			// don't care about display
+		EdxlcfExplicitCall,  // display as a function call
+		EdxlcfExplicitCast,  // display as an explicit cast
+		EdxlcfImplicitCast,  // implicit cast, so hide it
+		EdxlcfDontCare		 // don't care about display
 	};
 
 	//---------------------------------------------------------------------------
@@ -217,68 +217,54 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLOperator : public CRefCount
 	{
-		private:
-			// private copy constructor
-			CDXLOperator(const CDXLOperator &);
-			
-		protected:
-			// memory pool
-			IMemoryPool *m_memory_pool;
+	private:
+		// private copy constructor
+		CDXLOperator(const CDXLOperator &);
 
-		public:
-			// ctor/dtor
-			explicit
-			CDXLOperator(IMemoryPool *);
-			
-			virtual
-			~CDXLOperator();
-					
-			// ident accessors
-			virtual
-			Edxlopid GetDXLOperator() const = 0;
-			
-			// name of the operator
-			virtual
-			const CWStringConst *GetOpNameStr() const = 0;
-			
-			virtual
-			Edxloptype GetDXLOperatorType() const = 0;
-            
-			// serialize operator in DXL format given a serializer object and the
-			// host DXL node, providing access to the operator's children
-			virtual
-			void SerializeToDXL(CXMLSerializer *,const CDXLNode *) const = 0;
+	protected:
+		// memory pool
+		IMemoryPool *m_memory_pool;
 
-			// check if given column is defined by operator
-			virtual
-			BOOL IsColDefined
-				(
-				ULONG // col_id
-				)
-				const
-			{
-				// by default, operator does not define columns
-				return false;
-			}
+	public:
+		// ctor/dtor
+		explicit CDXLOperator(IMemoryPool *);
 
-			static
-			const CWStringConst *GetJoinTypeNameStr(EdxlJoinType );
+		virtual ~CDXLOperator();
 
-			// Return the index scan direction
-			static
-			const CWStringConst *GetIdxScanDirectionStr(EdxlIndexScanDirection );
+		// ident accessors
+		virtual Edxlopid GetDXLOperator() const = 0;
+
+		// name of the operator
+		virtual const CWStringConst *GetOpNameStr() const = 0;
+
+		virtual Edxloptype GetDXLOperatorType() const = 0;
+
+		// serialize operator in DXL format given a serializer object and the
+		// host DXL node, providing access to the operator's children
+		virtual void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const = 0;
+
+		// check if given column is defined by operator
+		virtual BOOL IsColDefined(ULONG  // col_id
+								  ) const
+		{
+			// by default, operator does not define columns
+			return false;
+		}
+
+		static const CWStringConst *GetJoinTypeNameStr(EdxlJoinType);
+
+		// Return the index scan direction
+		static const CWStringConst *GetIdxScanDirectionStr(EdxlIndexScanDirection);
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			virtual
-			void AssertValid(const CDXLNode *, BOOL validate_children) const = 0;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		virtual void AssertValid(const CDXLNode *, BOOL validate_children) const = 0;
+#endif  // GPOS_DEBUG
 	};
-	
-}
 
-#endif // !GPDXL_CDXLOperator_H
+}  // namespace gpdxl
+
+#endif  // !GPDXL_CDXLOperator_H
 
 // EOF
-

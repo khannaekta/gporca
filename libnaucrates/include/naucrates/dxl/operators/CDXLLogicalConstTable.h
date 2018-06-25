@@ -7,7 +7,7 @@
 //
 //	@doc:
 //		Class for representing DXL logical constant tables
-//		
+//
 //---------------------------------------------------------------------------
 
 #ifndef GPDXL_CDXLLogicalConstTable_H
@@ -30,91 +30,83 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLLogicalConstTable : public CDXLLogical
 	{
-		private:
+	private:
+		// list of column descriptors
+		ColumnDescrDXLArray *m_col_descr_array;
 
-			// list of column descriptors		
-			ColumnDescrDXLArray *m_col_descr_array;
+		// array of datum arrays (const tuples)
+		DXLDatumArrays *m_const_tuples_datum_array;
 
-			// array of datum arrays (const tuples)
-			DXLDatumArrays *m_const_tuples_datum_array;
+		// private copy ctor
+		CDXLLogicalConstTable(CDXLLogicalConstTable &);
 
-			// private copy ctor
-			CDXLLogicalConstTable(CDXLLogicalConstTable&);
+	public:
+		// ctor
+		CDXLLogicalConstTable(IMemoryPool *memory_pool,
+							  ColumnDescrDXLArray *col_descr_dxl_array,
+							  DXLDatumArrays *pdrgpdrgpdxldatum);
 
-		public:
-			// ctor
-			CDXLLogicalConstTable
-				(
-				IMemoryPool *memory_pool,
-				ColumnDescrDXLArray *col_descr_dxl_array,
-				DXLDatumArrays *pdrgpdrgpdxldatum
-				);
+		//dtor
+		virtual ~CDXLLogicalConstTable();
 
-			//dtor
-			virtual
-			~CDXLLogicalConstTable();
+		// accessors
 
-			// accessors
+		// operator type
+		Edxlopid GetDXLOperator() const;
 
-			// operator type
-			Edxlopid GetDXLOperator() const;
+		// operator name
+		const CWStringConst *GetOpNameStr() const;
 
-			// operator name
-			const CWStringConst *GetOpNameStr() const;
+		// column descriptors
+		const ColumnDescrDXLArray *
+		GetColumnDescrDXLArray() const
+		{
+			return m_col_descr_array;
+		}
 
-			// column descriptors
-			const ColumnDescrDXLArray *GetColumnDescrDXLArray() const
-			{
-				return m_col_descr_array;
-			}
+		// return the column descriptor at a given position
+		CDXLColDescr *GetColumnDescrAt(ULONG ul) const;
 
-			// return the column descriptor at a given position
-			CDXLColDescr *GetColumnDescrAt(ULONG ul) const;
+		// number of columns
+		ULONG Arity() const;
 
-			// number of columns
-			ULONG Arity() const;
+		// number of constant tuples
+		ULONG
+		GetConstTupleCount() const
+		{
+			return m_const_tuples_datum_array->Size();
+		}
 
-			// number of constant tuples
-			ULONG GetConstTupleCount() const
-			{
-				return m_const_tuples_datum_array->Size();
-			}
+		// return the const tuple (datum array) at a given position
+		const DXLDatumArray *
+		GetConstTupleDatumArrayAt(ULONG ulTuplePos) const
+		{
+			return (*m_const_tuples_datum_array)[ulTuplePos];
+		}
 
-			// return the const tuple (datum array) at a given position
-			const DXLDatumArray *GetConstTupleDatumArrayAt(ULONG ulTuplePos) const
-			{
-				return (*m_const_tuples_datum_array)[ulTuplePos];
-			}
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+		// check if given column is defined by operator
+		virtual BOOL IsColDefined(ULONG col_id) const;
 
-			// check if given column is defined by operator
-			virtual
-			BOOL IsColDefined(ULONG col_id) const;
+		// conversion function
+		static CDXLLogicalConstTable *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopLogicalConstTable == dxl_op->GetDXLOperator());
 
-			// conversion function
-			static
-			CDXLLogicalConstTable *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopLogicalConstTable == dxl_op->GetDXLOperator());
-
-				return dynamic_cast<CDXLLogicalConstTable*>(dxl_op);
-			}
+			return dynamic_cast<CDXLLogicalConstTable *>(dxl_op);
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL validate_children) const;
-#endif // GPOS_DEBUG
-
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
-#endif // !GPDXL_CDXLLogicalConstTable_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLLogicalConstTable_H
 
 // EOF

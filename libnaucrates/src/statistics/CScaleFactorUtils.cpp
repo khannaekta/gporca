@@ -44,11 +44,8 @@ const CDouble CScaleFactorUtils::InvalidScaleFactor(0.0);
 //
 //---------------------------------------------------------------------------
 CDouble
-CScaleFactorUtils::CumulativeJoinScaleFactor
-	(
-	const CStatisticsConfig *stats_config,
-	DrgPdouble *join_conds_scale_factors
-	)
+CScaleFactorUtils::CumulativeJoinScaleFactor(const CStatisticsConfig *stats_config,
+											 DrgPdouble *join_conds_scale_factors)
 {
 	GPOS_ASSERT(NULL != stats_config);
 	GPOS_ASSERT(NULL != join_conds_scale_factors);
@@ -66,11 +63,10 @@ CScaleFactorUtils::CumulativeJoinScaleFactor
 	{
 		CDouble local_scale_factor = *(*join_conds_scale_factors)[ul];
 
-		scale_factor = scale_factor * std::max
-										(
-										CStatistics::MinRows.Get(),
-										(local_scale_factor * DampedJoinScaleFactor(stats_config, ul + 1)).Get()
-										);
+		scale_factor =
+			scale_factor *
+			std::max(CStatistics::MinRows.Get(),
+					 (local_scale_factor * DampedJoinScaleFactor(stats_config, ul + 1)).Get());
 	}
 
 	return scale_factor;
@@ -86,11 +82,7 @@ CScaleFactorUtils::CumulativeJoinScaleFactor
 //
 //---------------------------------------------------------------------------
 CDouble
-CScaleFactorUtils::DampedJoinScaleFactor
-	(
-	const CStatisticsConfig *stats_config,
-	ULONG num_columns
-	)
+CScaleFactorUtils::DampedJoinScaleFactor(const CStatisticsConfig *stats_config, ULONG num_columns)
 {
 	if (1 >= num_columns)
 	{
@@ -110,11 +102,7 @@ CScaleFactorUtils::DampedJoinScaleFactor
 //
 //---------------------------------------------------------------------------
 CDouble
-CScaleFactorUtils::DampedFilterScaleFactor
-	(
-	const CStatisticsConfig *stats_config,
-	ULONG num_columns
-	)
+CScaleFactorUtils::DampedFilterScaleFactor(const CStatisticsConfig *stats_config, ULONG num_columns)
 {
 	GPOS_ASSERT(NULL != stats_config);
 
@@ -136,11 +124,8 @@ CScaleFactorUtils::DampedFilterScaleFactor
 //
 //---------------------------------------------------------------------------
 CDouble
-CScaleFactorUtils::DampedGroupByScaleFactor
-	(
-	const CStatisticsConfig *stats_config,
-	ULONG num_columns
-	)
+CScaleFactorUtils::DampedGroupByScaleFactor(const CStatisticsConfig *stats_config,
+											ULONG num_columns)
 {
 	GPOS_ASSERT(NULL != stats_config);
 
@@ -162,11 +147,7 @@ CScaleFactorUtils::DampedGroupByScaleFactor
 //
 //---------------------------------------------------------------------------
 void
-CScaleFactorUtils::SortScalingFactor
-	(
-	DrgPdouble *scale_factors,
-	BOOL is_descending
-	)
+CScaleFactorUtils::SortScalingFactor(DrgPdouble *scale_factors, BOOL is_descending)
 {
 	GPOS_ASSERT(NULL != scale_factors);
 	const ULONG num_cols = scale_factors->Size();
@@ -195,11 +176,7 @@ CScaleFactorUtils::SortScalingFactor
 //
 //---------------------------------------------------------------------------
 INT
-CScaleFactorUtils::DescendingOrderCmpFunc
-	(
-	const void *val1,
-	const void *val2
-	)
+CScaleFactorUtils::DescendingOrderCmpFunc(const void *val1, const void *val2)
 {
 	GPOS_ASSERT(NULL != val1 && NULL != val2);
 	const CDouble *double_val1 = *(const CDouble **) val1;
@@ -218,11 +195,7 @@ CScaleFactorUtils::DescendingOrderCmpFunc
 //
 //---------------------------------------------------------------------------
 INT
-CScaleFactorUtils::AscendingOrderCmpFunc
-	(
-	const void *val1,
-	const void *val2
-	)
+CScaleFactorUtils::AscendingOrderCmpFunc(const void *val1, const void *val2)
 {
 	GPOS_ASSERT(NULL != val1 && NULL != val2);
 	const CDouble *double_val1 = *(const CDouble **) val1;
@@ -241,12 +214,9 @@ CScaleFactorUtils::AscendingOrderCmpFunc
 //
 //---------------------------------------------------------------------------
 INT
-CScaleFactorUtils::DoubleCmpFunc
-	(
-	const CDouble *double_val1,
-	const CDouble *double_val2,
-	BOOL is_descending
-	)
+CScaleFactorUtils::DoubleCmpFunc(const CDouble *double_val1,
+								 const CDouble *double_val2,
+								 BOOL is_descending)
 {
 	GPOS_ASSERT(NULL != double_val1);
 	GPOS_ASSERT(NULL != double_val2);
@@ -258,12 +228,12 @@ CScaleFactorUtils::DoubleCmpFunc
 
 	if (double_val1->Get() < double_val2->Get() && is_descending)
 	{
-	    return 1;
+		return 1;
 	}
 
 	if (double_val1->Get() > double_val2->Get() && !is_descending)
 	{
-	    return 1;
+		return 1;
 	}
 
 	return -1;
@@ -279,11 +249,8 @@ CScaleFactorUtils::DoubleCmpFunc
 //
 //---------------------------------------------------------------------------
 CDouble
-CScaleFactorUtils::CalcScaleFactorCumulativeConj
-	(
-	const CStatisticsConfig *stats_config,
-	DrgPdouble *scale_factors
-	)
+CScaleFactorUtils::CalcScaleFactorCumulativeConj(const CStatisticsConfig *stats_config,
+												 DrgPdouble *scale_factors)
 {
 	GPOS_ASSERT(NULL != stats_config);
 	GPOS_ASSERT(NULL != scale_factors);
@@ -300,11 +267,11 @@ CScaleFactorUtils::CalcScaleFactorCumulativeConj
 	{
 		// apply damping factor
 		CDouble local_scale_factor = *(*scale_factors)[ul];
-		scale_factor = scale_factor * std::max
-										(
-										CStatistics::MinRows.Get(),
-										(local_scale_factor * CScaleFactorUtils::DampedFilterScaleFactor(stats_config, ul + 1)).Get()
-										);
+		scale_factor = scale_factor *
+					   std::max(CStatistics::MinRows.Get(),
+								(local_scale_factor *
+								 CScaleFactorUtils::DampedFilterScaleFactor(stats_config, ul + 1))
+									.Get());
 	}
 
 	return scale_factor;
@@ -321,12 +288,9 @@ CScaleFactorUtils::CalcScaleFactorCumulativeConj
 //
 //---------------------------------------------------------------------------
 CDouble
-CScaleFactorUtils::CalcScaleFactorCumulativeDisj
-	(
-	const CStatisticsConfig *stats_config,
-	DrgPdouble *scale_factors,
-	CDouble total_rows
-	)
+CScaleFactorUtils::CalcScaleFactorCumulativeDisj(const CStatisticsConfig *stats_config,
+												 DrgPdouble *scale_factors,
+												 CDouble total_rows)
 {
 	GPOS_ASSERT(NULL != stats_config);
 	GPOS_ASSERT(NULL != scale_factors);
@@ -355,11 +319,11 @@ CScaleFactorUtils::CalcScaleFactorCumulativeDisj
 		CDouble local_rows = total_rows / local_scale_factor;
 
 		// accumulate row estimates after damping
-		rows = rows + std::max
-							(
-							CStatistics::MinRows.Get(),
-							(local_rows * CScaleFactorUtils::DampedFilterScaleFactor(stats_config, ul + 1)).Get()
-							);
+		rows =
+			rows +
+			std::max(CStatistics::MinRows.Get(),
+					 (local_rows * CScaleFactorUtils::DampedFilterScaleFactor(stats_config, ul + 1))
+						 .Get());
 
 		// cap accumulated row estimate with total number of rows
 		rows = std::min(rows.Get(), total_rows.Get());

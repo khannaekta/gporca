@@ -25,15 +25,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerOp::CParseHandlerOp
-	(
-	IMemoryPool *memory_pool, 
-	CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root
-	)
-	:
-	CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
-	m_dxl_node(NULL)
+CParseHandlerOp::CParseHandlerOp(IMemoryPool *memory_pool,
+								 CParseHandlerManager *parse_handler_mgr,
+								 CParseHandlerBase *parse_handler_root)
+	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root), m_dxl_node(NULL)
 {
 }
 
@@ -76,22 +71,18 @@ CParseHandlerOp::CreateDXLNode() const
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerOp::AddChildFromParseHandler
-	(
-	const CParseHandlerOp *parse_handler_op
-	)
+CParseHandlerOp::AddChildFromParseHandler(const CParseHandlerOp *parse_handler_op)
 {
 	GPOS_ASSERT(NULL != m_dxl_node);
 	GPOS_ASSERT(NULL != parse_handler_op);
-	
+
 	// extract constructed element
 	CDXLNode *child_dxlnode = parse_handler_op->CreateDXLNode();
 	GPOS_ASSERT(NULL != child_dxlnode);
-	
+
 	child_dxlnode->AddRef();
 	m_dxl_node->AddChild(child_dxlnode);
 }
 
 
 // EOF
-

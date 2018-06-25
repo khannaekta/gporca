@@ -39,7 +39,7 @@ namespace gpmd
 	class CSystemId;
 
 	static const INT default_type_modifier = -1;
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		IMDId
@@ -50,185 +50,164 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class IMDId : public CRefCount
 	{
-		
-		private:
+	private:
+		// number of deletion locks -- each MDAccessor adds a new deletion lock if it uses
+		// an MDId object in its internal hash-table, the deletion lock is released when
+		// MDAccessor is destroyed
+		volatile ULONG_PTR m_deletion_locks;
 
-			// number of deletion locks -- each MDAccessor adds a new deletion lock if it uses
-			// an MDId object in its internal hash-table, the deletion lock is released when
-			// MDAccessor is destroyed
-			volatile ULONG_PTR m_deletion_locks;
+	public:
+		//------------------------------------------------------------------
+		//	@doc:
+		//		Type of md id.
+		//		The exact values are important when parsing mdids from DXL and
+		//		should not be modified without modifying the parser
+		//
+		//------------------------------------------------------------------
+		enum EMDIdType
+		{
+			EmdidGPDB = 0,
+			EmdidColStats = 1,
+			EmdidRelStats = 2,
+			EmdidCastFunc = 3,
+			EmdidScCmp = 4,
+			EmdidGPDBCtas = 5,
+			EmdidSentinel
+		};
 
-		public:
-			//------------------------------------------------------------------
-			//	@doc:
-			//		Type of md id.
-			//		The exact values are important when parsing mdids from DXL and
-			//		should not be modified without modifying the parser
-			//
-			//------------------------------------------------------------------
-			enum EMDIdType
+		// ctor
+		IMDId() : m_deletion_locks(0)
+		{
+		}
+
+		// dtor
+		virtual ~IMDId(){};
+
+		// type of mdid
+		virtual EMDIdType MdidType() const = 0;
+
+		// string representation of mdid
+		virtual const WCHAR *GetBuffer() const = 0;
+
+		// system id
+		virtual CSystemId Sysid() const = 0;
+
+
+		// equality check
+		virtual BOOL Equals(const IMDId *mdid) const = 0;
+
+		// computes the hash m_bytearray_value for the metadata id
+		virtual ULONG HashValue() const = 0;
+
+		// return true if calling object's destructor is allowed
+		virtual BOOL
+		Deletable() const
+		{
+			return (0 == m_deletion_locks);
+		}
+
+		// increase number of deletion locks
+		void
+		AddDeletionLock()
+		{
+			(void) ExchangeAddUlongPtrWithInt(&m_deletion_locks, 1);
+		}
+
+		// decrease number of deletion locks
+		void
+		RemoveDeletionLock()
+		{
+			GPOS_ASSERT(0 < m_deletion_locks);
+
+			(void) ExchangeAddUlongPtrWithInt(&m_deletion_locks, -1);
+		}
+
+		// return number of deletion locks
+		ULONG_PTR
+		DeletionLocks() const
+		{
+			return m_deletion_locks;
+		}
+
+		// static hash functions for use in different indexing structures,
+		// e.g. hashmaps, MD cache, etc.
+		static ULONG
+		MDIdHash(const IMDId *mdid)
+		{
+			GPOS_ASSERT(NULL != mdid);
+			return mdid->HashValue();
+		}
+
+		// hash function for using mdids in a cache
+		static ULONG
+		MDIdPtrHash(const VOID_PTR &pv)
+		{
+			GPOS_ASSERT(NULL != pv);
+			IMDId *mdid = static_cast<IMDId *>(pv);
+			return mdid->HashValue();
+		}
+
+		// static equality functions for use in different structures,
+		// e.g. hashmaps, MD cache, etc.
+		static BOOL
+		MDIdCompare(const IMDId *left_mdid, const IMDId *right_mdid)
+		{
+			GPOS_ASSERT(NULL != left_mdid && NULL != right_mdid);
+			return left_mdid->Equals(right_mdid);
+		}
+
+		// equality function for using mdids in a cache
+		static BOOL
+		MDIdPtrCompare(const VOID_PTR &pvLeft, const VOID_PTR &pvRight)
+		{
+			if (NULL == pvLeft && NULL == pvRight)
 			{
-				EmdidGPDB = 0,
-				EmdidColStats = 1,
-				EmdidRelStats = 2,
-				EmdidCastFunc = 3,
-				EmdidScCmp = 4,
-				EmdidGPDBCtas = 5,
-				EmdidSentinel
-			};
-			
-			// ctor
-			IMDId()
-				:
-				m_deletion_locks(0)
-			{}
-
-			// dtor
-			virtual 
-			~IMDId(){};
-			
-			// type of mdid
-			virtual
-			EMDIdType MdidType() const = 0;
-			
-			// string representation of mdid
-			virtual
-			const WCHAR *GetBuffer() const = 0;
-			
-			// system id
-			virtual
-			CSystemId Sysid() const = 0;
-			
-			
-			// equality check
-			virtual 
-			BOOL Equals(const IMDId *mdid) const = 0;
-					
-			// computes the hash m_bytearray_value for the metadata id
-			virtual
-			ULONG HashValue() const = 0;
-			
-			// return true if calling object's destructor is allowed
-			virtual
-			BOOL Deletable() const
-			{
-				return (0 == m_deletion_locks);
+				return true;
 			}
 
-			// increase number of deletion locks
-			void AddDeletionLock()
+			if (NULL == pvLeft || NULL == pvRight)
 			{
-				(void) ExchangeAddUlongPtrWithInt(&m_deletion_locks, 1);
+				return false;
 			}
 
-			// decrease number of deletion locks
-			void RemoveDeletionLock()
-			{
-				GPOS_ASSERT(0 < m_deletion_locks);
 
-				(void) ExchangeAddUlongPtrWithInt(&m_deletion_locks, -1);
-			}
+			IMDId *left_mdid = static_cast<IMDId *>(pvLeft);
+			IMDId *right_mdid = static_cast<IMDId *>(pvRight);
+			return left_mdid->Equals(right_mdid);
+		}
 
-			// return number of deletion locks
-			ULONG_PTR DeletionLocks() const
-			{
-				return m_deletion_locks;
-			}
+		// is the mdid valid
+		virtual BOOL IsValid() const = 0;
 
-			// static hash functions for use in different indexing structures,
-			// e.g. hashmaps, MD cache, etc.
-			static
-			ULONG MDIdHash
-				(
-				const IMDId *mdid
-				)
-			{
-				GPOS_ASSERT(NULL != mdid);
-				return mdid->HashValue();
-			}
+		// serialize mdid in DXL as the m_bytearray_value for the specified attribute
+		virtual void Serialize(CXMLSerializer *xml_serializer,
+							   const CWStringConst *pstrAttribute) const = 0;
 
-			// hash function for using mdids in a cache
-			static
-			ULONG MDIdPtrHash
-				(
-				const VOID_PTR & pv
-				)
-			{
-				GPOS_ASSERT(NULL != pv);
-				IMDId *mdid = static_cast<IMDId *> (pv);
-				return mdid->HashValue();
-			}
-			
-			// static equality functions for use in different structures, 
-			// e.g. hashmaps, MD cache, etc.
-			static 
-			BOOL MDIdCompare
-				(
-				const IMDId *left_mdid,
-				const IMDId *right_mdid
-				)
-			{
-				GPOS_ASSERT(NULL != left_mdid && NULL != right_mdid);
-				return left_mdid->Equals(right_mdid);
-			}
-			
-			// equality function for using mdids in a cache
-			static BOOL
-			MDIdPtrCompare
-				(
-				const VOID_PTR &pvLeft,
-				const VOID_PTR &pvRight
-				)
-			{
-				if (NULL == pvLeft && NULL == pvRight)
-				{
-					return true;
-				}
-				
-				if (NULL == pvLeft || NULL == pvRight)
-				{
-					return false;
-				}
-				
-			
-				IMDId *left_mdid = static_cast<IMDId *> (pvLeft);
-				IMDId *right_mdid = static_cast<IMDId *> (pvRight);
-				return left_mdid->Equals(right_mdid);
+		// debug print of the metadata id
+		virtual IOstream &OsPrint(IOstream &os) const = 0;
 
-			}
-			
-			// is the mdid valid
-			virtual
-			BOOL IsValid() const = 0;
-			
-			// serialize mdid in DXL as the m_bytearray_value for the specified attribute
-			virtual
-			void Serialize(CXMLSerializer *xml_serializer, const CWStringConst *pstrAttribute) const = 0;
-
-			// debug print of the metadata id
-			virtual
-			IOstream &OsPrint(IOstream &os) const = 0;
-			
-			// safe validity function
-			static
-			BOOL IsValid(const IMDId *mdid)
-			{
-				return NULL != mdid && mdid->IsValid();
-			}
+		// safe validity function
+		static BOOL
+		IsValid(const IMDId *mdid)
+		{
+			return NULL != mdid && mdid->IsValid();
+		}
 	};
-	
+
 	// common structures over metadata id elements
 	typedef CDynamicPtrArray<IMDId, CleanupRelease> MdidPtrArray;
 
-    // hash set for mdid
-    typedef CHashSet<IMDId, IMDId::MDIdHash, IMDId::MDIdCompare, CleanupRelease<IMDId> > MdidHashSet;
+	// hash set for mdid
+	typedef CHashSet<IMDId, IMDId::MDIdHash, IMDId::MDIdCompare, CleanupRelease<IMDId> >
+		MdidHashSet;
 
-    // iterator over the hash set for column id information for missing statistics
-    typedef CHashSetIter<IMDId, IMDId::MDIdHash, IMDId::MDIdCompare, CleanupRelease<IMDId> > MdidHashSetIter;
-}
+	// iterator over the hash set for column id information for missing statistics
+	typedef CHashSetIter<IMDId, IMDId::MDIdHash, IMDId::MDIdCompare, CleanupRelease<IMDId> >
+		MdidHashSetIter;
+}  // namespace gpmd
 
 
 
-#endif // !GPMD_IMDId_H
+#endif  // !GPMD_IMDId_H
 
 // EOF

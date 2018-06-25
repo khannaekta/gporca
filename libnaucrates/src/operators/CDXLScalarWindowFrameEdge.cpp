@@ -24,16 +24,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarWindowFrameEdge::CDXLScalarWindowFrameEdge
-	(
-	IMemoryPool *memory_pool,
-	BOOL fLeading,
-	EdxlFrameBoundary frame_boundary
-	)
-	:
-	CDXLScalar(memory_pool),
-	m_leading_edge(fLeading),
-	m_dxl_frame_boundary(frame_boundary)
+CDXLScalarWindowFrameEdge::CDXLScalarWindowFrameEdge(IMemoryPool *memory_pool,
+													 BOOL fLeading,
+													 EdxlFrameBoundary frame_boundary)
+	: CDXLScalar(memory_pool), m_leading_edge(fLeading), m_dxl_frame_boundary(frame_boundary)
 {
 }
 
@@ -80,24 +74,18 @@ CDXLScalarWindowFrameEdge::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLScalarWindowFrameEdge::GetFrameBoundaryStr
-	(
-	EdxlFrameBoundary frame_boundary
-	)
-	const
+CDXLScalarWindowFrameEdge::GetFrameBoundaryStr(EdxlFrameBoundary frame_boundary) const
 {
 	GPOS_ASSERT(EdxlfbSentinel > frame_boundary);
 
-	ULONG dxl_frame_boundary_token_mapping[][2] =
-					{
-					{EdxlfbUnboundedPreceding, EdxltokenWindowBoundaryUnboundedPreceding},
-					{EdxlfbBoundedPreceding, EdxltokenWindowBoundaryBoundedPreceding},
-					{EdxlfbCurrentRow, EdxltokenWindowBoundaryCurrentRow},
-					{EdxlfbUnboundedFollowing, EdxltokenWindowBoundaryUnboundedFollowing},
-					{EdxlfbBoundedFollowing, EdxltokenWindowBoundaryBoundedFollowing},
-					{EdxlfbDelayedBoundedPreceding, EdxltokenWindowBoundaryDelayedBoundedPreceding},
-					{EdxlfbDelayedBoundedFollowing, EdxltokenWindowBoundaryDelayedBoundedFollowing}
-					};
+	ULONG dxl_frame_boundary_token_mapping[][2] = {
+		{EdxlfbUnboundedPreceding, EdxltokenWindowBoundaryUnboundedPreceding},
+		{EdxlfbBoundedPreceding, EdxltokenWindowBoundaryBoundedPreceding},
+		{EdxlfbCurrentRow, EdxltokenWindowBoundaryCurrentRow},
+		{EdxlfbUnboundedFollowing, EdxltokenWindowBoundaryUnboundedFollowing},
+		{EdxlfbBoundedFollowing, EdxltokenWindowBoundaryBoundedFollowing},
+		{EdxlfbDelayedBoundedPreceding, EdxltokenWindowBoundaryDelayedBoundedPreceding},
+		{EdxlfbDelayedBoundedFollowing, EdxltokenWindowBoundaryDelayedBoundedFollowing}};
 
 	const ULONG arity = GPOS_ARRAY_SIZE(dxl_frame_boundary_token_mapping);
 	for (ULONG idx = 0; idx < arity; idx++)
@@ -123,28 +111,26 @@ CDXLScalarWindowFrameEdge::GetFrameBoundaryStr
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarWindowFrameEdge::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *dxlnode
-	)
-	const
+CDXLScalarWindowFrameEdge::SerializeToDXL(CXMLSerializer *xml_serializer,
+										  const CDXLNode *dxlnode) const
 {
-
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
 	if (m_leading_edge)
 	{
-		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowLeadingBoundary), GetFrameBoundaryStr(m_dxl_frame_boundary));
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowLeadingBoundary),
+									 GetFrameBoundaryStr(m_dxl_frame_boundary));
 	}
 	else
 	{
-		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowTrailingBoundary), GetFrameBoundaryStr(m_dxl_frame_boundary));
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowTrailingBoundary),
+									 GetFrameBoundaryStr(m_dxl_frame_boundary));
 	}
 
 	dxlnode->SerializeChildrenToDXL(xml_serializer);
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -157,19 +143,20 @@ CDXLScalarWindowFrameEdge::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarWindowFrameEdge::AssertValid
-	(
-	const CDXLNode *dxlnode,
-	BOOL validate_children
-	)
-	const
+CDXLScalarWindowFrameEdge::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
 	GPOS_ASSERT(1 >= arity);
 
-	GPOS_ASSERT_IMP((m_dxl_frame_boundary == EdxlfbBoundedPreceding || m_dxl_frame_boundary == EdxlfbBoundedFollowing
-					|| m_dxl_frame_boundary == EdxlfbDelayedBoundedPreceding || m_dxl_frame_boundary == EdxlfbDelayedBoundedFollowing), 1 == arity);
-	GPOS_ASSERT_IMP((m_dxl_frame_boundary == EdxlfbUnboundedPreceding || m_dxl_frame_boundary == EdxlfbUnboundedFollowing || m_dxl_frame_boundary == EdxlfbCurrentRow), 0 == arity);
+	GPOS_ASSERT_IMP((m_dxl_frame_boundary == EdxlfbBoundedPreceding ||
+					 m_dxl_frame_boundary == EdxlfbBoundedFollowing ||
+					 m_dxl_frame_boundary == EdxlfbDelayedBoundedPreceding ||
+					 m_dxl_frame_boundary == EdxlfbDelayedBoundedFollowing),
+					1 == arity);
+	GPOS_ASSERT_IMP((m_dxl_frame_boundary == EdxlfbUnboundedPreceding ||
+					 m_dxl_frame_boundary == EdxlfbUnboundedFollowing ||
+					 m_dxl_frame_boundary == EdxlfbCurrentRow),
+					0 == arity);
 
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
@@ -182,6 +169,6 @@ CDXLScalarWindowFrameEdge::AssertValid
 		}
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

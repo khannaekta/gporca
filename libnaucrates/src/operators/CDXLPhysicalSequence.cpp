@@ -26,12 +26,7 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalSequence::CDXLPhysicalSequence
-	(
-	IMemoryPool *memory_pool
-	)
-	:
-	CDXLPhysical(memory_pool)
+CDXLPhysicalSequence::CDXLPhysicalSequence(IMemoryPool *memory_pool) : CDXLPhysical(memory_pool)
 {
 }
 
@@ -85,24 +80,20 @@ CDXLPhysicalSequence::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalSequence::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *dxlnode
-	)
-	const
+CDXLPhysicalSequence::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
-		
+
 	// serialize properties
 	dxlnode->SerializePropertiesToDXL(xml_serializer);
 
 	// serialize children
 	dxlnode->SerializeChildrenToDXL(xml_serializer);
 
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -115,15 +106,9 @@ CDXLPhysicalSequence::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalSequence::AssertValid
-	(
-	const CDXLNode *dxlnode,
-	BOOL validate_children
-	) 
-	const
+CDXLPhysicalSequence::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
-
-	const ULONG arity = dxlnode->Arity();  
+	const ULONG arity = dxlnode->Arity();
 	GPOS_ASSERT(1 < arity);
 
 	for (ULONG ul = 1; ul < arity; ul++)
@@ -136,8 +121,7 @@ CDXLPhysicalSequence::AssertValid
 			child_dxlnode->GetOperator()->AssertValid(child_dxlnode, validate_children);
 		}
 	}
-
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

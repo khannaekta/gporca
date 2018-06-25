@@ -20,17 +20,15 @@ using namespace gpopt;
 
 // return statistics object after Group by computation
 CStatistics *
-CGroupByStatsProcessor::CalcGroupByStats
-	(
-	IMemoryPool *memory_pool,
-	const CStatistics *input_stats,
-	ULongPtrArray *GCs,
-	ULongPtrArray *aggs,
-	CBitSet *keys
-	)
+CGroupByStatsProcessor::CalcGroupByStats(IMemoryPool *memory_pool,
+										 const CStatistics *input_stats,
+										 ULongPtrArray *GCs,
+										 ULongPtrArray *aggs,
+										 CBitSet *keys)
 {
 	// create hash map from colid -> histogram for resultant structure
-	UlongHistogramHashMap *col_histogram_mapping = GPOS_NEW(memory_pool) UlongHistogramHashMap(memory_pool);
+	UlongHistogramHashMap *col_histogram_mapping =
+		GPOS_NEW(memory_pool) UlongHistogramHashMap(memory_pool);
 
 	// hash map colid -> width
 	UlongDoubleHashMap *col_width_mapping = GPOS_NEW(memory_pool) UlongDoubleHashMap(memory_pool);
@@ -42,27 +40,53 @@ CGroupByStatsProcessor::CalcGroupByStats
 	if (input_stats->IsEmpty())
 	{
 		// add dummy histograms for the aggregates and grouping columns
-		CHistogram::AddDummyHistogramAndWidthInfo(memory_pool, col_factory, col_histogram_mapping, col_width_mapping, aggs, true /* is_empty */);
-		CHistogram::AddDummyHistogramAndWidthInfo(memory_pool, col_factory, col_histogram_mapping, col_width_mapping, GCs, true /* is_empty */);
+		CHistogram::AddDummyHistogramAndWidthInfo(memory_pool,
+												  col_factory,
+												  col_histogram_mapping,
+												  col_width_mapping,
+												  aggs,
+												  true /* is_empty */);
+		CHistogram::AddDummyHistogramAndWidthInfo(memory_pool,
+												  col_factory,
+												  col_histogram_mapping,
+												  col_width_mapping,
+												  GCs,
+												  true /* is_empty */);
 
-		agg_stats = GPOS_NEW(memory_pool) CStatistics(memory_pool, col_histogram_mapping, col_width_mapping, agg_rows, true /* is_empty */);
+		agg_stats = GPOS_NEW(memory_pool) CStatistics(
+			memory_pool, col_histogram_mapping, col_width_mapping, agg_rows, true /* is_empty */);
 	}
 	else
 	{
 		// for computed aggregates, we're not going to be very smart right now
-		CHistogram::AddDummyHistogramAndWidthInfo(memory_pool, col_factory, col_histogram_mapping, col_width_mapping, aggs, false /* is_empty */);
+		CHistogram::AddDummyHistogramAndWidthInfo(memory_pool,
+												  col_factory,
+												  col_histogram_mapping,
+												  col_width_mapping,
+												  aggs,
+												  false /* is_empty */);
 
 		CColRefSet *computed_groupby_cols = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
-		CColRefSet *groupby_cols_for_stats = CStatisticsUtils::MakeGroupByColsForStats(memory_pool, GCs, computed_groupby_cols);
+		CColRefSet *groupby_cols_for_stats =
+			CStatisticsUtils::MakeGroupByColsForStats(memory_pool, GCs, computed_groupby_cols);
 
 		// add statistical information of columns (1) used to compute the cardinality of the aggregate
 		// and (2) the grouping columns that are computed
-		CStatisticsUtils::AddGrpColStats(memory_pool, input_stats, groupby_cols_for_stats, col_histogram_mapping, col_width_mapping);
-		CStatisticsUtils::AddGrpColStats(memory_pool, input_stats, computed_groupby_cols, col_histogram_mapping, col_width_mapping);
+		CStatisticsUtils::AddGrpColStats(memory_pool,
+										 input_stats,
+										 groupby_cols_for_stats,
+										 col_histogram_mapping,
+										 col_width_mapping);
+		CStatisticsUtils::AddGrpColStats(memory_pool,
+										 input_stats,
+										 computed_groupby_cols,
+										 col_histogram_mapping,
+										 col_width_mapping);
 
 		const CStatisticsConfig *stats_config = input_stats->GetStatsConfig();
 
-		DrgPdouble *NDVs = CStatisticsUtils::ExtractNDVForGrpCols(memory_pool, stats_config, input_stats, groupby_cols_for_stats, keys);
+		DrgPdouble *NDVs = CStatisticsUtils::ExtractNDVForGrpCols(
+			memory_pool, stats_config, input_stats, groupby_cols_for_stats, keys);
 		CDouble groups = CStatisticsUtils::GetCumulativeNDVs(stats_config, NDVs);
 
 		// clean up
@@ -70,10 +94,15 @@ CGroupByStatsProcessor::CalcGroupByStats
 		computed_groupby_cols->Release();
 		NDVs->Release();
 
-		agg_rows = std::min(std::max(CStatistics::MinRows.Get(), groups.Get()), input_stats->Rows().Get());
+		agg_rows =
+			std::min(std::max(CStatistics::MinRows.Get(), groups.Get()), input_stats->Rows().Get());
 
 		// create a new stats object for the output
-		agg_stats = GPOS_NEW(memory_pool) CStatistics(memory_pool, col_histogram_mapping, col_width_mapping, agg_rows, input_stats->IsEmpty());
+		agg_stats = GPOS_NEW(memory_pool) CStatistics(memory_pool,
+													  col_histogram_mapping,
+													  col_width_mapping,
+													  agg_rows,
+													  input_stats->IsEmpty());
 	}
 
 	// In the output statistics object, the upper bound source cardinality of the grouping column
@@ -83,7 +112,11 @@ CGroupByStatsProcessor::CalcGroupByStats
 	// and estimated group by cardinality.
 
 	// modify source id to upper bound card information
-	CStatisticsUtils::ComputeCardUpperBounds(memory_pool, input_stats, agg_stats, agg_rows, CStatistics::EcbmMin /* card_bounding_method */);
+	CStatisticsUtils::ComputeCardUpperBounds(memory_pool,
+											 input_stats,
+											 agg_stats,
+											 agg_rows,
+											 CStatistics::EcbmMin /* card_bounding_method */);
 
 	return agg_stats;
 }

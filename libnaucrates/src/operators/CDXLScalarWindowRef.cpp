@@ -29,26 +29,22 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarWindowRef::CDXLScalarWindowRef
-	(
-	IMemoryPool *memory_pool,
-	IMDId *mdid_func,
-	IMDId *mdid_return_type,
-	BOOL is_distinct,
-	BOOL is_star_arg,
-	BOOL is_simple_agg,
-	EdxlWinStage dxl_win_stage,
-	ULONG ulWinspecPosition
-	)
-	:
-	CDXLScalar(memory_pool),
-	m_func_mdid(mdid_func),
-	m_return_type_mdid(mdid_return_type),
-	m_is_distinct(is_distinct),
-	m_is_star_arg(is_star_arg),
-	m_is_simple_agg(is_simple_agg),
-	m_dxl_win_stage(dxl_win_stage),
-	m_win_spec_pos(ulWinspecPosition)
+CDXLScalarWindowRef::CDXLScalarWindowRef(IMemoryPool *memory_pool,
+										 IMDId *mdid_func,
+										 IMDId *mdid_return_type,
+										 BOOL is_distinct,
+										 BOOL is_star_arg,
+										 BOOL is_simple_agg,
+										 EdxlWinStage dxl_win_stage,
+										 ULONG ulWinspecPosition)
+	: CDXLScalar(memory_pool),
+	  m_func_mdid(mdid_func),
+	  m_return_type_mdid(mdid_return_type),
+	  m_is_distinct(is_distinct),
+	  m_is_star_arg(is_star_arg),
+	  m_is_simple_agg(is_simple_agg),
+	  m_dxl_win_stage(dxl_win_stage),
+	  m_win_spec_pos(ulWinspecPosition)
 {
 	GPOS_ASSERT(m_func_mdid->IsValid());
 	GPOS_ASSERT(m_return_type_mdid->IsValid());
@@ -95,12 +91,10 @@ const CWStringConst *
 CDXLScalarWindowRef::GetWindStageStr() const
 {
 	GPOS_ASSERT(EdxlwinstageSentinel > m_dxl_win_stage);
-	ULONG win_stage_token_mapping[][2] =
-					{
-					{EdxlwinstageImmediate, EdxltokenWindowrefStageImmediate},
-					{EdxlwinstagePreliminary, EdxltokenWindowrefStagePreliminary},
-					{EdxlwinstageRowKey, EdxltokenWindowrefStageRowKey}
-					};
+	ULONG win_stage_token_mapping[][2] = {{EdxlwinstageImmediate, EdxltokenWindowrefStageImmediate},
+										  {EdxlwinstagePreliminary,
+										   EdxltokenWindowrefStagePreliminary},
+										  {EdxlwinstageRowKey, EdxltokenWindowrefStageRowKey}};
 
 	const ULONG arity = GPOS_ARRAY_SIZE(win_stage_token_mapping);
 	for (ULONG ul = 0; ul < arity; ul++)
@@ -141,27 +135,28 @@ CDXLScalarWindowRef::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarWindowRef::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *dxlnode
-	)
-	const
+CDXLScalarWindowRef::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 	m_func_mdid->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenWindowrefOid));
 	m_return_type_mdid->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenTypeId));
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowrefDistinct),m_is_distinct);
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowrefStarArg),m_is_star_arg);
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowrefSimpleAgg),m_is_simple_agg);
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowrefStrategy), GetWindStageStr());
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowrefWinSpecPos), m_win_spec_pos);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowrefDistinct),
+								 m_is_distinct);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowrefStarArg),
+								 m_is_star_arg);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowrefSimpleAgg),
+								 m_is_simple_agg);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowrefStrategy),
+								 GetWindStageStr());
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowrefWinSpecPos),
+								 m_win_spec_pos);
 
 	dxlnode->SerializeChildrenToDXL(xml_serializer);
 
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 //---------------------------------------------------------------------------
@@ -173,11 +168,7 @@ CDXLScalarWindowRef::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 BOOL
-CDXLScalarWindowRef::HasBoolResult
-	(
-	CMDAccessor *md_accessor
-	)
-	const
+CDXLScalarWindowRef::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	IMDId *mdid = md_accessor->Pmdfunc(m_func_mdid)->GetResultTypeMdid();
 	return (IMDType::EtiBool == md_accessor->Pmdtype(mdid)->GetDatumType());
@@ -193,14 +184,10 @@ CDXLScalarWindowRef::HasBoolResult
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarWindowRef::AssertValid
-	(
-	const CDXLNode *dxlnode,
-	BOOL validate_children
-	)
-	const
+CDXLScalarWindowRef::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
-	EdxlWinStage edxlwinrefstage = ((CDXLScalarWindowRef*) dxlnode->GetOperator())->GetDxlWinStage();
+	EdxlWinStage edxlwinrefstage =
+		((CDXLScalarWindowRef *) dxlnode->GetOperator())->GetDxlWinStage();
 
 	GPOS_ASSERT((EdxlwinstageSentinel >= edxlwinrefstage));
 
@@ -216,6 +203,6 @@ CDXLScalarWindowRef::AssertValid
 		}
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

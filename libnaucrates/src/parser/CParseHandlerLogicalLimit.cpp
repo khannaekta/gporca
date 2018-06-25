@@ -29,14 +29,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerLogicalLimit::CParseHandlerLogicalLimit
-	(
-	IMemoryPool *memory_pool,
-	CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root
-	)
-	:
-	CParseHandlerLogicalOp(memory_pool, parse_handler_mgr, parse_handler_root)
+CParseHandlerLogicalLimit::CParseHandlerLogicalLimit(IMemoryPool *memory_pool,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
+	: CParseHandlerLogicalOp(memory_pool, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -49,45 +45,56 @@ CParseHandlerLogicalLimit::CParseHandlerLogicalLimit
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerLogicalLimit::StartElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const, // element_qname
-	const Attributes& attrs
-	)
+CParseHandlerLogicalLimit::StartElement(const XMLCh *const,  // element_uri,
+										const XMLCh *const element_local_name,
+										const XMLCh *const,  // element_qname
+										const Attributes &attrs)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenLogicalLimit), element_local_name))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenLogicalLimit),
+									  element_local_name))
 	{
-		const XMLCh *non_removable_limit_str = attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenTopLimitUnderDML));
+		const XMLCh *non_removable_limit_str =
+			attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenTopLimitUnderDML));
 		BOOL keep_limit = false;
 		if (non_removable_limit_str)
 		{
-			keep_limit = CDXLOperatorFactory::ConvertAttrValueToBool
-										(
-										m_parse_handler_mgr->GetDXLMemoryManager(),
-										non_removable_limit_str,
-										EdxltokenTopLimitUnderDML,
-										EdxltokenLogicalLimit
-										);
+			keep_limit = CDXLOperatorFactory::ConvertAttrValueToBool(
+				m_parse_handler_mgr->GetDXLMemoryManager(),
+				non_removable_limit_str,
+				EdxltokenTopLimitUnderDML,
+				EdxltokenLogicalLimit);
 		}
 
-		m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLLogicalLimit(m_memory_pool, keep_limit));
+		m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(
+			m_memory_pool, GPOS_NEW(m_memory_pool) CDXLLogicalLimit(m_memory_pool, keep_limit));
 
 		// create child node parsers
 
 		// parse handler for logical operator
-		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenLogical), m_parse_handler_mgr, this);
+		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
+			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenLogical), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
-		CParseHandlerBase *offset_parse_handler = CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalarLimitOffset), m_parse_handler_mgr, this);
+		CParseHandlerBase *offset_parse_handler = CParseHandlerFactory::GetParseHandler(
+			m_memory_pool,
+			CDXLTokens::XmlstrToken(EdxltokenScalarLimitOffset),
+			m_parse_handler_mgr,
+			this);
 		m_parse_handler_mgr->ActivateParseHandler(offset_parse_handler);
 
-		CParseHandlerBase *count_parse_handler = CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalarLimitCount), m_parse_handler_mgr, this);
+		CParseHandlerBase *count_parse_handler = CParseHandlerFactory::GetParseHandler(
+			m_memory_pool,
+			CDXLTokens::XmlstrToken(EdxltokenScalarLimitCount),
+			m_parse_handler_mgr,
+			this);
 		m_parse_handler_mgr->ActivateParseHandler(count_parse_handler);
 
 		// parse handler for the sorting column list
-		CParseHandlerBase *sort_col_list_parse_handler = CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalarSortColList), m_parse_handler_mgr, this);
+		CParseHandlerBase *sort_col_list_parse_handler = CParseHandlerFactory::GetParseHandler(
+			m_memory_pool,
+			CDXLTokens::XmlstrToken(EdxltokenScalarSortColList),
+			m_parse_handler_mgr,
+			this);
 		m_parse_handler_mgr->ActivateParseHandler(sort_col_list_parse_handler);
 
 		// store child parse handler in array
@@ -98,7 +105,8 @@ CParseHandlerLogicalLimit::StartElement
 	}
 	else
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 }
@@ -112,26 +120,28 @@ CParseHandlerLogicalLimit::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerLogicalLimit::EndElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const // element_qname
-	)
+CParseHandlerLogicalLimit::EndElement(const XMLCh *const,  // element_uri,
+									  const XMLCh *const element_local_name,
+									  const XMLCh *const  // element_qname
+)
 {
-	if(0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenLogicalLimit), element_local_name))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenLogicalLimit),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
-	GPOS_ASSERT(NULL != m_dxl_node );
+	GPOS_ASSERT(NULL != m_dxl_node);
 	GPOS_ASSERT(4 == this->Length());
 
-	CParseHandlerSortColList *sort_col_list_parse_handler = dynamic_cast<CParseHandlerSortColList*>((*this)[0]);
+	CParseHandlerSortColList *sort_col_list_parse_handler =
+		dynamic_cast<CParseHandlerSortColList *>((*this)[0]);
 	CParseHandlerScalarOp *count_parse_handler = dynamic_cast<CParseHandlerScalarOp *>((*this)[1]);
 	CParseHandlerScalarOp *offset_parse_handler = dynamic_cast<CParseHandlerScalarOp *>((*this)[2]);
-	CParseHandlerLogicalOp *child_parse_handler = dynamic_cast<CParseHandlerLogicalOp*>((*this)[3]);
+	CParseHandlerLogicalOp *child_parse_handler =
+		dynamic_cast<CParseHandlerLogicalOp *>((*this)[3]);
 
 	GPOS_ASSERT(NULL != child_parse_handler->CreateDXLNode());
 
@@ -142,7 +152,7 @@ CParseHandlerLogicalLimit::EndElement
 
 #ifdef GPOS_DEBUG
 	m_dxl_node->GetOperator()->AssertValid(m_dxl_node, false /* validate_children */);
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

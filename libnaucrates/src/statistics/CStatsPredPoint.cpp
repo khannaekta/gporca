@@ -27,16 +27,10 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CStatsPredPoint::CStatsPredPoint
-	(
-	ULONG col_id,
-	CStatsPred::EStatsCmpType stats_cmp_type,
-	CPoint *point
-	)
-	:
-	CStatsPred(col_id),
-	m_stats_cmp_type(stats_cmp_type),
-	m_pred_point(point)
+CStatsPredPoint::CStatsPredPoint(ULONG col_id,
+								 CStatsPred::EStatsCmpType stats_cmp_type,
+								 CPoint *point)
+	: CStatsPred(col_id), m_stats_cmp_type(stats_cmp_type), m_pred_point(point)
 {
 	GPOS_ASSERT(NULL != point);
 }
@@ -49,17 +43,11 @@ CStatsPredPoint::CStatsPredPoint
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CStatsPredPoint::CStatsPredPoint
-	(
-	IMemoryPool *memory_pool,
-	const CColRef *colref,
-	CStatsPred::EStatsCmpType stats_cmp_type,
-	IDatum *datum
-	)
-	:
-	CStatsPred(gpos::ulong_max),
-	m_stats_cmp_type(stats_cmp_type),
-	m_pred_point(NULL)
+CStatsPredPoint::CStatsPredPoint(IMemoryPool *memory_pool,
+								 const CColRef *colref,
+								 CStatsPred::EStatsCmpType stats_cmp_type,
+								 IDatum *datum)
+	: CStatsPred(gpos::ulong_max), m_stats_cmp_type(stats_cmp_type), m_pred_point(NULL)
 {
 	GPOS_ASSERT(NULL != colref);
 	GPOS_ASSERT(NULL != datum);
@@ -77,12 +65,7 @@ CStatsPredPoint::CStatsPredPoint
 //		Add padding to datums when needed
 //---------------------------------------------------------------------------
 IDatum *
-CStatsPredPoint::PreprocessDatum
-	(
-	IMemoryPool *memory_pool,
-	const CColRef *colref,
-	IDatum *datum
-	)
+CStatsPredPoint::PreprocessDatum(IMemoryPool *memory_pool, const CColRef *colref, IDatum *datum)
 {
 	GPOS_ASSERT(NULL != colref);
 	GPOS_ASSERT(NULL != datum);
@@ -94,10 +77,9 @@ CStatsPredPoint::PreprocessDatum
 		return datum;
 	}
 
-	const CColRefTable *colref_table = CColRefTable::PcrConvert(const_cast<CColRef*>(colref));
+	const CColRefTable *colref_table = CColRefTable::PcrConvert(const_cast<CColRef *>(colref));
 
 	return datum->MakePaddedDatum(memory_pool, colref_table->Width());
 }
 
 // EOF
-

@@ -32,64 +32,52 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarCaseTest : public CDXLScalar
 	{
-		private:
+	private:
+		// expression type
+		IMDId *m_mdid_type;
 
-			// expression type
-			IMDId *m_mdid_type;
+		// private copy ctor
+		CDXLScalarCaseTest(const CDXLScalarCaseTest &);
 
-			// private copy ctor
-			CDXLScalarCaseTest(const CDXLScalarCaseTest&);
+	public:
+		// ctor
+		CDXLScalarCaseTest(IMemoryPool *memory_pool, IMDId *mdid_type);
 
-		public:
+		// dtor
+		virtual ~CDXLScalarCaseTest();
 
-			// ctor
-			CDXLScalarCaseTest(IMemoryPool *memory_pool, IMDId *mdid_type);
+		// name of the operator
+		virtual const CWStringConst *GetOpNameStr() const;
 
-			// dtor
-			virtual
-			~CDXLScalarCaseTest();
+		// expression type
+		virtual IMDId *MDIdType() const;
 
-			// name of the operator
-			virtual
-			const CWStringConst *GetOpNameStr() const;
+		// DXL Operator ID
+		virtual Edxlopid GetDXLOperator() const;
 
-			// expression type
-			virtual
-			IMDId *MDIdType() const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
-			// DXL Operator ID
-			virtual
-			Edxlopid GetDXLOperator() const;
+		// does the operator return a boolean result
+		virtual BOOL HasBoolResult(CMDAccessor *md_accessor) const;
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+		// conversion function
+		static CDXLScalarCaseTest *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarCaseTest == dxl_op->GetDXLOperator());
 
-			// does the operator return a boolean result
-			virtual
-			BOOL HasBoolResult(CMDAccessor *md_accessor) const;
-
-			// conversion function
-			static
-			CDXLScalarCaseTest *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopScalarCaseTest == dxl_op->GetDXLOperator());
-
-				return dynamic_cast<CDXLScalarCaseTest*>(dxl_op);
-			}
+			return dynamic_cast<CDXLScalarCaseTest *>(dxl_op);
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			virtual
-			void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		virtual void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
-#endif // !GPDXL_CDXLScalarCaseTest_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLScalarCaseTest_H
 
 // EOF

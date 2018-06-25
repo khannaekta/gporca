@@ -26,46 +26,42 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDRelationCtasGPDB::CMDRelationCtasGPDB
-	(
-	IMemoryPool *memory_pool,
-	IMDId *mdid,
-	CMDName *mdname_schema,
-	CMDName *mdname,
-	BOOL fTemporary,
-	BOOL fHasOids,
-	Erelstoragetype rel_storage_type,
-	Ereldistrpolicy rel_distr_policy,
-	MDColumnPtrArray *mdcol_array,
-	ULongPtrArray *distr_col_array,
-	ULongPtrArray2D *keyset_array,
-	CDXLCtasStorageOptions *dxl_ctas_storage_options,
-	IntPtrArray *vartypemod_array
-	)
-	:
-	m_memory_pool(memory_pool),
-	m_mdid(mdid),
-	m_mdname_schema(mdname_schema),
-	m_mdname(mdname),
-	m_is_temp_table(fTemporary),
-	m_has_oids(fHasOids),
-	m_rel_storage_type(rel_storage_type),
-	m_rel_distr_policy(rel_distr_policy),
-	m_md_col_array(mdcol_array),
-	m_distr_col_array(distr_col_array),
-	m_keyset_array(keyset_array),
-	m_system_columns(0),
-	m_nondrop_col_pos_array(NULL),
-	m_dxl_ctas_storage_option(dxl_ctas_storage_options),
-	m_vartypemod_array(vartypemod_array)
+CMDRelationCtasGPDB::CMDRelationCtasGPDB(IMemoryPool *memory_pool,
+										 IMDId *mdid,
+										 CMDName *mdname_schema,
+										 CMDName *mdname,
+										 BOOL fTemporary,
+										 BOOL fHasOids,
+										 Erelstoragetype rel_storage_type,
+										 Ereldistrpolicy rel_distr_policy,
+										 MDColumnPtrArray *mdcol_array,
+										 ULongPtrArray *distr_col_array,
+										 ULongPtrArray2D *keyset_array,
+										 CDXLCtasStorageOptions *dxl_ctas_storage_options,
+										 IntPtrArray *vartypemod_array)
+	: m_memory_pool(memory_pool),
+	  m_mdid(mdid),
+	  m_mdname_schema(mdname_schema),
+	  m_mdname(mdname),
+	  m_is_temp_table(fTemporary),
+	  m_has_oids(fHasOids),
+	  m_rel_storage_type(rel_storage_type),
+	  m_rel_distr_policy(rel_distr_policy),
+	  m_md_col_array(mdcol_array),
+	  m_distr_col_array(distr_col_array),
+	  m_keyset_array(keyset_array),
+	  m_system_columns(0),
+	  m_nondrop_col_pos_array(NULL),
+	  m_dxl_ctas_storage_option(dxl_ctas_storage_options),
+	  m_vartypemod_array(vartypemod_array)
 {
 	GPOS_ASSERT(mdid->IsValid());
 	GPOS_ASSERT(NULL != mdcol_array);
 	GPOS_ASSERT(NULL != dxl_ctas_storage_options);
-	GPOS_ASSERT(IMDRelation::ErelstorageSentinel > m_rel_storage_type);	
+	GPOS_ASSERT(IMDRelation::ErelstorageSentinel > m_rel_storage_type);
 	GPOS_ASSERT(0 == keyset_array->Size());
 	GPOS_ASSERT(NULL != vartypemod_array);
-	
+
 	m_attrno_nondrop_col_pos_map = GPOS_NEW(m_memory_pool) IntUlongHashMap(m_memory_pool);
 	m_nondrop_col_pos_array = GPOS_NEW(m_memory_pool) ULongPtrArray(m_memory_pool);
 	m_col_width_array = GPOS_NEW(memory_pool) DrgPdouble(memory_pool);
@@ -84,17 +80,15 @@ CMDRelationCtasGPDB::CMDRelationCtasGPDB
 		else
 		{
 			m_nondrop_col_pos_array->Append(GPOS_NEW(m_memory_pool) ULONG(ul));
-		}		
+		}
 
-		(void) m_attrno_nondrop_col_pos_map->Insert
-									(
-									GPOS_NEW(m_memory_pool) INT(mdcol->AttrNum()),
-									GPOS_NEW(m_memory_pool) ULONG(ul)
-									);
+		(void) m_attrno_nondrop_col_pos_map->Insert(GPOS_NEW(m_memory_pool) INT(mdcol->AttrNum()),
+													GPOS_NEW(m_memory_pool) ULONG(ul));
 
 		m_col_width_array->Append(GPOS_NEW(memory_pool) CDouble(mdcol->Length()));
 	}
-	m_dxl_str = CDXLUtils::SerializeMDObj(m_memory_pool, this, false /*fSerializeHeader*/, false /*indentation*/);
+	m_dxl_str = CDXLUtils::SerializeMDObj(
+		m_memory_pool, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 //---------------------------------------------------------------------------
@@ -195,11 +189,7 @@ CMDRelationCtasGPDB::ColumnCount() const
 
 // Return the width of a column with regards to the position
 DOUBLE
-CMDRelationCtasGPDB::ColWidth
-	(
-	ULONG pos
-	)
-const
+CMDRelationCtasGPDB::ColWidth(ULONG pos) const
 {
 	return (*m_col_width_array)[pos]->Get();
 }
@@ -227,11 +217,7 @@ CMDRelationCtasGPDB::SystemColumnsCount() const
 //		attribute number in the system catalog
 //---------------------------------------------------------------------------
 ULONG
-CMDRelationCtasGPDB::GetPosFromAttno
-	(
-	INT attno
-	)
-	const
+CMDRelationCtasGPDB::GetPosFromAttno(INT attno) const
 {
 	ULONG *att_pos = m_attrno_nondrop_col_pos_map->Find(&attno);
 	GPOS_ASSERT(NULL != att_pos);
@@ -262,11 +248,7 @@ CMDRelationCtasGPDB::DistrColumnCount() const
 //
 //---------------------------------------------------------------------------
 const IMDColumn *
-CMDRelationCtasGPDB::GetMdCol
-	(
-	ULONG pos
-	)
-	const
+CMDRelationCtasGPDB::GetMdCol(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_md_col_array->Size());
 
@@ -282,11 +264,7 @@ CMDRelationCtasGPDB::GetMdCol
 //
 //---------------------------------------------------------------------------
 const IMDColumn *
-CMDRelationCtasGPDB::GetDistrColAt
-	(
-	ULONG pos
-	)
-	const
+CMDRelationCtasGPDB::GetDistrColAt(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_distr_col_array->Size());
 
@@ -303,33 +281,35 @@ CMDRelationCtasGPDB::GetDistrColAt
 //
 //---------------------------------------------------------------------------
 void
-CMDRelationCtasGPDB::Serialize
-	(
-	CXMLSerializer *xml_serializer
-	)
-	const
+CMDRelationCtasGPDB::Serialize(CXMLSerializer *xml_serializer) const
 {
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
-						CDXLTokens::GetDXLTokenStr(EdxltokenRelationCTAS));
+								CDXLTokens::GetDXLTokenStr(EdxltokenRelationCTAS));
 
 	m_mdid->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenMdid));
 	if (NULL != m_mdname_schema)
 	{
-		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenSchema), m_mdname_schema->GetMDName());
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenSchema),
+									 m_mdname_schema->GetMDName());
 	}
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenName), m_mdname->GetMDName());
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenRelTemporary), m_is_temp_table);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenRelTemporary),
+								 m_is_temp_table);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenRelHasOids), m_has_oids);
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenRelStorageType), IMDRelation::GetStorageTypeStr(m_rel_storage_type));
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenRelStorageType),
+								 IMDRelation::GetStorageTypeStr(m_rel_storage_type));
 
 	// serialize vartypmod list
-	CWStringDynamic *var_typemod_list_array = CDXLUtils::Serialize(m_memory_pool, m_vartypemod_array);
+	CWStringDynamic *var_typemod_list_array =
+		CDXLUtils::Serialize(m_memory_pool, m_vartypemod_array);
 	GPOS_ASSERT(NULL != var_typemod_list_array);
 
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenVarTypeModList), var_typemod_list_array);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenVarTypeModList),
+								 var_typemod_list_array);
 	GPOS_DELETE(var_typemod_list_array);
 
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenRelDistrPolicy), GetDistrPolicyStr(m_rel_distr_policy));
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenRelDistrPolicy),
+								 GetDistrPolicyStr(m_rel_distr_policy));
 
 	if (EreldistrHash == m_rel_distr_policy)
 	{
@@ -337,13 +317,14 @@ CMDRelationCtasGPDB::Serialize
 
 		// serialize distribution columns
 		CWStringDynamic *distr_col_array = ColumnsToStr(m_memory_pool, m_distr_col_array);
-		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenDistrColumns), distr_col_array);
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenDistrColumns),
+									 distr_col_array);
 		GPOS_DELETE(distr_col_array);
 	}
 
 	// serialize columns
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
-						CDXLTokens::GetDXLTokenStr(EdxltokenColumns));
+								CDXLTokens::GetDXLTokenStr(EdxltokenColumns));
 	const ULONG columns = m_md_col_array->Size();
 	for (ULONG ul = 0; ul < columns; ul++)
 	{
@@ -352,11 +333,11 @@ CMDRelationCtasGPDB::Serialize
 	}
 
 	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
-						CDXLTokens::GetDXLTokenStr(EdxltokenColumns));
+								 CDXLTokens::GetDXLTokenStr(EdxltokenColumns));
 
 	m_dxl_ctas_storage_option->Serialize(xml_serializer);
 	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
-						CDXLTokens::GetDXLTokenStr(EdxltokenRelationCTAS));
+								 CDXLTokens::GetDXLTokenStr(EdxltokenRelationCTAS));
 }
 
 #ifdef GPOS_DEBUG
@@ -369,11 +350,7 @@ CMDRelationCtasGPDB::Serialize
 //
 //---------------------------------------------------------------------------
 void
-CMDRelationCtasGPDB::DebugPrint
-	(
-	IOstream &os
-	)
-	const
+CMDRelationCtasGPDB::DebugPrint(IOstream &os) const
 {
 	os << "CTAS Relation id: ";
 	MDId()->OsPrint(os);
@@ -381,7 +358,8 @@ CMDRelationCtasGPDB::DebugPrint
 
 	os << "Relation name: " << (Mdname()).GetMDName()->GetBuffer() << std::endl;
 
-	os << "Distribution policy: " << GetDistrPolicyStr(m_rel_distr_policy)->GetBuffer() << std::endl;
+	os << "Distribution policy: " << GetDistrPolicyStr(m_rel_distr_policy)->GetBuffer()
+	   << std::endl;
 
 	os << "Relation columns: " << std::endl;
 	const ULONG total_columns = ColumnCount();
@@ -408,7 +386,6 @@ CMDRelationCtasGPDB::DebugPrint
 	os << std::endl;
 }
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF
-

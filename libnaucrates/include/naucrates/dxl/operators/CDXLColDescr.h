@@ -22,13 +22,12 @@
 
 namespace gpdxl
 {
-
 	using namespace gpmd;
-	
+
 	// fwd decl
 	class CXMLSerializer;
 	class CDXLColDescr;
-	
+
 	typedef CDynamicPtrArray<CDXLColDescr, CleanupRelease> ColumnDescrDXLArray;
 
 	//---------------------------------------------------------------------------
@@ -41,77 +40,74 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLColDescr : public CRefCount
 	{
-		private:
-			// memory pool
-			IMemoryPool *m_memory_pool;
-			
-			// name
-			CMDName *m_md_name;
-	
-			// column id: unique identifier of that instance of the column in the query
-			ULONG m_column_id;
-			
-			// attribute number in the database (corresponds to varattno in GPDB)
-			INT m_attr_no;
-			
-			// mdid of column's type
-			IMDId *m_column_mdid_type;
+	private:
+		// memory pool
+		IMemoryPool *m_memory_pool;
 
-			INT m_type_modifier;
+		// name
+		CMDName *m_md_name;
 
-			// is column dropped from the table: needed for correct restoring of attribute numbers in the range table entries
-			BOOL m_is_dropped;
+		// column id: unique identifier of that instance of the column in the query
+		ULONG m_column_id;
 
-			// width of the column, for instance  char(10) column has width 10
-			ULONG m_column_width;
-			
-			// private copy ctor
-			CDXLColDescr(const CDXLColDescr &);
-		
-		public:
-			// ctor
-			CDXLColDescr
-				(
-				IMemoryPool *,
-				CMDName *,
-				ULONG column_id,
-				INT attr_no,
-				IMDId *column_mdid_type,
-				INT type_modifier,
-				BOOL is_dropped,
-				ULONG width = gpos::ulong_max
-				);
+		// attribute number in the database (corresponds to varattno in GPDB)
+		INT m_attr_no;
 
-			//dtor
-			~CDXLColDescr();
-			
-			// column name
-			const CMDName *MdName() const;
+		// mdid of column's type
+		IMDId *m_column_mdid_type;
 
-			// column identifier
-			ULONG Id() const;
+		INT m_type_modifier;
 
-			// attribute number of the column in the base table
-			INT AttrNum() const;
+		// is column dropped from the table: needed for correct restoring of attribute numbers in the range table entries
+		BOOL m_is_dropped;
 
-			// is the column dropped in the base table
-			BOOL IsDropped() const;
+		// width of the column, for instance  char(10) column has width 10
+		ULONG m_column_width;
 
-			// column type
-			IMDId *MDIdType() const;
+		// private copy ctor
+		CDXLColDescr(const CDXLColDescr &);
 
-			INT TypeModifier() const;
+	public:
+		// ctor
+		CDXLColDescr(IMemoryPool *,
+					 CMDName *,
+					 ULONG column_id,
+					 INT attr_no,
+					 IMDId *column_mdid_type,
+					 INT type_modifier,
+					 BOOL is_dropped,
+					 ULONG width = gpos::ulong_max);
 
-			// column width
-			ULONG Width() const;
-			
-			void SerializeToDXL(CXMLSerializer *xml_serializer) const;
+		//dtor
+		~CDXLColDescr();
+
+		// column name
+		const CMDName *MdName() const;
+
+		// column identifier
+		ULONG Id() const;
+
+		// attribute number of the column in the base table
+		INT AttrNum() const;
+
+		// is the column dropped in the base table
+		BOOL IsDropped() const;
+
+		// column type
+		IMDId *MDIdType() const;
+
+		INT TypeModifier() const;
+
+		// column width
+		ULONG Width() const;
+
+		void SerializeToDXL(CXMLSerializer *xml_serializer) const;
 	};
 
-}
+}  // namespace gpdxl
 
 
 
-#endif // !GPDXL_CDXLColDescr_H
+#endif  // !GPDXL_CDXLColDescr_H
 
 // EOF

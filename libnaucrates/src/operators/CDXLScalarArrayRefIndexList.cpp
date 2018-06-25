@@ -26,14 +26,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarArrayRefIndexList::CDXLScalarArrayRefIndexList
-	(
-	IMemoryPool *memory_pool,
-	EIndexListBound index_list_bound
-	)
-	:
-	CDXLScalar(memory_pool),
-	m_index_list_bound(index_list_bound)
+CDXLScalarArrayRefIndexList::CDXLScalarArrayRefIndexList(IMemoryPool *memory_pool,
+														 EIndexListBound index_list_bound)
+	: CDXLScalar(memory_pool), m_index_list_bound(index_list_bound)
 {
 	GPOS_ASSERT(EilbSentinel > index_list_bound);
 }
@@ -75,21 +70,19 @@ CDXLScalarArrayRefIndexList::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarArrayRefIndexList::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *dxlnode
-	)
-	const
+CDXLScalarArrayRefIndexList::SerializeToDXL(CXMLSerializer *xml_serializer,
+											const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenScalarArrayRefIndexListBound), GetDXLIndexListBoundStr(m_index_list_bound));
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenScalarArrayRefIndexListBound),
+								 GetDXLIndexListBoundStr(m_index_list_bound));
 
 	dxlnode->SerializeChildrenToDXL(xml_serializer);
 
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 //---------------------------------------------------------------------------
@@ -101,10 +94,7 @@ CDXLScalarArrayRefIndexList::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLScalarArrayRefIndexList::GetDXLIndexListBoundStr
-	(
-	EIndexListBound index_list_bound
-	)
+CDXLScalarArrayRefIndexList::GetDXLIndexListBoundStr(EIndexListBound index_list_bound)
 {
 	switch (index_list_bound)
 	{
@@ -130,12 +120,7 @@ CDXLScalarArrayRefIndexList::GetDXLIndexListBoundStr
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarArrayRefIndexList::AssertValid
-	(
-	const CDXLNode *dxlnode,
-	BOOL validate_children
-	)
-	const
+CDXLScalarArrayRefIndexList::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
@@ -149,6 +134,6 @@ CDXLScalarArrayRefIndexList::AssertValid
 		}
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

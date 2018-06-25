@@ -34,20 +34,14 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDatumBoolGPDB::CDatumBoolGPDB
-	(
-	CSystemId sysid,
-	BOOL value,
-	BOOL is_null
-	)
-	:
-	m_value(value),
-	m_is_null(is_null)
+CDatumBoolGPDB::CDatumBoolGPDB(CSystemId sysid, BOOL value, BOOL is_null)
+	: m_value(value), m_is_null(is_null)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	IMDId *mdid = dynamic_cast<const CMDTypeBoolGPDB *>(md_accessor->PtMDType<IMDTypeBool>(sysid))->MDId();
+	IMDId *mdid =
+		dynamic_cast<const CMDTypeBoolGPDB *>(md_accessor->PtMDType<IMDTypeBool>(sysid))->MDId();
 	mdid->AddRef();
-	
+
 	m_mdid = mdid;
 
 	if (IsNull())
@@ -65,16 +59,8 @@ CDatumBoolGPDB::CDatumBoolGPDB
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDatumBoolGPDB::CDatumBoolGPDB
-	(
-	IMDId *mdid,
-	BOOL value,
-	BOOL is_null
-	)
-	:
-	m_mdid(mdid),
-	m_value(value),
-	m_is_null(is_null)
+CDatumBoolGPDB::CDatumBoolGPDB(IMDId *mdid, BOOL value, BOOL is_null)
+	: m_mdid(mdid), m_value(value), m_is_null(is_null)
 {
 	GPOS_ASSERT(NULL != m_mdid);
 	GPOS_ASSERT(GPDB_BOOL_OID == CMDIdGPDB::CastMdid(m_mdid)->OidObjectId());
@@ -182,11 +168,7 @@ CDatumBoolGPDB::HashValue() const
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDatumBoolGPDB::GetStrRepr
-	(
-	IMemoryPool *memory_pool
-	)
-	const
+CDatumBoolGPDB::GetStrRepr(IMemoryPool *memory_pool) const
 {
 	CWStringDynamic str(memory_pool);
 	if (!IsNull())
@@ -210,25 +192,21 @@ CDatumBoolGPDB::GetStrRepr
 //
 //---------------------------------------------------------------------------
 BOOL
-CDatumBoolGPDB::Matches
-	(
-	const IDatum *other
-	)
-	const
+CDatumBoolGPDB::Matches(const IDatum *other) const
 {
-	if(!other->MDId()->Equals(m_mdid))
+	if (!other->MDId()->Equals(m_mdid))
 	{
 		return false;
 	}
 
 	const CDatumBoolGPDB *other_cast = dynamic_cast<const CDatumBoolGPDB *>(other);
 
-	if(!other_cast->IsNull() && !IsNull())
+	if (!other_cast->IsNull() && !IsNull())
 	{
 		return (other_cast->GetValue() == GetValue());
 	}
 
-	if(other_cast->IsNull() && IsNull())
+	if (other_cast->IsNull() && IsNull())
 	{
 		return true;
 	}
@@ -245,11 +223,7 @@ CDatumBoolGPDB::Matches
 //
 //---------------------------------------------------------------------------
 IDatum *
-CDatumBoolGPDB::MakeCopy
-	(
-	IMemoryPool *memory_pool
-	)
-	const
+CDatumBoolGPDB::MakeCopy(IMemoryPool *memory_pool) const
 {
 	m_mdid->AddRef();
 	return GPOS_NEW(memory_pool) CDatumBoolGPDB(m_mdid, m_value, m_is_null);
@@ -264,11 +238,7 @@ CDatumBoolGPDB::MakeCopy
 //
 //---------------------------------------------------------------------------
 IOstream &
-CDatumBoolGPDB::OsPrint
-	(
-	IOstream &os
-	)
-	const
+CDatumBoolGPDB::OsPrint(IOstream &os) const
 {
 	if (!IsNull())
 	{
@@ -283,4 +253,3 @@ CDatumBoolGPDB::OsPrint
 }
 
 // EOF
-

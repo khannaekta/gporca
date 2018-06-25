@@ -33,61 +33,62 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLTableDescr : public CRefCount
 	{
-		private:
-			// memory pool
-			IMemoryPool *m_memory_pool;
-						
-			// id and version information for the table
-			IMDId *m_mdid;
-			
-			// table name
-			CMDName *m_mdname;
-	
-			// list of column descriptors		
-			ColumnDescrDXLArray *m_column_descr_dxl_array;
-			
-			// id of user the table needs to be accessed with
-			ULONG m_execute_as_user_id;
-			
-			// private copy ctor
-			CDXLTableDescr(const CDXLTableDescr &);
-			
-			void SerializeMDId(CXMLSerializer *xml_serializer) const;
-		
-		public:
-			// ctor/dtor
-			CDXLTableDescr(IMemoryPool *memory_pool, IMDId *mdid, CMDName *mdname, ULONG ulExecuteAsUser);
-						
-			virtual
-			~CDXLTableDescr();
-		
-			// setters
-			void SetColumnDescriptors(ColumnDescrDXLArray *column_descr_dxl_array);
-			
-			void AddColumnDescr(CDXLColDescr *pdxlcd);
-			
-			// table name
-			const CMDName *MdName() const;
-			
-			// table mdid
-			IMDId *MDId() const;
-			
-			// table arity
-			ULONG Arity() const;
-			
-			// user id
-			ULONG GetExecuteAsUserId() const;
-			
-			// get the column descriptor at the given position
-			const CDXLColDescr *GetColumnDescrAt(ULONG idx) const;
-			
-			// serialize to dxl format
-			void SerializeToDXL(CXMLSerializer *xml_serializer) const;
+	private:
+		// memory pool
+		IMemoryPool *m_memory_pool;
+
+		// id and version information for the table
+		IMDId *m_mdid;
+
+		// table name
+		CMDName *m_mdname;
+
+		// list of column descriptors
+		ColumnDescrDXLArray *m_column_descr_dxl_array;
+
+		// id of user the table needs to be accessed with
+		ULONG m_execute_as_user_id;
+
+		// private copy ctor
+		CDXLTableDescr(const CDXLTableDescr &);
+
+		void SerializeMDId(CXMLSerializer *xml_serializer) const;
+
+	public:
+		// ctor/dtor
+		CDXLTableDescr(IMemoryPool *memory_pool,
+					   IMDId *mdid,
+					   CMDName *mdname,
+					   ULONG ulExecuteAsUser);
+
+		virtual ~CDXLTableDescr();
+
+		// setters
+		void SetColumnDescriptors(ColumnDescrDXLArray *column_descr_dxl_array);
+
+		void AddColumnDescr(CDXLColDescr *pdxlcd);
+
+		// table name
+		const CMDName *MdName() const;
+
+		// table mdid
+		IMDId *MDId() const;
+
+		// table arity
+		ULONG Arity() const;
+
+		// user id
+		ULONG GetExecuteAsUserId() const;
+
+		// get the column descriptor at the given position
+		const CDXLColDescr *GetColumnDescrAt(ULONG idx) const;
+
+		// serialize to dxl format
+		void SerializeToDXL(CXMLSerializer *xml_serializer) const;
 	};
-}
+}  // namespace gpdxl
 
 
-#endif // !GPDXL_CDXLTableDescriptor_H
+#endif  // !GPDXL_CDXLTableDescriptor_H
 
 // EOF
-

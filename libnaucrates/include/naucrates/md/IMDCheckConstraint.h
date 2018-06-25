@@ -28,7 +28,7 @@ namespace gpopt
 {
 	class CExpression;
 	class CMDAccessor;
-}
+}  // namespace gpopt
 
 namespace gpmd
 {
@@ -45,25 +45,24 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class IMDCheckConstraint : public IMDCacheObject
 	{
-		public:
+	public:
+		// object type
+		virtual Emdtype
+		MDType() const
+		{
+			return EmdtCheckConstraint;
+		}
 
-	 		// object type
-	 	 	virtual
-	 	 	Emdtype MDType() const
-	 	 	{
-	 	 		return EmdtCheckConstraint;
-	 	 	}
+		// mdid of the relation
+		virtual IMDId *GetRelMdId() const = 0;
 
-			// mdid of the relation
-			virtual
-			IMDId *GetRelMdId() const = 0;
-
-			// the scalar expression of the check constraint
-			virtual
-			CExpression *GetCheckConstraintExpr(IMemoryPool *memory_pool, CMDAccessor *md_accessor, DrgPcr *colref_array) const = 0;
+		// the scalar expression of the check constraint
+		virtual CExpression *GetCheckConstraintExpr(IMemoryPool *memory_pool,
+													CMDAccessor *md_accessor,
+													DrgPcr *colref_array) const = 0;
 	};
-}
+}  // namespace gpmd
 
-#endif // !GPMD_IMDCheckConstraint_H
+#endif  // !GPMD_IMDCheckConstraint_H
 
 // EOF

@@ -18,7 +18,6 @@
 
 namespace gpnaucrates
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDatumBoolGPDB
@@ -27,14 +26,12 @@ namespace gpnaucrates
 	//		GPDB-specific bool representation
 	//
 	//---------------------------------------------------------------------------
-class CDatumBoolGPDB : public IDatumBool
-{
-
+	class CDatumBoolGPDB : public IDatumBool
+	{
 	private:
-
 		// type information
 		IMDId *m_mdid;
-	
+
 		// boolean m_bytearray_value
 		BOOL m_value;
 
@@ -45,54 +42,43 @@ class CDatumBoolGPDB : public IDatumBool
 		CDatumBoolGPDB(const CDatumBoolGPDB &);
 
 	public:
-
 		// ctors
 		CDatumBoolGPDB(CSystemId sysid, BOOL value, BOOL is_null = false);
 		CDatumBoolGPDB(IMDId *mdid, BOOL value, BOOL is_null = false);
-		
+
 		// dtor
-		virtual
-		~CDatumBoolGPDB();
+		virtual ~CDatumBoolGPDB();
 
 		// accessor of metadata type mdid
-		virtual
-		IMDId *MDId() const;
+		virtual IMDId *MDId() const;
 
 		// accessor of boolean m_bytearray_value
-		virtual
-		BOOL GetValue() const;
+		virtual BOOL GetValue() const;
 
 		// accessor of size
-		virtual
-		ULONG Size() const;
+		virtual ULONG Size() const;
 
 		// accessor of is null
-		virtual
-		BOOL IsNull() const;
+		virtual BOOL IsNull() const;
 
 		// return string representation
-		virtual
-		const CWStringConst *GetStrRepr(IMemoryPool *memory_pool) const;
+		virtual const CWStringConst *GetStrRepr(IMemoryPool *memory_pool) const;
 
 		// hash function
-		virtual
-		ULONG HashValue() const;
+		virtual ULONG HashValue() const;
 
 		// match function for datums
-		virtual
-		BOOL Matches(const IDatum *) const;
+		virtual BOOL Matches(const IDatum *) const;
 
 		// copy datum
-		virtual
-		IDatum *MakeCopy(IMemoryPool *memory_pool) const;
-		
+		virtual IDatum *MakeCopy(IMemoryPool *memory_pool) const;
+
 		// print function
-		virtual
-		IOstream &OsPrint(IOstream &os) const;
+		virtual IOstream &OsPrint(IOstream &os) const;
 
-	}; // class CDatumBoolGPDB
-}
+	};  // class CDatumBoolGPDB
+}  // namespace gpnaucrates
 
-#endif // !GPNAUCRATES_CDatumBoolGPDB_H
+#endif  // !GPNAUCRATES_CDatumBoolGPDB_H
 
 // EOF

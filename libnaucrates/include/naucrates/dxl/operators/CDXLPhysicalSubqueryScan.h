@@ -41,52 +41,44 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalSubqueryScan : public CDXLPhysical
 	{
-		private:
-		
-			// name for the subquery scan node (corresponding to name in GPDB's SubqueryScan)
-			CMDName *m_mdname_alias;
-			
-			// private copy ctor
-			CDXLPhysicalSubqueryScan(CDXLPhysicalSubqueryScan&);
+	private:
+		// name for the subquery scan node (corresponding to name in GPDB's SubqueryScan)
+		CMDName *m_mdname_alias;
 
-		public:
-			// ctor/dtor
-			CDXLPhysicalSubqueryScan(IMemoryPool *memory_pool, CMDName *mdname);
+		// private copy ctor
+		CDXLPhysicalSubqueryScan(CDXLPhysicalSubqueryScan &);
 
-			virtual
-			~CDXLPhysicalSubqueryScan();
-						
-			// accessors
-			Edxlopid GetDXLOperator() const;
-			const CWStringConst *GetOpNameStr() const;
-			const CMDName *MdName();
-			
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+	public:
+		// ctor/dtor
+		CDXLPhysicalSubqueryScan(IMemoryPool *memory_pool, CMDName *mdname);
 
-			// conversion function
-			static
-			CDXLPhysicalSubqueryScan *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopPhysicalSubqueryScan == dxl_op->GetDXLOperator());
+		virtual ~CDXLPhysicalSubqueryScan();
 
-				return dynamic_cast<CDXLPhysicalSubqueryScan*>(dxl_op);
-			}
+		// accessors
+		Edxlopid GetDXLOperator() const;
+		const CWStringConst *GetOpNameStr() const;
+		const CMDName *MdName();
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+
+		// conversion function
+		static CDXLPhysicalSubqueryScan *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopPhysicalSubqueryScan == dxl_op->GetDXLOperator());
+
+			return dynamic_cast<CDXLPhysicalSubqueryScan *>(dxl_op);
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL validate_children) const;
-#endif // GPOS_DEBUG
-			
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
-#endif // !GPDXL_CDXLPhysicalSubqueryScan_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLPhysicalSubqueryScan_H
 
 // EOF
-

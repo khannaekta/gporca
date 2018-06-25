@@ -34,51 +34,41 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerStatistics : public CParseHandlerBase
 	{
-		private:
+	private:
+		// list of derived table statistics
+		DXLStatsDerivedRelArray *m_stats_derived_rel_dxl_array;
 
-			// list of derived table statistics
-			DXLStatsDerivedRelArray *m_stats_derived_rel_dxl_array;
+		// private copy ctor
+		CParseHandlerStatistics(const CParseHandlerStatistics &);
 
-			// private copy ctor
-			CParseHandlerStatistics(const CParseHandlerStatistics&);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the start of an element
-			void StartElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
- 					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the end of an element
-			void EndElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-				);
+	public:
+		// ctor/dtor
+		CParseHandlerStatistics(IMemoryPool *memory_pool,
+								CParseHandlerManager *parse_handler_mgr,
+								CParseHandlerBase *parse_handler_root);
 
-		public:
-			// ctor/dtor
-			CParseHandlerStatistics
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
+		~CParseHandlerStatistics();
 
-			~CParseHandlerStatistics();
+		virtual EDxlParseHandlerType GetParseHandlerType() const;
 
-			virtual
-			EDxlParseHandlerType GetParseHandlerType() const;
-
-			// return the list of statistics objects
-			DXLStatsDerivedRelArray *GetStatsDerivedRelDXLArray() const;
-
+		// return the list of statistics objects
+		DXLStatsDerivedRelArray *GetStatsDerivedRelDXLArray() const;
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerStatistics_H
+#endif  // !GPDXL_CParseHandlerStatistics_H
 
 // EOF

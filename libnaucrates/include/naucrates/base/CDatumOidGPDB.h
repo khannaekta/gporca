@@ -17,7 +17,6 @@
 
 namespace gpnaucrates
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDatumOidGPDB
@@ -28,69 +27,57 @@ namespace gpnaucrates
 	//---------------------------------------------------------------------------
 	class CDatumOidGPDB : public IDatumOid
 	{
-		private:
+	private:
+		// type information
+		IMDId *m_mdid;
 
-			// type information
-			IMDId *m_mdid;
+		// oid m_bytearray_value
+		OID m_val;
 
-			// oid m_bytearray_value
-			OID m_val;
+		// is null
+		BOOL m_is_null;
 
-			// is null
-			BOOL m_is_null;
+		// private copy ctor
+		CDatumOidGPDB(const CDatumOidGPDB &);
 
-			// private copy ctor
-			CDatumOidGPDB(const CDatumOidGPDB &);
+	public:
+		// ctors
+		CDatumOidGPDB(CSystemId sysid, OID oid_val, BOOL is_null = false);
+		CDatumOidGPDB(IMDId *mdid, OID oid_val, BOOL is_null = false);
 
-		public:
+		// dtor
+		virtual ~CDatumOidGPDB();
 
-			// ctors
-			CDatumOidGPDB(CSystemId sysid, OID oid_val, BOOL is_null = false);
-			CDatumOidGPDB(IMDId *mdid, OID oid_val, BOOL is_null = false);
+		// accessor of metadata type id
+		virtual IMDId *MDId() const;
 
-			// dtor
-			virtual
-			~CDatumOidGPDB();
+		// accessor of size
+		virtual ULONG Size() const;
 
-			// accessor of metadata type id
-			virtual
-			IMDId *MDId() const;
+		// accessor of oid m_bytearray_value
+		virtual OID OidValue() const;
 
-			// accessor of size
-			virtual
-			ULONG Size() const;
+		// accessor of is null
+		virtual BOOL IsNull() const;
 
-			// accessor of oid m_bytearray_value
-			virtual
-			OID OidValue() const;
+		// return string representation
+		virtual const CWStringConst *GetStrRepr(IMemoryPool *memory_pool) const;
 
-			// accessor of is null
-			virtual
-			BOOL IsNull() const;
+		// hash function
+		virtual ULONG HashValue() const;
 
-			// return string representation
-			virtual
-			const CWStringConst *GetStrRepr(IMemoryPool *memory_pool) const;
+		// match function for datums
+		virtual BOOL Matches(const IDatum *) const;
 
-			// hash function
-			virtual
-			ULONG HashValue() const;
+		// copy datum
+		virtual IDatum *MakeCopy(IMemoryPool *memory_pool) const;
 
-			// match function for datums
-			virtual
-			BOOL Matches(const IDatum *) const;
+		// print function
+		virtual IOstream &OsPrint(IOstream &os) const;
 
-			// copy datum
-			virtual
-			IDatum *MakeCopy(IMemoryPool *memory_pool) const;
+	};  // class CDatumOidGPDB
+}  // namespace gpnaucrates
 
-			// print function
-			virtual
-			IOstream &OsPrint(IOstream &os) const;
-
-	}; // class CDatumOidGPDB
-}
-
-#endif // !GPNAUCRATES_CDatumOidGPDB_H
+#endif  // !GPNAUCRATES_CDatumOidGPDB_H
 
 // EOF

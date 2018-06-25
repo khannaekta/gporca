@@ -28,74 +28,68 @@ namespace gpnaucrates
 	//---------------------------------------------------------------------------
 	class CStatsPredConj : public CStatsPred
 	{
-		private:
+	private:
+		// private copy ctor
+		CStatsPredConj(const CStatsPredConj &);
 
-			// private copy ctor
-			CStatsPredConj(const CStatsPredConj &);
+		// private assignment operator
+		CStatsPredConj &operator=(CStatsPredConj &);
 
-			// private assignment operator
-			CStatsPredConj& operator=(CStatsPredConj &);
+		// array of filters
+		StatsPredPtrArry *m_conj_pred_stats_array;
 
-			// array of filters
-			StatsPredPtrArry *m_conj_pred_stats_array;
+	public:
+		// ctor
+		explicit CStatsPredConj(StatsPredPtrArry *pdrgpstatspred);
 
-		public:
+		// dtor
+		virtual ~CStatsPredConj()
+		{
+			m_conj_pred_stats_array->Release();
+		}
 
-			// ctor
-			explicit
-			CStatsPredConj(StatsPredPtrArry *pdrgpstatspred);
+		// the column identifier on which the predicates are on
+		virtual ULONG GetColId() const;
 
-			// dtor
-			virtual
-			~CStatsPredConj()
-			{
-				m_conj_pred_stats_array->Release();
-			}
+		// total number of predicates in the conjunction
+		ULONG
+		GetNumPreds() const
+		{
+			return m_conj_pred_stats_array->Size();
+		}
 
-			// the column identifier on which the predicates are on
-			virtual
-			ULONG GetColId() const;
+		StatsPredPtrArry *
+		GetConjPredStatsArray() const
+		{
+			return m_conj_pred_stats_array;
+		}
 
-			// total number of predicates in the conjunction
-			ULONG GetNumPreds() const
-			{
-				return m_conj_pred_stats_array->Size();
-			}
+		// sort the components of the conjunction
+		void Sort() const;
 
-			StatsPredPtrArry *GetConjPredStatsArray() const
-			{
-				return m_conj_pred_stats_array;
-			}
+		// return the filter at a particular position
+		CStatsPred *GetPredStats(ULONG pos) const;
 
-			// sort the components of the conjunction
-			void Sort() const;
+		// filter type id
+		virtual EStatsPredType
+		GetPredStatsType() const
+		{
+			return CStatsPred::EsptConj;
+		}
 
-			// return the filter at a particular position
-			CStatsPred *GetPredStats(ULONG pos) const;
+		// conversion function
+		static CStatsPredConj *
+		ConvertPredStats(CStatsPred *pred_stats)
+		{
+			GPOS_ASSERT(NULL != pred_stats);
+			GPOS_ASSERT(CStatsPred::EsptConj == pred_stats->GetPredStatsType());
 
-			// filter type id
-			virtual
-			EStatsPredType GetPredStatsType() const
-			{
-				return CStatsPred::EsptConj;
-			}
+			return dynamic_cast<CStatsPredConj *>(pred_stats);
+		}
 
-			// conversion function
-			static
-			CStatsPredConj *ConvertPredStats
-				(
-				CStatsPred *pred_stats
-				)
-			{
-				GPOS_ASSERT(NULL != pred_stats);
-				GPOS_ASSERT(CStatsPred::EsptConj == pred_stats->GetPredStatsType());
+	};  // class CStatsPredConj
+}  // namespace gpnaucrates
 
-				return dynamic_cast<CStatsPredConj*>(pred_stats);
-			}
-
-	}; // class CStatsPredConj
-}
-
-#endif // !GPNAUCRATES_CStatsPredConj_H
+#endif  // !GPNAUCRATES_CStatsPredConj_H
 
 // EOF

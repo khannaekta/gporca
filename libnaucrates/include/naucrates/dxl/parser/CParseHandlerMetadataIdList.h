@@ -23,7 +23,7 @@ namespace gpdxl
 	using namespace gpmd;
 
 	XERCES_CPP_NAMESPACE_USE
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CParseHandlerMetadataIdList
@@ -34,55 +34,46 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerMetadataIdList : public CParseHandlerBase
 	{
-		private:
-			// list of metadata identifiers
-			MdidPtrArray *m_mdid_array;
+	private:
+		// list of metadata identifiers
+		MdidPtrArray *m_mdid_array;
 
-			
-			// private copy ctor
-			CParseHandlerMetadataIdList(const CParseHandlerMetadataIdList &);
-			
-			// process the start of an element
-			void StartElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
- 					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
-				
-			// process the end of an element
-			void EndElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-				);
-			
-			// is this a supported element of a metadata list
-			BOOL FSupportedElem(const XMLCh * const xml_str);
-			
-			// is this a supported metadata list type
-			BOOL FSupportedListType(const XMLCh * const xml_str);
-			
-		public:
-			// ctor/dtor
-			CParseHandlerMetadataIdList
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
-			
-			virtual
-			~CParseHandlerMetadataIdList();
-			
-			// return the constructed list of metadata identifiers
-			MdidPtrArray *GetMdIdArray();
-			
+
+		// private copy ctor
+		CParseHandlerMetadataIdList(const CParseHandlerMetadataIdList &);
+
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
+
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+		// is this a supported element of a metadata list
+		BOOL FSupportedElem(const XMLCh *const xml_str);
+
+		// is this a supported metadata list type
+		BOOL FSupportedListType(const XMLCh *const xml_str);
+
+	public:
+		// ctor/dtor
+		CParseHandlerMetadataIdList(IMemoryPool *memory_pool,
+									CParseHandlerManager *parse_handler_mgr,
+									CParseHandlerBase *parse_handler_root);
+
+		virtual ~CParseHandlerMetadataIdList();
+
+		// return the constructed list of metadata identifiers
+		MdidPtrArray *GetMdIdArray();
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerMetadataIdList_H
+#endif  // !GPDXL_CParseHandlerMetadataIdList_H
 
 // EOF

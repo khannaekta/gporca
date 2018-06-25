@@ -28,18 +28,14 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDPartConstraintGPDB::CMDPartConstraintGPDB
-	(
-	IMemoryPool *memory_pool,
-	ULongPtrArray *level_with_default_part_array,
-	BOOL is_unbounded,
-	CDXLNode *dxlnode
-	)
-	:
-	m_memory_pool(memory_pool),
-	m_level_with_default_part_array(level_with_default_part_array),
-	m_is_unbounded(is_unbounded),
-	m_dxl_node(dxlnode)
+CMDPartConstraintGPDB::CMDPartConstraintGPDB(IMemoryPool *memory_pool,
+											 ULongPtrArray *level_with_default_part_array,
+											 BOOL is_unbounded,
+											 CDXLNode *dxlnode)
+	: m_memory_pool(memory_pool),
+	  m_level_with_default_part_array(level_with_default_part_array),
+	  m_is_unbounded(is_unbounded),
+	  m_dxl_node(dxlnode)
 {
 	GPOS_ASSERT(NULL != level_with_default_part_array);
 }
@@ -68,13 +64,9 @@ CMDPartConstraintGPDB::~CMDPartConstraintGPDB()
 //
 //---------------------------------------------------------------------------
 CExpression *
-CMDPartConstraintGPDB::GetPartConstraintExpr
-	(
-	IMemoryPool *memory_pool,
-	CMDAccessor *md_accessor,
-	DrgPcr *colref_array
-	)
-	const
+CMDPartConstraintGPDB::GetPartConstraintExpr(IMemoryPool *memory_pool,
+											 CMDAccessor *md_accessor,
+											 DrgPcr *colref_array) const
 {
 	GPOS_ASSERT(NULL != colref_array);
 
@@ -120,28 +112,27 @@ CMDPartConstraintGPDB::IsConstraintUnbounded() const
 //
 //---------------------------------------------------------------------------
 void
-CMDPartConstraintGPDB::Serialize
-	(
-	CXMLSerializer *xml_serializer
-	)
-	const
+CMDPartConstraintGPDB::Serialize(CXMLSerializer *xml_serializer) const
 {
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
-						CDXLTokens::GetDXLTokenStr(EdxltokenPartConstraint));
-	
+								CDXLTokens::GetDXLTokenStr(EdxltokenPartConstraint));
+
 	// serialize default parts
-	CWStringDynamic *default_part_array = CDXLUtils::Serialize(m_memory_pool, m_level_with_default_part_array);
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenDefaultPartition), default_part_array);
+	CWStringDynamic *default_part_array =
+		CDXLUtils::Serialize(m_memory_pool, m_level_with_default_part_array);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenDefaultPartition),
+								 default_part_array);
 	GPOS_DELETE(default_part_array);
 
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenPartConstraintUnbounded), m_is_unbounded);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenPartConstraintUnbounded),
+								 m_is_unbounded);
 
 	// serialize the scalar expression
 	if (NULL != m_dxl_node)
 		m_dxl_node->SerializeToDXL(xml_serializer);
 
 	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
-						CDXLTokens::GetDXLTokenStr(EdxltokenPartConstraint));
+								 CDXLTokens::GetDXLTokenStr(EdxltokenPartConstraint));
 
 	GPOS_CHECK_ABORT;
 }

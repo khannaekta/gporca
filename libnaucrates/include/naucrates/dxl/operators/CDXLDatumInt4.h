@@ -8,8 +8,8 @@
 //	@doc:
 //		Class for representing DXL integer datum
 //
-//	@owner: 
-//		
+//	@owner:
+//
 //
 //	@test:
 //
@@ -38,66 +38,54 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLDatumInt4 : public CDXLDatum
 	{
-		private:
-			// int4 m_bytearray_value
-			INT m_val;
+	private:
+		// int4 m_bytearray_value
+		INT m_val;
 
-			// private copy ctor
-			CDXLDatumInt4(const CDXLDatumInt4 &);
+		// private copy ctor
+		CDXLDatumInt4(const CDXLDatumInt4 &);
 
-		public:
-			// ctor
-			CDXLDatumInt4
-				(
-				IMemoryPool *memory_pool,
-				IMDId *mdid_type,
-				BOOL is_null,
-				INT val
-				);
+	public:
+		// ctor
+		CDXLDatumInt4(IMemoryPool *memory_pool, IMDId *mdid_type, BOOL is_null, INT val);
 
-			// dtor
-			virtual
-			~CDXLDatumInt4(){};
+		// dtor
+		virtual ~CDXLDatumInt4(){};
 
-			// accessor of int m_bytearray_value
-			INT Value() const;
+		// accessor of int m_bytearray_value
+		INT Value() const;
 
-			// serialize the datum as the given element
-			virtual
-			void Serialize(CXMLSerializer *xml_serializer);
+		// serialize the datum as the given element
+		virtual void Serialize(CXMLSerializer *xml_serializer);
 
-			// datum type
-			virtual
-			EdxldatumType GetDatumType() const
-			{
-				return CDXLDatum::EdxldatumInt4;
-			}
+		// datum type
+		virtual EdxldatumType
+		GetDatumType() const
+		{
+			return CDXLDatum::EdxldatumInt4;
+		}
 
-			// is type passed by m_bytearray_value
-			virtual
-			BOOL IsPassedByValue() const
-			{
-				return true;
-			}
+		// is type passed by m_bytearray_value
+		virtual BOOL
+		IsPassedByValue() const
+		{
+			return true;
+		}
 
-			// conversion function
-			static
-			CDXLDatumInt4 *Cast
-				(
-				CDXLDatum *datum_dxl
-				)
-			{
-				GPOS_ASSERT(NULL != datum_dxl);
-				GPOS_ASSERT(CDXLDatum::EdxldatumInt4 == datum_dxl->GetDatumType());
+		// conversion function
+		static CDXLDatumInt4 *
+		Cast(CDXLDatum *datum_dxl)
+		{
+			GPOS_ASSERT(NULL != datum_dxl);
+			GPOS_ASSERT(CDXLDatum::EdxldatumInt4 == datum_dxl->GetDatumType());
 
-				return dynamic_cast<CDXLDatumInt4*>(datum_dxl);
-			}
+			return dynamic_cast<CDXLDatumInt4 *>(datum_dxl);
+		}
 	};
-}
+}  // namespace gpdxl
 
 
 
-#endif // !GPDXL_CDXLDatumInt4_H
+#endif  // !GPDXL_CDXLDatumInt4_H
 
 // EOF
-

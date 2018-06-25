@@ -31,65 +31,56 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarCoalesce : public CDXLScalar
 	{
-		private:
-			// return type
-			IMDId *m_mdid_type;
+	private:
+		// return type
+		IMDId *m_mdid_type;
 
-			// private copy ctor
-			CDXLScalarCoalesce(const CDXLScalarCoalesce&);
+		// private copy ctor
+		CDXLScalarCoalesce(const CDXLScalarCoalesce &);
 
-		public:
+	public:
+		// ctor
+		CDXLScalarCoalesce(IMemoryPool *memory_pool, IMDId *mdid_type);
 
-			// ctor
-			CDXLScalarCoalesce(IMemoryPool *memory_pool, IMDId *mdid_type);
+		//dtor
+		virtual ~CDXLScalarCoalesce();
 
-			//dtor
-			virtual
-			~CDXLScalarCoalesce();
+		// name of the operator
+		virtual const CWStringConst *GetOpNameStr() const;
 
-			// name of the operator
-			virtual
-			const CWStringConst *GetOpNameStr() const;
+		// return type
+		virtual IMDId *
+		MDIdType() const
+		{
+			return m_mdid_type;
+		}
 
-			// return type
-			virtual
-			IMDId *MDIdType() const
-			{
-				return m_mdid_type;
-			}
+		// DXL Operator ID
+		virtual Edxlopid GetDXLOperator() const;
 
-			// DXL Operator ID
-			virtual
-			Edxlopid GetDXLOperator() const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
-
-			// does the operator return a boolean result
-			virtual
-			BOOL HasBoolResult(CMDAccessor *md_accessor) const;
+		// does the operator return a boolean result
+		virtual BOOL HasBoolResult(CMDAccessor *md_accessor) const;
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *node, BOOL validate_children) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *node, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 
-			// conversion function
-			static
-			CDXLScalarCoalesce *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopScalarCoalesce == dxl_op->GetDXLOperator());
+		// conversion function
+		static CDXLScalarCoalesce *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarCoalesce == dxl_op->GetDXLOperator());
 
-				return dynamic_cast<CDXLScalarCoalesce*>(dxl_op);
-			}
+			return dynamic_cast<CDXLScalarCoalesce *>(dxl_op);
+		}
 	};
-}
-#endif // !GPDXL_CDXLScalarCoalesce_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLScalarCoalesce_H
 
 // EOF

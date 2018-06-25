@@ -7,7 +7,7 @@
 //
 //	@doc:
 //		Parse handler for parsing CTAS storage options
-//		
+//
 //---------------------------------------------------------------------------
 #ifndef GPDXL_CParseHandlerCTASStorageOptions_H
 #define GPDXL_CParseHandlerCTASStorageOptions_H
@@ -19,7 +19,6 @@
 
 namespace gpdxl
 {
-	
 	using namespace gpos;
 
 	XERCES_CPP_NAMESPACE_USE
@@ -34,58 +33,49 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerCtasStorageOptions : public CParseHandlerBase
 	{
-		private:
+	private:
+		// tablespace name
+		CMDName *m_mdname_tablespace;
 
-			// tablespace name
-			CMDName *m_mdname_tablespace;
-			
-			// on commit action
-			CDXLCtasStorageOptions::ECtasOnCommitAction m_ctas_on_commit_action;
-			
-			// CTAS storage options
-			CDXLCtasStorageOptions *m_dxl_ctas_storage_option;
-			
-			// parsed array of key-m_bytearray_value pairs of options
-			CDXLCtasStorageOptions::DXLCtasOptionArray *m_ctas_storage_option_array;
-			
-			// private copy ctor
-			CParseHandlerCtasStorageOptions(const CParseHandlerCtasStorageOptions &);
+		// on commit action
+		CDXLCtasStorageOptions::ECtasOnCommitAction m_ctas_on_commit_action;
 
-			// process the start of an element
-			void StartElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
-				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname,		// element's qname
-				const Attributes& attr				// element's attributes
-				);
+		// CTAS storage options
+		CDXLCtasStorageOptions *m_dxl_ctas_storage_option;
 
-			// process the end of an element
-			void EndElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
-				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname		// element's qname
-				);
+		// parsed array of key-m_bytearray_value pairs of options
+		CDXLCtasStorageOptions::DXLCtasOptionArray *m_ctas_storage_option_array;
 
-		public:
-			// ctor
-			CParseHandlerCtasStorageOptions
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
-			
-			// dtor
-			virtual
-			~CParseHandlerCtasStorageOptions();
-			
-			// parsed storage options
-			CDXLCtasStorageOptions *GetDxlCtasStorageOption() const;
+		// private copy ctor
+		CParseHandlerCtasStorageOptions(const CParseHandlerCtasStorageOptions &);
+
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
+
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+	public:
+		// ctor
+		CParseHandlerCtasStorageOptions(IMemoryPool *memory_pool,
+										CParseHandlerManager *parse_handler_mgr,
+										CParseHandlerBase *parse_handler_root);
+
+		// dtor
+		virtual ~CParseHandlerCtasStorageOptions();
+
+		// parsed storage options
+		CDXLCtasStorageOptions *GetDxlCtasStorageOption() const;
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerCTASStorageOptions_H
+#endif  // !GPDXL_CParseHandlerCTASStorageOptions_H
 
 // EOF

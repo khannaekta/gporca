@@ -30,20 +30,16 @@ using namespace gpdxl;
 //		Constructs an AggRef node
 //
 //---------------------------------------------------------------------------
-CDXLScalarAggref::CDXLScalarAggref
-	(
-	IMemoryPool *memory_pool,
-	IMDId *agg_func_mdid,
-	IMDId *resolved_rettype_mdid,
-	BOOL is_distinct,
-	EdxlAggrefStage agg_stage
-	)
-	:
-	CDXLScalar(memory_pool),
-	m_agg_func_mdid(agg_func_mdid),
-	m_resolved_rettype_mdid(resolved_rettype_mdid),
-	m_is_distinct(is_distinct),
-	m_agg_stage(agg_stage)
+CDXLScalarAggref::CDXLScalarAggref(IMemoryPool *memory_pool,
+								   IMDId *agg_func_mdid,
+								   IMDId *resolved_rettype_mdid,
+								   BOOL is_distinct,
+								   EdxlAggrefStage agg_stage)
+	: CDXLScalar(memory_pool),
+	  m_agg_func_mdid(agg_func_mdid),
+	  m_resolved_rettype_mdid(resolved_rettype_mdid),
+	  m_is_distinct(is_distinct),
+	  m_agg_stage(agg_stage)
 {
 	GPOS_ASSERT(NULL != agg_func_mdid);
 	GPOS_ASSERT_IMP(NULL != resolved_rettype_mdid, resolved_rettype_mdid->IsValid());
@@ -186,26 +182,25 @@ CDXLScalarAggref::IsDistinct() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarAggref::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *dxlnode
-	)
-	const
+CDXLScalarAggref::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 	m_agg_func_mdid->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenAggrefOid));
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenAggrefDistinct),m_is_distinct);
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenAggrefStage), GetDXLStrAggStage());
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenAggrefDistinct),
+								 m_is_distinct);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenAggrefStage),
+								 GetDXLStrAggStage());
 	if (NULL != m_resolved_rettype_mdid)
 	{
-		m_resolved_rettype_mdid->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenTypeId));
+		m_resolved_rettype_mdid->Serialize(xml_serializer,
+										   CDXLTokens::GetDXLTokenStr(EdxltokenTypeId));
 	}
 	dxlnode->SerializeChildrenToDXL(xml_serializer);
 
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 //---------------------------------------------------------------------------
@@ -217,11 +212,7 @@ CDXLScalarAggref::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 BOOL
-CDXLScalarAggref::HasBoolResult
-	(
-	CMDAccessor *md_accessor
-	)
-	const
+CDXLScalarAggref::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	const IMDAggregate *pmdagg = md_accessor->Pmdagg(m_agg_func_mdid);
 	return (IMDType::EtiBool == md_accessor->Pmdtype(pmdagg->GetResultTypeMdid())->GetDatumType());
@@ -237,14 +228,9 @@ CDXLScalarAggref::HasBoolResult
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarAggref::AssertValid
-	(
-	const CDXLNode *dxlnode,
-	BOOL validate_children
-	) 
-	const
+CDXLScalarAggref::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
-	EdxlAggrefStage aggrefstage = ((CDXLScalarAggref*) dxlnode->GetOperator())->GetDXLAggStage();
+	EdxlAggrefStage aggrefstage = ((CDXLScalarAggref *) dxlnode->GetOperator())->GetDXLAggStage();
 
 	GPOS_ASSERT((EdxlaggstageFinal >= aggrefstage) && (EdxlaggstageNormal <= aggrefstage));
 
@@ -253,13 +239,13 @@ CDXLScalarAggref::AssertValid
 	{
 		CDXLNode *aggref_child_dxl = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar == aggref_child_dxl->GetOperator()->GetDXLOperatorType());
-		
+
 		if (validate_children)
 		{
 			aggref_child_dxl->GetOperator()->AssertValid(aggref_child_dxl, validate_children);
 		}
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

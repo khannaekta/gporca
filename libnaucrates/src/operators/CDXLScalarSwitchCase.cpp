@@ -27,12 +27,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarSwitchCase::CDXLScalarSwitchCase
-	(
-	IMemoryPool *memory_pool
-	)
-	:
-	CDXLScalar(memory_pool)
+CDXLScalarSwitchCase::CDXLScalarSwitchCase(IMemoryPool *memory_pool) : CDXLScalar(memory_pool)
 {
 }
 
@@ -73,18 +68,14 @@ CDXLScalarSwitchCase::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSwitchCase::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *dxlnode
-	)
-	const
+CDXLScalarSwitchCase::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 	dxlnode->SerializeChildrenToDXL(xml_serializer);
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -97,12 +88,7 @@ CDXLScalarSwitchCase::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSwitchCase::AssertValid
-	(
-	const CDXLNode *dxlnode,
-	BOOL validate_children
-	)
-	const
+CDXLScalarSwitchCase::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
 	GPOS_ASSERT(2 == arity);
@@ -118,6 +104,6 @@ CDXLScalarSwitchCase::AssertValid
 		}
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

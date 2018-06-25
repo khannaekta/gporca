@@ -7,7 +7,7 @@
 //
 //	@doc:
 //		Base class for DXL logical operators.
-//		
+//
 //---------------------------------------------------------------------------
 
 #ifndef GPDXL_CDXLLogical_H
@@ -20,10 +20,10 @@
 namespace gpdxl
 {
 	using namespace gpos;
-	
-	// fwd decl 
+
+	// fwd decl
 	class CXMLSerializer;
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDXLLogical
@@ -34,21 +34,19 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLLogical : public CDXLOperator
 	{
-		private:
+	private:
+		// private copy ctor
+		CDXLLogical(const CDXLLogical &);
 
-			// private copy ctor
-			CDXLLogical(const CDXLLogical&);
+	public:
+		// ctor/dtor
+		explicit CDXLLogical(IMemoryPool *memory_pool);
 
-		public:
-			// ctor/dtor
-			explicit
-			CDXLLogical(IMemoryPool *memory_pool);
-
-			// Get operator type
-			Edxloptype GetDXLOperatorType() const;
+		// Get operator type
+		Edxloptype GetDXLOperatorType() const;
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLLogical_H
+#endif  // !GPDXL_CDXLLogical_H
 
 // EOF

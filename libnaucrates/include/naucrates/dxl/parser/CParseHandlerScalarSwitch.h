@@ -33,49 +33,38 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerScalarSwitch : public CParseHandlerScalarOp
 	{
-		private:
+	private:
+		// return type
+		IMDId *m_mdid_type;
 
-			// return type
-			IMDId *m_mdid_type;
+		// was the arg child seen
+		BOOL m_arg_processed;
 
-			// was the arg child seen
-			BOOL m_arg_processed;
+		// was the default m_bytearray_value seen
+		BOOL m_default_val_processed;
 
-			// was the default m_bytearray_value seen
-			BOOL m_default_val_processed;
+		// private copy ctor
+		CParseHandlerScalarSwitch(const CParseHandlerScalarSwitch &);
 
-			// private copy ctor
-			CParseHandlerScalarSwitch(const CParseHandlerScalarSwitch &);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,
+						  const XMLCh *const element_local_name,
+						  const XMLCh *const element_qname,
+						  const Attributes &attr);
 
-			// process the start of an element
-			void StartElement
-					(
-					const XMLCh* const element_uri,
-					const XMLCh* const element_local_name,
-					const XMLCh* const element_qname,
-					const Attributes& attr
-					);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,
+						const XMLCh *const element_local_name,
+						const XMLCh *const element_qname);
 
-			// process the end of an element
-			void EndElement
-					(
-					const XMLCh* const element_uri,
-					const XMLCh* const element_local_name,
-					const XMLCh* const element_qname
-					);
+	public:
+		// ctor
+		CParseHandlerScalarSwitch(IMemoryPool *memory_pool,
+								  CParseHandlerManager *parse_handler_mgr,
+								  CParseHandlerBase *parse_handler_root);
+	};
+}  // namespace gpdxl
 
-		public:
-			// ctor
-			CParseHandlerScalarSwitch
-					(
-					IMemoryPool *memory_pool,
-					CParseHandlerManager *parse_handler_mgr,
-					CParseHandlerBase *parse_handler_root
-					);
-
-		};
-}
-
-#endif // !GPDXL_CParseHandlerScalarSwitch_H
+#endif  // !GPDXL_CParseHandlerScalarSwitch_H
 
 //EOF

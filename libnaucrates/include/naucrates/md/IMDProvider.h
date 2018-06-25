@@ -38,36 +38,35 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class IMDProvider : public CRefCount
 	{
-		protected:
+	protected:
+		// return the mdid for the requested type
+		static IMDId *GetGPDBTypeMdid(IMemoryPool *memory_pool,
+									  CSystemId sysid,
+									  IMDType::ETypeInfo type_info);
 
-			// return the mdid for the requested type
-			static
-			IMDId *GetGPDBTypeMdid
-				(
-				IMemoryPool *memory_pool,
-				CSystemId sysid,
-				IMDType::ETypeInfo type_info
-				);
+	public:
+		virtual ~IMDProvider()
+		{
+		}
 
-		public:
-			virtual ~IMDProvider(){}
-			
-			// returns the DXL string of the requested metadata object
-			virtual 
-			CWStringBase *GetMDObjDXLStr(IMemoryPool *memory_pool, CMDAccessor *md_accessor, IMDId *mdid) const = 0;
+		// returns the DXL string of the requested metadata object
+		virtual CWStringBase *GetMDObjDXLStr(IMemoryPool *memory_pool,
+											 CMDAccessor *md_accessor,
+											 IMDId *mdid) const = 0;
 
-			// return the mdid for the specified system id and type
-			virtual 
-			IMDId *MDId(IMemoryPool *memory_pool, CSystemId sysid, IMDType::ETypeInfo type_info) const = 0;
+		// return the mdid for the specified system id and type
+		virtual IMDId *MDId(IMemoryPool *memory_pool,
+							CSystemId sysid,
+							IMDType::ETypeInfo type_info) const = 0;
 	};
 
 	// arrays of MD providers
 	typedef CDynamicPtrArray<IMDProvider, CleanupRelease> MDProviderPtrArray;
 
-}
+}  // namespace gpmd
 
 
 
-#endif // !GPMD_IMDProvider_H
+#endif  // !GPMD_IMDProvider_H
 
 // EOF

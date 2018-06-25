@@ -41,47 +41,43 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalMergeJoin : public CDXLPhysicalJoin
 	{
-		private:
-			// true if outer relation has unique values for the merge key
-			BOOL m_is_unique_outer;
-			
-			// private copy ctor
-			CDXLPhysicalMergeJoin(const CDXLPhysicalMergeJoin&);
+	private:
+		// true if outer relation has unique values for the merge key
+		BOOL m_is_unique_outer;
 
-		public:
-			// ctor
-			CDXLPhysicalMergeJoin(IMemoryPool *memory_pool, EdxlJoinType join_type, BOOL is_unique_outer);
-			
-			// accessors
-			Edxlopid GetDXLOperator() const;
-			const CWStringConst *GetOpNameStr() const;
-			
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+		// private copy ctor
+		CDXLPhysicalMergeJoin(const CDXLPhysicalMergeJoin &);
 
-			// conversion function
-			static
-			CDXLPhysicalMergeJoin *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopPhysicalMergeJoin == dxl_op->GetDXLOperator());
+	public:
+		// ctor
+		CDXLPhysicalMergeJoin(IMemoryPool *memory_pool,
+							  EdxlJoinType join_type,
+							  BOOL is_unique_outer);
 
-				return dynamic_cast<CDXLPhysicalMergeJoin*>(dxl_op);
-			}
+		// accessors
+		Edxlopid GetDXLOperator() const;
+		const CWStringConst *GetOpNameStr() const;
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+
+		// conversion function
+		static CDXLPhysicalMergeJoin *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopPhysicalMergeJoin == dxl_op->GetDXLOperator());
+
+			return dynamic_cast<CDXLPhysicalMergeJoin *>(dxl_op);
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL validate_children) const;
-#endif // GPOS_DEBUG
-			
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
-#endif // !GPDXL_CDXLPhysicalMergeJoin_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLPhysicalMergeJoin_H
 
 // EOF
-

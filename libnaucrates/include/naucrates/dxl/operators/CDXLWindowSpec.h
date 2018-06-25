@@ -34,76 +34,73 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLWindowSpec : public CRefCount
 	{
-		private:
+	private:
+		// memory pool;
+		IMemoryPool *m_memory_pool;
 
-			// memory pool;
-			IMemoryPool *m_memory_pool;
+		// partition-by column identifiers
+		ULongPtrArray *m_partition_by_col_id_array;
 
-			// partition-by column identifiers
-			ULongPtrArray *m_partition_by_col_id_array;
+		// name of window specification
+		CMDName *m_mdname;
 
-			// name of window specification
-			CMDName *m_mdname;
+		// sorting columns
+		CDXLNode *m_sort_col_list_dxl;
 
-			// sorting columns
-			CDXLNode *m_sort_col_list_dxl;
+		// window frame associated with the window key
+		CDXLWindowFrame *m_window_frame;
 
-			// window frame associated with the window key
-			CDXLWindowFrame *m_window_frame;
+		// private copy ctor
+		CDXLWindowSpec(const CDXLWindowSpec &);
 
-			// private copy ctor
-			CDXLWindowSpec(const CDXLWindowSpec&);
+	public:
+		// ctor
+		CDXLWindowSpec(IMemoryPool *memory_pool,
+					   ULongPtrArray *partition_by_col_id_array,
+					   CMDName *mdname,
+					   CDXLNode *sort_col_list_dxl,
+					   CDXLWindowFrame *window_frame);
 
-		public:
+		// dtor
+		virtual ~CDXLWindowSpec();
 
-			// ctor
-			CDXLWindowSpec
-				(
-				IMemoryPool *memory_pool,
-				ULongPtrArray *partition_by_col_id_array,
-				CMDName *mdname,
-				CDXLNode *sort_col_list_dxl,
-				CDXLWindowFrame *window_frame
-				);
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *) const;
 
-			// dtor
-			virtual
-			~CDXLWindowSpec();
+		// set window frame definition
+		void SetWindowFrame(CDXLWindowFrame *window_frame);
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *) const;
+		// return window frame
+		CDXLWindowFrame *
+		GetWindowFrame() const
+		{
+			return m_window_frame;
+		}
 
-			// set window frame definition
-			void SetWindowFrame(CDXLWindowFrame *window_frame);
+		// partition-by column identifiers
+		ULongPtrArray *
+		GetPartitionByColIdArray() const
+		{
+			return m_partition_by_col_id_array;
+		}
 
-			// return window frame
-			CDXLWindowFrame *GetWindowFrame() const
-			{
-				return m_window_frame;
-			}
+		// sort columns
+		CDXLNode *
+		GetSortColListDXL() const
+		{
+			return m_sort_col_list_dxl;
+		}
 
-			// partition-by column identifiers
-			ULongPtrArray *GetPartitionByColIdArray() const
-			{
-				return m_partition_by_col_id_array;
-			}
-
-			// sort columns
-			CDXLNode *GetSortColListDXL() const
-			{
-				return m_sort_col_list_dxl;
-			}
-
-			// window specification name
-			CMDName *MdName() const
-			{
-				return m_mdname;
-			}
+		// window specification name
+		CMDName *
+		MdName() const
+		{
+			return m_mdname;
+		}
 	};
 
 	typedef CDynamicPtrArray<CDXLWindowSpec, CleanupRelease> DXLWindowSpecArray;
-}
-#endif // !GPDXL_CDXLWindowSpec_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLWindowSpec_H
 
 // EOF

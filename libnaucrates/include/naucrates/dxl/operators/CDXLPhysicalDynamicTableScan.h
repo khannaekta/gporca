@@ -28,7 +28,7 @@ namespace gpdxl
 		EdxldtsIndexFilter,
 		EdxldtsSentinel
 	};
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDXLPhysicalDynamicTableScan
@@ -39,75 +39,64 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalDynamicTableScan : public CDXLPhysical
 	{
-		private:
-		
-			// table descriptor for the scanned table
-			CDXLTableDescr *m_table_descr_dxl;
-			
-			// id of partition index structure
-			ULONG m_part_index_id;
-			
-			// printable partition index id
-			ULONG m_part_index_id_printable;
+	private:
+		// table descriptor for the scanned table
+		CDXLTableDescr *m_table_descr_dxl;
 
-			// private copy ctor
-			CDXLPhysicalDynamicTableScan(CDXLPhysicalDynamicTableScan&);
+		// id of partition index structure
+		ULONG m_part_index_id;
 
-		public:
-			// ctor
-			CDXLPhysicalDynamicTableScan
-				(
-				IMemoryPool *memory_pool,
-				CDXLTableDescr *table_descr,
-				ULONG part_idx_id,
-				ULONG part_idx_id_printable
-				);
-			
-			// dtor
-			virtual
-			~CDXLPhysicalDynamicTableScan();
-			
-			// operator type
-			Edxlopid GetDXLOperator() const;
+		// printable partition index id
+		ULONG m_part_index_id_printable;
 
-			// operator name
-			const CWStringConst *GetOpNameStr() const;
+		// private copy ctor
+		CDXLPhysicalDynamicTableScan(CDXLPhysicalDynamicTableScan &);
 
-			// table descriptor
-			const CDXLTableDescr *GetDXLTableDescr() const;
+	public:
+		// ctor
+		CDXLPhysicalDynamicTableScan(IMemoryPool *memory_pool,
+									 CDXLTableDescr *table_descr,
+									 ULONG part_idx_id,
+									 ULONG part_idx_id_printable);
 
-			// partition index id
-			ULONG GetPartIndexId() const;
-			
-			// printable partition index id
-			ULONG GetPartIndexIdPrintable() const;
+		// dtor
+		virtual ~CDXLPhysicalDynamicTableScan();
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
+		// operator type
+		Edxlopid GetDXLOperator() const;
 
-			// conversion function
-			static
-			CDXLPhysicalDynamicTableScan *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopPhysicalDynamicTableScan == dxl_op->GetDXLOperator());
+		// operator name
+		const CWStringConst *GetOpNameStr() const;
 
-				return dynamic_cast<CDXLPhysicalDynamicTableScan*>(dxl_op);
-			}
+		// table descriptor
+		const CDXLTableDescr *GetDXLTableDescr() const;
+
+		// partition index id
+		ULONG GetPartIndexId() const;
+
+		// printable partition index id
+		ULONG GetPartIndexIdPrintable() const;
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const;
+
+		// conversion function
+		static CDXLPhysicalDynamicTableScan *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopPhysicalDynamicTableScan == dxl_op->GetDXLOperator());
+
+			return dynamic_cast<CDXLPhysicalDynamicTableScan *>(dxl_op);
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL validate_children) const;
-#endif // GPOS_DEBUG
-			
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
-#endif // !GPDXL_CDXLPhysicalDynamicTableScan_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLPhysicalDynamicTableScan_H
 
 // EOF
-

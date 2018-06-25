@@ -7,7 +7,7 @@
 //
 //	@doc:
 //		Implementation of DXL Scalar FuncExpr
-//		
+//
 //---------------------------------------------------------------------------
 
 #include "naucrates/dxl/operators/CDXLScalarFuncExpr.h"
@@ -28,20 +28,16 @@ using namespace gpdxl;
 //		Constructs a scalar FuncExpr node
 //
 //---------------------------------------------------------------------------
-CDXLScalarFuncExpr::CDXLScalarFuncExpr
-	(
-	IMemoryPool *memory_pool,
-	IMDId *mdid_func,
-	IMDId *mdid_return_type,
-	INT return_type_modifier,
-	BOOL fRetSet
-	)
-	:
-	CDXLScalar(memory_pool),
-	m_func_mdid(mdid_func),
-	m_return_type_mdid(mdid_return_type),
-	m_return_type_modifier(return_type_modifier),
-	m_returns_set(fRetSet)
+CDXLScalarFuncExpr::CDXLScalarFuncExpr(IMemoryPool *memory_pool,
+									   IMDId *mdid_func,
+									   IMDId *mdid_return_type,
+									   INT return_type_modifier,
+									   BOOL fRetSet)
+	: CDXLScalar(memory_pool),
+	  m_func_mdid(mdid_func),
+	  m_return_type_mdid(mdid_return_type),
+	  m_return_type_modifier(return_type_modifier),
+	  m_returns_set(fRetSet)
 {
 	GPOS_ASSERT(m_func_mdid->IsValid());
 	GPOS_ASSERT(m_return_type_mdid->IsValid());
@@ -147,12 +143,7 @@ CDXLScalarFuncExpr::ReturnsSet() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarFuncExpr::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *dxlnode
-	)
-	const
+CDXLScalarFuncExpr::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -168,7 +159,8 @@ CDXLScalarFuncExpr::SerializeToDXL
 
 	dxlnode->SerializeChildrenToDXL(xml_serializer);
 
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 //---------------------------------------------------------------------------
@@ -180,11 +172,7 @@ CDXLScalarFuncExpr::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 BOOL
-CDXLScalarFuncExpr::HasBoolResult
-	(
-	CMDAccessor *md_accessor
-	)
-	const
+CDXLScalarFuncExpr::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	IMDId *mdid = md_accessor->Pmdfunc(m_func_mdid)->GetResultTypeMdid();
 	return (IMDType::EtiBool == md_accessor->Pmdtype(mdid)->GetDatumType());
@@ -200,25 +188,20 @@ CDXLScalarFuncExpr::HasBoolResult
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarFuncExpr::AssertValid
-	(
-	const CDXLNode *dxlnode,
-	BOOL validate_children
-	) 
-	const
+CDXLScalarFuncExpr::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
 	for (ULONG ul = 0; ul < dxlnode->Arity(); ++ul)
 	{
 		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar == dxlnode_arg->GetOperator()->GetDXLOperatorType());
-		
+
 		if (validate_children)
 		{
 			dxlnode_arg->GetOperator()->AssertValid(dxlnode_arg, validate_children);
 		}
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 
 // EOF

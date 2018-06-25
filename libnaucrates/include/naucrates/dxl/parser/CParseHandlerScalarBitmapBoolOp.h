@@ -6,7 +6,7 @@
 //		CParseHandlerScalarBitmapBoolOp.h
 //
 //	@doc:
-//		
+//
 //		SAX parse handler class for parsing scalar bitmap bool expressions
 //---------------------------------------------------------------------------
 
@@ -35,44 +35,34 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerScalarBitmapBoolOp : public CParseHandlerScalarOp
 	{
-		private:
-		
-			// private copy ctor
-			CParseHandlerScalarBitmapBoolOp(const CParseHandlerScalarBitmapBoolOp &);
-	
-			// process the start of an element
-			void StartElement
-					(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-					);
-	
-			// process the end of an element
-			void EndElement
-					(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-					);
-	
-			// parse the bool type from the Xerces xml string
-			static
-			EdxlBoolExprType GetDxlBoolTypeStr(const XMLCh *xmlszBoolType);
+	private:
+		// private copy ctor
+		CParseHandlerScalarBitmapBoolOp(const CParseHandlerScalarBitmapBoolOp &);
 
-		public:
-			// ctor
-			CParseHandlerScalarBitmapBoolOp
-					(
-					IMemoryPool *memory_pool,
-					CParseHandlerManager *parse_handler_mgr,
-					CParseHandlerBase *parse_handler_root
-					);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+		// parse the bool type from the Xerces xml string
+		static EdxlBoolExprType GetDxlBoolTypeStr(const XMLCh *xmlszBoolType);
+
+	public:
+		// ctor
+		CParseHandlerScalarBitmapBoolOp(IMemoryPool *memory_pool,
+										CParseHandlerManager *parse_handler_mgr,
+										CParseHandlerBase *parse_handler_root);
 	};
 
-}
-#endif // GPDXL_CParseHandlerScalarBitmapBoolOp_H
+}  // namespace gpdxl
+#endif  // GPDXL_CParseHandlerScalarBitmapBoolOp_H
 
 //EOF

@@ -29,14 +29,11 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerScalarPartDefault::CParseHandlerScalarPartDefault
-	(
+CParseHandlerScalarPartDefault::CParseHandlerScalarPartDefault(
 	IMemoryPool *memory_pool,
 	CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root
-	)
-	:
-	CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	CParseHandlerBase *parse_handler_root)
+	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -49,22 +46,27 @@ CParseHandlerScalarPartDefault::CParseHandlerScalarPartDefault
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerScalarPartDefault::StartElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const, // element_qname,
-	const Attributes& attrs
-	)
+CParseHandlerScalarPartDefault::StartElement(const XMLCh *const,  // element_uri,
+											 const XMLCh *const element_local_name,
+											 const XMLCh *const,  // element_qname,
+											 const Attributes &attrs)
 {
-	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarPartDefault), element_local_name))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarPartDefault),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
-	ULONG partition_level = CDXLOperatorFactory::ExtractConvertAttrValueToUlong(m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenPartLevel, EdxltokenScalarPartDefault);
-	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode (m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarPartDefault(m_memory_pool, partition_level));
+	ULONG partition_level = CDXLOperatorFactory::ExtractConvertAttrValueToUlong(
+		m_parse_handler_mgr->GetDXLMemoryManager(),
+		attrs,
+		EdxltokenPartLevel,
+		EdxltokenScalarPartDefault);
+	m_dxl_node = GPOS_NEW(m_memory_pool)
+		CDXLNode(m_memory_pool,
+				 GPOS_NEW(m_memory_pool) CDXLScalarPartDefault(m_memory_pool, partition_level));
 }
 
 //---------------------------------------------------------------------------
@@ -76,16 +78,16 @@ CParseHandlerScalarPartDefault::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerScalarPartDefault::EndElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const // element_qname
-	)
+CParseHandlerScalarPartDefault::EndElement(const XMLCh *const,  // element_uri,
+										   const XMLCh *const element_local_name,
+										   const XMLCh *const  // element_qname
+)
 {
-	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarPartDefault), element_local_name))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarPartDefault),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 

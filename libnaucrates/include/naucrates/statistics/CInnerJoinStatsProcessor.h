@@ -18,20 +18,15 @@ namespace gpnaucrates
 {
 	class CInnerJoinStatsProcessor : public CJoinStatsProcessor
 	{
-		public:
-			// inner join with another stats structure
-			static
-			CStatistics *CalcInnerJoinStatsStatic
-					(
-					IMemoryPool *memory_pool,
-					const IStatistics *outer_stats_input,
-					const IStatistics *inner_stats_input,
-					StatsPredJoinArray *join_preds_stats
-					);
+	public:
+		// inner join with another stats structure
+		static CStatistics *CalcInnerJoinStatsStatic(IMemoryPool *memory_pool,
+													 const IStatistics *outer_stats_input,
+													 const IStatistics *inner_stats_input,
+													 StatsPredJoinArray *join_preds_stats);
 	};
-}
+}  // namespace gpnaucrates
 
-#endif // !GPNAUCRATES_CInnerJoinStatsProcessor_H
+#endif  // !GPNAUCRATES_CInnerJoinStatsProcessor_H
 
 // EOF
-

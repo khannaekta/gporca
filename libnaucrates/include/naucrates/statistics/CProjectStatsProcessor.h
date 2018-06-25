@@ -18,18 +18,17 @@
 
 namespace gpnaucrates
 {
-
 	class CProjectStatsProcessor
 	{
-		public:
-
+	public:
 		// project
-		static
-		CStatistics *CalcProjStats(IMemoryPool *memory_pool, const CStatistics *input_stats, ULongPtrArray *projection_colids, HMUlDatum *datum_map);
+		static CStatistics *CalcProjStats(IMemoryPool *memory_pool,
+										  const CStatistics *input_stats,
+										  ULongPtrArray *projection_colids,
+										  HMUlDatum *datum_map);
 	};
-}
+}  // namespace gpnaucrates
 
-#endif // !GPNAUCRATES_CProjectStatsProcessor_H
+#endif  // !GPNAUCRATES_CProjectStatsProcessor_H
 
 // EOF
-

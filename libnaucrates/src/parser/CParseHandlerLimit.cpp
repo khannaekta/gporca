@@ -32,15 +32,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerLimit::CParseHandlerLimit
-	(
-	IMemoryPool *memory_pool,
-	CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root
-	)
-	:
-	CParseHandlerPhysicalOp(memory_pool, parse_handler_mgr, parse_handler_root),
-	m_dxl_op(NULL)
+CParseHandlerLimit::CParseHandlerLimit(IMemoryPool *memory_pool,
+									   CParseHandlerManager *parse_handler_mgr,
+									   CParseHandlerBase *parse_handler_root)
+	: CParseHandlerPhysicalOp(memory_pool, parse_handler_mgr, parse_handler_root), m_dxl_op(NULL)
 {
 }
 
@@ -54,39 +49,51 @@ CParseHandlerLimit::CParseHandlerLimit
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerLimit::StartElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const, // element_qname,
-	const Attributes& attrs
-	)
+CParseHandlerLimit::StartElement(const XMLCh *const,  // element_uri,
+								 const XMLCh *const element_local_name,
+								 const XMLCh *const,  // element_qname,
+								 const Attributes &attrs)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenPhysicalLimit), element_local_name))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenPhysicalLimit),
+									  element_local_name))
 	{
-
 		// parse and create Limit operator
-		m_dxl_op = (CDXLPhysicalLimit *) CDXLOperatorFactory::MakeDXLLimit(m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+		m_dxl_op = (CDXLPhysicalLimit *) CDXLOperatorFactory::MakeDXLLimit(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 		m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, m_dxl_op);
 
 		// create and activate the parse handler for the children nodes in reverse
 		// order of their expected appearance
 
-		CParseHandlerBase *offset_parse_handler = CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalarLimitOffset), m_parse_handler_mgr, this);
+		CParseHandlerBase *offset_parse_handler = CParseHandlerFactory::GetParseHandler(
+			m_memory_pool,
+			CDXLTokens::XmlstrToken(EdxltokenScalarLimitOffset),
+			m_parse_handler_mgr,
+			this);
 		m_parse_handler_mgr->ActivateParseHandler(offset_parse_handler);
 
-		CParseHandlerBase *count_parse_handler = CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalarLimitCount), m_parse_handler_mgr, this);
+		CParseHandlerBase *count_parse_handler = CParseHandlerFactory::GetParseHandler(
+			m_memory_pool,
+			CDXLTokens::XmlstrToken(EdxltokenScalarLimitCount),
+			m_parse_handler_mgr,
+			this);
 		m_parse_handler_mgr->ActivateParseHandler(count_parse_handler);
 
-		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenPhysical), m_parse_handler_mgr, this);
+		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
+			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenPhysical), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
 		// parse handler for the proj list
-		CParseHandlerBase *proj_list_parse_handler = CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalarProjList), m_parse_handler_mgr, this);
+		CParseHandlerBase *proj_list_parse_handler =
+			CParseHandlerFactory::GetParseHandler(m_memory_pool,
+												  CDXLTokens::XmlstrToken(EdxltokenScalarProjList),
+												  m_parse_handler_mgr,
+												  this);
 		m_parse_handler_mgr->ActivateParseHandler(proj_list_parse_handler);
 
 		//parse handler for the properties of the operator
-		CParseHandlerBase *prop_parse_handler = CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenProperties), m_parse_handler_mgr, this);
+		CParseHandlerBase *prop_parse_handler = CParseHandlerFactory::GetParseHandler(
+			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenProperties), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(prop_parse_handler);
 
 		// store parse handlers
@@ -98,7 +105,8 @@ CParseHandlerLimit::StartElement
 	}
 	else
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 }
@@ -112,25 +120,29 @@ CParseHandlerLimit::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerLimit::EndElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const // element_qname
-	)
+CParseHandlerLimit::EndElement(const XMLCh *const,  // element_uri,
+							   const XMLCh *const element_local_name,
+							   const XMLCh *const  // element_qname
+)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenPhysicalLimit), element_local_name))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenPhysicalLimit),
+									  element_local_name))
 	{
 		GPOS_ASSERT(5 == this->Length());
 
 		// construct node from the created child nodes
-		CParseHandlerProperties *prop_parse_handler = dynamic_cast<CParseHandlerProperties *>((*this)[0]);
+		CParseHandlerProperties *prop_parse_handler =
+			dynamic_cast<CParseHandlerProperties *>((*this)[0]);
 
-		CParseHandlerProjList *proj_list_parse_handler = dynamic_cast<CParseHandlerProjList*>((*this)[1]);
-		CParseHandlerPhysicalOp *child_parse_handler = dynamic_cast<CParseHandlerPhysicalOp *>((*this)[2]);
-		CParseHandlerScalarOp *count_parse_handler = dynamic_cast<CParseHandlerScalarOp *>((*this)[3]);
-		CParseHandlerScalarOp *offset_parse_handler = dynamic_cast<CParseHandlerScalarOp *>((*this)[4]);
-		
+		CParseHandlerProjList *proj_list_parse_handler =
+			dynamic_cast<CParseHandlerProjList *>((*this)[1]);
+		CParseHandlerPhysicalOp *child_parse_handler =
+			dynamic_cast<CParseHandlerPhysicalOp *>((*this)[2]);
+		CParseHandlerScalarOp *count_parse_handler =
+			dynamic_cast<CParseHandlerScalarOp *>((*this)[3]);
+		CParseHandlerScalarOp *offset_parse_handler =
+			dynamic_cast<CParseHandlerScalarOp *>((*this)[4]);
+
 		// set statistics and physical properties
 		CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
 
@@ -145,7 +157,8 @@ CParseHandlerLimit::EndElement
 	}
 	else
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 }

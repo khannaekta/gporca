@@ -28,49 +28,40 @@ namespace gpdxl
 	// parse handler class for parsing indexinfo list
 	class CParseHandlerMDIndexInfoList : public CParseHandlerBase
 	{
-		private:
-			// list of indexinfo
-			MDIndexInfoPtrArray *m_mdindex_info_array;
+	private:
+		// list of indexinfo
+		MDIndexInfoPtrArray *m_mdindex_info_array;
 
-			// private copy ctor
-			CParseHandlerMDIndexInfoList(const CParseHandlerMDIndexInfoList&);
+		// private copy ctor
+		CParseHandlerMDIndexInfoList(const CParseHandlerMDIndexInfoList &);
 
-			// process the start of an element
-			void StartElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
-				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname,		// element's qname
-				const Attributes& attr				// element's attributes
-				);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the end of an element
-			void EndElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
-				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname		// element's qname
-				);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-		public:
+	public:
+		// ctor
+		CParseHandlerMDIndexInfoList(IMemoryPool *memory_pool,
+									 CParseHandlerManager *parse_handler_mgr,
+									 CParseHandlerBase *parse_handler_root);
 
-			// ctor
-			CParseHandlerMDIndexInfoList
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
+		// dtor
+		virtual ~CParseHandlerMDIndexInfoList();
 
-			// dtor
-			virtual
-			~CParseHandlerMDIndexInfoList();
-
-			// returns array of indexinfo
-			MDIndexInfoPtrArray *GetMdIndexInfoArray();
+		// returns array of indexinfo
+		MDIndexInfoPtrArray *GetMdIndexInfoArray();
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerMDIndexInfoList_H
+#endif  // !GPDXL_CParseHandlerMDIndexInfoList_H
 
 // EOF

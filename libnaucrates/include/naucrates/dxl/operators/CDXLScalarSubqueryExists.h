@@ -18,7 +18,6 @@
 
 namespace gpdxl
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDXLScalarSubqueryExists
@@ -29,61 +28,51 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarSubqueryExists : public CDXLScalar
 	{
-		private:			
-			// private copy ctor
-			CDXLScalarSubqueryExists(CDXLScalarSubqueryExists&);
-			
-		public:
-			// ctor/dtor
-			explicit
-			CDXLScalarSubqueryExists(IMemoryPool *memory_pool);
-			
-			virtual
-			~CDXLScalarSubqueryExists();
+	private:
+		// private copy ctor
+		CDXLScalarSubqueryExists(CDXLScalarSubqueryExists &);
 
-			// ident accessors
-			Edxlopid GetDXLOperator() const;
-			
-			// name of the operator
-			const CWStringConst *GetOpNameStr() const;
-			
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const;
+	public:
+		// ctor/dtor
+		explicit CDXLScalarSubqueryExists(IMemoryPool *memory_pool);
 
-			// conversion function
-			static
-			CDXLScalarSubqueryExists *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopScalarSubqueryExists == dxl_op->GetDXLOperator());
+		virtual ~CDXLScalarSubqueryExists();
 
-				return dynamic_cast<CDXLScalarSubqueryExists*>(dxl_op);
-			}
+		// ident accessors
+		Edxlopid GetDXLOperator() const;
 
-			// does the operator return a boolean result
-			virtual
-			BOOL HasBoolResult
-					(
-					CMDAccessor *//md_accessor
-					)
-					const
-			{
-				return true;
-			}
+		// name of the operator
+		const CWStringConst *GetOpNameStr() const;
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const;
+
+		// conversion function
+		static CDXLScalarSubqueryExists *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarSubqueryExists == dxl_op->GetDXLOperator());
+
+			return dynamic_cast<CDXLScalarSubqueryExists *>(dxl_op);
+		}
+
+		// does the operator return a boolean result
+		virtual BOOL
+		HasBoolResult(CMDAccessor *  //md_accessor
+					  ) const
+		{
+			return true;
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
-#endif // GPOS_DEBUG
-			
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLScalarSubqueryExists_H
+#endif  // !GPDXL_CDXLScalarSubqueryExists_H
 
 // EOF

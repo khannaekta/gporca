@@ -30,50 +30,39 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalIndexOnlyScan : public CDXLPhysicalIndexScan
 	{
-		private:
+	private:
+		// private copy ctor
+		CDXLPhysicalIndexOnlyScan(CDXLPhysicalIndexOnlyScan &);
 
-			// private copy ctor
-			CDXLPhysicalIndexOnlyScan(CDXLPhysicalIndexOnlyScan&);
+	public:
+		//ctor
+		CDXLPhysicalIndexOnlyScan(IMemoryPool *memory_pool,
+								  CDXLTableDescr *table_descr,
+								  CDXLIndexDescr *index_descr_dxl,
+								  EdxlIndexScanDirection idx_scan_direction);
 
-		public:
+		//dtor
+		virtual ~CDXLPhysicalIndexOnlyScan()
+		{
+		}
 
-			//ctor
-			CDXLPhysicalIndexOnlyScan
-				(
-				IMemoryPool *memory_pool,
-				CDXLTableDescr *table_descr,
-				CDXLIndexDescr *index_descr_dxl,
-				EdxlIndexScanDirection idx_scan_direction
-				);
+		// operator type
+		virtual Edxlopid GetDXLOperator() const;
 
-			//dtor
-			virtual
-			~CDXLPhysicalIndexOnlyScan()
-			{}
+		// operator name
+		virtual const CWStringConst *GetOpNameStr() const;
 
-			// operator type
-			virtual
-			Edxlopid GetDXLOperator() const;
+		// conversion function
+		static CDXLPhysicalIndexOnlyScan *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopPhysicalIndexOnlyScan == dxl_op->GetDXLOperator());
 
-			// operator name
-			virtual
-			const CWStringConst *GetOpNameStr() const;
-
-			// conversion function
-			static
-			CDXLPhysicalIndexOnlyScan *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopPhysicalIndexOnlyScan == dxl_op->GetDXLOperator());
-
-				return dynamic_cast<CDXLPhysicalIndexOnlyScan*>(dxl_op);
-			}
+			return dynamic_cast<CDXLPhysicalIndexOnlyScan *>(dxl_op);
+		}
 	};
-}
-#endif // !GPDXL_CDXLPhysicalIndexOnlyScan_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLPhysicalIndexOnlyScan_H
 
 // EOF
-

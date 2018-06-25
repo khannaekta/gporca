@@ -7,7 +7,7 @@
 //
 //	@doc:
 //		Class representing the result of the Query to DXL translation
-//		
+//
 //---------------------------------------------------------------------------
 
 #ifndef GPDXL_CTranslatorQueryToDXLOutput_H
@@ -18,7 +18,6 @@
 
 namespace gpdxl
 {
-
 	using namespace gpos;
 
 	//---------------------------------------------------------------------------
@@ -31,35 +30,34 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CQueryToDXLResult
 	{
-		private:
+	private:
+		// DXL representing the Query
+		CDXLNode *m_query_dxl;
 
-			// DXL representing the Query
-			CDXLNode *m_query_dxl;
+		// array of DXL nodes that represent the query output
+		DXLNodeArray *m_query_output;
 
-			// array of DXL nodes that represent the query output
-			DXLNodeArray *m_query_output;
-			
-			// CTE list
-			DXLNodeArray *m_cte_producers;
+		// CTE list
+		DXLNodeArray *m_cte_producers;
 
-		public:
-			// ctor
-			CQueryToDXLResult(CDXLNode *query, DXLNodeArray *query_output, DXLNodeArray *cte_producers);
+	public:
+		// ctor
+		CQueryToDXLResult(CDXLNode *query, DXLNodeArray *query_output, DXLNodeArray *cte_producers);
 
-			// dtor
-			~CQueryToDXLResult();
+		// dtor
+		~CQueryToDXLResult();
 
-			// return the DXL representation of the query
-			const CDXLNode *CreateDXLNode() const;
+		// return the DXL representation of the query
+		const CDXLNode *CreateDXLNode() const;
 
-			// return the array of output columns
-			const DXLNodeArray *GetOutputColumnsDXLArray() const;
-			
-			// return the array of CTEs
-			const DXLNodeArray *GetCTEProducerDXLArray() const;
+		// return the array of output columns
+		const DXLNodeArray *GetOutputColumnsDXLArray() const;
+
+		// return the array of CTEs
+		const DXLNodeArray *GetCTEProducerDXLArray() const;
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CTranslatorQueryToDXLOutput_H
+#endif  // !GPDXL_CTranslatorQueryToDXLOutput_H
 
 // EOF

@@ -8,8 +8,8 @@
 //	@doc:
 //		Class providing methods for a ULONG counter
 //
-//	@owner: 
-//		
+//	@owner:
+//
 //
 //	@test:
 //
@@ -26,15 +26,17 @@ namespace gpdxl
 {
 	using namespace gpos;
 
-	class CIdGenerator {
-		private:
-			ULONG id;
-		public:
-			explicit CIdGenerator(ULONG);
-			ULONG next_id();
-			ULONG current_id();
+	class CIdGenerator
+	{
+	private:
+		ULONG id;
+
+	public:
+		explicit CIdGenerator(ULONG);
+		ULONG next_id();
+		ULONG current_id();
 	};
-}
-#endif // GPDXL_CIdGenerator_H
+}  // namespace gpdxl
+#endif  // GPDXL_CIdGenerator_H
 
 // EOF

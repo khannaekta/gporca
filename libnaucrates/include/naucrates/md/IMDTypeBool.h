@@ -40,26 +40,28 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class IMDTypeBool : public IMDType
 	{
-		public:
-		
-			// type id
-			static ETypeInfo GetTypeInfo()
-			{
-				return EtiBool;
-			}
+	public:
+		// type id
+		static ETypeInfo
+		GetTypeInfo()
+		{
+			return EtiBool;
+		}
 
-			virtual ETypeInfo GetDatumType() const
-			{
-				return IMDTypeBool::GetTypeInfo();
-			}
-			
-			// factory function for BOOL datums
-			virtual IDatumBool *CreateBoolDatum(IMemoryPool *memory_pool, BOOL value, BOOL is_null) const = 0;
-		
+		virtual ETypeInfo
+		GetDatumType() const
+		{
+			return IMDTypeBool::GetTypeInfo();
+		}
+
+		// factory function for BOOL datums
+		virtual IDatumBool *CreateBoolDatum(IMemoryPool *memory_pool,
+											BOOL value,
+											BOOL is_null) const = 0;
 	};
 
-}
+}  // namespace gpmd
 
-#endif // !GPMD_IMDTypeBool_H
+#endif  // !GPMD_IMDTypeBool_H
 
 // EOF

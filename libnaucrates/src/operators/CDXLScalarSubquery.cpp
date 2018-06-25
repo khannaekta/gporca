@@ -27,14 +27,8 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarSubquery::CDXLScalarSubquery
-	(
-	IMemoryPool *memory_pool,
-	ULONG col_id
-	)
-	:
-	CDXLScalar(memory_pool),
-	m_colid(col_id)
+CDXLScalarSubquery::CDXLScalarSubquery(IMemoryPool *memory_pool, ULONG col_id)
+	: CDXLScalar(memory_pool), m_colid(col_id)
 {
 }
 
@@ -88,12 +82,7 @@ CDXLScalarSubquery::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubquery::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *dxlnode
-	)
-	const
+CDXLScalarSubquery::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
@@ -102,7 +91,8 @@ CDXLScalarSubquery::SerializeToDXL
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenColId), m_colid);
 
 	dxlnode->SerializeChildrenToDXL(xml_serializer);
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -111,24 +101,19 @@ CDXLScalarSubquery::SerializeToDXL
 //		CDXLScalarSubquery::AssertValid
 //
 //	@doc:
-//		Checks whether operator node is well-structured 
+//		Checks whether operator node is well-structured
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubquery::AssertValid
-	(
-	const CDXLNode *dxlnode,
-	BOOL validate_children
-	) 
-	const
+CDXLScalarSubquery::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());
-	
+
 	CDXLNode *child_dxlnode = (*dxlnode)[0];
 	GPOS_ASSERT(EdxloptypeLogical == child_dxlnode->GetOperator()->GetDXLOperatorType());
 
 	dxlnode->AssertValid(validate_children);
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

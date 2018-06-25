@@ -9,7 +9,7 @@
 //		Class for representing the specification of directly dispatchable plans
 //
 //	@owner:
-//		
+//
 //
 //	@test:
 //
@@ -38,35 +38,32 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLDirectDispatchInfo : public CRefCount
 	{
-		private:
+	private:
+		// constants for determining segments to dispatch to
+		DXLDatumArrays *m_dispatch_identifer_datum_array;
 
-			// constants for determining segments to dispatch to
-			DXLDatumArrays *m_dispatch_identifer_datum_array;
-		
-			// private copy ctor
-			CDXLDirectDispatchInfo(const CDXLDirectDispatchInfo &);
+		// private copy ctor
+		CDXLDirectDispatchInfo(const CDXLDirectDispatchInfo &);
 
-		public:
-			// ctor
-			explicit
-			CDXLDirectDispatchInfo(DXLDatumArrays *dispatch_identifer_datum_array);
+	public:
+		// ctor
+		explicit CDXLDirectDispatchInfo(DXLDatumArrays *dispatch_identifer_datum_array);
 
-			// dtor
-			virtual
-			~CDXLDirectDispatchInfo();
+		// dtor
+		virtual ~CDXLDirectDispatchInfo();
 
-			// accessor to array of datums
-			DXLDatumArrays *GetDispatchIdentifierDatumArray() const
-			{
-				return m_dispatch_identifer_datum_array;
-			}
-			
-			// serialize the datum as the given element
-			void Serialize(CXMLSerializer *xml_serializer);
+		// accessor to array of datums
+		DXLDatumArrays *
+		GetDispatchIdentifierDatumArray() const
+		{
+			return m_dispatch_identifer_datum_array;
+		}
 
+		// serialize the datum as the given element
+		void Serialize(CXMLSerializer *xml_serializer);
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLDirectDispatchInfo_H
+#endif  // !GPDXL_CDXLDirectDispatchInfo_H
 
 // EOF

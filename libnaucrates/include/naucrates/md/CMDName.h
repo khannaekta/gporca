@@ -17,9 +17,9 @@
 #include "gpos/string/CWStringConst.h"
 
 namespace gpmd
-{	
+{
 	using namespace gpos;
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CMDName
@@ -30,34 +30,35 @@ namespace gpmd
 	//---------------------------------------------------------------------------
 	class CMDName
 	{
-		private:
-			// the string holding the name
-			const CWStringConst *m_name;
-			
-			// keep track of copy status
-			BOOL m_deep_copy;
-		
-		public:
-			// ctor/dtor
-			CMDName(IMemoryPool *memory_pool, const CWStringBase *str);
-			CMDName(const CWStringConst *, BOOL fOwnsMemory = false);
-			
-			// shallow copy ctor
-			CMDName(const CMDName &);
-			
-			~CMDName();
+	private:
+		// the string holding the name
+		const CWStringConst *m_name;
 
-			// accessors
-			const CWStringConst *GetMDName() const
-			{
-				return m_name;
-			}
+		// keep track of copy status
+		BOOL m_deep_copy;
+
+	public:
+		// ctor/dtor
+		CMDName(IMemoryPool *memory_pool, const CWStringBase *str);
+		CMDName(const CWStringConst *, BOOL fOwnsMemory = false);
+
+		// shallow copy ctor
+		CMDName(const CMDName &);
+
+		~CMDName();
+
+		// accessors
+		const CWStringConst *
+		GetMDName() const
+		{
+			return m_name;
+		}
 	};
 
 	// array of names
 	typedef CDynamicPtrArray<CMDName, CleanupDelete> DrgPmdname;
-}
+}  // namespace gpmd
 
-#endif // !GPMD_CMDName_H
+#endif  // !GPMD_CMDName_H
 
 // EOF

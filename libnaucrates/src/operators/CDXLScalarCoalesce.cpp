@@ -27,14 +27,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarCoalesce::CDXLScalarCoalesce
-	(
-	IMemoryPool *memory_pool,
-	IMDId *mdid_type
-	)
-	:
-	CDXLScalar(memory_pool),
-	m_mdid_type(mdid_type)
+CDXLScalarCoalesce::CDXLScalarCoalesce(IMemoryPool *memory_pool, IMDId *mdid_type)
+	: CDXLScalar(memory_pool), m_mdid_type(mdid_type)
 {
 	GPOS_ASSERT(m_mdid_type->IsValid());
 }
@@ -89,19 +83,15 @@ CDXLScalarCoalesce::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarCoalesce::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *node
-	)
-	const
+CDXLScalarCoalesce::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 	m_mdid_type->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenTypeId));
 	node->SerializeChildrenToDXL(xml_serializer);
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 //---------------------------------------------------------------------------
@@ -113,11 +103,7 @@ CDXLScalarCoalesce::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 BOOL
-CDXLScalarCoalesce::HasBoolResult
-	(
-	CMDAccessor *md_accessor
-	)
-	const
+CDXLScalarCoalesce::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	return (IMDType::EtiBool == md_accessor->Pmdtype(m_mdid_type)->GetDatumType());
 }
@@ -132,12 +118,7 @@ CDXLScalarCoalesce::HasBoolResult
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarCoalesce::AssertValid
-	(
-	const CDXLNode *node,
-	BOOL validate_children
-	)
-	const
+CDXLScalarCoalesce::AssertValid(const CDXLNode *node, BOOL validate_children) const
 {
 	GPOS_ASSERT(0 < node->Arity());
 
@@ -153,6 +134,6 @@ CDXLScalarCoalesce::AssertValid
 		}
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

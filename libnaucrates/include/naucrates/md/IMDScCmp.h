@@ -23,7 +23,7 @@ namespace gpmd
 {
 	using namespace gpos;
 
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		IMDScCmp
@@ -33,35 +33,30 @@ namespace gpmd
 	//
 	//---------------------------------------------------------------------------
 	class IMDScCmp : public IMDCacheObject
-	{	
-		public:
+	{
+	public:
+		// object type
+		virtual Emdtype
+		MDType() const
+		{
+			return EmdtScCmp;
+		}
 
-			// object type
-			virtual
-			Emdtype MDType() const
-			{
-				return EmdtScCmp;
-			}
+		// left type
+		virtual IMDId *GetLeftMdid() const = 0;
 
-			// left type
-			virtual 
-			IMDId *GetLeftMdid() const = 0;
+		// right type
+		virtual IMDId *GetRightMdid() const = 0;
 
-			// right type
-			virtual
-			IMDId *GetRightMdid() const = 0;
-			
-			// comparison type
-			virtual 
-			IMDType::ECmpType ParseCmpType() const = 0;
+		// comparison type
+		virtual IMDType::ECmpType ParseCmpType() const = 0;
 
-			// comparison operator id
-			virtual 
-			IMDId *MdIdOp() const = 0;
+		// comparison operator id
+		virtual IMDId *MdIdOp() const = 0;
 	};
-		
-}
 
-#endif // !GPMD_IMDScCmp_H
+}  // namespace gpmd
+
+#endif  // !GPMD_IMDScCmp_H
 
 // EOF

@@ -6,7 +6,7 @@
 //		CParseHandlerScalarBooleanTest.h
 //
 //	@doc:
-//		
+//
 //		SAX parse handler class for parsing scalar BooleanTest.
 //---------------------------------------------------------------------------
 
@@ -35,46 +35,36 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerScalarBooleanTest : public CParseHandlerScalarOp
 	{
-		private:
-	
-			EdxlBooleanTestType m_dxl_boolean_test_type;
-	
-			// private copy ctor
-			CParseHandlerScalarBooleanTest(const CParseHandlerScalarBooleanTest &);
-	
-			// process the start of an element
-			void StartElement
-					(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-					);
-	
-			// process the end of an element
-			void EndElement
-					(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-					);
-	
-			// parse the boolean test type from the Xerces xml string
-			static
-			EdxlBooleanTestType GetDxlBooleanTestType(const XMLCh *xmlszBoolType);
+	private:
+		EdxlBooleanTestType m_dxl_boolean_test_type;
 
-		public:
-			// ctor
-			CParseHandlerScalarBooleanTest
-					(
-					IMemoryPool *memory_pool,
-					CParseHandlerManager *parse_handler_mgr,
-					CParseHandlerBase *parse_handler_root
-					);
+		// private copy ctor
+		CParseHandlerScalarBooleanTest(const CParseHandlerScalarBooleanTest &);
 
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
+
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+		// parse the boolean test type from the Xerces xml string
+		static EdxlBooleanTestType GetDxlBooleanTestType(const XMLCh *xmlszBoolType);
+
+	public:
+		// ctor
+		CParseHandlerScalarBooleanTest(IMemoryPool *memory_pool,
+									   CParseHandlerManager *parse_handler_mgr,
+									   CParseHandlerBase *parse_handler_root);
 	};
 
-}
-#endif // GPDXL_CParseHandlerScalarBooleanTest_H
+}  // namespace gpdxl
+#endif  // GPDXL_CParseHandlerScalarBooleanTest_H
 
 //EOF

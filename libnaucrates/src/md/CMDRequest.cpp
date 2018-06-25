@@ -27,16 +27,12 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDRequest::CMDRequest
-	(
-	IMemoryPool *memory_pool,
-	MdidPtrArray *mdid_array,
-	MDTypeRequestPtrArray *mdtype_request_array
-	)
-	:
-	m_memory_pool(memory_pool),
-	m_mdid_array(mdid_array),
-	m_mdtype_request_array(mdtype_request_array)
+CMDRequest::CMDRequest(IMemoryPool *memory_pool,
+					   MdidPtrArray *mdid_array,
+					   MDTypeRequestPtrArray *mdtype_request_array)
+	: m_memory_pool(memory_pool),
+	  m_mdid_array(mdid_array),
+	  m_mdtype_request_array(mdtype_request_array)
 {
 	GPOS_ASSERT(NULL != memory_pool);
 	GPOS_ASSERT(NULL != mdid_array);
@@ -51,22 +47,15 @@ CMDRequest::CMDRequest
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDRequest::CMDRequest
-	(
-	IMemoryPool *memory_pool,
-	SMDTypeRequest *md_type_request
-	)
-	:
-	m_memory_pool(memory_pool),
-	m_mdid_array(NULL),
-	m_mdtype_request_array(NULL)
+CMDRequest::CMDRequest(IMemoryPool *memory_pool, SMDTypeRequest *md_type_request)
+	: m_memory_pool(memory_pool), m_mdid_array(NULL), m_mdtype_request_array(NULL)
 {
 	GPOS_ASSERT(NULL != memory_pool);
 	GPOS_ASSERT(NULL != md_type_request);
-	
+
 	m_mdid_array = GPOS_NEW(m_memory_pool) MdidPtrArray(m_memory_pool);
 	m_mdtype_request_array = GPOS_NEW(m_memory_pool) MDTypeRequestPtrArray(m_memory_pool);
-	
+
 	m_mdtype_request_array->Append(md_type_request);
 }
 
@@ -93,10 +82,7 @@ CMDRequest::~CMDRequest()
 //
 //---------------------------------------------------------------------------
 CWStringDynamic *
-CMDRequest::GetStrRepr
-	(
-	CSystemId sysid
-	) 
+CMDRequest::GetStrRepr(CSystemId sysid)
 {
 	CWStringDynamic *str = GPOS_NEW(m_memory_pool) CWStringDynamic(m_memory_pool);
 	str->AppendFormat(GPOS_WSZ_LIT("%d.%ls"), sysid.MdidType(), sysid.GetBuffer());
@@ -112,45 +98,44 @@ CMDRequest::GetStrRepr
 //
 //---------------------------------------------------------------------------
 void
-CMDRequest::Serialize
-	(
-	CXMLSerializer *xml_serializer
-	) 
+CMDRequest::Serialize(CXMLSerializer *xml_serializer)
 {
-	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), CDXLTokens::GetDXLTokenStr(EdxltokenMDRequest));
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								CDXLTokens::GetDXLTokenStr(EdxltokenMDRequest));
 
 	const ULONG ulMdids = m_mdid_array->Size();
 	for (ULONG ul = 0; ul < ulMdids; ul++)
 	{
 		IMDId *mdid = (*m_mdid_array)[ul];
-		xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), 
-										CDXLTokens::GetDXLTokenStr(EdxltokenMdid));				
+		xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+									CDXLTokens::GetDXLTokenStr(EdxltokenMdid));
 		mdid->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenValue));
-		xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), 
-						CDXLTokens::GetDXLTokenStr(EdxltokenMdid));
+		xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+									 CDXLTokens::GetDXLTokenStr(EdxltokenMdid));
 	}
 
 	const ULONG requests = m_mdtype_request_array->Size();
 	for (ULONG ul = 0; ul < requests; ul++)
 	{
 		SMDTypeRequest *md_type_request = (*m_mdtype_request_array)[ul];
-		xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), 
-										CDXLTokens::GetDXLTokenStr(EdxltokenMDTypeRequest));				
-		
+		xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+									CDXLTokens::GetDXLTokenStr(EdxltokenMDTypeRequest));
+
 		CWStringDynamic *str = GetStrRepr(md_type_request->m_sysid);
 		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenSysid), str);
 		GPOS_DELETE(str);
-		
-		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenTypeInfo), md_type_request->m_type_info);
-		
-		xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), 
-										CDXLTokens::GetDXLTokenStr(EdxltokenMDTypeRequest));				
+
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenTypeInfo),
+									 md_type_request->m_type_info);
+
+		xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+									 CDXLTokens::GetDXLTokenStr(EdxltokenMDTypeRequest));
 	}
-	
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), CDXLTokens::GetDXLTokenStr(EdxltokenMDRequest));
+
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 CDXLTokens::GetDXLTokenStr(EdxltokenMDRequest));
 }
 
 
 
 // EOF
-

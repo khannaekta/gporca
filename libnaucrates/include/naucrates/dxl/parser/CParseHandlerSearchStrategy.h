@@ -31,58 +31,49 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerSearchStrategy : public CParseHandlerBase
 	{
+	private:
+		// search stages
+		DrgPss *m_search_stage_array;
 
-		private:
+		// private ctor
+		CParseHandlerSearchStrategy(const CParseHandlerSearchStrategy &);
 
-			// search stages
-			DrgPss *m_search_stage_array;
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// private ctor
-			CParseHandlerSearchStrategy(const CParseHandlerSearchStrategy&);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the start of an element
-			void StartElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
- 				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname,		// element's qname
-				const Attributes& attr				// element's attributes
-				);
+	public:
+		// ctor/dtor
+		CParseHandlerSearchStrategy(IMemoryPool *memory_pool,
+									CParseHandlerManager *parse_handler_mgr,
+									CParseHandlerBase *parse_handler_root);
 
-			// process the end of an element
-			void EndElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
-				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname		// element's qname
-				);
+		virtual ~CParseHandlerSearchStrategy();
 
-		public:
-			// ctor/dtor
-			CParseHandlerSearchStrategy
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
+		// returns the dxl representation of search stages
+		DrgPss *
+		GetSearchStageArray()
+		{
+			return m_search_stage_array;
+		}
 
-			virtual
-			~CParseHandlerSearchStrategy();
-
-			// returns the dxl representation of search stages
-			DrgPss *GetSearchStageArray()
-			{
-				return m_search_stage_array;
-			}
-
-			EDxlParseHandlerType GetParseHandlerType() const
-			{
-				return EdxlphSearchStrategy;
-			}
-
+		EDxlParseHandlerType
+		GetParseHandlerType() const
+		{
+			return EdxlphSearchStrategy;
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerSearchStrategy_H
+#endif  // !GPDXL_CParseHandlerSearchStrategy_H
 
 // EOF

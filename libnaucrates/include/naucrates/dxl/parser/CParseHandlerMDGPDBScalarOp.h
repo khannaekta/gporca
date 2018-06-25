@@ -20,7 +20,7 @@ namespace gpdxl
 	using namespace gpos;
 
 	XERCES_CPP_NAMESPACE_USE
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CParseHandlerMDGPDBScalarOp
@@ -31,71 +31,64 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerMDGPDBScalarOp : public CParseHandlerMetadataObject
 	{
-		private:
-			// id and version 
-			IMDId *m_mdid;
-			
-			// name
-			CMDName *m_mdname;
-			
-			// type of left operand
-			IMDId *m_mdid_type_left;
-			
-			// type of right operand
-			IMDId *m_mdid_type_right;
+	private:
+		// id and version
+		IMDId *m_mdid;
 
-			// type of result operand
-			IMDId *m_mdid_type_result;
-			
-			// id of function which implements the operator
-			IMDId *m_func_mdid;
-			
-			// id of commute operator
-			IMDId *m_mdid_commute_opr;
-			
-			// id of inverse operator
-			IMDId *m_mdid_inverse_opr;
-			
-			// comparison type
-			IMDType::ECmpType m_comparision_type;
-			
-			// does operator return NULL on NULL input?
-			BOOL m_returns_null_on_null_input;
+		// name
+		CMDName *m_mdname;
 
-			// private copy ctor
-			CParseHandlerMDGPDBScalarOp(const CParseHandlerMDGPDBScalarOp &);
-			
-			// process the start of an element
-			void StartElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
-				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname,		// element's qname
-				const Attributes& attr				// element's attributes
-				);
-				
-			// process the end of an element
-			void EndElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
-				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname		// element's qname
-				);
+		// type of left operand
+		IMDId *m_mdid_type_left;
 
-			// is this a supported child elem of the scalar op
-			BOOL IsSupportedChildElem(const XMLCh* const xml_str);
-						
-		public:
-			// ctor
-			CParseHandlerMDGPDBScalarOp
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);			
+		// type of right operand
+		IMDId *m_mdid_type_right;
+
+		// type of result operand
+		IMDId *m_mdid_type_result;
+
+		// id of function which implements the operator
+		IMDId *m_func_mdid;
+
+		// id of commute operator
+		IMDId *m_mdid_commute_opr;
+
+		// id of inverse operator
+		IMDId *m_mdid_inverse_opr;
+
+		// comparison type
+		IMDType::ECmpType m_comparision_type;
+
+		// does operator return NULL on NULL input?
+		BOOL m_returns_null_on_null_input;
+
+		// private copy ctor
+		CParseHandlerMDGPDBScalarOp(const CParseHandlerMDGPDBScalarOp &);
+
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
+
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+		// is this a supported child elem of the scalar op
+		BOOL IsSupportedChildElem(const XMLCh *const xml_str);
+
+	public:
+		// ctor
+		CParseHandlerMDGPDBScalarOp(IMemoryPool *memory_pool,
+									CParseHandlerManager *parse_handler_mgr,
+									CParseHandlerBase *parse_handler_root);
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerMDGPDBScalarOp_H
+#endif  // !GPDXL_CParseHandlerMDGPDBScalarOp_H
 
 // EOF

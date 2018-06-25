@@ -26,26 +26,22 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalSplit::CDXLPhysicalSplit
-	(
-	IMemoryPool *memory_pool,
-	ULongPtrArray *delete_colid_array,
-	ULongPtrArray *insert_colid_array,
-	ULONG action_colid,
-	ULONG ctid_colid,
-	ULONG segid_colid,
-	BOOL preserve_oids,
-	ULONG tuple_oid
-	)
-	:
-	CDXLPhysical(memory_pool),
-	m_deletion_colid_array(delete_colid_array),
-	m_insert_colid_array(insert_colid_array),
-	m_action_colid(action_colid),
-	m_ctid_colid(ctid_colid),
-	m_segid_colid(segid_colid),
-	m_preserve_oids(preserve_oids),
-	m_tuple_oid(tuple_oid)
+CDXLPhysicalSplit::CDXLPhysicalSplit(IMemoryPool *memory_pool,
+									 ULongPtrArray *delete_colid_array,
+									 ULongPtrArray *insert_colid_array,
+									 ULONG action_colid,
+									 ULONG ctid_colid,
+									 ULONG segid_colid,
+									 BOOL preserve_oids,
+									 ULONG tuple_oid)
+	: CDXLPhysical(memory_pool),
+	  m_deletion_colid_array(delete_colid_array),
+	  m_insert_colid_array(insert_colid_array),
+	  m_action_colid(action_colid),
+	  m_ctid_colid(ctid_colid),
+	  m_segid_colid(segid_colid),
+	  m_preserve_oids(preserve_oids),
+	  m_tuple_oid(tuple_oid)
 {
 	GPOS_ASSERT(NULL != delete_colid_array);
 	GPOS_ASSERT(NULL != insert_colid_array);
@@ -102,12 +98,7 @@ CDXLPhysicalSplit::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalSplit::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *dxlnode
-	)
-	const
+CDXLPhysicalSplit::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
@@ -122,15 +113,18 @@ CDXLPhysicalSplit::SerializeToDXL
 
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenActionColId), m_action_colid);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenCtidColId), m_ctid_colid);
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenGpSegmentIdColId), m_segid_colid);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenGpSegmentIdColId),
+								 m_segid_colid);
 
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenUpdatePreservesOids), m_preserve_oids);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenUpdatePreservesOids),
+								 m_preserve_oids);
 
 	if (m_preserve_oids)
 	{
-		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenTupleOidColId), m_tuple_oid);
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenTupleOidColId),
+									 m_tuple_oid);
 	}
-	
+
 	dxlnode->SerializePropertiesToDXL(xml_serializer);
 
 	// serialize project list
@@ -139,7 +133,8 @@ CDXLPhysicalSplit::SerializeToDXL
 	// serialize physical child
 	(*dxlnode)[1]->SerializeToDXL(xml_serializer);
 
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -152,12 +147,7 @@ CDXLPhysicalSplit::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalSplit::AssertValid
-	(
-	const CDXLNode *dxlnode,
-	BOOL validate_children
-	)
-	const
+CDXLPhysicalSplit::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());
 	CDXLNode *child_dxlnode = (*dxlnode)[1];
@@ -169,7 +159,7 @@ CDXLPhysicalSplit::AssertValid
 	}
 }
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 
 // EOF

@@ -33,61 +33,46 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerIndexScan : public CParseHandlerPhysicalOp
 	{
-		private:
+	private:
+		// index scan direction
+		EdxlIndexScanDirection m_index_scan_dir;
 
-			// index scan direction
-			EdxlIndexScanDirection m_index_scan_dir;
+		// private copy ctor
+		CParseHandlerIndexScan(const CParseHandlerIndexScan &);
 
-			// private copy ctor
-			CParseHandlerIndexScan(const CParseHandlerIndexScan &);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the start of an element
-			void StartElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
- 					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the end of an element
-			void EndElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-				);
+	protected:
+		// common StartElement functionality for IndexScan and IndexOnlyScan
+		void StartElementHelper(const XMLCh *const element_local_name,
+								const Attributes &attrs,
+								Edxltoken token_type);
 
-		protected:
+		// common EndElement functionality for IndexScan and IndexOnlyScan
+		void EndElementHelper(const XMLCh *const element_local_name,
+							  Edxltoken token_type,
+							  ULONG part_idx_id = 0,
+							  ULONG part_idx_id_printable = 0);
 
-			// common StartElement functionality for IndexScan and IndexOnlyScan
-			void StartElementHelper
-				(
-				const XMLCh* const element_local_name,
-				const Attributes& attrs,
-				Edxltoken token_type
-				);
-
-			// common EndElement functionality for IndexScan and IndexOnlyScan
-			void EndElementHelper
-				(
-				const XMLCh* const element_local_name,
-				Edxltoken token_type,
-				ULONG part_idx_id = 0,
-				ULONG part_idx_id_printable = 0
-				);
-
-		public:
-			// ctor
-			CParseHandlerIndexScan
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
+	public:
+		// ctor
+		CParseHandlerIndexScan(IMemoryPool *memory_pool,
+							   CParseHandlerManager *parse_handler_mgr,
+							   CParseHandlerBase *parse_handler_root);
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerIndexScan_H
+#endif  // !GPDXL_CParseHandlerIndexScan_H
 
 // EOF

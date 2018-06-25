@@ -28,14 +28,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerSortCol::CParseHandlerSortCol
-	(
-	IMemoryPool *memory_pool,
-	CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root
-	)
-	:
-	CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+CParseHandlerSortCol::CParseHandlerSortCol(IMemoryPool *memory_pool,
+										   CParseHandlerManager *parse_handler_mgr,
+										   CParseHandlerBase *parse_handler_root)
+	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -49,22 +45,22 @@ CParseHandlerSortCol::CParseHandlerSortCol
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerSortCol::StartElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const, // element_qname
-	const Attributes& attrs
-	)
+CParseHandlerSortCol::StartElement(const XMLCh *const,  // element_uri,
+								   const XMLCh *const element_local_name,
+								   const XMLCh *const,  // element_qname
+								   const Attributes &attrs)
 {
-	if(0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarSortCol), element_local_name))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarSortCol),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
-	
+
 	// parse and create sort col operator
-	CDXLScalarSortCol *dxl_op = (CDXLScalarSortCol *) CDXLOperatorFactory::MakeDXLSortCol(m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+	CDXLScalarSortCol *dxl_op = (CDXLScalarSortCol *) CDXLOperatorFactory::MakeDXLSortCol(
+		m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, dxl_op);
 }
 
@@ -77,26 +73,25 @@ CParseHandlerSortCol::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerSortCol::EndElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const // element_qname
-	)
+CParseHandlerSortCol::EndElement(const XMLCh *const,  // element_uri,
+								 const XMLCh *const element_local_name,
+								 const XMLCh *const  // element_qname
+)
 {
-	
-	if(0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarSortCol), element_local_name))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarSortCol),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
-	
+
 	GPOS_ASSERT(NULL != m_dxl_node);
-	
+
 #ifdef GPOS_DEBUG
 	m_dxl_node->GetOperator()->AssertValid(m_dxl_node, false /* validate_children */);
-#endif // GPOS_DEBUG
-	
+#endif  // GPOS_DEBUG
+
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();
 }

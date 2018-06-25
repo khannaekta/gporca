@@ -28,24 +28,20 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDScCmpGPDB::CMDScCmpGPDB
-	(
-	IMemoryPool *memory_pool,
-	IMDId *mdid,
-	CMDName *mdname,
-	IMDId *left_mdid,
-	IMDId *right_mdid,
-	IMDType::ECmpType cmp_type,
-	IMDId *mdid_op
-	)
-	:
-	m_memory_pool(memory_pool),
-	m_mdid(mdid),
-	m_mdname(mdname),
-	m_mdid_left(left_mdid),
-	m_mdid_right(right_mdid),
-	m_comparision_type(cmp_type),
-	m_mdid_op(mdid_op)
+CMDScCmpGPDB::CMDScCmpGPDB(IMemoryPool *memory_pool,
+						   IMDId *mdid,
+						   CMDName *mdname,
+						   IMDId *left_mdid,
+						   IMDId *right_mdid,
+						   IMDType::ECmpType cmp_type,
+						   IMDId *mdid_op)
+	: m_memory_pool(memory_pool),
+	  m_mdid(mdid),
+	  m_mdname(mdname),
+	  m_mdid_left(left_mdid),
+	  m_mdid_right(right_mdid),
+	  m_comparision_type(cmp_type),
+	  m_mdid_op(mdid_op)
 {
 	GPOS_ASSERT(m_mdid->IsValid());
 	GPOS_ASSERT(m_mdid_left->IsValid());
@@ -53,7 +49,8 @@ CMDScCmpGPDB::CMDScCmpGPDB
 	GPOS_ASSERT(m_mdid_op->IsValid());
 	GPOS_ASSERT(IMDType::EcmptOther != m_comparision_type);
 
-	m_dxl_str = CDXLUtils::SerializeMDObj(m_memory_pool, this, false /*fSerializeHeader*/, false /*indentation*/);
+	m_dxl_str = CDXLUtils::SerializeMDObj(
+		m_memory_pool, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 //---------------------------------------------------------------------------
@@ -150,7 +147,7 @@ CMDScCmpGPDB::MdIdOp() const
 //		CMDScCmpGPDB::IsBinaryCoercible
 //
 //	@doc:
-//		Returns whether this is a cast between binary coercible types, i.e. the 
+//		Returns whether this is a cast between binary coercible types, i.e. the
 //		types are binary compatible
 //
 //---------------------------------------------------------------------------
@@ -169,27 +166,26 @@ CMDScCmpGPDB::ParseCmpType() const
 //
 //---------------------------------------------------------------------------
 void
-CMDScCmpGPDB::Serialize
-	(
-	CXMLSerializer *xml_serializer
-	) 
-	const
+CMDScCmpGPDB::Serialize(CXMLSerializer *xml_serializer) const
 {
-	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), 
-						CDXLTokens::GetDXLTokenStr(EdxltokenGPDBMDScCmp));
-	
+	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								CDXLTokens::GetDXLTokenStr(EdxltokenGPDBMDScCmp));
+
 	m_mdid->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenMdid));
 
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenName), m_mdname->GetMDName());
-	
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenGPDBScalarOpCmpType), IMDType::GetCmpTypeStr(m_comparision_type));
 
-	m_mdid_left->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenGPDBScalarOpLeftTypeId));
-	m_mdid_right->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenGPDBScalarOpRightTypeId));
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenGPDBScalarOpCmpType),
+								 IMDType::GetCmpTypeStr(m_comparision_type));
+
+	m_mdid_left->Serialize(xml_serializer,
+						   CDXLTokens::GetDXLTokenStr(EdxltokenGPDBScalarOpLeftTypeId));
+	m_mdid_right->Serialize(xml_serializer,
+							CDXLTokens::GetDXLTokenStr(EdxltokenGPDBScalarOpRightTypeId));
 	m_mdid_op->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenOpNo));
 
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), 
-						CDXLTokens::GetDXLTokenStr(EdxltokenGPDBMDScCmp));
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 CDXLTokens::GetDXLTokenStr(EdxltokenGPDBMDScCmp));
 
 	GPOS_CHECK_ABORT;
 }
@@ -206,11 +202,7 @@ CMDScCmpGPDB::Serialize
 //
 //---------------------------------------------------------------------------
 void
-CMDScCmpGPDB::DebugPrint
-	(
-	IOstream &os
-	)
-	const
+CMDScCmpGPDB::DebugPrint(IOstream &os) const
 {
 	os << "ComparisonOp ";
 	GetLeftMdid()->OsPrint(os);
@@ -222,9 +214,9 @@ CMDScCmpGPDB::DebugPrint
 
 	os << ", type: " << IMDType::GetCmpTypeStr(m_comparision_type);
 
-	os << std::endl;	
+	os << std::endl;
 }
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

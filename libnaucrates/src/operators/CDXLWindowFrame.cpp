@@ -29,20 +29,16 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLWindowFrame::CDXLWindowFrame
-	(
-	IMemoryPool *memory_pool,
-	EdxlFrameSpec edxlfs,
-	EdxlFrameExclusionStrategy frame_exc_strategy,
-	CDXLNode *dxlnode_leading,
-	CDXLNode *dxlnode_trailing
-	)
-	:
-	m_memory_pool(memory_pool),
-	m_dxl_win_frame_spec(edxlfs),
-	m_dxl_frame_exclusion_strategy(frame_exc_strategy),
-	m_dxlnode_leading(dxlnode_leading),
-	m_dxlnode_trailing(dxlnode_trailing)
+CDXLWindowFrame::CDXLWindowFrame(IMemoryPool *memory_pool,
+								 EdxlFrameSpec edxlfs,
+								 EdxlFrameExclusionStrategy frame_exc_strategy,
+								 CDXLNode *dxlnode_leading,
+								 CDXLNode *dxlnode_trailing)
+	: m_memory_pool(memory_pool),
+	  m_dxl_win_frame_spec(edxlfs),
+	  m_dxl_frame_exclusion_strategy(frame_exc_strategy),
+	  m_dxlnode_leading(dxlnode_leading),
+	  m_dxlnode_trailing(dxlnode_trailing)
 {
 	GPOS_ASSERT(NULL != m_memory_pool);
 	GPOS_ASSERT(EdxlfsSentinel > m_dxl_win_frame_spec);
@@ -74,21 +70,15 @@ CDXLWindowFrame::~CDXLWindowFrame()
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLWindowFrame::PstrES
-	(
-	EdxlFrameExclusionStrategy edxles
-	)
-	const
+CDXLWindowFrame::PstrES(EdxlFrameExclusionStrategy edxles) const
 {
 	GPOS_ASSERT(EdxlfesSentinel > edxles);
-	ULONG window_frame_boundary_to_frame_boundary_mapping[][2] =
-					{
-					{EdxlfesNone, EdxltokenWindowESNone},
-					{EdxlfesNulls, EdxltokenWindowESNulls},
-					{EdxlfesCurrentRow, EdxltokenWindowESCurrentRow},
-					{EdxlfesGroup, EdxltokenWindowESGroup},
-					{EdxlfesTies, EdxltokenWindowESTies}
-					};
+	ULONG window_frame_boundary_to_frame_boundary_mapping[][2] = {
+		{EdxlfesNone, EdxltokenWindowESNone},
+		{EdxlfesNulls, EdxltokenWindowESNulls},
+		{EdxlfesCurrentRow, EdxltokenWindowESCurrentRow},
+		{EdxlfesGroup, EdxltokenWindowESGroup},
+		{EdxlfesTies, EdxltokenWindowESTies}};
 
 	const ULONG arity = GPOS_ARRAY_SIZE(window_frame_boundary_to_frame_boundary_mapping);
 	for (ULONG ul = 0; ul < arity; ul++)
@@ -115,11 +105,7 @@ CDXLWindowFrame::PstrES
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDXLWindowFrame::PstrFS
-	(
-	EdxlFrameSpec edxlfs
-	)
-	const
+CDXLWindowFrame::PstrFS(EdxlFrameSpec edxlfs) const
 {
 	GPOS_ASSERT(EdxlfsSentinel > edxlfs && "Unrecognized window frame specification");
 
@@ -140,24 +126,23 @@ CDXLWindowFrame::PstrFS
 //
 //---------------------------------------------------------------------------
 void
-CDXLWindowFrame::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer
-	)
-	const
+CDXLWindowFrame::SerializeToDXL(CXMLSerializer *xml_serializer) const
 {
 	const CWStringConst *element_name = CDXLTokens::GetDXLTokenStr(EdxltokenWindowFrame);
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
 	// add attributes
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowFrameSpec), PstrFS(m_dxl_win_frame_spec));
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowExclusionStrategy), PstrES(m_dxl_frame_exclusion_strategy));
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowFrameSpec),
+								 PstrFS(m_dxl_win_frame_spec));
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenWindowExclusionStrategy),
+								 PstrES(m_dxl_frame_exclusion_strategy));
 
 	// add the values representing the window boundary
 	m_dxlnode_trailing->SerializeToDXL(xml_serializer);
 	m_dxlnode_leading->SerializeToDXL(xml_serializer);
 
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 // EOF

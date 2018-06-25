@@ -25,13 +25,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalExternalScan::CDXLPhysicalExternalScan
-	(
-	IMemoryPool *memory_pool
-	)
-	:
-	CDXLPhysicalTableScan(memory_pool)
-{}
+CDXLPhysicalExternalScan::CDXLPhysicalExternalScan(IMemoryPool *memory_pool)
+	: CDXLPhysicalTableScan(memory_pool)
+{
+}
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -41,14 +38,11 @@ CDXLPhysicalExternalScan::CDXLPhysicalExternalScan
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalExternalScan::CDXLPhysicalExternalScan
-	(
-	IMemoryPool *memory_pool,
-	CDXLTableDescr *table_descr
-	)
-	:
-	CDXLPhysicalTableScan(memory_pool, table_descr)
-{}
+CDXLPhysicalExternalScan::CDXLPhysicalExternalScan(IMemoryPool *memory_pool,
+												   CDXLTableDescr *table_descr)
+	: CDXLPhysicalTableScan(memory_pool, table_descr)
+{
+}
 
 //---------------------------------------------------------------------------
 //	@function:

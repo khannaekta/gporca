@@ -210,6 +210,6 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarExpr.h"
 
-#endif // !GPDXL_parsehandlers_H
+#endif  // !GPDXL_parsehandlers_H
 
 // EOF

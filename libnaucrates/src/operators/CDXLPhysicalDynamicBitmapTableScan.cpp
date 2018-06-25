@@ -42,12 +42,8 @@ CDXLPhysicalDynamicBitmapTableScan::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalDynamicBitmapTableScan::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *node
-	)
-	const
+CDXLPhysicalDynamicBitmapTableScan::SerializeToDXL(CXMLSerializer *xml_serializer,
+												   const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
@@ -55,13 +51,15 @@ CDXLPhysicalDynamicBitmapTableScan::SerializeToDXL
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenPartIndexId), m_part_index_id);
 	if (m_part_index_id_printable != m_part_index_id)
 	{
-		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenPartIndexIdPrintable), m_part_index_id_printable);
+		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenPartIndexIdPrintable),
+									 m_part_index_id_printable);
 	}
 	node->SerializePropertiesToDXL(xml_serializer);
 	node->SerializeChildrenToDXL(xml_serializer);
 	m_table_descr_dxl->SerializeToDXL(xml_serializer);
 
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 // EOF

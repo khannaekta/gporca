@@ -20,7 +20,7 @@ namespace gpopt
 	class CColRef;
 	class CStatisticsConfig;
 	class CColumnFactory;
-}
+}  // namespace gpopt
 
 namespace gpnaucrates
 {
@@ -37,488 +37,448 @@ namespace gpnaucrates
 	//---------------------------------------------------------------------------
 	class CHistogram
 	{
-
 		// hash map from column id to a histogram
-		typedef CHashMap<ULONG, CHistogram, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-							CleanupDelete<ULONG>, CleanupDelete<CHistogram> > UlongHistogramHashMap;
+		typedef CHashMap<ULONG,
+						 CHistogram,
+						 gpos::HashValue<ULONG>,
+						 gpos::Equals<ULONG>,
+						 CleanupDelete<ULONG>,
+						 CleanupDelete<CHistogram> >
+			UlongHistogramHashMap;
 
 		// iterator
-		typedef CHashMapIter<ULONG, CHistogram, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-							CleanupDelete<ULONG>, CleanupDelete<CHistogram> > UlongHistogramHashMapIter;
+		typedef CHashMapIter<ULONG,
+							 CHistogram,
+							 gpos::HashValue<ULONG>,
+							 gpos::Equals<ULONG>,
+							 CleanupDelete<ULONG>,
+							 CleanupDelete<CHistogram> >
+			UlongHistogramHashMapIter;
 
 		// hash map from column ULONG to CDouble
-		typedef CHashMap<ULONG, CDouble, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-						CleanupDelete<ULONG>, CleanupDelete<CDouble> > UlongDoubleHashMap;
+		typedef CHashMap<ULONG,
+						 CDouble,
+						 gpos::HashValue<ULONG>,
+						 gpos::Equals<ULONG>,
+						 CleanupDelete<ULONG>,
+						 CleanupDelete<CDouble> >
+			UlongDoubleHashMap;
 
 		// iterator
-		typedef CHashMapIter<ULONG, CDouble, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-						CleanupDelete<ULONG>, CleanupDelete<CDouble> > UlongDoubleHashMapIter;
+		typedef CHashMapIter<ULONG,
+							 CDouble,
+							 gpos::HashValue<ULONG>,
+							 gpos::Equals<ULONG>,
+							 CleanupDelete<ULONG>,
+							 CleanupDelete<CDouble> >
+			UlongDoubleHashMapIter;
 
-		private:
-			// all the buckets in the histogram
-			BucketArray *m_histogram_buckets;
+	private:
+		// all the buckets in the histogram
+		BucketArray *m_histogram_buckets;
 
-			// well-defined histogram. if false, then bounds are unknown
-			BOOL m_is_well_defined;
+		// well-defined histogram. if false, then bounds are unknown
+		BOOL m_is_well_defined;
 
-			// null fraction
-			CDouble m_null_freq;
+		// null fraction
+		CDouble m_null_freq;
 
-			// ndistinct of tuples not covered in the buckets
-			CDouble m_distinct_remaining;
+		// ndistinct of tuples not covered in the buckets
+		CDouble m_distinct_remaining;
 
-			// frequency of tuples not covered in the buckets
-			CDouble m_freq_remaining;
+		// frequency of tuples not covered in the buckets
+		CDouble m_freq_remaining;
 
-			// has histogram skew been measures
-			BOOL m_skew_was_measured;
+		// has histogram skew been measures
+		BOOL m_skew_was_measured;
 
-			// skew estimate
-			CDouble m_skew;
+		// skew estimate
+		CDouble m_skew;
 
-			// was the NDVs in histogram scaled
-			BOOL m_NDVs_were_scaled;
+		// was the NDVs in histogram scaled
+		BOOL m_NDVs_were_scaled;
 
-			// is column statistics missing in the database
-			BOOL m_is_col_stats_missing;
+		// is column statistics missing in the database
+		BOOL m_is_col_stats_missing;
 
-			// private copy ctor
-			CHistogram(const CHistogram &);
+		// private copy ctor
+		CHistogram(const CHistogram &);
 
-			// private assignment operator
-			CHistogram& operator=(const CHistogram &);
+		// private assignment operator
+		CHistogram &operator=(const CHistogram &);
 
-			// return an array buckets after applying equality filter on the histogram buckets
-			BucketArray *MakeBucketsWithEqualityFilter(IMemoryPool *memory_pool, CPoint *point) const;
+		// return an array buckets after applying equality filter on the histogram buckets
+		BucketArray *MakeBucketsWithEqualityFilter(IMemoryPool *memory_pool, CPoint *point) const;
 
-			// return an array buckets after applying non equality filter on the histogram buckets
-			BucketArray *MakeBucketsWithInequalityFilter(IMemoryPool *memory_pool, CPoint *point) const;
+		// return an array buckets after applying non equality filter on the histogram buckets
+		BucketArray *MakeBucketsWithInequalityFilter(IMemoryPool *memory_pool, CPoint *point) const;
 
-			// less than or less than equal filter
-			CHistogram *MakeHistogramLessThanOrLessThanEqualFilter(IMemoryPool *memory_pool, CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point) const;
+		// less than or less than equal filter
+		CHistogram *MakeHistogramLessThanOrLessThanEqualFilter(
+			IMemoryPool *memory_pool,
+			CStatsPred::EStatsCmpType stats_cmp_type,
+			CPoint *point) const;
 
-			// greater than or greater than equal filter
-			CHistogram *MakeHistogramGreaterThanOrGreaterThanEqualFilter(IMemoryPool *memory_pool, CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point) const;
+		// greater than or greater than equal filter
+		CHistogram *MakeHistogramGreaterThanOrGreaterThanEqualFilter(
+			IMemoryPool *memory_pool,
+			CStatsPred::EStatsCmpType stats_cmp_type,
+			CPoint *point) const;
 
-			// equal filter
-			CHistogram *MakeHistogramEqualFilter(IMemoryPool *memory_pool, CPoint *point) const;
+		// equal filter
+		CHistogram *MakeHistogramEqualFilter(IMemoryPool *memory_pool, CPoint *point) const;
 
-			// not equal filter
-			CHistogram *MakeHistogramInequalityFilter(IMemoryPool *memory_pool, CPoint *point) const;
+		// not equal filter
+		CHistogram *MakeHistogramInequalityFilter(IMemoryPool *memory_pool, CPoint *point) const;
 
-			// IDF filter
-			CHistogram *MakeHistogramIDFFilter(IMemoryPool *memory_pool, CPoint *point) const;
+		// IDF filter
+		CHistogram *MakeHistogramIDFFilter(IMemoryPool *memory_pool, CPoint *point) const;
 
-			// INDF filter
-			CHistogram *MakeHistogramINDFFilter(IMemoryPool *memory_pool, CPoint *point) const;
+		// INDF filter
+		CHistogram *MakeHistogramINDFFilter(IMemoryPool *memory_pool, CPoint *point) const;
 
-			// equality join
-			CHistogram *MakeJoinHistogramEqualityFilter(IMemoryPool *memory_pool, const CHistogram *histogram) const;
+		// equality join
+		CHistogram *MakeJoinHistogramEqualityFilter(IMemoryPool *memory_pool,
+													const CHistogram *histogram) const;
 
-			// generate histogram based on NDV
-			CHistogram *MakeNDVBasedJoinHistogramEqualityFilter(IMemoryPool *memory_pool, const CHistogram *histogram) const;
+		// generate histogram based on NDV
+		CHistogram *MakeNDVBasedJoinHistogramEqualityFilter(IMemoryPool *memory_pool,
+															const CHistogram *histogram) const;
 
-			// construct a new histogram for an INDF join predicate
-			CHistogram *MakeJoinHistogramINDFFilter(IMemoryPool *memory_pool, const CHistogram *histogram) const;
+		// construct a new histogram for an INDF join predicate
+		CHistogram *MakeJoinHistogramINDFFilter(IMemoryPool *memory_pool,
+												const CHistogram *histogram) const;
 
-			// accessor for n-th bucket
-			CBucket *operator [] (ULONG) const;
+		// accessor for n-th bucket
+		CBucket *operator[](ULONG) const;
 
-			// compute skew estimate
-			void ComputeSkew();
+		// compute skew estimate
+		void ComputeSkew();
 
-			// helper to add buckets from one histogram to another
-			static
-			void AddBuckets
-					(
-					IMemoryPool *memory_pool,
-					BucketArray *src_buckets,
-					BucketArray *dest_buckets,
-					CDouble rows_old,
-					CDouble rows_new,
-					ULONG begin,
-					ULONG end
-					);
+		// helper to add buckets from one histogram to another
+		static void AddBuckets(IMemoryPool *memory_pool,
+							   BucketArray *src_buckets,
+							   BucketArray *dest_buckets,
+							   CDouble rows_old,
+							   CDouble rows_new,
+							   ULONG begin,
+							   ULONG end);
 
-			static
-			void AddBuckets
-					(
-					IMemoryPool *memory_pool,
-					BucketArray *src_buckets,
-					BucketArray *dest_buckets,
-					CDouble rows,
-					DrgPdouble *dest_bucket_freqs,
-					ULONG begin,
-					ULONG end
-					);
+		static void AddBuckets(IMemoryPool *memory_pool,
+							   BucketArray *src_buckets,
+							   BucketArray *dest_buckets,
+							   CDouble rows,
+							   DrgPdouble *dest_bucket_freqs,
+							   ULONG begin,
+							   ULONG end);
 
-			// check if we can compute NDVRemain for JOIN histogram for the given input histograms
-			static
-			BOOL CanComputeJoinNDVRemain(const CHistogram *histogram1, const CHistogram *histogram2);
+		// check if we can compute NDVRemain for JOIN histogram for the given input histograms
+		static BOOL CanComputeJoinNDVRemain(const CHistogram *histogram1,
+											const CHistogram *histogram2);
 
-			// compute the effects of the NDV and frequency of the tuples not captured
-			// by the histogram
-			static
-			void ComputeJoinNDVRemainInfo
-					(
-					const CHistogram *histogram1,
-					const CHistogram *histogram2,
-					BucketArray *join_buckets, // join buckets
-					CDouble hist1_buckets_freq, // frequency of the buckets in input1 that contributed to the join
-					CDouble hist2_buckets_freq, // frequency of the buckets in input2 that contributed to the join
-					CDouble *result_distinct_remain,
-					CDouble *result_freq_remain
-					);
+		// compute the effects of the NDV and frequency of the tuples not captured
+		// by the histogram
+		static void ComputeJoinNDVRemainInfo(
+			const CHistogram *histogram1,
+			const CHistogram *histogram2,
+			BucketArray *join_buckets,  // join buckets
+			CDouble
+				hist1_buckets_freq,  // frequency of the buckets in input1 that contributed to the join
+			CDouble
+				hist2_buckets_freq,  // frequency of the buckets in input2 that contributed to the join
+			CDouble *result_distinct_remain,
+			CDouble *result_freq_remain);
 
 
-			// check if the cardinality estimation should be done only via NDVs
-			static
-			BOOL DoNDVBasedCardEstimation(const CHistogram *histogram);
+		// check if the cardinality estimation should be done only via NDVs
+		static BOOL DoNDVBasedCardEstimation(const CHistogram *histogram);
 
-		public:
+	public:
+		// ctors
+		explicit CHistogram(BucketArray *histogram_buckets, BOOL is_well_defined = true);
 
-			// ctors
-			explicit
-			CHistogram(BucketArray *histogram_buckets, BOOL is_well_defined = true);
+		CHistogram(BucketArray *histogram_buckets,
+				   BOOL is_well_defined,
+				   CDouble null_freq,
+				   CDouble distinct_remaining,
+				   CDouble freq_remaining,
+				   BOOL is_col_stats_missing = false);
 
-			CHistogram
-					(
-					BucketArray *histogram_buckets,
-					BOOL is_well_defined,
-					CDouble null_freq,
-					CDouble distinct_remaining,
-					CDouble freq_remaining,
-					BOOL is_col_stats_missing = false
-					);
+		// set null frequency
+		void SetNullFrequency(CDouble null_freq);
 
-			// set null frequency
-			void SetNullFrequency(CDouble null_freq);
+		// set information about the scaling of NDVs
+		void
+		SetNDVScaled()
+		{
+			m_NDVs_were_scaled = true;
+		}
 
-			// set information about the scaling of NDVs
-			void SetNDVScaled()
+		// have the NDVs been scaled
+		BOOL
+		WereNDVsScaled() const
+		{
+			return m_NDVs_were_scaled;
+		}
+
+		// filter by comparing with point
+		CHistogram *MakeHistogramFilter(IMemoryPool *memory_pool,
+										CStatsPred::EStatsCmpType stats_cmp_type,
+										CPoint *point) const;
+
+		// filter by comparing with point and normalize
+		CHistogram *MakeHistogramFilterNormalize(IMemoryPool *memory_pool,
+												 CStatsPred::EStatsCmpType stats_cmp_type,
+												 CPoint *point,
+												 CDouble *scale_factor) const;
+
+		// join with another histogram
+		CHistogram *MakeJoinHistogram(IMemoryPool *memory_pool,
+									  CStatsPred::EStatsCmpType stats_cmp_type,
+									  const CHistogram *histogram) const;
+
+		// LASJ with another histogram
+		CHistogram *MakeLASJHistogram(IMemoryPool *memory_pool,
+									  CStatsPred::EStatsCmpType stats_cmp_type,
+									  const CHistogram *histogram) const;
+
+		// join with another histogram and normalize it.
+		// If the join is not an equality join the function returns an empty histogram
+		CHistogram *MakeJoinHistogramNormalize(IMemoryPool *memory_pool,
+											   CStatsPred::EStatsCmpType stats_cmp_type,
+											   CDouble rows,
+											   const CHistogram *other_histogram,
+											   CDouble rows_other,
+											   CDouble *scale_factor) const;
+
+		// scale factor of inequality (!=) join
+		CDouble GetInequalityJoinScaleFactor(IMemoryPool *memory_pool,
+											 CDouble rows,
+											 const CHistogram *other_histogram,
+											 CDouble rows_other) const;
+
+		// left anti semi join with another histogram and normalize
+		CHistogram *MakeLASJHistogramNormalize(
+			IMemoryPool *memory_pool,
+			CStatsPred::EStatsCmpType stats_cmp_type,
+			CDouble rows,
+			const CHistogram *other_histogram,
+			CDouble *scale_factor,
+			BOOL
+				DoIgnoreLASJHistComputation  // except for the case of LOJ cardinality estimation this flag is always
+			// "true" since LASJ stats computation is very aggressive
+			) const;
+
+		// group by and normalize
+		CHistogram *MakeGroupByHistogramNormalize(IMemoryPool *memory_pool,
+												  CDouble rows,
+												  CDouble *scale_factor) const;
+
+		// union all and normalize
+		CHistogram *MakeUnionAllHistogramNormalize(IMemoryPool *memory_pool,
+												   CDouble rows,
+												   const CHistogram *other_histogram,
+												   CDouble rows_other) const;
+
+		// union and normalize
+		CHistogram *MakeUnionHistogramNormalize(IMemoryPool *memory_pool,
+												CDouble rows,
+												const CHistogram *other_histogram,
+												CDouble rows_other,
+												CDouble *num_output_rows) const;
+
+		// cleanup residual buckets
+		void CleanupResidualBucket(CBucket *bucket, BOOL bucket_is_residual) const;
+
+		// get the next bucket for union / union all
+		CBucket *GetNextBucket(const CHistogram *histogram,
+							   CBucket *new_bucket,
+							   BOOL *target_bucket_is_residual,
+							   ULONG *current_bucket_index) const;
+
+		// create a new histogram with updated bucket frequency
+		CHistogram *MakeHistogramUpdateFreq(IMemoryPool *memory_pool,
+											BucketArray *histogram_buckets,
+											DrgPdouble *dest_bucket_freqs,
+											CDouble *num_output_rows,
+											CDouble num_null_rows,
+											CDouble num_NDV_remain,
+											CDouble num_NDV_remain_rows) const;
+
+		// add residual union all buckets after the merge
+		ULONG AddResidualUnionAllBucket(IMemoryPool *memory_pool,
+										BucketArray *histogram_buckets,
+										CBucket *bucket,
+										CDouble rows_old,
+										CDouble rows_new,
+										BOOL bucket_is_residual,
+										ULONG index) const;
+
+		// add residual union buckets after the merge
+		ULONG AddResidualUnionBucket(IMemoryPool *memory_pool,
+									 BucketArray *histogram_buckets,
+									 CBucket *bucket,
+									 CDouble rows,
+									 BOOL bucket_is_residual,
+									 ULONG index,
+									 DrgPdouble *dest_bucket_freqs) const;
+
+		// number of buckets
+		ULONG
+		Buckets() const
+		{
+			return m_histogram_buckets->Size();
+		}
+
+		// buckets accessor
+		const BucketArray *
+		ParseDXLToBucketsArray() const
+		{
+			return m_histogram_buckets;
+		}
+
+		// well defined
+		BOOL
+		IsWellDefined() const
+		{
+			return m_is_well_defined;
+		}
+
+		// is the column statistics missing in the database
+		BOOL
+		IsColStatsMissing() const
+		{
+			return m_is_col_stats_missing;
+		}
+
+		// print function
+		virtual IOstream &OsPrint(IOstream &os) const;
+
+		// total frequency from buckets and null fraction
+		CDouble GetFrequency() const;
+
+		// total number of distinct values
+		CDouble GetNumDistinct() const;
+
+		// is histogram well formed
+		BOOL IsValid() const;
+
+		// return copy of histogram
+		CHistogram *CopyHistogram(IMemoryPool *memory_pool) const;
+
+		// destructor
+		virtual ~CHistogram()
+		{
+			m_histogram_buckets->Release();
+		}
+
+		// normalize histogram and return scaling factor
+		CDouble NormalizeHistogram();
+
+		// is histogram normalized
+		BOOL IsNormalized() const;
+
+		// translate the histogram into a derived column stats
+		CDXLStatsDerivedColumn *TranslateToDXLDerivedColumnStats(IMemoryPool *memory_pool,
+																 CMDAccessor *md_accessor,
+																 ULONG col_id,
+																 CDouble width) const;
+
+		// randomly pick a bucket index
+		ULONG GetRandomBucketIndex(ULONG *seed) const;
+
+		// estimate of data skew
+		CDouble
+		GetSkew()
+		{
+			if (!m_skew_was_measured)
 			{
-				m_NDVs_were_scaled = true;
+				ComputeSkew();
 			}
 
-			// have the NDVs been scaled
-			BOOL WereNDVsScaled() const
-			{
-				return m_NDVs_were_scaled;
-			}
+			return m_skew;
+		}
 
-			// filter by comparing with point
-			CHistogram *MakeHistogramFilter
-						(
-						IMemoryPool *memory_pool,
-						CStatsPred::EStatsCmpType stats_cmp_type,
-						CPoint *point
-						)
-						const;
+		// accessor of null fraction
+		CDouble
+		GetNullFreq() const
+		{
+			return m_null_freq;
+		}
 
-			// filter by comparing with point and normalize
-			CHistogram *MakeHistogramFilterNormalize
-						(
-						IMemoryPool *memory_pool,
-						CStatsPred::EStatsCmpType stats_cmp_type,
-						CPoint *point,
-						CDouble *scale_factor
-						)
-						const;
+		// accessor of remaining number of tuples
+		CDouble
+		GetDistinctRemain() const
+		{
+			return m_distinct_remaining;
+		}
 
-			// join with another histogram
-			CHistogram *MakeJoinHistogram
-						(
-						IMemoryPool *memory_pool,
-						CStatsPred::EStatsCmpType stats_cmp_type,
-						const CHistogram *histogram
-						)
-						const;
+		// accessor of remaining frequency
+		CDouble
+		GetFreqRemain() const
+		{
+			return m_freq_remaining;
+		}
 
-			// LASJ with another histogram
-			CHistogram *MakeLASJHistogram
-						(
-						IMemoryPool *memory_pool,
-						CStatsPred::EStatsCmpType stats_cmp_type,
-						const CHistogram *histogram
-						)
-						const;
+		// check if histogram is empty
+		BOOL IsEmpty() const;
 
-			// join with another histogram and normalize it.
-			// If the join is not an equality join the function returns an empty histogram
-			CHistogram *MakeJoinHistogramNormalize
-						(
-						IMemoryPool *memory_pool,
-						CStatsPred::EStatsCmpType stats_cmp_type,
-						CDouble rows,
-						const CHistogram *other_histogram,
-						CDouble rows_other,
-						CDouble *scale_factor
-						)
-						const;
+		// cap the total number of distinct values (NDVs) in buckets to the number of rows
+		void CapNDVs(CDouble rows);
 
-			// scale factor of inequality (!=) join
-			CDouble GetInequalityJoinScaleFactor
-						(
-						IMemoryPool *memory_pool,
-						CDouble rows,
-						const CHistogram *other_histogram,
-						CDouble rows_other
-						)
-						const;
+		// is comparison type supported for filters
+		static BOOL SupportsFilter(CStatsPred::EStatsCmpType stats_cmp_type);
 
-			// left anti semi join with another histogram and normalize
-			CHistogram *MakeLASJHistogramNormalize
-						(
-						IMemoryPool *memory_pool,
-						CStatsPred::EStatsCmpType stats_cmp_type,
-						CDouble rows,
-						const CHistogram *other_histogram,
-						CDouble *scale_factor,
-						BOOL DoIgnoreLASJHistComputation // except for the case of LOJ cardinality estimation this flag is always
-						                                // "true" since LASJ stats computation is very aggressive
-						)
-						const;
+		// is the join predicate's comparison type supported
+		static BOOL JoinPredCmpTypeIsSupported(CStatsPred::EStatsCmpType stats_cmp_type);
 
-			// group by and normalize
-			CHistogram *MakeGroupByHistogramNormalize
-						(
-						IMemoryPool *memory_pool,
-						CDouble rows,
-						CDouble *scale_factor
-						)
-						const;
+		// create the default histogram for a given column reference
+		static CHistogram *MakeDefaultHistogram(IMemoryPool *memory_pool,
+												CColRef *col_ref,
+												BOOL is_empty);
 
-			// union all and normalize
-			CHistogram *MakeUnionAllHistogramNormalize
-						(
-						IMemoryPool *memory_pool,
-						CDouble rows,
-						const CHistogram *other_histogram,
-						CDouble rows_other
-						)
-						const;
+		// create the default non empty histogram for a boolean column
+		static CHistogram *MakeDefaultBoolHistogram(IMemoryPool *memory_pool);
 
-			// union and normalize
-			CHistogram *MakeUnionHistogramNormalize
-						(
-						IMemoryPool *memory_pool,
-						CDouble rows,
-						const CHistogram *other_histogram,
-						CDouble rows_other,
-						CDouble *num_output_rows
-						)
-						const;
+		// helper method to append histograms from one map to the other
+		static void AddHistograms(IMemoryPool *memory_pool,
+								  UlongHistogramHashMap *src_histograms,
+								  UlongHistogramHashMap *dest_histograms);
 
-			// cleanup residual buckets
-			void CleanupResidualBucket(CBucket *bucket, BOOL bucket_is_residual) const;
+		// add dummy histogram buckets and column width for the array of columns
+		static void AddDummyHistogramAndWidthInfo(IMemoryPool *memory_pool,
+												  CColumnFactory *col_factory,
+												  UlongHistogramHashMap *output_histograms,
+												  UlongDoubleHashMap *output_col_widths,
+												  const ULongPtrArray *columns,
+												  BOOL is_empty);
 
-			// get the next bucket for union / union all
-			CBucket *GetNextBucket
-					(
-					const CHistogram *histogram,
-					CBucket *new_bucket,
-					BOOL *target_bucket_is_residual,
-					ULONG *current_bucket_index
-					)
-					const;
+		// add dummy histogram buckets for the columns in the input histogram
+		static void AddEmptyHistogram(IMemoryPool *memory_pool,
+									  UlongHistogramHashMap *output_histograms,
+									  UlongHistogramHashMap *input_histograms);
 
-			// create a new histogram with updated bucket frequency
-			CHistogram *MakeHistogramUpdateFreq
-						(
-						IMemoryPool *memory_pool,
-						BucketArray *histogram_buckets,
-						DrgPdouble *dest_bucket_freqs,
-						CDouble *num_output_rows,
-						CDouble num_null_rows,
-						CDouble num_NDV_remain,
-						CDouble num_NDV_remain_rows
-						)
-						const;
-				
-			// add residual union all buckets after the merge
-			ULONG AddResidualUnionAllBucket
-				(
-				IMemoryPool *memory_pool,
-				BucketArray *histogram_buckets,
-				CBucket *bucket,
-				CDouble rows_old,
-				CDouble rows_new,
-				BOOL bucket_is_residual,
-				ULONG index
-				)
-				const;
+		// default histogram selectivity
+		static const CDouble DefaultSelectivity;
 
-			// add residual union buckets after the merge
-			ULONG AddResidualUnionBucket
-				(
-				IMemoryPool *memory_pool,
-				BucketArray *histogram_buckets,
-				CBucket *bucket,
-				CDouble rows,
-				BOOL bucket_is_residual,
-				ULONG index,
-				DrgPdouble *dest_bucket_freqs
-				)
-				const;
+		// minimum number of distinct values in a column
+		static const CDouble MinDistinct;
 
-			// number of buckets
-			ULONG Buckets() const
-			{
-				return m_histogram_buckets->Size();
-			}
+		// default scale factor when there is no filtering of input
+		static const CDouble NeutralScaleFactor;
 
-			// buckets accessor
-			const BucketArray *ParseDXLToBucketsArray() const
-			{
-				return m_histogram_buckets;
-			}
+		// default Null frequency
+		static const CDouble DefaultNullFreq;
 
-			// well defined
-			BOOL IsWellDefined() const
-			{
-				return m_is_well_defined;
-			}
+		// default NDV remain
+		static const CDouble DefaultNDVRemain;
 
-			// is the column statistics missing in the database
-			BOOL IsColStatsMissing() const
-			{
-				return m_is_col_stats_missing;
-			}
+		// default frequency of NDV remain
+		static const CDouble DefaultNDVFreqRemain;
+	};  // class CHistogram
 
-			// print function
-			virtual
-			IOstream &OsPrint(IOstream &os) const;
+}  // namespace gpnaucrates
 
-			// total frequency from buckets and null fraction
-			CDouble GetFrequency() const;
-
-			// total number of distinct values
-			CDouble GetNumDistinct() const;
-
-			// is histogram well formed
-			BOOL IsValid() const;
-
-			// return copy of histogram
-			CHistogram *CopyHistogram(IMemoryPool *memory_pool) const;
-
-			// destructor
-			virtual
-			~CHistogram()
-			{
-				m_histogram_buckets->Release();
-			}
-
-			// normalize histogram and return scaling factor
-			CDouble NormalizeHistogram();
-
-			// is histogram normalized
-			BOOL IsNormalized() const;
-
-			// translate the histogram into a derived column stats
-			CDXLStatsDerivedColumn *TranslateToDXLDerivedColumnStats
-				(
-				IMemoryPool *memory_pool,
-				CMDAccessor *md_accessor,
-				ULONG col_id,
-				CDouble width
-				)
-				const;
-
-			// randomly pick a bucket index
-			ULONG GetRandomBucketIndex(ULONG *seed) const;
-
-			// estimate of data skew
-			CDouble GetSkew()
-			{
-				if (!m_skew_was_measured)
-				{
-					ComputeSkew();
-				}
-
-				return m_skew;
-			}
-
-			// accessor of null fraction
-			CDouble GetNullFreq() const
-			{
-				return m_null_freq;
-			}
-
-			// accessor of remaining number of tuples
-			CDouble GetDistinctRemain() const
-			{
-				return m_distinct_remaining;
-			}
-
-			// accessor of remaining frequency
-			CDouble GetFreqRemain() const
-			{
-				return m_freq_remaining;
-			}
-
-			// check if histogram is empty
-			BOOL IsEmpty() const;
-
-			// cap the total number of distinct values (NDVs) in buckets to the number of rows
-			void CapNDVs(CDouble rows);
-
-			// is comparison type supported for filters
-			static
-			BOOL SupportsFilter(CStatsPred::EStatsCmpType stats_cmp_type);
-
-			// is the join predicate's comparison type supported
-			static
-			BOOL JoinPredCmpTypeIsSupported(CStatsPred::EStatsCmpType stats_cmp_type);
-
-			// create the default histogram for a given column reference
-			static
-			CHistogram *MakeDefaultHistogram(IMemoryPool *memory_pool, CColRef *col_ref, BOOL is_empty);
-
-			// create the default non empty histogram for a boolean column
-			static
-			CHistogram *MakeDefaultBoolHistogram(IMemoryPool *memory_pool);
-
-			// helper method to append histograms from one map to the other
-			static
-			void AddHistograms(IMemoryPool *memory_pool, UlongHistogramHashMap *src_histograms, UlongHistogramHashMap *dest_histograms);
-
-			// add dummy histogram buckets and column width for the array of columns
-			static
-			void AddDummyHistogramAndWidthInfo
-				(
-				IMemoryPool *memory_pool,
-				CColumnFactory *col_factory,
-				UlongHistogramHashMap *output_histograms,
-				UlongDoubleHashMap *output_col_widths,
-				const ULongPtrArray *columns,
-				BOOL is_empty
-				);
-
-			// add dummy histogram buckets for the columns in the input histogram
-			static
-			void AddEmptyHistogram(IMemoryPool *memory_pool, UlongHistogramHashMap *output_histograms, UlongHistogramHashMap *input_histograms);
-
-			// default histogram selectivity
-			static const CDouble DefaultSelectivity;
-
-			// minimum number of distinct values in a column
-			static const CDouble MinDistinct;
-
-			// default scale factor when there is no filtering of input
-			static const CDouble NeutralScaleFactor;
-
-			// default Null frequency
-			static const CDouble DefaultNullFreq;
-
-			// default NDV remain
-			static const CDouble DefaultNDVRemain;
-
-			// default frequency of NDV remain
-			static const CDouble DefaultNDVFreqRemain;
-	}; // class CHistogram
-
-}
-
-#endif // !GPNAUCRATES_CHistogram_H
+#endif  // !GPNAUCRATES_CHistogram_H
 
 // EOF

@@ -28,94 +28,78 @@ namespace gpnaucrates
 	//---------------------------------------------------------------------------
 	class CStatsPred : public CRefCount
 	{
-		public:
+	public:
+		enum EStatsPredType
+		{
+			EsptPoint,		  // filter with literals
+			EsptConj,		  // conjunctive filter
+			EsptDisj,		  // disjunctive filter
+			EsptLike,		  // LIKE filter
+			EsptUnsupported,  // unsupported filter for statistics calculation
 
-			enum EStatsPredType
-			{
-				EsptPoint, // filter with literals
-				EsptConj, // conjunctive filter
-				EsptDisj, // disjunctive filter
-				EsptLike, // LIKE filter
-				EsptUnsupported, // unsupported filter for statistics calculation
+			EsptSentinel
+		};
 
-				EsptSentinel
-			};
+		// comparison types for stats computation
+		enum EStatsCmpType
+		{
+			EstatscmptEq,		// equals
+			EstatscmptNEq,		// not equals
+			EstatscmptL,		// less than
+			EstatscmptLEq,		// less or equal to
+			EstatscmptG,		// greater than
+			EstatscmptGEq,		// greater or equal to
+			EstatscmptIDF,		// is distinct from
+			EstatscmptINDF,		// is not distinct from
+			EstatscmptLike,		// LIKE predicate comparison
+			EstatscmptNotLike,  // NOT LIKE predicate comparison
+			EstatscmptEqNDV,  // NDV comparision for equality predicate on columns with functions, ex f(a) = b or f(a) = f(b)
 
-			// comparison types for stats computation
-			enum EStatsCmpType
-			{
-				EstatscmptEq,	// equals
-				EstatscmptNEq,	// not equals
-				EstatscmptL,		// less than
-				EstatscmptLEq,	// less or equal to
-				EstatscmptG,		// greater than
-				EstatscmptGEq,	// greater or equal to
-				EstatscmptIDF,	// is distinct from
-				EstatscmptINDF,	// is not distinct from
-				EstatscmptLike,	// LIKE predicate comparison
-				EstatscmptNotLike,	// NOT LIKE predicate comparison
-				EstatscmptEqNDV, // NDV comparision for equality predicate on columns with functions, ex f(a) = b or f(a) = f(b)
+			EstatscmptOther
+		};
 
-				EstatscmptOther
-			};
+	private:
+		// private copy ctor
+		CStatsPred(const CStatsPred &);
 
-		private:
+		// private assignment operator
+		CStatsPred &operator=(CStatsPred &);
 
-			// private copy ctor
-			CStatsPred(const CStatsPred &);
+	protected:
+		// column id
+		ULONG m_colid;
 
-			// private assignment operator
-			CStatsPred& operator=(CStatsPred &);
+	public:
+		// ctor
+		explicit CStatsPred(ULONG col_id) : m_colid(col_id)
+		{
+		}
 
-		protected:
+		// dtor
+		virtual ~CStatsPred()
+		{
+		}
 
-			// column id
-			ULONG m_colid;
+		// accessors
+		virtual ULONG
+		GetColId() const
+		{
+			return m_colid;
+		}
 
-		public:
+		// type id
+		virtual EStatsPredType GetPredStatsType() const = 0;
 
-			// ctor
-			explicit
-			CStatsPred
-				(
-				ULONG col_id
-				)
-				:
-				m_colid(col_id)
-			{
-			}
-
-			// dtor
-			virtual
-			~CStatsPred()
-			{
-			}
-
-			// accessors
-			virtual
-			ULONG GetColId() const
-			{
-				return m_colid;
-			}
-
-			// type id
-			virtual
-			EStatsPredType GetPredStatsType() const = 0;
-
-			// comparison function
-			static
-			inline INT StatsPredSortCmpFunc(const void *val1, const void *val2);
-	}; // class CStatsPred
+		// comparison function
+		static inline INT StatsPredSortCmpFunc(const void *val1, const void *val2);
+	};  // class CStatsPred
 
 	// array of filters
 	typedef CDynamicPtrArray<CStatsPred, CleanupRelease> StatsPredPtrArry;
 
 	// comparison function for sorting predicates
-	INT CStatsPred::StatsPredSortCmpFunc
-		(
-		const void *val1,
-		const void *val2
-		)
+	INT
+	CStatsPred::StatsPredSortCmpFunc(const void *val1, const void *val2)
 	{
 		const CStatsPred *stats_pred1 = *(const CStatsPred **) val1;
 		const CStatsPred *stats_pred2 = *(const CStatsPred **) val2;
@@ -123,8 +107,8 @@ namespace gpnaucrates
 		return (INT) stats_pred1->GetColId() - (INT) stats_pred2->GetColId();
 	}
 
-}
+}  // namespace gpnaucrates
 
-#endif // !GPNAUCRATES_CStatsPred_H
+#endif  // !GPNAUCRATES_CStatsPred_H
 
 // EOF

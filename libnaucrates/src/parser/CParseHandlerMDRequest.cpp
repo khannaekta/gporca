@@ -26,15 +26,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerMDRequest::CParseHandlerMDRequest
-	(
-	IMemoryPool *memory_pool,
-	CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root
-	)
-	:
-	CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
-	m_mdid_array(NULL)
+CParseHandlerMDRequest::CParseHandlerMDRequest(IMemoryPool *memory_pool,
+											   CParseHandlerManager *parse_handler_mgr,
+											   CParseHandlerBase *parse_handler_root)
+	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root), m_mdid_array(NULL)
 {
 }
 
@@ -62,45 +57,54 @@ CParseHandlerMDRequest::~CParseHandlerMDRequest()
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerMDRequest::StartElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const, // element_qname
-	const Attributes& attrs
-	)
+CParseHandlerMDRequest::StartElement(const XMLCh *const,  // element_uri,
+									 const XMLCh *const element_local_name,
+									 const XMLCh *const,  // element_qname
+									 const Attributes &attrs)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenMDRequest), element_local_name))
+	if (0 ==
+		XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenMDRequest), element_local_name))
 	{
 		// start of MD request section
 		GPOS_ASSERT(NULL == m_mdid_array);
 		m_mdid_array = GPOS_NEW(m_memory_pool) MdidPtrArray(m_memory_pool);
-		m_mdtype_request_array = GPOS_NEW(m_memory_pool) CMDRequest::MDTypeRequestPtrArray(m_memory_pool);
-		
+		m_mdtype_request_array =
+			GPOS_NEW(m_memory_pool) CMDRequest::MDTypeRequestPtrArray(m_memory_pool);
+
 		return;
 	}
-	
+
 	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenMdid), element_local_name))
 	{
 		GPOS_ASSERT(NULL != m_mdid_array);
-		
+
 		// parse mdid
-		IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenValue, EdxltokenMdid);
+		IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenValue, EdxltokenMdid);
 		m_mdid_array->Append(mdid);
-		
+
 		return;
 	}
-	
-	GPOS_ASSERT(0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenMDTypeRequest), element_local_name));
+
+	GPOS_ASSERT(0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenMDTypeRequest),
+											  element_local_name));
 	GPOS_ASSERT(NULL != m_mdtype_request_array);
 
-	CSystemId sysid = CDXLOperatorFactory::Sysid(m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenSysid, EdxltokenMDTypeRequest);
+	CSystemId sysid = CDXLOperatorFactory::Sysid(
+		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenSysid, EdxltokenMDTypeRequest);
 
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenMDTypeRequest), element_local_name))
-	{		
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenMDTypeRequest),
+									  element_local_name))
+	{
 		// parse type request
-		IMDType::ETypeInfo type_info = (IMDType::ETypeInfo) CDXLOperatorFactory::ExtractConvertAttrValueToUlong(m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenTypeInfo, EdxltokenMDTypeRequest);
-		m_mdtype_request_array->Append(GPOS_NEW(m_memory_pool) CMDRequest::SMDTypeRequest(sysid, type_info));
+		IMDType::ETypeInfo type_info =
+			(IMDType::ETypeInfo) CDXLOperatorFactory::ExtractConvertAttrValueToUlong(
+				m_parse_handler_mgr->GetDXLMemoryManager(),
+				attrs,
+				EdxltokenTypeInfo,
+				EdxltokenMDTypeRequest);
+		m_mdtype_request_array->Append(GPOS_NEW(m_memory_pool)
+										   CMDRequest::SMDTypeRequest(sysid, type_info));
 	}
 }
 
@@ -113,14 +117,13 @@ CParseHandlerMDRequest::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerMDRequest::EndElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const // element_qname
-	)
+CParseHandlerMDRequest::EndElement(const XMLCh *const,  // element_uri,
+								   const XMLCh *const element_local_name,
+								   const XMLCh *const  // element_qname
+)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenMDRequest), element_local_name))
+	if (0 ==
+		XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenMDRequest), element_local_name))
 	{
 		// deactivate handler
 		m_parse_handler_mgr->DeactivateHandler();

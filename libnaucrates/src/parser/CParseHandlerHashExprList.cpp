@@ -30,14 +30,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerHashExprList::CParseHandlerHashExprList
-	(
-	IMemoryPool *memory_pool,
-	CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root
-	)
-	:
-	CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+CParseHandlerHashExprList::CParseHandlerHashExprList(IMemoryPool *memory_pool,
+													 CParseHandlerManager *parse_handler_mgr,
+													 CParseHandlerBase *parse_handler_root)
+	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -52,35 +48,41 @@ CParseHandlerHashExprList::CParseHandlerHashExprList
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerHashExprList::StartElement
-	(
-	const XMLCh* const element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const element_qname,
-	const Attributes& attrs
-	)
+CParseHandlerHashExprList::StartElement(const XMLCh *const element_uri,
+										const XMLCh *const element_local_name,
+										const XMLCh *const element_qname,
+										const Attributes &attrs)
 {
-	if(0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarHashExprList), element_local_name))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarHashExprList),
+									  element_local_name))
 	{
 		// start the hash expr list
-		m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode (m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarHashExprList(m_memory_pool));
+		m_dxl_node = GPOS_NEW(m_memory_pool)
+			CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarHashExprList(m_memory_pool));
 	}
-	else if(0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarHashExpr), element_local_name))
+	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarHashExpr),
+										   element_local_name))
 	{
 		// we must have seen a hash expr list already and initialized the hash expr list node
 		GPOS_ASSERT(NULL != m_dxl_node);
 		// start new hash expr element
-		CParseHandlerBase *hash_expr_parse_handler = CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalarHashExpr), m_parse_handler_mgr, this);
+		CParseHandlerBase *hash_expr_parse_handler =
+			CParseHandlerFactory::GetParseHandler(m_memory_pool,
+												  CDXLTokens::XmlstrToken(EdxltokenScalarHashExpr),
+												  m_parse_handler_mgr,
+												  this);
 		m_parse_handler_mgr->ActivateParseHandler(hash_expr_parse_handler);
-		
+
 		// store parse handler
 		this->Append(hash_expr_parse_handler);
-		
-		hash_expr_parse_handler->startElement(element_uri, element_local_name, element_qname, attrs);
+
+		hash_expr_parse_handler->startElement(
+			element_uri, element_local_name, element_qname, attrs);
 	}
 	else
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 }
@@ -94,28 +96,29 @@ CParseHandlerHashExprList::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerHashExprList::EndElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const // element_qname
-	)
+CParseHandlerHashExprList::EndElement(const XMLCh *const,  // element_uri,
+									  const XMLCh *const element_local_name,
+									  const XMLCh *const  // element_qname
+)
 {
-	if(0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarHashExprList), element_local_name))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarHashExprList),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
-	
+
 	const ULONG length = this->Length();
 	// add hash expressions from child parse handlers
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CParseHandlerHashExpr *hash_expr_parse_handler = dynamic_cast<CParseHandlerHashExpr *>((*this)[ul]);
-		
+		CParseHandlerHashExpr *hash_expr_parse_handler =
+			dynamic_cast<CParseHandlerHashExpr *>((*this)[ul]);
+
 		AddChildFromParseHandler(hash_expr_parse_handler);
 	}
-		
+
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();
 }

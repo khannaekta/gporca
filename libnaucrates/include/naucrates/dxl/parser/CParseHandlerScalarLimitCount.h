@@ -7,7 +7,7 @@
 //
 //	@doc:
 //		SAX parse handler class for parsing LimitCount
-//		
+//
 //---------------------------------------------------------------------------
 #ifndef GPDXL_CParseHandlerScalarLimitCount_H
 #define GPDXL_CParseHandlerScalarLimitCount_H
@@ -32,39 +32,29 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerScalarLimitCount : public CParseHandlerScalarOp
 	{
-		private:
-			// private copy ctor
-			CParseHandlerScalarLimitCount(const CParseHandlerScalarLimitCount &);
+	private:
+		// private copy ctor
+		CParseHandlerScalarLimitCount(const CParseHandlerScalarLimitCount &);
 
-			// process the start of an element
-			void StartElement
-						(
-						const XMLCh* const element_uri,
-						const XMLCh* const element_local_name,
-						const XMLCh* const element_qname,
-						const Attributes& attr
-						);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,
+						  const XMLCh *const element_local_name,
+						  const XMLCh *const element_qname,
+						  const Attributes &attr);
 
-			// process the end of an element
-			void EndElement
-						(
-						const XMLCh* const element_uri,
-						const XMLCh* const element_local_name,
-						const XMLCh* const element_qname
-						);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,
+						const XMLCh *const element_local_name,
+						const XMLCh *const element_qname);
 
-		public:
-			// ctor
-			CParseHandlerScalarLimitCount
-						(
-						IMemoryPool *memory_pool,
-						CParseHandlerManager *parse_handler_mgr,
-						CParseHandlerBase *parse_handler_root
-						);
+	public:
+		// ctor
+		CParseHandlerScalarLimitCount(IMemoryPool *memory_pool,
+									  CParseHandlerManager *parse_handler_mgr,
+									  CParseHandlerBase *parse_handler_root);
+	};
+}  // namespace gpdxl
 
-		};
-}
-
-#endif // !GPDXL_CParseHandlerScalarLimitCount_H
+#endif  // !GPDXL_CParseHandlerScalarLimitCount_H
 
 //EOF

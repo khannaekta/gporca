@@ -9,7 +9,7 @@
 //		Implementation of the SAX parse handler class for parsing direct dispatch info
 //
 //	@owner:
-//		
+//
 //
 //	@test:
 //
@@ -33,18 +33,16 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerDirectDispatchInfo::CParseHandlerDirectDispatchInfo
-	(
+CParseHandlerDirectDispatchInfo::CParseHandlerDirectDispatchInfo(
 	IMemoryPool *memory_pool,
 	CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root
-	)
-	:
-	CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
-	m_dxl_datum_array(NULL),
-	m_datum_array_combination(NULL),
-	m_direct_dispatch_info(NULL)
-{}
+	CParseHandlerBase *parse_handler_root)
+	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	  m_dxl_datum_array(NULL),
+	  m_datum_array_combination(NULL),
+	  m_direct_dispatch_info(NULL)
+{
+}
 
 
 //---------------------------------------------------------------------------
@@ -71,33 +69,35 @@ CParseHandlerDirectDispatchInfo::~CParseHandlerDirectDispatchInfo()
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerDirectDispatchInfo::StartElement
-	(
-	const XMLCh* const , //element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const , // element_qname,
-	const Attributes& attrs
-	)
+CParseHandlerDirectDispatchInfo::StartElement(const XMLCh *const,  //element_uri,
+											  const XMLCh *const element_local_name,
+											  const XMLCh *const,  // element_qname,
+											  const Attributes &attrs)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchInfo), element_local_name))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchInfo),
+									  element_local_name))
 	{
 		m_datum_array_combination = GPOS_NEW(m_memory_pool) DXLDatumArrays(m_memory_pool);
 	}
-	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchKeyValue), element_local_name))
+	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchKeyValue),
+										   element_local_name))
 	{
 		CRefCount::SafeRelease(m_dxl_datum_array);
 		m_dxl_datum_array = GPOS_NEW(m_memory_pool) DXLDatumArray(m_memory_pool);
 	}
-	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDatum), element_local_name))
+	else if (0 ==
+			 XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDatum), element_local_name))
 	{
 		GPOS_ASSERT(NULL != m_dxl_datum_array);
 
-		CDXLDatum *datum_dxl = CDXLOperatorFactory::GetDatumVal(m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenDirectDispatchInfo);
+		CDXLDatum *datum_dxl = CDXLOperatorFactory::GetDatumVal(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenDirectDispatchInfo);
 		m_dxl_datum_array->Append(datum_dxl);
 	}
 	else
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 }
@@ -111,27 +111,30 @@ CParseHandlerDirectDispatchInfo::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerDirectDispatchInfo::EndElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const // element_qname
-	)
+CParseHandlerDirectDispatchInfo::EndElement(const XMLCh *const,  // element_uri,
+											const XMLCh *const element_local_name,
+											const XMLCh *const  // element_qname
+)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchInfo), element_local_name))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchInfo),
+									  element_local_name))
 	{
-		m_direct_dispatch_info = GPOS_NEW(m_memory_pool) CDXLDirectDispatchInfo(m_datum_array_combination);
+		m_direct_dispatch_info =
+			GPOS_NEW(m_memory_pool) CDXLDirectDispatchInfo(m_datum_array_combination);
 		m_parse_handler_mgr->DeactivateHandler();
 	}
-	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchKeyValue), element_local_name))
+	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchKeyValue),
+										   element_local_name))
 	{
 		GPOS_ASSERT(NULL != m_dxl_datum_array);
 		m_dxl_datum_array->AddRef();
 		m_datum_array_combination->Append(m_dxl_datum_array);
 	}
-	else if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDatum), element_local_name))
+	else if (0 !=
+			 XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDatum), element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 }
@@ -151,4 +154,3 @@ CParseHandlerDirectDispatchInfo::GetDXLDirectDispatchInfo() const
 }
 
 // EOF
-

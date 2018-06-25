@@ -28,14 +28,8 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarConstValue::CDXLScalarConstValue
-	(
-	IMemoryPool *memory_pool,
-	CDXLDatum *datum_dxl
-	)
-	:
-	CDXLScalar(memory_pool),
-	m_dxl_datum(datum_dxl)
+CDXLScalarConstValue::CDXLScalarConstValue(IMemoryPool *memory_pool, CDXLDatum *datum_dxl)
+	: CDXLScalar(memory_pool), m_dxl_datum(datum_dxl)
 {
 }
 
@@ -79,7 +73,8 @@ CDXLScalarConstValue::GetDXLOperator() const
 const CWStringConst *
 CDXLScalarConstValue::GetOpNameStr() const
 {
-	return CDXLTokens::GetDXLTokenStr(EdxltokenScalarConstValue);;
+	return CDXLTokens::GetDXLTokenStr(EdxltokenScalarConstValue);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -91,12 +86,9 @@ CDXLScalarConstValue::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarConstValue::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *//node
-	)
-	const
+CDXLScalarConstValue::SerializeToDXL(CXMLSerializer *xml_serializer,
+									 const CDXLNode *  //node
+									 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	m_dxl_datum->Serialize(xml_serializer, element_name);
@@ -111,11 +103,7 @@ CDXLScalarConstValue::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 BOOL
-CDXLScalarConstValue::HasBoolResult
-	(
-	CMDAccessor *md_accessor
-	)
-	const
+CDXLScalarConstValue::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	return (IMDType::EtiBool == md_accessor->Pmdtype(m_dxl_datum->MDId())->GetDatumType());
 }
@@ -130,16 +118,13 @@ CDXLScalarConstValue::HasBoolResult
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarConstValue::AssertValid
-	(
-	const CDXLNode *node,
-	BOOL // validate_children 
-	) 
-	const
+CDXLScalarConstValue::AssertValid(const CDXLNode *node,
+								  BOOL  // validate_children
+								  ) const
 {
 	GPOS_ASSERT(0 == node->Arity());
 	GPOS_ASSERT(m_dxl_datum->MDId()->IsValid());
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

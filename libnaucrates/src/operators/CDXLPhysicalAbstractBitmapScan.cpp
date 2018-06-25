@@ -43,12 +43,7 @@ CDXLPhysicalAbstractBitmapScan::~CDXLPhysicalAbstractBitmapScan()
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalAbstractBitmapScan::AssertValid
-	(
-	const CDXLNode *node,
-	BOOL validate_children
-	)
-	const
+CDXLPhysicalAbstractBitmapScan::AssertValid(const CDXLNode *node, BOOL validate_children) const
 {
 	GPOS_ASSERT(4 == node->Arity());
 
@@ -60,7 +55,7 @@ CDXLPhysicalAbstractBitmapScan::AssertValid
 	// assert bitmap access path is valid
 	CDXLNode *bitmap_dxlnode = (*node)[3];
 	GPOS_ASSERT(EdxlopScalarBitmapIndexProbe == bitmap_dxlnode->GetOperator()->GetDXLOperator() ||
-			EdxlopScalarBitmapBoolOp == bitmap_dxlnode->GetOperator()->GetDXLOperator());
+				EdxlopScalarBitmapBoolOp == bitmap_dxlnode->GetOperator()->GetDXLOperator());
 
 	// assert validity of table descriptor
 	GPOS_ASSERT(NULL != m_table_descr_dxl);
@@ -72,6 +67,6 @@ CDXLPhysicalAbstractBitmapScan::AssertValid
 		bitmap_dxlnode->GetOperator()->AssertValid(bitmap_dxlnode, validate_children);
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

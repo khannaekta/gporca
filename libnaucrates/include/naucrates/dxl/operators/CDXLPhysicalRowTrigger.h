@@ -32,96 +32,88 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalRowTrigger : public CDXLPhysical
 	{
-		private:
+	private:
+		// relation id on which triggers are to be executed
+		IMDId *m_rel_mdid;
 
-			// relation id on which triggers are to be executed
-			IMDId *m_rel_mdid;
+		// trigger type
+		INT m_type;
 
-			// trigger type
-			INT m_type;
+		// old column ids
+		ULongPtrArray *m_col_ids_old;
 
-			// old column ids
-			ULongPtrArray *m_col_ids_old;
+		// new column ids
+		ULongPtrArray *m_col_ids_new;
 
-			// new column ids
-			ULongPtrArray *m_col_ids_new;
+		// private copy ctor
+		CDXLPhysicalRowTrigger(const CDXLPhysicalRowTrigger &);
 
-			// private copy ctor
-			CDXLPhysicalRowTrigger(const CDXLPhysicalRowTrigger &);
+	public:
+		// ctor
+		CDXLPhysicalRowTrigger(IMemoryPool *memory_pool,
+							   IMDId *rel_mdid,
+							   INT type,
+							   ULongPtrArray *col_ids_old,
+							   ULongPtrArray *col_ids_new);
 
-		public:
+		// dtor
+		virtual ~CDXLPhysicalRowTrigger();
 
-			// ctor
-			CDXLPhysicalRowTrigger
-				(
-				IMemoryPool *memory_pool,
-				IMDId *rel_mdid,
-				INT type,
-				ULongPtrArray *col_ids_old,
-				ULongPtrArray *col_ids_new
-				);
+		// operator type
+		virtual Edxlopid GetDXLOperator() const;
 
-			// dtor
-			virtual
-			~CDXLPhysicalRowTrigger();
+		// operator name
+		virtual const CWStringConst *GetOpNameStr() const;
 
-			// operator type
-			virtual
-			Edxlopid GetDXLOperator() const;
+		// relation id
+		IMDId *
+		GetRelMdId() const
+		{
+			return m_rel_mdid;
+		}
 
-			// operator name
-			virtual
-			const CWStringConst *GetOpNameStr() const;
+		// trigger type
+		INT
+		GetType() const
+		{
+			return m_type;
+		}
 
-			// relation id
-			IMDId *GetRelMdId() const
-			{
-				return m_rel_mdid;
-			}
+		// old column ids
+		ULongPtrArray *
+		GetColIdsOld() const
+		{
+			return m_col_ids_old;
+		}
 
-			// trigger type
-			INT GetType() const
-			{
-				return m_type;
-			}
-
-			// old column ids
-			ULongPtrArray *GetColIdsOld() const
-			{
-				return m_col_ids_old;
-			}
-
-			// new column ids
-			ULongPtrArray *GetColIdsNew() const
-			{
-				return m_col_ids_new;
-			}
+		// new column ids
+		ULongPtrArray *
+		GetColIdsNew() const
+		{
+			return m_col_ids_new;
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
-#endif // GPOS_DEBUG
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
-			// conversion function
-			static
-			CDXLPhysicalRowTrigger *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopPhysicalRowTrigger == dxl_op->GetDXLOperator());
+		// conversion function
+		static CDXLPhysicalRowTrigger *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopPhysicalRowTrigger == dxl_op->GetDXLOperator());
 
-				return dynamic_cast<CDXLPhysicalRowTrigger*>(dxl_op);
-			}
+			return dynamic_cast<CDXLPhysicalRowTrigger *>(dxl_op);
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLPhysicalRowTrigger_H
+#endif  // !GPDXL_CDXLPhysicalRowTrigger_H
 
 // EOF

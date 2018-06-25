@@ -28,16 +28,13 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarSubqueryAny::CDXLScalarSubqueryAny
-	(
-	IMemoryPool *memory_pool,
-	IMDId *scalar_op_mdid,
-	CMDName *scalar_op_mdname,
-	ULONG col_id
-	)
-	:
-	CDXLScalarSubqueryQuantified(memory_pool, scalar_op_mdid, scalar_op_mdname, col_id)
-{}
+CDXLScalarSubqueryAny::CDXLScalarSubqueryAny(IMemoryPool *memory_pool,
+											 IMDId *scalar_op_mdid,
+											 CMDName *scalar_op_mdname,
+											 ULONG col_id)
+	: CDXLScalarSubqueryQuantified(memory_pool, scalar_op_mdid, scalar_op_mdname, col_id)
+{
+}
 
 //---------------------------------------------------------------------------
 //	@function:

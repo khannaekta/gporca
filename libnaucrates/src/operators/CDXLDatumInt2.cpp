@@ -7,9 +7,9 @@
 //
 //	@doc:
 //		Implementation of DXL datum of type short integer
-//		
-//	@owner: 
-//		
+//
+//	@owner:
+//
 //
 //	@test:
 //
@@ -29,16 +29,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLDatumInt2::CDXLDatumInt2
-	(
-	IMemoryPool *memory_pool,
-	IMDId *mdid_type,
-	BOOL is_null,
-	SINT val
-	)
-	:
-	CDXLDatum(memory_pool, mdid_type, default_type_modifier, is_null, 2 /*length*/ ),
-	m_val(val)
+CDXLDatumInt2::CDXLDatumInt2(IMemoryPool *memory_pool, IMDId *mdid_type, BOOL is_null, SINT val)
+	: CDXLDatum(memory_pool, mdid_type, default_type_modifier, is_null, 2 /*length*/), m_val(val)
 {
 }
 
@@ -65,15 +57,12 @@ CDXLDatumInt2::Value() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLDatumInt2::Serialize
-	(
-	CXMLSerializer *xml_serializer
-	)
+CDXLDatumInt2::Serialize(CXMLSerializer *xml_serializer)
 {
 	m_mdid_type->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenTypeId));
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenIsNull), m_is_null);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenIsByValue), IsPassedByValue());
-	
+
 	if (!m_is_null)
 	{
 		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenValue), m_val);

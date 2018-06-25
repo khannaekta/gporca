@@ -6,7 +6,7 @@
 //		CParseHandlerColDescr.h
 //
 //	@doc:
-//		SAX parse handler class for parsing the list of column descriptors 
+//		SAX parse handler class for parsing the list of column descriptors
 //		in a table descriptor node.
 //---------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ namespace gpdxl
 
 
 	XERCES_CPP_NAMESPACE_USE
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CParseHandlerColDescr
@@ -35,49 +35,41 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerColDescr : public CParseHandlerBase
 	{
-		private:
-					
-			// array of column descriptors to build
-			ColumnDescrDXLArray *m_column_descr_dxl_array;
-			
-			// current column descriptor being parsed
-			CDXLColDescr *m_current_column_descr;
-				
-			// private copy ctor
-			CParseHandlerColDescr(const CParseHandlerColDescr&); 
-			
-			// process the start of an element
-			void StartElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
- 					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
+	private:
+		// array of column descriptors to build
+		ColumnDescrDXLArray *m_column_descr_dxl_array;
 
-			// process the end of an element
-			void EndElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-				);
-			
-		public:
-			// ctor/dtor
-			CParseHandlerColDescr
-				(
-				IMemoryPool *m_memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_base
-				);
-			
-			virtual ~CParseHandlerColDescr();
-			
-			ColumnDescrDXLArray *GetColumnDescrDXLArray();
+		// current column descriptor being parsed
+		CDXLColDescr *m_current_column_descr;
+
+		// private copy ctor
+		CParseHandlerColDescr(const CParseHandlerColDescr &);
+
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
+
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
+
+	public:
+		// ctor/dtor
+		CParseHandlerColDescr(IMemoryPool *m_memory_pool,
+							  CParseHandlerManager *parse_handler_mgr,
+							  CParseHandlerBase *parse_handler_base);
+
+		virtual ~CParseHandlerColDescr();
+
+		ColumnDescrDXLArray *GetColumnDescrDXLArray();
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerColumnDescriptor_H
+#endif  // !GPDXL_CParseHandlerColumnDescriptor_H
 
 // EOF

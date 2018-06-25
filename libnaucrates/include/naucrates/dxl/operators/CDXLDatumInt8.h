@@ -8,8 +8,8 @@
 //	@doc:
 //		Class for representing DXL datums of type long int
 //
-//	@owner: 
-//		
+//	@owner:
+//
 //
 //	@test:
 //
@@ -38,63 +38,52 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLDatumInt8 : public CDXLDatum
 	{
-		private:
-			// long int m_bytearray_value
-			LINT m_val;
+	private:
+		// long int m_bytearray_value
+		LINT m_val;
 
-			// private copy ctor
-			CDXLDatumInt8(const CDXLDatumInt8 &);
+		// private copy ctor
+		CDXLDatumInt8(const CDXLDatumInt8 &);
 
-		public:
-			// ctor
-			CDXLDatumInt8
-				(
-				IMemoryPool *memory_pool,
-				IMDId *mdid_type,
-				BOOL is_null,
-				LINT val
-				);
+	public:
+		// ctor
+		CDXLDatumInt8(IMemoryPool *memory_pool, IMDId *mdid_type, BOOL is_null, LINT val);
 
-			// dtor
-			virtual
-			~CDXLDatumInt8(){};
+		// dtor
+		virtual ~CDXLDatumInt8(){};
 
-			// accessor of m_bytearray_value
-			LINT Value() const;
+		// accessor of m_bytearray_value
+		LINT Value() const;
 
-			// serialize the datum as the given element
-			virtual
-			void Serialize(CXMLSerializer *xml_serializer);
+		// serialize the datum as the given element
+		virtual void Serialize(CXMLSerializer *xml_serializer);
 
-			// datum type
-			virtual
-			EdxldatumType GetDatumType() const
-			{
-				return CDXLDatum::EdxldatumInt8;
-			}
+		// datum type
+		virtual EdxldatumType
+		GetDatumType() const
+		{
+			return CDXLDatum::EdxldatumInt8;
+		}
 
-			// is type passed by m_bytearray_value
-			virtual
-			BOOL IsPassedByValue() const
-			{
-				return true;
-			}
+		// is type passed by m_bytearray_value
+		virtual BOOL
+		IsPassedByValue() const
+		{
+			return true;
+		}
 
-			// conversion function
-			static
-			CDXLDatumInt8 *Cast
-				(
-				CDXLDatum *datum_dxl
-				)
-			{
-				GPOS_ASSERT(NULL != datum_dxl);
-				GPOS_ASSERT(CDXLDatum::EdxldatumInt8 == datum_dxl->GetDatumType());
+		// conversion function
+		static CDXLDatumInt8 *
+		Cast(CDXLDatum *datum_dxl)
+		{
+			GPOS_ASSERT(NULL != datum_dxl);
+			GPOS_ASSERT(CDXLDatum::EdxldatumInt8 == datum_dxl->GetDatumType());
 
-				return dynamic_cast<CDXLDatumInt8*>(datum_dxl);
-			}
+			return dynamic_cast<CDXLDatumInt8 *>(datum_dxl);
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLDatumInt8_H
+#endif  // !GPDXL_CDXLDatumInt8_H
 
 // EOF

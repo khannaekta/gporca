@@ -33,14 +33,11 @@ using namespace gpos;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerScalarBitmapIndexProbe::CParseHandlerScalarBitmapIndexProbe
-	(
+CParseHandlerScalarBitmapIndexProbe::CParseHandlerScalarBitmapIndexProbe(
 	IMemoryPool *memory_pool,
 	CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root
-	)
-	:
-	CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	CParseHandlerBase *parse_handler_root)
+	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -53,21 +50,17 @@ CParseHandlerScalarBitmapIndexProbe::CParseHandlerScalarBitmapIndexProbe
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerScalarBitmapIndexProbe::StartElement
-	(
-	const XMLCh* const,  // element_uri
- 	const XMLCh* const element_local_name,
-	const XMLCh* const,  // element_qname
-	const Attributes&  // attrs
-	)
+CParseHandlerScalarBitmapIndexProbe::StartElement(const XMLCh *const,  // element_uri
+												  const XMLCh *const element_local_name,
+												  const XMLCh *const,  // element_qname
+												  const Attributes &   // attrs
+)
 {
-	if (0 != XMLString::compareString
-					(
-					CDXLTokens::XmlstrToken(EdxltokenScalarBitmapIndexProbe),
-					element_local_name
-					))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBitmapIndexProbe),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
@@ -75,13 +68,16 @@ CParseHandlerScalarBitmapIndexProbe::StartElement
 	// order of their expected appearance
 
 	// parse handler for the index descriptor
-	CParseHandlerBase *index_descr_parse_handler =
-			CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenIndexDescr), m_parse_handler_mgr, this);
+	CParseHandlerBase *index_descr_parse_handler = CParseHandlerFactory::GetParseHandler(
+		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenIndexDescr), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(index_descr_parse_handler);
 
 	// parse handler for the index condition list
 	CParseHandlerBase *index_cond_list_parse_handler =
-			CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalarIndexCondList), m_parse_handler_mgr, this);
+		CParseHandlerFactory::GetParseHandler(m_memory_pool,
+											  CDXLTokens::XmlstrToken(EdxltokenScalarIndexCondList),
+											  m_parse_handler_mgr,
+											  this);
 	m_parse_handler_mgr->ActivateParseHandler(index_cond_list_parse_handler);
 
 	// store parse handlers
@@ -98,31 +94,30 @@ CParseHandlerScalarBitmapIndexProbe::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerScalarBitmapIndexProbe::EndElement
-	(
-	const XMLCh* const,  // element_uri
-	const XMLCh* const element_local_name,
-	const XMLCh* const  // element_qname
-	)
+CParseHandlerScalarBitmapIndexProbe::EndElement(const XMLCh *const,  // element_uri
+												const XMLCh *const element_local_name,
+												const XMLCh *const  // element_qname
+)
 {
-	if (0 != XMLString::compareString
-				(
-				CDXLTokens::XmlstrToken(EdxltokenScalarBitmapIndexProbe),
-				element_local_name
-				))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBitmapIndexProbe),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
 	// construct node from the created child nodes
-	CParseHandlerIndexCondList *index_cond_list_parse_handler = dynamic_cast<CParseHandlerIndexCondList *>((*this)[0]);
-	CParseHandlerIndexDescr *index_descr_parse_handler = dynamic_cast<CParseHandlerIndexDescr *>((*this)[1]);
+	CParseHandlerIndexCondList *index_cond_list_parse_handler =
+		dynamic_cast<CParseHandlerIndexCondList *>((*this)[0]);
+	CParseHandlerIndexDescr *index_descr_parse_handler =
+		dynamic_cast<CParseHandlerIndexDescr *>((*this)[1]);
 
 	CDXLIndexDescr *index_descr_dxl = index_descr_parse_handler->GetDXLIndexDescr();
 	index_descr_dxl->AddRef();
 
-	CDXLScalar *dxl_op = GPOS_NEW(m_memory_pool) CDXLScalarBitmapIndexProbe(m_memory_pool, index_descr_dxl);
+	CDXLScalar *dxl_op =
+		GPOS_NEW(m_memory_pool) CDXLScalarBitmapIndexProbe(m_memory_pool, index_descr_dxl);
 	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, dxl_op);
 
 	// add children

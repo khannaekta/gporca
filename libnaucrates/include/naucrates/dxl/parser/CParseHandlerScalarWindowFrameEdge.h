@@ -7,7 +7,7 @@
 //
 //	@doc:
 //		SAX parse handler class for parsing a window frame edge
-//		
+//
 //---------------------------------------------------------------------------
 #ifndef GPDXL_CParseHandlerScalarWindowFrameEdge_H
 #define GPDXL_CParseHandlerScalarWindowFrameEdge_H
@@ -32,43 +32,33 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerScalarWindowFrameEdge : public CParseHandlerScalarOp
 	{
-		private:
-			// identify if the parser is for a leading or trailing edge
-			BOOL m_leading_edge;
+	private:
+		// identify if the parser is for a leading or trailing edge
+		BOOL m_leading_edge;
 
-			// private copy ctor
-			CParseHandlerScalarWindowFrameEdge(const CParseHandlerScalarWindowFrameEdge &);
+		// private copy ctor
+		CParseHandlerScalarWindowFrameEdge(const CParseHandlerScalarWindowFrameEdge &);
 
-			// process the start of an element
-			void StartElement
-						(
-						const XMLCh* const element_uri,
-						const XMLCh* const element_local_name,
-						const XMLCh* const element_qname,
-						const Attributes& attr
-						);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,
+						  const XMLCh *const element_local_name,
+						  const XMLCh *const element_qname,
+						  const Attributes &attr);
 
-			// process the end of an element
-			void EndElement
-						(
-						const XMLCh* const element_uri,
-						const XMLCh* const element_local_name,
-						const XMLCh* const element_qname
-						);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,
+						const XMLCh *const element_local_name,
+						const XMLCh *const element_qname);
 
-		public:
-			// ctor
-			CParseHandlerScalarWindowFrameEdge
-						(
-						IMemoryPool *memory_pool,
-						CParseHandlerManager *parse_handler_mgr,
-						CParseHandlerBase *parse_handler_root,
-						BOOL leading_edge
-						);
+	public:
+		// ctor
+		CParseHandlerScalarWindowFrameEdge(IMemoryPool *memory_pool,
+										   CParseHandlerManager *parse_handler_mgr,
+										   CParseHandlerBase *parse_handler_root,
+										   BOOL leading_edge);
+	};
+}  // namespace gpdxl
 
-		};
-}
-
-#endif // !GPDXL_CParseHandlerScalarWindowFrameEdge_H
+#endif  // !GPDXL_CParseHandlerScalarWindowFrameEdge_H
 
 //EOF

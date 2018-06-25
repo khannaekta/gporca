@@ -34,49 +34,41 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerMDRelationExternal : public CParseHandlerMDRelation
 	{
-		private:
+	private:
+		// reject limit
+		INT m_reject_limit;
 
-			// reject limit
-			INT m_reject_limit;
+		// reject limit in rows?
+		BOOL m_is_rej_limit_in_rows;
 
-			// reject limit in rows?
-			BOOL m_is_rej_limit_in_rows;
+		// format error table mdid
+		IMDId *m_mdid_fmt_err_table;
 
-			// format error table mdid
-			IMDId *m_mdid_fmt_err_table;
+		// private copy ctor
+		CParseHandlerMDRelationExternal(const CParseHandlerMDRelationExternal &);
 
-			// private copy ctor
-			CParseHandlerMDRelationExternal(const CParseHandlerMDRelationExternal &);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the start of an element
-			void StartElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
-				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname,		// element's qname
-				const Attributes& attr				// element's attributes
-				);
-
-			// process the end of an element
-			void EndElement
-				(
-				const XMLCh* const element_uri, 		// URI of element's namespace
-				const XMLCh* const element_local_name,	// local part of element's name
-				const XMLCh* const element_qname		// element's qname
-				);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
 
-		public:
-			// ctor
-			CParseHandlerMDRelationExternal
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
+	public:
+		// ctor
+		CParseHandlerMDRelationExternal(IMemoryPool *memory_pool,
+										CParseHandlerManager *parse_handler_mgr,
+										CParseHandlerBase *parse_handler_root);
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerMDRelationExternal_H
+#endif  // !GPDXL_CParseHandlerMDRelationExternal_H
 
 // EOF

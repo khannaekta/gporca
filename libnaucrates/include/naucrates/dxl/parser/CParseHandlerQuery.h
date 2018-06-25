@@ -32,63 +32,53 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerQuery : public CParseHandlerBase
 	{
-		private:
+	private:
+		// the root of the parsed DXL tree constructed by the parse handler
+		CDXLNode *m_dxl_node;
 
-			// the root of the parsed DXL tree constructed by the parse handler
-			CDXLNode *m_dxl_node;
+		// list of output columns (represented as scalar ident nodes)
+		DXLNodeArray *m_output_colums_dxl_array;
 
-			// list of output columns (represented as scalar ident nodes)
-			DXLNodeArray *m_output_colums_dxl_array;
+		// list of CTE priducers
+		DXLNodeArray *m_cte_producers;
 
-			// list of CTE priducers
-			DXLNodeArray *m_cte_producers;
+		// private ctor
+		CParseHandlerQuery(const CParseHandlerQuery &);
 
-			// private ctor
-			CParseHandlerQuery(const CParseHandlerQuery&);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// process the start of an element
-			void StartElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
- 					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-			// process the end of an element
-			void EndElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-				);
+	public:
+		// ctor/dtor
+		CParseHandlerQuery(IMemoryPool *memory_pool,
+						   CParseHandlerManager *parse_handler_mgr,
+						   CParseHandlerBase *parse_handler_root);
 
-		public:
-			// ctor/dtor
-			CParseHandlerQuery
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
+		virtual ~CParseHandlerQuery();
 
-			virtual
-			~CParseHandlerQuery();
+		// returns the root of constructed DXL plan
+		CDXLNode *CreateDXLNode() const;
 
-			// returns the root of constructed DXL plan
-			CDXLNode *CreateDXLNode() const;
+		// returns the dxl representation of the query output
+		DXLNodeArray *GetOutputColumnsDXLArray() const;
 
-			// returns the dxl representation of the query output
-			DXLNodeArray *GetOutputColumnsDXLArray() const;
+		// returns the CTEs
+		DXLNodeArray *GetCTEProducerDXLArray() const;
 
-			// returns the CTEs
-			DXLNodeArray *GetCTEProducerDXLArray() const;
-
-			EDxlParseHandlerType GetParseHandlerType() const;
-
+		EDxlParseHandlerType GetParseHandlerType() const;
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerQuery_H
+#endif  // !GPDXL_CParseHandlerQuery_H
 
 // EOF

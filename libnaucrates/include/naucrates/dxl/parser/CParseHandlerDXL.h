@@ -28,11 +28,11 @@ namespace gpdxl
 	using namespace gpmd;
 
 	XERCES_CPP_NAMESPACE_USE
-	
+
 	// shorthand for functions for translating GPDB expressions into DXL nodes
 	typedef void (CParseHandlerDXL::*ParseHandler)(CParseHandlerBase *parse_handler_base);
 
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CParseHandlerDXL
@@ -44,181 +44,174 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerDXL : public CParseHandlerBase
 	{
-		private:
+	private:
+		// pair of parse handler type and parse handler function
+		struct SParseElem
+		{
+			EDxlParseHandlerType parse_handler_type;  // parse handler type
+			ParseHandler parse_handler_func;		  // pointer to corresponding function
+		};
 
-			// pair of parse handler type and parse handler function
-			struct SParseElem
-			{
-				EDxlParseHandlerType parse_handler_type; // parse handler type
-				ParseHandler parse_handler_func; // pointer to corresponding function
-			};
+		// traceflags
+		CBitSet *m_trace_flags_bitset;
 
-			// traceflags
-			CBitSet *m_trace_flags_bitset;
-			
-			// optimizer config
-			COptimizerConfig *m_optimizer_config;
-			
-			// MD request
-			CMDRequest *m_mdrequest;
-			
-			// the root of the parsed DXL query
-			CDXLNode *m_query_dxl_root;
-			
-			// list of query output columns
-			DXLNodeArray *m_output_colums_dxl_array;
+		// optimizer config
+		COptimizerConfig *m_optimizer_config;
 
-			// list of CTE producers
-			DXLNodeArray *m_cte_producers;
+		// MD request
+		CMDRequest *m_mdrequest;
 
-			// the root of the parsed DXL plan
-			CDXLNode *m_plan_dxl_root;
+		// the root of the parsed DXL query
+		CDXLNode *m_query_dxl_root;
 
-			// list of parsed metadata objects
-			IMDCachePtrArray *m_mdid_cached_obj_array;
-			
-			// list of parsed metadata ids
-			MdidPtrArray *m_mdid_array;
+		// list of query output columns
+		DXLNodeArray *m_output_colums_dxl_array;
 
-			// the root of the parsed scalar expression
-			CDXLNode *m_scalar_expr_dxl;
+		// list of CTE producers
+		DXLNodeArray *m_cte_producers;
 
-			// list of source system ids
-			SysidPtrArray *m_system_id_array;
-			
-			// list of parsed statistics objects
-			DXLStatsDerivedRelArray *m_stats_derived_rel_dxl_array;
+		// the root of the parsed DXL plan
+		CDXLNode *m_plan_dxl_root;
 
-			// search strategy
-			DrgPss *m_search_stage_array;
+		// list of parsed metadata objects
+		IMDCachePtrArray *m_mdid_cached_obj_array;
 
-			// plan Id
-			ULLONG m_plan_id;
+		// list of parsed metadata ids
+		MdidPtrArray *m_mdid_array;
 
-			// plan space size
-			ULLONG m_plan_space_size;
+		// the root of the parsed scalar expression
+		CDXLNode *m_scalar_expr_dxl;
 
-			// cost model params
-			ICostModelParams *m_cost_model_params;
+		// list of source system ids
+		SysidPtrArray *m_system_id_array;
 
-			// private copy ctor
-			CParseHandlerDXL(const CParseHandlerDXL&);
-			
-			// process the start of an element
-			void StartElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
- 					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
-				
-			// process the end of an element
-			void EndElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-				);
-			
-			// find the parse handler function for the given type
-			ParseHandler FindParseHandler(EDxlParseHandlerType parse_handler_type);
+		// list of parsed statistics objects
+		DXLStatsDerivedRelArray *m_stats_derived_rel_dxl_array;
 
-			// extract traceflags
-			void ExtractTraceFlags(CParseHandlerBase *parse_handler_base);
-			
-			// extract optimizer config
-			void ExtractOptimizerConfig(CParseHandlerBase *parse_handler_base);
+		// search strategy
+		DrgPss *m_search_stage_array;
 
-			// extract a physical plan
-			void ExtractDXLPlan(CParseHandlerBase *parse_handler_base);
+		// plan Id
+		ULLONG m_plan_id;
 
-			// extract metadata objects
-			void ExtractMetadataObjects(CParseHandlerBase *parse_handler_base);
+		// plan space size
+		ULLONG m_plan_space_size;
 
-			// extract statistics
-			void ExtractStats(CParseHandlerBase *parse_handler_base);
+		// cost model params
+		ICostModelParams *m_cost_model_params;
 
-			// extract DXL query
-			void ExtractDXLQuery(CParseHandlerBase *parse_handler_base);
+		// private copy ctor
+		CParseHandlerDXL(const CParseHandlerDXL &);
 
-			// extract mdids of requested objects
-			void ExtractMDRequest(CParseHandlerBase *parse_handler_base);
-			
-			// extract search strategy
-			void ExtractSearchStrategy(CParseHandlerBase *parse_handler_base);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,		  // URI of element's namespace
+						  const XMLCh *const element_local_name,  // local part of element's name
+						  const XMLCh *const element_qname,		  // element's qname
+						  const Attributes &attr				  // element's attributes
+		);
 
-			// extract cost params
-			void ExtractCostParams(CParseHandlerBase *parse_handler_base);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,			// URI of element's namespace
+						const XMLCh *const element_local_name,  // local part of element's name
+						const XMLCh *const element_qname		// element's qname
+		);
 
-            // extract a top level scalar expression
-			void ExtractScalarExpr(CParseHandlerBase *parse_handler_base);
+		// find the parse handler function for the given type
+		ParseHandler FindParseHandler(EDxlParseHandlerType parse_handler_type);
 
-			// check if given element name is valid for starting DXL document
-			static
-			BOOL IsValidStartElement(const XMLCh* const element_name);
+		// extract traceflags
+		void ExtractTraceFlags(CParseHandlerBase *parse_handler_base);
 
-		public:
-			// ctor
-			CParseHandlerDXL(IMemoryPool *memory_pool, CParseHandlerManager *parse_handler_mgr);
-			
-			//dtor
-			virtual
-			~CParseHandlerDXL();
-			
-			// traceflag bitset
-			CBitSet *Pbs() const;
-			
-			// optimizer config
-			COptimizerConfig *GetOptimizerConfig() const;
-			
-			// returns the root of the parsed DXL query
-			CDXLNode *GetQueryDXLRoot() const;
-			
-			// returns the list of query output columns
-			DXLNodeArray *GetOutputColumnsDXLArray() const;
+		// extract optimizer config
+		void ExtractOptimizerConfig(CParseHandlerBase *parse_handler_base);
 
-			// returns the list of CTE producers
-			DXLNodeArray *GetCTEProducerDXLArray() const;
+		// extract a physical plan
+		void ExtractDXLPlan(CParseHandlerBase *parse_handler_base);
 
-			// returns the root of the parsed DXL plan
-			CDXLNode *PdxlnPlan() const;
+		// extract metadata objects
+		void ExtractMetadataObjects(CParseHandlerBase *parse_handler_base);
 
-			// return the list of parsed metadata objects
-			IMDCachePtrArray *GetMdIdCachedObjArray() const;
+		// extract statistics
+		void ExtractStats(CParseHandlerBase *parse_handler_base);
 
-			// return the list of parsed metadata ids
-			MdidPtrArray *GetMdIdArray() const;
+		// extract DXL query
+		void ExtractDXLQuery(CParseHandlerBase *parse_handler_base);
 
-			// return the MD request object
-			CMDRequest *GetMiniDumper() const;
+		// extract mdids of requested objects
+		void ExtractMDRequest(CParseHandlerBase *parse_handler_base);
 
-			// return the root of the parsed scalar expression
-			CDXLNode *GetScalarExprDXLRoot() const;
+		// extract search strategy
+		void ExtractSearchStrategy(CParseHandlerBase *parse_handler_base);
 
-			// return the list of parsed source system id objects
-			SysidPtrArray *GetSysidPtrArray() const;
-			
-			// return the list of statistics objects
-			DXLStatsDerivedRelArray *GetStatsDerivedRelDXLArray() const;
+		// extract cost params
+		void ExtractCostParams(CParseHandlerBase *parse_handler_base);
 
-			// return search strategy
-			DrgPss *GetSearchStageArray() const;
+		// extract a top level scalar expression
+		void ExtractScalarExpr(CParseHandlerBase *parse_handler_base);
 
-			// return plan id
-			ULLONG GetPlanId() const;
+		// check if given element name is valid for starting DXL document
+		static BOOL IsValidStartElement(const XMLCh *const element_name);
 
-			// return plan space size
-			ULLONG GetPlanSpaceSize() const;
+	public:
+		// ctor
+		CParseHandlerDXL(IMemoryPool *memory_pool, CParseHandlerManager *parse_handler_mgr);
 
-			// return cost params
-			ICostModelParams *GetCostModelParams() const;
+		//dtor
+		virtual ~CParseHandlerDXL();
 
-			// process the end of the document
-			void endDocument();
+		// traceflag bitset
+		CBitSet *Pbs() const;
+
+		// optimizer config
+		COptimizerConfig *GetOptimizerConfig() const;
+
+		// returns the root of the parsed DXL query
+		CDXLNode *GetQueryDXLRoot() const;
+
+		// returns the list of query output columns
+		DXLNodeArray *GetOutputColumnsDXLArray() const;
+
+		// returns the list of CTE producers
+		DXLNodeArray *GetCTEProducerDXLArray() const;
+
+		// returns the root of the parsed DXL plan
+		CDXLNode *PdxlnPlan() const;
+
+		// return the list of parsed metadata objects
+		IMDCachePtrArray *GetMdIdCachedObjArray() const;
+
+		// return the list of parsed metadata ids
+		MdidPtrArray *GetMdIdArray() const;
+
+		// return the MD request object
+		CMDRequest *GetMiniDumper() const;
+
+		// return the root of the parsed scalar expression
+		CDXLNode *GetScalarExprDXLRoot() const;
+
+		// return the list of parsed source system id objects
+		SysidPtrArray *GetSysidPtrArray() const;
+
+		// return the list of statistics objects
+		DXLStatsDerivedRelArray *GetStatsDerivedRelDXLArray() const;
+
+		// return search strategy
+		DrgPss *GetSearchStageArray() const;
+
+		// return plan id
+		ULLONG GetPlanId() const;
+
+		// return plan space size
+		ULLONG GetPlanSpaceSize() const;
+
+		// return cost params
+		ICostModelParams *GetCostModelParams() const;
+
+		// process the end of the document
+		void endDocument();
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerDXL_H
+#endif  // !GPDXL_CParseHandlerDXL_H
 
 // EOF

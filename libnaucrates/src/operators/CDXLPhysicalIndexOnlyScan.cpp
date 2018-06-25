@@ -26,15 +26,11 @@ using namespace gpdxl;
 //		index descriptor and filter conditions on the index
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalIndexOnlyScan::CDXLPhysicalIndexOnlyScan
-	(
-	IMemoryPool *memory_pool,
-	CDXLTableDescr *table_descr,
-	CDXLIndexDescr *index_descr_dxl,
-	EdxlIndexScanDirection idx_scan_direction
-	)
-	:
-	CDXLPhysicalIndexScan(memory_pool, table_descr, index_descr_dxl, idx_scan_direction)
+CDXLPhysicalIndexOnlyScan::CDXLPhysicalIndexOnlyScan(IMemoryPool *memory_pool,
+													 CDXLTableDescr *table_descr,
+													 CDXLIndexDescr *index_descr_dxl,
+													 EdxlIndexScanDirection idx_scan_direction)
+	: CDXLPhysicalIndexScan(memory_pool, table_descr, index_descr_dxl, idx_scan_direction)
 {
 }
 

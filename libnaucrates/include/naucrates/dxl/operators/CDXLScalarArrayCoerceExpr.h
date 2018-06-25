@@ -36,75 +36,68 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLScalarArrayCoerceExpr : public CDXLScalarCoerceBase
 	{
-		private:
-			// catalog MDId of element coerce function
-			IMDId *m_coerce_func_mdid;
+	private:
+		// catalog MDId of element coerce function
+		IMDId *m_coerce_func_mdid;
 
-			// conversion semantics flag to pass to func
-			BOOL m_explicit;
+		// conversion semantics flag to pass to func
+		BOOL m_explicit;
 
-			// private copy ctor
-			CDXLScalarArrayCoerceExpr(const CDXLScalarArrayCoerceExpr&);
+		// private copy ctor
+		CDXLScalarArrayCoerceExpr(const CDXLScalarArrayCoerceExpr &);
 
-		public:
-			CDXLScalarArrayCoerceExpr
-				(
-				IMemoryPool *memory_pool,
-				IMDId *coerce_func_mdid,
-				IMDId *result_type_mdid,
-				INT type_modifier,
-				BOOL is_explicit,
-				EdxlCoercionForm coerce_format,
-				INT location
-				);
+	public:
+		CDXLScalarArrayCoerceExpr(IMemoryPool *memory_pool,
+								  IMDId *coerce_func_mdid,
+								  IMDId *result_type_mdid,
+								  INT type_modifier,
+								  BOOL is_explicit,
+								  EdxlCoercionForm coerce_format,
+								  INT location);
 
-			virtual
-			~CDXLScalarArrayCoerceExpr()
-			{
-				m_coerce_func_mdid->Release();
-			}
+		virtual ~CDXLScalarArrayCoerceExpr()
+		{
+			m_coerce_func_mdid->Release();
+		}
 
-			// ident accessor
-			virtual
-			Edxlopid GetDXLOperator() const
-			{
-				return EdxlopScalarArrayCoerceExpr;
-			}
+		// ident accessor
+		virtual Edxlopid
+		GetDXLOperator() const
+		{
+			return EdxlopScalarArrayCoerceExpr;
+		}
 
-			// return metadata id of element coerce function
-			IMDId *GetCoerceFuncMDid() const
-			{
-				return m_coerce_func_mdid;
-			}
+		// return metadata id of element coerce function
+		IMDId *
+		GetCoerceFuncMDid() const
+		{
+			return m_coerce_func_mdid;
+		}
 
-			BOOL IsExplicit() const
-			{
-				return m_explicit;
-			}
+		BOOL
+		IsExplicit() const
+		{
+			return m_explicit;
+		}
 
-			// name of the DXL operator name
-			virtual
-			const CWStringConst *GetOpNameStr() const;
+		// name of the DXL operator name
+		virtual const CWStringConst *GetOpNameStr() const;
 
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
-			// conversion function
-			static
-			CDXLScalarArrayCoerceExpr *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopScalarArrayCoerceExpr == dxl_op->GetDXLOperator());
+		// conversion function
+		static CDXLScalarArrayCoerceExpr *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopScalarArrayCoerceExpr == dxl_op->GetDXLOperator());
 
-				return dynamic_cast<CDXLScalarArrayCoerceExpr*>(dxl_op);
-			}
+			return dynamic_cast<CDXLScalarArrayCoerceExpr *>(dxl_op);
+		}
 	};
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CDXLScalarArrayCoerceExpr_H
+#endif  // !GPDXL_CDXLScalarArrayCoerceExpr_H
 
 // EOF

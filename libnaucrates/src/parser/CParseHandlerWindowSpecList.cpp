@@ -28,15 +28,11 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerWindowSpecList::CParseHandlerWindowSpecList
-	(
-	IMemoryPool *memory_pool,
-	CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root
-	)
-	:
-	CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
-	m_window_spec_array(NULL)
+CParseHandlerWindowSpecList::CParseHandlerWindowSpecList(IMemoryPool *memory_pool,
+														 CParseHandlerManager *parse_handler_mgr,
+														 CParseHandlerBase *parse_handler_root)
+	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	  m_window_spec_array(NULL)
 {
 }
 
@@ -49,35 +45,36 @@ CParseHandlerWindowSpecList::CParseHandlerWindowSpecList
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerWindowSpecList::StartElement
-	(
-	const XMLCh* const element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const element_qname,
-	const Attributes& attrs
-	)
+CParseHandlerWindowSpecList::StartElement(const XMLCh *const element_uri,
+										  const XMLCh *const element_local_name,
+										  const XMLCh *const element_qname,
+										  const Attributes &attrs)
 {
-	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenWindowSpecList), element_local_name))
+	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenWindowSpecList),
+									  element_local_name))
 	{
 		m_window_spec_array = GPOS_NEW(m_memory_pool) DXLWindowSpecArray(m_memory_pool);
 	}
-	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenWindowSpec), element_local_name))
+	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenWindowSpec),
+										   element_local_name))
 	{
 		// we must have seen a window specification list already
 		GPOS_ASSERT(NULL != m_window_spec_array);
 		// start new window specification element
-		CParseHandlerBase *window_spec_parse_handler =
-				CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenWindowSpec), m_parse_handler_mgr, this);
+		CParseHandlerBase *window_spec_parse_handler = CParseHandlerFactory::GetParseHandler(
+			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenWindowSpec), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(window_spec_parse_handler);
 
 		// store parse handler
 		this->Append(window_spec_parse_handler);
 
-		window_spec_parse_handler->startElement(element_uri, element_local_name, element_qname, attrs);
+		window_spec_parse_handler->startElement(
+			element_uri, element_local_name, element_qname, attrs);
 	}
 	else
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 }
@@ -91,16 +88,16 @@ CParseHandlerWindowSpecList::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerWindowSpecList::EndElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const // element_qname
-	)
+CParseHandlerWindowSpecList::EndElement(const XMLCh *const,  // element_uri,
+										const XMLCh *const element_local_name,
+										const XMLCh *const  // element_qname
+)
 {
-	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenWindowSpecList), element_local_name))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenWindowSpecList),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 	GPOS_ASSERT(NULL != m_window_spec_array);
@@ -109,7 +106,8 @@ CParseHandlerWindowSpecList::EndElement
 	// add the window specifications to the list
 	for (ULONG idx = 0; idx < size; idx++)
 	{
-		CParseHandlerWindowSpec *window_spec_parse_handler = dynamic_cast<CParseHandlerWindowSpec *>((*this)[idx]);
+		CParseHandlerWindowSpec *window_spec_parse_handler =
+			dynamic_cast<CParseHandlerWindowSpec *>((*this)[idx]);
 		m_window_spec_array->Append(window_spec_parse_handler->GetWindowKeyAt());
 	}
 

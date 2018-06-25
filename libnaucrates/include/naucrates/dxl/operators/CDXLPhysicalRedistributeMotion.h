@@ -31,7 +31,7 @@ namespace gpdxl
 	};
 
 
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CDXLPhysicalRedistributeMotion
@@ -42,62 +42,56 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CDXLPhysicalRedistributeMotion : public CDXLPhysicalMotion
 	{
-		private:
-			
-			// is this a duplicate sensitive redistribute motion
-			BOOL m_is_duplicate_sensitive;
-			
-			// private copy ctor
-			CDXLPhysicalRedistributeMotion(const CDXLPhysicalRedistributeMotion&);
-			
-			
-		public:
-			// ctor
-			CDXLPhysicalRedistributeMotion(IMemoryPool *memory_pool, BOOL is_duplicate_sensitive);
-			
-			// accessors
-			Edxlopid GetDXLOperator() const;
-			const CWStringConst *GetOpNameStr() const;
-			
-			// does motion remove duplicates
-			BOOL IsDuplicateSensitive() const
-			{
-				return m_is_duplicate_sensitive;
-			}
-			
-			// index of relational child node in the children array
-			virtual 
-			ULONG GetRelationChildIdx() const
-			{
-				return EdxlrmIndexChild;
-			}
-			
-			// serialize operator in DXL format
-			virtual
-			void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+	private:
+		// is this a duplicate sensitive redistribute motion
+		BOOL m_is_duplicate_sensitive;
 
-			// conversion function
-			static
-			CDXLPhysicalRedistributeMotion *Cast
-				(
-				CDXLOperator *dxl_op
-				)
-			{
-				GPOS_ASSERT(NULL != dxl_op);
-				GPOS_ASSERT(EdxlopPhysicalMotionRedistribute == dxl_op->GetDXLOperator());
+		// private copy ctor
+		CDXLPhysicalRedistributeMotion(const CDXLPhysicalRedistributeMotion &);
 
-				return dynamic_cast<CDXLPhysicalRedistributeMotion*>(dxl_op);
-			}
+
+	public:
+		// ctor
+		CDXLPhysicalRedistributeMotion(IMemoryPool *memory_pool, BOOL is_duplicate_sensitive);
+
+		// accessors
+		Edxlopid GetDXLOperator() const;
+		const CWStringConst *GetOpNameStr() const;
+
+		// does motion remove duplicates
+		BOOL
+		IsDuplicateSensitive() const
+		{
+			return m_is_duplicate_sensitive;
+		}
+
+		// index of relational child node in the children array
+		virtual ULONG
+		GetRelationChildIdx() const
+		{
+			return EdxlrmIndexChild;
+		}
+
+		// serialize operator in DXL format
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
+
+		// conversion function
+		static CDXLPhysicalRedistributeMotion *
+		Cast(CDXLOperator *dxl_op)
+		{
+			GPOS_ASSERT(NULL != dxl_op);
+			GPOS_ASSERT(EdxlopPhysicalMotionRedistribute == dxl_op->GetDXLOperator());
+
+			return dynamic_cast<CDXLPhysicalRedistributeMotion *>(dxl_op);
+		}
 
 #ifdef GPOS_DEBUG
-			// checks whether the operator has valid structure, i.e. number and
-			// types of child nodes
-			void AssertValid(const CDXLNode *, BOOL validate_children) const;
-#endif // GPOS_DEBUG
-			
+		// checks whether the operator has valid structure, i.e. number and
+		// types of child nodes
+		void AssertValid(const CDXLNode *, BOOL validate_children) const;
+#endif  // GPOS_DEBUG
 	};
-}
-#endif // !GPDXL_CDXLPhysicalRedistributeMotion_H
+}  // namespace gpdxl
+#endif  // !GPDXL_CDXLPhysicalRedistributeMotion_H
 
 // EOF
-

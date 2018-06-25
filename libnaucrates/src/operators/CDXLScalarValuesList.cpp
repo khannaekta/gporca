@@ -20,12 +20,7 @@ using namespace gpdxl;
 
 
 // constructs a m_bytearray_value list node
-CDXLScalarValuesList::CDXLScalarValuesList
-	(
-	IMemoryPool *memory_pool
-	)
-	:
-	CDXLScalar(memory_pool)
+CDXLScalarValuesList::CDXLScalarValuesList(IMemoryPool *memory_pool) : CDXLScalar(memory_pool)
 {
 }
 
@@ -50,12 +45,7 @@ CDXLScalarValuesList::GetOpNameStr() const
 
 // serialize operator in DXL format
 void
-CDXLScalarValuesList::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *dxlnode
-	)
-	const
+CDXLScalarValuesList::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const
 {
 	GPOS_CHECK_ABORT;
 
@@ -63,31 +53,26 @@ CDXLScalarValuesList::SerializeToDXL
 
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 	dxlnode->SerializeChildrenToDXL(xml_serializer);
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 
 	GPOS_CHECK_ABORT;
 }
 
 // conversion function
 CDXLScalarValuesList *
-CDXLScalarValuesList::Cast
-	(
-	CDXLOperator *dxl_op
-	)
+CDXLScalarValuesList::Cast(CDXLOperator *dxl_op)
 {
 	GPOS_ASSERT(NULL != dxl_op);
 	GPOS_ASSERT(EdxlopScalarValuesList == dxl_op->GetDXLOperator());
 
-	return dynamic_cast<CDXLScalarValuesList*>(dxl_op);
+	return dynamic_cast<CDXLScalarValuesList *>(dxl_op);
 }
 
 // does the operator return a boolean result
 BOOL
-CDXLScalarValuesList::HasBoolResult
-	(
-	CMDAccessor * //md_accessor
-	)
-	const
+CDXLScalarValuesList::HasBoolResult(CMDAccessor *  //md_accessor
+									) const
 {
 	return false;
 }
@@ -96,12 +81,7 @@ CDXLScalarValuesList::HasBoolResult
 
 // checks whether operator node is well-structured
 void
-CDXLScalarValuesList::AssertValid
-	(
-	const CDXLNode *dxlnode,
-	BOOL validate_children
-	)
-	const
+CDXLScalarValuesList::AssertValid(const CDXLNode *dxlnode, BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
 
@@ -116,6 +96,6 @@ CDXLScalarValuesList::AssertValid
 		}
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

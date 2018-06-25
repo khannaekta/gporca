@@ -33,50 +33,38 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerScalarMinMax : public CParseHandlerScalarOp
 	{
-		private:
+	private:
+		// return type
+		IMDId *m_mdid_type;
 
-			// return type
-			IMDId *m_mdid_type;
+		// min/max type
+		CDXLScalarMinMax::EdxlMinMaxType m_min_max_type;
 
-			// min/max type
-			CDXLScalarMinMax::EdxlMinMaxType m_min_max_type;
+		// private copy ctor
+		CParseHandlerScalarMinMax(const CParseHandlerScalarMinMax &);
 
-			// private copy ctor
-			CParseHandlerScalarMinMax(const CParseHandlerScalarMinMax &);
+		// process the start of an element
+		void StartElement(const XMLCh *const element_uri,
+						  const XMLCh *const element_local_name,
+						  const XMLCh *const element_qname,
+						  const Attributes &attr);
 
-			// process the start of an element
-			void StartElement
-					(
-					const XMLCh* const element_uri,
-					const XMLCh* const element_local_name,
-					const XMLCh* const element_qname,
-					const Attributes& attr
-					);
+		// process the end of an element
+		void EndElement(const XMLCh *const element_uri,
+						const XMLCh *const element_local_name,
+						const XMLCh *const element_qname);
 
-			// process the end of an element
-			void EndElement
-					(
-					const XMLCh* const element_uri,
-					const XMLCh* const element_local_name,
-					const XMLCh* const element_qname
-					);
+		// parse the min/max type from the attribute m_bytearray_value
+		static CDXLScalarMinMax::EdxlMinMaxType GetMinMaxType(const XMLCh *element_local_name);
 
-			// parse the min/max type from the attribute m_bytearray_value
-			static
-			CDXLScalarMinMax::EdxlMinMaxType GetMinMaxType(const XMLCh *element_local_name);
+	public:
+		// ctor
+		CParseHandlerScalarMinMax(IMemoryPool *memory_pool,
+								  CParseHandlerManager *parse_handler_mgr,
+								  CParseHandlerBase *parse_handler_root);
+	};
+}  // namespace gpdxl
 
-		public:
-			// ctor
-			CParseHandlerScalarMinMax
-					(
-					IMemoryPool *memory_pool,
-					CParseHandlerManager *parse_handler_mgr,
-					CParseHandlerBase *parse_handler_root
-					);
-
-		};
-}
-
-#endif // !GPDXL_CParseHandlerScalarMinMax_H
+#endif  // !GPDXL_CParseHandlerScalarMinMax_H
 
 //EOF

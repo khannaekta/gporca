@@ -30,14 +30,11 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerPhysicalCTEProducer::CParseHandlerPhysicalCTEProducer
-	(
+CParseHandlerPhysicalCTEProducer::CParseHandlerPhysicalCTEProducer(
 	IMemoryPool *memory_pool,
 	CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root
-	)
-	:
-	CParseHandlerPhysicalOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	CParseHandlerBase *parse_handler_root)
+	: CParseHandlerPhysicalOp(memory_pool, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -50,43 +47,49 @@ CParseHandlerPhysicalCTEProducer::CParseHandlerPhysicalCTEProducer
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerPhysicalCTEProducer::StartElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const, // element_qname
-	const Attributes& attrs
-	)
+CParseHandlerPhysicalCTEProducer::StartElement(const XMLCh *const,  // element_uri,
+											   const XMLCh *const element_local_name,
+											   const XMLCh *const,  // element_qname
+											   const Attributes &attrs)
 {
-	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenPhysicalCTEProducer), element_local_name))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenPhysicalCTEProducer),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
 	// parse cteid and create cte operator
-	ULONG id = CDXLOperatorFactory::ExtractConvertAttrValueToUlong
-											(
-											m_parse_handler_mgr->GetDXLMemoryManager(),
-											attrs,
-											EdxltokenCTEId,
-											EdxltokenPhysicalCTEProducer
-											);
+	ULONG id = CDXLOperatorFactory::ExtractConvertAttrValueToUlong(
+		m_parse_handler_mgr->GetDXLMemoryManager(),
+		attrs,
+		EdxltokenCTEId,
+		EdxltokenPhysicalCTEProducer);
 
-	ULongPtrArray *output_colids_array = CDXLOperatorFactory::ExtractConvertValuesToArray(m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenColumns, EdxltokenPhysicalCTEProducer);
+	ULongPtrArray *output_colids_array =
+		CDXLOperatorFactory::ExtractConvertValuesToArray(m_parse_handler_mgr->GetDXLMemoryManager(),
+														 attrs,
+														 EdxltokenColumns,
+														 EdxltokenPhysicalCTEProducer);
 
-	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLPhysicalCTEProducer(m_memory_pool, id, output_colids_array));
+	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(
+		m_memory_pool,
+		GPOS_NEW(m_memory_pool) CDXLPhysicalCTEProducer(m_memory_pool, id, output_colids_array));
 
 	// create and activate the parse handler for the child expression node
-	CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenPhysical), m_parse_handler_mgr, this);
+	CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
+		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenPhysical), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
 	// parse handler for the proj list
-	CParseHandlerBase *proj_list_parse_handler = CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalarProjList), m_parse_handler_mgr, this);
+	CParseHandlerBase *proj_list_parse_handler = CParseHandlerFactory::GetParseHandler(
+		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalarProjList), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(proj_list_parse_handler);
 
 	//parse handler for the properties of the operator
-	CParseHandlerBase *prop_parse_handler = CParseHandlerFactory::GetParseHandler(m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenProperties), m_parse_handler_mgr, this);
+	CParseHandlerBase *prop_parse_handler = CParseHandlerFactory::GetParseHandler(
+		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenProperties), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(prop_parse_handler);
 
 	// store parse handler
@@ -104,25 +107,28 @@ CParseHandlerPhysicalCTEProducer::StartElement
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerPhysicalCTEProducer::EndElement
-	(
-	const XMLCh* const, // element_uri,
-	const XMLCh* const element_local_name,
-	const XMLCh* const // element_qname
-	)
+CParseHandlerPhysicalCTEProducer::EndElement(const XMLCh *const,  // element_uri,
+											 const XMLCh *const element_local_name,
+											 const XMLCh *const  // element_qname
+)
 {
-	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenPhysicalCTEProducer), element_local_name))
+	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenPhysicalCTEProducer),
+									  element_local_name))
 	{
-		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
+		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
 	GPOS_ASSERT(NULL != m_dxl_node);
 
 
-	CParseHandlerProperties *prop_parse_handler = dynamic_cast<CParseHandlerProperties *>((*this)[0]);
-	CParseHandlerProjList *proj_list_parse_handler = dynamic_cast<CParseHandlerProjList*>((*this)[1]);
-	CParseHandlerPhysicalOp *child_parse_handler = dynamic_cast<CParseHandlerPhysicalOp *>((*this)[2]);
+	CParseHandlerProperties *prop_parse_handler =
+		dynamic_cast<CParseHandlerProperties *>((*this)[0]);
+	CParseHandlerProjList *proj_list_parse_handler =
+		dynamic_cast<CParseHandlerProjList *>((*this)[1]);
+	CParseHandlerPhysicalOp *child_parse_handler =
+		dynamic_cast<CParseHandlerPhysicalOp *>((*this)[2]);
 
 	// set physical properties
 	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
@@ -132,8 +138,8 @@ CParseHandlerPhysicalCTEProducer::EndElement
 	AddChildFromParseHandler(child_parse_handler);
 
 #ifdef GPOS_DEBUG
-		m_dxl_node->GetOperator()->AssertValid(m_dxl_node, false /* validate_children */);
-#endif // GPOS_DEBUG
+	m_dxl_node->GetOperator()->AssertValid(m_dxl_node, false /* validate_children */);
+#endif  // GPOS_DEBUG
 
 	m_parse_handler_mgr->DeactivateHandler();
 }

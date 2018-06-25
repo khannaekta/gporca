@@ -26,18 +26,14 @@ using namespace gpdxl;
 //		index descriptor and filter conditions on the index
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalIndexScan::CDXLPhysicalIndexScan
-	(
-	IMemoryPool *memory_pool,
-	CDXLTableDescr *table_descr,
-	CDXLIndexDescr *index_descr_dxl,
-	EdxlIndexScanDirection idx_scan_direction
-	)
-	:
-	CDXLPhysical(memory_pool),
-	m_table_descr_dxl(table_descr),
-	m_index_descr_dxl(index_descr_dxl),
-	m_index_scan_dir(idx_scan_direction)
+CDXLPhysicalIndexScan::CDXLPhysicalIndexScan(IMemoryPool *memory_pool,
+											 CDXLTableDescr *table_descr,
+											 CDXLIndexDescr *index_descr_dxl,
+											 EdxlIndexScanDirection idx_scan_direction)
+	: CDXLPhysical(memory_pool),
+	  m_table_descr_dxl(table_descr),
+	  m_index_descr_dxl(index_descr_dxl),
+	  m_index_scan_dir(idx_scan_direction)
 {
 	GPOS_ASSERT(NULL != m_table_descr_dxl);
 	GPOS_ASSERT(NULL != m_index_descr_dxl);
@@ -136,21 +132,13 @@ CDXLPhysicalIndexScan::GetDXLTableDescr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalIndexScan::SerializeToDXL
-	(
-	CXMLSerializer *xml_serializer,
-	const CDXLNode *node
-	)
-	const
+CDXLPhysicalIndexScan::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
-	xml_serializer->AddAttribute
-				(
-				CDXLTokens::GetDXLTokenStr(EdxltokenIndexScanDirection),
-				CDXLOperator::GetIdxScanDirectionStr(m_index_scan_dir)
-				);
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenIndexScanDirection),
+								 CDXLOperator::GetIdxScanDirectionStr(m_index_scan_dir));
 
 	// serialize properties
 	node->SerializePropertiesToDXL(xml_serializer);
@@ -164,7 +152,8 @@ CDXLPhysicalIndexScan::SerializeToDXL
 	// serialize table descriptor
 	m_table_descr_dxl->SerializeToDXL(xml_serializer);
 
-	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
+	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+								 element_name);
 }
 
 #ifdef GPOS_DEBUG
@@ -177,12 +166,7 @@ CDXLPhysicalIndexScan::SerializeToDXL
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalIndexScan::AssertValid
-	(
-	const CDXLNode *node,
-	BOOL validate_children
-	)
-	const
+CDXLPhysicalIndexScan::AssertValid(const CDXLNode *node, BOOL validate_children) const
 {
 	// assert proj list and filter are valid
 	CDXLPhysical::AssertValid(node, validate_children);
@@ -210,6 +194,6 @@ CDXLPhysicalIndexScan::AssertValid
 		index_cond_dxlnode->GetOperator()->AssertValid(index_cond_dxlnode, validate_children);
 	}
 }
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF

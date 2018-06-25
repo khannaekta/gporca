@@ -32,40 +32,33 @@ namespace gpdxl
 	//---------------------------------------------------------------------------
 	class CParseHandlerScalarBitmapIndexProbe : public CParseHandlerScalarOp
 	{
-		private:
-			// private copy ctor
-			CParseHandlerScalarBitmapIndexProbe(const CParseHandlerScalarBitmapIndexProbe &);
+	private:
+		// private copy ctor
+		CParseHandlerScalarBitmapIndexProbe(const CParseHandlerScalarBitmapIndexProbe &);
 
-			// process the start of an element
-			virtual
-			void StartElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
- 					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname,		// element's qname
-					const Attributes& attr				// element's attributes
-				);
+		// process the start of an element
+		virtual void StartElement(
+			const XMLCh *const element_uri,			// URI of element's namespace
+			const XMLCh *const element_local_name,  // local part of element's name
+			const XMLCh *const element_qname,		// element's qname
+			const Attributes &attr					// element's attributes
+		);
 
-			// process the end of an element
-			virtual
-			void EndElement
-				(
-					const XMLCh* const element_uri, 		// URI of element's namespace
-					const XMLCh* const element_local_name,	// local part of element's name
-					const XMLCh* const element_qname		// element's qname
-				);
+		// process the end of an element
+		virtual void EndElement(
+			const XMLCh *const element_uri,			// URI of element's namespace
+			const XMLCh *const element_local_name,  // local part of element's name
+			const XMLCh *const element_qname		// element's qname
+		);
 
-		public:
-			// ctor
-			CParseHandlerScalarBitmapIndexProbe
-				(
-				IMemoryPool *memory_pool,
-				CParseHandlerManager *parse_handler_mgr,
-				CParseHandlerBase *parse_handler_root
-				);
+	public:
+		// ctor
+		CParseHandlerScalarBitmapIndexProbe(IMemoryPool *memory_pool,
+											CParseHandlerManager *parse_handler_mgr,
+											CParseHandlerBase *parse_handler_root);
 	};  // class CParseHandlerScalarBitmapIndexProbe
-}
+}  // namespace gpdxl
 
-#endif // !GPDXL_CParseHandlerScalarBitmapIndexProbe_H
+#endif  // !GPDXL_CParseHandlerScalarBitmapIndexProbe_H
 
 // EOF
