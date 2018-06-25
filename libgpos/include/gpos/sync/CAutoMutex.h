@@ -2,7 +2,7 @@
 //	Greenplum Database
 //	Copyright (C) 2008 Greenplum, Inc.
 //
-//	@filename: 
+//	@filename:
 //		CAutoMutex.h
 //
 //	@doc:
@@ -29,69 +29,60 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CAutoMutex : public CStackObject
 	{
-		private:
+	private:
+		// actual mutex
+		CMutexBase &m_mutex;
 
-			// actual mutex
-			CMutexBase &m_mutex;
+		// lock count
+		ULONG m_lock_count;
 
-			// lock count
-			ULONG m_lock_count;
+		// no copy ctor
+		CAutoMutex(const CAutoMutex &);
 
-			// no copy ctor
-			CAutoMutex
-				(
-				const CAutoMutex&
-				);
-			
-		public:
-		
-			// ctor
-			explicit
-			CAutoMutex
-				(
-				CMutexBase &mutex
-				)
-				:
-				m_mutex(mutex),
-				m_lock_count(0)
-			{}
+	public:
+		// ctor
+		explicit CAutoMutex(CMutexBase &mutex) : m_mutex(mutex), m_lock_count(0)
+		{
+		}
 
 
-			// ctor
-			~CAutoMutex ();
-			
+		// ctor
+		~CAutoMutex();
 
-			// acquire lock
-			void Lock()
+
+		// acquire lock
+		void
+		Lock()
+		{
+			m_mutex.Lock();
+			++m_lock_count;
+		}
+
+		// attempt locking
+		BOOL
+		TryLock()
+		{
+			if (m_mutex.TryLock())
 			{
-				m_mutex.Lock();
 				++m_lock_count;
+				return true;
 			}
-			
-			// attempt locking
-			BOOL TryLock()
-			{
-				if (m_mutex.TryLock())
-				{
-					++m_lock_count;
-					return true;
-				}
-				return false;
-			}
-			
-			// release lock
-			void Unlock()
-			{
-				GPOS_ASSERT(0 < m_lock_count && "GetMutex not locked");
-				
-				--m_lock_count;
-				m_mutex.Unlock();
-			}
+			return false;
+		}
 
-	}; // class CAutoMutex
-}
+		// release lock
+		void
+		Unlock()
+		{
+			GPOS_ASSERT(0 < m_lock_count && "GetMutex not locked");
 
-#endif // !GPOS_CAutoMutex_H
+			--m_lock_count;
+			m_mutex.Unlock();
+		}
+
+	};  // class CAutoMutex
+}  // namespace gpos
+
+#endif  // !GPOS_CAutoMutex_H
 
 // EOF
-

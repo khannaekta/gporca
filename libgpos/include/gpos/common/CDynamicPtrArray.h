@@ -18,7 +18,7 @@
 namespace gpos
 {
 	// forward declaration
-	template <class T, void (*CleanupFn)(T*)>
+	template <class T, void (*CleanupFn)(T *)>
 	class CDynamicPtrArray;
 
 	// comparison function signature
@@ -27,28 +27,34 @@ namespace gpos
 	// frequently used destroy functions
 
 	// NOOP
-	template<class T>
-	inline void CleanupNULL(T*) {}
+	template <class T>
+	inline void
+	CleanupNULL(T *)
+	{
+	}
 
 	// plain delete
-	template<class T>
-	inline void CleanupDelete(T *elem)
+	template <class T>
+	inline void
+	CleanupDelete(T *elem)
 	{
 		GPOS_DELETE(elem);
 	}
 
 	// delete of array
-	template<class T>
-	inline void CleanupDeleteArray(T *elem)
+	template <class T>
+	inline void
+	CleanupDeleteArray(T *elem)
 	{
 		GPOS_DELETE_ARRAY(elem);
 	}
 
 	// release ref-count'd object
-	template<class T>
-	inline void CleanupRelease(T *elem)
+	template <class T>
+	inline void
+	CleanupRelease(T *elem)
 	{
-		(dynamic_cast<CRefCount*>(elem))->Release();
+		(dynamic_cast<CRefCount *>(elem))->Release();
 	}
 
 	// commonly used array types
@@ -75,270 +81,280 @@ namespace gpos
 	//		Simply dynamic array for pointer types
 	//
 	//---------------------------------------------------------------------------
-	template <class T, void (*CleanupFn)(T*)>
+	template <class T, void (*CleanupFn)(T *)>
 	class CDynamicPtrArray : public CRefCount
 	{
-		private:
-		
-			// memory pool
-			IMemoryPool *m_memory_pool;
-			
-			// currently allocated size
-			ULONG m_capacity;
-			
-			// min size
-			ULONG m_min_size;
-			
-			// current size
-			ULONG m_size;
+	private:
+		// memory pool
+		IMemoryPool *m_memory_pool;
 
-			// expansion factor
-			ULONG m_expansion_factor;
+		// currently allocated size
+		ULONG m_capacity;
 
-			// actual array
-			T **m_elems;
-			
-			// comparison function for pointers
-			static INT PtrCmp(const void *p1, const void *p2)
-            {
-				ULONG_PTR ulp1 = *(ULONG_PTR*)p1;
-				ULONG_PTR ulp2 = *(ULONG_PTR*)p2;
+		// min size
+		ULONG m_min_size;
 
-                if (ulp1 < ulp2)
-                {
-                    return -1;
-                }
+		// current size
+		ULONG m_size;
 
-                if (ulp1 > ulp2)
-                {
-                    return 1;
-                }
+		// expansion factor
+		ULONG m_expansion_factor;
 
-                return 0;
-            }
+		// actual array
+		T **m_elems;
 
-			// private copy ctor
-			CDynamicPtrArray<T, CleanupFn> (const CDynamicPtrArray<T, CleanupFn> &);
-			
-			// resize function
-			void Resize(ULONG new_size)
-            {
-                GPOS_ASSERT(new_size > m_capacity && "Invalid call to Resize, cannot shrink array");
+		// comparison function for pointers
+		static INT
+		PtrCmp(const void *p1, const void *p2)
+		{
+			ULONG_PTR ulp1 = *(ULONG_PTR *) p1;
+			ULONG_PTR ulp2 = *(ULONG_PTR *) p2;
 
-                // get new target array
-                T **new_elems = GPOS_NEW_ARRAY(m_memory_pool, T*, new_size);
+			if (ulp1 < ulp2)
+			{
+				return -1;
+			}
 
-                if (m_size > 0)
-                {
-                    GPOS_ASSERT(NULL != m_elems);
-                    clib::Memcpy(new_elems, m_elems, sizeof(T*) * m_size);
-                    GPOS_DELETE_ARRAY(m_elems);
-                }
+			if (ulp1 > ulp2)
+			{
+				return 1;
+			}
 
-                m_elems = new_elems;
-                m_capacity = new_size;
-            }
-			
-		public:
-		
-			// ctor
-			explicit
-			CDynamicPtrArray<T, CleanupFn> (IMemoryPool *mp, ULONG min_size = 4, ULONG expansion_factor = 10)
-            :
-            m_memory_pool(mp),
-            m_capacity(0),
-            m_min_size(std::max((ULONG)4, min_size)),
-            m_size(0),
-            m_expansion_factor(std::max((ULONG)2, expansion_factor)),
-            m_elems(NULL)
-            {
-                GPOS_ASSERT(NULL != CleanupFn && "No valid destroy function specified");
+			return 0;
+		}
 
-                // do not allocate in constructor; defer allocation to first insertion
-            }
+		// private copy ctor
+		CDynamicPtrArray<T, CleanupFn>(const CDynamicPtrArray<T, CleanupFn> &);
 
-			// dtor
-			~CDynamicPtrArray<T, CleanupFn> ()
-            {
-                Clear();
+		// resize function
+		void
+		Resize(ULONG new_size)
+		{
+			GPOS_ASSERT(new_size > m_capacity && "Invalid call to Resize, cannot shrink array");
 
-                GPOS_DELETE_ARRAY(m_elems);
-            }
-	
-			// clear elements
-			void Clear()
-            {
-                for(ULONG i = 0; i < m_size; i++)
-                {
-                    CleanupFn(m_elems[i]);
-                }
-                m_size = 0;
-            }
-	
-			// append element to end of array
-			void Append(T *elem)
-            {
-                if (m_size == m_capacity)
-                {
-                    // resize at least by 4 elements or percentage as given by ulExp
-                    ULONG new_size = (ULONG) (m_capacity * (1 + (m_expansion_factor/100.0)));
-                    ULONG min_expand_size = m_capacity + 4;
+			// get new target array
+			T **new_elems = GPOS_NEW_ARRAY(m_memory_pool, T *, new_size);
 
-                    Resize(std::max(std::max(min_expand_size, new_size), m_min_size));
-                }
+			if (m_size > 0)
+			{
+				GPOS_ASSERT(NULL != m_elems);
+				clib::Memcpy(new_elems, m_elems, sizeof(T *) * m_size);
+				GPOS_DELETE_ARRAY(m_elems);
+			}
 
-                GPOS_ASSERT(m_size < m_capacity);
+			m_elems = new_elems;
+			m_capacity = new_size;
+		}
 
-                m_elems[m_size] = elem;
-                ++m_size;
-            }
-			
-			// append array -- flatten it
-			void AppendArray(const CDynamicPtrArray<T, CleanupFn> *arr)
-            {
-                GPOS_ASSERT(NULL != arr);
-                GPOS_ASSERT(this != arr && "Cannot append array to itself");
+	public:
+		// ctor
+		explicit CDynamicPtrArray<T, CleanupFn>(IMemoryPool *mp,
+												ULONG min_size = 4,
+												ULONG expansion_factor = 10)
+			: m_memory_pool(mp),
+			  m_capacity(0),
+			  m_min_size(std::max((ULONG) 4, min_size)),
+			  m_size(0),
+			  m_expansion_factor(std::max((ULONG) 2, expansion_factor)),
+			  m_elems(NULL)
+		{
+			GPOS_ASSERT(NULL != CleanupFn && "No valid destroy function specified");
 
-                ULONG total_size = m_size + arr->m_size;
-                if (total_size > m_capacity)
-                {
-                    Resize(total_size);
-                }
+			// do not allocate in constructor; defer allocation to first insertion
+		}
 
-                GPOS_ASSERT(m_size <= m_capacity);
-                GPOS_ASSERT_IMP(m_size == m_capacity, 0 == arr->m_size);
+		// dtor
+		~CDynamicPtrArray<T, CleanupFn>()
+		{
+			Clear();
 
-                GPOS_ASSERT(total_size <= m_capacity);
+			GPOS_DELETE_ARRAY(m_elems);
+		}
 
-                // at this point old memory is no longer accessible, hence, no self-copy
-                if (arr->m_size > 0)
-                {
-                    GPOS_ASSERT(NULL != arr->m_elems);
-                    clib::Memcpy(m_elems + m_size, arr->m_elems, arr->m_size * sizeof(T*));
-                }
+		// clear elements
+		void
+		Clear()
+		{
+			for (ULONG i = 0; i < m_size; i++)
+			{
+				CleanupFn(m_elems[i]);
+			}
+			m_size = 0;
+		}
 
-                m_size = total_size;
-            }
+		// append element to end of array
+		void
+		Append(T *elem)
+		{
+			if (m_size == m_capacity)
+			{
+				// resize at least by 4 elements or percentage as given by ulExp
+				ULONG new_size = (ULONG)(m_capacity * (1 + (m_expansion_factor / 100.0)));
+				ULONG min_expand_size = m_capacity + 4;
 
-			
-			// number of elements currently held
-			ULONG Size() const
-            {
-                return m_size;
-            }
+				Resize(std::max(std::max(min_expand_size, new_size), m_min_size));
+			}
 
-			// sort array
-			void Sort(CompareFn compare_func = PtrCmp)
-            {
-                clib::Qsort(m_elems, m_size, sizeof(T*), compare_func);
-            }
-			
-			// equality check
-			BOOL Equals(const CDynamicPtrArray<T, CleanupFn> *arr) const
-            {
-                BOOL is_equal = (Size() == arr->Size());
+			GPOS_ASSERT(m_size < m_capacity);
 
-                for (ULONG i = 0; i < m_size && is_equal; i++)
-                {
-                    is_equal = (m_elems[i] == arr->m_elems[i]);
-                }
+			m_elems[m_size] = elem;
+			++m_size;
+		}
 
-                return is_equal;
-            }
-			
-			// lookup object
-			T* Find(const T *elem) const
-            {
-                GPOS_ASSERT(NULL != elem);
+		// append array -- flatten it
+		void
+		AppendArray(const CDynamicPtrArray<T, CleanupFn> *arr)
+		{
+			GPOS_ASSERT(NULL != arr);
+			GPOS_ASSERT(this != arr && "Cannot append array to itself");
 
-                for (ULONG i = 0; i < m_size; i++)
-                {
-                    if (*m_elems[i] == *elem)
-                    {
-                        return m_elems[i];
-                    }
-                }
+			ULONG total_size = m_size + arr->m_size;
+			if (total_size > m_capacity)
+			{
+				Resize(total_size);
+			}
 
-                return NULL;
-            }
+			GPOS_ASSERT(m_size <= m_capacity);
+			GPOS_ASSERT_IMP(m_size == m_capacity, 0 == arr->m_size);
 
-			// lookup object position
-			ULONG IndexOf(const T *elem) const
-            {
-                GPOS_ASSERT(NULL != elem);
+			GPOS_ASSERT(total_size <= m_capacity);
 
-                for (ULONG ul = 0; ul < m_size; ul++)
-                {
-                    if (*m_elems[ul] == *elem)
-                    {
-                        return ul;
-                    }
-                }
+			// at this point old memory is no longer accessible, hence, no self-copy
+			if (arr->m_size > 0)
+			{
+				GPOS_ASSERT(NULL != arr->m_elems);
+				clib::Memcpy(m_elems + m_size, arr->m_elems, arr->m_size * sizeof(T *));
+			}
 
-                return gpos::ulong_max;
-            }
+			m_size = total_size;
+		}
+
+
+		// number of elements currently held
+		ULONG
+		Size() const
+		{
+			return m_size;
+		}
+
+		// sort array
+		void
+		Sort(CompareFn compare_func = PtrCmp)
+		{
+			clib::Qsort(m_elems, m_size, sizeof(T *), compare_func);
+		}
+
+		// equality check
+		BOOL
+		Equals(const CDynamicPtrArray<T, CleanupFn> *arr) const
+		{
+			BOOL is_equal = (Size() == arr->Size());
+
+			for (ULONG i = 0; i < m_size && is_equal; i++)
+			{
+				is_equal = (m_elems[i] == arr->m_elems[i]);
+			}
+
+			return is_equal;
+		}
+
+		// lookup object
+		T *
+		Find(const T *elem) const
+		{
+			GPOS_ASSERT(NULL != elem);
+
+			for (ULONG i = 0; i < m_size; i++)
+			{
+				if (*m_elems[i] == *elem)
+				{
+					return m_elems[i];
+				}
+			}
+
+			return NULL;
+		}
+
+		// lookup object position
+		ULONG
+		IndexOf(const T *elem) const
+		{
+			GPOS_ASSERT(NULL != elem);
+
+			for (ULONG ul = 0; ul < m_size; ul++)
+			{
+				if (*m_elems[ul] == *elem)
+				{
+					return ul;
+				}
+			}
+
+			return gpos::ulong_max;
+		}
 
 #ifdef GPOS_DEBUG
-			// check if array is sorted
-			BOOL IsSorted() const
-            {
-                for (ULONG i = 1; i < m_size; i++)
-                {
-                    if ((ULONG_PTR)(m_elems[i - 1]) > (ULONG_PTR)(m_elems[i]))
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-#endif // GPOS_DEBUG
-						
-			// accessor for n-th element
-			T *operator [] (ULONG pos) const
-            {
-                GPOS_ASSERT(pos < m_size && "Out of bounds access");
-                return (T*) m_elems[pos];
-            }
-			
-			// replace an element in the array
-			void  Replace(ULONG pos, T *new_elem)
-            {
-                GPOS_ASSERT(pos < m_size && "Out of bounds access");
-                CleanupFn(m_elems[pos]);
-                m_elems[pos] = new_elem;
-            }
-
-			// return the indexes of first appearances of elements of the first array
-			// in the second array if the first array is not included in the second,
-			// return null
-			// equality comparison between elements is via the "==" operator
-			ULongPtrArray *IndexesOfSubsequence(CDynamicPtrArray<T, CleanupFn> *subsequence)
-            {
-                GPOS_ASSERT(NULL != subsequence);
-
-                ULONG subsequence_length = subsequence->Size();
-                ULongPtrArray *indexes = GPOS_NEW(m_memory_pool) ULongPtrArray(m_memory_pool);
-
-                for (ULONG ul1 = 0; ul1 < subsequence_length; ul1++)
-                {
-                    T* elem = (*subsequence)[ul1];
-					ULONG index = IndexOf(elem);
-					if (gpos::ulong_max == index)
-					{
-						// not found
-						indexes->Release();
-						return NULL;
-					}
-
-					indexes->Append(GPOS_NEW(m_memory_pool) ULONG(index));
+		// check if array is sorted
+		BOOL
+		IsSorted() const
+		{
+			for (ULONG i = 1; i < m_size; i++)
+			{
+				if ((ULONG_PTR)(m_elems[i - 1]) > (ULONG_PTR)(m_elems[i]))
+				{
+					return false;
 				}
-                return indexes;
-            }
-	}; // class CDynamicPtrArray
-}
+			}
 
-#endif // !GPOS_CDynamicPtrArray_H
+			return true;
+		}
+#endif  // GPOS_DEBUG
+
+		// accessor for n-th element
+		T *operator[](ULONG pos) const
+		{
+			GPOS_ASSERT(pos < m_size && "Out of bounds access");
+			return (T *) m_elems[pos];
+		}
+
+		// replace an element in the array
+		void
+		Replace(ULONG pos, T *new_elem)
+		{
+			GPOS_ASSERT(pos < m_size && "Out of bounds access");
+			CleanupFn(m_elems[pos]);
+			m_elems[pos] = new_elem;
+		}
+
+		// return the indexes of first appearances of elements of the first array
+		// in the second array if the first array is not included in the second,
+		// return null
+		// equality comparison between elements is via the "==" operator
+		ULongPtrArray *
+		IndexesOfSubsequence(CDynamicPtrArray<T, CleanupFn> *subsequence)
+		{
+			GPOS_ASSERT(NULL != subsequence);
+
+			ULONG subsequence_length = subsequence->Size();
+			ULongPtrArray *indexes = GPOS_NEW(m_memory_pool) ULongPtrArray(m_memory_pool);
+
+			for (ULONG ul1 = 0; ul1 < subsequence_length; ul1++)
+			{
+				T *elem = (*subsequence)[ul1];
+				ULONG index = IndexOf(elem);
+				if (gpos::ulong_max == index)
+				{
+					// not found
+					indexes->Release();
+					return NULL;
+				}
+
+				indexes->Append(GPOS_NEW(m_memory_pool) ULONG(index));
+			}
+			return indexes;
+		}
+	};  // class CDynamicPtrArray
+}  // namespace gpos
+
+#endif  // !GPOS_CDynamicPtrArray_H
 
 // EOF
-

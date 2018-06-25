@@ -31,11 +31,8 @@ using namespace gpos;
 GPOS_RESULT
 CTimeSliceTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
-		GPOS_UNITTEST_FUNC(CTimeSliceTest::EresUnittest_Basic),
-		GPOS_UNITTEST_FUNC(CTimeSliceTest::EresUnittest_CheckTimeSlice)
-		};
+	CUnittest rgut[] = {GPOS_UNITTEST_FUNC(CTimeSliceTest::EresUnittest_Basic),
+						GPOS_UNITTEST_FUNC(CTimeSliceTest::EresUnittest_CheckTimeSlice)};
 
 	GPOS_RESULT eres = CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 
@@ -66,7 +63,8 @@ CTimeSliceTest::EresUnittest_Basic()
 		timer.Restart();
 
 		// loop until time slice is exceeded
-		ULONG ulThreads = std::max((ULONG) 1, CWorkerPoolManager::WorkerPoolManager()->GetNumWorkersRunning());
+		ULONG ulThreads =
+			std::max((ULONG) 1, CWorkerPoolManager::WorkerPoolManager()->GetNumWorkersRunning());
 		while (GPOS_CHECK_ABORT_MAX_INTERVAL_MSEC * ulThreads >= timer.ElapsedMS())
 		{
 			// burn some CPU
@@ -138,7 +136,6 @@ CTimeSliceTest::EresUnittest_CheckTimeSlice()
 	return eres;
 }
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF
-

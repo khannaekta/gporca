@@ -28,14 +28,14 @@ using namespace gpos;
 //
 //---------------------------------------------------------------------------
 CEvent::CEvent()
-	:
-	m_mutex(NULL),
-	m_inited(false),
-	m_num_waiters(0),
-	m_num_signals(0),
-	m_num_total_signals(0),
-	m_num_total_broadcasts(0)
-{}
+	: m_mutex(NULL),
+	  m_inited(false),
+	  m_num_waiters(0),
+	  m_num_signals(0),
+	  m_num_total_signals(0),
+	  m_num_total_broadcasts(0)
+{
+}
 
 
 //---------------------------------------------------------------------------
@@ -67,14 +67,11 @@ CEvent::~CEvent()
 //
 //---------------------------------------------------------------------------
 void
-CEvent::Init
-	(
-	CMutexBase *pmutex
-	)
+CEvent::Init(CMutexBase *pmutex)
 {
 	GPOS_ASSERT(NULL != pmutex);
 	GPOS_ASSERT(!m_inited && "Event already initialized.");
-	
+
 	m_mutex = pmutex;
 	if (0 != pthread::CondInit(&m_cond, NULL))
 	{
@@ -124,7 +121,7 @@ CEvent::Broadcast()
 {
 	GPOS_ASSERT(m_inited && "Event not initialized.");
 	GPOS_ASSERT(m_mutex->IsOwned());
-	
+
 	// check if anyone is waiting
 	if (0 < m_num_waiters)
 	{
@@ -154,8 +151,8 @@ CEvent::Wait()
 {
 #ifdef GPOS_DEBUG
 	GPOS_RESULT eres =
-#endif // GPOS_DEBUG
-	TimedWait(gpos::ulong_max);
+#endif  // GPOS_DEBUG
+		TimedWait(gpos::ulong_max);
 
 	GPOS_ASSERT(GPOS_OK == eres && "Failed to receive a signal on the event");
 }
@@ -171,10 +168,7 @@ CEvent::Wait()
 //
 //---------------------------------------------------------------------------
 GPOS_RESULT
-CEvent::TimedWait
-	(
-	ULONG timeout_ms
-	)
+CEvent::TimedWait(ULONG timeout_ms)
 {
 	GPOS_ASSERT(m_inited && "Event not initialized.");
 	GPOS_ASSERT(m_mutex->IsOwned());
@@ -212,7 +206,7 @@ CEvent::TimedWait
 		{
 			CWorker::Self()->ResetTimeSlice();
 		}
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 		// check if broadcast was received
 		if (broadcasts_previous < m_num_total_broadcasts)
@@ -235,8 +229,7 @@ CEvent::TimedWait
 			}
 		}
 
-	}
-	while (GPOS_OK != eres);
+	} while (GPOS_OK != eres);
 
 	GPOS_ASSERT(m_mutex->IsOwned());
 
@@ -256,29 +249,27 @@ CEvent::TimedWait
 //
 //---------------------------------------------------------------------------
 void
-CEvent::InternalTimedWait
-	(
-	ULONG m_timeout_ms
-	)
+CEvent::InternalTimedWait(ULONG m_timeout_ms)
 {
 	GPOS_ASSERT(m_inited && "Event not initialized.");
 	GPOS_ASSERT(m_mutex->IsOwned());
 
 	// set expiration timer
 	TIMEVAL tv;
-	syslib::GetTimeOfDay(&tv, NULL/*timezone*/);
+	syslib::GetTimeOfDay(&tv, NULL /*timezone*/);
 	ULLONG current_us = tv.tv_sec * GPOS_USEC_IN_SEC + tv.tv_usec;
 	ULLONG expire_us = current_us + m_timeout_ms * GPOS_USEC_IN_MSEC;
 	TIMESPEC ts;
-	ts.tv_sec = (ULONG_PTR) (expire_us / GPOS_USEC_IN_SEC);
-	ts.tv_nsec = (ULONG_PTR) ((expire_us % GPOS_USEC_IN_SEC) * (GPOS_NSEC_IN_SEC / GPOS_USEC_IN_SEC));
+	ts.tv_sec = (ULONG_PTR)(expire_us / GPOS_USEC_IN_SEC);
+	ts.tv_nsec =
+		(ULONG_PTR)((expire_us % GPOS_USEC_IN_SEC) * (GPOS_NSEC_IN_SEC / GPOS_USEC_IN_SEC));
 
 	m_mutex->Relinquish();
 
 #ifdef GPOS_DEBUG
 	INT ret =
-#endif // GPOS_DEBUG
-	pthread::CondTimedWait(&m_cond, m_mutex->GetMutex(), &ts);
+#endif  // GPOS_DEBUG
+		pthread::CondTimedWait(&m_cond, m_mutex->GetMutex(), &ts);
 
 	m_mutex->Regain();
 
@@ -287,4 +278,3 @@ CEvent::InternalTimedWait
 }
 
 // EOF
-

@@ -6,14 +6,14 @@
 //		CMessageTable.h
 //
 //	@doc:
-//		Error message table; 
+//		Error message table;
 //---------------------------------------------------------------------------
 #ifndef GPOS_CMessageTable_H
 #define GPOS_CMessageTable_H
 
 #include "gpos/error/CMessage.h"
 
-#define GPOS_MSGTAB_SIZE	4096
+#define GPOS_MSGTAB_SIZE 4096
 
 namespace gpos
 {
@@ -27,80 +27,61 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CMessageTable
 	{
-			// short hand for message tables
-			typedef CSyncHashtable<
-						CMessage, 
-						CException, 
-						CSpinlockOS> MessageTable;
+		// short hand for message tables
+		typedef CSyncHashtable<CMessage, CException, CSpinlockOS> MessageTable;
 
-			// short hand for message table accessor
-			typedef CSyncHashtableAccessByKey<
-						CMessage, 
-						CException, 
-						CSpinlockOS> MTAccessor;
-		
-			// message hashtable
-			MessageTable m_hash_table;
-		
-			// private copy ctor
-			CMessageTable(const CMessageTable&);
-			
-		public:
+		// short hand for message table accessor
+		typedef CSyncHashtableAccessByKey<CMessage, CException, CSpinlockOS> MTAccessor;
 
-			// ctor
-			CMessageTable(IMemoryPool *memory_pool, ULONG size, ELocale locale);
-		
-			// lookup message by error/local
-			CMessage *LookupMessage(CException exc);
-			
-			// insert message
-			void AddMessage(CMessage *msg);
+		// message hashtable
+		MessageTable m_hash_table;
 
-			// simple comparison
-			BOOL operator ==
-				(
-				const CMessageTable &mt
-				)
-				const
-			{
-				return m_locale == mt.m_locale;
-			}
-			
-			// equality function -- needed for hashtable
-			static
-			BOOL Equals
-				(
-				const ELocale &locale,
-				const ELocale &other_locale
-				)
-			{
-				return locale == other_locale;
-			}
+		// private copy ctor
+		CMessageTable(const CMessageTable &);
 
-			// basic hash function
-			static
-			ULONG HashValue
-				(
-				const ELocale &locale
-				)
-			{
-				return (ULONG) locale;
-			}
+	public:
+		// ctor
+		CMessageTable(IMemoryPool *memory_pool, ULONG size, ELocale locale);
 
-			// link object
-			SLink m_link;
+		// lookup message by error/local
+		CMessage *LookupMessage(CException exc);
 
-			// locale
-			ELocale m_locale;
+		// insert message
+		void AddMessage(CMessage *msg);
 
-			// invalid locale
-			static
-			const ELocale m_invalid_locale;
-					
-	}; // class CMessageTable
-}
+		// simple comparison
+		BOOL
+		operator==(const CMessageTable &mt) const
+		{
+			return m_locale == mt.m_locale;
+		}
 
-#endif // !GPOS_CMessageTable_H
+		// equality function -- needed for hashtable
+		static BOOL
+		Equals(const ELocale &locale, const ELocale &other_locale)
+		{
+			return locale == other_locale;
+		}
+
+		// basic hash function
+		static ULONG
+		HashValue(const ELocale &locale)
+		{
+			return (ULONG) locale;
+		}
+
+		// link object
+		SLink m_link;
+
+		// locale
+		ELocale m_locale;
+
+		// invalid locale
+		static const ELocale m_invalid_locale;
+
+	};  // class CMessageTable
+}  // namespace gpos
+
+#endif  // !GPOS_CMessageTable_H
 
 // EOF
-

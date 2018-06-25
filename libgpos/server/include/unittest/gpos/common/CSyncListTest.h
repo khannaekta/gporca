@@ -18,7 +18,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CSyncListTest
@@ -30,80 +29,66 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CSyncListTest
 	{
-		private:
+	private:
+		// list element;
+		struct SElem
+		{
+			// object id
+			ULONG m_id;
 
-			// list element;
-			struct SElem
+			// generic link for list
+			SLink m_link;
+
+			// ctor
+			SElem() : m_id(0)
 			{
-				// object id
-				ULONG m_id;
+			}
+		};
 
-				// generic link for list
-				SLink m_link;
+		// collection of parameters for parallel tasks
+		struct SArg
+		{
+			// pointer to list
+			CSyncList<SElem> *m_plist;
 
-				// ctor
-				SElem()
-					:
-					m_id(0)
-				{}
-			};
+			// pool of elements to insert
+			CSyncPool<SElem> *m_psp;
 
-			// collection of parameters for parallel tasks
-			struct SArg
+			// number of tasks
+			ULONG m_ulCount;
+
+			// ctor
+			SArg(CSyncList<SElem> *pstack, CSyncPool<SElem> *psp, ULONG count)
+				: m_plist(pstack), m_psp(psp), m_ulCount(count)
 			{
-				// pointer to list
-				CSyncList<SElem> *m_plist;
+			}
 
-				// pool of elements to insert
-				CSyncPool<SElem> *m_psp;
+			// ctor
+			SArg() : m_plist(NULL), m_psp(NULL), m_ulCount(0)
+			{
+			}
+		};
 
-				// number of tasks
-				ULONG m_ulCount;
+		// stress functions
+		static void *RunPush(void *pv);
+		static void *RunPop(void *pv);
 
-				// ctor
-				SArg
-					(
-					CSyncList<SElem> *pstack,
-					CSyncPool<SElem> *psp,
-					ULONG count
-					)
-					:
-					m_plist(pstack),
-					m_psp(psp),
-					m_ulCount(count)
-				{}
+		// task management functions
+		static void ConcurrentPush(IMemoryPool *memory_pool, SArg *parg);
+		static void ConcurrentPushPop(IMemoryPool *memory_pool, SArg *parg);
+		static void ConcurrentPop(IMemoryPool *memory_pool, SArg *parg);
+		static void RunTasks(CAutoTaskProxy *patp, CTask **rgptsk, ULONG ulTasks);
 
-				// ctor
-				SArg()
-					:
-					m_plist(NULL),
-					m_psp(NULL),
-					m_ulCount(0)
-				{}
-			};
+	public:
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_Basics();
+		static GPOS_RESULT EresUnittest_Concurrency();
 
-			// stress functions
-			static void *RunPush(void *pv);
-			static void *RunPop(void *pv);
-
-			// task management functions
-			static void ConcurrentPush(IMemoryPool *memory_pool, SArg *parg);
-			static void ConcurrentPushPop(IMemoryPool *memory_pool, SArg *parg);
-			static void ConcurrentPop(IMemoryPool *memory_pool, SArg *parg);
-			static void RunTasks(CAutoTaskProxy *patp, CTask **rgptsk, ULONG ulTasks);
-
-		public:
-
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_Basics();
-			static GPOS_RESULT EresUnittest_Concurrency();
-
-	}; // class CSyncListTest
-}
+	};  // class CSyncListTest
+}  // namespace gpos
 
 
-#endif // !GPOS_CSyncListTest_H
+#endif  // !GPOS_CSyncListTest_H
 
 // EOF
-

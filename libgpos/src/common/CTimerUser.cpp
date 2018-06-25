@@ -30,9 +30,8 @@ CTimerUser::ElapsedUS() const
 	RUSAGE rusage;
 	syslib::GetRusage(&rusage);
 
-	ULONG diff = (ULONG)
-		(((rusage.ru_utime.tv_sec - m_rusage.ru_utime.tv_sec) * GPOS_USEC_IN_SEC) +
-		 (rusage.ru_utime.tv_usec - m_rusage.ru_utime.tv_usec));
+	ULONG diff = (ULONG)(((rusage.ru_utime.tv_sec - m_rusage.ru_utime.tv_sec) * GPOS_USEC_IN_SEC) +
+						 (rusage.ru_utime.tv_usec - m_rusage.ru_utime.tv_usec));
 
 	return diff;
 }
@@ -54,4 +53,3 @@ CTimerUser::Restart()
 
 
 // EOF
-

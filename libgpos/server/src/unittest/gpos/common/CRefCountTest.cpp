@@ -30,18 +30,15 @@ using namespace gpos;
 GPOS_RESULT
 CRefCountTest::EresUnittest()
 {
-
-	CUnittest rgut[] =
-		{
-		GPOS_UNITTEST_FUNC(CRefCountTest::EresUnittest_CountUpAndDown),
-		GPOS_UNITTEST_FUNC(CRefCountTest::EresUnittest_DeletableObjects)
+	CUnittest rgut[] = {GPOS_UNITTEST_FUNC(CRefCountTest::EresUnittest_CountUpAndDown),
+						GPOS_UNITTEST_FUNC(CRefCountTest::EresUnittest_DeletableObjects)
 
 #ifdef GPOS_DEBUG
-		,
-		GPOS_UNITTEST_FUNC_ASSERT(CRefCountTest::EresUnittest_Stack),
-		GPOS_UNITTEST_FUNC_ASSERT(CRefCountTest::EresUnittest_Check)
-#endif // GPOS_DEBUG
-		};
+							,
+						GPOS_UNITTEST_FUNC_ASSERT(CRefCountTest::EresUnittest_Stack),
+						GPOS_UNITTEST_FUNC_ASSERT(CRefCountTest::EresUnittest_Check)
+#endif  // GPOS_DEBUG
+	};
 
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
@@ -165,7 +162,7 @@ CRefCountTest::EresUnittest_Check()
 	IMemoryPool *memory_pool = amp.Pmp();
 
 	BYTE *rgb = GPOS_NEW_ARRAY(memory_pool, BYTE, 128);
-	CRefCount *pref = (CRefCount*)rgb;
+	CRefCount *pref = (CRefCount *) rgb;
 
 	GPOS_DELETE_ARRAY(rgb);
 
@@ -177,7 +174,6 @@ CRefCountTest::EresUnittest_Check()
 	return GPOS_FAILED;
 }
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF
-

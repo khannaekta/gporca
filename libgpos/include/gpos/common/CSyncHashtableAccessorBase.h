@@ -25,7 +25,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CSyncHashtableAccessorBase<T, K, S>
@@ -40,130 +39,126 @@ namespace gpos
 	template <class T, class K, class S>
 	class CSyncHashtableAccessorBase : public CStackObject
 	{
+	private:
+		// shorthand for buckets
+		typedef struct CSyncHashtable<T, K, S>::SBucket SBucket;
 
-		private:
+		// target hashtable
+		CSyncHashtable<T, K, S> &m_ht;
 
-			// shorthand for buckets
-			typedef struct CSyncHashtable<T, K, S>::SBucket SBucket;
+		// bucket to operate on
+		SBucket &m_bucket;
 
-			// target hashtable
-			CSyncHashtable<T, K, S> &m_ht;
+		// no copy ctor
+		CSyncHashtableAccessorBase<T, K, S>(const CSyncHashtableAccessorBase<T, K, S> &);
 
-			// bucket to operate on
-			SBucket &m_bucket;
+	protected:
+		// ctor - protected to restrict instantiation to children
+		CSyncHashtableAccessorBase<T, K, S>(CSyncHashtable<T, K, S> &ht, ULONG bucket_idx)
+			: m_ht(ht), m_bucket(m_ht.GetBucket(bucket_idx))
+		{
+			// acquire spin lock on bucket
+			m_bucket.m_lock.Lock();
+		}
 
-			// no copy ctor
-			CSyncHashtableAccessorBase<T, K, S>
-				(const CSyncHashtableAccessorBase<T, K, S>&);
+		// dtor
+		virtual ~CSyncHashtableAccessorBase<T, K, S>()
+		{
+			// unlock bucket
+			m_bucket.m_lock.Unlock();
+		}
 
-		protected:
+		// accessor to hashtable
+		CSyncHashtable<T, K, S> &
+		GetHashTable() const
+		{
+			return m_ht;
+		}
 
-			// ctor - protected to restrict instantiation to children
-			CSyncHashtableAccessorBase<T, K, S>
-				(
-				CSyncHashtable<T, K, S> &ht,
-				ULONG bucket_idx
-				)
-            :
-            m_ht(ht),
-            m_bucket(m_ht.GetBucket(bucket_idx))
-            {
-                // acquire spin lock on bucket
-                m_bucket.m_lock.Lock();
-            }
+		// accessor to maintained bucket
+		SBucket &
+		GetBucket() const
+		{
+			return m_bucket;
+		}
 
-			// dtor
-			virtual
-			~CSyncHashtableAccessorBase<T, K, S>()
-            {
-                // unlock bucket
-                m_bucket.m_lock.Unlock();
-            }
+		// returns the first element in the hash chain
+		T *
+		First() const
+		{
+			return m_bucket.m_chain.First();
+		}
 
-			// accessor to hashtable
-			CSyncHashtable<T, K, S>& GetHashTable() const
-			{
-				return m_ht;
-			}
+		// finds the element next to the given one
+		T *
+		Next(T *value) const
+		{
+			GPOS_ASSERT(NULL != value);
 
-			// accessor to maintained bucket
-			SBucket& GetBucket() const
-			{
-				return m_bucket;
-			}
+			// make sure element is in this hash chain
+			GPOS_ASSERT(GPOS_OK == m_bucket.m_chain.Find(value));
 
-			// returns the first element in the hash chain
-			T *First() const
-            {
-                return m_bucket.m_chain.First();
-            }
+			return m_bucket.m_chain.Next(value);
+		}
 
-			// finds the element next to the given one
-			T *Next(T *value) const
-            {
-                GPOS_ASSERT(NULL != value);
+		// inserts element at the head of hash chain
+		void
+		Prepend(T *value)
+		{
+			GPOS_ASSERT(NULL != value);
 
-                // make sure element is in this hash chain
-                GPOS_ASSERT(GPOS_OK == m_bucket.m_chain.Find(value));
+			m_bucket.m_chain.Prepend(value);
 
-                return m_bucket.m_chain.Next(value);
-            }
+			// increase number of entries
+			(void) ExchangeAddUlongPtrWithInt(&(m_ht.m_size), 1);
+		}
 
-			// inserts element at the head of hash chain
-			void Prepend(T *value)
-            {
-                GPOS_ASSERT(NULL != value);
+		// adds first element before second element
+		void
+		Prepend(T *value, T *ptNext)
+		{
+			GPOS_ASSERT(NULL != value);
 
-                m_bucket.m_chain.Prepend(value);
+			// make sure element is in this hash chain
+			GPOS_ASSERT(GPOS_OK == m_bucket.m_chain.Find(ptNext));
 
-                // increase number of entries
-                (void) ExchangeAddUlongPtrWithInt(&(m_ht.m_size), 1);
-            }
+			m_bucket.m_chain.Prepend(value, ptNext);
 
-			// adds first element before second element
-			void Prepend(T *value, T *ptNext)
-            {
-                GPOS_ASSERT(NULL != value);
+			// increase number of entries
+			(void) ExchangeAddUlongPtrWithInt(&(m_ht.m_size), 1);
+		}
 
-                // make sure element is in this hash chain
-                GPOS_ASSERT(GPOS_OK == m_bucket.m_chain.Find(ptNext));
+		// adds first element after second element
+		void
+		Append(T *value, T *ptPrev)
+		{
+			GPOS_ASSERT(NULL != value);
 
-                m_bucket.m_chain.Prepend(value, ptNext);
+			// make sure element is in this hash chain
+			GPOS_ASSERT(GPOS_OK == m_bucket.m_chain.Find(ptPrev));
 
-                // increase number of entries
-                (void) ExchangeAddUlongPtrWithInt(&(m_ht.m_size), 1);
-            }
+			m_bucket.m_chain.Append(value, ptPrev);
 
-			// adds first element after second element
-			void Append(T *value, T *ptPrev)
-            {
-                GPOS_ASSERT(NULL != value);
+			// increase number of entries
+			(void) ExchangeAddUlongPtrWithInt(&(m_ht.m_size), 1);
+		}
 
-                // make sure element is in this hash chain
-                GPOS_ASSERT(GPOS_OK == m_bucket.m_chain.Find(ptPrev));
+	public:
+		// unlinks element
+		void
+		Remove(T *value)
+		{
+			// not NULL and is-list-member checks are done in CList
+			m_bucket.m_chain.Remove(value);
 
-                m_bucket.m_chain.Append(value, ptPrev);
+			// decrease number of entries
+			(void) ExchangeAddUlongPtrWithInt(&(m_ht.m_size), -1);
+		}
 
-                // increase number of entries
-                (void) ExchangeAddUlongPtrWithInt(&(m_ht.m_size), 1);
-            }
+	};  // class CSyncHashtableAccessorBase
 
-		public:
+}  // namespace gpos
 
-			// unlinks element
-			void Remove(T *value)
-            {
-                // not NULL and is-list-member checks are done in CList
-                m_bucket.m_chain.Remove(value);
-
-                // decrease number of entries
-                (void) ExchangeAddUlongPtrWithInt(&(m_ht.m_size), -1);
-            }
-
-	}; // class CSyncHashtableAccessorBase
-
-}
-
-#endif // GPOS_CSyncHashtableAccessorBase_H_
+#endif  // GPOS_CSyncHashtableAccessorBase_H_
 
 // EOF

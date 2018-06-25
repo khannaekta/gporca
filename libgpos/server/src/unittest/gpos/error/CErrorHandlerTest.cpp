@@ -30,17 +30,15 @@ using namespace gpos;
 GPOS_RESULT
 CErrorHandlerTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
-			GPOS_UNITTEST_FUNC(CErrorHandlerTest::EresUnittest_Basic)
+	CUnittest rgut[] = {GPOS_UNITTEST_FUNC(CErrorHandlerTest::EresUnittest_Basic)
 #ifdef GPOS_DEBUG
-			,
-			GPOS_UNITTEST_FUNC_ASSERT(CErrorHandlerTest::EresUnittest_BadRethrow),
-			GPOS_UNITTEST_FUNC_ASSERT(CErrorHandlerTest::EresUnittest_BadReset),
-			GPOS_UNITTEST_FUNC_ASSERT(CErrorHandlerTest::EresUnittest_Unhandled)			
-#endif // GPOS_DEBUG
-		};
-	
+							,
+						GPOS_UNITTEST_FUNC_ASSERT(CErrorHandlerTest::EresUnittest_BadRethrow),
+						GPOS_UNITTEST_FUNC_ASSERT(CErrorHandlerTest::EresUnittest_BadReset),
+						GPOS_UNITTEST_FUNC_ASSERT(CErrorHandlerTest::EresUnittest_Unhandled)
+#endif  // GPOS_DEBUG
+	};
+
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
 
@@ -66,14 +64,14 @@ CErrorHandlerTest::EresUnittest_Basic()
 	{
 		// make sure we catch an OOM
 		GPOS_ASSERT(GPOS_MATCH_EX(ex, CException::ExmaSystem, CException::ExmiOOM));
-			
+
 		GPOS_RESET_EX;
 	}
 	GPOS_CATCH_END;
-	
+
 	return GPOS_OK;
 }
-	
+
 #ifdef GPOS_DEBUG
 //---------------------------------------------------------------------------
 //	@function:
@@ -95,10 +93,10 @@ CErrorHandlerTest::EresUnittest_BadRethrow()
 	{
 		// make sure we catch an OOM
 		GPOS_ASSERT(GPOS_MATCH_EX(ex, CException::ExmaSystem, CException::ExmiOOM));
-		
+
 		// reset error context -- ignore, don't handle
 		GPOS_RESET_EX;
-		
+
 		// this asserts because we've reset already
 		GPOS_RETHROW(ex);
 	}
@@ -129,15 +127,15 @@ CErrorHandlerTest::EresUnittest_BadReset()
 	{
 		// make sure we catch an OOM
 		GPOS_ASSERT(GPOS_MATCH_EX(ex, CException::ExmaSystem, CException::ExmiOOM));
-		
-		// reset error context 
+
+		// reset error context
 		GPOS_RESET_EX;
 
 		// reset error context again -- this throws
 		GPOS_RESET_EX;
 	}
 	GPOS_CATCH_END;
-	
+
 	return GPOS_FAILED;
 }
 
@@ -162,18 +160,17 @@ CErrorHandlerTest::EresUnittest_Unhandled()
 	{
 		// make sure we catch an OOM
 		GPOS_ASSERT(GPOS_MATCH_EX(ex, CException::ExmaSystem, CException::ExmiOOM));
-		
+
 		// do not reset or rethrow here...
 	}
 	GPOS_CATCH_END;
 
 	// try raising another OOM exception -- this must assert
 	GPOS_OOM_CHECK(NULL);
-	
+
 	return GPOS_FAILED;
 }
 
 #endif  // GPOS_DEBUG
 
 // EOF
-

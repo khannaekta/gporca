@@ -29,11 +29,8 @@ using namespace gpos;
 GPOS_RESULT
 CWorkerPoolManagerTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
-		GPOS_UNITTEST_FUNC(CWorkerPoolManagerTest::EresUnittest_Performance),
-		GPOS_UNITTEST_FUNC(CWorkerPoolManagerTest::EresUnittest_Stress)
-		};
+	CUnittest rgut[] = {GPOS_UNITTEST_FUNC(CWorkerPoolManagerTest::EresUnittest_Performance),
+						GPOS_UNITTEST_FUNC(CWorkerPoolManagerTest::EresUnittest_Stress)};
 
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
@@ -55,42 +52,30 @@ CWorkerPoolManagerTest::EresUnittest_Performance()
 	GPOS_TRACE(GPOS_WSZ_LIT("\t- Short-running task : "));
 
 	// test using one worker
-	Unittest_TestTaskPerformance
-			(
-			1 /*workers*/,
-			1000 /*iterations*/,
-			CAutoTaskProxyTest::PvUnittest_Short,
-			CWorkerPoolManagerTest::PvUnittest_ShortRepeated
-			);
+	Unittest_TestTaskPerformance(1 /*workers*/,
+								 1000 /*iterations*/,
+								 CAutoTaskProxyTest::PvUnittest_Short,
+								 CWorkerPoolManagerTest::PvUnittest_ShortRepeated);
 
 	// test using multiple workers
-	Unittest_TestTaskPerformance
-			(
-			10 /*workers*/,
-			1000 /*iterations*/,
-			CAutoTaskProxyTest::PvUnittest_Short,
-			CWorkerPoolManagerTest::PvUnittest_ShortRepeated
-			);
+	Unittest_TestTaskPerformance(10 /*workers*/,
+								 1000 /*iterations*/,
+								 CAutoTaskProxyTest::PvUnittest_Short,
+								 CWorkerPoolManagerTest::PvUnittest_ShortRepeated);
 
 	GPOS_TRACE(GPOS_WSZ_LIT("\t- Long-running task : "));
 
 	// test using one worker
-	Unittest_TestTaskPerformance
-			(
-			1 /*workers*/,
-			40 /*iterations*/,
-			CAutoTaskProxyTest::PvUnittest_Long,
-			CWorkerPoolManagerTest::PvUnittest_LongRepeated
-			);
+	Unittest_TestTaskPerformance(1 /*workers*/,
+								 40 /*iterations*/,
+								 CAutoTaskProxyTest::PvUnittest_Long,
+								 CWorkerPoolManagerTest::PvUnittest_LongRepeated);
 
 	// test using multiple workers
-	Unittest_TestTaskPerformance
-			(
-			10 /*workers*/,
-			40 /*iterations*/,
-			CAutoTaskProxyTest::PvUnittest_Long,
-			CWorkerPoolManagerTest::PvUnittest_LongRepeated
-			);
+	Unittest_TestTaskPerformance(10 /*workers*/,
+								 40 /*iterations*/,
+								 CAutoTaskProxyTest::PvUnittest_Long,
+								 CWorkerPoolManagerTest::PvUnittest_LongRepeated);
 
 
 	return GPOS_OK;
@@ -114,7 +99,7 @@ CWorkerPoolManagerTest::EresUnittest_Stress()
 
 #ifdef GPOS_DEBUG
 	BOOL fEnforceTimeSlices = CWorker::m_enforce_time_slices;
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 	GPOS_TRY
 	{
@@ -122,7 +107,7 @@ CWorkerPoolManagerTest::EresUnittest_Stress()
 
 #ifdef GPOS_DEBUG
 		CWorker::m_enforce_time_slices = false;
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 		// task function
 		void *(*func)(void *);
@@ -144,7 +129,7 @@ CWorkerPoolManagerTest::EresUnittest_Stress()
 
 #ifdef GPOS_DEBUG
 		CWorker::m_enforce_time_slices = fEnforceTimeSlices;
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 		GPOS_RETHROW(ex);
 	}
@@ -157,7 +142,7 @@ CWorkerPoolManagerTest::EresUnittest_Stress()
 #ifdef GPOS_DEBUG
 	CWorker::m_enforce_time_slices = fEnforceTimeSlices;
 	CWorker::Self()->ResetTimeSlice();
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 	while (workers_max < pwpm->GetNumWorkers())
 	{
@@ -178,13 +163,10 @@ CWorkerPoolManagerTest::EresUnittest_Stress()
 //
 //---------------------------------------------------------------------------
 void
-CWorkerPoolManagerTest::Unittest_TestTaskPerformance
-	(
-	ULONG ulWorkers,
-	ULONG ulIterCnt,
-	void *funcSingle(void *),
-	void *funcRepeated(void *)
-	)
+CWorkerPoolManagerTest::Unittest_TestTaskPerformance(ULONG ulWorkers,
+													 ULONG ulIterCnt,
+													 void *funcSingle(void *),
+													 void *funcRepeated(void *))
 {
 	ULONG timeSingle = 0;
 	ULONG timeMulti = 0;
@@ -213,15 +195,11 @@ CWorkerPoolManagerTest::Unittest_TestTaskPerformance
 	}
 
 	// print results
-	GPOS_TRACE_FORMAT
-		(
-		"\t\t* %d worker(s):  	1 task: %dms   %d tasks: %dms ",
-		ulWorkers,
-		timeSingle,
-		ulIterCnt,
-		timeMulti
-		)
-		;
+	GPOS_TRACE_FORMAT("\t\t* %d worker(s):  	1 task: %dms   %d tasks: %dms ",
+					  ulWorkers,
+					  timeSingle,
+					  ulIterCnt,
+					  timeMulti);
 }
 
 
@@ -234,18 +212,15 @@ CWorkerPoolManagerTest::Unittest_TestTaskPerformance
 //
 //---------------------------------------------------------------------------
 void
-CWorkerPoolManagerTest::Unittest_TestSingleTaskPerformance
-	(
-	IMemoryPool *memory_pool,
-	ULONG ulWorkers,
-	ULONG ulIterCnt,
-	void *funcRepeated(void *)
-	)
+CWorkerPoolManagerTest::Unittest_TestSingleTaskPerformance(IMemoryPool *memory_pool,
+														   ULONG ulWorkers,
+														   ULONG ulIterCnt,
+														   void *funcRepeated(void *))
 {
 	CWorkerPoolManager *pwpm = CWorkerPoolManager::WorkerPoolManager();
 	CAutoTaskProxy atp(memory_pool, pwpm);
 	CAutoRg<CTask *> argPtsk;
-	argPtsk = GPOS_NEW_ARRAY(memory_pool, CTask*, ulWorkers);
+	argPtsk = GPOS_NEW_ARRAY(memory_pool, CTask *, ulWorkers);
 
 	ULONG ulIterCntPerWorkers = ulIterCnt / ulWorkers;
 
@@ -276,13 +251,10 @@ CWorkerPoolManagerTest::Unittest_TestSingleTaskPerformance
 //
 //---------------------------------------------------------------------------
 void
-CWorkerPoolManagerTest::Unittest_TestMultiTaskPerformance
-	(
-	IMemoryPool *memory_pool,
-	ULONG ulWorkers,
-	ULONG ulIterCnt,
-	void *funcSingle(void *)
-	)
+CWorkerPoolManagerTest::Unittest_TestMultiTaskPerformance(IMemoryPool *memory_pool,
+														  ULONG ulWorkers,
+														  ULONG ulIterCnt,
+														  void *funcSingle(void *))
 {
 	CWorkerPoolManager *pwpm = CWorkerPoolManager::WorkerPoolManager();
 	CAutoTaskProxy atp(memory_pool, pwpm);
@@ -292,7 +264,7 @@ CWorkerPoolManagerTest::Unittest_TestMultiTaskPerformance
 	for (ULONG i = 0; i < ulIterCntPerWorkers; i++)
 	{
 		CAutoRg<CTask *> argPtsk;
-		argPtsk = GPOS_NEW_ARRAY(memory_pool, CTask*, ulWorkers);
+		argPtsk = GPOS_NEW_ARRAY(memory_pool, CTask *, ulWorkers);
 		ULLONG ulRes;
 
 		for (ULONG i = 0; i < ulWorkers; i++)
@@ -326,12 +298,7 @@ CWorkerPoolManagerTest::Unittest_TestMultiTaskPerformance
 //
 //---------------------------------------------------------------------------
 void
-CWorkerPoolManagerTest::Unittest_Stress
-	(
-	ULONG ulWorkers,
-	ULONG culTskCnt,
-	void *func(void *)
-	)
+CWorkerPoolManagerTest::Unittest_Stress(ULONG ulWorkers, ULONG culTskCnt, void *func(void *))
 {
 	ULONG time = 0;
 
@@ -355,7 +322,7 @@ CWorkerPoolManagerTest::Unittest_Stress
 	{
 		CAutoTaskProxy atp(memory_pool, pwpm);
 		CAutoRg<CTask *> argPtsk;
-		argPtsk = GPOS_NEW_ARRAY(memory_pool, CTask*, culTskCnt);
+		argPtsk = GPOS_NEW_ARRAY(memory_pool, CTask *, culTskCnt);
 		ULLONG ulSum = 0;
 
 		CWallClock clock;
@@ -392,10 +359,7 @@ CWorkerPoolManagerTest::Unittest_Stress
 //
 //---------------------------------------------------------------------------
 void *
-CWorkerPoolManagerTest::PvUnittest_ShortRepeated
-	(
-	void *pv
-	)
+CWorkerPoolManagerTest::PvUnittest_ShortRepeated(void *pv)
 {
 	const ULONG culCnt = *(ULONG *) pv;
 
@@ -420,10 +384,7 @@ CWorkerPoolManagerTest::PvUnittest_ShortRepeated
 //
 //---------------------------------------------------------------------------
 void *
-CWorkerPoolManagerTest::PvUnittest_LongRepeated
-	(
-	void *pv
-	)
+CWorkerPoolManagerTest::PvUnittest_LongRepeated(void *pv)
 {
 	const ULONG culCnt = *(ULONG *) pv;
 
@@ -439,4 +400,3 @@ CWorkerPoolManagerTest::PvUnittest_LongRepeated
 }
 
 // EOF
-

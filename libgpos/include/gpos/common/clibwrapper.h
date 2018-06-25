@@ -13,9 +13,9 @@
 #ifndef GPOS_clibwrapper_H
 #define GPOS_clibwrapper_H
 
-#define VA_START(vaList, last)  va_start(vaList, last);
-#define VA_END(vaList)		va_end(vaList)
-#define VA_ARG(vaList, type)    va_arg(vaList,type)
+#define VA_START(vaList, last) va_start(vaList, last);
+#define VA_END(vaList) va_end(vaList)
+#define VA_ARG(vaList, type) va_arg(vaList, type)
 
 #include <unistd.h>
 #include "gpos/types.h"
@@ -25,7 +25,6 @@ namespace gpos
 {
 	namespace clib
 	{
-
 		typedef INT (*Comparator)(const void *, const void *);
 
 #ifdef GPOS_sparc
@@ -49,7 +48,7 @@ namespace gpos
 		// compare a specified number of bytes of two regions of memory
 		INT Memcmp(const void *left, const void *right, SIZE_T num_bytes);
 
-		 // sleep given number of microseconds
+		// sleep given number of microseconds
 		void USleep(ULONG usecs);
 
 		// compare two strings
@@ -65,7 +64,7 @@ namespace gpos
 		WCHAR *WcStrNCpy(WCHAR *dest, const WCHAR *src, SIZE_T num_bytes);
 
 		// copy a specified number of bytes between two memory areas
-		void* Memcpy(void *dest, const void* src, SIZE_T num_bytes);
+		void *Memcpy(void *dest, const void *src, SIZE_T num_bytes);
 
 		// copy a specified number of wide characters
 		WCHAR *Wmemcpy(WCHAR *dest, const WCHAR *src, SIZE_T num_bytes);
@@ -77,7 +76,7 @@ namespace gpos
 		CHAR *Strchr(const CHAR *src, INT c);
 
 		// set a specified number of bytes to a specified m_bytearray_value
-		void* Memset(void *dest, INT value, SIZE_T num_bytes);
+		void *Memset(void *dest, INT value, SIZE_T num_bytes);
 
 		// calculate the length of a wide-character string
 		ULONG Wcslen(const WCHAR *dest);
@@ -86,10 +85,10 @@ namespace gpos
 		ULONG Strlen(const CHAR *buf);
 
 		// sort a specified number of elements
-		void Qsort(void *dest, SIZE_T num_bytes, SIZE_T size,  Comparator fnComparator);
+		void Qsort(void *dest, SIZE_T num_bytes, SIZE_T size, Comparator fnComparator);
 
 		// parse command-line options
-		INT Getopt(INT argc, CHAR * const argv[], const CHAR *opt_string);
+		INT Getopt(INT argc, CHAR *const argv[], const CHAR *opt_string);
 
 		// convert string to long integer
 		LINT Strtol(const CHAR *val, CHAR **end, ULONG base);
@@ -104,7 +103,7 @@ namespace gpos
 		ULONG Rand(ULONG *seed);
 
 		// format wide character output conversion
-		INT Vswprintf(WCHAR *wcstr, SIZE_T max_len, const WCHAR * format, VA_LIST vaArgs);
+		INT Vswprintf(WCHAR *wcstr, SIZE_T max_len, const WCHAR *format, VA_LIST vaArgs);
 
 		// format string
 		INT Vsnprintf(CHAR *src, SIZE_T size, const CHAR *format, VA_LIST vaArgs);
@@ -136,9 +135,9 @@ namespace gpos
 		// resolve symbol information from its address
 		void Dladdr(void *addr, DL_INFO *info);
 
-	} //namespace clib
-}
+	}  //namespace clib
+}  // namespace gpos
 
-#endif // !GPOS_clibwrapper_H
+#endif  // !GPOS_clibwrapper_H
 
 // EOF

@@ -16,10 +16,10 @@
 #include "gpos/types.h"
 #include "gpos/common/clibtypes.h"
 
-namespace gpos {
-
-	namespace syslib {
-
+namespace gpos
+{
+	namespace syslib
+	{
 		// get the date and time
 		void GetTimeOfDay(TIMEVAL *tv, TIMEZONE *tz);
 
@@ -39,9 +39,8 @@ namespace gpos {
 		void CloseLog();
 
 
-	} //namespace syslib
-}
+	}  //namespace syslib
+}  // namespace gpos
 
 #endif
 // EOF
-

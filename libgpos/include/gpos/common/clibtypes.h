@@ -31,7 +31,7 @@ namespace gpos
 	typedef struct timezone TIMEZONE;
 
 	// represents an elapsed time
-	typedef struct timespec	TIMESPEC;
+	typedef struct timespec TIMESPEC;
 
 	// store system time values
 	typedef time_t TIME_T;
@@ -41,9 +41,8 @@ namespace gpos
 
 	// store information of a calling process
 	typedef Dl_info DL_INFO;
-}
+}  // namespace gpos
 
-#endif // !GPOS_clibtypes_H
+#endif  // !GPOS_clibtypes_H
 
 // EOF
-

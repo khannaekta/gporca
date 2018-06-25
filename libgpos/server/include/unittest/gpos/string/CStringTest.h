@@ -25,18 +25,15 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CStringTest
 	{
+	public:
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_Equals();
+		static GPOS_RESULT EresUnittest_Append();
+		static GPOS_RESULT EresUnittest_AppendFormat();
+	};  // class CStringTest
+}  // namespace gpos
 
-		public:
-
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_Equals();
-			static GPOS_RESULT EresUnittest_Append();
-			static GPOS_RESULT EresUnittest_AppendFormat();
-	}; // class CStringTest
-}
-
-#endif // !GPOS_CStringTest_H
+#endif  // !GPOS_CStringTest_H
 
 // EOF
-

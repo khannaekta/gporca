@@ -2,7 +2,7 @@
 //	Greenplum Database
 //	Copyright (C) 2011 EMC Corp.
 //
-//	@filename: 
+//	@filename:
 //		CHeapObject.h
 //
 //	@doc:
@@ -26,14 +26,11 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CHeapObject
 	{
-		protected:
-
-			CHeapObject();
-
+	protected:
+		CHeapObject();
 	};
-}
+}  // namespace gpos
 
-#endif // !GPOS_CHeapObject_H
+#endif  // !GPOS_CHeapObject_H
 
 // EOF
-

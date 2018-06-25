@@ -15,7 +15,6 @@
 
 namespace gpos
 {
-
 	// prototypes
 	class CTask;
 	class CTaskId;
@@ -31,44 +30,39 @@ namespace gpos
 
 	class ITaskScheduler
 	{
-		private:
+	private:
+		// private copy ctor
+		ITaskScheduler(const ITaskScheduler &);
 
-			// private copy ctor
-			ITaskScheduler(const ITaskScheduler&);
+	public:
+		// dummy ctor
+		ITaskScheduler()
+		{
+		}
 
-		public:
+		// dummy dtor
+		virtual ~ITaskScheduler()
+		{
+		}
 
-			// dummy ctor
-			ITaskScheduler() {}
+		// add task to waiting queue
+		virtual void Enqueue(CTask *) = 0;
 
-			// dummy dtor
-			virtual
-			~ITaskScheduler() {}
+		// get next task to execute
+		virtual CTask *Dequeue() = 0;
 
-			// add task to waiting queue
-			virtual
-			void Enqueue(CTask *) = 0;
+		// check if task is waiting to be scheduled and remove it
+		virtual GPOS_RESULT Cancel(CTask *task) = 0;
 
-			// get next task to execute
-			virtual
-			CTask *Dequeue() = 0;
+		// get number of waiting tasks
+		virtual ULONG GetQueueSize() = 0;
 
-			// check if task is waiting to be scheduled and remove it
-			virtual
-			GPOS_RESULT Cancel(CTask *task) = 0;
+		// check if task queue is empty
+		virtual BOOL IsEmpty() const = 0;
 
-			// get number of waiting tasks
-			virtual
-			ULONG GetQueueSize() = 0;
-
-			// check if task queue is empty
-			virtual
-			BOOL IsEmpty() const = 0;
-
-	};	// class ITaskScheduler
-}
+	};  // class ITaskScheduler
+}  // namespace gpos
 
 #endif /* GPOS_ITaskScheduler_H */
 
 // EOF
-

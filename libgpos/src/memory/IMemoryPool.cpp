@@ -18,71 +18,62 @@
 
 namespace gpos
 {
-
-ULONG
-IMemoryPool::SizeOfAlloc(const void *ptr) {
-	return CMemoryPool::SizeOfAlloc(ptr);
-}
-
-//---------------------------------------------------------------------------
-//	@function:
-//		IMemoryPool::NewImpl
-//
-//	@doc:
-//		Implementation of New that can be used by "operator new" functions
-////
-//---------------------------------------------------------------------------
-void*
-IMemoryPool::NewImpl
-	(
-	SIZE_T size,
-	const CHAR *filename,
-	ULONG line,
-	IMemoryPool::EAllocationType eat
-	)
-{
-	GPOS_ASSERT(gpos::ulong_max >= size);
-	GPOS_ASSERT_IMP
-		(
-		(NULL != CMemoryPoolManager::GetMemoryPoolMgr()) && (this == CMemoryPoolManager::GetMemoryPoolMgr()->GetGlobalMemoryPool()),
-		CMemoryPoolManager::GetMemoryPoolMgr()->IsGlobalNewAllowed() &&
-		"Use of new operator without target memory pool is prohibited, use New(...) instead"
-		);
-
-	ULONG alloc_size = CMemoryPool::GetAllocSize((ULONG) size);
-	void *ptr = Allocate(alloc_size, filename, line);
-
-	GPOS_OOM_CHECK(ptr);
-
-	return dynamic_cast<CMemoryPool*>(this)->FinalizeAlloc(ptr, (ULONG) size, eat);
-}
-
-//---------------------------------------------------------------------------
-//	@function:
-//		DeleteImpl
-//
-//	@doc:
-//		implementation of Delete that can be used by operator new functions
-//
-//---------------------------------------------------------------------------
-void
-IMemoryPool::DeleteImpl
-	(
-	void *ptr,
-	EAllocationType eat
-	)
-{
-	// deletion of NULL pointers is legal
-	if (NULL == ptr)
+	ULONG
+	IMemoryPool::SizeOfAlloc(const void *ptr)
 	{
-		return;
+		return CMemoryPool::SizeOfAlloc(ptr);
 	}
 
-	// release allocation
-	CMemoryPool::FreeAlloc(ptr, eat);
-}
+	//---------------------------------------------------------------------------
+	//	@function:
+	//		IMemoryPool::NewImpl
+	//
+	//	@doc:
+	//		Implementation of New that can be used by "operator new" functions
+	////
+	//---------------------------------------------------------------------------
+	void *
+	IMemoryPool::NewImpl(SIZE_T size,
+						 const CHAR *filename,
+						 ULONG line,
+						 IMemoryPool::EAllocationType eat)
+	{
+		GPOS_ASSERT(gpos::ulong_max >= size);
+		GPOS_ASSERT_IMP((NULL != CMemoryPoolManager::GetMemoryPoolMgr()) &&
+							(this == CMemoryPoolManager::GetMemoryPoolMgr()->GetGlobalMemoryPool()),
+						CMemoryPoolManager::GetMemoryPoolMgr()->IsGlobalNewAllowed() &&
+							"Use of new operator without target memory pool is prohibited, use "
+							"New(...) instead");
+
+		ULONG alloc_size = CMemoryPool::GetAllocSize((ULONG) size);
+		void *ptr = Allocate(alloc_size, filename, line);
+
+		GPOS_OOM_CHECK(ptr);
+
+		return dynamic_cast<CMemoryPool *>(this)->FinalizeAlloc(ptr, (ULONG) size, eat);
+	}
+
+	//---------------------------------------------------------------------------
+	//	@function:
+	//		DeleteImpl
+	//
+	//	@doc:
+	//		implementation of Delete that can be used by operator new functions
+	//
+	//---------------------------------------------------------------------------
+	void
+	IMemoryPool::DeleteImpl(void *ptr, EAllocationType eat)
+	{
+		// deletion of NULL pointers is legal
+		if (NULL == ptr)
+		{
+			return;
+		}
+
+		// release allocation
+		CMemoryPool::FreeAlloc(ptr, eat);
+	}
 
 }  // namespace gpos
 
 // EOF
-

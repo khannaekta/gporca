@@ -38,15 +38,11 @@ using namespace gpos;
 //  	the CMemoryPoolManager global instance
 //
 //---------------------------------------------------------------------------
-CAutoMemoryPool::CAutoMemoryPool
-	(
-	ELeakCheck leak_check_type,
-	CMemoryPoolManager::AllocType ept,
-	BOOL thread_safe,
-	ULLONG capacity
-	)
-	:
-	m_leak_check_type(leak_check_type)
+CAutoMemoryPool::CAutoMemoryPool(ELeakCheck leak_check_type,
+								 CMemoryPoolManager::AllocType ept,
+								 BOOL thread_safe,
+								 ULLONG capacity)
+	: m_leak_check_type(leak_check_type)
 {
 	m_memory_pool = CMemoryPoolManager::GetMemoryPoolMgr()->Create(ept, thread_safe, capacity);
 }
@@ -67,7 +63,7 @@ CAutoMemoryPool::Detach()
 {
 	IMemoryPool *memory_pool = m_memory_pool;
 	m_memory_pool = NULL;
-	
+
 	return memory_pool;
 }
 
@@ -88,20 +84,21 @@ CAutoMemoryPool::~CAutoMemoryPool()
 	{
 		return;
 	}
-	
+
 	// suspend cancellation
 	CAutoSuspendAbort asa;
 
 #ifdef GPOS_DEBUG
 
 	ITask *task = ITask::Self();
-	
+
 	// ElcExc must be used inside tasks only
 	GPOS_ASSERT_IMP(ElcExc == m_leak_check_type, NULL != task);
-	
+
 	GPOS_TRY
 	{
-		if (ElcStrict == m_leak_check_type || (ElcExc == m_leak_check_type && !task->GetErrCtxt()->IsPending()))
+		if (ElcStrict == m_leak_check_type ||
+			(ElcExc == m_leak_check_type && !task->GetErrCtxt()->IsPending()))
 		{
 			gpos::IOstream &os = gpos::oswcerr;
 
@@ -117,19 +114,18 @@ CAutoMemoryPool::~CAutoMemoryPool()
 		GPOS_ASSERT(GPOS_MATCH_EX(ex, CException::ExmaSystem, CException::ExmiAssert));
 
 		// release pool
-		CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(m_memory_pool);	
-		
+		CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(m_memory_pool);
+
 		GPOS_RETHROW(ex);
 	}
 	GPOS_CATCH_END;
 
-#else // GPOS_DEBUG
-	
+#else  // GPOS_DEBUG
+
 	// hand in pool and return
 	CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(m_memory_pool);
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 }
 
 // EOF
-

@@ -15,7 +15,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CHashMapIterTest
@@ -26,16 +25,14 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CHashMapIterTest
 	{
-		public:
+	public:
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_Basic();
 
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_Basic();
+	};  // class CHashMapIterTest
+}  // namespace gpos
 
-	}; // class CHashMapIterTest
-}
-
-#endif // !GPOS_CHashMapIterTest_H
+#endif  // !GPOS_CHashMapIterTest_H
 
 // EOF
-

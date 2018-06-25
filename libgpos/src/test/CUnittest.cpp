@@ -43,22 +43,17 @@ void (*CUnittest::m_pfCleanup)() = NULL;
 //		Constructor for exception-free test
 //
 //---------------------------------------------------------------------------
-CUnittest::CUnittest
-	(
-	const CHAR *szTitle,
-	ETestType ett,
-	GPOS_RESULT (*pfunc)(void)
-	)
-	:
-	m_szTitle(szTitle),
-	m_ett(ett),
-	m_pfunc(pfunc),
-	m_pfuncSubtest(NULL),
-	m_ulSubtest(0),
-	m_fExcep(false),
-	m_ulMajor(CException::ExmaInvalid),
-	m_ulMinor(CException::ExmiInvalid)
-{}
+CUnittest::CUnittest(const CHAR *szTitle, ETestType ett, GPOS_RESULT (*pfunc)(void))
+	: m_szTitle(szTitle),
+	  m_ett(ett),
+	  m_pfunc(pfunc),
+	  m_pfuncSubtest(NULL),
+	  m_ulSubtest(0),
+	  m_fExcep(false),
+	  m_ulMajor(CException::ExmaInvalid),
+	  m_ulMinor(CException::ExmiInvalid)
+{
+}
 
 
 //---------------------------------------------------------------------------
@@ -69,24 +64,18 @@ CUnittest::CUnittest
 //		Constructor for test which are expected to throw an exception
 //
 //---------------------------------------------------------------------------
-CUnittest::CUnittest
-	(
-	const CHAR *szTitle,
-	ETestType ett,
-	GPOS_RESULT (*pfunc)(void),
-	ULONG major,
-	ULONG minor
-	)
-	:
-	m_szTitle(szTitle),
-	m_ett(ett),
-	m_pfunc(pfunc),
-	m_pfuncSubtest(NULL),
-	m_ulSubtest(0),
-	m_fExcep(true),
-	m_ulMajor(major),
-	m_ulMinor(minor)
-{}
+CUnittest::CUnittest(
+	const CHAR *szTitle, ETestType ett, GPOS_RESULT (*pfunc)(void), ULONG major, ULONG minor)
+	: m_szTitle(szTitle),
+	  m_ett(ett),
+	  m_pfunc(pfunc),
+	  m_pfuncSubtest(NULL),
+	  m_ulSubtest(0),
+	  m_fExcep(true),
+	  m_ulMajor(major),
+	  m_ulMinor(minor)
+{
+}
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -96,23 +85,20 @@ CUnittest::CUnittest
 //		Constructor for subtest identified by ULONG id
 //
 //---------------------------------------------------------------------------
-CUnittest::CUnittest
-	(
-	const CHAR *szTitle,
-	ETestType ett,
-	GPOS_RESULT (*pfuncSubtest)(ULONG),
-	ULONG ulSubtest
-	)
-	:
-	m_szTitle(szTitle),
-	m_ett(ett),
-	m_pfunc(NULL),
-	m_pfuncSubtest(pfuncSubtest),
-	m_ulSubtest(ulSubtest),
-	m_fExcep(false),
-	m_ulMajor(CException::ExmaInvalid),
-	m_ulMinor(CException::ExmiInvalid)
-{}
+CUnittest::CUnittest(const CHAR *szTitle,
+					 ETestType ett,
+					 GPOS_RESULT (*pfuncSubtest)(ULONG),
+					 ULONG ulSubtest)
+	: m_szTitle(szTitle),
+	  m_ett(ett),
+	  m_pfunc(NULL),
+	  m_pfuncSubtest(pfuncSubtest),
+	  m_ulSubtest(ulSubtest),
+	  m_fExcep(false),
+	  m_ulMajor(CException::ExmaInvalid),
+	  m_ulMinor(CException::ExmiInvalid)
+{
+}
 
 
 //---------------------------------------------------------------------------
@@ -123,20 +109,17 @@ CUnittest::CUnittest
 //		Copy constructor
 //
 //---------------------------------------------------------------------------
-CUnittest::CUnittest
-	(
-	const CUnittest &ut
-	)
-	:
-	m_szTitle(ut.m_szTitle),
-	m_ett(ut.m_ett),
-	m_pfunc(ut.m_pfunc),
-	m_pfuncSubtest(ut.m_pfuncSubtest),
-	m_ulSubtest(ut.m_ulSubtest),
-	m_fExcep(ut.m_fExcep),
-	m_ulMajor(ut.m_ulMajor),
-	m_ulMinor(ut.m_ulMinor)
-{}
+CUnittest::CUnittest(const CUnittest &ut)
+	: m_szTitle(ut.m_szTitle),
+	  m_ett(ut.m_ett),
+	  m_pfunc(ut.m_pfunc),
+	  m_pfuncSubtest(ut.m_pfuncSubtest),
+	  m_ulSubtest(ut.m_ulSubtest),
+	  m_fExcep(ut.m_fExcep),
+	  m_ulMajor(ut.m_ulMajor),
+	  m_ulMinor(ut.m_ulMinor)
+{
+}
 
 
 
@@ -164,11 +147,7 @@ CUnittest::FThrows() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CUnittest::Equals
-	(
-	CHAR *sz
-	)
-	const
+CUnittest::Equals(CHAR *sz) const
 {
 	return 0 == clib::Strcmp(sz, m_szTitle);
 }
@@ -183,12 +162,7 @@ CUnittest::Equals
 //
 //---------------------------------------------------------------------------
 BOOL
-CUnittest::FThrows
-	(
-	ULONG major,
-	ULONG minor
-	)
-	const
+CUnittest::FThrows(ULONG major, ULONG minor) const
 {
 	return (m_ulMajor == major && m_ulMinor == minor);
 }
@@ -204,12 +178,9 @@ CUnittest::FThrows
 //
 //---------------------------------------------------------------------------
 GPOS_RESULT
-CUnittest::EresExecLoop
-	(
-	const CUnittest &ut
-	)
+CUnittest::EresExecLoop(const CUnittest &ut)
 {
-	while(true)
+	while (true)
 	{
 		GPOS_TRY
 		{
@@ -260,10 +231,7 @@ CUnittest::EresExecLoop
 //
 //---------------------------------------------------------------------------
 GPOS_RESULT
-CUnittest::EresExecTest
-	(
-	const CUnittest &ut
-	)
+CUnittest::EresExecTest(const CUnittest &ut)
 {
 	GPOS_RESULT eres = GPOS_FAILED;
 
@@ -274,7 +242,7 @@ CUnittest::EresExecTest
 		CTask::Self()->ResetCancel();
 #ifdef GPOS_DEBUG
 		CWorker::Self()->ResetTimeSlice();
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 		eres = ut.m_pfunc != NULL ? ut.m_pfunc() : ut.m_pfuncSubtest(ut.m_ulSubtest);
 
@@ -328,26 +296,22 @@ CUnittest::EresExecTest
 //
 //---------------------------------------------------------------------------
 BOOL
-CUnittest::FSimulated
-	(
-	CException ex
-	)
+CUnittest::FSimulated(CException ex)
 {
 	ITask *ptsk = ITask::Self();
 	GPOS_ASSERT(NULL != ptsk);
 
-	return
-		(ptsk->IsTraceSet(EtraceSimulateOOM) &&
-		 GPOS_MATCH_EX(ex, CException::ExmaSystem, CException::ExmiOOM)) ||
+	return (ptsk->IsTraceSet(EtraceSimulateOOM) &&
+			GPOS_MATCH_EX(ex, CException::ExmaSystem, CException::ExmiOOM)) ||
 
-		(ptsk->IsTraceSet(EtraceSimulateAbort) &&
-		 GPOS_MATCH_EX(ex, CException::ExmaSystem, CException::ExmiAbort)) ||
+		   (ptsk->IsTraceSet(EtraceSimulateAbort) &&
+			GPOS_MATCH_EX(ex, CException::ExmaSystem, CException::ExmiAbort)) ||
 
-		(ptsk->IsTraceSet(EtraceSimulateIOError) &&
-		 GPOS_MATCH_EX(ex, CException::ExmaSystem, CException::ExmiIOError)) ||
+		   (ptsk->IsTraceSet(EtraceSimulateIOError) &&
+			GPOS_MATCH_EX(ex, CException::ExmaSystem, CException::ExmiIOError)) ||
 
-		(ptsk->IsTraceSet(EtraceSimulateNetError) &&
-		 GPOS_MATCH_EX(ex, CException::ExmaSystem, CException::ExmiNetError));
+		   (ptsk->IsTraceSet(EtraceSimulateNetError) &&
+			GPOS_MATCH_EX(ex, CException::ExmaSystem, CException::ExmiNetError));
 }
 
 //---------------------------------------------------------------------------
@@ -359,37 +323,30 @@ CUnittest::FSimulated
 //
 //---------------------------------------------------------------------------
 GPOS_RESULT
-CUnittest::EresExecute
-	(
-	const CUnittest *rgut,
-	const ULONG cSize
-	)
+CUnittest::EresExecute(const CUnittest *rgut, const ULONG cSize)
 {
 	GPOS_RESULT eres = GPOS_OK;
 
-	for(ULONG i = 0; i < cSize; i++)
+	for (ULONG i = 0; i < cSize; i++)
 	{
 		GPOS_RESULT eresPart = GPOS_FAILED;
 		const CUnittest &ut = rgut[i];
 
-		{ // scope for timer
+		{  // scope for timer
 			CAutoTimer timer(ut.m_szTitle, true /*fPrint*/);
 			eresPart = EresExecLoop(ut);
 		}
 
-		GPOS_TRACE_FORMAT
-			(
-			"Unittest %s...%s.",
-			ut.m_szTitle,
-			(  GPOS_OK == eresPart ? "OK" : "*** FAILED ***" )
-			);
+		GPOS_TRACE_FORMAT(
+			"Unittest %s...%s.", ut.m_szTitle, (GPOS_OK == eresPart ? "OK" : "*** FAILED ***"));
 
 #ifdef GPOS_DEBUG
 		{
 			CAutoMemoryPool amp;
-			CMemoryPoolManager::GetMemoryPoolMgr()->PrintOverSizedPools(amp.Pmp(), GPOS_OVERSIZED_POOL_SIZE);
+			CMemoryPoolManager::GetMemoryPoolMgr()->PrintOverSizedPools(amp.Pmp(),
+																		GPOS_OVERSIZED_POOL_SIZE);
 		}
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 		// invalidate result summary if any part fails
 		if (GPOS_OK != eresPart)
@@ -412,25 +369,20 @@ CUnittest::EresExecute
 //
 //---------------------------------------------------------------------------
 void
-CUnittest::FindTest
-	(
-	CBitVector &bv,
-	ETestType ett,
-	CHAR *szTestName
-	)
+CUnittest::FindTest(CBitVector &bv, ETestType ett, CHAR *szTestName)
 {
-	for(ULONG i = 0; i < CUnittest::m_ulTests; i++)
+	for (ULONG i = 0; i < CUnittest::m_ulTests; i++)
 	{
 		CUnittest &ut = CUnittest::m_rgut[i];
 
 		if ((ut.Ett() == ett && (NULL == szTestName || ut.Equals(szTestName))) ||
-			 (NULL != szTestName && ut.Equals(szTestName)))
+			(NULL != szTestName && ut.Equals(szTestName)))
 		{
 			(void) bv.ExchangeSet(i);
 		}
 	}
 
-	if(bv.IsEmpty())
+	if (bv.IsEmpty())
 	{
 		GPOS_TRACE_FORMAT("'%s' is not a valid test case.", szTestName);
 	}
@@ -446,13 +398,10 @@ CUnittest::FindTest
 //
 //---------------------------------------------------------------------------
 void
-CUnittest::SetTraceFlag
-	(
-	const CHAR *szTrace
-	)
+CUnittest::SetTraceFlag(const CHAR *szTrace)
 {
 	CHAR *pcEnd = NULL;
-	LINT lTrace = clib::Strtol(szTrace, &pcEnd, 0/*iBase*/);
+	LINT lTrace = clib::Strtol(szTrace, &pcEnd, 0 /*iBase*/);
 
 	GPOS_SET_TRACE((ULONG) lTrace);
 }
@@ -478,10 +427,7 @@ CUnittest::UllParsePlanId
 //
 //---------------------------------------------------------------------------
 ULONG
-CUnittest::Driver
-	(
-	CBitVector *pbv
-	)
+CUnittest::Driver(CBitVector *pbv)
 {
 	CAutoConfig ac(m_pfConfig, m_pfCleanup, m_ulNested);
 	ULONG ulOk = 0;
@@ -496,8 +442,8 @@ CUnittest::Driver
 			{
 				CUnittest &ut = CUnittest::m_rgut[i];
 				GPOS_RESULT eres = EresExecute(&ut, 1 /*size*/);
-				GPOS_ASSERT((GPOS_OK == eres || GPOS_FAILED == eres)
-							&& "Unexpected result from unittest");
+				GPOS_ASSERT((GPOS_OK == eres || GPOS_FAILED == eres) &&
+							"Unexpected result from unittest");
 
 				if (GPOS_OK == eres)
 				{
@@ -505,12 +451,12 @@ CUnittest::Driver
 				}
 
 #ifdef GPOS_DEBUG
-		{
-			CAutoMemoryPool amp;
-			CMemoryPoolManager::GetMemoryPoolMgr()->PrintOverSizedPools(amp.Pmp(), GPOS_OVERSIZED_POOL_SIZE);
-		}
-#endif // GPOS_DEBUG
-
+				{
+					CAutoMemoryPool amp;
+					CMemoryPoolManager::GetMemoryPoolMgr()->PrintOverSizedPools(
+						amp.Pmp(), GPOS_OVERSIZED_POOL_SIZE);
+				}
+#endif  // GPOS_DEBUG
 			}
 		}
 	}
@@ -531,10 +477,7 @@ CUnittest::Driver
 //
 //---------------------------------------------------------------------------
 ULONG
-CUnittest::Driver
-	(
-	CMainArgs *pma
-	)
+CUnittest::Driver(CMainArgs *pma)
 {
 	CBitVector bv(ITask::Self()->Pmp(), CUnittest::UlTests());
 
@@ -578,13 +521,7 @@ CUnittest::Driver
 //
 //---------------------------------------------------------------------------
 void
-CUnittest::Init
-	(
-	CUnittest *rgut,
-	ULONG ulUtCnt,
-	void (*pfConfig)(),
-	void (*pfCleanup)()
-	)
+CUnittest::Init(CUnittest *rgut, ULONG ulUtCnt, void (*pfConfig)(), void (*pfCleanup)())
 {
 	GPOS_ASSERT(0 == m_ulTests && "Unittest array has already been initialized");
 
@@ -598,4 +535,3 @@ CUnittest::Init
 }
 
 // EOF
-

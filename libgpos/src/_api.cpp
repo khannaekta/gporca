@@ -34,14 +34,16 @@ using namespace gpos;
 //		Initialize GPOS memory pool, worker pool and message repository
 //
 //---------------------------------------------------------------------------
-void gpos_init(struct gpos_init_params* params) {
+void
+gpos_init(struct gpos_init_params *params)
+{
+	void *(*func_ptr_alloc)(SIZE_T) = params->alloc;
+	void (*func_ptr_free)(void *) = params->free;
 
-	void* (*func_ptr_alloc) (SIZE_T) = params->alloc;
-	void (*func_ptr_free) (void*) = params->free;
-
-	if (NULL == func_ptr_alloc || NULL == func_ptr_free) {
-	  func_ptr_alloc = clib::Malloc;
-	  func_ptr_free = clib::Free;
+	if (NULL == func_ptr_alloc || NULL == func_ptr_free)
+	{
+		func_ptr_alloc = clib::Malloc;
+		func_ptr_free = clib::Free;
 	}
 
 	CWorker::abort_requested_by_system = params->abort_requested;
@@ -51,7 +53,7 @@ void gpos_init(struct gpos_init_params* params) {
 		return;
 	}
 
-	if (GPOS_OK != gpos::CWorkerPoolManager::Init(0,0))
+	if (GPOS_OK != gpos::CWorkerPoolManager::Init(0, 0))
 	{
 		CMemoryPoolManager::GetMemoryPoolMgr()->Shutdown();
 		return;
@@ -76,7 +78,7 @@ void gpos_init(struct gpos_init_params* params) {
 		CWorkerPoolManager::WorkerPoolManager()->Shutdown();
 		CMemoryPoolManager::GetMemoryPoolMgr()->Shutdown();
 	}
-#endif // GPOS_FPSIMULATOR
+#endif  // GPOS_FPSIMULATOR
 }
 
 //---------------------------------------------------------------------------
@@ -89,7 +91,8 @@ void gpos_init(struct gpos_init_params* params) {
 //		if any exception happens re-throw it.
 //
 //---------------------------------------------------------------------------
-int gpos_set_threads(int min, int max)
+int
+gpos_set_threads(int min, int max)
 {
 	try
 	{
@@ -123,10 +126,8 @@ int gpos_set_threads(int min, int max)
 //		return 0 for successful completion, 1 for error;
 //
 //---------------------------------------------------------------------------
-int gpos_exec
-	(
-	gpos_exec_params *params
-	)
+int
+gpos_exec(gpos_exec_params *params)
 {
 	// check if passed parameters are valid
 	if (NULL == params || NULL == params->func)
@@ -179,11 +180,9 @@ int gpos_exec
 				{
 					GPOS_ASSERT(0 < params->error_buffer_size);
 
-					apwstr = GPOS_NEW(memory_pool) CWStringStatic
-						(
-						(WCHAR *) params->error_buffer,
-						params->error_buffer_size / GPOS_SIZEOF(WCHAR)
-						);
+					apwstr = GPOS_NEW(memory_pool)
+						CWStringStatic((WCHAR *) params->error_buffer,
+									   params->error_buffer_size / GPOS_SIZEOF(WCHAR));
 					aposs = GPOS_NEW(memory_pool) COstreamString(apwstr.Value());
 					aplogger = GPOS_NEW(memory_pool) CLoggerStream(*aposs.Value());
 
@@ -203,19 +202,14 @@ int gpos_exec
 				{
 					return 1;
 				}
-
 			}
 		}
 	}
-	catch(CException ex)
+	catch (CException ex)
 	{
-		std::cerr
-			<< "Unexpected exception reached top of execution stack:"
-			<< " major=" << ex.Major()
-			<< " minor=" << ex.Minor()
-			<< " file=" << ex.Filename()
-			<< " line=" << ex.Line()
-			<< std::endl;
+		std::cerr << "Unexpected exception reached top of execution stack:"
+				  << " major=" << ex.Major() << " minor=" << ex.Minor() << " file=" << ex.Filename()
+				  << " line=" << ex.Line() << std::endl;
 
 		// unexpected failure
 		throw ex;
@@ -238,18 +232,18 @@ int gpos_exec
 //		Shutdown GPOS memory pool, worker pool and message repository
 //
 //---------------------------------------------------------------------------
-void gpos_terminate()
+void
+gpos_terminate()
 {
 #ifdef GPOS_DEBUG
 #ifdef GPOS_FPSIMULATOR
 	CFSimulator::FSim()->Shutdown();
-#endif // GPOS_FPSIMULATOR
+#endif  // GPOS_FPSIMULATOR
 	CMessageRepository::GetMessageRepository()->Shutdown();
 	CWorkerPoolManager::WorkerPoolManager()->Shutdown();
 	CCacheFactory::GetFactory()->Shutdown();
 	CMemoryPoolManager::GetMemoryPoolMgr()->Shutdown();
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 }
 
 // EOF
-

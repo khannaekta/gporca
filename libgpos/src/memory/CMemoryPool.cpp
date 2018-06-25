@@ -7,14 +7,14 @@
 //		CMemoryPool.cpp
 //
 //	@doc:
-//		Implementation of abstract interface; 
+//		Implementation of abstract interface;
 //		implements helper functions for extraction of allocation
 //		header from memory block;
 //---------------------------------------------------------------------------
 
 #ifdef GPOS_DEBUG
 #include "gpos/error/CFSimulator.h"
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 #include "gpos/memory/CMemoryPool.h"
 #include "gpos/memory/CMemoryPoolManager.h"
 #include "gpos/memory/CMemoryVisitorPrint.h"
@@ -36,25 +36,21 @@ const ULONG_PTR CMemoryPool::m_invalid = ULONG_PTR_MAX;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMemoryPool::CMemoryPool
-	(
-	IMemoryPool *underlying_memory_pool,
-	BOOL owns_underlying_memory_pool,
-	BOOL thread_safe
-	)
-	:
-	m_ref_counter(0),
-	m_hash_key(0),
-	m_underlying_memory_pool(underlying_memory_pool),
-	m_owns_underlying_memory_pool(owns_underlying_memory_pool),
-	m_thread_safe(thread_safe)
+CMemoryPool::CMemoryPool(IMemoryPool *underlying_memory_pool,
+						 BOOL owns_underlying_memory_pool,
+						 BOOL thread_safe)
+	: m_ref_counter(0),
+	  m_hash_key(0),
+	  m_underlying_memory_pool(underlying_memory_pool),
+	  m_owns_underlying_memory_pool(owns_underlying_memory_pool),
+	  m_thread_safe(thread_safe)
 {
 	GPOS_ASSERT_IMP(owns_underlying_memory_pool, NULL != underlying_memory_pool);
 
 	m_hash_key = reinterpret_cast<ULONG_PTR>(this);
 #ifdef GPOS_DEBUG
 	m_stack_desc.BackTrace();
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 }
 
 
@@ -84,20 +80,15 @@ CMemoryPool::~CMemoryPool()
 //
 //---------------------------------------------------------------------------
 void *
-CMemoryPool::FinalizeAlloc
-	(
-	void *ptr,
-	ULONG alloc,
-	EAllocationType eat
-	)
+CMemoryPool::FinalizeAlloc(void *ptr, ULONG alloc, EAllocationType eat)
 {
 	GPOS_ASSERT(NULL != ptr);
 
-	AllocHeader *header = static_cast<AllocHeader*>(ptr);
+	AllocHeader *header = static_cast<AllocHeader *>(ptr);
 	header->m_memory_pool = this;
 	header->m_alloc = alloc;
 
-	BYTE *alloc_type = reinterpret_cast<BYTE*>(header + 1) + alloc;
+	BYTE *alloc_type = reinterpret_cast<BYTE *>(header + 1) + alloc;
 	*alloc_type = eat;
 
 	return header + 1;
@@ -113,31 +104,23 @@ CMemoryPool::FinalizeAlloc
 //
 //---------------------------------------------------------------------------
 void
-CMemoryPool::FreeAlloc
-	(
-	void *ptr,
-	EAllocationType eat
-	)
+CMemoryPool::FreeAlloc(void *ptr, EAllocationType eat)
 {
 	GPOS_ASSERT(ptr != NULL);
 
-	AllocHeader *header = static_cast<AllocHeader*>(ptr) - 1;
-	BYTE *alloc_type = static_cast<BYTE*>(ptr) + header->m_alloc;
+	AllocHeader *header = static_cast<AllocHeader *>(ptr) - 1;
+	BYTE *alloc_type = static_cast<BYTE *>(ptr) + header->m_alloc;
 	GPOS_RTL_ASSERT(*alloc_type == eat);
 	header->m_memory_pool->Free(header);
-
 }
 
 
 ULONG
-CMemoryPool::SizeOfAlloc
-	(
-	const void *ptr
-	)
+CMemoryPool::SizeOfAlloc(const void *ptr)
 {
 	GPOS_ASSERT(NULL != ptr);
 
-	const AllocHeader *header = static_cast<const AllocHeader*>(ptr) - 1;
+	const AllocHeader *header = static_cast<const AllocHeader *>(ptr) - 1;
 	return header->m_alloc;
 }
 
@@ -152,10 +135,7 @@ CMemoryPool::SizeOfAlloc
 //
 //---------------------------------------------------------------------------
 IOstream &
-CMemoryPool::OsPrint
-	(
-	IOstream &os
-	)
+CMemoryPool::OsPrint(IOstream &os)
 {
 	os << "Memory pool: " << this;
 
@@ -191,34 +171,25 @@ CMemoryPool::OsPrint
 //
 //---------------------------------------------------------------------------
 void
-CMemoryPool::AssertEmpty
-	(
-	IOstream &os
-	)
+CMemoryPool::AssertEmpty(IOstream &os)
 {
 	if (SupportsLiveObjectWalk() && NULL != ITask::Self() &&
-	    !GPOS_FTRACE(EtraceDisablePrintMemoryLeak))
+		!GPOS_FTRACE(EtraceDisablePrintMemoryLeak))
 	{
 		CMemoryVisitorPrint visitor(os);
 		WalkLiveObjects(&visitor);
 
 		if (0 != visitor.GetNumVisits())
 		{
-			os
-				<< "Unfreed memory in memory pool "
-				<< (void*)this
-				<< ": "
-				<< visitor.GetNumVisits()
-				<< " objects leaked"
-				<< std::endl;
+			os << "Unfreed memory in memory pool " << (void *) this << ": "
+			   << visitor.GetNumVisits() << " objects leaked" << std::endl;
 
 			GPOS_ASSERT(!"leak detected");
 		}
 	}
 }
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 
 // EOF
-

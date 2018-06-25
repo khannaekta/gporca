@@ -33,4 +33,3 @@ CAutoSpinlock::~CAutoSpinlock()
 }
 
 // EOF
-

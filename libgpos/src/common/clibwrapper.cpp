@@ -46,10 +46,7 @@ using namespace gpos;
 //
 //---------------------------------------------------------------------------
 INT
-gpos::clib::GetContext
-	(
-	ucontext_t *user_ctxt
-	)
+gpos::clib::GetContext(ucontext_t *user_ctxt)
 {
 	INT res = getcontext(user_ctxt);
 
@@ -69,12 +66,7 @@ gpos::clib::GetContext
 //
 //---------------------------------------------------------------------------
 INT
-gpos::clib::WalkContext
-	(
-	const ucontext_t *user_ctxt,
-	Callback callback,
-	void *arg
-	)
+gpos::clib::WalkContext(const ucontext_t *user_ctxt, Callback callback, void *arg)
 {
 	INT res = walkcontext(user_ctxt, callback, arg);
 
@@ -83,7 +75,7 @@ gpos::clib::WalkContext
 	return res;
 }
 
-#endif //GPOS_sparc
+#endif  //GPOS_sparc
 
 
 
@@ -96,10 +88,7 @@ gpos::clib::WalkContext
 //
 //---------------------------------------------------------------------------
 void
-gpos::clib::USleep
-	(
-	ULONG usecs
-	)
+gpos::clib::USleep(ULONG usecs)
 {
 	GPOS_ASSERT(1000000 >= usecs);
 
@@ -117,11 +106,7 @@ gpos::clib::USleep
 //
 //---------------------------------------------------------------------------
 INT
-gpos::clib::Strcmp
-	(
-	const CHAR *left,
-	const CHAR *right
-	)
+gpos::clib::Strcmp(const CHAR *left, const CHAR *right)
 {
 	GPOS_ASSERT(NULL != left);
 	GPOS_ASSERT(NULL != right);
@@ -139,12 +124,7 @@ gpos::clib::Strcmp
 //
 //---------------------------------------------------------------------------
 INT
-gpos::clib::Strncmp
-	(
-	const CHAR *left,
-	const CHAR *right,
-	SIZE_T num_bytes
-	)
+gpos::clib::Strncmp(const CHAR *left, const CHAR *right, SIZE_T num_bytes)
 {
 	GPOS_ASSERT(NULL != left);
 	GPOS_ASSERT(NULL != right);
@@ -161,12 +141,7 @@ gpos::clib::Strncmp
 //		Compare a specified number of bytes of two regions of memory
 //---------------------------------------------------------------------------
 INT
-gpos::clib::Memcmp
-	(
-	const void* left,
-	const void* right,
-	SIZE_T num_bytes
-	)
+gpos::clib::Memcmp(const void *left, const void *right, SIZE_T num_bytes)
 {
 	GPOS_ASSERT(NULL != left);
 	GPOS_ASSERT(NULL != right);
@@ -184,12 +159,7 @@ gpos::clib::Memcmp
 //
 //---------------------------------------------------------------------------
 INT
-gpos::clib::Wcsncmp
-	(
-	const WCHAR *left,
-	const WCHAR *right,
-	SIZE_T num_bytes
-	)
+gpos::clib::Wcsncmp(const WCHAR *left, const WCHAR *right, SIZE_T num_bytes)
 {
 	GPOS_ASSERT(NULL != left);
 	GPOS_ASSERT(NULL != right);
@@ -206,13 +176,8 @@ gpos::clib::Wcsncmp
 //		Copy two strings up to a specified number of wide characters
 //
 //---------------------------------------------------------------------------
-WCHAR*
-gpos::clib::WcStrNCpy
-	(
-	WCHAR *dest,
-	const WCHAR *src,
-	SIZE_T num_bytes
-	)
+WCHAR *
+gpos::clib::WcStrNCpy(WCHAR *dest, const WCHAR *src, SIZE_T num_bytes)
 {
 	GPOS_ASSERT(NULL != dest);
 	GPOS_ASSERT(NULL != src && num_bytes > 0);
@@ -232,22 +197,17 @@ gpos::clib::WcStrNCpy
 //		Copy a specified number of bytes between two memory areas
 //
 //---------------------------------------------------------------------------
-void*
-gpos::clib::Memcpy
-	(
-	void *dest,
-	const void* src,
-	SIZE_T num_bytes
-	)
+void *
+gpos::clib::Memcpy(void *dest, const void *src, SIZE_T num_bytes)
 {
 	GPOS_ASSERT(NULL != dest);
 
 	GPOS_ASSERT(NULL != src && num_bytes > 0);
 
 #ifdef GPOS_DEBUG
-	const BYTE* src_addr = static_cast<const BYTE*>(src);
-	const BYTE* dest_addr = static_cast<const BYTE*>(dest);
-#endif // GPOS_DEBUG
+	const BYTE *src_addr = static_cast<const BYTE *>(src);
+	const BYTE *dest_addr = static_cast<const BYTE *>(dest);
+#endif  // GPOS_DEBUG
 
 	// check for overlap
 	GPOS_ASSERT(((src_addr + num_bytes) <= dest_addr) || ((dest_addr + num_bytes) <= src_addr));
@@ -264,20 +224,15 @@ gpos::clib::Memcpy
 //		Copy a specified number of wide characters
 //
 //---------------------------------------------------------------------------
-WCHAR*
-gpos::clib::Wmemcpy
-	(
-	WCHAR *dest,
-	const WCHAR *src,
-	SIZE_T num_bytes
-	)
+WCHAR *
+gpos::clib::Wmemcpy(WCHAR *dest, const WCHAR *src, SIZE_T num_bytes)
 {
 	GPOS_ASSERT(NULL != dest);
 	GPOS_ASSERT(NULL != src && num_bytes > 0);
 
 #ifdef GPOS_DEBUG
-	const WCHAR* src_addr = static_cast<const WCHAR*>(src);
-	const WCHAR* dest_addr = static_cast<WCHAR*>(dest);
+	const WCHAR *src_addr = static_cast<const WCHAR *>(src);
+	const WCHAR *dest_addr = static_cast<WCHAR *>(dest);
 #endif
 
 	// check for overlap
@@ -295,13 +250,8 @@ gpos::clib::Wmemcpy
 //		Copy a specified number of characters
 //
 //---------------------------------------------------------------------------
-CHAR*
-gpos::clib::Strncpy
-	(
-	CHAR *dest,
-	const CHAR *src,
-	SIZE_T num_bytes
-	)
+CHAR *
+gpos::clib::Strncpy(CHAR *dest, const CHAR *src, SIZE_T num_bytes)
 {
 	GPOS_ASSERT(NULL != dest);
 	GPOS_ASSERT(NULL != src && num_bytes > 0);
@@ -321,15 +271,11 @@ gpos::clib::Strncpy
 //
 //---------------------------------------------------------------------------
 CHAR *
-gpos::clib::Strchr
-	(
-	const CHAR *src,
-	INT c
-	)
+gpos::clib::Strchr(const CHAR *src, INT c)
 {
 	GPOS_ASSERT(NULL != src);
 
-	return (CHAR *) strchr (src, c);
+	return (CHAR *) strchr(src, c);
 }
 
 //---------------------------------------------------------------------------
@@ -340,13 +286,8 @@ gpos::clib::Strchr
 //		Set the bytes of a given memory block to a specific m_bytearray_value
 //
 //---------------------------------------------------------------------------
-void*
-gpos::clib::Memset
-	(
-	void *dest,
-	INT value,
-	SIZE_T num_bytes
-	)
+void *
+gpos::clib::Memset(void *dest, INT value, SIZE_T num_bytes)
 {
 	GPOS_ASSERT(NULL != dest);
 	GPOS_ASSERT_IFF(0 <= value, 255 >= value);
@@ -364,13 +305,7 @@ gpos::clib::Memset
 //
 //---------------------------------------------------------------------------
 void
-gpos::clib::Qsort
-	(
-	void *dest,
-	SIZE_T num_bytes,
-	SIZE_T size,
-	Comparator comparator
-	)
+gpos::clib::Qsort(void *dest, SIZE_T num_bytes, SIZE_T size, Comparator comparator)
 {
 	GPOS_ASSERT(NULL != dest);
 
@@ -387,12 +322,7 @@ gpos::clib::Qsort
 //
 //---------------------------------------------------------------------------
 INT
-gpos::clib::Getopt
-	(
-	INT argc,
-	CHAR * const argv[],
-	const CHAR *opt_string
-	)
+gpos::clib::Getopt(INT argc, CHAR *const argv[], const CHAR *opt_string)
 {
 	return getopt(argc, argv, opt_string);
 }
@@ -407,12 +337,7 @@ gpos::clib::Getopt
 //
 //---------------------------------------------------------------------------
 LINT
-gpos::clib::Strtol
-	(
-	const CHAR *val,
-	CHAR **end,
-	ULONG base
-	)
+gpos::clib::Strtol(const CHAR *val, CHAR **end, ULONG base)
 {
 	GPOS_ASSERT(NULL != val);
 	GPOS_ASSERT(0 == base || 2 == base || 10 == base || 16 == base);
@@ -429,12 +354,7 @@ gpos::clib::Strtol
 //
 //---------------------------------------------------------------------------
 LINT
-gpos::clib::Strtoll
-	(
-	const CHAR *val,
-	CHAR **end,
-	ULONG base
-	)
+gpos::clib::Strtoll(const CHAR *val, CHAR **end, ULONG base)
 {
 	GPOS_ASSERT(NULL != val);
 	GPOS_ASSERT(0 == base || 2 == base || 10 == base || 16 == base);
@@ -451,10 +371,7 @@ gpos::clib::Strtoll
 //
 //---------------------------------------------------------------------------
 ULONG
-gpos::clib::Rand
-	(
-	ULONG *seed
-	)
+gpos::clib::Rand(ULONG *seed)
 {
 	GPOS_ASSERT(NULL != seed);
 
@@ -475,13 +392,7 @@ gpos::clib::Rand
 //
 //---------------------------------------------------------------------------
 INT
-gpos::clib::Vswprintf
-	(
-	WCHAR *wcstr,
-	SIZE_T max_len,
-	const WCHAR * format,
-	VA_LIST vaArgs
-	)
+gpos::clib::Vswprintf(WCHAR *wcstr, SIZE_T max_len, const WCHAR *format, VA_LIST vaArgs)
 {
 	GPOS_ASSERT(NULL != wcstr);
 	GPOS_ASSERT(NULL != format);
@@ -507,13 +418,7 @@ gpos::clib::Vswprintf
 //
 //---------------------------------------------------------------------------
 INT
-gpos::clib::Vsnprintf
-	(
-	CHAR *src,
-	SIZE_T size,
-	const CHAR *format,
-	VA_LIST vaArgs
-	)
+gpos::clib::Vsnprintf(CHAR *src, SIZE_T size, const CHAR *format, VA_LIST vaArgs)
 {
 	GPOS_ASSERT(NULL != src);
 	GPOS_ASSERT(NULL != format);
@@ -531,12 +436,7 @@ gpos::clib::Vsnprintf
 //
 //---------------------------------------------------------------------------
 void
-gpos::clib::Strerror_r
-	(
-	INT errnum,
-	CHAR *buf,
-	SIZE_T buf_len
-	)
+gpos::clib::Strerror_r(INT errnum, CHAR *buf, SIZE_T buf_len)
 {
 	GPOS_ASSERT(NULL != buf);
 
@@ -547,7 +447,8 @@ gpos::clib::Strerror_r
 
 	// GNU strerror_r() may return a pointer to a static error string.
 	// Copy it into 'buf' if that is the case.
-	if (error_str != buf) {
+	if (error_str != buf)
+	{
 		strncpy(buf, error_str, buf_len);
 		// Ensure null-terminated.
 		buf[buf_len - 1] = '\0';
@@ -557,7 +458,7 @@ gpos::clib::Strerror_r
 #ifdef GPOS_DEBUG
 	INT str_err_code =
 #endif
-			strerror_r(errnum, buf, buf_len);
+		strerror_r(errnum, buf, buf_len);
 	GPOS_ASSERT(0 == str_err_code);
 
 #endif
@@ -573,10 +474,7 @@ gpos::clib::Strerror_r
 //
 //---------------------------------------------------------------------------
 ULONG
-gpos::clib::Wcslen
-	(
-	const WCHAR *dest
-	)
+gpos::clib::Wcslen(const WCHAR *dest)
 {
 	GPOS_ASSERT(NULL != dest);
 
@@ -593,12 +491,8 @@ gpos::clib::Wcslen
 //		Expressed relative to the user's specified time zone
 //
 //---------------------------------------------------------------------------
-struct tm*
-gpos::clib::Localtime_r
-	(
-	const TIME_T *time,
-	TIME *result
-	)
+struct tm *
+gpos::clib::Localtime_r(const TIME_T *time, TIME *result)
 {
 	GPOS_ASSERT(NULL != time);
 
@@ -618,11 +512,8 @@ gpos::clib::Localtime_r
 //		Allocate dynamic memory
 //
 //---------------------------------------------------------------------------
-void*
-gpos::clib::Malloc
-	(
-	SIZE_T size
-	)
+void *
+gpos::clib::Malloc(SIZE_T size)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 
@@ -639,10 +530,7 @@ gpos::clib::Malloc
 //
 //---------------------------------------------------------------------------
 void
-gpos::clib::Free
-	(
-	void *src
-	)
+gpos::clib::Free(void *src)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 
@@ -659,10 +547,7 @@ gpos::clib::Free
 //
 //---------------------------------------------------------------------------
 ULONG
-gpos::clib::Strlen
-	(
-	const CHAR *buf
-	)
+gpos::clib::Strlen(const CHAR *buf)
 {
 	GPOS_ASSERT(NULL != buf);
 
@@ -679,11 +564,7 @@ gpos::clib::Strlen
 //
 //---------------------------------------------------------------------------
 INT
-gpos::clib::Wctomb
-	(
-	CHAR *dest,
-	WCHAR src
-	)
+gpos::clib::Wctomb(CHAR *dest, WCHAR src)
 {
 	return wctomb(dest, src);
 }
@@ -698,12 +579,7 @@ gpos::clib::Wctomb
 //
 //---------------------------------------------------------------------------
 ULONG
-gpos::clib::Mbstowcs
-	(
-	WCHAR *dest,
-	const CHAR *src,
-	SIZE_T len
-	)
+gpos::clib::Mbstowcs(WCHAR *dest, const CHAR *src, SIZE_T len)
 {
 	GPOS_ASSERT(NULL != dest);
 	GPOS_ASSERT(NULL != src);
@@ -721,12 +597,7 @@ gpos::clib::Mbstowcs
 //
 //---------------------------------------------------------------------------
 LINT
-gpos::clib::Wcstombs
-	(
-	CHAR *dest,
-	WCHAR *src,
-	ULONG_PTR dest_size
-	)
+gpos::clib::Wcstombs(CHAR *dest, WCHAR *src, ULONG_PTR dest_size)
 {
 	return wcstombs(dest, src, dest_size);
 }
@@ -742,10 +613,7 @@ gpos::clib::Wcstombs
 //
 //---------------------------------------------------------------------------
 DOUBLE
-gpos::clib::Strtod
-	(
-	const CHAR *str
-	)
+gpos::clib::Strtod(const CHAR *str)
 {
 	return strtod(str, NULL);
 }
@@ -759,11 +627,8 @@ gpos::clib::Strtod
 //		Get an environment variable
 //
 //---------------------------------------------------------------------------
-CHAR*
-gpos::clib::GetEnv
-	(
-	const CHAR *name
-	)
+CHAR *
+gpos::clib::GetEnv(const CHAR *name)
 {
 	GPOS_ASSERT(NULL != name);
 
@@ -780,18 +645,12 @@ gpos::clib::GetEnv
 //		symbol or NULL if demangling fails
 //
 //---------------------------------------------------------------------------
-CHAR*
-gpos::clib::Demangle
-	(
-	const CHAR *symbol,
-	CHAR *buf,
-	SIZE_T *len,
-	INT *status
-	)
+CHAR *
+gpos::clib::Demangle(const CHAR *symbol, CHAR *buf, SIZE_T *len, INT *status)
 {
 	GPOS_ASSERT(NULL != symbol);
 
-	CHAR* res = abi::__cxa_demangle(symbol, buf, len, status);
+	CHAR *res = abi::__cxa_demangle(symbol, buf, len, status);
 
 	GPOS_ASSERT(-3 != *status && "One of the arguments is invalid.");
 
@@ -808,16 +667,12 @@ gpos::clib::Demangle
 //
 //---------------------------------------------------------------------------
 void
-gpos::clib::Dladdr
-	(
-	void *addr,
-	DL_INFO *info
-	)
+gpos::clib::Dladdr(void *addr, DL_INFO *info)
 {
 #ifdef GPOS_DEBUG
 	INT res =
 #endif
-	dladdr(addr, info);
+		dladdr(addr, info);
 
 	GPOS_ASSERT(0 != res);
 }

@@ -17,7 +17,7 @@
 #include "gpos/common/CDynamicPtrArray.h"
 
 namespace gpos
-{	
+{
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CHashMapIter
@@ -26,100 +26,98 @@ namespace gpos
 	//		Hash map iterator
 	//
 	//---------------------------------------------------------------------------
-	template <class K, class T, 
-				ULONG (*HashFn)(const K*), 
-				BOOL (*EqFn)(const K*, const K*),
-				void (*DestroyKFn)(K*),
-				void (*DestroyTFn)(T*)>
+	template <class K,
+			  class T,
+			  ULONG (*HashFn)(const K *),
+			  BOOL (*EqFn)(const K *, const K *),
+			  void (*DestroyKFn)(K *),
+			  void (*DestroyTFn)(T *)>
 	class CHashMapIter : public CStackObject
 	{
-	
 		// short hand for hashmap type
 		typedef CHashMap<K, T, HashFn, EqFn, DestroyKFn, DestroyTFn> TMap;
-	
-		private:
 
-			// map to iterate
-			const TMap *m_map;
+	private:
+		// map to iterate
+		const TMap *m_map;
 
-			// current hashchain
-			ULONG m_chain_idx;
+		// current hashchain
+		ULONG m_chain_idx;
 
-			// current key
-			ULONG m_key_idx;
+		// current key
+		ULONG m_key_idx;
 
-			// is initialized?
-			BOOL m_is_initialized;
+		// is initialized?
+		BOOL m_is_initialized;
 
-			// private copy ctor
-			CHashMapIter(const CHashMapIter<K, T, HashFn, EqFn, DestroyKFn, DestroyTFn> &);
-			
-			// method to return the current element
-			const typename TMap::CHashMapElem *Get() const
-            {
-                typename TMap::CHashMapElem *elem = NULL;
-                K *k = (*(m_map->m_keys))[m_key_idx-1];
-                elem = m_map->Lookup(k);
+		// private copy ctor
+		CHashMapIter(const CHashMapIter<K, T, HashFn, EqFn, DestroyKFn, DestroyTFn> &);
 
-                return elem;
-            }
+		// method to return the current element
+		const typename TMap::CHashMapElem *
+		Get() const
+		{
+			typename TMap::CHashMapElem *elem = NULL;
+			K *k = (*(m_map->m_keys))[m_key_idx - 1];
+			elem = m_map->Lookup(k);
 
-		public:
-		
-			// ctor
-			CHashMapIter<K, T, HashFn, EqFn, DestroyKFn, DestroyTFn> (TMap *ptm)
-            :
-            m_map(ptm),
-            m_chain_idx(0),
-            m_key_idx(0)
-            {
-                GPOS_ASSERT(NULL != ptm);
-            }
+			return elem;
+		}
 
-			// dtor
-			virtual
-			~CHashMapIter<K, T, HashFn, EqFn, DestroyKFn, DestroyTFn> ()
-			{}
+	public:
+		// ctor
+		CHashMapIter<K, T, HashFn, EqFn, DestroyKFn, DestroyTFn>(TMap *ptm)
+			: m_map(ptm), m_chain_idx(0), m_key_idx(0)
+		{
+			GPOS_ASSERT(NULL != ptm);
+		}
 
-			// advance iterator to next element
-			BOOL Advance()
-            {
-                if (m_key_idx < m_map->m_keys->Size())
-                {
-                    m_key_idx++;
-                    return true;
-                }
+		// dtor
+		virtual ~CHashMapIter<K, T, HashFn, EqFn, DestroyKFn, DestroyTFn>()
+		{
+		}
 
-                return false;
-            }
-			
-			// current key
-			const K *Key() const
-            {
-                const typename TMap::CHashMapElem *elem = Get();
-                if (NULL != elem)
-                {
-                    return elem->Key();
-                }
-                return NULL;
-            }
+		// advance iterator to next element
+		BOOL
+		Advance()
+		{
+			if (m_key_idx < m_map->m_keys->Size())
+			{
+				m_key_idx++;
+				return true;
+			}
 
-			// current m_bytearray_value
-			const T *Value() const
-            {
-                const typename TMap::CHashMapElem *elem = Get();
-                if (NULL != elem)
-                {
-                    return elem->Value();
-                }
-                return NULL;
-            }
+			return false;
+		}
 
-	}; // class CHashMapIter
+		// current key
+		const K *
+		Key() const
+		{
+			const typename TMap::CHashMapElem *elem = Get();
+			if (NULL != elem)
+			{
+				return elem->Key();
+			}
+			return NULL;
+		}
 
-}
+		// current m_bytearray_value
+		const T *
+		Value() const
+		{
+			const typename TMap::CHashMapElem *elem = Get();
+			if (NULL != elem)
+			{
+				return elem->Value();
+			}
+			return NULL;
+		}
 
-#endif // !GPOS_CHashMapIter_H
+	};  // class CHashMapIter
+
+}  // namespace gpos
+
+#endif  // !GPOS_CHashMapIter_H
 
 // EOF
-

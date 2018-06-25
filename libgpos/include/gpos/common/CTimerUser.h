@@ -15,7 +15,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CTimerUser
@@ -26,29 +25,25 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CTimerUser : public ITimer
 	{
-		private:
+	private:
+		// actual timer
+		RUSAGE m_rusage;
 
-			// actual timer
-			RUSAGE m_rusage;
+	public:
+		// ctor
+		CTimerUser()
+		{
+		}
 
-		public:
+		// retrieve elapsed user time in micro-seconds
+		virtual ULONG ElapsedUS() const;
 
-			// ctor
-			CTimerUser()
-			{}
+		// restart timer
+		virtual void Restart();
 
-			// retrieve elapsed user time in micro-seconds
-			virtual
-			ULONG ElapsedUS() const;
+	};  // class CTimerUser
+}  // namespace gpos
 
-			// restart timer
-			virtual
-			void Restart();
-
-	}; // class CTimerUser
-}
-
-#endif // !GPOS_CTimerUser_H
+#endif  // !GPOS_CTimerUser_H
 
 // EOF
-

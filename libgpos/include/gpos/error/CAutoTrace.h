@@ -17,50 +17,45 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CAutoTrace
 	//
 	//	@doc:
-    //		Auto object for creating trace messages;
+	//		Auto object for creating trace messages;
 	//		creates a stream over a dynamic string and uses it to print objects;
 	//		at destruction the string is written to the log as a trace msg;
 	//
 	//---------------------------------------------------------------------------
 	class CAutoTrace : public CStackObject
 	{
+	private:
+		// dynamic string buffer
+		CWStringDynamic m_wstr;
 
-		private:
+		// string stream
+		COstreamString m_os;
 
-			// dynamic string buffer
-			CWStringDynamic m_wstr;
+		// private copy ctor
+		CAutoTrace(const CAutoTrace &);
 
-			// string stream
-			COstreamString m_os;
+	public:
+		// ctor
+		explicit CAutoTrace(IMemoryPool *memory_pool);
 
-			// private copy ctor
-			CAutoTrace(const CAutoTrace &);
+		// dtor
+		~CAutoTrace();
 
-		public:
+		// stream accessor
+		IOstream &
+		Os()
+		{
+			return m_os;
+		}
 
-			// ctor
-			explicit
-			CAutoTrace(IMemoryPool *memory_pool);
+	};  // class CAutoTrace
+}  // namespace gpos
 
-			// dtor
-			~CAutoTrace();
-
-			// stream accessor
-			IOstream& Os()
-			{
-				return m_os;
-			}
-
-	}; // class CAutoTrace
-}
-
-#endif // !GPOS_CAutoTrace_H
+#endif  // !GPOS_CAutoTrace_H
 
 // EOF
-

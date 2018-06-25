@@ -22,7 +22,7 @@
 
 
 
-#define GPOS_MEMORY_POOL_HT_SIZE	(1024)		// number of hash table buckets
+#define GPOS_MEMORY_POOL_HT_SIZE (1024)  // number of hash table buckets
 
 namespace gpos
 {
@@ -35,162 +35,145 @@ namespace gpos
 	//
 	//---------------------------------------------------------------------------
 	class CMemoryPoolManager
-	{	
-		public:
+	{
+	public:
+		// different types of pools
+		enum AllocType
+		{
+			EatTracker,
+			EatStack
+		};
 
-			// different types of pools
-			enum AllocType
-			{
-				EatTracker,
-				EatStack
-			};
+	private:
+		typedef CSyncHashtableAccessByKey<CMemoryPool, ULONG_PTR, CSpinlockOS>
+			MemoryPoolKeyAccessor;
 
-		private:
+		typedef CSyncHashtableIter<CMemoryPool, ULONG_PTR, CSpinlockOS> MemoryPoolIter;
 
-			typedef CSyncHashtableAccessByKey<CMemoryPool, ULONG_PTR, CSpinlockOS>
-				MemoryPoolKeyAccessor;
+		typedef CSyncHashtableAccessByIter<CMemoryPool, ULONG_PTR, CSpinlockOS>
+			MemoryPoolIterAccessor;
 
-			typedef CSyncHashtableIter<CMemoryPool, ULONG_PTR, CSpinlockOS>
-				MemoryPoolIter;
+		// memory pool used to get memory from the underlying system
+		// all created pools use this as their underlying allocator
+		IMemoryPool *m_base_memory_pool;
 
-			typedef CSyncHashtableAccessByIter<CMemoryPool, ULONG_PTR, CSpinlockOS>
-				MemoryPoolIterAccessor;
+		// memory pool in which all objects created by the manager itself
+		// are allocated - must be thread-safe
+		IMemoryPool *m_internal_memory_pool;
 
-			// memory pool used to get memory from the underlying system
-			// all created pools use this as their underlying allocator
-			IMemoryPool *m_base_memory_pool;
+		// memory pool in which all objects created using global new operator
+		// are allocated
+		IMemoryPool *m_global_memory_pool;
 
-			// memory pool in which all objects created by the manager itself
-			// are allocated - must be thread-safe
-			IMemoryPool *m_internal_memory_pool;
+		// are allocations using global new operator allowed?
+		BOOL m_allow_global_new;
 
-			// memory pool in which all objects created using global new operator
-			// are allocated
-			IMemoryPool *m_global_memory_pool;
+		// hash table to maintain created pools
+		CSyncHashtable<CMemoryPool, ULONG_PTR, CSpinlockOS> m_hash_table;
 
-			// are allocations using global new operator allowed?
-			BOOL m_allow_global_new;
+		// global instance
+		static CMemoryPoolManager *m_memory_pool_mgr;
 
-			// hash table to maintain created pools
-			CSyncHashtable<CMemoryPool, ULONG_PTR, CSpinlockOS> m_hash_table;
+		// down-cast IMemoryPool to CMemoryPool
+		CMemoryPool *
+		Convert(IMemoryPool *memory_pool)
+		{
+			GPOS_ASSERT(NULL != memory_pool);
 
-			// global instance
-			static CMemoryPoolManager *m_memory_pool_mgr;
+			return dynamic_cast<CMemoryPool *>(memory_pool);
+		}
 
-			// down-cast IMemoryPool to CMemoryPool
-			CMemoryPool *Convert(IMemoryPool *memory_pool)
-			{
-				GPOS_ASSERT(NULL != memory_pool);
+		// private ctor
+		CMemoryPoolManager(IMemoryPool *internal, IMemoryPool *base);
 
-				return dynamic_cast<CMemoryPool*>(memory_pool);
-			}
-
-			// private ctor
-			CMemoryPoolManager
-				(
-				IMemoryPool *internal,
-				IMemoryPool *base
-				);
-
-			// create new pool of given type
-			IMemoryPool *New
-				(
-				AllocType alloc_type,
-				IMemoryPool *underlying_memory_pool,
-				ULLONG capacity,
-				BOOL thread_safe,
-				BOOL owns_underlying_memory_pool
-				);
+		// create new pool of given type
+		IMemoryPool *New(AllocType alloc_type,
+						 IMemoryPool *underlying_memory_pool,
+						 ULLONG capacity,
+						 BOOL thread_safe,
+						 BOOL owns_underlying_memory_pool);
 
 #ifdef GPOS_DEBUG
-			// surround new pool with tracker pools
-			IMemoryPool *CreatePoolStack
-				(
-				AllocType type,
-				ULLONG capacity,
-				BOOL thread_safe
-				);
-#endif // GPOS_DEBUG
+		// surround new pool with tracker pools
+		IMemoryPool *CreatePoolStack(AllocType type, ULLONG capacity, BOOL thread_safe);
+#endif  // GPOS_DEBUG
 
-			// no copy ctor
-			CMemoryPoolManager(const CMemoryPoolManager&);
+		// no copy ctor
+		CMemoryPoolManager(const CMemoryPoolManager &);
 
-			// clean-up memory pools
-			void Cleanup();
+		// clean-up memory pools
+		void Cleanup();
 
-			// destroy a memory pool at shutdown
-			static
-			void DestroyMemoryPoolAtShutdown(CMemoryPool *memory_pool);
+		// destroy a memory pool at shutdown
+		static void DestroyMemoryPoolAtShutdown(CMemoryPool *memory_pool);
 
-		public:
+	public:
+		// create new memory pool
+		IMemoryPool *Create(CMemoryPoolManager::AllocType alloc_type,
+							BOOL thread_safe,
+							ULLONG capacity);
 
-			// create new memory pool
-			IMemoryPool *Create
-				(
-				CMemoryPoolManager::AllocType alloc_type,
-				BOOL thread_safe,
-				ULLONG capacity
-				);
-				
-			// release memory pool
-			void Destroy(IMemoryPool *);
+		// release memory pool
+		void Destroy(IMemoryPool *);
 
-			// delete a pool that is not registered with the memory pool manager
-			void DeleteUnregistered(IMemoryPool *);
-			
+		// delete a pool that is not registered with the memory pool manager
+		void DeleteUnregistered(IMemoryPool *);
+
 #ifdef GPOS_DEBUG
-			// print internal contents of allocated memory pools
-			IOstream &OsPrint(IOstream &os);
+		// print internal contents of allocated memory pools
+		IOstream &OsPrint(IOstream &os);
 
-			// print memory pools whose allocated size above the given threshold
-			void PrintOverSizedPools(IMemoryPool *trace, ULLONG size_threshold);
-#endif // GPOS_DEBUG
+		// print memory pools whose allocated size above the given threshold
+		void PrintOverSizedPools(IMemoryPool *trace, ULLONG size_threshold);
+#endif  // GPOS_DEBUG
 
-			// delete memory pools and release manager
-			void Shutdown();
+		// delete memory pools and release manager
+		void Shutdown();
 
-			// accessor of memory pool used in global new allocations
-			IMemoryPool *GetGlobalMemoryPool()
-			{
-				return m_global_memory_pool;
-			}
+		// accessor of memory pool used in global new allocations
+		IMemoryPool *
+		GetGlobalMemoryPool()
+		{
+			return m_global_memory_pool;
+		}
 
-			// are allocations using global new operator allowed?
-			BOOL IsGlobalNewAllowed() const
-			{
-				return m_allow_global_new;
-			}
+		// are allocations using global new operator allowed?
+		BOOL
+		IsGlobalNewAllowed() const
+		{
+			return m_allow_global_new;
+		}
 
-			// disable allocations using global new operator
-			void DisableGlobalNew()
-			{
-				m_allow_global_new = false;
-			}
+		// disable allocations using global new operator
+		void
+		DisableGlobalNew()
+		{
+			m_allow_global_new = false;
+		}
 
-			// enable allocations using global new operator
-			void EnableGlobalNew()
-			{
-				m_allow_global_new = true;
-			}
+		// enable allocations using global new operator
+		void
+		EnableGlobalNew()
+		{
+			m_allow_global_new = true;
+		}
 
-			// return total allocated size in bytes
-			ULLONG TotalAllocatedSize();
+		// return total allocated size in bytes
+		ULLONG TotalAllocatedSize();
 
-			// initialize global instance
-			static
-			GPOS_RESULT Init(void* (*) (SIZE_T), void (*) (void*));
+		// initialize global instance
+		static GPOS_RESULT Init(void *(*) (SIZE_T), void (*)(void *));
 
-			// global accessor
-			static
-			CMemoryPoolManager *GetMemoryPoolMgr()
-			{
-				return m_memory_pool_mgr;
-			}
+		// global accessor
+		static CMemoryPoolManager *
+		GetMemoryPoolMgr()
+		{
+			return m_memory_pool_mgr;
+		}
 
-	}; // class CMemoryPoolManager
-}
+	};  // class CMemoryPoolManager
+}  // namespace gpos
 
-#endif // !GPOS_CMemoryPoolManager_H
+#endif  // !GPOS_CMemoryPoolManager_H
 
 // EOF
-

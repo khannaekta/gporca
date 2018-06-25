@@ -14,28 +14,28 @@
 
 #include "unittest/gpos/test/CUnittestTest.h"
 
-namespace gpos {
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CUnittestTest::EresSubtest
-//
-//	@doc:
-//		Driver for trivial subtest.
-//
-//---------------------------------------------------------------------------
-GPOS_RESULT
-CUnittestTest::EresSubtest(ULONG ulSubtest)
+namespace gpos
 {
-	if (ulSubtest * 1 == ulSubtest)
+	//---------------------------------------------------------------------------
+	//	@function:
+	//		CUnittestTest::EresSubtest
+	//
+	//	@doc:
+	//		Driver for trivial subtest.
+	//
+	//---------------------------------------------------------------------------
+	GPOS_RESULT
+	CUnittestTest::EresSubtest(ULONG ulSubtest)
 	{
-		return GPOS_OK;
+		if (ulSubtest * 1 == ulSubtest)
+		{
+			return GPOS_OK;
+		}
+		else
+		{
+			return GPOS_FAILED;
+		}
 	}
-	else
-	{
-		return GPOS_FAILED;
-	}
-}
 
 }  // namespace gpos
 

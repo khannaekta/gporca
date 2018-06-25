@@ -28,16 +28,14 @@ using namespace gpos;
 GPOS_RESULT
 CAutoMutexTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
-		GPOS_UNITTEST_FUNC(CAutoMutexTest::EresUnittest_LockRelease),
-		GPOS_UNITTEST_FUNC(CAutoMutexTest::EresUnittest_Recursion)
+	CUnittest rgut[] = {GPOS_UNITTEST_FUNC(CAutoMutexTest::EresUnittest_LockRelease),
+						GPOS_UNITTEST_FUNC(CAutoMutexTest::EresUnittest_Recursion)
 #ifdef GPOS_DEBUG
-		,
-		GPOS_UNITTEST_FUNC_ASSERT(CAutoMutexTest::EresUnittest_SelfDeadlock),
-		GPOS_UNITTEST_FUNC_ASSERT(CAutoMutexTest::EresUnittest_SelfDeadlockAttempt)
-#endif // GPOS_DEBUG
-		};
+							,
+						GPOS_UNITTEST_FUNC_ASSERT(CAutoMutexTest::EresUnittest_SelfDeadlock),
+						GPOS_UNITTEST_FUNC_ASSERT(CAutoMutexTest::EresUnittest_SelfDeadlockAttempt)
+#endif  // GPOS_DEBUG
+	};
 
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
@@ -64,7 +62,7 @@ CAutoMutexTest::EresUnittest_LockRelease()
 		GPOS_ASSERT(mutex.IsOwned());
 
 		amx.Unlock();
-		
+
 		// test trylock routine
 		(void) amx.TryLock();
 		GPOS_ASSERT(mutex.IsOwned());
@@ -95,18 +93,16 @@ CAutoMutexTest::EresUnittest_Recursion()
 	{
 		CAutoMutex amx(mutex);
 
-		for(ULONG i = 0; i < 100; i++)
+		for (ULONG i = 0; i < 100; i++)
 		{
 			amx.Lock();
 			GPOS_ASSERT(amx.TryLock());
 		}
 
 		GPOS_ASSERT(mutex.IsOwned());
-
 	}
 
 	return GPOS_OK;
-
 }
 
 #ifdef GPOS_DEBUG
@@ -130,7 +126,6 @@ CAutoMutexTest::EresUnittest_SelfDeadlock()
 
 		// this must throw
 		amx.Lock();
-
 	}
 
 	return GPOS_FAILED;
@@ -152,19 +147,17 @@ CAutoMutexTest::EresUnittest_SelfDeadlockAttempt()
 	CMutex mutex;
 	{
 		CAutoMutex amx(mutex);
-		
+
 		amx.Lock();
-		
+
 		// this must throw
 		(void) amx.TryLock();
-		
 	}
-	
+
 	return GPOS_FAILED;
 }
 
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF
-

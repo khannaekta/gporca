@@ -13,8 +13,8 @@
 
 #include "gpos/types.h"
 
-#define GPOS_FILE_NAME_BUF_SIZE   (1024)
-#define GPOS_FILE_DESCR_INVALID   (-1)
+#define GPOS_FILE_NAME_BUF_SIZE (1024)
+#define GPOS_FILE_DESCR_INVALID (-1)
 
 namespace gpos
 {
@@ -29,47 +29,44 @@ namespace gpos
 
 	class CFileDescriptor
 	{
-		private:
+	private:
+		// file descriptor
+		INT m_file_descriptor;
 
-			// file descriptor
-			INT m_file_descriptor;
+		// no copy ctor
+		CFileDescriptor(const CFileDescriptor &);
 
-			// no copy ctor
-			CFileDescriptor(const CFileDescriptor&);
+	protected:
+		// ctor -- accessible through inheritance only
+		CFileDescriptor();
 
-		protected:
+		// dtor -- accessible through inheritance only
+		virtual ~CFileDescriptor();
 
-			// ctor -- accessible through inheritance only
-			CFileDescriptor();
+		// get file descriptor
+		INT
+		GetFileDescriptor() const
+		{
+			return m_file_descriptor;
+		}
 
-			// dtor -- accessible through inheritance only
-			virtual
-			~CFileDescriptor();
+		// open file
+		void OpenFile(const CHAR *file_path, ULONG mode, ULONG permission_bits);
 
-			// get file descriptor
-			INT GetFileDescriptor() const
-			{
-				return m_file_descriptor;
-			}
+		// close file
+		void CloseFile();
 
-			// open file
-			void OpenFile(const CHAR *file_path, ULONG mode, ULONG permission_bits);
+	public:
+		// check if file is open
+		BOOL
+		IsFileOpen() const
+		{
+			return (GPOS_FILE_DESCR_INVALID != m_file_descriptor);
+		}
 
-			// close file
-			void CloseFile();
+	};  // class CFile
+}  // namespace gpos
 
-		public:
-
-			// check if file is open
-			BOOL IsFileOpen() const
-			{
-				return (GPOS_FILE_DESCR_INVALID != m_file_descriptor);
-			}
-
-	};	// class CFile
-}
-
-#endif // !GPOS_CFile_H
+#endif  // !GPOS_CFile_H
 
 // EOF
-

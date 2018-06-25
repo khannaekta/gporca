@@ -25,20 +25,17 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CDoubleTest
 	{
+	public:
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_Arithmetic();
+		static GPOS_RESULT EresUnittest_Bool();
+		static GPOS_RESULT EresUnittest_Convert();
+		static GPOS_RESULT EresUnittest_Limits();
 
-		public:
+	};  // class CDoubleTest
+}  // namespace gpos
 
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_Arithmetic();
-			static GPOS_RESULT EresUnittest_Bool();
-			static GPOS_RESULT EresUnittest_Convert();
-			static GPOS_RESULT EresUnittest_Limits();
-
-	}; // class CDoubleTest
-}
-
-#endif // !GPOS_CDoubleTest_H
+#endif  // !GPOS_CDoubleTest_H
 
 // EOF
-

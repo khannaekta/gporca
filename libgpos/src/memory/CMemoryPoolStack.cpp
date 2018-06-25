@@ -25,8 +25,7 @@
 
 #define GPOS_MEM_BLOCK_SIZE (1024 * 1024)
 
-#define GPOS_MEM_BLOCK_HEADER_SIZE \
-	(GPOS_MEM_ALIGNED_STRUCT_SIZE(SBlockDescriptor))
+#define GPOS_MEM_BLOCK_HEADER_SIZE (GPOS_MEM_ALIGNED_STRUCT_SIZE(SBlockDescriptor))
 
 
 using namespace gpos;
@@ -42,19 +41,15 @@ GPOS_CPL_ASSERT(MAX_ALIGNED(GPOS_MEM_BLOCK_SIZE));
 //	  ctor
 //
 //---------------------------------------------------------------------------
-CMemoryPoolStack::CMemoryPoolStack
-	(
-	IMemoryPool *memory_pool,
-	ULLONG capacity,
-	BOOL thread_safe,
-	BOOL owns_underlying_memory_pool
-	)
-	:
-	CMemoryPool(memory_pool, owns_underlying_memory_pool, thread_safe),
-	m_block_descriptor(NULL),
-	m_reserved(0),
-	m_capacity(capacity),
-	m_blocksize(GPOS_MEM_ALIGNED_SIZE(GPOS_MEM_BLOCK_SIZE))
+CMemoryPoolStack::CMemoryPoolStack(IMemoryPool *memory_pool,
+								   ULLONG capacity,
+								   BOOL thread_safe,
+								   BOOL owns_underlying_memory_pool)
+	: CMemoryPool(memory_pool, owns_underlying_memory_pool, thread_safe),
+	  m_block_descriptor(NULL),
+	  m_reserved(0),
+	  m_capacity(capacity),
+	  m_blocksize(GPOS_MEM_ALIGNED_SIZE(GPOS_MEM_BLOCK_SIZE))
 {
 	GPOS_ASSERT(NULL != memory_pool);
 	GPOS_ASSERT(GPOS_MEM_BLOCK_SIZE < m_capacity);
@@ -87,12 +82,10 @@ CMemoryPoolStack::~CMemoryPoolStack()
 //
 //---------------------------------------------------------------------------
 void *
-CMemoryPoolStack::Allocate
-	(
-	ULONG bytes,
-	const CHAR *,  // szFile
-	const ULONG    // line
-	)
+CMemoryPoolStack::Allocate(ULONG bytes,
+						   const CHAR *,  // szFile
+						   const ULONG	// line
+)
 {
 	GPOS_ASSERT(GPOS_MEM_ALLOC_MAX >= bytes);
 
@@ -136,11 +129,7 @@ CMemoryPoolStack::Allocate
 //
 //---------------------------------------------------------------------------
 CMemoryPoolStack::SBlockDescriptor *
-CMemoryPoolStack::FindMemoryBlock
-	(
-	CAutoSpinlock &as,
-	ULONG alloc
-	)
+CMemoryPoolStack::FindMemoryBlock(CAutoSpinlock &as, ULONG alloc)
 {
 	SLock(as);
 
@@ -182,19 +171,14 @@ CMemoryPoolStack::FindMemoryBlock
 //
 //---------------------------------------------------------------------------
 CMemoryPoolStack::SBlockDescriptor *
-CMemoryPoolStack::New
-	(
-	ULONG size
-	)
+CMemoryPoolStack::New(ULONG size)
 {
 	ULONG block_size = std::max(m_blocksize, size + (ULONG) GPOS_MEM_BLOCK_HEADER_SIZE);
 	GPOS_ASSERT(MAX_ALIGNED(block_size));
 
 	// allocate memory and put block descriptor to the beginning of it
-	SBlockDescriptor *desc = static_cast<SBlockDescriptor*>
-			(
-			GetUnderlyingMemoryPool()->Allocate(block_size, __FILE__, __LINE__)
-			);
+	SBlockDescriptor *desc = static_cast<SBlockDescriptor *>(
+		GetUnderlyingMemoryPool()->Allocate(block_size, __FILE__, __LINE__));
 
 	if (NULL != desc)
 	{
@@ -240,11 +224,7 @@ CMemoryPoolStack::TearDown()
 //
 //---------------------------------------------------------------------------
 void
-CMemoryPoolStack::CheckAllocation
-	(
-	void *ptr
-	)
-	const
+CMemoryPoolStack::CheckAllocation(void *ptr) const
 {
 	SBlockDescriptor *desc = m_block_list.First();
 	while (NULL != desc)
@@ -263,7 +243,6 @@ CMemoryPoolStack::CheckAllocation
 	GPOS_ASSERT(!"object is allocated in one of the blocks");
 }
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF
-

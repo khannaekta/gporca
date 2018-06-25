@@ -16,7 +16,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CMessageTableTest
@@ -27,15 +26,13 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CMessageTableTest
 	{
-		public:
-
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_Basic();
+	public:
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_Basic();
 	};
-}
+}  // namespace gpos
 
-#endif // !GPOS_CMessageTableTest_H
+#endif  // !GPOS_CMessageTableTest_H
 
 // EOF
-

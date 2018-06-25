@@ -15,7 +15,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		COstreamStringTest
@@ -26,19 +25,17 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class COstreamStringTest
 	{
-		public:
-
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_Basic();
-			static GPOS_RESULT EresUnittest_OOM();
+	public:
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_Basic();
+		static GPOS_RESULT EresUnittest_OOM();
 #ifdef GPOS_DEBUG
-			static GPOS_RESULT EresUnittest_EndlAssert();
-#endif			
+		static GPOS_RESULT EresUnittest_EndlAssert();
+#endif
 	};
-}
+}  // namespace gpos
 
-#endif // !GPOS_COstreamStringTest_H
+#endif  // !GPOS_COstreamStringTest_H
 
 // EOF
-

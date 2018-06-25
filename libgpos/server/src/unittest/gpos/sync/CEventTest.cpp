@@ -33,12 +33,9 @@ using namespace gpos;
 GPOS_RESULT
 CEventTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
-		GPOS_UNITTEST_FUNC(CEventTest::EresUnittest_ProducerConsumer),
-		GPOS_UNITTEST_FUNC(CEventTest::EresUnittest_TimedWait)
-		};
-		
+	CUnittest rgut[] = {GPOS_UNITTEST_FUNC(CEventTest::EresUnittest_ProducerConsumer),
+						GPOS_UNITTEST_FUNC(CEventTest::EresUnittest_TimedWait)};
+
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
 
@@ -187,7 +184,6 @@ CEventTest::EresUnittest_TimedWait()
 	}
 
 	return GPOS_OK;
-
 }
 
 
@@ -200,18 +196,15 @@ CEventTest::EresUnittest_TimedWait()
 //
 //---------------------------------------------------------------------------
 void *
-CEventTest::PvUnittest_Producer
-	(
-	void *pv
-	)
+CEventTest::PvUnittest_Producer(void *pv)
 {
-	CEvent *pevent = (CEvent*)pv;
+	CEvent *pevent = (CEvent *) pv;
 	CMutexBase *pmutex = pevent->GetMutex();
 
 	CAutoMutex am(*pmutex);
 	am.Lock();
 
-	for(ULONG i = 0; i < GPOS_EVENT_TEST_STEPS; i++)
+	for (ULONG i = 0; i < GPOS_EVENT_TEST_STEPS; i++)
 	{
 		if (0 == i % 10)
 		{
@@ -239,12 +232,9 @@ CEventTest::PvUnittest_Producer
 //
 //---------------------------------------------------------------------------
 void *
-CEventTest::PvUnittest_Consumer
-	(
-	void *pv
-	)
+CEventTest::PvUnittest_Consumer(void *pv)
 {
-	CEvent *pevent = (CEvent*)pv;
+	CEvent *pevent = (CEvent *) pv;
 	CMutexBase *pmutex = pevent->GetMutex();
 
 	CAutoMutex am(*pmutex);
@@ -253,7 +243,7 @@ CEventTest::PvUnittest_Consumer
 	// signal to parent that we're up and running and will be waiting
 	pevent->Signal();
 
-	for(ULONG i = 0; i < GPOS_EVENT_TEST_STEPS; i++)
+	for (ULONG i = 0; i < GPOS_EVENT_TEST_STEPS; i++)
 	{
 		if (0 == i % 10)
 		{
@@ -280,10 +270,7 @@ CEventTest::PvUnittest_Consumer
 //
 //---------------------------------------------------------------------------
 void *
-CEventTest::PvUnittest_TimedWait
-	(
-	void *pv
-	)
+CEventTest::PvUnittest_TimedWait(void *pv)
 {
 	CEvent *pevent = (CEvent *) pv;
 	CMutexBase *pmutex = pevent->GetMutex();
@@ -304,4 +291,3 @@ CEventTest::PvUnittest_TimedWait
 }
 
 // EOF
-

@@ -6,7 +6,7 @@
 //		CListTest.h
 //
 //	@doc:
-//		Tests for CList 
+//		Tests for CList
 //---------------------------------------------------------------------------
 #ifndef GPOS_CListTest_H
 #define GPOS_CListTest_H
@@ -16,7 +16,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CListTest
@@ -28,40 +27,36 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CListTest
 	{
-
+	public:
+		//---------------------------------------------------------------------------
+		//	@class:
+		//		SElem
+		//
+		//	@doc:
+		//		Local class for list experiment;
+		//
+		//---------------------------------------------------------------------------
+		struct SElem
+		{
 		public:
+			// generic link for primary list
+			SLink m_linkFwd;
 
-			//---------------------------------------------------------------------------
-			//	@class:
-			//		SElem
-			//
-			//	@doc:
-			//		Local class for list experiment;
-			//
-			//---------------------------------------------------------------------------
-			struct SElem
-			{
-				public:
+			// ..for secondary list
+			SLink m_linkBwd;
 
-					// generic link for primary list
-					SLink m_linkFwd;
+		};  // struct SElem
 
-					// ..for secondary list
-					SLink m_linkBwd;
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_Basics();
+		static GPOS_RESULT EresUnittest_Navigate();
+		static GPOS_RESULT EresUnittest_Cursor();
 
-			}; // struct SElem
-
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_Basics();
-			static GPOS_RESULT EresUnittest_Navigate();
-			static GPOS_RESULT EresUnittest_Cursor();
-
-	}; // class CListTest
-}
+	};  // class CListTest
+}  // namespace gpos
 
 
-#endif // !GPOS_CListTest_H
+#endif  // !GPOS_CListTest_H
 
 // EOF
-

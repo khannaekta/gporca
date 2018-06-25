@@ -25,65 +25,52 @@ namespace gpos
 	//
 	//---------------------------------------------------------------------------
 	class CWorkerId
-	{	
-		private:
-		
-			// id of thread
-			PTHREAD_T m_pthread;
-		
-		public:
-		
-			// ctor
-			CWorkerId(BOOL valid = true);
-			
-			// simple comparison
-			BOOL Equals(const CWorkerId &wid) const;
+	{
+	private:
+		// id of thread
+		PTHREAD_T m_pthread;
 
-			// set worker id to current thread
-			void SetThreadToCurrent();
+	public:
+		// ctor
+		CWorkerId(BOOL valid = true);
 
-			// reset to invalid id
-			void SetThreadToInvalid();
+		// simple comparison
+		BOOL Equals(const CWorkerId &wid) const;
+
+		// set worker id to current thread
+		void SetThreadToCurrent();
+
+		// reset to invalid id
+		void SetThreadToInvalid();
 
 #ifdef GPOS_DEBUG
-			// check if worker id is valid
-			BOOL IsValid() const;
-#endif // GPOS_DEBUG
+		// check if worker id is valid
+		BOOL IsValid() const;
+#endif  // GPOS_DEBUG
 
-			// comparison operator
-			inline
-			BOOL operator == 
-				(
-				const CWorkerId &wid
-				)
-				const
-			{
-				return this->Equals(wid);
-			}
+		// comparison operator
+		inline BOOL
+		operator==(const CWorkerId &wid) const
+		{
+			return this->Equals(wid);
+		}
 
-			// comparison function; used in hashtables
-			static
-			BOOL Equals
-				(
-				const CWorkerId &wid,
-				const CWorkerId &wid_other
-				)
-			{
-				return wid == wid_other;
-			}
+		// comparison function; used in hashtables
+		static BOOL
+		Equals(const CWorkerId &wid, const CWorkerId &wid_other)
+		{
+			return wid == wid_other;
+		}
 
-			// primitive hash function
-			static 
-			ULONG HashValue(const CWorkerId &wid);
+		// primitive hash function
+		static ULONG HashValue(const CWorkerId &wid);
 
-			// invalid worker id
-			static
-			const CWorkerId m_wid_invalid;
+		// invalid worker id
+		static const CWorkerId m_wid_invalid;
 
-	}; // class CWorkerId
-}
+	};  // class CWorkerId
+}  // namespace gpos
 
-#endif // !GPOS_CWorkerId_H
+#endif  // !GPOS_CWorkerId_H
 
 // EOF
-

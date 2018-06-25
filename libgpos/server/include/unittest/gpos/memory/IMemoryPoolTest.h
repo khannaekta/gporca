@@ -30,14 +30,12 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CMemoryPoolTest
 	{
-		public:
-
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_DeleteNULL();
+	public:
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_DeleteNULL();
 	};
-}
+}  // namespace gpos
 
-#endif // !GPOS_IMemoryPoolTest_H
+#endif  // !GPOS_IMemoryPoolTest_H
 
 // EOF
-

@@ -17,7 +17,6 @@
 
 namespace gpos
 {
-
 	// fwd declarations
 	class IMemoryPool;
 
@@ -31,28 +30,27 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CErrorHandler
 	{
-		private:
+	private:
+		// private copy ctor
+		CErrorHandler(const CErrorHandler &);
 
-			// private copy ctor
-			CErrorHandler(const CErrorHandler&);
+	public:
+		// ctor
+		CErrorHandler()
+		{
+		}
 
-		public:
+		// dtor
+		virtual ~CErrorHandler()
+		{
+		}
 
-			// ctor
-			CErrorHandler() {}
-			
-			// dtor
-			virtual
-			~CErrorHandler() {}
+		// process error
+		virtual void Process(CException exception) = 0;
 
-			// process error
-			virtual
-			void Process(CException exception) = 0;
+	};  // class CErrorHandler
+}  // namespace gpos
 
-	}; // class CErrorHandler
-}
-
-#endif // !GPOS_CErrorHandler_H
+#endif  // !GPOS_CErrorHandler_H
 
 // EOF
-

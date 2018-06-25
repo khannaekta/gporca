@@ -25,17 +25,15 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CLoggerTest
 	{
-		public:
+	public:
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_Basic();
+		static GPOS_RESULT EresUnittest_LoggerSyslog();
 
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_Basic();
-			static GPOS_RESULT EresUnittest_LoggerSyslog();
+	};  // CLoggerTest
+}  // namespace gpos
 
-	}; // CLoggerTest
-}
-
-#endif // !GPOS_CLoggerTest_H
+#endif  // !GPOS_CLoggerTest_H
 
 // EOF
-

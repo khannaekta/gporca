@@ -24,72 +24,55 @@ namespace gpos
 	// memory pool wrapping clib allocation API
 	class CMemoryPoolAlloc : public CMemoryPool
 	{
-		private:
+	private:
+		// private copy ctor
+		CMemoryPoolAlloc(CMemoryPoolAlloc &);
+		void *(*m_alloc)(SIZE_T);
+		void (*m_free)(void *);
 
-			// private copy ctor
-			CMemoryPoolAlloc(CMemoryPoolAlloc &);
-			void* (*m_alloc) (SIZE_T);
-			void (*m_free) (void*);
+	public:
+		// ctor
+		CMemoryPoolAlloc(void *(*alloc)(SIZE_T), void (*free_func)(void *))
+			: CMemoryPool(NULL /*pmpUnderlying*/, false /*fOwnsUnderlying*/, true /*fThreadSafe*/
+						  ),
+			  m_alloc(alloc),
+			  m_free(free_func)
+		{
+		}
 
-		public:
+		// dtor
+		virtual ~CMemoryPoolAlloc()
+		{
+		}
 
-			// ctor
-			CMemoryPoolAlloc
-				(
-					void* (*alloc)(SIZE_T),
-					void (*free_func)(void*)
-				)
-				:
-				CMemoryPool
-					(
-					NULL /*pmpUnderlying*/,
-					false /*fOwnsUnderlying*/,
-					true /*fThreadSafe*/
-					),
-				m_alloc(alloc),
-				m_free(free_func)
-			{}
-
-			// dtor
-			virtual
-			~CMemoryPoolAlloc()
-			{}
-
-			// allocate memory
-			virtual
-			void *Allocate
-				(
-				ULONG num_bytes,
-				const CHAR *, // filename
-				const ULONG   // line
-				)
-			{
-
-				void* ptr = m_alloc(num_bytes);
+		// allocate memory
+		virtual void *
+		Allocate(ULONG num_bytes,
+				 const CHAR *,  // filename
+				 const ULONG	// line
+		)
+		{
+			void *ptr = m_alloc(num_bytes);
 
 #ifdef GPOS_DEBUG
-				if (NULL != ITask::Self() && GPOS_FTRACE(EtraceSimulateOOM) && NULL == ptr)
-				{
-					GPOS_RAISE(CException::ExmaSystem, CException::ExmiUnexpectedOOMDuringFaultSimulation);
-				}
-#endif // GPOS_DEBUG
-				return ptr;
-			}
-
-			// free memory
-			virtual
-			void Free
-				(
-				void *ptr
-				)
+			if (NULL != ITask::Self() && GPOS_FTRACE(EtraceSimulateOOM) && NULL == ptr)
 			{
-				m_free(ptr);
+				GPOS_RAISE(CException::ExmaSystem,
+						   CException::ExmiUnexpectedOOMDuringFaultSimulation);
 			}
+#endif  // GPOS_DEBUG
+			return ptr;
+		}
 
+		// free memory
+		virtual void
+		Free(void *ptr)
+		{
+			m_free(ptr);
+		}
 	};
-}
+}  // namespace gpos
 
-#endif // !GPOS_CMemoryPoolAlloc_H
+#endif  // !GPOS_CMemoryPoolAlloc_H
 
 // EOF
-

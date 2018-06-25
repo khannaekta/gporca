@@ -31,13 +31,12 @@ using namespace gpos;
 GPOS_RESULT
 CDoubleTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
+	CUnittest rgut[] = {
 		GPOS_UNITTEST_FUNC(CDoubleTest::EresUnittest_Arithmetic),
 		GPOS_UNITTEST_FUNC(CDoubleTest::EresUnittest_Bool),
 		GPOS_UNITTEST_FUNC(CDoubleTest::EresUnittest_Convert),
 		GPOS_UNITTEST_FUNC(CDoubleTest::EresUnittest_Limits),
-		};
+	};
 
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
@@ -171,7 +170,7 @@ CDoubleTest::EresUnittest_Convert()
 	   << INT(10) << " * " << fp << " = " << (INT(10) * fp) << std::endl
 	   << LINT(10) << "l / " << fp << " = " << (LINT(10) / fp) << std::endl
 	   << "-'10.0' = " << (-CDouble(clib::Strtod("10.0"))) << std::endl
-	   << "Pow(" << ULONG(3)  << ") = " << fp.Pow(ULONG(3)) << std::endl;
+	   << "Pow(" << ULONG(3) << ") = " << fp.Pow(ULONG(3)) << std::endl;
 
 	return GPOS_OK;
 }

@@ -36,11 +36,10 @@ using namespace gpos;
 GPOS_RESULT
 CHashSetTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
+	CUnittest rgut[] = {
 		GPOS_UNITTEST_FUNC(CHashSetTest::EresUnittest_Basic),
 		GPOS_UNITTEST_FUNC(CHashSetTest::EresUnittest_Ownership),
-		};
+	};
 
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
@@ -62,18 +61,19 @@ CHashSetTest::EresUnittest_Basic()
 	IMemoryPool *memory_pool = amp.Pmp();
 
 	// test with ULONG array
-	ULONG_PTR rgul[] = {0,1,2,3,4,5,6,7,8,9};
+	ULONG_PTR rgul[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 	const ULONG ulCnt = GPOS_ARRAY_SIZE(rgul);
 
-	typedef CHashSet< ULONG_PTR, HashPtr<ULONG_PTR>, Equals<ULONG_PTR>, CleanupNULL<ULONG_PTR> > HSUl;
+	typedef CHashSet<ULONG_PTR, HashPtr<ULONG_PTR>, Equals<ULONG_PTR>, CleanupNULL<ULONG_PTR> >
+		HSUl;
 
 	HSUl *phs = GPOS_NEW(memory_pool) HSUl(memory_pool, 128);
 	for (ULONG ul = 0; ul < ulCnt; ul++)
 	{
 #ifdef GPOS_DEBUG
 		BOOL fSuccess =
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 			phs->Insert(&rgul[ul]);
 		GPOS_ASSERT(fSuccess);
 	}
@@ -107,7 +107,8 @@ CHashSetTest::EresUnittest_Ownership()
 
 	ULONG ulCnt = 256;
 
-	typedef CHashSet< ULONG_PTR, HashPtr<ULONG_PTR>, Equals<ULONG_PTR>, CleanupDelete<ULONG_PTR> > HSUl;
+	typedef CHashSet<ULONG_PTR, HashPtr<ULONG_PTR>, Equals<ULONG_PTR>, CleanupDelete<ULONG_PTR> >
+		HSUl;
 
 	HSUl *phs = GPOS_NEW(memory_pool) HSUl(memory_pool, 32);
 	for (ULONG ul = 0; ul < ulCnt; ul++)
@@ -116,7 +117,7 @@ CHashSetTest::EresUnittest_Ownership()
 
 #ifdef GPOS_DEBUG
 		BOOL fSuccess =
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 			phs->Insert(pulp);
 
 		GPOS_ASSERT(fSuccess);
@@ -132,4 +133,3 @@ CHashSetTest::EresUnittest_Ownership()
 }
 
 // EOF
-

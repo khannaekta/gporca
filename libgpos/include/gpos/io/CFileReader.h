@@ -17,7 +17,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CFileReader
@@ -29,46 +28,42 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CFileReader : public CFileDescriptor
 	{
-		private:
+	private:
+		// file size
+		ULLONG m_file_size;
 
-			// file size
-			ULLONG m_file_size;
+		// read size
+		ULLONG m_file_read_size;
 
-			// read size
-			ULLONG m_file_read_size;
+		// no copy ctor
+		CFileReader(const CFileReader &);
 
-			// no copy ctor
-			CFileReader(const CFileReader &);
+	public:
+		// ctor
+		CFileReader();
 
-		public:
+		// dtor
+		virtual ~CFileReader();
 
-			// ctor
-			CFileReader();
+		// get file size
+		ULLONG FileSize() const;
 
-			// dtor
-			virtual
-			~CFileReader();
+		// get file read size
+		ULLONG FileReadSize() const;
 
-			// get file size
-			ULLONG FileSize() const;
+		// open file for reading
+		void Open(const CHAR *file_path, const ULONG permission_bits = S_IRUSR);
 
-			// get file read size
-			ULLONG FileReadSize() const;
+		// close file
+		void Close();
 
-			// open file for reading
-			void Open(const CHAR *file_path, const ULONG permission_bits =  S_IRUSR);
+		// read bytes to buffer
+		ULONG_PTR ReadBytesToBuffer(BYTE *read_buffer, const ULONG_PTR file_read_size);
 
-			// close file
-			void Close();
+	};  // class CFileReader
 
-			// read bytes to buffer
-			ULONG_PTR ReadBytesToBuffer(BYTE *read_buffer, const ULONG_PTR file_read_size);
+}  // namespace gpos
 
-	};	// class CFileReader
-
-}
-
-#endif // !GPOS_CFileReader_H
+#endif  // !GPOS_CFileReader_H
 
 // EOF
-

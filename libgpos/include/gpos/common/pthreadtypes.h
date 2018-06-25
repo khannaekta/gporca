@@ -39,9 +39,8 @@ namespace gpos
 
 	// set of signals
 	typedef sigset_t SIGSET_T;
-}
+}  // namespace gpos
 
-#endif // !GPOS_pthreadtypes_H
+#endif  // !GPOS_pthreadtypes_H
 
 // EOF
-

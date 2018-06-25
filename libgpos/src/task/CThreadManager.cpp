@@ -129,10 +129,7 @@ CThreadManager::Create()
 //
 //---------------------------------------------------------------------------
 void *
-CThreadManager::RunWorker
-	(
-	void *worker
-	)
+CThreadManager::RunWorker(void *worker)
 {
 	ThreadDescriptor *descriptor = reinterpret_cast<ThreadDescriptor *>(worker);
 	CWorkerPoolManager *worker_pool_mgr = CWorkerPoolManager::WorkerPoolManager();
@@ -150,26 +147,21 @@ CThreadManager::RunWorker
 		// mark thread as finished
 		worker_pool_mgr->m_thread_manager.SetFinished(descriptor);
 	}
-	catch(CException ex)
+	catch (CException ex)
 	{
-		std::cerr
-			<< "Unexpected exception reached top of execution stack:"
-			<< " major=" << ex.Major()
-			<< " minor=" << ex.Minor()
-			<< " file=" << ex.Filename()
-			<< " line=" << ex.Line()
-			<< std::endl;
+		std::cerr << "Unexpected exception reached top of execution stack:"
+				  << " major=" << ex.Major() << " minor=" << ex.Minor() << " file=" << ex.Filename()
+				  << " line=" << ex.Line() << std::endl;
 
 		GPOS_ASSERT(!"Unexpected exception reached top of execution stack");
 	}
-	catch(...)
+	catch (...)
 	{
 		GPOS_ASSERT(!"Unexpected exception reached top of execution stack");
 	}
 
 	// destroy thread
 	return NULL;
-
 }
 
 
@@ -182,10 +174,7 @@ CThreadManager::RunWorker
 //
 //---------------------------------------------------------------------------
 void
-CThreadManager::SetFinished
-	(
-	ThreadDescriptor *descriptor
-	)
+CThreadManager::SetFinished(ThreadDescriptor *descriptor)
 {
 	CAutoMutex am(m_mutex);
 	am.Lock();
@@ -298,10 +287,7 @@ CThreadManager::SetSignalMask()
 //
 //---------------------------------------------------------------------------
 BOOL
-CThreadManager::IsThreadRunning
-	(
-	PTHREAD_T thread
-	)
+CThreadManager::IsThreadRunning(PTHREAD_T thread)
 {
 	ThreadDescriptor *descriptor = m_running_descriptors.First();
 	while (NULL != descriptor)
@@ -315,8 +301,6 @@ CThreadManager::IsThreadRunning
 	}
 
 	return false;
-
 }
 
 // EOF
-

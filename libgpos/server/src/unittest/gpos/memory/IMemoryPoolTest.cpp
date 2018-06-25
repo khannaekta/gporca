@@ -32,15 +32,10 @@ using namespace gpos;
 GPOS_RESULT
 CMemoryPoolTest::EresUnittest()
 {
-
-	CUnittest rgut[] =
-		{
-		GPOS_UNITTEST_FUNC(CMemoryPoolTest::EresUnittest_DeleteNULL)
-		};
+	CUnittest rgut[] = {GPOS_UNITTEST_FUNC(CMemoryPoolTest::EresUnittest_DeleteNULL)};
 
 	// execute unit tests
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
-
 }
 
 
@@ -62,4 +57,3 @@ CMemoryPoolTest::EresUnittest_DeleteNULL()
 }
 
 // EOF
-

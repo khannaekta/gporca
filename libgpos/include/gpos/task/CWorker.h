@@ -22,9 +22,8 @@
 
 namespace gpos
 {
-
 	class CTask;
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CWorker
@@ -36,132 +35,131 @@ namespace gpos
 	//---------------------------------------------------------------------------
 
 	class CWorker : public IWorker
-	{	
+	{
 		friend class CThreadManager;
 		friend class CAutoTaskProxy;
-		
-		private:
 
-			// current task
-			CTask *m_task;
+	private:
+		// current task
+		CTask *m_task;
 
-			// thread id
-			ULONG m_thread_id;
+		// thread id
+		ULONG m_thread_id;
 
-			// available stack
-			ULONG m_stack_size;
+		// available stack
+		ULONG m_stack_size;
 
-			// start address of current thread's stack
-			const ULONG_PTR m_stack_start;
+		// start address of current thread's stack
+		const ULONG_PTR m_stack_start;
 
 #ifdef GPOS_DEBUG
-			// currently owned spinlocks
-			CList<CSpinlockBase> m_spin_lock_list;
-			
-			// currently owned mutexes
-			CList<CMutexBase> m_mutex_list;
+		// currently owned spinlocks
+		CList<CSpinlockBase> m_spin_lock_list;
 
-			// stack descriptor for last abort checkpoint
-			CStackDescriptor m_last_ca;
+		// currently owned mutexes
+		CList<CMutexBase> m_mutex_list;
 
-			// timer for measuring intervals between abort checkpoints
-			CTimerUser m_timer_last_ca;
+		// stack descriptor for last abort checkpoint
+		CStackDescriptor m_last_ca;
 
-			// check if interval since last abort checkpoint exceeds maximum
-			void CheckTimeSlice();
+		// timer for measuring intervals between abort checkpoints
+		CTimerUser m_timer_last_ca;
 
-#endif // GPOS_DEBUG
+		// check if interval since last abort checkpoint exceeds maximum
+		void CheckTimeSlice();
 
-			// execute tasks iteratively
-			void Run();
+#endif  // GPOS_DEBUG
 
-			// execute single task
-			void Execute(CTask *task);
+		// execute tasks iteratively
+		void Run();
 
-			// check for abort request
-			void CheckForAbort(const CHAR *file, ULONG line_num);
+		// execute single task
+		void Execute(CTask *task);
+
+		// check for abort request
+		void CheckForAbort(const CHAR *file, ULONG line_num);
 
 #ifdef GPOS_FPSIMULATOR
-			// simulate abort request, log abort injection
-			void SimulateAbort(const CHAR *file, ULONG line_num);
-#endif // GPOS_FPSIMULATOR
+		// simulate abort request, log abort injection
+		void SimulateAbort(const CHAR *file, ULONG line_num);
+#endif  // GPOS_FPSIMULATOR
 
-			// no copy ctor
-			CWorker(const CWorker&);
+		// no copy ctor
+		CWorker(const CWorker &);
 
-		public:
-		
-			// ctor
-			CWorker(ULONG thread_id, ULONG stack_size, ULONG_PTR stack_start);
+	public:
+		// ctor
+		CWorker(ULONG thread_id, ULONG stack_size, ULONG_PTR stack_start);
 
-			// dtor
-			virtual ~CWorker();
+		// dtor
+		virtual ~CWorker();
 
-			// thread identification
-			ULONG GetThreadId() const
-			{
-				return m_thread_id;
-			}
+		// thread identification
+		ULONG
+		GetThreadId() const
+		{
+			return m_thread_id;
+		}
 
-			// worker identification
-			inline
-			CWorkerId GetWid() const
-			{
-				return m_wid;
-			}
+		// worker identification
+		inline CWorkerId
+		GetWid() const
+		{
+			return m_wid;
+		}
 
-			// stack start accessor
-			inline
-			ULONG_PTR GetStackStart() const
-			{
-				return m_stack_start;
-			}
+		// stack start accessor
+		inline ULONG_PTR
+		GetStackStart() const
+		{
+			return m_stack_start;
+		}
 
 #ifdef GPOS_DEBUG
-			BOOL CanAcquireSpinlock(const CSpinlockBase *slock) const;
-			BOOL OwnsSpinlocks() const;
-			
-			void RegisterSpinlock(CSpinlockBase *slock);
-			void UnregisterSpinlock(CSpinlockBase *slock);
+		BOOL CanAcquireSpinlock(const CSpinlockBase *slock) const;
+		BOOL OwnsSpinlocks() const;
 
-			BOOL OwnsMutexes() const;
-			void RegisterMutex(CMutexBase *mutex);
-			void UnregisterMutex(CMutexBase *mutex);
+		void RegisterSpinlock(CSpinlockBase *slock);
+		void UnregisterSpinlock(CSpinlockBase *slock);
 
-			// reset abort-related stack descriptor and timer
-			void ResetTimeSlice();
+		BOOL OwnsMutexes() const;
+		void RegisterMutex(CMutexBase *mutex);
+		void UnregisterMutex(CMutexBase *mutex);
 
-#endif // GPOS_DEBUG
+		// reset abort-related stack descriptor and timer
+		void ResetTimeSlice();
 
-			// stack check
-			BOOL CheckStackSize(ULONG request = 0) const;
+#endif  // GPOS_DEBUG
 
-			// accessor
-			inline
-			CTask *GetTask()
-			{
-				return m_task;
-			}
+		// stack check
+		BOOL CheckStackSize(ULONG request = 0) const;
 
-			// slink for hashtable
-			SLink m_link;
+		// accessor
+		inline CTask *
+		GetTask()
+		{
+			return m_task;
+		}
 
-			// identification; public in order to be used as key in HTs
-			CWorkerId m_wid;
+		// slink for hashtable
+		SLink m_link;
 
-			// lookup worker in worker pool manager
-			static CWorker *Self()
-			{
-				return dynamic_cast<CWorker*>(IWorker::Self());
-			}
+		// identification; public in order to be used as key in HTs
+		CWorkerId m_wid;
 
-			// host system callback function to report abort requests
-			static bool (*abort_requested_by_system) (void);
+		// lookup worker in worker pool manager
+		static CWorker *
+		Self()
+		{
+			return dynamic_cast<CWorker *>(IWorker::Self());
+		}
 
-	}; // class CWorker
-}
+		// host system callback function to report abort requests
+		static bool (*abort_requested_by_system)(void);
 
-#endif // !GPOS_CWorker_H
+	};  // class CWorker
+}  // namespace gpos
+
+#endif  // !GPOS_CWorker_H
 
 // EOF
-

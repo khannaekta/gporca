@@ -22,7 +22,6 @@
 #include "gpos/task/ITask.h"
 #include "gpos/task/IWorker.h"
 
-#endif // GPOS_base_H
+#endif  // GPOS_base_H
 
 // EOF
-

@@ -21,46 +21,43 @@ namespace gpos
 	//		ITimer
 	//
 	//	@doc:
-    //		Timer interface;
+	//		Timer interface;
 	//
 	//---------------------------------------------------------------------------
 	class ITimer
 	{
-		private:
-		
-			// private copy ctor
-			ITimer(const ITimer&);
-	
-		public:
+	private:
+		// private copy ctor
+		ITimer(const ITimer &);
 
-			// ctor
-			ITimer()
-			{}
+	public:
+		// ctor
+		ITimer()
+		{
+		}
 
-			// dtor
-			virtual
-			~ITimer()
-			{}
+		// dtor
+		virtual ~ITimer()
+		{
+		}
 
-			// retrieve elapsed time in micro-seconds
-			virtual
-			ULONG ElapsedUS() const = 0;
+		// retrieve elapsed time in micro-seconds
+		virtual ULONG ElapsedUS() const = 0;
 
-			// retrieve elapsed time in milli-seconds
-			ULONG ElapsedMS() const
-			{
-				return ElapsedUS() / GPOS_USEC_IN_MSEC;
-			}
+		// retrieve elapsed time in milli-seconds
+		ULONG
+		ElapsedMS() const
+		{
+			return ElapsedUS() / GPOS_USEC_IN_MSEC;
+		}
 
-			// restart timer
-			virtual
-			void Restart() = 0;
+		// restart timer
+		virtual void Restart() = 0;
 
-	}; // class ITimer
+	};  // class ITimer
 
-}
+}  // namespace gpos
 
-#endif // !GPOS_ITimer_H
+#endif  // !GPOS_ITimer_H
 
 // EOF
-

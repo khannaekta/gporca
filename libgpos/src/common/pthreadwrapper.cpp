@@ -29,16 +29,10 @@ using namespace gpos;
 //
 //---------------------------------------------------------------------------
 BOOL
-gpos::pthread::MutexTypeIsValid
-	(
-	INT type
-	)
+gpos::pthread::MutexTypeIsValid(INT type)
 {
-	return
-		PTHREAD_MUTEX_NORMAL == (type) ||
-		PTHREAD_MUTEX_ERRORCHECK == (type) ||
-		PTHREAD_MUTEX_RECURSIVE == (type) ||
-		PTHREAD_MUTEX_DEFAULT == (type) ;
+	return PTHREAD_MUTEX_NORMAL == (type) || PTHREAD_MUTEX_ERRORCHECK == (type) ||
+		   PTHREAD_MUTEX_RECURSIVE == (type) || PTHREAD_MUTEX_DEFAULT == (type);
 }
 
 
@@ -51,14 +45,9 @@ gpos::pthread::MutexTypeIsValid
 //
 //---------------------------------------------------------------------------
 BOOL
-gpos::pthread::IsValidDetachedState
-	(
-	INT state
-	)
+gpos::pthread::IsValidDetachedState(INT state)
 {
-	return
-		PTHREAD_CREATE_DETACHED == (state) ||
-		PTHREAD_CREATE_JOINABLE == (state);
+	return PTHREAD_CREATE_DETACHED == (state) || PTHREAD_CREATE_JOINABLE == (state);
 }
 
 
@@ -71,21 +60,14 @@ gpos::pthread::IsValidDetachedState
 //
 //---------------------------------------------------------------------------
 INT
-gpos::pthread::AttrInit
-	(
-	PTHREAD_ATTR_T *attr
-	)
+gpos::pthread::AttrInit(PTHREAD_ATTR_T *attr)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != attr);
 
 	INT res = pthread_attr_init(attr);
 
-	GPOS_ASSERT
-	(
-		0 == res ||
-		(EINTR != res && "Unexpected Error")
-	);
+	GPOS_ASSERT(0 == res || (EINTR != res && "Unexpected Error"));
 
 	return res;
 }
@@ -100,21 +82,17 @@ gpos::pthread::AttrInit
 //
 //---------------------------------------------------------------------------
 void
-gpos::pthread::AttrDestroy
-	(
-	PTHREAD_ATTR_T *attr
-	)
+gpos::pthread::AttrDestroy(PTHREAD_ATTR_T *attr)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != attr);
 
 #ifdef GPOS_DEBUG
 	INT res =
-#endif // GPOS_DEBUG
-	pthread_attr_destroy(attr);
+#endif  // GPOS_DEBUG
+		pthread_attr_destroy(attr);
 
 	GPOS_ASSERT(0 == res && "function pthread_attr_destroy() failed");
-
 }
 
 
@@ -127,11 +105,7 @@ gpos::pthread::AttrDestroy
 //
 //---------------------------------------------------------------------------
 INT
-gpos::pthread::AttrGetDetachState
-	(
-	const PTHREAD_ATTR_T *attr,
-	INT *state
-	)
+gpos::pthread::AttrGetDetachState(const PTHREAD_ATTR_T *attr, INT *state)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != attr);
@@ -139,11 +113,8 @@ gpos::pthread::AttrGetDetachState
 
 	INT res = pthread_attr_getdetachstate(attr, state);
 
-	GPOS_ASSERT
-	(
-		(0 == res && IsValidDetachedState(*state)) ||
-		(0 != res && EINTR != res && "Unexpected Error")
-	);
+	GPOS_ASSERT((0 == res && IsValidDetachedState(*state)) ||
+				(0 != res && EINTR != res && "Unexpected Error"));
 
 	return res;
 }
@@ -158,11 +129,7 @@ gpos::pthread::AttrGetDetachState
 //
 //---------------------------------------------------------------------------
 INT
-gpos::pthread::AttrSetDetachState
-	(
-	PTHREAD_ATTR_T *attr,
-	INT state
-	)
+gpos::pthread::AttrSetDetachState(PTHREAD_ATTR_T *attr, INT state)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != attr);
@@ -170,11 +137,7 @@ gpos::pthread::AttrSetDetachState
 
 	INT res = pthread_attr_setdetachstate(attr, state);
 
-	GPOS_ASSERT
-	(
-		0 == res ||
-		(EINTR != res && "Unexpected Error")
-	);
+	GPOS_ASSERT(0 == res || (EINTR != res && "Unexpected Error"));
 
 	return res;
 }
@@ -189,10 +152,7 @@ gpos::pthread::AttrSetDetachState
 //
 //---------------------------------------------------------------------------
 INT
-gpos::pthread::MutexAttrInit
-	(
-	PTHREAD_MUTEXATTR_T *attr
-	)
+gpos::pthread::MutexAttrInit(PTHREAD_MUTEXATTR_T *attr)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != attr);
@@ -214,18 +174,15 @@ gpos::pthread::MutexAttrInit
 //
 //---------------------------------------------------------------------------
 void
-gpos::pthread::MutexAttrDestroy
-	(
-	PTHREAD_MUTEXATTR_T *attr
-	)
+gpos::pthread::MutexAttrDestroy(PTHREAD_MUTEXATTR_T *attr)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != attr);
 
 #ifdef GPOS_DEBUG
 	INT res =
-#endif // GPOS_DEBUG
-	pthread_mutexattr_destroy(attr);
+#endif  // GPOS_DEBUG
+		pthread_mutexattr_destroy(attr);
 
 	GPOS_ASSERT(0 == res && "function pthread_mutexattr_destroy() failed");
 }
@@ -240,11 +197,7 @@ gpos::pthread::MutexAttrDestroy
 //
 //---------------------------------------------------------------------------
 void
-gpos::pthread::MutexAttrGettype
-	(
-	const PTHREAD_MUTEXATTR_T *attr,
-	INT *type
-	)
+gpos::pthread::MutexAttrGettype(const PTHREAD_MUTEXATTR_T *attr, INT *type)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != attr);
@@ -252,15 +205,14 @@ gpos::pthread::MutexAttrGettype
 
 #ifdef GPOS_DEBUG
 	INT res =
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 #ifdef GPOS_FreeBSD
-	pthread_mutexattr_gettype(const_cast<PTHREAD_MUTEXATTR_T*>(attr), type);
+		pthread_mutexattr_gettype(const_cast<PTHREAD_MUTEXATTR_T *>(attr), type);
 #else  // !GPOS_FreeBSD
 	pthread_mutexattr_gettype(attr, type);
 #endif
 
 	GPOS_ASSERT(0 == res && MutexTypeIsValid(*type));
-
 }
 
 
@@ -273,11 +225,7 @@ gpos::pthread::MutexAttrGettype
 //
 //---------------------------------------------------------------------------
 void
-gpos::pthread::MutexAttrSettype
-	(
-	PTHREAD_MUTEXATTR_T *attr,
-	INT type
-	)
+gpos::pthread::MutexAttrSettype(PTHREAD_MUTEXATTR_T *attr, INT type)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != attr);
@@ -285,8 +233,8 @@ gpos::pthread::MutexAttrSettype
 
 #ifdef GPOS_DEBUG
 	INT res =
-#endif // GPOS_DEBUG
-	pthread_mutexattr_settype(attr, type);
+#endif  // GPOS_DEBUG
+		pthread_mutexattr_settype(attr, type);
 
 	GPOS_ASSERT(0 == res);
 }
@@ -301,11 +249,7 @@ gpos::pthread::MutexAttrSettype
 //
 //---------------------------------------------------------------------------
 INT
-gpos::pthread::MutexInit
-	(
-	PTHREAD_MUTEX_T *mutex,
-	const PTHREAD_MUTEXATTR_T *attr
-	)
+gpos::pthread::MutexInit(PTHREAD_MUTEX_T *mutex, const PTHREAD_MUTEXATTR_T *attr)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != attr);
@@ -313,13 +257,9 @@ gpos::pthread::MutexInit
 
 	INT res = pthread_mutex_init(mutex, attr);
 
-	GPOS_ASSERT
-	(
-		0 == res ||
-		(EINVAL != res && "Invalid mutex attr") ||
-		(EBUSY != res && "Attempt to reinitialize") ||
-		(EINTR != res && "Unexpected Error")
-	);
+	GPOS_ASSERT(0 == res || (EINVAL != res && "Invalid mutex attr") ||
+				(EBUSY != res && "Attempt to reinitialize") ||
+				(EINTR != res && "Unexpected Error"));
 
 	return res;
 }
@@ -334,18 +274,15 @@ gpos::pthread::MutexInit
 //
 //---------------------------------------------------------------------------
 void
-gpos::pthread::MutexDestroy
-	(
-	PTHREAD_MUTEX_T *mutex
-	)
+gpos::pthread::MutexDestroy(PTHREAD_MUTEX_T *mutex)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != mutex);
 
 #ifdef GPOS_DEBUG
 	INT res =
-#endif // GPOS_DEBUG
-	pthread_mutex_destroy(mutex);
+#endif  // GPOS_DEBUG
+		pthread_mutex_destroy(mutex);
 
 	GPOS_ASSERT(0 == res && "function pthread_mutex_destroy() failed");
 }
@@ -360,23 +297,16 @@ gpos::pthread::MutexDestroy
 //
 //---------------------------------------------------------------------------
 INT
-gpos::pthread::MutexLock
-	(
-	PTHREAD_MUTEX_T *mutex
-	)
+gpos::pthread::MutexLock(PTHREAD_MUTEX_T *mutex)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != mutex);
 
 	INT res = pthread_mutex_lock(mutex);
 
-	GPOS_ASSERT
-	(
-		res == 0 ||
-		(EINVAL != res && "Uninitialized mutex structure") ||
-		(EDEADLK != res && "The thread already owned the mutex") ||
-		(EINTR != res && "Unexpected Error")
-	);
+	GPOS_ASSERT(res == 0 || (EINVAL != res && "Uninitialized mutex structure") ||
+				(EDEADLK != res && "The thread already owned the mutex") ||
+				(EINTR != res && "Unexpected Error"));
 
 	return res;
 }
@@ -391,22 +321,15 @@ gpos::pthread::MutexLock
 //
 //---------------------------------------------------------------------------
 INT
-gpos::pthread::MutexTryLock
-	(
-	PTHREAD_MUTEX_T *mutex
-	)
+gpos::pthread::MutexTryLock(PTHREAD_MUTEX_T *mutex)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != mutex);
 
 	INT res = pthread_mutex_trylock(mutex);
 
-	GPOS_ASSERT
-	(
-		0 == res ||
-		(EINVAL != res && "Uninitialized mutex structure") ||
-		(EINTR != res && "Unexpected Error")
-	);
+	GPOS_ASSERT(0 == res || (EINVAL != res && "Uninitialized mutex structure") ||
+				(EINTR != res && "Unexpected Error"));
 
 	return res;
 }
@@ -421,23 +344,16 @@ gpos::pthread::MutexTryLock
 //
 //---------------------------------------------------------------------------
 INT
-gpos::pthread::MutexUnlock
-	(
-	PTHREAD_MUTEX_T *mutex
-	)
+gpos::pthread::MutexUnlock(PTHREAD_MUTEX_T *mutex)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != mutex);
 
 	INT res = pthread_mutex_unlock(mutex);
 
-	GPOS_ASSERT
-	(
-		0 == res ||
-		(EINVAL != res && "Uninitialized mutex structure") ||
-		(EPERM != res && "GetMutex was not owned by thread") ||
-		(EINTR != res && "Unexpected Error")
-	);
+	GPOS_ASSERT(0 == res || (EINVAL != res && "Uninitialized mutex structure") ||
+				(EPERM != res && "GetMutex was not owned by thread") ||
+				(EINTR != res && "Unexpected Error"));
 
 	return res;
 }
@@ -453,22 +369,14 @@ gpos::pthread::MutexUnlock
 //---------------------------------------------------------------------------
 #ifndef GPOS_Darwin
 INT
-gpos::pthread::MutexTimedlock
-	(
-	PTHREAD_MUTEX_T *mutex,
-	const TIMESPEC *timeout
-	)
+gpos::pthread::MutexTimedlock(PTHREAD_MUTEX_T *mutex, const TIMESPEC *timeout)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != mutex);
 
 	INT res = pthread_mutex_timedlock(mutex, timeout);
-	GPOS_ASSERT
-	(
-		0 == res ||
-		(EINVAL != res && "Invalid mutex structure") ||
-		(EINTR != res && "Unexpected Error")
-	);
+	GPOS_ASSERT(0 == res || (EINVAL != res && "Invalid mutex structure") ||
+				(EINTR != res && "Unexpected Error"));
 
 	return res;
 }
@@ -484,24 +392,16 @@ gpos::pthread::MutexTimedlock
 //
 //---------------------------------------------------------------------------
 INT
-gpos::pthread::CondInit
-	(
-	PTHREAD_COND_T *__restrict cond,
-	const PTHREAD_CONDATTR_T *__restrict attr
-	)
+gpos::pthread::CondInit(PTHREAD_COND_T *__restrict cond, const PTHREAD_CONDATTR_T *__restrict attr)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != cond);
 
 	INT res = pthread_cond_init(cond, attr);
 
-	GPOS_ASSERT
-	(
-		0 == res ||
-		(EINVAL != res && "Invalid condition attr") ||
-		(EBUSY != res && "Attempt to reinitialize") ||
-		(EINTR != res && "Unexpected Error")
-	);
+	GPOS_ASSERT(0 == res || (EINVAL != res && "Invalid condition attr") ||
+				(EBUSY != res && "Attempt to reinitialize") ||
+				(EINTR != res && "Unexpected Error"));
 
 	return res;
 }
@@ -516,18 +416,15 @@ gpos::pthread::CondInit
 //
 //---------------------------------------------------------------------------
 void
-gpos::pthread::CondDestroy
-	(
-	PTHREAD_COND_T *cond
-	)
+gpos::pthread::CondDestroy(PTHREAD_COND_T *cond)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != cond);
 
 #ifdef GPOS_DEBUG
 	INT res =
-#endif // GPOS_DEBUG
-	pthread_cond_destroy(cond);
+#endif  // GPOS_DEBUG
+		pthread_cond_destroy(cond);
 
 	GPOS_ASSERT(0 == res && "function pthread_attr_destroy() failed");
 }
@@ -542,22 +439,15 @@ gpos::pthread::CondDestroy
 //
 //---------------------------------------------------------------------------
 INT
-gpos::pthread::CondBroadcast
-	(
-	PTHREAD_COND_T *cond
-	)
+gpos::pthread::CondBroadcast(PTHREAD_COND_T *cond)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != cond);
 
 	INT res = pthread_cond_broadcast(cond);
 
-	GPOS_ASSERT
-	(
-		0 == res ||
-		(EINVAL != res && "Uninitialized condition structure") ||
-		(EINTR != res && "Unexpected Error")
-	);
+	GPOS_ASSERT(0 == res || (EINVAL != res && "Uninitialized condition structure") ||
+				(EINTR != res && "Unexpected Error"));
 
 	return res;
 }
@@ -572,22 +462,15 @@ gpos::pthread::CondBroadcast
 //
 //---------------------------------------------------------------------------
 INT
-gpos::pthread::CondSignal
-	(
-	PTHREAD_COND_T *cond
-	)
+gpos::pthread::CondSignal(PTHREAD_COND_T *cond)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != cond);
 
 	INT res = pthread_cond_signal(cond);
 
-	GPOS_ASSERT
-	(
-		0 == res ||
-		(EINVAL != res && "Uninitialized condition structure") ||
-		(EINTR != res && "Unexpected Error")
-	);
+	GPOS_ASSERT(0 == res || (EINVAL != res && "Uninitialized condition structure") ||
+				(EINTR != res && "Unexpected Error"));
 
 	return res;
 }
@@ -602,25 +485,18 @@ gpos::pthread::CondSignal
 //
 //---------------------------------------------------------------------------
 INT
-gpos::pthread::CondTimedWait
-	(
-	PTHREAD_COND_T *__restrict cond,
-	PTHREAD_MUTEX_T *__restrict mutex,
-	const TIMESPEC *__restrict abstime
-	)
+gpos::pthread::CondTimedWait(PTHREAD_COND_T *__restrict cond,
+							 PTHREAD_MUTEX_T *__restrict mutex,
+							 const TIMESPEC *__restrict abstime)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != cond);
 
 	INT res = pthread_cond_timedwait(cond, mutex, abstime);
 
-	GPOS_ASSERT
-	(
-		0 == res ||
-		(EINVAL != res && "Invalid parameters") ||
-		(EPERM != res && "GetMutex was not owned by thread") ||
-		(EINTR != res && "Unexpected Error")
-	);
+	GPOS_ASSERT(0 == res || (EINVAL != res && "Invalid parameters") ||
+				(EPERM != res && "GetMutex was not owned by thread") ||
+				(EINTR != res && "Unexpected Error"));
 
 	return res;
 }
@@ -635,24 +511,16 @@ gpos::pthread::CondTimedWait
 //
 //---------------------------------------------------------------------------
 INT
-gpos::pthread::CondWait
-	(
-	PTHREAD_COND_T *__restrict cond,
-	PTHREAD_MUTEX_T *__restrict mutex
-	)
+gpos::pthread::CondWait(PTHREAD_COND_T *__restrict cond, PTHREAD_MUTEX_T *__restrict mutex)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != cond);
 
 	INT res = pthread_cond_wait(cond, mutex);
 
-	GPOS_ASSERT
-	(
-		0 == res ||
-		(EINVAL != res && "Invalid parameters") ||
-		(EPERM != res && "GetMutex was not owned by thread") ||
-		(EINTR != res && "Unexpected Error")
-	);
+	GPOS_ASSERT(0 == res || (EINVAL != res && "Invalid parameters") ||
+				(EPERM != res && "GetMutex was not owned by thread") ||
+				(EINTR != res && "Unexpected Error"));
 
 	return res;
 }
@@ -667,25 +535,18 @@ gpos::pthread::CondWait
 //
 //---------------------------------------------------------------------------
 INT
-gpos::pthread::Create
-	(
-	PTHREAD_T *__restrict thread,
-	const PTHREAD_ATTR_T *__restrict attr,
-	ExecFn func,
-	void *__restrict arg
-	)
+gpos::pthread::Create(PTHREAD_T *__restrict thread,
+					  const PTHREAD_ATTR_T *__restrict attr,
+					  ExecFn func,
+					  void *__restrict arg)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 	GPOS_ASSERT(NULL != thread);
 
 	INT res = pthread_create(thread, attr, func, arg);
 
-	GPOS_ASSERT
-	(
-		0 == res ||
-		(EINVAL != res && "Invalid pthread attr") ||
-		(EINTR != res && "Unexpected Error")
-	);
+	GPOS_ASSERT(0 == res || (EINVAL != res && "Invalid pthread attr") ||
+				(EINTR != res && "Unexpected Error"));
 
 	return res;
 }
@@ -700,23 +561,14 @@ gpos::pthread::Create
 //
 //---------------------------------------------------------------------------
 INT
-gpos::pthread::Join
-	(
-	PTHREAD_T thread,
-	void **retval
-	)
+gpos::pthread::Join(PTHREAD_T thread, void **retval)
 {
 	GPOS_ASSERT_NO_SPINLOCK;
 
 	INT res = pthread_join(thread, retval);
 
-	GPOS_ASSERT
-	(
-		0 == res ||
-		(EINVAL != res && "Thread is not joinable") ||
-		(ESRCH != res && "No such thread") ||
-		(EINTR != res && "Unexpected Error")
-	);
+	GPOS_ASSERT(0 == res || (EINVAL != res && "Thread is not joinable") ||
+				(ESRCH != res && "No such thread") || (EINTR != res && "Unexpected Error"));
 
 	return res;
 }
@@ -731,11 +583,7 @@ gpos::pthread::Join
 //
 //---------------------------------------------------------------------------
 BOOL
-gpos::pthread::Equal
-	(
-	PTHREAD_T pthread1,
-	PTHREAD_T pthread2
-	)
+gpos::pthread::Equal(PTHREAD_T pthread1, PTHREAD_T pthread2)
 {
 	INT res = pthread_equal(pthread1, pthread2);
 
@@ -754,9 +602,7 @@ gpos::pthread::Equal
 //
 //---------------------------------------------------------------------------
 PTHREAD_T
-gpos::pthread::Self
-	(
-	)
+gpos::pthread::Self()
 {
 	return pthread_self();
 }
@@ -771,17 +617,12 @@ gpos::pthread::Self
 //
 //---------------------------------------------------------------------------
 void
-gpos::pthread::SigMask
-	(
-	INT mode,
-	const SIGSET_T *set,
-	SIGSET_T *oldset
-	)
+gpos::pthread::SigMask(INT mode, const SIGSET_T *set, SIGSET_T *oldset)
 {
 #ifdef GPOS_DEBUG
 	INT res =
-#endif // GPOS_DEBUG
-	pthread_sigmask(mode, set, oldset);
+#endif  // GPOS_DEBUG
+		pthread_sigmask(mode, set, oldset);
 
 	GPOS_ASSERT(0 == res);
 }
@@ -796,15 +637,12 @@ gpos::pthread::SigMask
 //
 //---------------------------------------------------------------------------
 void
-gpos::pthread::SigEmptySet
-	(
-	SIGSET_T *set
-	)
+gpos::pthread::SigEmptySet(SIGSET_T *set)
 {
 #ifdef GPOS_DEBUG
 	INT res =
-#endif // GPOS_DEBUG
-	sigemptyset(set);
+#endif  // GPOS_DEBUG
+		sigemptyset(set);
 
 	GPOS_ASSERT(0 == res);
 }
@@ -819,20 +657,15 @@ gpos::pthread::SigEmptySet
 //
 //---------------------------------------------------------------------------
 void
-gpos::pthread::SigAddSet
-	(
-	SIGSET_T *set,
-	INT signum
-	)
+gpos::pthread::SigAddSet(SIGSET_T *set, INT signum)
 {
 #ifdef GPOS_DEBUG
 	INT res =
-#endif // GPOS_DEBUG
-	sigaddset(set, signum);
+#endif  // GPOS_DEBUG
+		sigaddset(set, signum);
 
 	GPOS_ASSERT(0 == res);
 }
 
 
 // EOF
-

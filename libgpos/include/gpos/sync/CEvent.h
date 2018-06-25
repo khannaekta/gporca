@@ -18,7 +18,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CEvent
@@ -28,110 +27,103 @@ namespace gpos
 	//
 	//---------------------------------------------------------------------------
 	class CEvent
-	{				
+	{
+	private:
+		//---------------------------------------------------------------------------
+		//	@class:
+		//		CAutoCounter
+		//
+		//	@doc:
+		//		Ensures safe counter increment/decrement, even in the occurrence
+		//		of an exception
+		//
+		//---------------------------------------------------------------------------
+		class CAutoCounter : CStackObject
+		{
 		private:
-		
-			//---------------------------------------------------------------------------
-			//	@class:
-			//		CAutoCounter
-			//
-			//	@doc:
-			//		Ensures safe counter increment/decrement, even in the occurrence
-			//		of an exception
-			//
-			//---------------------------------------------------------------------------
-			class CAutoCounter : CStackObject
-			{
-				private:
-
-					ULONG *m_count;
-
-				public:
-
-					// ctor - increments
-					explicit
-					CAutoCounter(ULONG *count)
-						:
-						m_count(count)
-					{
-						(*m_count)++;
-					}
-
-					// dtor - decrements
-					~CAutoCounter()
-					{
-						(*m_count)--;
-					}
-			};
-
-			// no copy ctor
-			CEvent(const CEvent &);
-
-			// external mutex
-			CMutexBase *m_mutex;
-			
-			// indicator that event is bound to mutex
-			BOOL m_inited;
-			
-			// waiters
-			ULONG m_num_waiters;
-
-			// pending signals
-			ULONG m_num_signals;
-
-			// total signals
-			ULLONG m_num_total_signals;
-
-			// total broadcasts
-			ULLONG m_num_total_broadcasts;
-
-			// basic condition variable
-			PTHREAD_COND_T m_cond;		
-					
-			// internal wait function, used to implement TimedWait
-			void InternalTimedWait(ULONG m_timeout_ms);
+			ULONG *m_count;
 
 		public:
-		
-			// ctor
-			explicit
-			CEvent();
-							
-			// dtor
-			~CEvent();
-						
-			// bind to mutex
-			void Init(CMutexBase *);
-
-			// accessor to underlying mutex
-			CMutexBase *GetMutex() const
+			// ctor - increments
+			explicit CAutoCounter(ULONG *count) : m_count(count)
 			{
-				return m_mutex;
+				(*m_count)++;
 			}
-			
-			// accessor to waiter counter
-			ULONG GetNumWaiters() const
+
+			// dtor - decrements
+			~CAutoCounter()
 			{
-				return m_num_waiters;
+				(*m_count)--;
 			}
-			
-			// wait signal/broadcast
-			void Wait();
-			
-			// wait signal/broadcast with timeout
-			GPOS_RESULT TimedWait(ULONG m_timeout_ms);
+		};
 
-			// signal primitive
-			void Signal();
+		// no copy ctor
+		CEvent(const CEvent &);
 
-			// broadcast primitive
-			void Broadcast();
-	
-	}; // class CEvent
-}
+		// external mutex
+		CMutexBase *m_mutex;
+
+		// indicator that event is bound to mutex
+		BOOL m_inited;
+
+		// waiters
+		ULONG m_num_waiters;
+
+		// pending signals
+		ULONG m_num_signals;
+
+		// total signals
+		ULLONG m_num_total_signals;
+
+		// total broadcasts
+		ULLONG m_num_total_broadcasts;
+
+		// basic condition variable
+		PTHREAD_COND_T m_cond;
+
+		// internal wait function, used to implement TimedWait
+		void InternalTimedWait(ULONG m_timeout_ms);
+
+	public:
+		// ctor
+		explicit CEvent();
+
+		// dtor
+		~CEvent();
+
+		// bind to mutex
+		void Init(CMutexBase *);
+
+		// accessor to underlying mutex
+		CMutexBase *
+		GetMutex() const
+		{
+			return m_mutex;
+		}
+
+		// accessor to waiter counter
+		ULONG
+		GetNumWaiters() const
+		{
+			return m_num_waiters;
+		}
+
+		// wait signal/broadcast
+		void Wait();
+
+		// wait signal/broadcast with timeout
+		GPOS_RESULT TimedWait(ULONG m_timeout_ms);
+
+		// signal primitive
+		void Signal();
+
+		// broadcast primitive
+		void Broadcast();
+
+	};  // class CEvent
+}  // namespace gpos
 
 
-#endif // !GPOS_CEvent_H
+#endif  // !GPOS_CEvent_H
 
 // EOF
-

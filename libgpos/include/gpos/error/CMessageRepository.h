@@ -6,7 +6,7 @@
 //		CMessageRepository.h
 //
 //	@doc:
-//		Error message repository; 
+//		Error message repository;
 //---------------------------------------------------------------------------
 #ifndef GPOS_CMessageRepository_H
 #define GPOS_CMessageRepository_H
@@ -26,67 +26,55 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CMessageRepository
 	{
-		private:
-		
-			// global singleton
-			static
-			CMessageRepository *m_repository;
-			
-			// memory pool
-			IMemoryPool *m_memory_pool;
+	private:
+		// global singleton
+		static CMessageRepository *m_repository;
 
-			// short hand for Table of Message Tables (TMT)
-			typedef CSyncHashtable<
-						CMessageTable, 
-						ELocale, 
-						CSpinlockOS> TMT;
+		// memory pool
+		IMemoryPool *m_memory_pool;
 
-			// short hand for TMT accessor
-			typedef CSyncHashtableAccessByKey<
-						CMessageTable, 
-						ELocale, 
-						CSpinlockOS> TMTAccessor;
-		
-			// basic hash table
-			TMT m_hash_table;
-			
-			// init basic directory
-			void InitDirectory(IMemoryPool *memory_pool);
-			
-			// install message table for a given locale
-			void AddMessageTable(ELocale locale);
-		
-			// pre-load standard messages
-			void LoadStandardMessages();
+		// short hand for Table of Message Tables (TMT)
+		typedef CSyncHashtable<CMessageTable, ELocale, CSpinlockOS> TMT;
 
-		public:
+		// short hand for TMT accessor
+		typedef CSyncHashtableAccessByKey<CMessageTable, ELocale, CSpinlockOS> TMTAccessor;
 
-			// ctor
-			CMessageRepository(IMemoryPool *memory_pool);
+		// basic hash table
+		TMT m_hash_table;
 
-			// dtor
-			~CMessageRepository();
+		// init basic directory
+		void InitDirectory(IMemoryPool *memory_pool);
 
-			// lookup message by error/local
-			CMessage *LookupMessage(CException exc, ELocale locale);
+		// install message table for a given locale
+		void AddMessageTable(ELocale locale);
 
-			// add individual message
-			void AddMessage(ELocale locale, CMessage *msg);
+		// pre-load standard messages
+		void LoadStandardMessages();
 
-			// initializer for global singleton
-			static
-			GPOS_RESULT Init();
+	public:
+		// ctor
+		CMessageRepository(IMemoryPool *memory_pool);
 
-			// accessor for global singleton
-			static 
-			CMessageRepository* GetMessageRepository();
+		// dtor
+		~CMessageRepository();
 
-			void Shutdown();
+		// lookup message by error/local
+		CMessage *LookupMessage(CException exc, ELocale locale);
 
-	}; // class CMessageRepository
-}
+		// add individual message
+		void AddMessage(ELocale locale, CMessage *msg);
 
-#endif // !GPOS_CMessageRepository_H
+		// initializer for global singleton
+		static GPOS_RESULT Init();
+
+		// accessor for global singleton
+		static CMessageRepository *GetMessageRepository();
+
+		void Shutdown();
+
+	};  // class CMessageRepository
+}  // namespace gpos
+
+#endif  // !GPOS_CMessageRepository_H
 
 // EOF
-

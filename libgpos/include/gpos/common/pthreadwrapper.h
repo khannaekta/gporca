@@ -21,9 +21,8 @@ namespace gpos
 {
 	namespace pthread
 	{
-
 		// thread entry function declaration
-		typedef void *(*ExecFn)(void*);
+		typedef void *(*ExecFn)(void *);
 
 		// return the specified type is a valid mutex type or not
 		BOOL MutexTypeIsValid(INT type);
@@ -47,10 +46,10 @@ namespace gpos
 		INT MutexAttrInit(PTHREAD_MUTEXATTR_T *attr);
 
 		// destroy the mutex attributes object
-		void MutexAttrDestroy(PTHREAD_MUTEXATTR_T * attr);
+		void MutexAttrDestroy(PTHREAD_MUTEXATTR_T *attr);
 
 		// get the mutex type attribute
-		void MutexAttrGettype(const PTHREAD_MUTEXATTR_T *attr,INT *type);
+		void MutexAttrGettype(const PTHREAD_MUTEXATTR_T *attr, INT *type);
 
 		// set the mutex type attribute
 		void MutexAttrSettype(PTHREAD_MUTEXATTR_T *attr, INT type);
@@ -88,15 +87,18 @@ namespace gpos
 		INT CondSignal(PTHREAD_COND_T *cond);
 
 		// wait on a condition
-		INT CondTimedWait(PTHREAD_COND_T *__restrict cond, PTHREAD_MUTEX_T *__restrict mutex,
-			const TIMESPEC *__restrict abstime);
+		INT CondTimedWait(PTHREAD_COND_T *__restrict cond,
+						  PTHREAD_MUTEX_T *__restrict mutex,
+						  const TIMESPEC *__restrict abstime);
 
 		// wait on a condition
 		INT CondWait(PTHREAD_COND_T *__restrict cond, PTHREAD_MUTEX_T *__restrict mutex);
 
 		// thread creation
-		INT Create(PTHREAD_T *__restrict thread, const PTHREAD_ATTR_T *__restrict attr,
-			ExecFn func, void *__restrict arg);
+		INT Create(PTHREAD_T *__restrict thread,
+				   const PTHREAD_ATTR_T *__restrict attr,
+				   ExecFn func,
+				   void *__restrict arg);
 
 		// wait for thread termination
 		INT Join(PTHREAD_T thread, void **retval);
@@ -116,10 +118,9 @@ namespace gpos
 		// add signal to set
 		void SigAddSet(SIGSET_T *set, INT signum);
 
-	} // namespace pthread
-}
+	}  // namespace pthread
+}  // namespace gpos
 
 #endif
 
 // EOF
-

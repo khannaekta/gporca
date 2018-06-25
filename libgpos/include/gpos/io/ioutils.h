@@ -23,35 +23,35 @@
 #ifdef GPOS_FPSIMULATOR
 // simulate I/O error with specified address of returned error m_bytearray_value,
 // and specified errno
-#define GPOS_CHECK_SIM_IO_ERR_CODE(return_value, error_no, IOFunc) \
-		do \
-		{\
-			if (!ioutils::SimulateIOError(return_value, error_no, __FILE__, __LINE__)) \
-			{ \
-				*return_value = IOFunc; \
-			} \
-		} while(0)
+#define GPOS_CHECK_SIM_IO_ERR_CODE(return_value, error_no, IOFunc)                 \
+	do                                                                             \
+	{                                                                              \
+		if (!ioutils::SimulateIOError(return_value, error_no, __FILE__, __LINE__)) \
+		{                                                                          \
+			*return_value = IOFunc;                                                \
+		}                                                                          \
+	} while (0)
 #else
 // execute the I/O function
 #define GPOS_CHECK_SIM_IO_ERR_CODE(return_value, error_no, IOFunc) \
-		do \
-		{\
-			GPOS_ASSERT(NULL != return_value); \
-                 \
-			*return_value = IOFunc; \
-		} while(0)
-#endif // GPOS_FPSIMULATOR
+	do                                                             \
+	{                                                              \
+		GPOS_ASSERT(NULL != return_value);                         \
+                                                                   \
+		*return_value = IOFunc;                                    \
+	} while (0)
+#endif  // GPOS_FPSIMULATOR
 
 // simulate I/O error with specified address of returned error m_bytearray_value
 // and errno will set to 1 automatically
-#define GPOS_CHECK_SIM_IO_ERR(return_value, IOFunc)  GPOS_CHECK_SIM_IO_ERR_CODE(return_value, 1, IOFunc)
+#define GPOS_CHECK_SIM_IO_ERR(return_value, IOFunc) \
+	GPOS_CHECK_SIM_IO_ERR_CODE(return_value, 1, IOFunc)
 
 
 namespace gpos
 {
 	namespace ioutils
 	{
-
 		// check state of file or directory
 		void CheckState(const CHAR *file_path, SFileStat *file_state);
 
@@ -112,21 +112,20 @@ namespace gpos
 
 #if defined(GPOS_64BIT) || defined(GPOS_Darwin)
 		// inject I/O error for functions whose returned m_bytearray_value type is INT_PTR
-		inline
-		BOOL SimulateIOError(INT_PTR *return_value, INT error_no, const CHAR *file, ULONG line_num)
+		inline BOOL
+		SimulateIOError(INT_PTR *return_value, INT error_no, const CHAR *file, ULONG line_num)
 		{
-			return SimulateIOError((INT*) return_value, error_no, file, line_num);
+			return SimulateIOError((INT *) return_value, error_no, file, line_num);
 		}
 #endif
 
 		// inject I/O error for functions whose returned m_bytearray_value type is CHAR*
 		BOOL SimulateIOError(CHAR **return_value, INT error_no, const CHAR *file, ULONG line_num);
-#endif // GPOS_FPSIMULATOR
+#endif  // GPOS_FPSIMULATOR
 
-	}	// namespace ioutils
-}
+	}  // namespace ioutils
+}  // namespace gpos
 
-#endif // !GPOS_ioutils_H
+#endif  // !GPOS_ioutils_H
 
 // EOF
-

@@ -16,7 +16,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CFileWriter
@@ -28,43 +27,41 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CFileWriter : public CFileDescriptor
 	{
-		private:
+	private:
+		// file size
+		ULLONG m_file_size;
 
-			// file size
-			ULLONG m_file_size;
+		// no copy ctor
+		CFileWriter(const CFileWriter &);
 
-			// no copy ctor
-			CFileWriter(const CFileWriter &);
+	public:
+		// ctor
+		CFileWriter();
 
-		public:
+		// dtor
+		virtual ~CFileWriter()
+		{
+		}
 
-			// ctor
-			CFileWriter();
+		ULLONG
+		FileSize() const
+		{
+			return m_file_size;
+		}
 
-			// dtor
-			virtual
-			~CFileWriter()
-			{}
+		// open file for writing
+		void Open(const CHAR *file_path, ULONG permission_bits);
 
-			ULLONG FileSize() const
-			{
-				return m_file_size;
-			}
+		// close file
+		void Close();
 
-			// open file for writing
-			void Open(const CHAR *file_path, ULONG permission_bits);
+		// write bytes to file
+		void Write(const BYTE *read_buffer, const ULONG_PTR write_size);
 
-			// close file
-			void Close();
+	};  // class CFileWriter
 
-			// write bytes to file
-			void Write(const BYTE *read_buffer, const ULONG_PTR write_size);
+}  // namespace gpos
 
-	};	// class CFileWriter
-
-}
-
-#endif // !GPOS_CFileWriter_H
+#endif  // !GPOS_CFileWriter_H
 
 // EOF
-

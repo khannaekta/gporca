@@ -26,7 +26,7 @@
 using namespace gpos;
 
 // make sure we can cast the target address in ExchangeAddUlongPtrWithInt
-GPOS_CPL_ASSERT(sizeof(ULONG_PTR) == sizeof(void*));
+GPOS_CPL_ASSERT(sizeof(ULONG_PTR) == sizeof(void *));
 
 
 //---------------------------------------------------------------------------
@@ -43,11 +43,7 @@ GPOS_CPL_ASSERT(sizeof(ULONG_PTR) == sizeof(void*));
 //
 //---------------------------------------------------------------------------
 ULONG_PTR
-gpos::ExchangeAddUlongPtrWithInt
-	(
-	volatile ULONG_PTR *ul,
-	INT i
-	)
+gpos::ExchangeAddUlongPtrWithInt(volatile ULONG_PTR *ul, INT i)
 {
 	// check for alignment of the address
 	GPOS_ASSERT(ALIGNED_32(ul));
@@ -74,11 +70,7 @@ gpos::ExchangeAddUlongPtrWithInt
 //
 //---------------------------------------------------------------------------
 ULLONG
-gpos::ExchangeAddUllongWithUllong
-	(
-	volatile ULLONG *value,
-	ULLONG inc
-	)
+gpos::ExchangeAddUllongWithUllong(volatile ULLONG *value, ULLONG inc)
 {
 	// check for alignment of the address
 	GPOS_ASSERT(ALIGNED_64(value));
@@ -114,12 +106,7 @@ gpos::ExchangeAddUllongWithUllong
 //
 //---------------------------------------------------------------------------
 BOOL
-gpos::CompareSwap
-	(
-	volatile ULONG *dest_val,
-	ULONG old_val,
-	ULONG new_val
-	)
+gpos::CompareSwap(volatile ULONG *dest_val, ULONG old_val, ULONG new_val)
 {
 	GPOS_ASSERT(NULL != dest_val);
 	GPOS_ASSERT(old_val != new_val);
@@ -134,7 +121,6 @@ gpos::CompareSwap
 #else
 	GPOS_CPL_ASSERT(!"no atomic compare-and-swap defined");
 #endif
-
 }
 
 //---------------------------------------------------------------------------
@@ -152,12 +138,7 @@ gpos::CompareSwap
 //
 //---------------------------------------------------------------------------
 BOOL
-gpos::CompareSwap
-	(
-	volatile ULLONG *dest_val,
-	ULLONG old_val,
-	ULLONG new_val
-	)
+gpos::CompareSwap(volatile ULLONG *dest_val, ULLONG old_val, ULLONG new_val)
 {
 	GPOS_ASSERT(NULL != dest_val);
 	GPOS_ASSERT(old_val != new_val);
@@ -173,7 +154,6 @@ gpos::CompareSwap
 	// unknown primitive
 	GPOS_CPL_ASSERT(!"no atomic add primitive defined");
 #endif
-
 }
 
 #ifdef GPOS_Darwin
@@ -189,20 +169,15 @@ gpos::CompareSwap
 //
 //---------------------------------------------------------------------------
 BOOL
-gpos::CompareSwap
-	(
-	volatile ULONG_PTR *dest_val,
-	ULONG_PTR old_val,
-	ULONG_PTR new_val
-	)
+gpos::CompareSwap(volatile ULONG_PTR *dest_val, ULONG_PTR old_val, ULONG_PTR new_val)
 {
 #ifdef GPOS_32BIT
-	return CompareSwap((ULONG*) dest_val, (ULONG) old_val, (ULONG) new_val);
+	return CompareSwap((ULONG *) dest_val, (ULONG) old_val, (ULONG) new_val);
 #else
-	return CompareSwap((ULLONG*) dest_val, (ULLONG) old_val, (ULLONG) new_val);
-#endif // GPOS_32BIT
+	return CompareSwap((ULLONG *) dest_val, (ULLONG) old_val, (ULLONG) new_val);
+#endif  // GPOS_32BIT
 }
 
-#endif // GPOS_Darwin
+#endif  // GPOS_Darwin
 
 //EOF

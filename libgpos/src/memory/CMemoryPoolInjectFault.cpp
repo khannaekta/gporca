@@ -33,13 +33,9 @@ using namespace gpos;
 //	  Ctor
 //
 //---------------------------------------------------------------------------
-CMemoryPoolInjectFault::CMemoryPoolInjectFault
-	(
-	IMemoryPool *memory_pool,
-	BOOL owns_underlying_memory_pool
-	)
-	:
-	CMemoryPool(memory_pool, owns_underlying_memory_pool, true /*fThreadSafe*/)
+CMemoryPoolInjectFault::CMemoryPoolInjectFault(IMemoryPool *memory_pool,
+											   BOOL owns_underlying_memory_pool)
+	: CMemoryPool(memory_pool, owns_underlying_memory_pool, true /*fThreadSafe*/)
 {
 	GPOS_ASSERT(memory_pool != NULL);
 }
@@ -55,12 +51,7 @@ CMemoryPoolInjectFault::CMemoryPoolInjectFault
 //
 //---------------------------------------------------------------------------
 void *
-CMemoryPoolInjectFault::Allocate
-	(
-	const ULONG num_bytes,
-	const CHAR *filename,
-	const ULONG line
-	)
+CMemoryPoolInjectFault::Allocate(const ULONG num_bytes, const CHAR *filename, const ULONG line)
 {
 #ifdef GPOS_FPSIMULATOR
 	if (SimulateAllocFailure())
@@ -88,10 +79,7 @@ CMemoryPoolInjectFault::Allocate
 //
 //---------------------------------------------------------------------------
 void
-CMemoryPoolInjectFault::Free
-	(
-	void *memory
-	)
+CMemoryPoolInjectFault::Free(void *memory)
 {
 	GetUnderlyingMemoryPool()->Free(memory);
 }
@@ -113,16 +101,14 @@ CMemoryPoolInjectFault::SimulateAllocFailure()
 	ITask *task = ITask::Self();
 	if (NULL != task)
 	{
-		return
-			task->IsTraceSet(EtraceSimulateOOM) &&
-			CFSimulator::FSim()->NewStack(CException::ExmaSystem, CException::ExmiOOM);
+		return task->IsTraceSet(EtraceSimulateOOM) &&
+			   CFSimulator::FSim()->NewStack(CException::ExmaSystem, CException::ExmiOOM);
 	}
 
 	return false;
 }
 
-#endif // GPOS_FPSIMULATOR
+#endif  // GPOS_FPSIMULATOR
 
 
 // EOF
-

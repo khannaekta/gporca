@@ -39,54 +39,48 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CAutoMemoryPool : public CStackObject
 	{
-		public:
-		
-			enum ELeakCheck
-			{
-				ElcNone,	// no leak checking -- to be deprecated
-				
-				ElcExc,		// check for leaks unless an exception is pending (default)
-				ElcStrict	// always check for leaks
-			};
-		
-		private:
+	public:
+		enum ELeakCheck
+		{
+			ElcNone,  // no leak checking -- to be deprecated
 
-			// private copy ctor
-			CAutoMemoryPool(const CAutoMemoryPool &);
+			ElcExc,	// check for leaks unless an exception is pending (default)
+			ElcStrict  // always check for leaks
+		};
 
-			// memory pool to protect
-			IMemoryPool *m_memory_pool;
-			
-			// type of leak check to perform
-			ELeakCheck m_leak_check_type;
+	private:
+		// private copy ctor
+		CAutoMemoryPool(const CAutoMemoryPool &);
 
-		public:
+		// memory pool to protect
+		IMemoryPool *m_memory_pool;
 
-			// ctor
-			CAutoMemoryPool
-				(
-				ELeakCheck leak_check_type = ElcExc,
-				CMemoryPoolManager::AllocType ept = CMemoryPoolManager::EatTracker,
-				BOOL thread_safe = true,
-				ULLONG capacity = gpos::ullong_max
-				);
+		// type of leak check to perform
+		ELeakCheck m_leak_check_type;
 
-			// dtor
-			~CAutoMemoryPool();
+	public:
+		// ctor
+		CAutoMemoryPool(ELeakCheck leak_check_type = ElcExc,
+						CMemoryPoolManager::AllocType ept = CMemoryPoolManager::EatTracker,
+						BOOL thread_safe = true,
+						ULLONG capacity = gpos::ullong_max);
 
-			// accessor
-			IMemoryPool *Pmp() const
-			{
-				return m_memory_pool;
-			}
-			
-			// detach from pool
-			IMemoryPool *Detach();
+		// dtor
+		~CAutoMemoryPool();
 
-	}; // CAutoMemoryPool
-}
+		// accessor
+		IMemoryPool *
+		Pmp() const
+		{
+			return m_memory_pool;
+		}
 
-#endif // GPOS_CAutoMemoryPool_H
+		// detach from pool
+		IMemoryPool *Detach();
+
+	};  // CAutoMemoryPool
+}  // namespace gpos
+
+#endif  // GPOS_CAutoMemoryPool_H
 
 // EOF
-

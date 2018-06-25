@@ -24,7 +24,7 @@ namespace gpos
 {
 	class CWStringConst;
 	class IMemoryPool;
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CWStringBase
@@ -42,69 +42,67 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CWStringBase
 	{
-		private:
-			// private copy ctor
-			CWStringBase(const CWStringBase&);
-			
-		protected:
-			// represents end-of-wide-string character
-			static const WCHAR m_empty_wcstr;
-			
-			// size of the string in number of WCHAR units (not counting the terminating '\0')
-			ULONG m_length;
-			
-			// whether string owns its memory and should take care of deallocating it at destruction time
-			BOOL m_owns_memory;
-			
-			// checks whether the string is byte-wise equal to a given string literal
-			virtual BOOL Equals(const WCHAR *w_str_buffer) const;
-			
-		public:
-			
-			// ctor
-			CWStringBase(ULONG length, BOOL owns_memory)
-				:
-				m_length(length),
-				m_owns_memory(owns_memory)
-			{}
-			
-			// dtor
-			virtual ~CWStringBase(){}
-			
-			// deep copy of the string
-			virtual CWStringConst *Copy(IMemoryPool *memory_pool) const;
+	private:
+		// private copy ctor
+		CWStringBase(const CWStringBase &);
 
-			// accessors
-			virtual ULONG Length() const;
-			
-			// checks whether the string is byte-wise equal to another string
-			virtual BOOL Equals(const CWStringBase *str) const;			
-			
-			// checks whether the string contains any characters
-			virtual BOOL IsEmpty() const;
-			
-			// checks whether a string is properly null-terminated
-			bool IsValid() const;
-			
-			// equality operator 
-			BOOL operator == (const CWStringBase &str) const;
+	protected:
+		// represents end-of-wide-string character
+		static const WCHAR m_empty_wcstr;
 
-			// returns the wide character buffer storing the string
-			virtual const WCHAR* GetBuffer() const = 0;
+		// size of the string in number of WCHAR units (not counting the terminating '\0')
+		ULONG m_length;
 
-			// returns the index of the first occurrence of a character, -1 if not found
-			INT Find(WCHAR wc) const;
+		// whether string owns its memory and should take care of deallocating it at destruction time
+		BOOL m_owns_memory;
 
-			// checks if a character is escaped
-			BOOL HasEscapedCharAt(ULONG offset) const;
+		// checks whether the string is byte-wise equal to a given string literal
+		virtual BOOL Equals(const WCHAR *w_str_buffer) const;
 
-			// count how many times the character appears in string
-			ULONG CountOccurrencesOf(const WCHAR wc) const;
+	public:
+		// ctor
+		CWStringBase(ULONG length, BOOL owns_memory) : m_length(length), m_owns_memory(owns_memory)
+		{
+		}
+
+		// dtor
+		virtual ~CWStringBase()
+		{
+		}
+
+		// deep copy of the string
+		virtual CWStringConst *Copy(IMemoryPool *memory_pool) const;
+
+		// accessors
+		virtual ULONG Length() const;
+
+		// checks whether the string is byte-wise equal to another string
+		virtual BOOL Equals(const CWStringBase *str) const;
+
+		// checks whether the string contains any characters
+		virtual BOOL IsEmpty() const;
+
+		// checks whether a string is properly null-terminated
+		bool IsValid() const;
+
+		// equality operator
+		BOOL operator==(const CWStringBase &str) const;
+
+		// returns the wide character buffer storing the string
+		virtual const WCHAR *GetBuffer() const = 0;
+
+		// returns the index of the first occurrence of a character, -1 if not found
+		INT Find(WCHAR wc) const;
+
+		// checks if a character is escaped
+		BOOL HasEscapedCharAt(ULONG offset) const;
+
+		// count how many times the character appears in string
+		ULONG CountOccurrencesOf(const WCHAR wc) const;
 	};
-	
-}
 
-#endif // !GPOS_CWStringBase_H
+}  // namespace gpos
+
+#endif  // !GPOS_CWStringBase_H
 
 // EOF
-

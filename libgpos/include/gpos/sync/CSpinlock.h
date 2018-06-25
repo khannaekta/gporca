@@ -7,14 +7,14 @@
 //
 //	@doc:
 //		Spinlock implementation broken into a generic part and a template
-//		specialization which incorporates the rank of a spinlock; 
+//		specialization which incorporates the rank of a spinlock;
 //
-//		Ranked Spinlock implementation: spinlocks can only be acquired in 
-//		monotonic order of rank, i.e. while holding a lock of a given rank only 
+//		Ranked Spinlock implementation: spinlocks can only be acquired in
+//		monotonic order of rank, i.e. while holding a lock of a given rank only
 //		locks of the same or a lower rank can be acquired.
 //
 //		Locks of rank 0 are distinguished in that they are used in the framework
-//		implementation, i.e. they are used to build some of the accounting 
+//		implementation, i.e. they are used to build some of the accounting
 //		mechanisms used for tracking locks of higher rank;
 //
 //		The acquisition of spinlocks of rank 0 or higher are tracked in the
@@ -33,7 +33,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CSpinlockBase
@@ -43,61 +42,51 @@ namespace gpos
 	//		used to decide whether a lock should be tracked
 	//
 	//---------------------------------------------------------------------------
-	class CSpinlockBase 
+	class CSpinlockBase
 	{
-	
-		private:
-		
-			// rank of spinlock
-			ULONG m_rank;
-		
-		public:
+	private:
+		// rank of spinlock
+		ULONG m_rank;
 
-			// ctor
-			CSpinlockBase
-				(
-				ULONG rank
-				)
-				:
-				m_rank(rank)
-			{}
-		
-			// dtor
-			virtual
-			~CSpinlockBase()
-			{};
+	public:
+		// ctor
+		CSpinlockBase(ULONG rank) : m_rank(rank)
+		{
+		}
 
-			// acquire spinlock
-			virtual
-			void Lock() = 0;
+		// dtor
+		virtual ~CSpinlockBase(){};
 
-			// release spinlock
-			virtual
-			void Unlock() = 0;
-			
+		// acquire spinlock
+		virtual void Lock() = 0;
 
-			// decide trackability of spinlock
-			BOOL IsTrackable()
-			{
-				// do not track lock of rank 0
-				return 0 < m_rank;
-			}
+		// release spinlock
+		virtual void Unlock() = 0;
 
-			ULONG Rank() const
-			{
-				return m_rank;
-			}
-			
+
+		// decide trackability of spinlock
+		BOOL
+		IsTrackable()
+		{
+			// do not track lock of rank 0
+			return 0 < m_rank;
+		}
+
+		ULONG
+		Rank() const
+		{
+			return m_rank;
+		}
+
 #ifdef GPOS_DEBUG
-			// test whether we own the spinlock
-			virtual
-			BOOL IsOwned() const = 0;
-#endif // GPOS_ASSERT
+		// test whether we own the spinlock
+		virtual BOOL IsOwned() const = 0;
+#endif  // GPOS_ASSERT
 
-			// link for accounting list
-			SLink m_link;
-			
-	}; // class CSpinlockBase
+		// link for accounting list
+		SLink m_link;
+
+	};  // class CSpinlockBase
 
 
 	//---------------------------------------------------------------------------
@@ -110,151 +99,154 @@ namespace gpos
 	//		to the constructor.
 	//
 	//---------------------------------------------------------------------------
-	template<ULONG rank>
+	template <ULONG rank>
 	class CSpinlockRanked : public CSpinlockBase
 	{
 #ifdef GPOS_DEBUG
 		// owning worker
 		CWorkerId m_wid;
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 		// lock indicator -- lock counter is not usable in asserts
 		BOOL m_locked;
 
 		// actual lock counter
 		ULONG_PTR m_lock_counter;
-		
+
 		// counter for collisions
 		ULONG_PTR m_collisions_counter;
-		
-	public:
 
+	public:
 		// ctor
 		CSpinlockRanked<rank>()
-			:
-			CSpinlockBase(rank),
+			: CSpinlockBase(rank),
 #ifdef GPOS_DEBUG
-			m_wid(false),
-#endif // GPOS_DEBUG
-			m_locked(false),
-			m_lock_counter(0), 
-			m_collisions_counter(0)
-		{}
-		
-		
+			  m_wid(false),
+#endif  // GPOS_DEBUG
+			  m_locked(false),
+			  m_lock_counter(0),
+			  m_collisions_counter(0)
+		{
+		}
+
+
 		// dtor
 		~CSpinlockRanked<rank>()
-        {
-            // since this might burn up the CPU be defensive
-            if (m_locked)
-            {
-                Unlock();
-                GPOS_ASSERT(!"Tried to destruct locked spinlock.");
-            }
-        }
+		{
+			// since this might burn up the CPU be defensive
+			if (m_locked)
+			{
+				Unlock();
+				GPOS_ASSERT(!"Tried to destruct locked spinlock.");
+			}
+		}
 
 		// acquire lock
-		void Lock()
-        {
+		void
+		Lock()
+		{
 #ifdef GPOS_DEBUG
-            GPOS_ASSERT_IMP(0 < rank && IWorker::Self(),
-                            IWorker::Self()->CanAcquireSpinlock(this) &&
-                            "Tried to acquire spinlock in incorrect order or detected deadlock.");
-#endif // GPOS_DEBUG
+			GPOS_ASSERT_IMP(
+				0 < rank && IWorker::Self(),
+				IWorker::Self()->CanAcquireSpinlock(this) &&
+					"Tried to acquire spinlock in incorrect order or detected deadlock.");
+#endif  // GPOS_DEBUG
 
-            ULONG attempts = 0;
+			ULONG attempts = 0;
 
-            // attempt getting the lock
-            while(1)
-            {
-                // do not attempt a sync'd increment unless the counter is likely to be 0
-                if (0 == m_lock_counter)
-                {
-                    // attempt sync'd increment
-                    if (0 == gpos::ExchangeAddUlongPtrWithInt(&m_lock_counter, 1))
-                    {
-                        break;
-                    }
+			// attempt getting the lock
+			while (1)
+			{
+				// do not attempt a sync'd increment unless the counter is likely to be 0
+				if (0 == m_lock_counter)
+				{
+					// attempt sync'd increment
+					if (0 == gpos::ExchangeAddUlongPtrWithInt(&m_lock_counter, 1))
+					{
+						break;
+					}
 
-                    // count back down
-                    gpos::ExchangeAddUlongPtrWithInt(&m_lock_counter, -1);
-                }
+					// count back down
+					gpos::ExchangeAddUlongPtrWithInt(&m_lock_counter, -1);
+				}
 
-                // assert it is not us who holds the lock
-                GPOS_ASSERT(!IsOwned() && "self-deadlock detected");
+				// assert it is not us who holds the lock
+				GPOS_ASSERT(!IsOwned() && "self-deadlock detected");
 
-                // trigger a back-off after a certain number of attempts
-                if (attempts++ > GPOS_SPIN_ATTEMPTS)
-                {
-                    // up stats
-                    gpos::ExchangeAddUlongPtrWithInt(&m_collisions_counter, attempts);
-                    attempts = 0;
+				// trigger a back-off after a certain number of attempts
+				if (attempts++ > GPOS_SPIN_ATTEMPTS)
+				{
+					// up stats
+					gpos::ExchangeAddUlongPtrWithInt(&m_collisions_counter, attempts);
+					attempts = 0;
 
-                    clib::USleep(GPOS_SPIN_BACKOFF);
+					clib::USleep(GPOS_SPIN_BACKOFF);
 
-                    // TODO: 08/02/2009; add warning when burning
-                    // a non-trackable lock; dependent on OPT-87, OPT-86
+					// TODO: 08/02/2009; add warning when burning
+					// a non-trackable lock; dependent on OPT-87, OPT-86
 
-                    // non-trackable locks don't know about aborts
-                    if (IsTrackable())
-                    {
-                        // TODO: 03/09/2008; log that we're burning CPU
+					// non-trackable locks don't know about aborts
+					if (IsTrackable())
+					{
+						// TODO: 03/09/2008; log that we're burning CPU
 
-                        GPOS_CHECK_ABORT;
-                    }
-                }
-            }
+						GPOS_CHECK_ABORT;
+					}
+				}
+			}
 
-            // got the lock
-            GPOS_ASSERT(m_lock_counter > 0);
+			// got the lock
+			GPOS_ASSERT(m_lock_counter > 0);
 
-            // final update of collision stats
-            gpos::ExchangeAddUlongPtrWithInt(&m_collisions_counter, attempts);
+			// final update of collision stats
+			gpos::ExchangeAddUlongPtrWithInt(&m_collisions_counter, attempts);
 
 #ifdef GPOS_DEBUG
-            if (0 < rank && NULL != IWorker::Self())
-            {
-                IWorker::Self()->RegisterSpinlock(this);
-            }
+			if (0 < rank && NULL != IWorker::Self())
+			{
+				IWorker::Self()->RegisterSpinlock(this);
+			}
 
-            m_wid.SetThreadToCurrent();
-#endif // GPOS_DEBUG
-            m_locked = true;
-        }
-		
+			m_wid.SetThreadToCurrent();
+#endif  // GPOS_DEBUG
+			m_locked = true;
+		}
+
 		// release
-		void Unlock()
-        {
+		void
+		Unlock()
+		{
 #ifdef GPOS_DEBUG
-            if (0 < rank && NULL != IWorker::Self())
-            {
-                IWorker::Self()->UnregisterSpinlock(this);
-            }
+			if (0 < rank && NULL != IWorker::Self())
+			{
+				IWorker::Self()->UnregisterSpinlock(this);
+			}
 
-            m_wid.SetThreadToInvalid();
-            m_locked = false;
-#endif // GPOS_DEBUG
+			m_wid.SetThreadToInvalid();
+			m_locked = false;
+#endif  // GPOS_DEBUG
 
-            GPOS_ASSERT(m_lock_counter > 0);
-            gpos::ExchangeAddUlongPtrWithInt(&m_lock_counter, -1);
-        }
-		
+			GPOS_ASSERT(m_lock_counter > 0);
+			gpos::ExchangeAddUlongPtrWithInt(&m_lock_counter, -1);
+		}
+
 #ifdef GPOS_DEBUG
 		// test whether we own the spinlock
-		BOOL IsOwned() const
-        {
-            CWorkerId wid;
-            return m_locked && m_wid.Equals(wid);
-        }
-#endif // GPOS_ASSERT
+		BOOL
+		IsOwned() const
+		{
+			CWorkerId wid;
+			return m_locked && m_wid.Equals(wid);
+		}
+#endif  // GPOS_ASSERT
 
-	}; // class CSpinlockRanked
+	};  // class CSpinlockRanked
 
 
 	// GPOS SPINLOCKS - reserve range 0-200
 
 	// core spinlock -- not tracked (used to implement tracking)
-	typedef CSpinlockRanked<0>	CSpinlockOS;
+	typedef CSpinlockRanked<0> CSpinlockOS;
 
 	// generic cache spinlock
 	typedef CSpinlockRanked<20> CSpinlockCache;
@@ -262,13 +254,12 @@ namespace gpos
 
 	// TEST SPINLOCKS
 
-	typedef CSpinlockRanked<1000>	CSpinlockDummy;
-	
+	typedef CSpinlockRanked<1000> CSpinlockDummy;
+
 	typedef CSpinlockRanked<1010> CSpinlockDummyLo;
 	typedef CSpinlockRanked<1011> CSpinlockDummyHi;
-}
+}  // namespace gpos
 
-#endif // !GPOS_CSpinlock_H
+#endif  // !GPOS_CSpinlock_H
 
 // EOF
-

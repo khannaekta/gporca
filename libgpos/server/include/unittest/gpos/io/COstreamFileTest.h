@@ -15,7 +15,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		COstreamFileTest
@@ -26,26 +25,23 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class COstreamFileTest
 	{
-		private:
+	private:
+		// write to output file stream
+		static void Unittest_WriteFileStream(const CHAR *szFile);
 
-			// write to output file stream
-			static void Unittest_WriteFileStream(const CHAR *szFile);
+		// check file stream for correctness
+		static void Unittest_CheckOutputFile(const CHAR *szFile);
 
-			// check file stream for correctness
-			static void Unittest_CheckOutputFile(const CHAR *szFile);
+		// delete temporary file and containing directory
+		static void Unittest_DeleteTmpFile(const CHAR *szDir, const CHAR *szFile);
 
-			// delete temporary file and containing directory
-			static void Unittest_DeleteTmpFile(const CHAR *szDir, const CHAR *szFile);
-
-		public:
-
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_Basic();
+	public:
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_Basic();
 	};
-}
+}  // namespace gpos
 
-#endif // !GPOS_COstreamFileTest_H
+#endif  // !GPOS_COstreamFileTest_H
 
 // EOF
-

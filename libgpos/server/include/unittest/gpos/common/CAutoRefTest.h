@@ -17,7 +17,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CAutoRefTest
@@ -28,34 +27,27 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CAutoRefTest
 	{
+	public:
+		class CElem : public CRefCount
+		{
 		public:
-
-			class CElem : public CRefCount
+			CElem(ULONG ul) : m_ul(ul)
 			{
-				public:
+			}
 
-					CElem
-						(
-						ULONG ul
-						)
-						:
-						m_ul(ul)
-					{}
+			ULONG m_ul;
 
-					ULONG m_ul;
-
-			}; // class CElem
+		};  // class CElem
 
 
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_Basics();
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_Basics();
 
-	}; // class CAutoRefTest
+	};  // class CAutoRefTest
 
-}
+}  // namespace gpos
 
-#endif // !GPOS_CAutoRefTest_H
+#endif  // !GPOS_CAutoRefTest_H
 
 // EOF
-

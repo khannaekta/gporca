@@ -34,107 +34,103 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CAutoTaskProxy : CStackObject
 	{
-		private:
+	private:
+		// memory pool
+		IMemoryPool *m_memory_pool;
 
-			// memory pool
-			IMemoryPool *m_memory_pool;
+		// worker pool
+		CWorkerPoolManager *m_pwpm;
 
-			// worker pool
-			CWorkerPoolManager *m_pwpm;
+		// task list
+		CList<CTask> m_list;
 
-			// task list
-			CList<CTask> m_list;
+		// mutex for event
+		CMutex m_mutex;
 
-			// mutex for event
-			CMutex m_mutex;
+		// event to signal task completion, shared by all tasks
+		CEvent m_event;
 
-			// event to signal task completion, shared by all tasks
-			CEvent m_event;
+		// propagate error of sub-task or not
+		BOOL m_propagate_error;
 
-			// propagate error of sub-task or not
-			BOOL m_propagate_error;
+		// find finished task
+		GPOS_RESULT
+		FindFinished(CTask **task);
 
-			// find finished task
-			GPOS_RESULT
-			FindFinished(CTask **task);
-
-			// no copy ctor
-			CAutoTaskProxy(const CAutoTaskProxy&);
+		// no copy ctor
+		CAutoTaskProxy(const CAutoTaskProxy &);
 
 #ifdef GPOS_DEBUG
-			// id of worker hosting ATP
-			CWorkerId m_wid_parent;
+		// id of worker hosting ATP
+		CWorkerId m_wid_parent;
 
-			// check task owner
-			BOOL OwnerOf(CTask *task);
-#endif // GPOS_DEBUG
+		// check task owner
+		BOOL OwnerOf(CTask *task);
+#endif  // GPOS_DEBUG
 
-			// propagate the error from sub-task to current task
-			void PropagateError(CTask *sub_task);
+		// propagate the error from sub-task to current task
+		void PropagateError(CTask *sub_task);
 
-			// check error from sub-task
-			void CheckError(CTask *sub_task);
+		// check error from sub-task
+		void CheckError(CTask *sub_task);
 
-		public:
+	public:
+		// ctor
+		CAutoTaskProxy(IMemoryPool *memory_pool,
+					   CWorkerPoolManager *m_pwpm,
+					   BOOL propagate_error = true);
 
-			// ctor
-			CAutoTaskProxy
-				(
-				IMemoryPool *memory_pool,
-				CWorkerPoolManager *m_pwpm,
-				BOOL propagate_error = true
-				);
+		// dtor
+		~CAutoTaskProxy();
 
-			// dtor
-			~CAutoTaskProxy();
+		// task count
+		ULONG
+		TaskCount()
+		{
+			return m_list.Size();
+		}
 
-			// task count
-			ULONG TaskCount()
-			{
-				return m_list.Size();
-			}
+		// disable/enable error propagation
+		void
+		SetPropagateError(BOOL propagate_error)
+		{
+			m_propagate_error = propagate_error;
+		}
 
-			// disable/enable error propagation
-			void SetPropagateError(BOOL propagate_error)
-			{
-				m_propagate_error = propagate_error;
-			}
+		// create new task
+		CTask *Create(void *(*pfunc)(void *), void *argv, volatile BOOL *cancel = NULL);
 
-			// create new task
-			CTask *Create(void *(*pfunc)(void*), void *argv, volatile BOOL *cancel = NULL);
+		// schedule task for execution
+		void Schedule(CTask *task);
 
-			// schedule task for execution
-			void Schedule(CTask *task);
+		// wait for task to complete
+		void Wait(CTask *task);
 
-			// wait for task to complete
-			void Wait(CTask *task);
+		// wait for task to complete - with timeout_ms
+		GPOS_RESULT TimedWait(CTask *task, ULONG timeout_ms);
 
-			// wait for task to complete - with timeout_ms
-			GPOS_RESULT TimedWait(CTask *task, ULONG timeout_ms);
+		// wait until at least one task completes
+		void WaitAny(CTask **ptask);
 
-			// wait until at least one task completes
-			void WaitAny(CTask **ptask);
+		// wait until at least one task completes - with timeout_ms
+		GPOS_RESULT TimedWaitAny(CTask **ptask, ULONG timeout_ms);
 
-			// wait until at least one task completes - with timeout_ms
-			GPOS_RESULT TimedWaitAny(CTask **ptask, ULONG timeout_ms);
+		// execute task in thread owning ATP (synchronous execution)
+		void Execute(CTask *task);
 
-			// execute task in thread owning ATP (synchronous execution)
-			void Execute(CTask *task);
+		// cancel task
+		void Cancel(CTask *task);
 
-			// cancel task
-			void Cancel(CTask *task);
+		// unregister and release task
+		void Destroy(CTask *task);
 
-			// unregister and release task
-			void Destroy(CTask *task);
+		// unregister and release all tasks
+		void DestroyAll();
 
-			// unregister and release all tasks
-			void DestroyAll();
+	};  // class CAutoTaskProxy
 
-	}; // class CAutoTaskProxy
+}  // namespace gpos
 
-}
-
-#endif // !GPOS_CAutoTaskProxy_H_
+#endif  // !GPOS_CAutoTaskProxy_H_
 
 // EOF
-

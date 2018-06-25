@@ -37,8 +37,7 @@ namespace gpos
 	//
 	//---------------------------------------------------------------------------
 	class CTask : public ITask
-	{	
-
+	{
 		friend class CAutoTaskProxy;
 		friend class CAutoTaskProxyTest;
 		friend class CTaskSchedulerFifo;
@@ -47,259 +46,268 @@ namespace gpos
 		friend class CUnittest;
 		friend class CAutoSuspendAbort;
 
-		private:
+	private:
+		// task memory pool -- exclusively used by this task
+		IMemoryPool *m_memory_pool;
 
-			// task memory pool -- exclusively used by this task
-			IMemoryPool *m_memory_pool;
-		
-			// task context
-			CTaskContext *m_task_ctxt;
+		// task context
+		CTaskContext *m_task_ctxt;
 
-			// error context
-			IErrorContext *m_err_ctxt;
-				
-			// error handler stack
-			CErrorHandler *m_err_handle;		
+		// error context
+		IErrorContext *m_err_ctxt;
 
-			// function to execute
-			void *(*m_func)(void *);
-			
-			// function argument
-			void *m_arg;
-			
-			// function result
-			void *m_res;
+		// error handler stack
+		CErrorHandler *m_err_handle;
 
-			// TLS
-			CTaskLocalStorage m_tls;
-			
-			// mutex for status change
-			CMutexBase *m_mutex;
+		// function to execute
+		void *(*m_func)(void *);
 
-			// event to signal status change
-			CEvent *m_event;
+		// function argument
+		void *m_arg;
 
-			// task status
-			volatile ETaskStatus m_status;
+		// function result
+		void *m_res;
 
-			// cancellation flag
-			volatile BOOL *m_cancel;
+		// TLS
+		CTaskLocalStorage m_tls;
 
-			// local cancellation flag; used when no flag is externally passed
-			volatile BOOL m_cancel_local;
+		// mutex for status change
+		CMutexBase *m_mutex;
 
-			// counter of requests to suspend cancellation
-			ULONG m_abort_suspend_count;
+		// event to signal status change
+		CEvent *m_event;
 
-			// flag denoting task completion report
-			BOOL m_reported;
+		// task status
+		volatile ETaskStatus m_status;
 
-			// task identifier
-			CTaskId m_tid;
+		// cancellation flag
+		volatile BOOL *m_cancel;
 
-			// ctor
-			CTask
-				(
-				IMemoryPool *memory_pool,
-				CTaskContext *task_ctxt,
-				IErrorContext *err_ctxt,
-				CEvent *event,
-				volatile BOOL *cancel
-				);
+		// local cancellation flag; used when no flag is externally passed
+		volatile BOOL m_cancel_local;
 
-			// no copy ctor
-			CTask(const CTask&);
+		// counter of requests to suspend cancellation
+		ULONG m_abort_suspend_count;
 
-			// set task status
-			void SetStatus(ETaskStatus status);
+		// flag denoting task completion report
+		BOOL m_reported;
 
-			// signal task completion or error
-			void Signal(ETaskStatus status) throw();
+		// task identifier
+		CTaskId m_tid;
 
-			// binding a task structure to a function and its arguments
-			void Bind(void *(*func)(void*), void *arg);
+		// ctor
+		CTask(IMemoryPool *memory_pool,
+			  CTaskContext *task_ctxt,
+			  IErrorContext *err_ctxt,
+			  CEvent *event,
+			  volatile BOOL *cancel);
 
-			// execution, called by the owning worker
-			void Execute();
+		// no copy ctor
+		CTask(const CTask &);
 
-			// check if task has been scheduled
-			BOOL IsScheduled() const;
+		// set task status
+		void SetStatus(ETaskStatus status);
 
-			// check if task finished executing
-			BOOL IsFinished() const;
+		// signal task completion or error
+		void Signal(ETaskStatus status) throw();
 
-			// check if task is currently executing
-			BOOL IsRunning() const
-			{
-				return EtsRunning == m_status;
-			}
+		// binding a task structure to a function and its arguments
+		void Bind(void *(*func)(void *), void *arg);
 
-			// reported flag accessor
-			BOOL IsReported() const
-			{
-				return m_reported;
-			}
+		// execution, called by the owning worker
+		void Execute();
 
-			// set reported flag
-			void SetReported()
-			{
-				GPOS_ASSERT(!m_reported && "Task already reported as completed");
+		// check if task has been scheduled
+		BOOL IsScheduled() const;
 
-				m_reported = true;
-			}
+		// check if task finished executing
+		BOOL IsFinished() const;
 
-		public:
+		// check if task is currently executing
+		BOOL
+		IsRunning() const
+		{
+			return EtsRunning == m_status;
+		}
 
-			// dtor
-			virtual ~CTask();
+		// reported flag accessor
+		BOOL
+		IsReported() const
+		{
+			return m_reported;
+		}
 
-			// accessor for memory pool, e.g. used for allocating task parameters in
-			IMemoryPool *Pmp() const
-			{
-				return m_memory_pool;
-			}
+		// set reported flag
+		void
+		SetReported()
+		{
+			GPOS_ASSERT(!m_reported && "Task already reported as completed");
 
-			// TLS accessor
-			CTaskLocalStorage &GetTls()
-			{
-				return m_tls;
-			}
+			m_reported = true;
+		}
 
-			// task id accessor
-			CTaskId &GetTid()
-			{
-				return m_tid;
-			}
+	public:
+		// dtor
+		virtual ~CTask();
 
-			// task context accessor
-			CTaskContext *GetTaskCtxt() const
-			{
-				return m_task_ctxt;
-			}
+		// accessor for memory pool, e.g. used for allocating task parameters in
+		IMemoryPool *
+		Pmp() const
+		{
+			return m_memory_pool;
+		}
 
-			// basic output streams
-			ILogger *GetOutputLogger() const
-			{
-				return this->m_task_ctxt->GetOutputLogger();
-			}
-			
-			ILogger *GetErrorLogger() const
-			{
-				return this->m_task_ctxt->GetErrorLogger();
-			}
-			
-			BOOL SetTrace
-				(
-				ULONG trace,
-				BOOL val
-				)
-			{
-				return this->m_task_ctxt->SetTrace(trace, val);
-			}
-			
-			BOOL IsTraceSet
-				(
-				ULONG trace
-				)
-			{
-				return this->m_task_ctxt->IsTraceSet(trace);
-			}
+		// TLS accessor
+		CTaskLocalStorage &
+		GetTls()
+		{
+			return m_tls;
+		}
 
-			
-			// locale
-			ELocale Locale() const
-			{
-				return m_task_ctxt->Locale();
-			}
+		// task id accessor
+		CTaskId &
+		GetTid()
+		{
+			return m_tid;
+		}
 
-			// check if task is canceled
-			BOOL IsCanceled() const
-			{
-				return *m_cancel;
-			}
+		// task context accessor
+		CTaskContext *
+		GetTaskCtxt() const
+		{
+			return m_task_ctxt;
+		}
 
-			// reset cancel flag
-			void ResetCancel()
-			{
-				*m_cancel = false;
-			}
+		// basic output streams
+		ILogger *
+		GetOutputLogger() const
+		{
+			return this->m_task_ctxt->GetOutputLogger();
+		}
 
-			// set cancel flag
-			void Cancel()
-			{
-				*m_cancel = true;
-			}
+		ILogger *
+		GetErrorLogger() const
+		{
+			return this->m_task_ctxt->GetErrorLogger();
+		}
 
-			// check if a request to suspend abort was received
-			BOOL IsAbortSuspended() const
-			{
-				return (0 < m_abort_suspend_count);
-			}
+		BOOL
+		SetTrace(ULONG trace, BOOL val)
+		{
+			return this->m_task_ctxt->SetTrace(trace, val);
+		}
 
-			// increment counter for requests to suspend abort
-			void SuspendAbort()
-			{
-				m_abort_suspend_count++;
-			}
+		BOOL
+		IsTraceSet(ULONG trace)
+		{
+			return this->m_task_ctxt->IsTraceSet(trace);
+		}
 
-			// decrement counter for requests to suspend abort
- 			void ResumeAbort();
 
-			// task status accessor
-			ETaskStatus GetStatus() const
-			{
-				return m_status;
-			}
+		// locale
+		ELocale
+		Locale() const
+		{
+			return m_task_ctxt->Locale();
+		}
 
-			// task result accessor
-			void *GetRes() const
-			{
-				return m_res;
-			}
+		// check if task is canceled
+		BOOL
+		IsCanceled() const
+		{
+			return *m_cancel;
+		}
 
-			// error context
-			IErrorContext *GetErrCtxt() const
-			{
-				return m_err_ctxt;
-			}
-			
-			// error context
-			CErrorContext *ConvertErrCtxt()
-			{
-				return dynamic_cast<CErrorContext*>(m_err_ctxt);
-			}
+		// reset cancel flag
+		void
+		ResetCancel()
+		{
+			*m_cancel = false;
+		}
 
-			// pending exceptions
-			BOOL HasPendingExceptions() const
-			{
-				return m_err_ctxt->IsPending();
-			}
+		// set cancel flag
+		void
+		Cancel()
+		{
+			*m_cancel = true;
+		}
+
+		// check if a request to suspend abort was received
+		BOOL
+		IsAbortSuspended() const
+		{
+			return (0 < m_abort_suspend_count);
+		}
+
+		// increment counter for requests to suspend abort
+		void
+		SuspendAbort()
+		{
+			m_abort_suspend_count++;
+		}
+
+		// decrement counter for requests to suspend abort
+		void ResumeAbort();
+
+		// task status accessor
+		ETaskStatus
+		GetStatus() const
+		{
+			return m_status;
+		}
+
+		// task result accessor
+		void *
+		GetRes() const
+		{
+			return m_res;
+		}
+
+		// error context
+		IErrorContext *
+		GetErrCtxt() const
+		{
+			return m_err_ctxt;
+		}
+
+		// error context
+		CErrorContext *
+		ConvertErrCtxt()
+		{
+			return dynamic_cast<CErrorContext *>(m_err_ctxt);
+		}
+
+		// pending exceptions
+		BOOL
+		HasPendingExceptions() const
+		{
+			return m_err_ctxt->IsPending();
+		}
 
 #ifdef GPOS_DEBUG
-			// check if task has expected status
-			BOOL CheckStatus(BOOL completed);
-#endif // GPOS_DEBUG
+		// check if task has expected status
+		BOOL CheckStatus(BOOL completed);
+#endif  // GPOS_DEBUG
 
-			// slink for auto task proxy
-			SLink m_proxy_link;
+		// slink for auto task proxy
+		SLink m_proxy_link;
 
-			// slink for task scheduler
-			SLink m_task_scheduler_link;
+		// slink for task scheduler
+		SLink m_task_scheduler_link;
 
-			// slink for worker pool manager
-			SLink m_worker_pool_manager_link;
+		// slink for worker pool manager
+		SLink m_worker_pool_manager_link;
 
-			static
-			CTask *Self()
-			{
-				return dynamic_cast<CTask *>(ITask::Self());
-			}
+		static CTask *
+		Self()
+		{
+			return dynamic_cast<CTask *>(ITask::Self());
+		}
 
-	}; // class CTask
+	};  // class CTask
 
-}
+}  // namespace gpos
 
-#endif // !GPOS_CTask_H
+#endif  // !GPOS_CTask_H
 
 // EOF
-

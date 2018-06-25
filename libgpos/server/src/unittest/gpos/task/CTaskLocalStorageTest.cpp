@@ -33,11 +33,10 @@ using namespace gpos;
 GPOS_RESULT
 CTaskLocalStorageTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
+	CUnittest rgut[] = {
 		GPOS_UNITTEST_FUNC(CTaskLocalStorageTest::EresUnittest_Basics),
 		GPOS_UNITTEST_FUNC(CTaskLocalStorageTest::EresUnittest_TraceFlags),
-		};
+	};
 
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
@@ -103,7 +102,7 @@ CTaskLocalStorageTest::EresUnittest_TraceFlags()
 		GPOS_ASSERT_IMP(!fFound, EtraceTest == tfi.Bit());
 		fFound = true;
 	}
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 	GPOS_ASSERT(GPOS_FTRACE(EtraceTest));
 	GPOS_UNSET_TRACE(EtraceTest);
@@ -112,4 +111,3 @@ CTaskLocalStorageTest::EresUnittest_TraceFlags()
 	return GPOS_OK;
 }
 // EOF
-

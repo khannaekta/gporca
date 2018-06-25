@@ -19,10 +19,10 @@
 #include "gpos/types.h"
 
 // number of spins before acquisition before backing off
-#define GPOS_SPIN_ATTEMPTS	10000U
+#define GPOS_SPIN_ATTEMPTS 10000U
 
 // backoff wait period in microseconds
-#define GPOS_SPIN_BACKOFF	1000U
+#define GPOS_SPIN_BACKOFF 1000U
 
 namespace gpos
 {
@@ -41,22 +41,18 @@ namespace gpos
 #ifdef GPOS_Darwin
 	// compare-and-swap function for integers holding addresses
 	BOOL CompareSwap(volatile ULONG_PTR *dest_val, ULONG_PTR old_val, ULONG_PTR new_val);
-#endif // GPOS_Darwin
+#endif  // GPOS_Darwin
 
 	// compare-and-swap function for generic pointers
-	template<class T>
-	BOOL CompareSwap
-		(
-		volatile T **dest_val,
-		T *old_val,
-		T *new_val
-		)
+	template <class T>
+	BOOL
+	CompareSwap(volatile T **dest_val, T *old_val, T *new_val)
 	{
-		return CompareSwap((ULONG_PTR*) dest_val, (ULONG_PTR) old_val, (ULONG_PTR) new_val);
+		return CompareSwap((ULONG_PTR *) dest_val, (ULONG_PTR) old_val, (ULONG_PTR) new_val);
 	}
-}
+}  // namespace gpos
 
-#endif // !GPOS_atomic_H
+#endif  // !GPOS_atomic_H
 
 
 // EOF

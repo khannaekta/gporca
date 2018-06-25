@@ -20,11 +20,7 @@ using namespace gpos;
 
 
 // logger buffer must be large enough to store error messages
-GPOS_CPL_ASSERT
-	(
-	GPOS_ERROR_MESSAGE_BUFFER_SIZE <= GPOS_LOG_ENTRY_BUFFER_SIZE
-	)
-	;
+GPOS_CPL_ASSERT(GPOS_ERROR_MESSAGE_BUFFER_SIZE <= GPOS_LOG_ENTRY_BUFFER_SIZE);
 
 
 //---------------------------------------------------------------------------
@@ -34,18 +30,14 @@ GPOS_CPL_ASSERT
 //	@doc:
 //
 //---------------------------------------------------------------------------
-CErrorContext::CErrorContext
-	(
-	CMiniDumper *mini_dumper_handle
-	)
-	:
-	m_exception(CException::m_invalid_exception),
-	m_severity(CException::ExsevError),
-	m_pending(false),
-	m_rethrown(false),
-	m_serializing(false),
-	m_static_buffer(m_error_msg, GPOS_ARRAY_SIZE(m_error_msg)),
-	m_mini_dumper_handle(mini_dumper_handle)
+CErrorContext::CErrorContext(CMiniDumper *mini_dumper_handle)
+	: m_exception(CException::m_invalid_exception),
+	  m_severity(CException::ExsevError),
+	  m_pending(false),
+	  m_rethrown(false),
+	  m_serializing(false),
+	  m_static_buffer(m_error_msg, GPOS_ARRAY_SIZE(m_error_msg)),
+	  m_mini_dumper_handle(mini_dumper_handle)
 {
 	m_serializable_objects_list.Init(GPOS_OFFSET(CSerializable, m_err_ctxt_link));
 }
@@ -77,7 +69,7 @@ void
 CErrorContext::Reset()
 {
 	GPOS_ASSERT(m_pending);
-	
+
 	m_pending = false;
 	m_rethrown = false;
 	m_serializing = false;
@@ -95,11 +87,7 @@ CErrorContext::Reset()
 //
 //---------------------------------------------------------------------------
 void
-CErrorContext::Record
-	(
-	CException &exc,
-	VA_LIST vl
-	)
+CErrorContext::Record(CException &exc, VA_LIST vl)
 {
 	if (m_serializing)
 		return;
@@ -109,14 +97,14 @@ CErrorContext::Record
 	{
 		// reset pending flag so we can throw from here
 		m_pending = false;
-		
+
 		GPOS_ASSERT(!"Pending error unhandled when raising new error");
- 	}
-#endif // GPOS_DEBUG
-	
+	}
+#endif  // GPOS_DEBUG
+
 	m_pending = true;
 	m_exception = exc;
-	
+
 	// store stack, skipping current frame
 	m_stack_descriptor.BackTrace(1);
 
@@ -145,11 +133,8 @@ void
 CErrorContext::AppendErrnoMsg()
 {
 	GPOS_ASSERT(m_pending);
-	GPOS_ASSERT
-		(
-		GPOS_MATCH_EX(m_exception, CException::ExmaSystem, CException::ExmiIOError) ||
-		GPOS_MATCH_EX(m_exception, CException::ExmaSystem, CException::ExmiNetError)
-		);
+	GPOS_ASSERT(GPOS_MATCH_EX(m_exception, CException::ExmaSystem, CException::ExmiIOError) ||
+				GPOS_MATCH_EX(m_exception, CException::ExmaSystem, CException::ExmiNetError));
 	GPOS_ASSERT(0 < errno && "Errno has not been set");
 
 	// get errno description
@@ -168,10 +153,7 @@ CErrorContext::AppendErrnoMsg()
 //
 //---------------------------------------------------------------------------
 void
-CErrorContext::CopyPropErrCtxt
-	(
-	const IErrorContext *err_ctxt
-	)
+CErrorContext::CopyPropErrCtxt(const IErrorContext *err_ctxt)
 {
 	GPOS_ASSERT(!m_pending);
 
@@ -182,7 +164,7 @@ CErrorContext::CopyPropErrCtxt
 
 	// copy error message
 	m_static_buffer.Reset();
-	m_static_buffer.Append(&(reinterpret_cast<const CErrorContext*>(err_ctxt)->m_static_buffer));
+	m_static_buffer.Append(&(reinterpret_cast<const CErrorContext *>(err_ctxt)->m_static_buffer));
 
 	// copy severity
 	m_severity = err_ctxt->GetSeverity();
@@ -214,14 +196,14 @@ CErrorContext::Serialize()
 	// avoid recursion.
 	CAutoSuspendAbort asa;
 	// get mini-dumper's stream to serialize to
-	COstream& oos = m_mini_dumper_handle->GetOStream();
+	COstream &oos = m_mini_dumper_handle->GetOStream();
 
 	// serialize objects to reserved space
 	m_mini_dumper_handle->SerializeEntryHeader();
 
 	for (CSerializable *serializable_obj = m_serializable_objects_list.First();
-	     NULL != serializable_obj;
-	     serializable_obj = m_serializable_objects_list.Next(serializable_obj))
+		 NULL != serializable_obj;
+		 serializable_obj = m_serializable_objects_list.Next(serializable_obj))
 	{
 		serializable_obj->Serialize(oos);
 	}

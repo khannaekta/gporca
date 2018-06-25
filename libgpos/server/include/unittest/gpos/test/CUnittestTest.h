@@ -27,15 +27,13 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CUnittestTest
 	{
-		public:
+	public:
+		// unittests
+		static GPOS_RESULT EresSubtest(ULONG ulSubtest);
 
-			// unittests
-			static GPOS_RESULT EresSubtest(ULONG ulSubtest);
+	};  // CAutoMutexTest
+}  // namespace gpos
 
-	}; // CAutoMutexTest
-}
-
-#endif // !GPOS_CUnittestTest_H
+#endif  // !GPOS_CUnittestTest_H
 
 // EOF
-

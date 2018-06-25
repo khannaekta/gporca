@@ -16,7 +16,6 @@
 
 namespace gpos
 {
-	
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CAtomicCounter
@@ -28,48 +27,40 @@ namespace gpos
 	template <class T>
 	class CAtomicCounter
 	{
-		private:
+	private:
+		// counter
+		volatile ULONG_PTR m_counter;
 
-			// counter
-			volatile ULONG_PTR m_counter;
+		// private copy ctor
+		CAtomicCounter(const CAtomicCounter &);
 
-			// private copy ctor
-			CAtomicCounter(const CAtomicCounter &);
-			
-		public:
-		
-			// ctor
-			explicit
-			CAtomicCounter
-				(
-				T seed = 0
-				)
-				: 
-				m_counter(seed)
-			{
-				GPOS_ASSERT(sizeof(T) <= sizeof(m_counter) && "Type too large for wrapper");
-			}
+	public:
+		// ctor
+		explicit CAtomicCounter(T seed = 0) : m_counter(seed)
+		{
+			GPOS_ASSERT(sizeof(T) <= sizeof(m_counter) && "Type too large for wrapper");
+		}
 
-			// incr
-			T Incr()
-			{
+		// incr
+		T
+		Incr()
+		{
 #ifdef GPOS_DEBUG
-				T t = (T)-1;
-				GPOS_ASSERT(m_counter < t - 1 && "Counter overflow");
-#endif // GPOS_DEBUG
-				return (T) ExchangeAddUlongPtrWithInt(&m_counter, 1);
-			}			
-			
-	}; // class CAtomicCounter
+			T t = (T) -1;
+			GPOS_ASSERT(m_counter < t - 1 && "Counter overflow");
+#endif  // GPOS_DEBUG
+			return (T) ExchangeAddUlongPtrWithInt(&m_counter, 1);
+		}
+
+	};  // class CAtomicCounter
 
 
 	// ULONG, ULONG_PTR counters
 	typedef CAtomicCounter<ULONG> CAtomicULONG;
 	typedef CAtomicCounter<ULONG_PTR> CAtomicULONG_PTR;
-	
-}
 
-#endif // !GPOS_CAtomicCounter_H
+}  // namespace gpos
+
+#endif  // !GPOS_CAtomicCounter_H
 
 // EOF
-

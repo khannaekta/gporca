@@ -34,40 +34,30 @@ CWorkerPoolManager *CWorkerPoolManager::m_worker_pool_manager = NULL;
 //		Private ctor
 //
 //---------------------------------------------------------------------------
-CWorkerPoolManager::CWorkerPoolManager
-	(
-	IMemoryPool *memory_pool
-	)
-	:
-	m_memory_pool(memory_pool),
-	m_num_workers(0),
-	m_min_workers(0),
-	m_max_workers(0),
-	m_auto_task_proxy_counter(0),
-	m_active(false)
+CWorkerPoolManager::CWorkerPoolManager(IMemoryPool *memory_pool)
+	: m_memory_pool(memory_pool),
+	  m_num_workers(0),
+	  m_min_workers(0),
+	  m_max_workers(0),
+	  m_auto_task_proxy_counter(0),
+	  m_active(false)
 {
 	// initialize hash tables
-	m_shtWLS.Init
-		(
-		memory_pool,
-		GPOS_WORKERPOOL_HT_SIZE,
-		GPOS_OFFSET(CWorker, m_link),
-		GPOS_OFFSET(CWorker, m_wid),
-		&(CWorkerId::m_wid_invalid),
-		CWorkerId::HashValue,
-		CWorkerId::Equals
-		);
+	m_shtWLS.Init(memory_pool,
+				  GPOS_WORKERPOOL_HT_SIZE,
+				  GPOS_OFFSET(CWorker, m_link),
+				  GPOS_OFFSET(CWorker, m_wid),
+				  &(CWorkerId::m_wid_invalid),
+				  CWorkerId::HashValue,
+				  CWorkerId::Equals);
 
-	m_shtTS.Init
-		(
-		memory_pool,
-		GPOS_WORKERPOOL_HT_SIZE,
-		GPOS_OFFSET(CTask, m_worker_pool_manager_link),
-		GPOS_OFFSET(CTask, m_tid),
-		&(CTaskId::m_invalid_tid),
-		CTaskId::HashValue,
-		CTaskId::Equals
-		);
+	m_shtTS.Init(memory_pool,
+				 GPOS_WORKERPOOL_HT_SIZE,
+				 GPOS_OFFSET(CTask, m_worker_pool_manager_link),
+				 GPOS_OFFSET(CTask, m_tid),
+				 &(CTaskId::m_invalid_tid),
+				 CTaskId::HashValue,
+				 CTaskId::Equals);
 
 	// initialize mutex
 	m_event.Init(&m_mutex);
@@ -86,23 +76,14 @@ CWorkerPoolManager::CWorkerPoolManager
 //
 //---------------------------------------------------------------------------
 GPOS_RESULT
-CWorkerPoolManager::Init
-	(
-	ULONG min_workers,
-	ULONG max_workers
-	)
+CWorkerPoolManager::Init(ULONG min_workers, ULONG max_workers)
 {
 	GPOS_ASSERT(NULL == WorkerPoolManager());
 	GPOS_ASSERT(min_workers <= max_workers);
 	GPOS_ASSERT(max_workers <= GPOS_THREAD_MAX);
 
-	IMemoryPool *memory_pool =
-		CMemoryPoolManager::GetMemoryPoolMgr()->Create
-			(
-			CMemoryPoolManager::EatTracker,
-			true /*fThreadSafe*/,
-			GPOS_WORKERPOOL_MEM_POOL_SIZE
-			);
+	IMemoryPool *memory_pool = CMemoryPoolManager::GetMemoryPoolMgr()->Create(
+		CMemoryPoolManager::EatTracker, true /*fThreadSafe*/, GPOS_WORKERPOOL_MEM_POOL_SIZE);
 
 	GPOS_TRY
 	{
@@ -149,7 +130,7 @@ CWorkerPoolManager::Shutdown()
 	GPOS_ASSERT(NULL != worker_pool_manager && "Worker pool has not been initialized");
 
 	GPOS_ASSERT(0 == worker_pool_manager->m_auto_task_proxy_counter &&
-			    "AutoTaskProxy alive at worker pool shutdown");
+				"AutoTaskProxy alive at worker pool shutdown");
 
 	// scope for mutex
 	{
@@ -174,7 +155,7 @@ CWorkerPoolManager::Shutdown()
 	GPOS_DELETE(worker_pool_manager);
 
 	// release allocated memory pool
-    CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(memory_pool);
+	CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(memory_pool);
 }
 
 
@@ -221,24 +202,21 @@ CWorkerPoolManager::CreateWorkerThread()
 //
 //---------------------------------------------------------------------------
 void
-CWorkerPoolManager::RegisterWorker
-	(
-	CWorker *worker
-	)
+CWorkerPoolManager::RegisterWorker(CWorker *worker)
 {
 #ifdef GPOS_DEBUG
 	// make sure worker registers itself
 	CWorkerId self_wid;
 	GPOS_ASSERT(NULL != worker);
 	GPOS_ASSERT(self_wid.Equals(worker->GetWid()));
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 	// scope for hash table accessor
 	{
 		// get access
 		CWorkerId wid = worker->GetWid();
 		CSyncHashtableAccessByKey<CWorker, CWorkerId, CSpinlockOS> shta(m_shtWLS, wid);
-		
+
 		// must be first to register
 		GPOS_ASSERT(NULL == shta.Find() && "Found registered worker.");
 
@@ -259,25 +237,21 @@ CWorkerPoolManager::RegisterWorker
 //
 //---------------------------------------------------------------------------
 CWorker *
-CWorkerPoolManager::RemoveWorker
-	(
-	CWorkerId wid
-	)
+CWorkerPoolManager::RemoveWorker(CWorkerId wid)
 {
-
 #ifdef GPOS_DEBUG
 	// make sure regular workers can only remove themselves
 	CWorkerId self_wid;
 	GPOS_ASSERT(self_wid.Equals(wid));
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 	CWorker *worker = NULL;
-	
+
 	// scope for hash table accessor
 	{
 		// get access
 		CSyncHashtableAccessByKey<CWorker, CWorkerId, CSpinlockOS> shta(m_shtWLS, wid);
-		
+
 		worker = shta.Find();
 		if (NULL != worker)
 		{
@@ -301,10 +275,7 @@ CWorkerPoolManager::RemoveWorker
 //
 //---------------------------------------------------------------------------
 CWorker *
-CWorkerPoolManager::Worker
-	(
-	CWorkerId wid
-	)
+CWorkerPoolManager::Worker(CWorkerId wid)
 {
 	// get access
 	CSyncHashtableAccessByKey<CWorker, CWorkerId, CSpinlockOS> shta(m_shtWLS, wid);
@@ -322,10 +293,7 @@ CWorkerPoolManager::Worker
 //
 //---------------------------------------------------------------------------
 void
-CWorkerPoolManager::RegisterTask
-	(
-	CTask *task
-	)
+CWorkerPoolManager::RegisterTask(CTask *task)
 {
 	GPOS_ASSERT(m_active && "Worker pool is not operating");
 
@@ -352,12 +320,8 @@ CWorkerPoolManager::RegisterTask
 //
 //---------------------------------------------------------------------------
 CTask *
-CWorkerPoolManager::RemoveTask
-	(
-	CTaskId tid
-	)
+CWorkerPoolManager::RemoveTask(CTaskId tid)
 {
-
 	CTask *task = NULL;
 
 	// scope for hash table accessor
@@ -385,10 +349,7 @@ CWorkerPoolManager::RemoveTask
 //
 //---------------------------------------------------------------------------
 void
-CWorkerPoolManager::Schedule
-	(
-	CTask *task
-	)
+CWorkerPoolManager::Schedule(CTask *task)
 {
 	GPOS_ASSERT(m_active && "Worker pool is not operating");
 	GPOS_ASSERT(0 < m_num_workers && "Worker pool has no workers");
@@ -424,10 +385,7 @@ CWorkerPoolManager::Schedule
 //
 //---------------------------------------------------------------------------
 CWorkerPoolManager::EScheduleResponse
-CWorkerPoolManager::RespondToNextTaskRequest
-	(
-	CTask **task
-	)
+CWorkerPoolManager::RespondToNextTaskRequest(CTask **task)
 {
 	CAutoMutex am(m_mutex);
 	am.Lock();
@@ -500,10 +458,7 @@ CWorkerPoolManager::WorkersDecrease()
 //
 //---------------------------------------------------------------------------
 void
-CWorkerPoolManager::Cancel
-	(
-	CTaskId tid
-	)
+CWorkerPoolManager::Cancel(CTaskId tid)
 {
 	BOOL is_queued = false;
 
@@ -553,11 +508,7 @@ CWorkerPoolManager::Cancel
 //
 //---------------------------------------------------------------------------
 void
-CWorkerPoolManager::SetWorkersLimit
-	(
-	ULONG min_workers,
-	ULONG max_workers
-	)
+CWorkerPoolManager::SetWorkersLimit(ULONG min_workers, ULONG max_workers)
 {
 	GPOS_ASSERT(min_workers <= max_workers);
 	GPOS_ASSERT(max_workers <= GPOS_THREAD_MAX);
@@ -594,11 +545,8 @@ CWorkerPoolManager::SetWorkersLimit
 //		Set min number of workers
 //
 //---------------------------------------------------------------------------
-void 
-CWorkerPoolManager::SetMinWorkers
-	(
-	volatile ULONG min_workers
-	)
+void
+CWorkerPoolManager::SetMinWorkers(volatile ULONG min_workers)
 {
 	SetWorkersLimit(min_workers, std::max(min_workers, m_max_workers));
 }
@@ -612,15 +560,11 @@ CWorkerPoolManager::SetMinWorkers
 //		Set max number of workers
 //
 //---------------------------------------------------------------------------
-void 
-CWorkerPoolManager::SetMaxWorkers
-	(
-	volatile ULONG max_workers
-	)
+void
+CWorkerPoolManager::SetMaxWorkers(volatile ULONG max_workers)
 {
 	SetWorkersLimit(std::min(max_workers, m_min_workers), max_workers);
 }
 
 
 // EOF
-

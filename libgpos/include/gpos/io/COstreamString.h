@@ -26,47 +26,39 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class COstreamString : public COstream
 	{
-		private:
-			
-			// underlying string
-			CWString *m_string;
+	private:
+		// underlying string
+		CWString *m_string;
 
-			// private copy ctor
-			COstreamString(const COstreamString &);
-			
-		public:
+		// private copy ctor
+		COstreamString(const COstreamString &);
 
-			// please see comments in COstream.h for an explanation
-			using COstream::operator <<;
-			
-			// ctor
-			explicit
-			COstreamString(CWString*);
+	public:
+		// please see comments in COstream.h for an explanation
+		using COstream::operator<<;
 
-			virtual
-			~COstreamString() {}
+		// ctor
+		explicit COstreamString(CWString *);
 
-			// implement << operator on wide char array
-			virtual
-			IOstream& operator<< (const WCHAR * wc_array);
+		virtual ~COstreamString()
+		{
+		}
 
-			// implement << operator on char array
-			virtual
-			IOstream& operator<< (const CHAR *c_array);
+		// implement << operator on wide char array
+		virtual IOstream &operator<<(const WCHAR *wc_array);
 
-			// implement << operator on wide char
-			virtual
-			IOstream& operator<< (const WCHAR wc);
+		// implement << operator on char array
+		virtual IOstream &operator<<(const CHAR *c_array);
 
-			// implement << operator on char
-			virtual
-			IOstream& operator<< (const CHAR c);
+		// implement << operator on wide char
+		virtual IOstream &operator<<(const WCHAR wc);
 
+		// implement << operator on char
+		virtual IOstream &operator<<(const CHAR c);
 	};
 
-}
+}  // namespace gpos
 
-#endif // !GPOS_COstreamString_H
+#endif  // !GPOS_COstreamString_H
 
 // EOF
-

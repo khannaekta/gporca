@@ -31,11 +31,10 @@ using namespace gpos;
 GPOS_RESULT
 CMessageRepositoryTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
+	CUnittest rgut[] = {
 		GPOS_UNITTEST_FUNC(CMessageRepositoryTest::EresUnittest_Basic),
-		};
-	
+	};
+
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
 
@@ -50,27 +49,20 @@ CMessageRepositoryTest::EresUnittest()
 GPOS_RESULT
 CMessageRepositoryTest::EresUnittest_Basic()
 {
-		
 #ifdef GPOS_DEBUG
 	// lookup OOM message
 	CMessage *pmsg = CMessageRepository::GetMessageRepository()->LookupMessage(
-						CException(CException::ExmaSystem, CException::ExmiOOM),
-						ElocEnUS_Utf8);
+		CException(CException::ExmaSystem, CException::ExmiOOM), ElocEnUS_Utf8);
 
-	GPOS_ASSERT(GPOS_MATCH_EX(pmsg->m_exception, 
-						CException::ExmaSystem, 
-						CException::ExmiOOM));
-	
+	GPOS_ASSERT(GPOS_MATCH_EX(pmsg->m_exception, CException::ExmaSystem, CException::ExmiOOM));
+
 	GPOS_ASSERT(pmsg == CMessage::GetMessage(CException::ExmiOOM));
 
 	// attempt looking up OOM message in German -- should return enUS OOM message;
 	pmsg = CMessageRepository::GetMessageRepository()->LookupMessage(
-						 CException(CException::ExmaSystem, CException::ExmiOOM),
-						 ElocGeDE_Utf8);
+		CException(CException::ExmaSystem, CException::ExmiOOM), ElocGeDE_Utf8);
 
-	GPOS_ASSERT(GPOS_MATCH_EX(pmsg->m_exception,
-						  CException::ExmaSystem,
-						  CException::ExmiOOM));
+	GPOS_ASSERT(GPOS_MATCH_EX(pmsg->m_exception, CException::ExmaSystem, CException::ExmiOOM));
 
 	GPOS_ASSERT(pmsg == CMessage::GetMessage(CException::ExmiOOM));
 
@@ -78,8 +70,7 @@ CMessageRepositoryTest::EresUnittest_Basic()
 	{
 		// attempt looking up message with invalid exception code
 		pmsg = CMessageRepository::GetMessageRepository()->LookupMessage(
-							CException(CException::ExmaSystem, 1234567),
-							ElocEnUS_Utf8);
+			CException(CException::ExmaSystem, 1234567), ElocEnUS_Utf8);
 	}
 	GPOS_CATCH_EX(exc)
 	{
@@ -87,11 +78,10 @@ CMessageRepositoryTest::EresUnittest_Basic()
 		GPOS_RESET_EX;
 	}
 	GPOS_CATCH_END;
-	
-#endif // GPOS_DEBUG
-	
+
+#endif  // GPOS_DEBUG
+
 	return GPOS_OK;
 }
 
 // EOF
-

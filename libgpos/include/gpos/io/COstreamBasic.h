@@ -26,36 +26,33 @@ namespace gpos
 
 	class COstreamBasic : public COstream
 	{
-		private:
-			
-			// underlying stream
-			WOSTREAM *m_ostream;
+	private:
+		// underlying stream
+		WOSTREAM *m_ostream;
 
-			// private copy ctor
-			COstreamBasic(const COstreamBasic &);
-			
-		public:
+		// private copy ctor
+		COstreamBasic(const COstreamBasic &);
 
-			// please see comments in COstream.h for an explanation
-			using COstream::operator <<;
-			
-			// ctor
-			explicit
-			COstreamBasic(WOSTREAM *ostream);
+	public:
+		// please see comments in COstream.h for an explanation
+		using COstream::operator<<;
 
-			virtual ~COstreamBasic() {}
-						
-			// implement << operator				
-			virtual IOstream& operator<< (const WCHAR *);
+		// ctor
+		explicit COstreamBasic(WOSTREAM *ostream);
 
-			// implement << operator
-			virtual IOstream& operator<< (const WCHAR);
+		virtual ~COstreamBasic()
+		{
+		}
 
+		// implement << operator
+		virtual IOstream &operator<<(const WCHAR *);
+
+		// implement << operator
+		virtual IOstream &operator<<(const WCHAR);
 	};
 
-}
+}  // namespace gpos
 
-#endif // !GPOS_COstreamBasic_H
+#endif  // !GPOS_COstreamBasic_H
 
 // EOF
-

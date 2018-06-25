@@ -30,10 +30,9 @@ using namespace gpos;
 GPOS_RESULT
 CHashMapIterTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
+	CUnittest rgut[] = {
 		GPOS_UNITTEST_FUNC(CHashMapIterTest::EresUnittest_Basic),
-		};
+	};
 
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
@@ -55,16 +54,24 @@ CHashMapIterTest::EresUnittest_Basic()
 	IMemoryPool *memory_pool = amp.Pmp();
 
 	// test data
-	ULONG rgul[] = {1,2,3,4,5,6,7,8,9};
+	ULONG rgul[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 	const ULONG ulCnt = GPOS_ARRAY_SIZE(rgul);
-	
-	typedef CHashMap<ULONG, ULONG, 
-		HashPtr<ULONG>, gpos::Equals<ULONG>,
-		CleanupNULL<ULONG>, CleanupNULL<ULONG> > Map;
 
-	typedef CHashMapIter<ULONG, ULONG, 
-		HashPtr<ULONG>, gpos::Equals<ULONG>,
-		CleanupNULL<ULONG>, CleanupNULL<ULONG> > MapIter;
+	typedef CHashMap<ULONG,
+					 ULONG,
+					 HashPtr<ULONG>,
+					 gpos::Equals<ULONG>,
+					 CleanupNULL<ULONG>,
+					 CleanupNULL<ULONG> >
+		Map;
+
+	typedef CHashMapIter<ULONG,
+						 ULONG,
+						 HashPtr<ULONG>,
+						 gpos::Equals<ULONG>,
+						 CleanupNULL<ULONG>,
+						 CleanupNULL<ULONG> >
+		MapIter;
 
 
 	// using N - 2 slots guarantees collisions
@@ -75,11 +82,12 @@ CHashMapIterTest::EresUnittest_Basic()
 	// iteration over empty map
 	MapIter miEmpty(pm);
 	GPOS_ASSERT(!miEmpty.Advance());
-	
-#endif // GPOS_DEBUG
+
+#endif  // GPOS_DEBUG
 
 	typedef CDynamicPtrArray<const ULONG, CleanupNULL> ULongPtrArray;
-	CAutoRef<ULongPtrArray> pdrgpulKeys(GPOS_NEW(memory_pool) ULongPtrArray(memory_pool)), pdrgpulValues(GPOS_NEW(memory_pool) ULongPtrArray(memory_pool));
+	CAutoRef<ULongPtrArray> pdrgpulKeys(GPOS_NEW(memory_pool) ULongPtrArray(memory_pool)),
+		pdrgpulValues(GPOS_NEW(memory_pool) ULongPtrArray(memory_pool));
 	// load map and iterate over it after each step
 	for (ULONG ul = 0; ul < ulCnt; ++ul)
 	{
@@ -87,7 +95,8 @@ CHashMapIterTest::EresUnittest_Basic()
 		pdrgpulKeys->Append(&rgul[ul]);
 		pdrgpulValues->Append(&rgul[ul]);
 
-		CAutoRef<ULongPtrArray> pdrgpulIterKeys(GPOS_NEW(memory_pool) ULongPtrArray(memory_pool)), pdrgpulIterValues(GPOS_NEW(memory_pool) ULongPtrArray(memory_pool));
+		CAutoRef<ULongPtrArray> pdrgpulIterKeys(GPOS_NEW(memory_pool) ULongPtrArray(memory_pool)),
+			pdrgpulIterValues(GPOS_NEW(memory_pool) ULongPtrArray(memory_pool));
 
 		// iterate over full map
 		MapIter mi(pm);
@@ -103,7 +112,7 @@ CHashMapIterTest::EresUnittest_Basic()
 		GPOS_ASSERT(pdrgpulKeys->Equals(pdrgpulIterKeys.Value()));
 		GPOS_ASSERT(pdrgpulValues->Equals(pdrgpulIterValues.Value()));
 	}
-	
+
 	pm->Release();
 
 	return GPOS_OK;
@@ -111,4 +120,3 @@ CHashMapIterTest::EresUnittest_Basic()
 
 
 // EOF
-

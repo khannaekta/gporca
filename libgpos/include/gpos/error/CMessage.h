@@ -21,14 +21,12 @@
 #include "gpos/common/clibwrapper.h"
 #include "gpos/common/CSyncHashtable.h"
 
-#define GPOS_WSZ_WSZLEN(x)    (L##x), (gpos::clib::Wcslen(L##x))
+#define GPOS_WSZ_WSZLEN(x) (L##x), (gpos::clib::Wcslen(L##x))
 
-#define GPOS_ERRMSG_FORMAT(...) \
-	gpos::CMessage::FormatMessage(__VA_ARGS__)
+#define GPOS_ERRMSG_FORMAT(...) gpos::CMessage::FormatMessage(__VA_ARGS__)
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CMessage
@@ -39,75 +37,71 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CMessage
 	{
-		private:
+	private:
+		// severity
+		ULONG m_severity;
 
-			// severity
-			ULONG m_severity;
-			
-			// format string
-			const WCHAR *m_fmt;
-			
-			// length of format string
-			ULONG m_fmt_len;
+		// format string
+		const WCHAR *m_fmt;
 
-			// number of parameters
-			ULONG m_num_params;
-			
-			// comment string
-			const WCHAR *m_comment;
-			
-			// length of commen string
-			ULONG m_comment_len;
+		// length of format string
+		ULONG m_fmt_len;
 
-		public:
-		
-			// exception carries error number/identification
-			CException m_exception;
+		// number of parameters
+		ULONG m_num_params;
 
-			// TODO: 6/29/2010: incorporate string class
-			// as soon as available
-			//
-			// ctor
-			CMessage(CException exc, 
-					 ULONG severity,
-					 const WCHAR *fmt, ULONG fmt_len,
-					 ULONG num_params,
-					 const WCHAR *comment, ULONG comment_len);
+		// comment string
+		const WCHAR *m_comment;
 
-			// copy ctor
-			CMessage(const CMessage&);
+		// length of commen string
+		ULONG m_comment_len;
 
-			// format contents into given buffer
-			void
-			Format(CWStringStatic *buf, VA_LIST) const;
+	public:
+		// exception carries error number/identification
+		CException m_exception;
 
-			// severity accessor
-			ULONG GetSeverity() const
-			{
-				return m_severity;
-			}
+		// TODO: 6/29/2010: incorporate string class
+		// as soon as available
+		//
+		// ctor
+		CMessage(CException exc,
+				 ULONG severity,
+				 const WCHAR *fmt,
+				 ULONG fmt_len,
+				 ULONG num_params,
+				 const WCHAR *comment,
+				 ULONG comment_len);
 
-			// link object
-			SLink m_link;
+		// copy ctor
+		CMessage(const CMessage &);
 
-			// access a message by index
-			static
-			CMessage *GetMessage(ULONG index);
+		// format contents into given buffer
+		void Format(CWStringStatic *buf, VA_LIST) const;
 
-			// format an error message
-			static 
-			void FormatMessage(CWStringStatic *str, ULONG major, ULONG minor, ...);
-			
+		// severity accessor
+		ULONG
+		GetSeverity() const
+		{
+			return m_severity;
+		}
+
+		// link object
+		SLink m_link;
+
+		// access a message by index
+		static CMessage *GetMessage(ULONG index);
+
+		// format an error message
+		static void FormatMessage(CWStringStatic *str, ULONG major, ULONG minor, ...);
+
 #ifdef GPOS_DEBUG
-			// debug print function
-			IOstream &
-			OsPrint(IOstream &);
-#endif // GPOS_DEBUG
+		// debug print function
+		IOstream &OsPrint(IOstream &);
+#endif  // GPOS_DEBUG
 
-	}; // class CMessage
-}
+	};  // class CMessage
+}  // namespace gpos
 
-#endif // !GPOS_CMessage_H
+#endif  // !GPOS_CMessage_H
 
 // EOF
-

@@ -28,49 +28,39 @@ namespace gpos
 {
 	class CMemoryPoolInjectFault : public CMemoryPool
 	{
-		private:
-
+	private:
 #ifdef GPOS_FPSIMULATOR
-			// check for OOM simulation
-			BOOL SimulateAllocFailure();
-#endif // GPOS_FPSIMULATOR
+		// check for OOM simulation
+		BOOL SimulateAllocFailure();
+#endif  // GPOS_FPSIMULATOR
 
-			// private copy ctor
-			CMemoryPoolInjectFault(CMemoryPoolInjectFault &);
+		// private copy ctor
+		CMemoryPoolInjectFault(CMemoryPoolInjectFault &);
 
-		public:
+	public:
+		// ctor
+		CMemoryPoolInjectFault(IMemoryPool *memory_pool, BOOL owns_underlying_memory_pool);
 
-			// ctor
-			CMemoryPoolInjectFault(IMemoryPool *memory_pool, BOOL owns_underlying_memory_pool);
+		//dtor
+		virtual ~CMemoryPoolInjectFault()
+		{
+		}
 
-			//dtor
-			virtual
-			~CMemoryPoolInjectFault()
-			{}
+		// allocate memory
+		virtual void *Allocate(const ULONG num_bytes, const CHAR *filename, const ULONG line);
 
-			// allocate memory
-			virtual
-			void *Allocate
-				(
-				const ULONG num_bytes,
-				const CHAR *filename,
-				const ULONG line
-				);
+		// free memory
+		virtual void Free(void *ptr);
 
-			// free memory
-			virtual
-			void Free(void *ptr);
-
-			// return total allocated size
-			virtual
-			ULLONG TotalAllocatedSize() const
-			{
-				return GetUnderlyingMemoryPool()->TotalAllocatedSize();
-			}
+		// return total allocated size
+		virtual ULLONG
+		TotalAllocatedSize() const
+		{
+			return GetUnderlyingMemoryPool()->TotalAllocatedSize();
+		}
 	};
-}
+}  // namespace gpos
 
-#endif // !GPOS_CMemoryPoolInjectFault_H
+#endif  // !GPOS_CMemoryPoolInjectFault_H
 
 // EOF
-

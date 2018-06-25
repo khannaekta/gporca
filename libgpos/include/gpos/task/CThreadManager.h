@@ -16,7 +16,7 @@
 #include "gpos/common/pthreadwrapper.h"
 #include "gpos/sync/CAutoMutex.h"
 
-#define GPOS_THREAD_MAX	(1024)	// max allowed number of threads
+#define GPOS_THREAD_MAX (1024)  // max allowed number of threads
 
 namespace gpos
 {
@@ -32,85 +32,80 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CThreadManager
 	{
-		public:
+	public:
+		// thread descriptor struct; encapsulates PTHREAD_T descriptor
+		struct ThreadDescriptor
+		{
+			// pthread descriptor
+			PTHREAD_T m_pthrdt;
 
-			// thread descriptor struct; encapsulates PTHREAD_T descriptor
-			struct ThreadDescriptor
-			{
-					// pthread descriptor
-					PTHREAD_T m_pthrdt;
+			// thread id
+			ULONG id;
 
-					// thread id
-					ULONG id;
+			// list link
+			SLink m_link;
+		};
 
-					// list link
-					SLink m_link;
-			};
+	private:
+		typedef CList<ThreadDescriptor> TDL;
 
-		private:
+		// array of thread descriptors
+		ThreadDescriptor m_thread_descriptors[GPOS_THREAD_MAX];
 
-			typedef CList<ThreadDescriptor> TDL;
+		// list of unused thread descriptors
+		TDL m_unused_descriptors;
 
-			// array of thread descriptors
-			ThreadDescriptor m_thread_descriptors[GPOS_THREAD_MAX];
+		// descriptor list of running threads
+		TDL m_running_descriptors;
 
-			// list of unused thread descriptors
-			TDL m_unused_descriptors;
+		// descriptor list of finished threads
+		TDL m_finished_descriptors;
 
-			// descriptor list of running threads
-			TDL m_running_descriptors;
+		// mutex
+		CMutexOS m_mutex;
 
-			// descriptor list of finished threads
-			TDL m_finished_descriptors;
+		// pthread attribute
+		PTHREAD_ATTR_T m_pthread_attr;
 
-			// mutex
-			CMutexOS m_mutex;
+		// run worker;
+		// function run by threads
+		// declared static to be used by pthread_create
+		static void *RunWorker(void *worker);
 
-			// pthread attribute
-			PTHREAD_ATTR_T m_pthread_attr;
+		// mark thread as finished
+		void SetFinished(ThreadDescriptor *descriptor);
 
-			// run worker;
-			// function run by threads
-			// declared static to be used by pthread_create
-			static void *RunWorker(void *worker);
+		// garbage collection;
+		// join finished threads and recycle their descriptors;
+		void GC();
 
-			// mark thread as finished
-			void SetFinished(ThreadDescriptor *descriptor);
+		// set signal mask on current thread
+		static void SetSignalMask();
 
-			// garbage collection;
-			// join finished threads and recycle their descriptors;
-			void GC();
+	public:
+		// ctor
+		CThreadManager();
 
-			// set signal mask on current thread
-			static
-			void SetSignalMask();
+		// no copy ctor
+		CThreadManager(const CThreadManager &);
 
-		public:
+		// dtor
+		~CThreadManager();
 
-			// ctor
-			CThreadManager();
+		// create new thread
+		GPOS_RESULT Create();
 
-			// no copy ctor
-			CThreadManager(const CThreadManager&);
+		// check if given thread is in the running threads list
+		BOOL IsThreadRunning(PTHREAD_T thread);
 
-			// dtor
-			~CThreadManager();
+		// shutdown thread manager;
+		// return when all threads are joined (exit);
+		void ShutDown();
 
-			// create new thread
-			GPOS_RESULT Create();
+	};  // class CThreadManager
 
-			// check if given thread is in the running threads list
-			BOOL IsThreadRunning(PTHREAD_T thread);
+}  // namespace gpos
 
-			// shutdown thread manager;
-			// return when all threads are joined (exit);
-			void ShutDown();
-
-	}; // class CThreadManager
-
-}
-
-#endif // !GPOS_CThreadManager_H
+#endif  // !GPOS_CThreadManager_H
 
 // EOF
-

@@ -27,19 +27,17 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CFSimulatorTest
 	{
-		public:
+	public:
+		// unittests
+		static GPOS_RESULT EresUnittest();
+		static GPOS_RESULT EresUnittest_BasicTracking();
+		static GPOS_RESULT EresUnittest_OOM();
 
-			// unittests
-			static GPOS_RESULT EresUnittest();
-			static GPOS_RESULT EresUnittest_BasicTracking();
-			static GPOS_RESULT EresUnittest_OOM();
+	};  // CFSimulatorTest
+}  // namespace gpos
 
-	}; // CFSimulatorTest
-}
+#endif  // GPOS_FPSIMULATOR
 
-#endif // GPOS_FPSIMULATOR
-
-#endif // !GPOS_CFSimulatorTest_H
+#endif  // !GPOS_CFSimulatorTest_H
 
 // EOF
-

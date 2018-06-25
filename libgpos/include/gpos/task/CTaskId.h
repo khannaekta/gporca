@@ -28,71 +28,54 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CTaskId
 	{
+	private:
+		// task id
+		ULONG_PTR m_task_id;
 
-		private:
+		// atomic counter
+		static CAtomicULONG_PTR m_counter;
 
-			// task id
-			ULONG_PTR m_task_id;
+	public:
+		// ctor
+		CTaskId() : m_task_id(m_counter.Incr())
+		{
+		}
 
-			// atomic counter
-			static CAtomicULONG_PTR m_counter;
+		// simple comparison
+		BOOL
+		Equals(const CTaskId &tid) const
+		{
+			return m_task_id == tid.m_task_id;
+		}
 
-		public:
+		// comparison operator
+		inline BOOL
+		operator==(const CTaskId &tid) const
+		{
+			return this->Equals(tid);
+		}
 
-			// ctor
-			CTaskId()
-				:
-				m_task_id(m_counter.Incr())
-			{}
+		// comparison function; used in hashtables
+		static BOOL
+		Equals(const CTaskId &tid, const CTaskId &other)
+		{
+			return tid == other;
+		}
 
-			// simple comparison
-			BOOL Equals
-				(
-				const CTaskId &tid
-				)
-				const
-			{
-				return m_task_id == tid.m_task_id;
-			}
+		// primitive hash function
+		static ULONG
+		HashValue(const CTaskId &tid)
+		{
+			return gpos::HashValue<ULONG_PTR>(&tid.m_task_id);
+		}
 
-			// comparison operator
-			inline
-			BOOL operator ==
-				(
-				const CTaskId &tid
-				)
-				const
-			{
-				return this->Equals(tid);
-			}
+		// invalid id
+		static const CTaskId m_invalid_tid;
 
-			// comparison function; used in hashtables
-			static
-			BOOL Equals
-				(
-				const CTaskId &tid,
-				const CTaskId &other
-				)
-			{
-				return tid == other;
-			}
+	};  // class CTaskId
 
-			// primitive hash function
-			static
-			ULONG HashValue(const CTaskId &tid)
-			{
-				return gpos::HashValue<ULONG_PTR>(&tid.m_task_id);
-			}
+}  // namespace gpos
 
-			// invalid id
-			static
-			const CTaskId m_invalid_tid;
-
-	}; // class CTaskId
-
-}
-
-#endif // !GPOS_CTaskId_H
+#endif  // !GPOS_CTaskId_H
 
 // EOF
-

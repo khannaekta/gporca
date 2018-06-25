@@ -17,7 +17,7 @@
 
 #include "unittest/gpos/sync/CMutexTest.h"
 
-#define GPOS_MUTEX_THREADS	8
+#define GPOS_MUTEX_THREADS 8
 
 using namespace gpos;
 
@@ -32,17 +32,15 @@ using namespace gpos;
 GPOS_RESULT
 CMutexTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
-		GPOS_UNITTEST_FUNC(CMutexTest::EresUnittest_LockRelease),
-		GPOS_UNITTEST_FUNC(CMutexTest::EresUnittest_Recursion),
-		GPOS_UNITTEST_FUNC(CMutexTest::EresUnittest_Concurrency)
+	CUnittest rgut[] = {GPOS_UNITTEST_FUNC(CMutexTest::EresUnittest_LockRelease),
+						GPOS_UNITTEST_FUNC(CMutexTest::EresUnittest_Recursion),
+						GPOS_UNITTEST_FUNC(CMutexTest::EresUnittest_Concurrency)
 #ifdef GPOS_DEBUG
-		,
-		GPOS_UNITTEST_FUNC(CMutexTest::EresUnittest_SelfDeadlock)
-#endif // GPOS_DEBUG
-		};
-		
+							,
+						GPOS_UNITTEST_FUNC(CMutexTest::EresUnittest_SelfDeadlock)
+#endif  // GPOS_DEBUG
+	};
+
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
 
@@ -65,13 +63,13 @@ CMutexTest::EresUnittest_LockRelease()
 	GPOS_ASSERT(mutex.IsOwned());
 
 	mutex.Unlock();
-	
+
 	GPOS_ASSERT(!mutex.IsOwned());
-	
-	(void)mutex.TryLock();
-	
+
+	(void) mutex.TryLock();
+
 	GPOS_ASSERT(mutex.IsOwned());
-	
+
 	mutex.Unlock();
 
 	return GPOS_OK;
@@ -92,12 +90,12 @@ CMutexTest::EresUnittest_Recursion()
 	CMutexRecursive mutex;
 	ULONG c = 100;
 
-	for(ULONG i = 0; i < c; i++)
+	for (ULONG i = 0; i < c; i++)
 	{
 		mutex.Lock();
 	}
 
-	for(ULONG i = 0; i < c; i++)
+	for (ULONG i = 0; i < c; i++)
 	{
 		GPOS_ASSERT(mutex.IsOwned());
 		mutex.Unlock();
@@ -106,7 +104,6 @@ CMutexTest::EresUnittest_Recursion()
 	GPOS_ASSERT(!mutex.IsOwned());
 
 	return GPOS_OK;
-
 }
 
 
@@ -167,12 +164,9 @@ CMutexTest::EresUnittest_Concurrency()
 //
 //---------------------------------------------------------------------------
 void *
-CMutexTest::PvUnittest_ConcurrencyRun
-	(
-	void *pv
-	)
+CMutexTest::PvUnittest_ConcurrencyRun(void *pv)
 {
-	CMutexOS *pmutex = (CMutexOS*)pv;
+	CMutexOS *pmutex = (CMutexOS *) pv;
 
 	for (ULONG i = 0; i < 10000; i++)
 	{
@@ -181,7 +175,7 @@ CMutexTest::PvUnittest_ConcurrencyRun
 		CAutoMutex am(*pmutex);
 		am.Lock();
 		am.Unlock();
-		
+
 		if (am.TryLock())
 		{
 			am.Unlock();
@@ -229,7 +223,6 @@ CMutexTest::EresUnittest_SelfDeadlock()
 }
 
 
-#endif // GPOS_DEBUG
+#endif  // GPOS_DEBUG
 
 // EOF
-

@@ -27,45 +27,44 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class IOstream
 	{
-		protected:
+	protected:
+		// ctor
+		IOstream()
+		{
+		}
 
-			// ctor
-			IOstream()
-			{}
+	public:
+		enum EStreamManipulator
+		{
+			EsmDec,
+			EsmHex
+			// no sentinel to enforce strict switch-ing
+		};
 
-		public:
+		// virtual dtor
+		virtual ~IOstream()
+		{
+		}
 
-			enum EStreamManipulator
-			{
-				EsmDec,
-				EsmHex
-				// no sentinel to enforce strict switch-ing
-			};
+		// operator interface
+		virtual IOstream &operator<<(const CHAR *) = 0;
+		virtual IOstream &operator<<(const WCHAR) = 0;
+		virtual IOstream &operator<<(const CHAR) = 0;
+		virtual IOstream &operator<<(ULONG) = 0;
+		virtual IOstream &operator<<(ULLONG) = 0;
+		virtual IOstream &operator<<(INT) = 0;
+		virtual IOstream &operator<<(LINT) = 0;
+		virtual IOstream &operator<<(DOUBLE) = 0;
+		virtual IOstream &operator<<(const void *) = 0;
+		virtual IOstream &operator<<(WOSTREAM &(*) (WOSTREAM &) ) = 0;
+		virtual IOstream &operator<<(EStreamManipulator) = 0;
 
-			// virtual dtor
-			virtual ~IOstream()
-			{}
-		
-			// operator interface
-			virtual IOstream& operator<< (const CHAR *) = 0;
-			virtual IOstream& operator<< (const WCHAR) = 0;
-			virtual IOstream& operator<< (const CHAR) = 0;
-			virtual IOstream& operator<< (ULONG) = 0;
-			virtual IOstream& operator<< (ULLONG) = 0;
-			virtual IOstream& operator<< (INT) = 0;
-			virtual IOstream& operator<< (LINT) = 0;
-			virtual IOstream& operator<< (DOUBLE) = 0;
-			virtual IOstream& operator<< (const void*) = 0;
-			virtual IOstream& operator<< (WOSTREAM& (*)(WOSTREAM&)) = 0;
-			virtual IOstream& operator<< (EStreamManipulator) = 0;
-
-			// needs to be implemented by subclass
-			virtual IOstream& operator<< (const WCHAR *) = 0;
+		// needs to be implemented by subclass
+		virtual IOstream &operator<<(const WCHAR *) = 0;
 	};
-	
-}
 
-#endif // !GPOS_IOstream_H
+}  // namespace gpos
+
+#endif  // !GPOS_IOstream_H
 
 // EOF
-

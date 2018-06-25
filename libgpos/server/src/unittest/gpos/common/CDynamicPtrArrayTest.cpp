@@ -29,14 +29,13 @@ using namespace gpos;
 GPOS_RESULT
 CDynamicPtrArrayTest::EresUnittest()
 {
-	CUnittest rgut[] =
-		{
+	CUnittest rgut[] = {
 		GPOS_UNITTEST_FUNC(CDynamicPtrArrayTest::EresUnittest_Basic),
 		GPOS_UNITTEST_FUNC(CDynamicPtrArrayTest::EresUnittest_Ownership),
 		GPOS_UNITTEST_FUNC(CDynamicPtrArrayTest::EresUnittest_ArrayAppend),
 		GPOS_UNITTEST_FUNC(CDynamicPtrArrayTest::EresUnittest_ArrayAppendExactFit),
 		GPOS_UNITTEST_FUNC(CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes),
-		};
+	};
 
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
@@ -61,9 +60,9 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 
 	CHAR rgsz[][9] = {"abc", "def", "ghi", "qwe", "wer", "wert", "dfg", "xcv", "zxc"};
 	const CHAR *szMissingElem = "missing";
-	
+
 	CDynamicPtrArray<CHAR, CleanupNULL<CHAR> > *pdrg =
-		GPOS_NEW(memory_pool) CDynamicPtrArray<CHAR, CleanupNULL<CHAR> > (memory_pool, 2);
+		GPOS_NEW(memory_pool) CDynamicPtrArray<CHAR, CleanupNULL<CHAR> >(memory_pool, 2);
 
 	// add elements incl trigger resize of array
 	for (ULONG i = 0; i < 9; i++)
@@ -75,21 +74,21 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 
 	// lookup tests
 #ifdef GPOS_DEBUG
-	const CHAR *szElem = 
-#endif // GPOS_DEBUG
-	pdrg->Find(rgsz[0]);
+	const CHAR *szElem =
+#endif  // GPOS_DEBUG
+		pdrg->Find(rgsz[0]);
 	GPOS_ASSERT(NULL != szElem);
-	
+
 #ifdef GPOS_DEBUG
-	ULONG ulPos = 
-#endif // GPOS_DEBUG
-	pdrg->IndexOf(rgsz[0]);
+	ULONG ulPos =
+#endif  // GPOS_DEBUG
+		pdrg->IndexOf(rgsz[0]);
 	GPOS_ASSERT(0 == ulPos);
-	
+
 #ifdef GPOS_DEBUG
-	ULONG ulPosMissing = 
-#endif // GPOS_DEBUG
-	pdrg->IndexOf(szMissingElem);
+	ULONG ulPosMissing =
+#endif  // GPOS_DEBUG
+		pdrg->IndexOf(szMissingElem);
 	GPOS_ASSERT(gpos::ulong_max == ulPosMissing);
 	// all elements were inserted in ascending order
 	GPOS_ASSERT(pdrg->IsSorted());
@@ -106,7 +105,7 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 	// add elements incl trigger resize of array
 	for (ULONG_PTR ulpK = c; ulpK > 0; ulpK--)
 	{
-		ULONG *pul = (ULONG*)(ulpK - 1);
+		ULONG *pul = (ULONG *) (ulpK - 1);
 		pdrgULONG->Append(pul);
 	}
 
@@ -121,7 +120,7 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 	// test that all positions got copied and sorted properly
 	for (ULONG_PTR ulpJ = 0; ulpJ < c; ulpJ++)
 	{
-		GPOS_ASSERT((ULONG*)ulpJ == (*pdrgULONG)[(ULONG)ulpJ]);
+		GPOS_ASSERT((ULONG *) ulpJ == (*pdrgULONG)[(ULONG) ulpJ]);
 	}
 	pdrgULONG->Release();
 
@@ -210,7 +209,7 @@ CDynamicPtrArrayTest::EresUnittest_ArrayAppend()
 	// array with x elements
 	ULONG cX = 1000;
 	DrgULONG *pdrgULONG2 = GPOS_NEW(memory_pool) DrgULONG(memory_pool, 1);
-	for(ULONG i = 0; i < cX; i++)
+	for (ULONG i = 0; i < cX; i++)
 	{
 		pdrgULONG2->Append(&cX);
 	}
@@ -259,7 +258,7 @@ CDynamicPtrArrayTest::EresUnittest_ArrayAppendExactFit()
 	// array with x elements
 	ULONG cX = 9;
 	DrgULONG *pdrgULONG2 = GPOS_NEW(memory_pool) DrgULONG(memory_pool, 15);
-	for(ULONG i = 0; i < cX; i++)
+	for (ULONG i = 0; i < cX; i++)
 	{
 		pdrgULONG2->Append(&cX);
 	}
@@ -346,4 +345,3 @@ CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes()
 }
 
 // EOF
-

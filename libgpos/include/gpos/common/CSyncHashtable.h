@@ -6,7 +6,7 @@
 //		CSyncHashtable.h
 //
 //	@doc:
-//		Allocation-less static hashtable; 
+//		Allocation-less static hashtable;
 //		Manages client objects without additional allocations; this is a
 //		requirement for system programming tasks to ensure the hashtable
 //		works in exception situations, e.g. OOM;
@@ -29,7 +29,6 @@
 
 namespace gpos
 {
-
 	// prototypes
 	template <class T, class K, class S>
 	class CSyncHashtableAccessorBase;
@@ -64,247 +63,230 @@ namespace gpos
 		friend class CSyncHashtableAccessByIter<T, K, S>;
 		friend class CSyncHashtableIter<T, K, S>;
 
+	private:
+		// hash bucket is a pair of list, spinlock
+		struct SBucket
+		{
 		private:
-	
-			// hash bucket is a pair of list, spinlock
-			struct SBucket
-			{
-				private:
-			
-					// no copy ctor
-					SBucket(const SBucket &);
-
-				public:
-			
-					// ctor
-					SBucket() {};
-				
-					// spinlock to protect bucket
-					S m_lock;
-				
-					// hash chain
-					CList<T> m_chain;
-
-#ifdef GPOS_DEBUG
-					// bucket number
-					ULONG m_bucket_idx;
-#endif // GPOS_DEBUG
-
-			};
-
-			// range of buckets
-			SBucket *m_buckets;
-		
-			// number of ht buckets
-			ULONG m_nbuckets;
-
-			// number of ht entries
-			volatile ULONG_PTR m_size;
-		
-			// offset of key
-			ULONG m_key_offset;
-
-			// invalid key - needed for iteration
-			const K *m_invalid_key;
-
-			// pointer to hashing function
-			ULONG (*m_hashfn)(const K&);
-
-			// pointer to key equality function
-			BOOL (*m_eqfn)(const K&, const K&);
-				
-			// function to compute bucket index for key
-			ULONG GetBucketIndex
-				(
-				const K &key
-				)
-				const
-			{
-				GPOS_ASSERT(IsValid(key) && "Invalid key is inaccessible");
-
-				return m_hashfn(key) % m_nbuckets;
-			}
-
-			// function to get bucket by index
-			SBucket &GetBucket
-				(
-				const ULONG index
-				)
-				const
-			{
-				GPOS_ASSERT(index < m_nbuckets && "Invalid bucket index");
-
-				return m_buckets[index];
-			}
-
-			// extract key out of type
-			K &Key
-				(
-				T *value
-				)
-				const
-			{
-				GPOS_ASSERT(gpos::ulong_max != m_key_offset &&
-							"Key offset not initialized.");
-
-				K &k = *(K*)((BYTE*)value + m_key_offset);
-
-				return k;
-			}
-
-			// key validity check
-			BOOL IsValid
-				(
-				const K &key
-				)
-				const
-			{
-				return !m_eqfn(key, *m_invalid_key);
-			}
+			// no copy ctor
+			SBucket(const SBucket &);
 
 		public:
-	
-			// type definition of function used to cleanup element
-			typedef void (*DestroyEntryFuncPtr)(T *);
-
 			// ctor
-			CSyncHashtable<T, K, S>()
-				:
-				m_buckets(NULL),
-				m_nbuckets(0),
-				m_size(0),
-				m_key_offset(gpos::ulong_max),
-				m_invalid_key(NULL)
-			{}
-		
-			// dtor
-			// deallocates hashtable internals, does not destroy
-			// client objects
-			~CSyncHashtable<T, K, S>()
-            {
-                Cleanup();
-            }
-		
-			// Initialization of hashtable
-			void Init
-				(
-				IMemoryPool *memory_pool,
-				ULONG size,
-				ULONG link_offset,
-				ULONG key_offset,
-				const K *invalid_key,
-				ULONG (*func_hash)(const K&),
-				BOOL (*func_equal)(const K&, const K&)
-				)
-            {
-                GPOS_ASSERT(NULL == m_buckets);
-                GPOS_ASSERT(0 == m_nbuckets);
-                GPOS_ASSERT(NULL != invalid_key);
-                GPOS_ASSERT(NULL != func_hash);
-                GPOS_ASSERT(NULL != func_equal);
+			SBucket(){};
 
-                m_nbuckets = size;
-                m_key_offset = key_offset;
-                m_invalid_key = invalid_key;
-                m_hashfn = func_hash;
-                m_eqfn = func_equal;
+			// spinlock to protect bucket
+			S m_lock;
 
-                m_buckets = GPOS_NEW_ARRAY(memory_pool, SBucket, m_nbuckets);
+			// hash chain
+			CList<T> m_chain;
 
-                // NOTE: 03/25/2008; since it's the only allocation in the
-                //		constructor the protection is not needed strictly speaking;
-                //		Using auto range here just for cleanliness;
-                CAutoRg<SBucket> argbucket;
-                argbucket = m_buckets;
+#ifdef GPOS_DEBUG
+			// bucket number
+			ULONG m_bucket_idx;
+#endif  // GPOS_DEBUG
+		};
 
-                for(ULONG i = 0; i < m_nbuckets; i ++)
-                {
-                    m_buckets[i].m_chain.Init(link_offset);
-    #ifdef GPOS_DEBUG
-                    // add serial number
-                    m_buckets[i].m_bucket_idx = i;
-    #endif // GPOS_DEBUG
-                }
+		// range of buckets
+		SBucket *m_buckets;
 
-                // unhook from protector
-                argbucket.RgtReset();
-            }
+		// number of ht buckets
+		ULONG m_nbuckets;
 
-			// dealloc bucket range and reset members
-			void Cleanup()
-            {
-                GPOS_DELETE_ARRAY(m_buckets);
-                m_buckets = NULL;
+		// number of ht entries
+		volatile ULONG_PTR m_size;
 
-                m_nbuckets = 0;
-            }
+		// offset of key
+		ULONG m_key_offset;
 
-			// iterate over all entries and call destroy function on each entry
-			void DestroyEntries(DestroyEntryFuncPtr pfunc_destroy)
-            {
-                // need to suspend cancellation while cleaning up
-                CAutoSuspendAbort asa;
+		// invalid key - needed for iteration
+		const K *m_invalid_key;
 
-                T *value = NULL;
-                CSyncHashtableIter<T, K, S> it(*this);
+		// pointer to hashing function
+		ULONG (*m_hashfn)(const K &);
 
-                // since removing an entry will automatically advance iter's
-                // position, we need to make sure that advance iter is called
-                // only when we do not have an entry to delete
-                while (NULL != value || it.Advance())
-                {
-                    if (NULL != value)
-                    {
-                        pfunc_destroy(value);
-                    }
+		// pointer to key equality function
+		BOOL (*m_eqfn)(const K &, const K &);
 
-                    {
-                        CSyncHashtableAccessByIter<T, K, S> acc(it);
-                        if (NULL != (value = acc.Value()))
-                        {
-                            acc.Remove(value);
-                        }
-                    }
-                }
+		// function to compute bucket index for key
+		ULONG
+		GetBucketIndex(const K &key) const
+		{
+			GPOS_ASSERT(IsValid(key) && "Invalid key is inaccessible");
 
-    #ifdef GPOS_DEBUG
-                CSyncHashtableIter<T, K, S> it_snd(*this);
-                GPOS_ASSERT(!it_snd.Advance());
-    #endif // GPOS_DEBUG
-            }
+			return m_hashfn(key) % m_nbuckets;
+		}
 
-			// insert function;
-			void Insert(T *value)
-            {
-                K &key = Key(value);
+		// function to get bucket by index
+		SBucket &
+		GetBucket(const ULONG index) const
+		{
+			GPOS_ASSERT(index < m_nbuckets && "Invalid bucket index");
 
-                GPOS_ASSERT(IsValid(key));
+			return m_buckets[index];
+		}
 
-                // determine target bucket
-                SBucket &bucket = GetBucket(GetBucketIndex(key));
+		// extract key out of type
+		K &
+		Key(T *value) const
+		{
+			GPOS_ASSERT(gpos::ulong_max != m_key_offset && "Key offset not initialized.");
 
-                // acquire auto spinlock
-                CAutoSpinlock alock(bucket.m_lock);
-                alock.Lock();
+			K &k = *(K *) ((BYTE *) value + m_key_offset);
 
-                // inserting at bucket's head is required by hashtable iteration
-                bucket.m_chain.Prepend(value);
+			return k;
+		}
 
-                // increase number of entries
-                (void) ExchangeAddUlongPtrWithInt(&m_size, 1);
-            }
+		// key validity check
+		BOOL
+		IsValid(const K &key) const
+		{
+			return !m_eqfn(key, *m_invalid_key);
+		}
 
-			// return number of entries
-			ULONG_PTR Size() const
+	public:
+		// type definition of function used to cleanup element
+		typedef void (*DestroyEntryFuncPtr)(T *);
+
+		// ctor
+		CSyncHashtable<T, K, S>()
+			: m_buckets(NULL),
+			  m_nbuckets(0),
+			  m_size(0),
+			  m_key_offset(gpos::ulong_max),
+			  m_invalid_key(NULL)
+		{
+		}
+
+		// dtor
+		// deallocates hashtable internals, does not destroy
+		// client objects
+		~CSyncHashtable<T, K, S>()
+		{
+			Cleanup();
+		}
+
+		// Initialization of hashtable
+		void
+		Init(IMemoryPool *memory_pool,
+			 ULONG size,
+			 ULONG link_offset,
+			 ULONG key_offset,
+			 const K *invalid_key,
+			 ULONG (*func_hash)(const K &),
+			 BOOL (*func_equal)(const K &, const K &))
+		{
+			GPOS_ASSERT(NULL == m_buckets);
+			GPOS_ASSERT(0 == m_nbuckets);
+			GPOS_ASSERT(NULL != invalid_key);
+			GPOS_ASSERT(NULL != func_hash);
+			GPOS_ASSERT(NULL != func_equal);
+
+			m_nbuckets = size;
+			m_key_offset = key_offset;
+			m_invalid_key = invalid_key;
+			m_hashfn = func_hash;
+			m_eqfn = func_equal;
+
+			m_buckets = GPOS_NEW_ARRAY(memory_pool, SBucket, m_nbuckets);
+
+			// NOTE: 03/25/2008; since it's the only allocation in the
+			//		constructor the protection is not needed strictly speaking;
+			//		Using auto range here just for cleanliness;
+			CAutoRg<SBucket> argbucket;
+			argbucket = m_buckets;
+
+			for (ULONG i = 0; i < m_nbuckets; i++)
 			{
-				return m_size;
+				m_buckets[i].m_chain.Init(link_offset);
+#ifdef GPOS_DEBUG
+				// add serial number
+				m_buckets[i].m_bucket_idx = i;
+#endif  // GPOS_DEBUG
 			}
 
-	}; // class CSyncHashtable
+			// unhook from protector
+			argbucket.RgtReset();
+		}
 
-}
+		// dealloc bucket range and reset members
+		void
+		Cleanup()
+		{
+			GPOS_DELETE_ARRAY(m_buckets);
+			m_buckets = NULL;
 
-#endif // !GPOS_CSyncHashtable_H
+			m_nbuckets = 0;
+		}
+
+		// iterate over all entries and call destroy function on each entry
+		void
+		DestroyEntries(DestroyEntryFuncPtr pfunc_destroy)
+		{
+			// need to suspend cancellation while cleaning up
+			CAutoSuspendAbort asa;
+
+			T *value = NULL;
+			CSyncHashtableIter<T, K, S> it(*this);
+
+			// since removing an entry will automatically advance iter's
+			// position, we need to make sure that advance iter is called
+			// only when we do not have an entry to delete
+			while (NULL != value || it.Advance())
+			{
+				if (NULL != value)
+				{
+					pfunc_destroy(value);
+				}
+
+				{
+					CSyncHashtableAccessByIter<T, K, S> acc(it);
+					if (NULL != (value = acc.Value()))
+					{
+						acc.Remove(value);
+					}
+				}
+			}
+
+#ifdef GPOS_DEBUG
+			CSyncHashtableIter<T, K, S> it_snd(*this);
+			GPOS_ASSERT(!it_snd.Advance());
+#endif  // GPOS_DEBUG
+		}
+
+		// insert function;
+		void
+		Insert(T *value)
+		{
+			K &key = Key(value);
+
+			GPOS_ASSERT(IsValid(key));
+
+			// determine target bucket
+			SBucket &bucket = GetBucket(GetBucketIndex(key));
+
+			// acquire auto spinlock
+			CAutoSpinlock alock(bucket.m_lock);
+			alock.Lock();
+
+			// inserting at bucket's head is required by hashtable iteration
+			bucket.m_chain.Prepend(value);
+
+			// increase number of entries
+			(void) ExchangeAddUlongPtrWithInt(&m_size, 1);
+		}
+
+		// return number of entries
+		ULONG_PTR
+		Size() const
+		{
+			return m_size;
+		}
+
+	};  // class CSyncHashtable
+
+}  // namespace gpos
+
+#endif  // !GPOS_CSyncHashtable_H
 
 // EOF
-

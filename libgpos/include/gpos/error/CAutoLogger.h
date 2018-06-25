@@ -16,7 +16,6 @@
 
 namespace gpos
 {
-
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CAutoLogger
@@ -27,67 +26,56 @@ namespace gpos
 	//---------------------------------------------------------------------------
 	class CAutoLogger : public CStackObject
 	{
+	private:
+		// old logger
+		ILogger *m_old_logger;
 
-		private:
+		// flag indicating if logger is used for error logging
+		BOOL m_error;
 
-			// old logger
-			ILogger *m_old_logger;
+		// private copy ctor
+		CAutoLogger(const CAutoLogger &);
 
-			// flag indicating if logger is used for error logging
-			BOOL m_error;
+	public:
+		// ctor
+		CAutoLogger(ILogger *logger, BOOL error) : m_old_logger(NULL), m_error(error)
+		{
+			GPOS_ASSERT(NULL != logger);
 
-			// private copy ctor
-			CAutoLogger(const CAutoLogger &);
+			ITask *task = ITask::Self();
+			GPOS_ASSERT(NULL != task);
 
-		public:
-
-			// ctor
-			CAutoLogger
-				(
-				ILogger *logger,
-				BOOL error
-				)
-				:
-				m_old_logger(NULL),
-				m_error(error)
+			if (m_error)
 			{
-				GPOS_ASSERT(NULL != logger);
-
-				ITask *task = ITask::Self();
-				GPOS_ASSERT(NULL != task);
-
-				if (m_error)
-				{
-					m_old_logger = task->GetErrorLogger();
-					task->GetTaskCtxt()->SetLogErr(logger);
-				}
-				else
-				{
-					m_old_logger = task->GetOutputLogger();
-					task->GetTaskCtxt()->SetLogOut(logger);
-				}
+				m_old_logger = task->GetErrorLogger();
+				task->GetTaskCtxt()->SetLogErr(logger);
 			}
-
-			// dtor
-			~CAutoLogger()
+			else
 			{
-				ITask *task = ITask::Self();
-				GPOS_ASSERT(NULL != task);
-
-				if (m_error)
-				{
-					task->GetTaskCtxt()->SetLogErr(m_old_logger);
-				}
-				else
-				{
-					task->GetTaskCtxt()->SetLogOut(m_old_logger);
-				}
+				m_old_logger = task->GetOutputLogger();
+				task->GetTaskCtxt()->SetLogOut(logger);
 			}
+		}
 
-	}; // class CAutoLogger
-}
+		// dtor
+		~CAutoLogger()
+		{
+			ITask *task = ITask::Self();
+			GPOS_ASSERT(NULL != task);
 
-#endif // !GPOS_CAutoLogger_H
+			if (m_error)
+			{
+				task->GetTaskCtxt()->SetLogErr(m_old_logger);
+			}
+			else
+			{
+				task->GetTaskCtxt()->SetLogOut(m_old_logger);
+			}
+		}
+
+	};  // class CAutoLogger
+}  // namespace gpos
+
+#endif  // !GPOS_CAutoLogger_H
 
 // EOF
-
