@@ -189,7 +189,7 @@ CXformGbAgg2HashAgg::FApplicable
 		CExpression *pexprAggFunc = (*pexprPrjEl)[0];
 		CScalarAggFunc *popScAggFunc = CScalarAggFunc::PopConvert(pexprAggFunc->Pop());
 
-		if (popScAggFunc->IsDistinct() || !md_accessor->Pmdagg(popScAggFunc->MDId())->IsHashAggCapable() )
+		if (popScAggFunc->IsDistinct() || !md_accessor->RetrieveAgg(popScAggFunc->MDId())->IsHashAggCapable() )
 		{
 			return false;
 		}

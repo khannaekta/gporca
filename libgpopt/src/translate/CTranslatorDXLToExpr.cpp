@@ -462,7 +462,7 @@ CTranslatorDXLToExpr::PexprLogicalTVF
 		const CDXLColDescr *pdxlcoldesc = dxl_op->GetColumnDescrAt(ul);
 		GPOS_ASSERT(pdxlcoldesc->MDIdType()->IsValid());
 
-		const IMDType *pmdtype = m_pmda->Pmdtype(pdxlcoldesc->MDIdType());
+		const IMDType *pmdtype = m_pmda->RetrieveType(pdxlcoldesc->MDIdType());
 
 		GPOS_ASSERT(NULL != pdxlcoldesc->MdName()->GetMDName()->GetBuffer());
 		CWStringConst strColName(m_memory_pool, pdxlcoldesc->MdName()->GetMDName()->GetBuffer());
@@ -551,7 +551,7 @@ CTranslatorDXLToExpr::PexprLogicalGet
 	CLogical *popGet = NULL;
 	DrgPcr *colref_array = NULL; 
 
-	const IMDRelation *pmdrel = m_pmda->Pmdrel(table_descr->MDId());
+	const IMDRelation *pmdrel = m_pmda->RetrieveRel(table_descr->MDId());
 	if (pmdrel->IsPartitioned())
 	{
 		GPOS_ASSERT(EdxlopLogicalGet == edxlopid);
@@ -818,7 +818,7 @@ CTranslatorDXLToExpr::BuildSetOpChild
 		const CDXLColDescr *pdxlcdOutput = dxl_op->GetColumnDescrAt(ulColPos);
 
 		// check if a cast function needs to be introduced
-		IMDId *pmdidSource = colref->Pmdtype()->MDId();
+		IMDId *pmdidSource = colref->RetrieveType()->MDId();
 		IMDId *mdid_dest = pdxlcdOutput->MDIdType();
 
 		if (FCastingUnknownType(pmdidSource, mdid_dest))
@@ -826,7 +826,7 @@ CTranslatorDXLToExpr::BuildSetOpChild
 			GPOS_RAISE(gpopt::ExmaGPOPT, gpopt::ExmiUnsupportedOp, GPOS_WSZ_LIT("Casting of columns of unknown data type"));
 		}
 
-		const IMDType *pmdtype = m_pmda->Pmdtype(mdid_dest);
+		const IMDType *pmdtype = m_pmda->RetrieveType(mdid_dest);
 		INT type_modifier = pdxlcdOutput->TypeModifier();
 
 		BOOL fEqualTypes = IMDId::MDIdCompare(pmdidSource, mdid_dest);
@@ -1062,7 +1062,7 @@ CTranslatorDXLToExpr::Pdrgpcr
 	{
 		CDXLColDescr *pdxlcd = (*col_descr_dxl_array)[ul];
 		IMDId *mdid = pdxlcd->MDIdType();
-		const IMDType *pmdtype = m_pmda->Pmdtype(mdid);
+		const IMDType *pmdtype = m_pmda->RetrieveType(mdid);
 
 		CName name(pdxlcd->MdName()->GetMDName());
 		// generate a new column reference
@@ -1716,7 +1716,7 @@ CTranslatorDXLToExpr::PexprLogicalSeqPr
 
 			CScalar *popScalar = CScalar::PopConvert(pexprScWindowFunc->Pop());
 			IMDId *mdid = popScalar->MDIdType();
-			const IMDType *pmdtype = m_pmda->Pmdtype(mdid);
+			const IMDType *pmdtype = m_pmda->RetrieveType(mdid);
 
 			CName name(pdxlopPrEl->GetMdNameAlias()->GetMDName());
 
@@ -2063,7 +2063,7 @@ CTranslatorDXLToExpr::Ptabdesc
 	IMDId *mdid = table_descr->MDId();
 
 	// get the relation information from the cache
-	const IMDRelation *pmdrel = m_pmda->Pmdrel(mdid);
+	const IMDRelation *pmdrel = m_pmda->RetrieveRel(mdid);
 
 	// construct mappings for columns that are not dropped
 	IntUlongHashMap *phmiulAttnoColMapping = GPOS_NEW(m_memory_pool) IntUlongHashMap(m_memory_pool);
@@ -2090,7 +2090,7 @@ CTranslatorDXLToExpr::Ptabdesc
 	IMDRelation::Ereldistrpolicy rel_distr_policy = pmdrel->GetRelDistribution();
 
 	// get storage type
-	IMDRelation::Erelstoragetype rel_storage_type = pmdrel->GetRelStorageType();
+	IMDRelation::Erelstoragetype rel_storage_type = pmdrel->RetrieveRelStorageType();
 
 	mdid->AddRef();
 	CTableDescriptor *ptabdesc = GPOS_NEW(m_memory_pool) CTableDescriptor
@@ -2117,7 +2117,7 @@ CTranslatorDXLToExpr::Ptabdesc
 		BOOL is_nullable = pmdcolNext->IsNullable();
 
 		GPOS_ASSERT(pdxlcoldesc->MDIdType()->IsValid());
-		const IMDType *pmdtype = m_pmda->Pmdtype(pdxlcoldesc->MDIdType());
+		const IMDType *pmdtype = m_pmda->RetrieveType(pdxlcoldesc->MDIdType());
 
 		GPOS_ASSERT(NULL != pdxlcoldesc->MdName()->GetMDName()->GetBuffer());
 		CWStringConst strColName(m_memory_pool, pdxlcoldesc->MdName()->GetMDName()->GetBuffer());
@@ -2230,7 +2230,7 @@ CTranslatorDXLToExpr::RegisterMDRelationCtas
 			GPOS_NEW(m_memory_pool) CMDName(m_memory_pool, pdxlopCTAS->MdName()->GetMDName()),
 			pdxlopCTAS->IsTemporary(),
 			pdxlopCTAS->HasOids(),
-			pdxlopCTAS->GetRelStorageType(),
+			pdxlopCTAS->RetrieveRelStorageType(),
 			pdxlopCTAS->Ereldistrpolicy(),
 			mdcol_array,
 			pdxlopCTAS->GetDistrColPosArray(),
@@ -2267,7 +2267,7 @@ CTranslatorDXLToExpr::PtabdescFromCTAS
 	IMDId *mdid = pdxlopCTAS->MDId();
 
 	// get the relation information from the cache
-	const IMDRelation *pmdrel = m_pmda->Pmdrel(mdid);
+	const IMDRelation *pmdrel = m_pmda->RetrieveRel(mdid);
 
 	// construct mappings for columns that are not dropped
 	IntUlongHashMap *phmiulAttnoColMapping = GPOS_NEW(m_memory_pool) IntUlongHashMap(m_memory_pool);
@@ -2292,7 +2292,7 @@ CTranslatorDXLToExpr::PtabdescFromCTAS
 	IMDRelation::Ereldistrpolicy rel_distr_policy = pmdrel->GetRelDistribution();
 
 	// get storage type
-	IMDRelation::Erelstoragetype rel_storage_type = pmdrel->GetRelStorageType();
+	IMDRelation::Erelstoragetype rel_storage_type = pmdrel->RetrieveRelStorageType();
 
 	mdid->AddRef();
 	CTableDescriptor *ptabdesc = GPOS_NEW(m_memory_pool) CTableDescriptor
@@ -2320,7 +2320,7 @@ CTranslatorDXLToExpr::PtabdescFromCTAS
 		const CDXLColDescr *pdxlcoldesc = (*col_descr_dxl_array)[ul];
 
 		GPOS_ASSERT(pdxlcoldesc->MDIdType()->IsValid());
-		const IMDType *pmdtype = m_pmda->Pmdtype(pdxlcoldesc->MDIdType());
+		const IMDType *pmdtype = m_pmda->RetrieveType(pdxlcoldesc->MDIdType());
 
 		GPOS_ASSERT(NULL != pdxlcoldesc->MdName()->GetMDName()->GetBuffer());
 		CWStringConst strColName(m_memory_pool, pdxlcoldesc->MdName()->GetMDName()->GetBuffer());
@@ -2415,7 +2415,7 @@ CTranslatorDXLToExpr::PexprLogicalConstTableGet
 	for (ULONG ulColIdx = 0; ulColIdx < ulColumns; ulColIdx++)
 	{
 		CDXLColDescr *pdxlcd = (*col_descr_dxl_array)[ulColIdx];
-		const IMDType *pmdtype = m_pmda->Pmdtype(pdxlcd->MDIdType());
+		const IMDType *pmdtype = m_pmda->RetrieveType(pdxlcd->MDIdType());
 		CName name(m_memory_pool, pdxlcd->MdName()->GetMDName());
 
 		const ULONG ulWidth = pdxlcd->Width();
@@ -2631,7 +2631,7 @@ CTranslatorDXLToExpr::PexprCollapseNot
 
 		// get mdid and name of the inverse of the comparison operator used by quantified subquery
 		IMDId *mdid_op = pdxlopSubqueryQuantified->GetScalarOpMdId();
-		IMDId *pmdidInverseOp = m_pmda->Pmdscop(mdid_op)->GetInverseOpMdid();
+		IMDId *pmdidInverseOp = m_pmda->RetrieveScOp(mdid_op)->GetInverseOpMdid();
 
 		// if inverse operator cannot be found in metadata, the optimizer won't collapse NOT node
 		if (NULL == pmdidInverseOp)
@@ -2639,7 +2639,7 @@ CTranslatorDXLToExpr::PexprCollapseNot
 			return NULL;
 		}
 
-		const CWStringConst *pstrInverseOp = m_pmda->Pmdscop(pmdidInverseOp)->Mdname().GetMDName();
+		const CWStringConst *pstrInverseOp = m_pmda->RetrieveScOp(pmdidInverseOp)->Mdname().GetMDName();
 		
 		pmdidInverseOp->AddRef();
 		return PexprScalarSubqueryQuantified
@@ -2767,7 +2767,7 @@ CTranslatorDXLToExpr::PexprScalarIsDistinctFrom
 	
 	IMDId *mdid_op = pdxlopDistCmp->MDId();
 	mdid_op->AddRef();
-	const IMDScalarOp *md_scalar_op = m_pmda->Pmdscop(mdid_op);
+	const IMDScalarOp *md_scalar_op = m_pmda->RetrieveScOp(mdid_op);
 
 	CScalarIsDistinctFrom *popScIDF = GPOS_NEW(m_memory_pool) CScalarIsDistinctFrom
 													(
@@ -2879,7 +2879,7 @@ CTranslatorDXLToExpr::PexprScalarFunc
 
 	IMDId *mdid_func = pdxlopFuncExpr->FuncMdId();
 	mdid_func->AddRef();
-	const IMDFunction *pmdfunc = m_pmda->Pmdfunc(mdid_func);
+	const IMDFunction *pmdfunc = m_pmda->RetrieveFunc(mdid_func);
 
 	IMDId *mdid_return_type = pdxlopFuncExpr->ReturnTypeMdId();
 	mdid_return_type->AddRef();
@@ -3113,7 +3113,7 @@ CTranslatorDXLToExpr::PexprAggFunc
 	
 	IMDId *agg_func_mdid = dxl_op->GetDXLAggFuncMDid();
 	agg_func_mdid->AddRef();
-	const IMDAggregate *pmdagg = m_pmda->Pmdagg(agg_func_mdid);
+	const IMDAggregate *pmdagg = m_pmda->RetrieveAgg(agg_func_mdid);
 	
 	EAggfuncStage agg_func_stage = EaggfuncstageLocal;
 	if (EdxlaggstagePartial != dxl_op->GetDXLAggStage())
@@ -3858,7 +3858,7 @@ CTranslatorDXLToExpr::PexprScalarProjElem
 	CScalar *popScalar = CScalar::PopConvert(pexprChild->Pop());
 
 	IMDId *mdid = popScalar->MDIdType();
-	const IMDType *pmdtype = m_pmda->Pmdtype(mdid);
+	const IMDType *pmdtype = m_pmda->RetrieveType(mdid);
 
 	CName name(pdxlopPrEl->GetMdNameAlias()->GetMDName());
 	

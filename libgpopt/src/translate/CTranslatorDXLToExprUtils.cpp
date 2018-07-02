@@ -65,7 +65,7 @@ CTranslatorDXLToExprUtils::GetDatum
 	)
 {
 	IMDId *mdid = dxl_op->GetDatumVal()->MDId();
-	IDatum *datum = md_accessor->Pmdtype(mdid)->GetDatumForDXLConstVal(dxl_op);
+	IDatum *datum = md_accessor->RetrieveType(mdid)->GetDatumForDXLConstVal(dxl_op);
 
 	return datum;
 }
@@ -94,7 +94,7 @@ CTranslatorDXLToExprUtils::Pdrgpdatum
 	{
 		CDXLDatum *datum_dxl = (*pdrgpdxldatum)[ul];
 		IMDId *mdid = datum_dxl->MDId();
-		IDatum *datum = md_accessor->Pmdtype(mdid)->GetDatumForDXLDatum(memory_pool, datum_dxl);
+		IDatum *datum = md_accessor->RetrieveType(mdid)->GetDatumForDXLDatum(memory_pool, datum_dxl);
 		pdrgdatum->Append(datum);
 	}
 

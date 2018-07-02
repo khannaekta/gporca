@@ -100,7 +100,7 @@ CStatsPred::EStatsCmpType
 CStatsPredUtils::StatsCmpType(IMDId *mdid)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDScalarOp *md_scalar_op = md_accessor->Pmdscop(mdid);
+	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid);
 
 	// Simply go by operator name.
 	// If the name of the operator is "<", then it is a LessThan etc.
@@ -280,7 +280,7 @@ CStatsPredUtils::GetPredStats(IMemoryPool *memory_pool, CExpression *expr)
 
 	IDatum *datum = scalar_const_op->GetDatum();
 	if (!CHistogram::SupportsFilter(stats_cmp_type) ||
-		!IMDType::StatsAreComparable(col_ref->Pmdtype(), datum))
+		!IMDType::StatsAreComparable(col_ref->RetrieveType(), datum))
 	{
 		// case 1: unsupported predicate for stats calculations
 		// example: SELECT 1 FROM pg_catalog.pg_class c WHERE c.relname ~ '^(t36)$';
@@ -834,7 +834,7 @@ CStatsPredUtils::GetStatsPredLike(IMemoryPool *memory_pool,
 	IDatum *datum_literal = scalar_const_op->GetDatum();
 
 	const CColRef *col_ref = scalar_ident_op->Pcr();
-	if (!IMDType::StatsAreComparable(col_ref->Pmdtype(), datum_literal))
+	if (!IMDType::StatsAreComparable(col_ref->RetrieveType(), datum_literal))
 	{
 		// unsupported stats comparison between the column and datum
 		return GPOS_NEW(memory_pool)
@@ -1044,7 +1044,7 @@ CStatsPredUtils::ExtractJoinStatsFromJoinPred(
 		IsPredCmpColsOrIgnoreCast(join_pred_expr, &col_ref_left, &stats_cmp_type, &col_ref_right);
 	if (fSupportedScIdentComparison && CStatsPred::EstatscmptOther != stats_cmp_type)
 	{
-		if (!IMDType::StatsAreComparable(col_ref_left->Pmdtype(), col_ref_right->Pmdtype()))
+		if (!IMDType::StatsAreComparable(col_ref_left->RetrieveType(), col_ref_right->RetrieveType()))
 		{
 			// unsupported statistics comparison between the histogram boundaries of the columns
 			join_pred_expr->AddRef();

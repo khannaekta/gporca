@@ -3216,7 +3216,7 @@ CTranslatorExprToDXL::PdxlnCorrelatedNLJoin
 	{
 		CColRef *colref = crsi.Pcr();
 		CMDName *mdname = GPOS_NEW(m_memory_pool) CMDName(m_memory_pool, colref->Name().Pstr());
-		IMDId *mdid = colref->Pmdtype()->MDId();
+		IMDId *mdid = colref->RetrieveType()->MDId();
 		mdid->AddRef();
 		CDXLColRef *dxl_colref = GPOS_NEW(m_memory_pool) CDXLColRef(m_memory_pool, mdname, colref->Id(), mdid, colref->TypeModifier());
 		dxl_colref_array->Append(dxl_colref);
@@ -3308,7 +3308,7 @@ CTranslatorExprToDXL::BuildDxlnSubPlan
 	)
 {
 	GPOS_ASSERT(NULL != colref);
-	IMDId *mdid = colref->Pmdtype()->MDId();
+	IMDId *mdid = colref->RetrieveType()->MDId();
 	mdid->AddRef();
 
 	// construct a subplan node, with the inner child under it
@@ -4408,7 +4408,7 @@ CTranslatorExprToDXL::PdxlnPartitionSelectorExpand
 
 	// project list
 	IMDId *mdid = popSelector->MDId();
-	const IMDRelation *pmdrel = (IMDRelation *) m_pmda->Pmdrel(mdid);
+	const IMDRelation *pmdrel = (IMDRelation *) m_pmda->RetrieveRel(mdid);
 	CDXLNode *pdxlnPrL = CTranslatorExprToDXLUtils::PdxlnPrLPartitionSelector
 							(
 							m_memory_pool,
@@ -4547,7 +4547,7 @@ CTranslatorExprToDXL::PdxlnPartitionSelectorFilter
 
 	// project list
 	IMDId *mdid = popSelector->MDId();
-	const IMDRelation *pmdrel = (IMDRelation *) m_pmda->Pmdrel(mdid);
+	const IMDRelation *pmdrel = (IMDRelation *) m_pmda->RetrieveRel(mdid);
 	CDXLNode *pdxlnPrL = CTranslatorExprToDXLUtils::PdxlnPrLPartitionSelector
 							(
 							m_memory_pool,
@@ -4743,14 +4743,14 @@ CTranslatorExprToDXL::ConstructLevelFilters4PartitionSelector
 {
 	GPOS_ASSERT(NULL != pexprPartSelector);
 	CPhysicalPartitionSelector *popSelector = CPhysicalPartitionSelector::PopConvert(pexprPartSelector->Pop());
-	const IMDRelation *pmdrel = (IMDRelation *) m_pmda->Pmdrel(popSelector->MDId());
+	const IMDRelation *pmdrel = (IMDRelation *) m_pmda->RetrieveRel(popSelector->MDId());
 
 	const ULONG ulPartLevels = popSelector->UlPartLevels();
 	GPOS_ASSERT(1 <= ulPartLevels);
 
 	DrgDrgPcr *pdrgpdrgpcrPartKeys = popSelector->Pdrgpdrgpcr();
 	CBitSet *pbsDefaultParts = NULL;
-	IMDPartConstraint *mdpart_constraint = m_pmda->Pmdrel(popSelector->MDId())->MDPartConstraint();
+	IMDPartConstraint *mdpart_constraint = m_pmda->RetrieveRel(popSelector->MDId())->MDPartConstraint();
 	if (NULL != mdpart_constraint)
 		pbsDefaultParts = CUtils::Pbs(m_memory_pool, mdpart_constraint->GetDefaultPartsArray());
 
@@ -4760,7 +4760,7 @@ CTranslatorExprToDXL::ConstructLevelFilters4PartitionSelector
 	for (ULONG ulLevel = 0; ulLevel < ulPartLevels; ulLevel++)
 	{
 		CColRef *pcrPartKey = CUtils::PcrExtractPartKey(pdrgpdrgpcrPartKeys, ulLevel);
-		IMDId *pmdidTypePartKey = pcrPartKey->Pmdtype()->MDId();
+		IMDId *pmdidTypePartKey = pcrPartKey->RetrieveType()->MDId();
 		CHAR szPartType = pmdrel->PartTypeAtLevel(ulLevel);
 		BOOL fRangePart = IMDRelation::ErelpartitionRange == szPartType;
 
@@ -5376,7 +5376,7 @@ CTranslatorExprToDXL::PdxlnCTAS
 	CExpression *pexprChild = (*pexpr)[0];
 	CTableDescriptor *ptabdesc = popDML->Ptabdesc();
 	DrgPcr *pdrgpcrSource = popDML->PdrgpcrSource();
-	CMDRelationCtasGPDB *pmdrel = (CMDRelationCtasGPDB *) m_pmda->Pmdrel(ptabdesc->MDId());
+	CMDRelationCtasGPDB *pmdrel = (CMDRelationCtasGPDB *) m_pmda->RetrieveRel(ptabdesc->MDId());
 
 	CDXLNode *child_dxlnode = CreateDXLNode(pexprChild, pdrgpcrSource, pdrgpdsBaseTables, pulNonGatherMotions, pfDML, true /*fRemap*/, true /*fRoot*/);
 
@@ -5396,11 +5396,11 @@ CTranslatorExprToDXL::PdxlnCTAS
 		const CColumnDescriptor *pcd = ptabdesc->Pcoldesc(ul);
 
 		CMDName *pmdnameCol = GPOS_NEW(m_memory_pool) CMDName(m_memory_pool, pcd->Name().Pstr());
-		CColRef *colref = m_pcf->PcrCreate(pcd->Pmdtype(), pcd->TypeModifier(), pcd->Name());
+		CColRef *colref = m_pcf->PcrCreate(pcd->RetrieveType(), pcd->TypeModifier(), pcd->Name());
 
 		// use the col ref id for the corresponding output output column as 
 		// colid for the dxl column
-		CMDIdGPDB *pmdidColType = CMDIdGPDB::CastMdid(colref->Pmdtype()->MDId());
+		CMDIdGPDB *pmdidColType = CMDIdGPDB::CastMdid(colref->RetrieveType()->MDId());
 		pmdidColType->AddRef();
 
 		CDXLColDescr *pdxlcd = GPOS_NEW(m_memory_pool) CDXLColDescr
@@ -5450,7 +5450,7 @@ CTranslatorExprToDXL::PdxlnCTAS
 									pdrgpulDistr,
 									pmdrel->IsTemporary(),
 									pmdrel->HasOids(),
-									pmdrel->GetRelStorageType(),
+									pmdrel->RetrieveRelStorageType(),
 									pdrgpul,
 									vartypemod_array
 									);
@@ -5538,7 +5538,7 @@ CTranslatorExprToDXL::GetDXLDirectDispatchInfo
 	else
 	{
 		GPOS_ASSERT(pci->FIncludesNull());
-		datum_dxl = pcrDistrCol->Pmdtype()->GetDXLDatumNull(m_memory_pool);
+		datum_dxl = pcrDistrCol->RetrieveType()->GetDXLDatumNull(m_memory_pool);
 	}
 
 	pdrgpdxldatum->Append(datum_dxl);
@@ -6019,7 +6019,7 @@ CTranslatorExprToDXL::PdxlnScFuncExpr
 	IMDId *mdid_return_type = popScFunc->MDIdType();
 	mdid_return_type->AddRef();
 
-	const IMDFunction *pmdfunc = m_pmda->Pmdfunc(mdid_func);
+	const IMDFunction *pmdfunc = m_pmda->RetrieveFunc(mdid_func);
 
 	CDXLNode *pdxlnFuncExpr = GPOS_NEW(m_memory_pool) CDXLNode
 											(
@@ -7118,7 +7118,7 @@ CTranslatorExprToDXL::PdxlnScConst
 
 	IDatum *datum = popScConst->GetDatum();
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDType *pmdtype = md_accessor->Pmdtype(datum->MDId());
+	const IMDType *pmdtype = md_accessor->RetrieveType(datum->MDId());
 
 	CDXLNode *dxlnode = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, pmdtype->GetDXLOpScConst(m_memory_pool, datum));
 
@@ -7194,12 +7194,12 @@ CTranslatorExprToDXL::MakeDXLTableDescr
 		}
 		else
 		{
-			colref = m_pcf->PcrCreate(pcd->Pmdtype(), pcd->TypeModifier(), pcd->Name());
+			colref = m_pcf->PcrCreate(pcd->RetrieveType(), pcd->TypeModifier(), pcd->Name());
 		}
 
 		// use the col ref id for the corresponding output output column as 
 		// colid for the dxl column
-		CMDIdGPDB *pmdidColType = CMDIdGPDB::CastMdid(colref->Pmdtype()->MDId());
+		CMDIdGPDB *pmdidColType = CMDIdGPDB::CastMdid(colref->RetrieveType()->MDId());
 		pmdidColType->AddRef();
 
 		CDXLColDescr *pdxlcd = GPOS_NEW(m_memory_pool) CDXLColDescr
@@ -7556,7 +7556,7 @@ CTranslatorExprToDXL::PdxlnProjListFromConstTableGet
 		ULONG ulPos = UlPosInArray(colref, pdrgpcrCTGOutput);
 		GPOS_ASSERT(ulPos < pdrgpcrCTGOutput->Size());
 		IDatum *datum = (*pdrgpdatumValues)[ulPos];
-		CDXLScalarConstValue *pdxlopConstValue = colref->Pmdtype()->GetDXLOpScConst(m_memory_pool, datum);
+		CDXLScalarConstValue *pdxlopConstValue = colref->RetrieveType()->GetDXLOpScConst(m_memory_pool, datum);
 		CDXLNode *pdxlnPrEl = PdxlnProjElem(colref, GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, pdxlopConstValue));
 		proj_list_dxlnode->AddChild(pdxlnPrEl);
 	}
@@ -7654,7 +7654,7 @@ CTranslatorExprToDXL::GetSortColListDXL
 		GPOS_ASSERT(COrderSpec::EntFirst == ent || COrderSpec::EntLast == ent || COrderSpec::EntAuto == ent);
 		
 		// get sort operator name
-		const IMDScalarOp *md_scalar_op = m_pmda->Pmdscop(sort_op_id);
+		const IMDScalarOp *md_scalar_op = m_pmda->RetrieveScOp(sort_op_id);
 		
 		CWStringConst *sort_op_name = 
 				GPOS_NEW(m_memory_pool) CWStringConst(m_memory_pool, md_scalar_op->Mdname().GetMDName()->GetBuffer());

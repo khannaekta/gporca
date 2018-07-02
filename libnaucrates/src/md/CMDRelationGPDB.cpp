@@ -193,14 +193,14 @@ CMDRelationGPDB::IsTemporary() const
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDRelationGPDB::GetRelStorageType
+//		CMDRelationGPDB::RetrieveRelStorageType
 //
 //	@doc:
 //		Returns the storage type for this relation
 //
 //---------------------------------------------------------------------------
 IMDRelation::Erelstoragetype
-CMDRelationGPDB::GetRelStorageType() const
+CMDRelationGPDB::RetrieveRelStorageType() const
 {
 	return m_rel_storage_type;
 }

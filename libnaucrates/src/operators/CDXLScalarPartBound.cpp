@@ -92,7 +92,7 @@ CDXLScalarPartBound::GetOpNameStr() const
 BOOL
 CDXLScalarPartBound::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	return (IMDType::EtiBool == md_accessor->Pmdtype(m_mdid_type)->GetDatumType());
+	return (IMDType::EtiBool == md_accessor->RetrieveType(m_mdid_type)->GetDatumType());
 }
 
 //---------------------------------------------------------------------------

@@ -207,7 +207,7 @@ CStatistics::Width(ULongPtrArray *col_ids) const
 			CColRef *colref = col_factory->LookupColRef(col_id);
 			GPOS_ASSERT(NULL != colref);
 
-			total_width = total_width + CStatisticsUtils::DefaultColumnWidth(colref->Pmdtype());
+			total_width = total_width + CStatisticsUtils::DefaultColumnWidth(colref->RetrieveType());
 		}
 	}
 	return total_width.Ceil();
@@ -329,7 +329,7 @@ CStatistics::MakeDummyStats(IMemoryPool *memory_pool,
 		CColRef *colref = col_factory->LookupColRef(col_id);
 		GPOS_ASSERT(NULL != colref);
 
-		CDouble width = CStatisticsUtils::DefaultColumnWidth(colref->Pmdtype());
+		CDouble width = CStatisticsUtils::DefaultColumnWidth(colref->RetrieveType());
 		colid_width_mapping->Insert(GPOS_NEW(memory_pool) ULONG(col_id),
 									GPOS_NEW(memory_pool) CDouble(width));
 	}

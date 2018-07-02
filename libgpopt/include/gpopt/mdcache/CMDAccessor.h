@@ -80,7 +80,7 @@ namespace gpopt
 	//
 	//		CMDAccessor maintains a cache of metadata objects (IMDCacheObject)
 	//		keyed on CMDKey (wrapper over IMDId). It also provides various accessor
-	//		methods (such as Pmdagg(), Pmdrel() etc.) to request for corresponding
+	//		methods (such as RetrieveAgg(), RetrieveRel() etc.) to request for corresponding
 	//		metadata objects (such as aggregates and relations respectively). These
 	//		methods in turn call the private method GetImdObj().
 	//
@@ -235,10 +235,10 @@ namespace gpopt
 			const IMDCacheObject *GetImdObj(IMDId *mdid);
 
 			// return the type corresponding to the given type info and source system id
-			const IMDType *Pmdtype(CSystemId sysid, IMDType::ETypeInfo type_info);
+			const IMDType *RetrieveType(CSystemId sysid, IMDType::ETypeInfo type_info);
 
 			// return the generic type corresponding to the given type info
-			const IMDType *Pmdtype(IMDType::ETypeInfo type_info);
+			const IMDType *RetrieveType(IMDType::ETypeInfo type_info);
 			
 			// destroy accessor element when MDAccessor is destroyed
 			static
@@ -302,10 +302,10 @@ namespace gpopt
 			void RegisterProviders(const SysidPtrArray *pdrgpsysid, const MDProviderPtrArray *pdrgpmdp);
 
 			// interface to a relation object from the MD cache
-			const IMDRelation *Pmdrel(IMDId *mdid);
+			const IMDRelation *RetrieveRel(IMDId *mdid);
 
 			// interface to type's from the MD cache given the type's mdid
-			const IMDType *Pmdtype(IMDId *mdid);
+			const IMDType *RetrieveType(IMDId *mdid);
 			
 			// obtain the specified base type given by the template parameter
 			template <class T>
@@ -313,7 +313,7 @@ namespace gpopt
 			{
 				IMDType::ETypeInfo type_info = T::GetTypeInfo();
 				GPOS_ASSERT(IMDType::EtiGeneric != type_info);
-				return dynamic_cast<const T*>(Pmdtype(type_info));
+				return dynamic_cast<const T*>(RetrieveType(type_info));
 			}
 			
 			// obtain the specified base type given by the template parameter
@@ -322,29 +322,29 @@ namespace gpopt
 			{
 				IMDType::ETypeInfo type_info = T::GetTypeInfo();
 				GPOS_ASSERT(IMDType::EtiGeneric != type_info);
-				return dynamic_cast<const T*>(Pmdtype(sysid, type_info));
+				return dynamic_cast<const T*>(RetrieveType(sysid, type_info));
 			}
 			
 			// interface to a scalar operator from the MD cache
-			const IMDScalarOp *Pmdscop(IMDId *mdid);
+			const IMDScalarOp *RetrieveScOp(IMDId *mdid);
 			
 			// interface to a function from the MD cache
-			const IMDFunction *Pmdfunc(IMDId *mdid);
+			const IMDFunction *RetrieveFunc(IMDId *mdid);
 			
 			// interface to check if the window function from the MD cache is an aggregate window function
 			BOOL FAggWindowFunc(IMDId *mdid);
 
 			// interface to an aggregate from the MD cache
-			const IMDAggregate *Pmdagg(IMDId *mdid);
+			const IMDAggregate *RetrieveAgg(IMDId *mdid);
 	
 			// interface to a trigger from the MD cache
-			const IMDTrigger *Pmdtrigger(IMDId *mdid);
+			const IMDTrigger *RetrieveTrigger(IMDId *mdid);
 
 			// interface to an index from the MD cache
-			const IMDIndex *Pmdindex(IMDId *mdid);
+			const IMDIndex *RetrieveIndex(IMDId *mdid);
 
 			// interface to a check constraint from the MD cache
-			const IMDCheckConstraint *Pmdcheckconstraint(IMDId *mdid);
+			const IMDCheckConstraint *RetrieveCheckConstraints(IMDId *mdid);
 
 			// retrieve a column stats object from the cache
 			const IMDColStats *Pmdcolstats(IMDId *mdid);

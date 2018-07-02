@@ -196,7 +196,7 @@ CUtils::GetScCmpMdId
 
 	if (left_mdid->Equals(right_mdid))
 	{
-		const IMDType *pmdtypeLeft = md_accessor->Pmdtype(left_mdid);
+		const IMDType *pmdtypeLeft = md_accessor->RetrieveType(left_mdid);
 		return pmdtypeLeft->GetMdidForCmpType(cmp_type);
 	}
 	
@@ -240,8 +240,8 @@ CUtils::PexprScalarCmp
 	IMDType::ECmpType cmp_type = ParseCmpType(mdid_op);
 	if (IMDType::EcmptOther != cmp_type)
 	{
-		IMDId *left_mdid = pcrLeft->Pmdtype()->MDId();
-		IMDId *right_mdid = pcrRight->Pmdtype()->MDId();
+		IMDId *left_mdid = pcrLeft->RetrieveType()->MDId();
+		IMDId *right_mdid = pcrRight->RetrieveType()->MDId();
 
 		if (FCmpOrCastedCmpExists(left_mdid, right_mdid, cmp_type))
 		{
@@ -308,7 +308,7 @@ CUtils::PexprScalarCmp
 	IMDType::ECmpType cmp_type = ParseCmpType(mdid_op);
 	if (IMDType::EcmptOther != cmp_type)
 	{
-		IMDId *left_mdid = pcrLeft->Pmdtype()->MDId();
+		IMDId *left_mdid = pcrLeft->RetrieveType()->MDId();
 		IMDId *right_mdid = CScalar::PopConvert(pexprRight->Pop())->MDIdType();
 
 		if (FCmpOrCastedCmpExists(left_mdid, right_mdid, cmp_type))
@@ -405,7 +405,7 @@ CUtils::PexprScalarCmp
 	if (IMDType::EcmptOther != cmp_type)
 	{
 		IMDId *left_mdid = CScalar::PopConvert(pexprLeft->Pop())->MDIdType();
-		IMDId *right_mdid = pcrRight->Pmdtype()->MDId();
+		IMDId *right_mdid = pcrRight->RetrieveType()->MDId();
 
 		if (FCmpOrCastedCmpExists(left_mdid, right_mdid, cmp_type))
 		{
@@ -509,7 +509,7 @@ CUtils::PexprScalarCmp
 	}
 
 	pmdidCmpOp->AddRef();
-	const CMDName mdname = md_accessor->Pmdscop(pmdidCmpOp)->Mdname();
+	const CMDName mdname = md_accessor->RetrieveScOp(pmdidCmpOp)->Mdname();
 	CWStringConst strCmpOpName(mdname.GetMDName()->GetBuffer());
 	
 	CExpression *pexprResult = GPOS_NEW(memory_pool) CExpression
@@ -777,15 +777,15 @@ CUtils::PexprScalarArrayCmp
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	// get column type mdid and mdid of the array type corresponding to that type
-	IMDId *pmdidColType = colref->Pmdtype()->MDId();
-	IMDId *pmdidArrType = colref->Pmdtype()->GetArrayTypeMdid();
-	IMDId *pmdidCmpOp = colref->Pmdtype()->GetMdidForCmpType(ecmptype);
+	IMDId *pmdidColType = colref->RetrieveType()->MDId();
+	IMDId *pmdidArrType = colref->RetrieveType()->GetArrayTypeMdid();
+	IMDId *pmdidCmpOp = colref->RetrieveType()->GetMdidForCmpType(ecmptype);
 
 	pmdidColType->AddRef();
 	pmdidArrType->AddRef();
 	pmdidCmpOp ->AddRef();
 
-	const CMDName mdname = md_accessor->Pmdscop(pmdidCmpOp)->Mdname();
+	const CMDName mdname = md_accessor->RetrieveScOp(pmdidCmpOp)->Mdname();
 	CWStringConst strOp(mdname.GetMDName()->GetBuffer());
 
 	CExpression *pexprArray = GPOS_NEW(memory_pool) CExpression
@@ -817,12 +817,12 @@ CUtils::PexprCmpWithZero
 	GPOS_ASSERT(pexprLeft->Pop()->FScalar());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDType *pmdtype = md_accessor->Pmdtype(mdid_type_left);
+	const IMDType *pmdtype = md_accessor->RetrieveType(mdid_type_left);
 	GPOS_ASSERT(pmdtype->GetDatumType() == IMDType::EtiInt8 && "left expression must be of type int8");
 
 	IMDId *mdid_op = pmdtype->GetMdidForCmpType(ecmptype);
 	mdid_op->AddRef();
-	const CMDName mdname = md_accessor->Pmdscop(mdid_op)->Mdname();
+	const CMDName mdname = md_accessor->RetrieveScOp(mdid_op)->Mdname();
 	CWStringConst strOpName(mdname.GetMDName()->GetBuffer());
 
 	return GPOS_NEW(memory_pool) CExpression
@@ -872,7 +872,7 @@ CUtils::PexprIDF
 	}
 
 	pmdidEqOp->AddRef();
-	const CMDName mdname = md_accessor->Pmdscop(pmdidEqOp)->Mdname();
+	const CMDName mdname = md_accessor->RetrieveScOp(pmdidEqOp)->Mdname();
 	CWStringConst strEqOpName(mdname.GetMDName()->GetBuffer());
 
 	return GPOS_NEW(memory_pool) CExpression
@@ -1997,7 +1997,7 @@ CUtils::PexprCountStar
 	CScalarAggFunc *popScalarAggFunc = CScalarAggFunc::PopConvert(pexprCountStar->Pop());
 	IMDId *mdid_type = popScalarAggFunc->MDIdType();
 	INT type_modifier = popScalarAggFunc->TypeModifier();
-	const IMDType *pmdtype = md_accessor->Pmdtype(mdid_type);
+	const IMDType *pmdtype = md_accessor->RetrieveType(mdid_type);
 	CColRef *pcrComputed = col_factory->PcrCreate(pmdtype, type_modifier);
 	CExpression *pexprPrjElem = PexprScalarProjectElement(memory_pool, pcrComputed, pexprCountStar);
 	CExpression *pexprPrjList = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CScalarProjectList(memory_pool), pexprPrjElem);
@@ -2028,14 +2028,14 @@ CUtils::PexprCountStarAndSum
 	CScalarAggFunc *popScalarAggFunc = CScalarAggFunc::PopConvert(pexprCountStar->Pop());
 	IMDId *mdid_type = popScalarAggFunc->MDIdType();
 	INT type_modifier = popScalarAggFunc->TypeModifier();
-	const IMDType *pmdtype = md_accessor->Pmdtype(mdid_type);
+	const IMDType *pmdtype = md_accessor->RetrieveType(mdid_type);
 	CColRef *pcrComputed = col_factory->PcrCreate(pmdtype, type_modifier);
 	CExpression *pexprPrjElemCount = PexprScalarProjectElement(memory_pool, pcrComputed, pexprCountStar);
 
 	// generate sum(col) expression
 	CExpression *pexprSum = PexprSum(memory_pool, colref);
 	CScalarAggFunc *popScalarSumFunc = CScalarAggFunc::PopConvert(pexprSum->Pop());
-	const IMDType *pmdtypeSum = md_accessor->Pmdtype(popScalarSumFunc->MDIdType());
+	const IMDType *pmdtypeSum = md_accessor->RetrieveType(popScalarSumFunc->MDIdType());
 	CColRef *pcrSum = col_factory->PcrCreate(pmdtypeSum, popScalarSumFunc->TypeModifier());
 	CExpression *pexprPrjElemSum = PexprScalarProjectElement(memory_pool, pcrSum, pexprSum);
 	CExpression *pexprPrjList = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CScalarProjectList(memory_pool), pexprPrjElemCount, pexprPrjElemSum);
@@ -2185,7 +2185,7 @@ CUtils::PexprGbAggSum
 		CColRef *colref = (*pdrgpcrSum)[ul];
 		CExpression *pexprSum = PexprSum(memory_pool, colref);
 		CScalarAggFunc *popScalarAggFunc = CScalarAggFunc::PopConvert(pexprSum->Pop());
-		const IMDType *pmdtypeSum = md_accessor->Pmdtype(popScalarAggFunc->MDIdType());
+		const IMDType *pmdtypeSum = md_accessor->RetrieveType(popScalarAggFunc->MDIdType());
 		CColRef *pcrSum = col_factory->PcrCreate(pmdtypeSum, popScalarAggFunc->TypeModifier());
 		CExpression *pexprPrjElemSum = PexprScalarProjectElement(memory_pool, pcrSum, pexprSum);
 		pdrgpexpr->Append(pexprPrjElemSum);
@@ -2236,9 +2236,9 @@ CUtils::PexprAgg
 	)
 {
 	GPOS_ASSERT(IMDType::EaggGeneric >agg_type);
-	GPOS_ASSERT(colref->Pmdtype()->GetMdidForAggType(agg_type)->IsValid());
+	GPOS_ASSERT(colref->RetrieveType()->GetMdidForAggType(agg_type)->IsValid());
 	
-	const IMDAggregate *pmdagg = md_accessor->Pmdagg(colref->Pmdtype()->GetMdidForAggType(agg_type));
+	const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(colref->RetrieveType()->GetMdidForAggType(agg_type));
 	
 	IMDId *agg_mdid = pmdagg->MDId();
 	agg_mdid->AddRef();
@@ -2435,7 +2435,7 @@ CUtils::PexprScalarProjListConst
 		CScalarConst *popScConst = GPOS_NEW(memory_pool) CScalarConst(memory_pool, datum);
 		CExpression *pexprScConst = GPOS_NEW(memory_pool) CExpression(memory_pool, popScConst);
 
-		CColRef *new_colref = col_factory->PcrCreate(colref->Pmdtype(), colref->TypeModifier(), colref->Name());
+		CColRef *new_colref = col_factory->PcrCreate(colref->RetrieveType(), colref->TypeModifier(), colref->Name());
 		if (NULL != colref_mapping)
 		{
 #ifdef GPOS_DEBUG
@@ -2505,7 +2505,7 @@ CUtils::PexprAddProjection
 
 		// generate a computed column with scalar expression type
 		CScalar *popScalar = CScalar::PopConvert(pexprProjected->Pop());
-		const IMDType *pmdtype = md_accessor->Pmdtype(popScalar->MDIdType());
+		const IMDType *pmdtype = md_accessor->RetrieveType(popScalar->MDIdType());
 		CColRef *colref = col_factory->PcrCreate(pmdtype, popScalar->TypeModifier());
 
 		pexprProjected->AddRef();
@@ -2584,7 +2584,7 @@ CUtils::ParseCmpType
 	)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDScalarOp *md_scalar_op = md_accessor->Pmdscop(mdid);
+	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid);
 	return md_scalar_op->ParseCmpType();
 }
 
@@ -2596,7 +2596,7 @@ CUtils::ParseCmpType
 	IMDId *mdid
 	)
 {
-	const IMDScalarOp *md_scalar_op = md_accessor->Pmdscop(mdid);
+	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid);
 	return md_scalar_op->ParseCmpType();
 }
 
@@ -3223,7 +3223,7 @@ CUtils::FScalarIdentBoolType
 	)
 {
 	return FScalarIdent(pexpr) && 
-			IMDType::EtiBool == CScalarIdent::PopConvert(pexpr->Pop())->Pcr()->Pmdtype()->GetDatumType();
+			IMDType::EtiBool == CScalarIdent::PopConvert(pexpr->Pop())->Pcr()->RetrieveType()->GetDatumType();
 }
 
 // check if given expression is a scalar array
@@ -3345,7 +3345,7 @@ CUtils::FConstrainableType
 		return false;
 	}
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDType *pmdtype = md_accessor->Pmdtype(mdid_type);
+	const IMDType *pmdtype = md_accessor->RetrieveType(mdid_type);
 
 	return FHasAllDefaultComparisons(pmdtype);
 }
@@ -3358,7 +3358,7 @@ CUtils::FIntType
 	)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	IMDType::ETypeInfo type_info = md_accessor->Pmdtype(mdid_type)->GetDatumType();
+	IMDType::ETypeInfo type_info = md_accessor->RetrieveType(mdid_type)->GetDatumType();
 
 	return (IMDType::EtiInt2 == type_info ||
 			IMDType::EtiInt4 == type_info ||
@@ -3431,7 +3431,7 @@ CUtils::FComparisonPossible
 	for (ULONG ul = 0; ul < size; ul++)
 	{
 		CColRef *colref = (*colref_array)[ul];
-		const IMDType *pmdtype = colref->Pmdtype();
+		const IMDType *pmdtype = colref->RetrieveType();
 		if (!IMDId::IsValid(pmdtype->GetMdidForCmpType(cmp_type)))
 		{
 			return false;
@@ -3479,7 +3479,7 @@ CUtils::PdrgpcrRedistributableSubset
 	for (ULONG ul = 0; ul < size; ul++)
 	{
 		CColRef *colref = (*colref_array)[ul];
-		const IMDType *pmdtype = colref->Pmdtype();
+		const IMDType *pmdtype = colref->RetrieveType();
 		if (pmdtype->IsRedistributable())
 		{
 			pdrgpcrRedist->Append(colref);
@@ -3503,7 +3503,7 @@ CUtils::IsHashable
 	for (ULONG ul = 0; ul < size; ul++)
 	{
 		CColRef *colref = (*colref_array)[ul];
-		const IMDType *pmdtype = colref->Pmdtype();
+		const IMDType *pmdtype = colref->RetrieveType();
 		if (!pmdtype->IsHashable())
 		{
 			return false;
@@ -4970,11 +4970,11 @@ CUtils::FGeneratePartOid
 	)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->Pmdrel(mdid);
-	BOOL fInsertSortOnParquet = (!GPOS_FTRACE(EopttraceDisableSortForDMLOnParquet) && pmdrel->GetRelStorageType() == IMDRelation::ErelstorageAppendOnlyParquet);
+	const IMDRelation *pmdrel = md_accessor->RetrieveRel(mdid);
+	BOOL fInsertSortOnParquet = (!GPOS_FTRACE(EopttraceDisableSortForDMLOnParquet) && pmdrel->RetrieveRelStorageType() == IMDRelation::ErelstorageAppendOnlyParquet);
 
 	COptimizerConfig *optimizer_config = COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
-	BOOL fInsertSortOnRows = (pmdrel->GetRelStorageType() == IMDRelation::ErelstorageAppendOnlyRows) && (optimizer_config->GetHint()->UlMinNumOfPartsToRequireSortOnInsert() <= pmdrel->PartitionCount());
+	BOOL fInsertSortOnRows = (pmdrel->RetrieveRelStorageType() == IMDRelation::ErelstorageAppendOnlyRows) && (optimizer_config->GetHint()->UlMinNumOfPartsToRequireSortOnInsert() <= pmdrel->PartitionCount());
 
 	return fInsertSortOnParquet || fInsertSortOnRows;
 }

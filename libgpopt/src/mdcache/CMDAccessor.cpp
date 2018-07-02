@@ -692,7 +692,7 @@ CMDAccessor::GetImdObj
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDAccessor::Pmdrel
+//		CMDAccessor::RetrieveRel
 //
 //	@doc:
 //		Retrieves a metadata cache relation from the md cache, possibly retrieving
@@ -700,7 +700,7 @@ CMDAccessor::GetImdObj
 //
 //---------------------------------------------------------------------------
 const IMDRelation *
-CMDAccessor::Pmdrel
+CMDAccessor::RetrieveRel
 	(
 	IMDId *mdid
 	)
@@ -716,7 +716,7 @@ CMDAccessor::Pmdrel
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDAccessor::Pmdtype
+//		CMDAccessor::RetrieveType
 //
 //	@doc:
 //		Retrieves the metadata description for a type from the md cache, 
@@ -725,7 +725,7 @@ CMDAccessor::Pmdrel
 //
 //---------------------------------------------------------------------------
 const IMDType *
-CMDAccessor::Pmdtype
+CMDAccessor::RetrieveType
 	(
 	IMDId *mdid
 	)
@@ -741,7 +741,7 @@ CMDAccessor::Pmdtype
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDAccessor::Pmdtype
+//		CMDAccessor::RetrieveType
 //
 //	@doc:
 //		Retrieves the MD type from the md cache given the type info and source
@@ -750,7 +750,7 @@ CMDAccessor::Pmdtype
 //
 //---------------------------------------------------------------------------
 const IMDType *
-CMDAccessor::Pmdtype
+CMDAccessor::RetrieveType
 	(
 	CSystemId sysid,
 	IMDType::ETypeInfo type_info
@@ -771,7 +771,7 @@ CMDAccessor::Pmdtype
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDAccessor::Pmdtype
+//		CMDAccessor::RetrieveType
 //
 //	@doc:
 //		Retrieves the generic MD type from the md cache given the
@@ -780,7 +780,7 @@ CMDAccessor::Pmdtype
 //
 //---------------------------------------------------------------------------
 const IMDType *
-CMDAccessor::Pmdtype
+CMDAccessor::RetrieveType
 	(
 	IMDType::ETypeInfo type_info
 	)
@@ -801,7 +801,7 @@ CMDAccessor::Pmdtype
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDAccessor::Pmdscop
+//		CMDAccessor::RetrieveScOp
 //
 //	@doc:
 //		Retrieves the metadata description for a scalar operator from the md cache, 
@@ -810,7 +810,7 @@ CMDAccessor::Pmdtype
 //
 //---------------------------------------------------------------------------
 const IMDScalarOp *
-CMDAccessor::Pmdscop
+CMDAccessor::RetrieveScOp
 	(
 	IMDId *mdid
 	)
@@ -826,7 +826,7 @@ CMDAccessor::Pmdscop
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDAccessor::Pmdfunc
+//		CMDAccessor::RetrieveFunc
 //
 //	@doc:
 //		Retrieves the metadata description for a function from the md cache, 
@@ -835,7 +835,7 @@ CMDAccessor::Pmdscop
 //
 //---------------------------------------------------------------------------
 const IMDFunction *
-CMDAccessor::Pmdfunc
+CMDAccessor::RetrieveFunc
 	(
 	IMDId *mdid
 	)
@@ -873,7 +873,7 @@ CMDAccessor::FAggWindowFunc
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDAccessor::Pmdagg
+//		CMDAccessor::RetrieveAgg
 //
 //	@doc:
 //		Retrieves the metadata description for an aggregate from the md cache, 
@@ -882,7 +882,7 @@ CMDAccessor::FAggWindowFunc
 //
 //---------------------------------------------------------------------------
 const IMDAggregate *
-CMDAccessor::Pmdagg
+CMDAccessor::RetrieveAgg
 	(
 	IMDId *mdid
 	)
@@ -898,7 +898,7 @@ CMDAccessor::Pmdagg
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDAccessor::Pmdtrigger
+//		CMDAccessor::RetrieveTrigger
 //
 //	@doc:
 //		Retrieves the metadata description for a trigger from the md cache,
@@ -907,7 +907,7 @@ CMDAccessor::Pmdagg
 //
 //---------------------------------------------------------------------------
 const IMDTrigger *
-CMDAccessor::Pmdtrigger
+CMDAccessor::RetrieveTrigger
 	(
 	IMDId *mdid
 	)
@@ -923,7 +923,7 @@ CMDAccessor::Pmdtrigger
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDAccessor::Pmdindex
+//		CMDAccessor::RetrieveIndex
 //
 //	@doc:
 //		Retrieves the metadata description for an index from the md cache, 
@@ -932,7 +932,7 @@ CMDAccessor::Pmdtrigger
 //
 //---------------------------------------------------------------------------
 const IMDIndex *
-CMDAccessor::Pmdindex
+CMDAccessor::RetrieveIndex
 	(
 	IMDId *mdid
 	)
@@ -948,7 +948,7 @@ CMDAccessor::Pmdindex
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDAccessor::Pmdcheckconstraint
+//		CMDAccessor::RetrieveCheckConstraints
 //
 //	@doc:
 //		Retrieves the metadata description for a check constraint from the md cache,
@@ -957,7 +957,7 @@ CMDAccessor::Pmdindex
 //
 //---------------------------------------------------------------------------
 const IMDCheckConstraint *
-CMDAccessor::Pmdcheckconstraint
+CMDAccessor::RetrieveCheckConstraints
 	(
 	IMDId *mdid
 	)
@@ -1126,7 +1126,7 @@ CMDAccessor::RecordColumnStats
 	col_id_width_mapping->Insert(GPOS_NEW(memory_pool) ULONG(col_id), width);
 
 	// extract the the histogram and insert it into the hashmap
-	const IMDRelation *pmdrel = Pmdrel(rel_mdid);
+	const IMDRelation *pmdrel = RetrieveRel(rel_mdid);
 	IMDId *mdid_type = pmdrel->GetMdCol(ulPos)->MDIdType();
 	CHistogram *histogram = GetHistogram(memory_pool, mdid_type, pmdcolstats);
 	GPOS_ASSERT(NULL != histogram);
@@ -1196,7 +1196,7 @@ CMDAccessor::Pstats
 	rel_stats_mdid->Release();
 
 	BOOL fEmptyTable = pmdRelStats->IsEmpty();
-	const IMDRelation *pmdrel = Pmdrel(rel_mdid);
+	const IMDRelation *pmdrel = RetrieveRel(rel_mdid);
 
 	UlongHistogramHashMap *col_histogram_mapping = GPOS_NEW(memory_pool) UlongHistogramHashMap(memory_pool);
 	UlongDoubleHashMap *col_id_width_mapping = GPOS_NEW(memory_pool) UlongDoubleHashMap(memory_pool);
@@ -1364,7 +1364,7 @@ CMDAccessor::GetDatum
 	const CDXLDatum *datum_dxl
 	)
 {
-	const IMDType *pmdtype = Pmdtype(mdid_type);
+	const IMDType *pmdtype = RetrieveType(mdid_type);
 		
 	return pmdtype->GetDatumForDXLDatum(memory_pool, datum_dxl);
 }

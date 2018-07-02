@@ -105,7 +105,7 @@ namespace gpmd
 			return m_freq_remaining;
 		}
 
-		const DXLBucketPtrArray *GetDXLBucketArray() const;
+		const DXLBucketPtrArray *TransformHistogramToDXLBucketArray() const;
 
 		// serialize bucket in DXL format
 		void Serialize(gpdxl::CXMLSerializer *) const;

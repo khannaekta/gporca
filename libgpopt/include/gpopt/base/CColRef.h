@@ -82,7 +82,7 @@ namespace gpopt
 			~CColRef();
 			
 			// accessor to type info
-			const IMDType *Pmdtype() const
+			const IMDType *RetrieveType() const
 			{
 				return m_pmdtype;
 			}

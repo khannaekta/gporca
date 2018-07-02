@@ -752,7 +752,7 @@ const
 			continue;
 		}
 		const CColRef *pcrHashed = CScalarIdent::PopConvert(pexpr->Pop())->Pcr();
-		const IMDType *pmdtype = pcrHashed->Pmdtype();
+		const IMDType *pmdtype = pcrHashed->RetrieveType();
 		if (!pmdtype->IsHashable())
 		{
 			// skip non-hashable columns

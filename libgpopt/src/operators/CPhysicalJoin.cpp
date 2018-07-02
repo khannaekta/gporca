@@ -493,8 +493,8 @@ CPhysicalJoin::FHashJoinCompatible
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	return fHashJoinCompatiblePred &&
-					md_accessor->Pmdtype(pmdidTypeOuter)->IsHashable() &&
-					md_accessor->Pmdtype(pmdidTypeInner)->IsHashable();
+					md_accessor->RetrieveType(pmdidTypeOuter)->IsHashable() &&
+					md_accessor->RetrieveType(pmdidTypeInner)->IsHashable();
 }
 
 

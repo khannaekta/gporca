@@ -67,7 +67,7 @@ CScalarSubquery::~CScalarSubquery()
 IMDId *
 CScalarSubquery::MDIdType() const
 {
-	return m_pcr->Pmdtype()->MDId();
+	return m_pcr->RetrieveType()->MDId();
 }
 
 //---------------------------------------------------------------------------

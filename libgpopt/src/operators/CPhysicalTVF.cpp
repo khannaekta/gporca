@@ -55,7 +55,7 @@ CPhysicalTVF::CPhysicalTVF
 	GPOS_ASSERT(NULL != m_pcrsOutput);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	m_pmdfunc = md_accessor->Pmdfunc(m_func_mdid);
+	m_pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
 }
 
 

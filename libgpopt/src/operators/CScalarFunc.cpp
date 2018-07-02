@@ -80,7 +80,7 @@ CScalarFunc::CScalarFunc
 	GPOS_ASSERT(mdid_return_type->IsValid());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDFunction *pmdfunc = md_accessor->Pmdfunc(m_func_mdid);
+	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
 
 	m_efs = pmdfunc->GetFuncStability();
 	m_efda = pmdfunc->GetFuncDataAccess();

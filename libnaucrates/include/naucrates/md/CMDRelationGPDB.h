@@ -165,7 +165,7 @@ namespace gpmd
 		virtual BOOL IsTemporary() const;
 
 		// storage type (heap, appendonly, ...)
-		virtual Erelstoragetype GetRelStorageType() const;
+		virtual Erelstoragetype RetrieveRelStorageType() const;
 
 		// distribution policy (none, hash, random)
 		virtual Ereldistrpolicy GetRelDistribution() const;

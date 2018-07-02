@@ -77,7 +77,7 @@ CPhysicalStreamAgg::InitOrderSpec
 
 		// TODO: 12/21/2011 - ; this seems broken: a colref must not embed
 		// a pointer to a cached object
-		gpmd::IMDId *mdid = colref->Pmdtype()->GetMdidForCmpType(IMDType::EcmptL);
+		gpmd::IMDId *mdid = colref->RetrieveType()->GetMdidForCmpType(IMDType::EcmptL);
 		mdid->AddRef();
 
 		m_pos->Append(mdid, colref, COrderSpec::EntLast);
@@ -157,7 +157,7 @@ CPhysicalStreamAgg::PosCovering
 			CColRef *colref = (*pdrgpcrGrp)[ul];
 			if (!pcrsReqd->FMember(colref))
 			{
-				IMDId *mdid = colref->Pmdtype()->GetMdidForCmpType(IMDType::EcmptL);
+				IMDId *mdid = colref->RetrieveType()->GetMdidForCmpType(IMDType::EcmptL);
 				mdid->AddRef();
 				pos->Append(mdid, colref, COrderSpec::EntLast);
 			}

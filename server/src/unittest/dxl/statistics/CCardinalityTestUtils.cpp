@@ -196,7 +196,7 @@ CCardinalityTestUtils::PpointNumeric
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	CMDIdGPDB *mdid = GPOS_NEW(memory_pool) CMDIdGPDB(CMDIdGPDB::m_mdid_numeric);
-	const IMDType *pmdtype = md_accessor->Pmdtype(mdid);
+	const IMDType *pmdtype = md_accessor->RetrieveType(mdid);
 
 	ULONG ulbaSize = 0;
 	BYTE *data = CDXLUtils::DecodeByteArrayFromString(memory_pool, pstrEncodedValue, &ulbaSize);

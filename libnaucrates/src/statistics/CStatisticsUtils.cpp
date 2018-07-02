@@ -60,7 +60,7 @@ CPoint *
 CStatisticsUtils::NextPoint(IMemoryPool *memory_pool, CMDAccessor *md_accessor, CPoint *point)
 {
 	IMDId *mdid = point->GetDatum()->MDId();
-	const IMDType *mdtype = md_accessor->Pmdtype(mdid);
+	const IMDType *mdtype = md_accessor->RetrieveType(mdid);
 
 	// type has integer mapping
 	if (mdtype->GetDatumType() == IMDType::EtiInt2 || mdtype->GetDatumType() == IMDType::EtiInt4 ||
@@ -1026,7 +1026,7 @@ CStatisticsUtils::GetColId(const StatsPredPtrArry *pred_stats_array)
 IDatum *
 CStatisticsUtils::DatumNull(const CColRef *colref)
 {
-	const IMDType *mdtype = colref->Pmdtype();
+	const IMDType *mdtype = colref->RetrieveType();
 
 	IDatum *datum = mdtype->DatumNull();
 	datum->AddRef();

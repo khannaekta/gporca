@@ -221,7 +221,7 @@ CExpressionPreprocessor::PexprSimplifyQuantifiedSubqueries
 
 			CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 			IMDId *mdid = popSubqQuantified->MdIdOp();
-			const CWStringConst *str = md_accessor->Pmdscop(mdid)->Mdname().GetMDName();
+			const CWStringConst *str = md_accessor->RetrieveScOp(mdid)->Mdname().GetMDName();
 			mdid->AddRef();
 			pexprScalar->AddRef();
 
@@ -859,7 +859,7 @@ CExpressionPreprocessor::PexprProjBelowSubquery
 		if (NULL != prcsOutput && !prcsOutput->FMember(pcrSubquery))
 		{
 			CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
-			CColRef *pcrNewSubquery = col_factory->PcrCreate(pcrSubquery->Pmdtype(), pcrSubquery->TypeModifier());
+			CColRef *pcrNewSubquery = col_factory->PcrCreate(pcrSubquery->RetrieveType(), pcrSubquery->TypeModifier());
 
 			CExpression *pexprPrEl = CUtils::PexprScalarProjectElement(memory_pool, pcrNewSubquery, CUtils::PexprScalarIdent(memory_pool, pcrSubquery));
 			CExpression *pexprProjList =  GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CScalarProjectList(memory_pool), pexprPrEl);
@@ -2028,7 +2028,7 @@ CExpressionPreprocessor::ConvertInToSimpleExists
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	IMDId *mdid = CScalarSubqueryAny::PopConvert(pop)->MdIdOp();
-	const CWStringConst *str = md_accessor->Pmdscop(mdid)->Mdname().GetMDName();
+	const CWStringConst *str = md_accessor->RetrieveScOp(mdid)->Mdname().GetMDName();
 
 	mdid->AddRef();
 	pexprRight->AddRef();

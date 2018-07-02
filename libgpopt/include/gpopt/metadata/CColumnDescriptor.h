@@ -79,7 +79,7 @@ namespace gpopt
 			}
 			
 			// return metadata type
-			const IMDType *Pmdtype() const
+			const IMDType *RetrieveType() const
 			{
 				return m_pmdtype;
 			}

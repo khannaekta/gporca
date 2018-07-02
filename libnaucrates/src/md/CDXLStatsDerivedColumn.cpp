@@ -61,14 +61,14 @@ CDXLStatsDerivedColumn::~CDXLStatsDerivedColumn()
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLStatsDerivedColumn::GetDXLBucketArray
+//		CDXLStatsDerivedColumn::TransformHistogramToDXLBucketArray
 //
 //	@doc:
 //		Returns the array of buckets
 //
 //---------------------------------------------------------------------------
 const DXLBucketPtrArray *
-CDXLStatsDerivedColumn::GetDXLBucketArray() const
+CDXLStatsDerivedColumn::TransformHistogramToDXLBucketArray() const
 {
 	return m_stats_bucket_dxl_array;
 }

@@ -688,7 +688,7 @@ CXformUtils::FSameDatatype
 
 			GPOS_ASSERT(pcrOuter != pcrInner);
 
-			if (pcrInner->Pmdtype() != pcrOuter->Pmdtype())
+			if (pcrInner->RetrieveType() != pcrOuter->RetrieveType())
 			{
 				return false;
 			}
@@ -743,7 +743,7 @@ CXformUtils::ExistentialToAgg
 			(
 			memory_pool,
 			CUtils::PexprScalarIdent(memory_pool, pcrCount),
-			pcrCount->Pmdtype()->MDId(),
+			pcrCount->RetrieveType()->MDId(),
 			ecmptype
 			);
 }
@@ -890,7 +890,7 @@ CXformUtils::SubqueryAnyToAgg
 
 		const CColRef *pcrSubquery = CScalarProjectElement::PopConvert((*(*pexprPrj)[1])[0]->Pop())->Pcr();
 		*ppexprNewSubquery = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CScalarSubquery(memory_pool, pcrSubquery, false /*fGeneratedByExist*/, true /*fGeneratedByQuantified*/), pexprPrj);
-		*ppexprNewScalar = CUtils::PexprCmpWithZero(memory_pool, CUtils::PexprScalarIdent(memory_pool, pcrSubquery), pcrSubquery->Pmdtype()->MDId(), IMDType::EcmptG);
+		*ppexprNewScalar = CUtils::PexprCmpWithZero(memory_pool, CUtils::PexprScalarIdent(memory_pool, pcrSubquery), pcrSubquery->RetrieveType()->MDId(), IMDType::EcmptG);
 	}
 	else
 	{
@@ -898,7 +898,7 @@ CXformUtils::SubqueryAnyToAgg
 		const CColRef *pcrCount = CScalarProjectElement::PopConvert((*(*pexprInnerNew)[1])[0]->Pop())->Pcr();
 
 		*ppexprNewSubquery = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CScalarSubquery(memory_pool, pcrCount, false /*fGeneratedByExist*/, true /*fGeneratedByQuantified*/), pexprInnerNew);
-		*ppexprNewScalar = CUtils::PexprCmpWithZero(memory_pool, CUtils::PexprScalarIdent(memory_pool, pcrCount), pcrCount->Pmdtype()->MDId(), IMDType::EcmptG);
+		*ppexprNewScalar = CUtils::PexprCmpWithZero(memory_pool, CUtils::PexprScalarIdent(memory_pool, pcrCount), pcrCount->RetrieveType()->MDId(), IMDType::EcmptG);
 	}
 }
 
@@ -1143,8 +1143,8 @@ CXformUtils::PexprInversePred
 
 	// get mdid and name of the inverse of the comparison operator used by subquery
 	IMDId *mdid_op = popSqAll->MdIdOp();
-	IMDId *pmdidInverseOp = md_accessor->Pmdscop(mdid_op)->GetInverseOpMdid();
-	const CWStringConst *pstrFirst = md_accessor->Pmdscop(pmdidInverseOp)->Mdname().GetMDName();
+	IMDId *pmdidInverseOp = md_accessor->RetrieveScOp(mdid_op)->GetInverseOpMdid();
+	const CWStringConst *pstrFirst = md_accessor->RetrieveScOp(pmdidInverseOp)->Mdname().GetMDName();
 
 	// generate a predicate for the inversion of the comparison involved in the subquery
 	pexprScalar->AddRef();
@@ -1344,12 +1344,12 @@ CXformUtils::FTriggersExist
 	)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->Pmdrel(ptabdesc->MDId());
+	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdesc->MDId());
 	const ULONG ulTriggers = pmdrel->TriggerCount();
 
 	for (ULONG ul = 0; ul < ulTriggers; ul++)
 	{
-		const IMDTrigger *pmdtrigger = md_accessor->Pmdtrigger(pmdrel->TriggerMDidAt(ul));
+		const IMDTrigger *pmdtrigger = md_accessor->RetrieveTrigger(pmdrel->TriggerMDidAt(ul));
 		if (!pmdtrigger->IsEnabled() ||
 			!pmdtrigger->ExecutesOnRowLevel() ||
 			!FTriggerApplies(edmlop, pmdtrigger))
@@ -1630,7 +1630,7 @@ CXformUtils::PexprAssertCheckConstraints
 	)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->Pmdrel(ptabdesc->MDId());
+	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdesc->MDId());
 
 	const ULONG ulCheckConstraint = pmdrel->CheckConstraintCount();
 	if (0 < ulCheckConstraint)
@@ -1640,7 +1640,7 @@ CXformUtils::PexprAssertCheckConstraints
 		for (ULONG ul = 0; ul < ulCheckConstraint; ul++)
 		{
 			IMDId *pmdidCheckConstraint = pmdrel->CheckConstraintMDidAt(ul);
-			const IMDCheckConstraint *pmdCheckConstraint = md_accessor->Pmdcheckconstraint(pmdidCheckConstraint);
+			const IMDCheckConstraint *pmdCheckConstraint = md_accessor->RetrieveCheckConstraints(pmdidCheckConstraint);
 
 			// extract the check constraint expression
 			CExpression *pexprCheckConstraint = pmdCheckConstraint->GetCheckConstraintExpr(memory_pool, md_accessor, colref_array);
@@ -1742,7 +1742,7 @@ CXformUtils::PexprAssertUpdateCardinality
 	CExpression *pexprCountStar = CUtils::PexprCountStar(memory_pool);
 
 	CScalar *pop = CScalar::PopConvert(pexprCountStar->Pop());
-	const IMDType *pmdtype = md_accessor->Pmdtype(pop->MDIdType());
+	const IMDType *pmdtype = md_accessor->RetrieveType(pop->MDIdType());
 	CColRef *pcrProjElem = col_factory->PcrCreate(pmdtype, pop->TypeModifier());
 	 
 	CExpression *pexprProjElem = GPOS_NEW(memory_pool) CExpression
@@ -1819,7 +1819,7 @@ CXformUtils::FSupportsMinAgg
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
 		CColRef *colref = (*colref_array)[ul];
-		const IMDType *pmdtype = colref->Pmdtype();
+		const IMDType *pmdtype = colref->RetrieveType();
 		if (!IMDId::IsValid(pmdtype->GetMdidForAggType(IMDType::EaggMin)))
 		{
 			return false;
@@ -1933,7 +1933,7 @@ CXformUtils::AddMinAggs
 			CExpression *pexprMinAgg = CUtils::PexprMin(memory_pool, md_accessor, colref);
 			CScalar *popMin = CScalar::PopConvert(pexprMinAgg->Pop());
 			
-			const IMDType *pmdtypeMin = md_accessor->Pmdtype(popMin->MDIdType());
+			const IMDType *pmdtypeMin = md_accessor->RetrieveType(popMin->MDIdType());
 			new_colref = col_factory->PcrCreate(pmdtypeMin, popMin->TypeModifier());
 			CExpression *pexprProjElemMin = GPOS_NEW(memory_pool) CExpression
 											(
@@ -2386,7 +2386,7 @@ CXformUtils::PexprWindowWithRowNumber
 
 	// generate a new column reference
 	CScalarWindowFunc *popScWindowFunc = CScalarWindowFunc::PopConvert(pexprScWindowFunc->Pop());
-	const IMDType *pmdtype = COptCtxt::PoctxtFromTLS()->Pmda()->Pmdtype(popScWindowFunc->MDIdType());
+	const IMDType *pmdtype = COptCtxt::PoctxtFromTLS()->Pmda()->RetrieveType(popScWindowFunc->MDIdType());
 	CName name(popScWindowFunc->PstrFunc());
 	CColRef *colref = COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(pmdtype, popScWindowFunc->TypeModifier(), name);
 
@@ -3148,7 +3148,7 @@ CXformUtils::PexprEqualityOnBoolColumn
 	IMDId *mdid_op = pmdtype->GetMdidForCmpType(IMDType::EcmptEq);
 	mdid_op->AddRef();
 
-	const CMDName mdname = md_accessor->Pmdscop(mdid_op)->Mdname();
+	const CMDName mdname = md_accessor->RetrieveScOp(mdid_op)->Mdname();
 	CWStringConst strOpName(mdname.GetMDName()->GetBuffer());
 
 	return CUtils::PexprScalarCmp
@@ -3382,7 +3382,7 @@ CXformUtils::PexprBitmapForSelectCondition
 	const ULONG ulIndexes = pmdrel->IndexCount();
 	for (ULONG ul = 0; ul < ulIndexes; ul++)
 	{
-		const IMDIndex *pmdindex = md_accessor->Pmdindex(pmdrel->IndexMDidAt(ul));
+		const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pmdrel->IndexMDidAt(ul));
 		
 		if (!pmdrel->IsPartialIndex(pmdindex->MDId()) && CXformUtils::FIndexApplicable
 									(
@@ -3492,7 +3492,7 @@ CXformUtils::PexprBitmapForIndexLookup
 	const ULONG ulIndexes = pmdrel->IndexCount();
 	for (ULONG ul = 0; ul < ulIndexes; ul++)
 	{
-		const IMDIndex *pmdindex = md_accessor->Pmdindex(pmdrel->IndexMDidAt(ul));
+		const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pmdrel->IndexMDidAt(ul));
 
 		if (pmdrel->IsPartialIndex(pmdindex->MDId()) || !CXformUtils::FIndexApplicable
 									(
@@ -3668,7 +3668,7 @@ CXformUtils::FHasAmbiguousType
 				if (NULL != mdid)
 				{
 					// check MD type of scalar node
-					fAmbiguous = md_accessor->Pmdtype(mdid)->IsAmbiguous();
+					fAmbiguous = md_accessor->RetrieveType(mdid)->IsAmbiguous();
 				}
 		}
 	}
@@ -3772,7 +3772,7 @@ CXformUtils::PexprBitmapTableGet
 
 	// find the indexes whose included columns meet the required columns
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->Pmdrel(ptabdesc->MDId());
+	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdesc->MDId());
 
 	GPOS_ASSERT(0 < pdrgpexpr->Size());
 	
@@ -3894,7 +3894,7 @@ CXformUtils::PdrgpdrgppartdigCandidates
 
 	for (ULONG ul = 0; ul < ulIndexes; ul++)
 	{
-		const IMDIndex *pmdindex = md_accessor->Pmdindex(pmdrel->IndexMDidAt(ul));
+		const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pmdrel->IndexMDidAt(ul));
 
 		if (!CXformUtils::FIndexApplicable(memory_pool, pmdindex, pmdrel, pdrgpcrOutput, pcrsReqd, pcrsScalarExpr, IMDIndex::EmdindBtree /*emdindtype*/) ||
 			!pmdrel->IsPartialIndex(pmdindex->MDId()))

@@ -81,7 +81,7 @@ CLogicalTVF::CLogicalTVF
 	m_pdrgpcrOutput = PdrgpcrCreateMapping(memory_pool, pdrgpcoldesc, UlOpId());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDFunction *pmdfunc = md_accessor->Pmdfunc(m_func_mdid);
+	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
 
 	m_efs = pmdfunc->GetFuncStability();
 	m_efda = pmdfunc->GetFuncDataAccess();
@@ -120,7 +120,7 @@ CLogicalTVF::CLogicalTVF
 	GPOS_ASSERT(NULL != pdrgpcrOutput);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDFunction *pmdfunc = md_accessor->Pmdfunc(m_func_mdid);
+	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
 
 	m_efs = pmdfunc->GetFuncStability();
 	m_efda = pmdfunc->GetFuncDataAccess();

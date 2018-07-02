@@ -1069,7 +1069,7 @@ CConstraintTest::PexprScalarCmp
 	IMDId *mdid_op = pmdtypeint8->GetMdidForCmpType(cmp_type);
 	mdid_op->AddRef();
 
-	const CMDName mdname = md_accessor->Pmdscop(mdid_op)->Mdname();
+	const CMDName mdname = md_accessor->RetrieveScOp(mdid_op)->Mdname();
 
 	CWStringConst strOpName(mdname.GetMDName()->GetBuffer());
 
@@ -1283,7 +1283,7 @@ CConstraintTest::EresUnittest_NegativeTests()
 	CAutoOptCtxt aoc(memory_pool, &mda, pceeval, CTestUtils::GetCostModel(memory_pool));
 	GPOS_ASSERT(NULL != COptCtxt::PoctxtFromTLS()->Pcomp());
 
-	const IMDType *pmdtype = mda.Pmdtype(&CMDIdGPDB::m_mdid_text);
+	const IMDType *pmdtype = mda.RetrieveType(&CMDIdGPDB::m_mdid_text);
 	CWStringConst str(GPOS_WSZ_LIT("text_col"));
 	CName name(memory_pool, &str);
 	CAutoP<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(pmdtype, default_type_modifier, name));
@@ -1343,7 +1343,7 @@ CConstraintTest::EresUnittest_ConstraintsOnDates()
 	CAutoOptCtxt aoc(memory_pool, &mda, pceeval, CTestUtils::GetCostModel(memory_pool));
 	GPOS_ASSERT(NULL != COptCtxt::PoctxtFromTLS()->Pcomp());
 
-	const IMDType *pmdtype = mda.Pmdtype(&CMDIdGPDB::m_mdid_date);
+	const IMDType *pmdtype = mda.RetrieveType(&CMDIdGPDB::m_mdid_date);
 	CWStringConst str(GPOS_WSZ_LIT("date_col"));
 	CName name(memory_pool, &str);
 	CAutoP<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(pmdtype, default_type_modifier, name));

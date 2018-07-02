@@ -72,7 +72,7 @@ CMCVTest::EresUnittest_SortInt4MCVs()
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	CMDIdGPDB *mdid = GPOS_NEW(memory_pool) CMDIdGPDB(CMDIdGPDB::m_mdid_int4);
-	const IMDType *pmdtype = md_accessor->Pmdtype(mdid);
+	const IMDType *pmdtype = md_accessor->RetrieveType(mdid);
 
 	// create three integer MCVs
 	CPoint *point1 = CTestUtils::PpointInt4(memory_pool, 5);

@@ -46,12 +46,12 @@ CMDAccessorUtils::PstrWindowFuncName
 {
 	if (md_accessor->FAggWindowFunc(mdid_func))
 	{
-		const IMDAggregate *pmdagg = md_accessor->Pmdagg(mdid_func);
+		const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(mdid_func);
 		
 		return pmdagg->Mdname().GetMDName();
 	}
 
-	const IMDFunction *pmdfunc = md_accessor->Pmdfunc(mdid_func);
+	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(mdid_func);
 
 	return pmdfunc->Mdname().GetMDName();
 }
@@ -74,11 +74,11 @@ CMDAccessorUtils::PmdidWindowReturnType
 
 	if (md_accessor->FAggWindowFunc(mdid_func))
 	{
-		const IMDAggregate *pmdagg = md_accessor->Pmdagg(mdid_func);
+		const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(mdid_func);
 		return pmdagg->GetResultTypeMdid();
 	}
 
-	const IMDFunction *pmdfunc = md_accessor->Pmdfunc(mdid_func);
+	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(mdid_func);
 	return pmdfunc->GetResultTypeMdid();
 }
 
@@ -112,7 +112,7 @@ CMDAccessorUtils::FCmpExists
 
 	if (left_mdid->Equals(right_mdid))
 	{
-		const IMDType *pmdtypeLeft = md_accessor->Pmdtype(left_mdid);
+		const IMDType *pmdtypeLeft = md_accessor->RetrieveType(left_mdid);
 		return IMDId::IsValid(pmdtypeLeft->GetMdidForCmpType(cmp_type));
 	}
 
@@ -204,7 +204,7 @@ CMDAccessorUtils::FScalarOpReturnsNullOnNullInput
 
 	GPOS_TRY
 	{
-		const IMDScalarOp *md_scalar_op = md_accessor->Pmdscop(mdid_op);
+		const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid_op);
 
 		return md_scalar_op->ReturnsNullOnNullInput();
 	}
@@ -238,7 +238,7 @@ CMDAccessorUtils::FBoolType
 
 	if (NULL != mdid_type && mdid_type->IsValid())
 	{
-		return (IMDType::EtiBool == md_accessor->Pmdtype(mdid_type)->GetDatumType());
+		return (IMDType::EtiBool == md_accessor->RetrieveType(mdid_type)->GetDatumType());
 	}
 
 	return false;
@@ -262,7 +262,7 @@ CMDAccessorUtils::FCommutativeScalarOp
 	GPOS_ASSERT(NULL != md_accessor);
 	GPOS_ASSERT(NULL != mdid_op);
 
-	const IMDScalarOp *md_scalar_op = md_accessor->Pmdscop(mdid_op);
+	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid_op);
 
 	return mdid_op->Equals(md_scalar_op->GetCommuteOpMdid());
 }

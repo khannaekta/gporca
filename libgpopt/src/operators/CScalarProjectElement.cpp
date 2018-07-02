@@ -99,7 +99,7 @@ CScalarProjectElement::PopCopyWithRemappedColumns
 			CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
 			CName name(m_pcr->Name());
-			colref = col_factory->PcrCreate(m_pcr->Pmdtype(), m_pcr->TypeModifier(), name);
+			colref = col_factory->PcrCreate(m_pcr->RetrieveType(), m_pcr->TypeModifier(), name);
 
 #ifdef GPOS_DEBUG
 			BOOL result =

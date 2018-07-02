@@ -34,7 +34,7 @@ CColRefTable::CColRefTable
 	ULONG ulOpSource
 	)
 	:
-	CColRef(pcoldesc->Pmdtype(), pcoldesc->TypeModifier(), id, pname),
+	CColRef(pcoldesc->RetrieveType(), pcoldesc->TypeModifier(), id, pname),
 	m_iAttno(0),
 	m_ulSourceOpId(ulOpSource),
 	m_width(pcoldesc->Width())

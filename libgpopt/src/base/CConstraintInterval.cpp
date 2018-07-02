@@ -857,7 +857,7 @@ CConstraintInterval::PexprConstructArrayScalar(IMemoryPool *memory_pool, bool fI
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 		IDatum *datum = (*m_pdrgprng)[0]->PdatumRight();
 		GPOS_ASSERT(NULL != datum);
-		IDatum *pdatumNull = md_accessor->Pmdtype(datum->MDId())->DatumNull();
+		IDatum *pdatumNull = md_accessor->RetrieveType(datum->MDId())->DatumNull();
 		pdatumNull->AddRef();
 		CScalarConst *popScConst = GPOS_NEW(memory_pool) CScalarConst(memory_pool, pdatumNull);
 		prngexpr->Append(GPOS_NEW(memory_pool) CExpression(memory_pool, popScConst));
@@ -1209,7 +1209,7 @@ CConstraintInterval::PciUnbounded
 	BOOL fIncludesNull
 	)
 {
-	IMDId *mdid = colref->Pmdtype()->MDId();
+	IMDId *mdid = colref->RetrieveType()->MDId();
 	if (!CUtils::FConstrainableType(mdid))
 	{
 		return NULL;
@@ -1282,7 +1282,7 @@ CConstraintInterval::MDIdType()
 	}
 
 	// otherwise return type of column ref
-	return m_pcr->Pmdtype()->MDId();
+	return m_pcr->RetrieveType()->MDId();
 }
 
 //---------------------------------------------------------------------------

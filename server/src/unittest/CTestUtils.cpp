@@ -1755,7 +1755,7 @@ CTestUtils::PexprPrjElemWithSum
 	// map a computed column to SUM expression
 	CScalar *pop = CScalar::PopConvert(pexprScalarAgg->Pop());
 	IMDId *mdid_type = pop->MDIdType();
-	const IMDType *pmdtype = md_accessor->Pmdtype(mdid_type);
+	const IMDType *pmdtype = md_accessor->RetrieveType(mdid_type);
 	CWStringConst str(GPOS_WSZ_LIT("sum_col"));
 	CName name(memory_pool, &str);
 	CColRef *pcrComputed = COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(pmdtype, pop->TypeModifier(), name);
@@ -2518,7 +2518,7 @@ CTestUtils::PexprLogicalSequenceProject
 				);
 
 	IMDId *mdid = GPOS_NEW(memory_pool) CMDIdGPDB(oidFunc);
-	const IMDFunction *pmdfunc = md_accessor->Pmdfunc(mdid);
+	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(mdid);
 
 	IMDId *mdid_return_type = pmdfunc->GetResultTypeMdid();
 	mdid_return_type->AddRef();
@@ -2540,7 +2540,7 @@ CTestUtils::PexprLogicalSequenceProject
 							)
 				);
 	// window function call is not a cast and so does not need a type modifier
-	CColRef *pcrComputed = col_factory->PcrCreate(md_accessor->Pmdtype(pmdfunc->GetResultTypeMdid()), default_type_modifier);
+	CColRef *pcrComputed = col_factory->PcrCreate(md_accessor->RetrieveType(pmdfunc->GetResultTypeMdid()), default_type_modifier);
 
 	CExpression *pexprPrjList =
 		GPOS_NEW(memory_pool) CExpression
@@ -4204,7 +4204,7 @@ CTestUtils::CreateGenericDatum
 	GPOS_ASSERT(NULL != md_accessor);
 
 	GPOS_ASSERT(!mdid_type->Equals(&CMDIdGPDB::m_mdid_numeric));
-	const IMDType *pmdtype = md_accessor->Pmdtype(mdid_type);
+	const IMDType *pmdtype = md_accessor->RetrieveType(mdid_type);
 	ULONG ulbaSize = 0;
 	BYTE *data = CDXLUtils::DecodeByteArrayFromString(memory_pool, pstrEncodedValue, &ulbaSize);
 

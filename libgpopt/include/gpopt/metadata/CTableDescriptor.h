@@ -147,7 +147,7 @@ namespace gpopt
 			}
 			
 			// return the position of a particular attribute (identified by attno)
-			ULONG UlPosition(INT attno) const;
+			ULONG GetAttributePosition(INT attno) const;
 
 			// column descriptor accessor
 			DrgPcoldesc *Pdrgpcoldesc() const
@@ -183,7 +183,7 @@ namespace gpopt
 			}
 			
 			// storage type
-			IMDRelation::Erelstoragetype GetRelStorageType() const
+			IMDRelation::Erelstoragetype RetrieveRelStorageType() const
 			{
 				return m_erelstoragetype;
 			}

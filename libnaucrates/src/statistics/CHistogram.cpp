@@ -1872,7 +1872,7 @@ CHistogram::MakeDefaultHistogram(IMemoryPool *memory_pool, CColRef *col_ref, BOO
 {
 	GPOS_ASSERT(NULL != col_ref);
 
-	if (IMDType::EtiBool == col_ref->Pmdtype()->GetDatumType() && !is_empty)
+	if (IMDType::EtiBool == col_ref->RetrieveType()->GetDatumType() && !is_empty)
 	{
 		return CHistogram::MakeDefaultBoolHistogram(memory_pool);
 	}
@@ -1981,7 +1981,7 @@ CHistogram::AddDummyHistogramAndWidthInfo(IMemoryPool *memory_pool,
 		CHistogram *histogram = CHistogram::MakeDefaultHistogram(memory_pool, col_ref, is_empty);
 		output_histograms->Insert(GPOS_NEW(memory_pool) ULONG(col_id), histogram);
 
-		CDouble width = CStatisticsUtils::DefaultColumnWidth(col_ref->Pmdtype());
+		CDouble width = CStatisticsUtils::DefaultColumnWidth(col_ref->RetrieveType());
 		output_col_widths->Insert(GPOS_NEW(memory_pool) ULONG(col_id),
 								  GPOS_NEW(memory_pool) CDouble(width));
 	}

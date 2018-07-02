@@ -159,7 +159,7 @@ CScalarOp::MDIdType() const
 	}
 	
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	return md_accessor->Pmdscop(m_mdid_op)->GetResultTypeMdid();
+	return md_accessor->RetrieveScOp(m_mdid_op)->GetResultTypeMdid();
 }
 
 //---------------------------------------------------------------------------

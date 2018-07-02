@@ -555,7 +555,7 @@ namespace gpopt
 				)
 			{
 				IMDId *mdid = datum->MDId();
-				return md_accessor->Pmdtype(mdid)->GetDatumVal(memory_pool, datum);
+				return md_accessor->RetrieveType(mdid)->GetDatumVal(memory_pool, datum);
 			}
 
 			// return a copy the dxl node's physical properties

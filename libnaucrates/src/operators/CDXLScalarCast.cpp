@@ -140,7 +140,7 @@ CDXLScalarCast::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *d
 BOOL
 CDXLScalarCast::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	return (IMDType::EtiBool == md_accessor->Pmdtype(m_mdid_type)->GetDatumType());
+	return (IMDType::EtiBool == md_accessor->RetrieveType(m_mdid_type)->GetDatumType());
 }
 
 #ifdef GPOS_DEBUG

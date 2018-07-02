@@ -402,7 +402,7 @@ CLogicalSetOp::PdrgpcnstrColumn
 	DrgPcnstr *pdrgpcnstr = GPOS_NEW(memory_pool) DrgPcnstr(memory_pool);
 
 	CColRef *colref = (*m_pdrgpcrOutput)[ulColIndex];
-	if (!CUtils::FConstrainableType(colref->Pmdtype()->MDId()))
+	if (!CUtils::FConstrainableType(colref->RetrieveType()->MDId()))
 	{
 		return pdrgpcnstr;
 	}

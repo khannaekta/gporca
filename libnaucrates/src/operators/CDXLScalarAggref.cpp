@@ -214,8 +214,8 @@ CDXLScalarAggref::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode 
 BOOL
 CDXLScalarAggref::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	const IMDAggregate *pmdagg = md_accessor->Pmdagg(m_agg_func_mdid);
-	return (IMDType::EtiBool == md_accessor->Pmdtype(pmdagg->GetResultTypeMdid())->GetDatumType());
+	const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(m_agg_func_mdid);
+	return (IMDType::EtiBool == md_accessor->RetrieveType(pmdagg->GetResultTypeMdid())->GetDatumType());
 }
 
 #ifdef GPOS_DEBUG

@@ -63,7 +63,7 @@ CScalarWindowFunc::CScalarWindowFunc
 	m_fAgg = md_accessor->FAggWindowFunc(m_func_mdid);
 	if (!m_fAgg)
 	{
-		const IMDFunction *pmdfunc = md_accessor->Pmdfunc(m_func_mdid);
+		const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
 		m_efs = pmdfunc->GetFuncStability();
 		m_efda = pmdfunc->GetFuncDataAccess();
 	}

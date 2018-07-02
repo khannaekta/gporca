@@ -122,9 +122,9 @@ CLogicalProject::PdrgpcrsEquivClassFromScIdent
 	CScalarIdent *popScIdent = CScalarIdent::PopConvert(pexprScalar->Pop());
 	const CColRef *pcrScIdent =  popScIdent->Pcr();
 	GPOS_ASSERT(pcrPrEl->Id() != pcrScIdent->Id());
-	GPOS_ASSERT(pcrPrEl->Pmdtype()->MDId()->Equals(pcrScIdent->Pmdtype()->MDId()));
+	GPOS_ASSERT(pcrPrEl->RetrieveType()->MDId()->Equals(pcrScIdent->RetrieveType()->MDId()));
 
-	if (!CUtils::FConstrainableType(pcrPrEl->Pmdtype()->MDId()))
+	if (!CUtils::FConstrainableType(pcrPrEl->RetrieveType()->MDId()))
 	{
 		return NULL;
 	}
@@ -175,7 +175,7 @@ CLogicalProject::ExtractConstraintFromScConst
 	CColRef *colref = popPrEl->Pcr();
 	CExpression *pexprScalar = (*pexprPrEl)[0];
 
-	IMDId *mdid_type = colref->Pmdtype()->MDId();
+	IMDId *mdid_type = colref->RetrieveType()->MDId();
 
 	if (EopScalarConst != pexprScalar->Pop()->Eopid() ||
 				!CUtils::FConstrainableType(mdid_type))

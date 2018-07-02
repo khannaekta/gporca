@@ -123,7 +123,7 @@ namespace gpopt
 			}
 
 			// is default partition included on the given level
-			BOOL FDefaultPartition(ULONG ulLevel) const
+			BOOL IsDefaultPartition(ULONG ulLevel) const
 			{
 				return m_pbsDefaultParts->Get(ulLevel);
 			}

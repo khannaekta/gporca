@@ -288,8 +288,8 @@ CXformSplitDQA::PexprSplitIntoLocalDQAGlobalAgg
 			DrgPexpr *pdrgpexprArgsLocal = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
 			pdrgpexprArgsLocal->Append(CUtils::PexprScalarIdent(memory_pool, pcrDistinctCol));
 
-			const IMDAggregate *pmdagg = md_accessor->Pmdagg(popScAggFunc->MDId());
-			const IMDType *pmdtype = md_accessor->Pmdtype(pmdagg->GetIntermediateResultTypeMdid());
+			const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(popScAggFunc->MDId());
+			const IMDType *pmdtype = md_accessor->RetrieveType(pmdagg->GetIntermediateResultTypeMdid());
 			CColRef *pcrLocal = col_factory->PcrCreate(pmdtype, default_type_modifier);
 
 			CExpression *pexprPrElLocal = CUtils::PexprScalarProjectElement
@@ -572,8 +572,8 @@ CXformSplitDQA::PopulatePrLMultiPhaseAgg
 	CExpression *pexprAggFunc = (*pexprPrEl)[0];
 	CScalarAggFunc *popScAggFunc = CScalarAggFunc::PopConvert(pexprAggFunc->Pop());
 
-	const IMDAggregate *pmdagg = md_accessor->Pmdagg(popScAggFunc->MDId());
-	const IMDType *pmdtype = md_accessor->Pmdtype(pmdagg->GetIntermediateResultTypeMdid());
+	const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(popScAggFunc->MDId());
+	const IMDType *pmdtype = md_accessor->RetrieveType(pmdagg->GetIntermediateResultTypeMdid());
 
 	// create new column reference for the first stage (local) project element
 	CColRef *pcrLocal = col_factory->PcrCreate(pmdtype, default_type_modifier);
@@ -642,7 +642,7 @@ CXformSplitDQA::PcrAggFuncArgument
 
 	CScalar *popScalar = CScalar::PopConvert(pexprArg->Pop());
 	// computed argument to the input
-	const IMDType *pmdtype = md_accessor->Pmdtype(popScalar->MDIdType());
+	const IMDType *pmdtype = md_accessor->RetrieveType(popScalar->MDIdType());
 	CColRef *pcrAdditionalGrpCol = col_factory->PcrCreate(pmdtype, popScalar->TypeModifier());
 
 	pexprArg->AddRef();
@@ -825,7 +825,7 @@ CXformSplitDQA::ExtractDistinctCols
 		CExpression *pexprAggFunc = (*pexprPrEl)[0];
 		CScalarAggFunc *popScAggFunc = CScalarAggFunc::PopConvert(pexprAggFunc->Pop());
 
-		if (popScAggFunc->IsDistinct() && md_accessor->Pmdagg(popScAggFunc->MDId())->IsSplittable())
+		if (popScAggFunc->IsDistinct() && md_accessor->RetrieveAgg(popScAggFunc->MDId())->IsSplittable())
 		{
 			GPOS_ASSERT(1 == pexprAggFunc->Arity());
 			

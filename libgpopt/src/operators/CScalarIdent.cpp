@@ -130,7 +130,7 @@ CScalarIdent::PopCopyWithRemappedColumns
 IMDId*
 CScalarIdent::MDIdType() const
 {
-	return m_pcr->Pmdtype()->MDId();
+	return m_pcr->RetrieveType()->MDId();
 }
 
 INT

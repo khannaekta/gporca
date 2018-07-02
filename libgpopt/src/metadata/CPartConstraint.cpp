@@ -186,7 +186,7 @@ CPartConstraint::FAllDefaultPartsIncluded()
 {
 	for (ULONG ul = 0; ul < m_num_of_part_levels; ul++)
 	{
-		if (!FDefaultPartition(ul))
+		if (!IsDefaultPartition(ul))
 		{
 			return false;
 		}
@@ -338,7 +338,7 @@ CPartConstraint::FOverlapLevel
 	BOOL fOverlap = !pcnstrIntersect->FContradiction();
 	pcnstrIntersect->Release();
 
-	return fOverlap || (FDefaultPartition(ulLevel) && ppartcnstr->FDefaultPartition(ulLevel));
+	return fOverlap || (IsDefaultPartition(ulLevel) && ppartcnstr->IsDefaultPartition(ulLevel));
 }
 
 //---------------------------------------------------------------------------
@@ -413,7 +413,7 @@ CPartConstraint::FSubsume
 		GPOS_ASSERT(NULL != pcnstrOther);
 
 		fSubsumeLevel = pcnstrCurrent->Contains(pcnstrOther) &&
-						(FDefaultPartition(ul) || !ppartcnstr->FDefaultPartition(ul));
+						(IsDefaultPartition(ul) || !ppartcnstr->IsDefaultPartition(ul));
 	}
 
 	return fSubsumeLevel;
@@ -490,7 +490,7 @@ CPartConstraint::PpartcnstrRemaining
 	phmulcnstr->Insert(GPOS_NEW(memory_pool) ULONG(0), pcnstrRemaining);
 	GPOS_ASSERT(result);
 
-	if (FDefaultPartition(0 /*ulLevel*/) && !ppartcnstr->FDefaultPartition(0 /*ulLevel*/))
+	if (IsDefaultPartition(0 /*ulLevel*/) && !ppartcnstr->IsDefaultPartition(0 /*ulLevel*/))
 	{
 		pbsDefaultParts->ExchangeSet(0 /*ulBit*/);
 	}
@@ -509,7 +509,7 @@ CPartConstraint::PpartcnstrRemaining
 			GPOS_ASSERT(result);
 		}
 
-		if (FDefaultPartition(ul))
+		if (IsDefaultPartition(ul))
 		{
 			pbsDefaultParts->ExchangeSet(ul);
 		}
@@ -676,7 +676,7 @@ CPartConstraint::FDisjunctionPossible
 		fSuccess = (NULL != pcnstrFst &&
 					NULL != pcnstrSnd &&
 					pcnstrFst->Equals(pcnstrSnd) &&
-					ppartcnstrFst->FDefaultPartition(ul) == ppartcnstrSnd->FDefaultPartition(ul));
+					ppartcnstrFst->IsDefaultPartition(ul) == ppartcnstrSnd->IsDefaultPartition(ul));
 	}
 
 	// last level constraints cannot be NULL as well
@@ -739,7 +739,7 @@ CPartConstraint::PpartcnstrDisjunction
 		phmulcnstr->Insert(GPOS_NEW(memory_pool) ULONG(ul), pcnstrFst);
 		GPOS_ASSERT(result);
 
-		if (ppartcnstrFst->FDefaultPartition(ul))
+		if (ppartcnstrFst->IsDefaultPartition(ul))
 		{
 			pbsCombined->ExchangeSet(ul);
 		}
@@ -764,7 +764,7 @@ CPartConstraint::PpartcnstrDisjunction
 	phmulcnstr->Insert(GPOS_NEW(memory_pool) ULONG(ulLevels - 1), pcnstrDisj);
 	GPOS_ASSERT(result);
 
-	if (ppartcnstrFst->FDefaultPartition(ulLevels - 1) || ppartcnstrSnd->FDefaultPartition(ulLevels - 1))
+	if (ppartcnstrFst->IsDefaultPartition(ulLevels - 1) || ppartcnstrSnd->IsDefaultPartition(ulLevels - 1))
 	{
 		pbsCombined->ExchangeSet(ulLevels - 1);
 	}

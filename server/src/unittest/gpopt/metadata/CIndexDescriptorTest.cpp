@@ -78,12 +78,12 @@ CIndexDescriptorTest::EresUnittest_Basic()
 	CTableDescriptor *ptabdesc = CTestUtils::PtabdescCreate(memory_pool, 10, mdid, CName(&strName));
 
 	// get the index associated with the table
-	const IMDRelation *pmdrel = mda.Pmdrel(ptabdesc->MDId());
+	const IMDRelation *pmdrel = mda.RetrieveRel(ptabdesc->MDId());
 	GPOS_ASSERT(0 < pmdrel->IndexCount());
 
 	// create an index descriptor
 	IMDId *pmdidIndex = pmdrel->IndexMDidAt(0); // get the first index
-	const IMDIndex *pmdindex = mda.Pmdindex(pmdidIndex);
+	const IMDIndex *pmdindex = mda.RetrieveIndex(pmdidIndex);
 	CIndexDescriptor *pindexdesc  = CIndexDescriptor::Pindexdesc(memory_pool, ptabdesc, pmdindex);
 
 #ifdef GPOS_DEBUG

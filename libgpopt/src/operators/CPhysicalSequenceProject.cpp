@@ -92,7 +92,7 @@ CPhysicalSequenceProject::CreateOrderSpec
 			CScalarIdent *popScId = CScalarIdent::PopConvert(pexpr->Pop());
 			const CColRef *colref = popScId->Pcr();
 
-			gpmd::IMDId *mdid = colref->Pmdtype()->GetMdidForCmpType(IMDType::EcmptL);
+			gpmd::IMDId *mdid = colref->RetrieveType()->GetMdidForCmpType(IMDType::EcmptL);
 			mdid->AddRef();
 
 			m_pos->Append(mdid, colref, COrderSpec::EntLast);

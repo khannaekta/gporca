@@ -129,12 +129,12 @@ CMDAccessorTest::EresUnittest_Basic()
 #ifdef GPOS_DEBUG
 	const IMDRelation *pimdrel1 = 
 #endif
-	mda.Pmdrel(pmdidObject1);
+	mda.RetrieveRel(pmdidObject1);
 	
 #ifdef GPOS_DEBUG
 	const IMDRelation *pimdrel2 = 
 #endif	
-	mda.Pmdrel(pmdidObject2);
+	mda.RetrieveRel(pmdidObject2);
 
 	GPOS_ASSERT(pimdrel1->MDId()->Equals(pmdidObject1) && pimdrel2->MDId()->Equals(pmdidObject2));
 	
@@ -142,7 +142,7 @@ CMDAccessorTest::EresUnittest_Basic()
 #ifdef GPOS_DEBUG
 	const IMDRelation *pimdrel3 = 
 #endif
-	mda.Pmdrel(pmdidObject1);
+	mda.RetrieveRel(pmdidObject1);
 	
 	GPOS_ASSERT(pimdrel1 == pimdrel3);
 	
@@ -154,19 +154,19 @@ CMDAccessorTest::EresUnittest_Basic()
 #ifdef GPOS_DEBUG
 	const IMDType *pimdtype = 
 #endif
-	mda.Pmdtype(mdid_type);
+	mda.RetrieveType(mdid_type);
 	
 #ifdef GPOS_DEBUG
 	const IMDScalarOp *md_scalar_op =
 #endif
-	mda.Pmdscop(mdid_op);
+	mda.RetrieveScOp(mdid_op);
 
 	GPOS_ASSERT(IMDType::EcmptL == md_scalar_op->ParseCmpType());
 	
 #ifdef GPOS_DEBUG
 	const IMDAggregate *pmdagg = 
 #endif
-	mda.Pmdagg(agg_mdid);
+	mda.RetrieveAgg(agg_mdid);
 
 
 	// access types by type info
@@ -342,11 +342,11 @@ CMDAccessorTest::EresUnittest_Navigate()
 	// lookup a function in the MD cache
 	CMDIdGPDB *mdid_func = GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_FUNC_TIMEOFDAY /* OID */, 1 /* major version */, 0 /* minor version */);
 
-	const IMDFunction *pmdfunc = mda.Pmdfunc(mdid_func);
+	const IMDFunction *pmdfunc = mda.RetrieveFunc(mdid_func);
 	
 	// lookup function return type
 	IMDId *pmdidFuncReturnType = pmdfunc->GetResultTypeMdid();
-	const IMDType *pimdtype = mda.Pmdtype(pmdidFuncReturnType);
+	const IMDType *pimdtype = mda.RetrieveType(pmdidFuncReturnType);
 		
 	// lookup equality operator for function return type
 	IMDId *pmdidEqOp = pimdtype->GetMdidForCmpType(IMDType::EcmptEq);
@@ -354,7 +354,7 @@ CMDAccessorTest::EresUnittest_Navigate()
 #ifdef GPOS_DEBUG
 	const IMDScalarOp *md_scalar_op =
 #endif
-	mda.Pmdscop(pmdidEqOp);
+	mda.RetrieveScOp(pmdidEqOp);
 		
 #ifdef GPOS_DEBUG
 	// print objects
@@ -420,12 +420,12 @@ CMDAccessorTest::EresUnittest_Indexes()
 	// lookup a relation in the MD cache
 	CMDIdGPDB *rel_mdid =  GPOS_NEW(memory_pool) CMDIdGPDB(GPOPT_MDCACHE_TEST_OID, 1 /* major */, 1 /* minor version */);
 	
-	const IMDRelation *pmdrel = mda.Pmdrel(rel_mdid);
+	const IMDRelation *pmdrel = mda.RetrieveRel(rel_mdid);
 	
 	GPOS_ASSERT(0 < pmdrel->IndexCount());
 	
 	IMDId *pmdidIndex = pmdrel->IndexMDidAt(0);
-	const IMDIndex *pmdindex = mda.Pmdindex(pmdidIndex);
+	const IMDIndex *pmdindex = mda.RetrieveIndex(pmdidIndex);
 	
 	ULONG ulKeys = pmdindex->Keys();
 	
@@ -495,7 +495,7 @@ CMDAccessorTest::EresUnittest_CheckConstraint()
 	// lookup a relation in the MD cache
 	CMDIdGPDB *rel_mdid =  GPOS_NEW(memory_pool) CMDIdGPDB(GPOPT_TEST_REL_OID21, 1 /* major */, 1 /* minor version */);
 
-	const IMDRelation *pmdrel = mda.Pmdrel(rel_mdid);
+	const IMDRelation *pmdrel = mda.RetrieveRel(rel_mdid);
 	GPOS_ASSERT(0 < pmdrel->CheckConstraintCount());
 
 	// create the array of column reference for the table columns
@@ -505,14 +505,14 @@ CMDAccessorTest::EresUnittest_CheckConstraint()
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
 		const IMDColumn *pmdcol = pmdrel->GetMdCol(ul);
-		const IMDType *pmdtype = mda.Pmdtype(pmdcol->MDIdType());
+		const IMDType *pmdtype = mda.RetrieveType(pmdcol->MDIdType());
 		CColRef *colref = col_factory->PcrCreate(pmdtype, pmdcol->TypeModifier());
 		colref_array->Append(colref);
 	}
 
 	// get one of its check constraint
 	IMDId *pmdidCheckConstraint = pmdrel->CheckConstraintMDidAt(0);
-	const IMDCheckConstraint *pmdCheckConstraint = mda.Pmdcheckconstraint(pmdidCheckConstraint);
+	const IMDCheckConstraint *pmdCheckConstraint = mda.RetrieveCheckConstraints(pmdidCheckConstraint);
 
 #ifdef GPOS_DEBUG
 	os << std::endl;
@@ -571,7 +571,7 @@ CMDAccessorTest::EresUnittest_IndexPartConstraint()
 	// lookup a relation in the MD cache
 	CMDIdGPDB *rel_mdid =  GPOS_NEW(memory_pool) CMDIdGPDB(GPOPT_TEST_REL_OID22);
 
-	const IMDRelation *pmdrel = mda.Pmdrel(rel_mdid);
+	const IMDRelation *pmdrel = mda.RetrieveRel(rel_mdid);
 	GPOS_ASSERT(0 < pmdrel->IndexCount());
 
 	// create the array of column reference for the table columns
@@ -581,7 +581,7 @@ CMDAccessorTest::EresUnittest_IndexPartConstraint()
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
 		const IMDColumn *pmdcol = pmdrel->GetMdCol(ul);
-		const IMDType *pmdtype = mda.Pmdtype(pmdcol->MDIdType());
+		const IMDType *pmdtype = mda.RetrieveType(pmdcol->MDIdType());
 		CColRef *colref = col_factory->PcrCreate(pmdtype, pmdcol->TypeModifier());
 		colref_array->Append(colref);
 	}
@@ -589,7 +589,7 @@ CMDAccessorTest::EresUnittest_IndexPartConstraint()
 	// get one of its indexes
 	GPOS_ASSERT(0 < pmdrel->IndexCount());
 	IMDId *pmdidIndex = pmdrel->IndexMDidAt(0);
-	const IMDIndex *pmdindex = mda.Pmdindex(pmdidIndex);
+	const IMDIndex *pmdindex = mda.RetrieveIndex(pmdidIndex);
 
 	// extract and then print the part constraint expression
 	IMDPartConstraint *mdpart_constraint = pmdindex->MDPartConstraint();
@@ -743,7 +743,7 @@ CMDAccessorTest::EresUnittest_Negative()
 	CMDIdGPDB *pmdidNonExistingObject = GPOS_NEW(memory_pool) CMDIdGPDB(GPOPT_MDCACHE_TEST_OID /* OID */, 15 /* version */, 1 /* minor version */);
 
 	// call should result in an exception
-	(void) mda.Pmdrel(pmdidNonExistingObject);
+	(void) mda.RetrieveRel(pmdidNonExistingObject);
 
 	pmdidNonExistingObject->Release();
 	
@@ -926,7 +926,7 @@ CMDAccessorTest::PvLookupSingleObj
 	CMDIdGPDB *mdid = GPOS_NEW(memory_pool) CMDIdGPDB(GPOPT_MDCACHE_TEST_OID /* OID */, 1 /* major version */, 1 /* minor version */);
 
 	// lookup object
-	(void) md_accessor->Pmdrel(mdid);
+	(void) md_accessor->RetrieveRel(mdid);
 	mdid->Release();
 	
 	return NULL;
@@ -965,7 +965,7 @@ CMDAccessorTest::PvLookupMultipleObj
 
 		// lookup relation
 		CMDIdGPDB *mdid = GPOS_NEW(pmdtaskparams->m_memory_pool) CMDIdGPDB(GPOPT_MDCACHE_TEST_OID /*OID*/, 1 /*major*/, ul + 1 /*minor*/);
-		(void) md_accessor->Pmdrel(mdid);
+		(void) md_accessor->RetrieveRel(mdid);
 		mdid->Release();
 	}
 	

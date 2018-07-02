@@ -132,7 +132,7 @@ namespace gpdxl
 
 		// storage type
 		IMDRelation::Erelstoragetype
-		GetRelStorageType() const
+		RetrieveRelStorageType() const
 		{
 			return m_rel_storage_type;
 		}

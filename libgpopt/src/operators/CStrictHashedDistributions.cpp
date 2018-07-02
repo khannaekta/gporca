@@ -24,7 +24,7 @@ DrgPds(memory_pool)
 		for (ULONG ulCol = 0; ulCol < num_cols; ulCol++)
 		{
 			CColRef *colref = (*colref_array)[ulCol];
-			if (colref->Pmdtype()->IsRedistributable())
+			if (colref->RetrieveType()->IsRedistributable())
 			{
 				CExpression *pexpr = CUtils::PexprScalarIdent(memory_pool, colref);
 				pdrgpexpr->Append(pexpr);

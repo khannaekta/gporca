@@ -112,7 +112,7 @@ CXformSelect2PartialDynamicIndexGet::Transform
 	
 	CTableDescriptor *ptabdesc = popGet->Ptabdesc();
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->Pmdrel(ptabdesc->MDId());
+	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdesc->MDId());
 	const ULONG ulIndices = pmdrel->IndexCount();
 
 	if (0 == ulIndices)

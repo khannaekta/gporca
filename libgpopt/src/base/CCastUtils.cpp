@@ -111,7 +111,7 @@ CCastUtils::PexprCast
 {
 	GPOS_ASSERT(NULL != mdid_dest);
 
-    IMDId *mdid_src = colref->Pmdtype()->MDId();
+    IMDId *mdid_src = colref->RetrieveType()->MDId();
 	GPOS_ASSERT(CMDAccessorUtils::FCastExists(md_accessor, mdid_src, mdid_dest));
 
 	const IMDCast *pmdcast = md_accessor->Pmdcast(mdid_src, mdid_dest);

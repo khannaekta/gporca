@@ -68,7 +68,7 @@ CPredicateUtils::FBooleanScalarIdent
 	if (COperator::EopScalarIdent == pexprPred->Pop()->Eopid())
 	{
 		CScalarIdent *popScIdent = CScalarIdent::PopConvert(pexprPred->Pop());
-		if (IMDType::EtiBool == popScIdent->Pcr()->Pmdtype()->GetDatumType())
+		if (IMDType::EtiBool == popScIdent->Pcr()->RetrieveType()->GetDatumType())
 		{
 			return true;
 		}
@@ -520,7 +520,7 @@ CPredicateUtils::FLikePredicate
 	GPOS_ASSERT(NULL != mdid);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDScalarOp *md_scalar_op = md_accessor->Pmdscop(mdid);
+	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid);
 
 	const CWStringConst *str_opname = md_scalar_op->Mdname().GetMDName();
 
@@ -1401,7 +1401,7 @@ CPredicateUtils::FBoolPredicateOnColumn
 	CColRef *colref
 	)
 {
-	BOOL fBoolean = (IMDType::EtiBool == colref->Pmdtype()->GetDatumType());
+	BOOL fBoolean = (IMDType::EtiBool == colref->RetrieveType()->GetDatumType());
 
 	if (fBoolean && 
 			(CUtils::FScalarIdent(pexpr, colref) || 
@@ -2086,8 +2086,8 @@ CPredicateUtils::PexprInverseComparison
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	IMDId *mdid_op = CScalarCmp::PopConvert(pexprCmp->Pop())->MdIdOp();
-	IMDId *pmdidInverseOp = md_accessor->Pmdscop(mdid_op)->GetInverseOpMdid();
-	const CWStringConst *pstrFirst = md_accessor->Pmdscop(pmdidInverseOp)->Mdname().GetMDName();
+	IMDId *pmdidInverseOp = md_accessor->RetrieveScOp(mdid_op)->GetInverseOpMdid();
+	const CWStringConst *pstrFirst = md_accessor->RetrieveScOp(pmdidInverseOp)->Mdname().GetMDName();
 
 	// generate a predicate for the inversion of the comparison involved in the subquery
 	(*pexprCmp)[0]->AddRef();
@@ -2476,12 +2476,12 @@ CPredicateUtils::FCompatibleIndexPredicate
 	if (COperator::EopScalarCmp == pexprPred->Pop()->Eopid())
 	{
 		CScalarCmp *popScCmp = CScalarCmp::PopConvert(pexprPred->Pop());
-		pmdobjScCmp = md_accessor->Pmdscop(popScCmp->MdIdOp());
+		pmdobjScCmp = md_accessor->RetrieveScOp(popScCmp->MdIdOp());
 	}
 	else if (COperator::EopScalarArrayCmp == pexprPred->Pop()->Eopid())
 	{
 		CScalarArrayCmp *popScArrCmp = CScalarArrayCmp::PopConvert(pexprPred->Pop());
-		pmdobjScCmp = md_accessor->Pmdscop(popScArrCmp->MdIdOp());
+		pmdobjScCmp = md_accessor->RetrieveScOp(popScArrCmp->MdIdOp());
 	}
 	else
 	{

@@ -188,7 +188,7 @@ CConstraint::PcnstrFromScalarExpr
 	if (1 == num_cols)
 	{
 		CColRef *colref = pcrs->PcrFirst();
-		if (!CUtils::FConstrainableType(colref->Pmdtype()->MDId()))
+		if (!CUtils::FConstrainableType(colref->RetrieveType()->MDId()))
 		{
 			return NULL;
 		}
@@ -382,8 +382,8 @@ CConstraint::PcnstrFromScalarCmp
 		CScalarIdent *popScIdRight = CScalarIdent::PopConvert((*pexpr)[1]->Pop());
 		const CColRef *pcrRight =  popScIdRight->Pcr();
 
-		if (!CUtils::FConstrainableType(pcrLeft->Pmdtype()->MDId()) ||
-			!CUtils::FConstrainableType(pcrRight->Pmdtype()->MDId()))
+		if (!CUtils::FConstrainableType(pcrLeft->RetrieveType()->MDId()) ||
+			!CUtils::FConstrainableType(pcrRight->RetrieveType()->MDId()))
 		{
 			return NULL;
 		}

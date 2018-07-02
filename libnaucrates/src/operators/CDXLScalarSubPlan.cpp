@@ -100,7 +100,7 @@ CDXLScalarSubPlan::GetFirstColTypeMdId() const
 BOOL
 CDXLScalarSubPlan::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	return (IMDType::EtiBool == md_accessor->Pmdtype(m_first_col_type_mdid)->GetDatumType());
+	return (IMDType::EtiBool == md_accessor->RetrieveType(m_first_col_type_mdid)->GetDatumType());
 }
 
 

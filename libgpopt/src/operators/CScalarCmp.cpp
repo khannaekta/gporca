@@ -189,7 +189,7 @@ CScalarCmp::PmdidCommuteOp
 	)
 {
 	CScalarCmp *popScalarCmp = dynamic_cast<CScalarCmp *>(pop);
-	const IMDScalarOp *pmdScalarCmpOp = md_accessor->Pmdscop(popScalarCmp->MdIdOp());
+	const IMDScalarOp *pmdScalarCmpOp = md_accessor->RetrieveScOp(popScalarCmp->MdIdOp());
 
 	IMDId *pmdidScalarCmpCommute = pmdScalarCmpOp->GetCommuteOpMdid();
 	return pmdidScalarCmpCommute;
@@ -205,7 +205,7 @@ CScalarCmp::Pstr
 	)
 {
 	mdid->AddRef();
-	return GPOS_NEW(memory_pool) CWStringConst(memory_pool, (md_accessor->Pmdscop(mdid)->Mdname().GetMDName())->GetBuffer());
+	return GPOS_NEW(memory_pool) CWStringConst(memory_pool, (md_accessor->RetrieveScOp(mdid)->Mdname().GetMDName())->GetBuffer());
 }
 
 // get commuted scalar comparision operator

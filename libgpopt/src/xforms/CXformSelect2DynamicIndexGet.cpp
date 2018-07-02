@@ -125,12 +125,12 @@ CXformSelect2DynamicIndexGet::Transform
 
 	// find the indexes whose included columns meet the required columns
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->Pmdrel(popDynamicGet->Ptabdesc()->MDId());
+	const IMDRelation *pmdrel = md_accessor->RetrieveRel(popDynamicGet->Ptabdesc()->MDId());
 
 	for (ULONG ul = 0; ul < ulIndices; ul++)
 	{
 		IMDId *pmdidIndex = pmdrel->IndexMDidAt(ul);
-		const IMDIndex *pmdindex = md_accessor->Pmdindex(pmdidIndex);
+		const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pmdidIndex);
 		CPartConstraint *ppartcnstrIndex = CUtils::PpartcnstrFromMDPartCnstr
 								(
 								memory_pool,

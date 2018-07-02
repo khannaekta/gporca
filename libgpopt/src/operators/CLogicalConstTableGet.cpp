@@ -318,7 +318,7 @@ CLogicalConstTableGet::PdrgpcoldescMapping
 		CColumnDescriptor *pcoldesc = GPOS_NEW(memory_pool) CColumnDescriptor
 													(
 													memory_pool,
-													colref->Pmdtype(),
+													colref->RetrieveType(),
 													colref->TypeModifier(),
 													colref->Name(),
 													ul + 1, //attno

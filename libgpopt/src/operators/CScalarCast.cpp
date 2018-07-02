@@ -51,7 +51,7 @@ CScalarCast::CScalarCast
 	if (NULL != m_func_mdid && m_func_mdid->IsValid())
 	{
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-		const IMDFunction *pmdfunc = md_accessor->Pmdfunc(m_func_mdid);
+		const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
 
 		m_returns_null_on_null_input = pmdfunc->IsStrict();
 		m_fBoolReturnType = CMDAccessorUtils::FBoolType(md_accessor, m_return_type_mdid);

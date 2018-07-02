@@ -105,7 +105,7 @@ IMDId *
 CScalarSubqueryQuantified::MDIdType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	IMDId *mdid_type = md_accessor->Pmdscop(m_scalar_op_mdid)->GetResultTypeMdid();
+	IMDId *mdid_type = md_accessor->RetrieveScOp(m_scalar_op_mdid)->GetResultTypeMdid();
 
 	GPOS_ASSERT(md_accessor->PtMDType<IMDTypeBool>()->MDId()->Equals(mdid_type));
 

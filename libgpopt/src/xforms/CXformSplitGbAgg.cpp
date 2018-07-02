@@ -252,8 +252,8 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList
 														);
 
 		// determine column reference for the new project element
-		const IMDAggregate *pmdagg = md_accessor->Pmdagg(popScAggFunc->MDId());
-		const IMDType *pmdtype = md_accessor->Pmdtype(pmdagg->GetIntermediateResultTypeMdid());
+		const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(popScAggFunc->MDId());
+		const IMDType *pmdtype = md_accessor->RetrieveType(pmdagg->GetIntermediateResultTypeMdid());
 		CColRef *pcrLocal = col_factory->PcrCreate(pmdtype, default_type_modifier);
 		CColRef *pcrGlobal = popScPrEl->Pcr();
 
@@ -345,7 +345,7 @@ CXformSplitGbAgg::FApplicable
 		CExpression *pexprAggFunc = (*pexprPrEl)[0];
 		CScalarAggFunc *popScAggFunc = CScalarAggFunc::PopConvert(pexprAggFunc->Pop());
 
-		if (popScAggFunc->IsDistinct() || !md_accessor->Pmdagg(popScAggFunc->MDId())->IsSplittable())
+		if (popScAggFunc->IsDistinct() || !md_accessor->RetrieveAgg(popScAggFunc->MDId())->IsSplittable())
 		{
 			return false;
 		}

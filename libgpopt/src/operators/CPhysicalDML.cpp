@@ -506,7 +506,7 @@ CPhysicalDML::PosComputeRequired
 		
 		if (fNeedsSort)
 		{
-			IMDId *mdid = m_pcrAction->Pmdtype()->GetMdidForCmpType(IMDType::EcmptL);
+			IMDId *mdid = m_pcrAction->RetrieveType()->GetMdidForCmpType(IMDType::EcmptL);
 			mdid->AddRef();
 			pos->Append(mdid, m_pcrAction, COrderSpec::EntAuto);
 		}
@@ -524,7 +524,7 @@ CPhysicalDML::PosComputeRequired
 			m_input_sort_req = true;
 			// if this is an INSERT over a partitioned Parquet or Row-oriented table,
 			// sort tuples by their table oid
-			IMDId *mdid = m_pcrTableOid->Pmdtype()->GetMdidForCmpType(IMDType::EcmptL);
+			IMDId *mdid = m_pcrTableOid->RetrieveType()->GetMdidForCmpType(IMDType::EcmptL);
 			mdid->AddRef();
 			pos->Append(mdid, m_pcrTableOid, COrderSpec::EntAuto);
 		}
@@ -545,7 +545,7 @@ BOOL
 CPhysicalDML::FInsertSortOnParquet()
 {
 	return !GPOS_FTRACE(EopttraceDisableSortForDMLOnParquet) &&
-					(IMDRelation::ErelstorageAppendOnlyParquet == m_ptabdesc->GetRelStorageType());
+					(IMDRelation::ErelstorageAppendOnlyParquet == m_ptabdesc->RetrieveRelStorageType());
 }
 
 //---------------------------------------------------------------------------
@@ -564,7 +564,7 @@ CPhysicalDML::FInsertSortOnRows
 {
 	GPOS_ASSERT(NULL != optimizer_config);
 
-	return (IMDRelation::ErelstorageAppendOnlyRows == m_ptabdesc->GetRelStorageType()) &&
+	return (IMDRelation::ErelstorageAppendOnlyRows == m_ptabdesc->RetrieveRelStorageType()) &&
 			(optimizer_config->GetHint()->UlMinNumOfPartsToRequireSortOnInsert() <= m_ptabdesc->PartitionCount());
 }
 

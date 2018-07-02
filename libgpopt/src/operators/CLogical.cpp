@@ -176,7 +176,7 @@ CLogical::PosFromIndex
 
 	// get relation from the metadata accessor using metadata id
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->Pmdrel(ptabdesc->MDId());
+	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdesc->MDId());
 
 	for (ULONG  ul = 0; ul < ulLenKeys; ul++)
 	{
@@ -188,10 +188,10 @@ CLogical::PosFromIndex
 		INT attno = pmdcol->AttrNum();
 
 		// get the position of the index key column relative to the table descriptor
-		const ULONG ulPosTabDesc = ptabdesc->UlPosition(attno);
+		const ULONG ulPosTabDesc = ptabdesc->GetAttributePosition(attno);
 		CColRef *colref = (*colref_array)[ulPosTabDesc];
 
-		IMDId *mdid = colref->Pmdtype()->GetMdidForCmpType(IMDType::EcmptL);
+		IMDId *mdid = colref->RetrieveType()->GetMdidForCmpType(IMDType::EcmptL);
 		mdid->AddRef();
 	
 		// TODO:  March 27th 2012; we hard-code NULL treatment
@@ -772,14 +772,14 @@ CLogical::PpcDeriveConstraintFromTable
 	}
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->Pmdrel(ptabdesc->MDId());
+	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdesc->MDId());
 
 	const ULONG ulCheckConstraint = pmdrel->CheckConstraintCount();
 	for (ULONG ul = 0; ul < ulCheckConstraint; ul++)
 	{
 		IMDId *pmdidCheckConstraint = pmdrel->CheckConstraintMDidAt(ul);
 
-		const IMDCheckConstraint *pmdCheckConstraint = md_accessor->Pmdcheckconstraint(pmdidCheckConstraint);
+		const IMDCheckConstraint *pmdCheckConstraint = md_accessor->RetrieveCheckConstraints(pmdidCheckConstraint);
 
 		// extract the check constraint expression
 		CExpression *pexprCheckConstraint = pmdCheckConstraint->GetCheckConstraintExpr(memory_pool, md_accessor, pdrgpcrNonSystem);

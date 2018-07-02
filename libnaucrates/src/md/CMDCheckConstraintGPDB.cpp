@@ -78,7 +78,7 @@ CMDCheckConstraintGPDB::GetCheckConstraintExpr(IMemoryPool *memory_pool,
 {
 	GPOS_ASSERT(NULL != colref_array);
 
-	const IMDRelation *mdrel = md_accessor->Pmdrel(m_rel_mdid);
+	const IMDRelation *mdrel = md_accessor->RetrieveRel(m_rel_mdid);
 #ifdef GPOS_DEBUG
 	const ULONG len = colref_array->Size();
 	GPOS_ASSERT(len > 0);
