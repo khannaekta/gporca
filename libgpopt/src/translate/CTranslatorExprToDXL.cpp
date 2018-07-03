@@ -5275,7 +5275,7 @@ CTranslatorExprToDXL::PdxlnDML
 		return PdxlnCTAS(pexpr, pdrgpdsBaseTables, pulNonGatherMotions, pfDML);
 	}
 
-	EdxlDmlType dml_type_dxl = Edxldmloptype(popDML->Edmlop());
+	EdxlDmlType dxl_dml_type = Edxldmloptype(popDML->Edmlop());
 
 	CExpression *pexprChild = (*pexpr)[0];
 	CTableDescriptor *ptabdesc = popDML->Ptabdesc();
@@ -5318,7 +5318,7 @@ CTranslatorExprToDXL::PdxlnDML
 	CDXLPhysicalDML *pdxlopDML = GPOS_NEW(m_mp) CDXLPhysicalDML
 									(
 									m_mp,
-									dml_type_dxl,
+									dxl_dml_type,
 									table_descr,
 									pdrgpul,
 									action_colid,

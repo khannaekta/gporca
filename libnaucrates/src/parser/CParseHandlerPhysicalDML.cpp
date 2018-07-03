@@ -38,7 +38,7 @@ CParseHandlerPhysicalDML::CParseHandlerPhysicalDML(IMemoryPool *mp,
 												   CParseHandlerManager *parse_handler_mgr,
 												   CParseHandlerBase *parse_handler_root)
 	: CParseHandlerPhysicalOp(mp, parse_handler_mgr, parse_handler_root),
-	  m_dml_type_dxl(Edxldmlinsert),
+	  m_dxl_dml_type(Edxldmlinsert),
 	  m_src_colids_array(NULL),
 	  m_action_colid(0),
 	  m_oid_colid(0),
@@ -81,13 +81,13 @@ CParseHandlerPhysicalDML::StartElement(const XMLCh *const,  // element_uri,
 									  element_local_name))
 	{
 		token_type = EdxltokenPhysicalDMLDelete;
-		m_dml_type_dxl = Edxldmldelete;
+		m_dxl_dml_type = Edxldmldelete;
 	}
 	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenPhysicalDMLUpdate),
 										   element_local_name))
 	{
 		token_type = EdxltokenPhysicalDMLUpdate;
-		m_dml_type_dxl = Edxldmlupdate;
+		m_dxl_dml_type = Edxldmlupdate;
 	}
 
 	const XMLCh *src_colids_xml =
@@ -184,9 +184,9 @@ CParseHandlerPhysicalDML::EndElement(const XMLCh *const,  // element_uri,
 									 const XMLCh *const  // element_qname
 )
 {
-	EdxlDmlType dml_type_dxl = CParseHandlerPhysicalDML::GetDmlOpType(element_local_name);
+	EdxlDmlType dxl_dml_type = CParseHandlerPhysicalDML::GetDmlOpType(element_local_name);
 
-	if (EdxldmlSentinel == dml_type_dxl || m_dml_type_dxl != dml_type_dxl)
+	if (EdxldmlSentinel == dxl_dml_type || m_dxl_dml_type != dxl_dml_type)
 	{
 		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
 			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
@@ -222,7 +222,7 @@ CParseHandlerPhysicalDML::EndElement(const XMLCh *const,  // element_uri,
 		direct_dispatch_parse_handler->GetDXLDirectDispatchInfo();
 	dxl_direct_dispatch_info->AddRef();
 	CDXLPhysicalDML *dxl_op = GPOS_NEW(m_mp) CDXLPhysicalDML(m_mp,
-																	  m_dml_type_dxl,
+																	  m_dxl_dml_type,
 																	  table_descr,
 																	  m_src_colids_array,
 																	  m_action_colid,

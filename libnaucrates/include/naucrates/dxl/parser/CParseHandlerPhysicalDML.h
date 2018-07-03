@@ -34,7 +34,7 @@ namespace gpdxl
 	{
 	private:
 		// operator type
-		EdxlDmlType m_dml_type_dxl;
+		EdxlDmlType m_dxl_dml_type;
 
 		// source col ids
 		ULongPtrArray *m_src_colids_array;
