@@ -2536,15 +2536,15 @@ CTranslatorExprToDXL::PdxlnSort
 	pdxlnSort->SetProperties(dxl_properties);
 
 	// construct empty limit count and offset nodes
-	CDXLNode *limit_count = GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarLimitCount(m_mp));
-	CDXLNode *limit_offset = GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarLimitOffset(m_mp));
+	CDXLNode *limit_count_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarLimitCount(m_mp));
+	CDXLNode *limit_offset_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarLimitOffset(m_mp));
 	
 	// add children
 	pdxlnSort->AddChild(proj_list_dxlnode);
 	pdxlnSort->AddChild(filter_dxlnode);
 	pdxlnSort->AddChild(sort_col_list_dxlnode);
-	pdxlnSort->AddChild(limit_count);
-	pdxlnSort->AddChild(limit_offset);
+	pdxlnSort->AddChild(limit_count_dxlnode);
+	pdxlnSort->AddChild(limit_offset_dxlnode);
 	pdxlnSort->AddChild(child_dxlnode);
 	
 #ifdef GPOS_DEBUG
