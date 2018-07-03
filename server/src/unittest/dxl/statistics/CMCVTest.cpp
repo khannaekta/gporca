@@ -107,13 +107,13 @@ CMCVTest::EresUnittest_SortInt4MCVs()
 								);
 
 	// create hash map from colid -> histogram
-	UlongHistogramHashMap *col_histogram_mapping = GPOS_NEW(mp) UlongHistogramHashMap(mp);
+	UlongToHistogramMap *col_histogram_mapping = GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// generate int histogram for column 1
 	col_histogram_mapping->Insert(GPOS_NEW(mp) ULONG(1), phistMCV);
 
 	// column width for int4
-	UlongDoubleHashMap *colid_width_mapping = GPOS_NEW(mp) UlongDoubleHashMap(mp);
+	UlongToDoubleMap *colid_width_mapping = GPOS_NEW(mp) UlongToDoubleMap(mp);
 	colid_width_mapping->Insert(GPOS_NEW(mp) ULONG(1), GPOS_NEW(mp) CDouble(4.0));
 
 	CStatistics *stats = GPOS_NEW(mp) CStatistics
@@ -227,14 +227,14 @@ CMCVTest::EresUnittest_MergeHistMCV()
 		CHistogram *phistMerged = CStatisticsUtils::MergeMCVHist(mp, phistMCV, phistHist);
 
 		// create hash map from colid -> histogram
-		UlongHistogramHashMap *col_histogram_mapping = GPOS_NEW(mp) UlongHistogramHashMap(mp);
+		UlongToHistogramMap *col_histogram_mapping = GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 		// generate int histogram for column 1
 		ULONG colid = pdxlstatsdercolMCV->GetColId();
 		col_histogram_mapping->Insert(GPOS_NEW(mp) ULONG(colid), phistMerged);
 
 		// column width for int4
-		UlongDoubleHashMap *colid_width_mapping = GPOS_NEW(mp) UlongDoubleHashMap(mp);
+		UlongToDoubleMap *colid_width_mapping = GPOS_NEW(mp) UlongToDoubleMap(mp);
 		CDouble width = pdxlstatsdercolMCV->Width();
 		colid_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid), GPOS_NEW(mp) CDouble(width));
 

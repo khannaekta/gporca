@@ -1943,10 +1943,10 @@ CHistogram::DoNDVBasedCardEstimation(const CHistogram *histogram)
 // append given histograms to current object
 void
 CHistogram::AddHistograms(IMemoryPool *mp,
-						  UlongHistogramHashMap *src_histograms,
-						  UlongHistogramHashMap *dest_histograms)
+						  UlongToHistogramMap *src_histograms,
+						  UlongToHistogramMap *dest_histograms)
 {
-	UlongHistogramHashMapIter col_hist_mapping(src_histograms);
+	UlongToHistogramMapIter col_hist_mapping(src_histograms);
 	while (col_hist_mapping.Advance())
 	{
 		ULONG colid = *(col_hist_mapping.Key());
@@ -1959,8 +1959,8 @@ CHistogram::AddHistograms(IMemoryPool *mp,
 void
 CHistogram::AddDummyHistogramAndWidthInfo(IMemoryPool *mp,
 										  CColumnFactory *col_factory,
-										  UlongHistogramHashMap *output_histograms,
-										  UlongDoubleHashMap *output_col_widths,
+										  UlongToHistogramMap *output_histograms,
+										  UlongToDoubleMap *output_col_widths,
 										  const ULongPtrArray *columns,
 										  BOOL is_empty)
 {
@@ -1990,13 +1990,13 @@ CHistogram::AddDummyHistogramAndWidthInfo(IMemoryPool *mp,
 //	add empty histogram for the columns in the input histogram
 void
 CHistogram::AddEmptyHistogram(IMemoryPool *mp,
-							  UlongHistogramHashMap *output_histograms,
-							  UlongHistogramHashMap *input_histograms)
+							  UlongToHistogramMap *output_histograms,
+							  UlongToHistogramMap *input_histograms)
 {
 	GPOS_ASSERT(NULL != output_histograms);
 	GPOS_ASSERT(NULL != input_histograms);
 
-	UlongHistogramHashMapIter col_hist_mapping(input_histograms);
+	UlongToHistogramMapIter col_hist_mapping(input_histograms);
 	while (col_hist_mapping.Advance())
 	{
 		ULONG colid = *(col_hist_mapping.Key());

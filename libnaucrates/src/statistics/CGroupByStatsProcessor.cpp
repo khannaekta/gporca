@@ -27,11 +27,11 @@ CGroupByStatsProcessor::CalcGroupByStats(IMemoryPool *mp,
 										 CBitSet *keys)
 {
 	// create hash map from colid -> histogram for resultant structure
-	UlongHistogramHashMap *col_histogram_mapping =
-		GPOS_NEW(mp) UlongHistogramHashMap(mp);
+	UlongToHistogramMap *col_histogram_mapping =
+		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// hash map colid -> width
-	UlongDoubleHashMap *col_width_mapping = GPOS_NEW(mp) UlongDoubleHashMap(mp);
+	UlongToDoubleMap *col_width_mapping = GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 

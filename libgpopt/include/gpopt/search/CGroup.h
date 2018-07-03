@@ -53,7 +53,7 @@ namespace gpopt
 	
 	// map required plan props to cost lower bound of corresponding plan
 	typedef CHashMap<CReqdPropPlan, CCost, CReqdPropPlan::UlHashForCostBounding, CReqdPropPlan::FEqualForCostBounding,
-					CleanupRelease<CReqdPropPlan>, CleanupDelete<CCost> > CostMap;
+					CleanupRelease<CReqdPropPlan>, CleanupDelete<CCost> > ReqdPropPlanToCostMap;
 
 	// optimization levels in ascending order,
 	// under a given optimization context, group expressions in higher levels
@@ -181,7 +181,7 @@ namespace gpopt
 
 			// map of computed stats objects during costing
 			typedef CHashMap<COptimizationContext, IStatistics, COptimizationContext::UlHashForStats, COptimizationContext::FEqualForStats,
-							CleanupRelease<COptimizationContext>, CleanupRelease<IStatistics> > StatsMap;
+							CleanupRelease<COptimizationContext>, CleanupRelease<IStatistics> > OptCtxtToIStatisticsMap;
 
 			// memory pool
 			IMemoryPool *m_mp;
@@ -224,7 +224,7 @@ namespace gpopt
 			LinkMap *m_plinkmap;
 
 			// map of computed stats during costing
-			StatsMap *m_pstatsmap;
+			OptCtxtToIStatisticsMap *m_pstatsmap;
 
 			// mutex for locking stats map when adding a new entry
 			CMutex m_mutexStats;
@@ -240,7 +240,7 @@ namespace gpopt
 			ULONG m_ulGExprs;
 
 			// map of cost lower bounds
-			CostMap *m_pcostmap;
+			ReqdPropPlanToCostMap *m_pcostmap;
 
 			// number of optimization contexts
 			volatile ULONG_PTR m_ulpOptCtxts;

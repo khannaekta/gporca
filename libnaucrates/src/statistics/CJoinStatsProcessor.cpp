@@ -236,8 +236,8 @@ CJoinStatsProcessor::SetResultingJoinStats(IMemoryPool *mp,
 	const CStatistics *inner_side_stats = dynamic_cast<const CStatistics *>(inner_stats_input);
 
 	// create hash map from colid -> histogram for resultant structure
-	UlongHistogramHashMap *result_col_hist_mapping =
-		GPOS_NEW(mp) UlongHistogramHashMap(mp);
+	UlongToHistogramMap *result_col_hist_mapping =
+		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// build a bitset with all join columns
 	CBitSet *join_colids = GPOS_NEW(mp) CBitSet(mp);
@@ -332,7 +332,7 @@ CJoinStatsProcessor::SetResultingJoinStats(IMemoryPool *mp,
 	join_conds_scale_factors->Release();
 	join_colids->Release();
 
-	UlongDoubleHashMap *col_width_mapping_result = outer_stats->CopyWidths(mp);
+	UlongToDoubleMap *col_width_mapping_result = outer_stats->CopyWidths(mp);
 	if (!semi_join)
 	{
 		inner_side_stats->CopyWidthsInto(mp, col_width_mapping_result);

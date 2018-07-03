@@ -31,11 +31,11 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(IMemoryPool *mp,
 	GPOS_ASSERT(output_colids->Size() == second_child_colids->Size());
 
 	// create hash map from colid -> histogram for resultant structure
-	UlongHistogramHashMap *histograms_new =
-		GPOS_NEW(mp) UlongHistogramHashMap(mp);
+	UlongToHistogramMap *histograms_new =
+		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// column ids on which widths are to be computed
-	UlongDoubleHashMap *column_to_width_map = GPOS_NEW(mp) UlongDoubleHashMap(mp);
+	UlongToDoubleMap *column_to_width_map = GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	BOOL is_empty_unionall = stats_first_child->IsEmpty() && stats_second_child->IsEmpty();
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();

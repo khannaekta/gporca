@@ -360,7 +360,7 @@ namespace gpopt
 				(
 				CTableDescriptor *ptabdesc, 
 				const IMDRelation *pmdrel, 
-				IntUlongHashMap *phmiulAttnoColMapping
+				IntToUlongMap *phmiulAttnoColMapping
 				);
 
 			// initialize index of operator translators

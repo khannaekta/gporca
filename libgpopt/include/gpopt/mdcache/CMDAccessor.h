@@ -266,8 +266,8 @@ namespace gpopt
 					ULONG ulPos,
 					BOOL fSystemCol,
 					BOOL fEmptyTable,
-					UlongHistogramHashMap *col_histogram_mapping,
-					UlongDoubleHashMap *colid_width_mapping,
+					UlongToHistogramMap *col_histogram_mapping,
+					UlongToDoubleMap *colid_width_mapping,
 					CStatisticsConfig *stats_config
 					);
 

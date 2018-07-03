@@ -328,12 +328,12 @@ CTranslatorExprToDXLUtils::PdxlnPropagationExpressionForPartConstraints
 	IMemoryPool *mp, 
 	CMDAccessor *md_accessor, 
 	CColumnFactory *col_factory,
-	PartCnstrMap *ppartcnstrmap,
+	UlongToPartConstraintMap *ppartcnstrmap,
 	ColRefArrays *pdrgpdrgpcrPartKeys,
 	CharPtrArray *pdrgszPartTypes
 	)
 {	
-	PartCnstrMapIter pcmi(ppartcnstrmap);
+	UlongToPartConstraintMapIter pcmi(ppartcnstrmap);
 		
 	CDXLNode *pdxlnScalarRootIfStmt = NULL;
 	CDXLNode *pdxlnScalarLeafIfStmt = NULL;
@@ -1464,7 +1464,7 @@ CTranslatorExprToDXLUtils::PdxlnPropExprPartitionSelector
 	CMDAccessor *md_accessor,
 	CColumnFactory *col_factory,
 	BOOL fConditional,
-	PartCnstrMap *ppartcnstrmap,
+	UlongToPartConstraintMap *ppartcnstrmap,
 	ColRefArrays *pdrgpdrgpcrKeys,
 	ULONG scan_id,
 	CharPtrArray *pdrgszPartTypes

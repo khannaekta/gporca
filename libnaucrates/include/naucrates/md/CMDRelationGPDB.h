@@ -113,7 +113,7 @@ namespace gpmd
 
 		// mapping of attribute number in the system catalog to the positions of
 		// the non dropped column in the metadata object
-		IntUlongHashMap *m_attrno_nondrop_col_pos_map;
+		IntToUlongMap *m_attrno_nondrop_col_pos_map;
 
 		// the original positions of all the non-dropped columns
 		ULongPtrArray *m_nondrop_col_pos_array;

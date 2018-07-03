@@ -46,7 +46,7 @@ namespace gpnaucrates
 					 gpos::Equals<ULONG>,
 					 CleanupDelete<ULONG>,
 					 CleanupDelete<CHistogram> >
-		UlongHistogramHashMap;
+		UlongToHistogramMap;
 
 	// iterator
 	typedef CHashMapIter<ULONG,
@@ -55,7 +55,7 @@ namespace gpnaucrates
 						 gpos::Equals<ULONG>,
 						 CleanupDelete<ULONG>,
 						 CleanupDelete<CHistogram> >
-		UlongHistogramHashMapIter;
+		UlongToHistogramMapIter;
 
 	// hash map from column ULONG to CDouble
 	typedef CHashMap<ULONG,
@@ -64,7 +64,7 @@ namespace gpnaucrates
 					 gpos::Equals<ULONG>,
 					 CleanupDelete<ULONG>,
 					 CleanupDelete<CDouble> >
-		UlongDoubleHashMap;
+		UlongToDoubleMap;
 
 	// iterator
 	typedef CHashMapIter<ULONG,
@@ -73,7 +73,7 @@ namespace gpnaucrates
 						 gpos::Equals<ULONG>,
 						 CleanupDelete<ULONG>,
 						 CleanupDelete<CDouble> >
-		UlongDoubleHashMapIter;
+		UlongToDoubleMapIter;
 
 	typedef CHashMap<ULONG,
 					 ULONG,
@@ -90,7 +90,7 @@ namespace gpnaucrates
 					 gpos::Equals<INT>,
 					 CleanupDelete<INT>,
 					 CleanupDelete<ULONG> >
-		IntUlongHashMap;
+		IntToUlongMap;
 
 	//---------------------------------------------------------------------------
 	//	@class:

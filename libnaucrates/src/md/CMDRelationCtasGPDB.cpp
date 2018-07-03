@@ -62,7 +62,7 @@ CMDRelationCtasGPDB::CMDRelationCtasGPDB(IMemoryPool *mp,
 	GPOS_ASSERT(0 == keyset_array->Size());
 	GPOS_ASSERT(NULL != vartypemod_array);
 
-	m_attrno_nondrop_col_pos_map = GPOS_NEW(m_mp) IntUlongHashMap(m_mp);
+	m_attrno_nondrop_col_pos_map = GPOS_NEW(m_mp) IntToUlongMap(m_mp);
 	m_nondrop_col_pos_array = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 	m_col_width_array = GPOS_NEW(mp) CDoubleArray(mp);
 

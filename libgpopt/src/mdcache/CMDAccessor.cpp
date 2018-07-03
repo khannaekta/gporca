@@ -1108,8 +1108,8 @@ CMDAccessor::RecordColumnStats
 	ULONG ulPos,
 	BOOL fSystemCol,
 	BOOL fEmptyTable,
-	UlongHistogramHashMap *col_histogram_mapping,
-	UlongDoubleHashMap *colid_width_mapping,
+	UlongToHistogramMap *col_histogram_mapping,
+	UlongToDoubleMap *colid_width_mapping,
 	CStatisticsConfig *stats_config
 	)
 {
@@ -1198,8 +1198,8 @@ CMDAccessor::Pstats
 	BOOL fEmptyTable = pmdRelStats->IsEmpty();
 	const IMDRelation *pmdrel = RetrieveRel(rel_mdid);
 
-	UlongHistogramHashMap *col_histogram_mapping = GPOS_NEW(mp) UlongHistogramHashMap(mp);
-	UlongDoubleHashMap *colid_width_mapping = GPOS_NEW(mp) UlongDoubleHashMap(mp);
+	UlongToHistogramMap *col_histogram_mapping = GPOS_NEW(mp) UlongToHistogramMap(mp);
+	UlongToDoubleMap *colid_width_mapping = GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	CColRefSetIter crsiHist(*pcrsHist);
 	while (crsiHist.Advance())

@@ -44,7 +44,7 @@ namespace gpnaucrates
 						 gpos::Equals<ULONG>,
 						 CleanupDelete<ULONG>,
 						 CleanupDelete<CHistogram> >
-			UlongHistogramHashMap;
+			UlongToHistogramMap;
 
 		// iterator
 		typedef CHashMapIter<ULONG,
@@ -53,7 +53,7 @@ namespace gpnaucrates
 							 gpos::Equals<ULONG>,
 							 CleanupDelete<ULONG>,
 							 CleanupDelete<CHistogram> >
-			UlongHistogramHashMapIter;
+			UlongToHistogramMapIter;
 
 		// hash map from column ULONG to CDouble
 		typedef CHashMap<ULONG,
@@ -62,7 +62,7 @@ namespace gpnaucrates
 						 gpos::Equals<ULONG>,
 						 CleanupDelete<ULONG>,
 						 CleanupDelete<CDouble> >
-			UlongDoubleHashMap;
+			UlongToDoubleMap;
 
 		// iterator
 		typedef CHashMapIter<ULONG,
@@ -71,7 +71,7 @@ namespace gpnaucrates
 							 gpos::Equals<ULONG>,
 							 CleanupDelete<ULONG>,
 							 CleanupDelete<CDouble> >
-			UlongDoubleHashMapIter;
+			UlongToDoubleMapIter;
 
 	private:
 		// all the buckets in the histogram
@@ -442,21 +442,21 @@ namespace gpnaucrates
 
 		// helper method to append histograms from one map to the other
 		static void AddHistograms(IMemoryPool *mp,
-								  UlongHistogramHashMap *src_histograms,
-								  UlongHistogramHashMap *dest_histograms);
+								  UlongToHistogramMap *src_histograms,
+								  UlongToHistogramMap *dest_histograms);
 
 		// add dummy histogram buckets and column width for the array of columns
 		static void AddDummyHistogramAndWidthInfo(IMemoryPool *mp,
 												  CColumnFactory *col_factory,
-												  UlongHistogramHashMap *output_histograms,
-												  UlongDoubleHashMap *output_col_widths,
+												  UlongToHistogramMap *output_histograms,
+												  UlongToDoubleMap *output_col_widths,
 												  const ULongPtrArray *columns,
 												  BOOL is_empty);
 
 		// add dummy histogram buckets for the columns in the input histogram
 		static void AddEmptyHistogram(IMemoryPool *mp,
-									  UlongHistogramHashMap *output_histograms,
-									  UlongHistogramHashMap *input_histograms);
+									  UlongToHistogramMap *output_histograms,
+									  UlongToHistogramMap *input_histograms);
 
 		// default histogram selectivity
 		static const CDouble DefaultSelectivity;

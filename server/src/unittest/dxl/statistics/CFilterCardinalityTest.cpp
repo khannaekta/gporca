@@ -1029,10 +1029,10 @@ CFilterCardinalityTest::EresUnittest_CStatisticsAccumulateCard()
 	IMemoryPool *mp = amp.Pmp();
 
 	// create hash map from colid -> histogram
-	UlongHistogramHashMap *col_histogram_mapping = GPOS_NEW(mp) UlongHistogramHashMap(mp);
+	UlongToHistogramMap *col_histogram_mapping = GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// array capturing columns for which width information is available
-	UlongDoubleHashMap *colid_width_mapping = GPOS_NEW(mp) UlongDoubleHashMap(mp);
+	UlongToDoubleMap *colid_width_mapping = GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	const ULONG num_cols = 3;
 	for (ULONG ul = 0; ul < num_cols; ul ++)

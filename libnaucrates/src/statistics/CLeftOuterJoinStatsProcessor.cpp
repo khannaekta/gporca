@@ -37,7 +37,7 @@ CLeftOuterJoinStatsProcessor::CalcLOJoinStatsStatic(IMemoryPool *mp,
 
 	// create a new hash map of histograms, for each column from the outer child
 	// add the buckets that do not contribute to the inner join
-	UlongHistogramHashMap *LOJ_histograms =
+	UlongToHistogramMap *LOJ_histograms =
 		CLeftOuterJoinStatsProcessor::MakeLOJHistogram(mp,
 													   result_stats_outer_side,
 													   result_stats_inner_side,
@@ -83,7 +83,7 @@ CLeftOuterJoinStatsProcessor::CalcLOJoinStatsStatic(IMemoryPool *mp,
 
 // create a new hash map of histograms for LOJ from the histograms
 // of the outer child and the histograms of the inner join
-UlongHistogramHashMap *
+UlongToHistogramMap *
 CLeftOuterJoinStatsProcessor::MakeLOJHistogram(IMemoryPool *mp,
 											   const CStatistics *outer_side_stats,
 											   const CStatistics *inner_side_stats,
@@ -115,8 +115,8 @@ CLeftOuterJoinStatsProcessor::MakeLOJHistogram(IMemoryPool *mp,
 		num_rows_LASJ = LASJ_stats->Rows();
 	}
 
-	UlongHistogramHashMap *LOJ_histograms =
-		GPOS_NEW(mp) UlongHistogramHashMap(mp);
+	UlongToHistogramMap *LOJ_histograms =
+		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	ULongPtrArray *outer_colids_with_stats = outer_side_stats->GetColIdsWithStats(mp);
 	const ULONG num_outer_cols = outer_colids_with_stats->Size();
@@ -186,7 +186,7 @@ CLeftOuterJoinStatsProcessor::AddHistogramsLOJInner(IMemoryPool *mp,
 													ULongPtrArray *inner_colids_with_stats,
 													CDouble num_rows_LASJ,
 													CDouble num_rows_inner_join,
-													UlongHistogramHashMap *LOJ_histograms)
+													UlongToHistogramMap *LOJ_histograms)
 {
 	GPOS_ASSERT(NULL != inner_join_stats);
 	GPOS_ASSERT(NULL != inner_colids_with_stats);

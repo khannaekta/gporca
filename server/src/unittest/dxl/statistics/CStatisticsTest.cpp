@@ -398,7 +398,7 @@ CStatisticsTest::EresUnittest_CStatisticsBasic()
 	}
 
 	// create hash map from colid -> histogram
-	UlongHistogramHashMap *col_histogram_mapping = GPOS_NEW(mp) UlongHistogramHashMap(mp);
+	UlongToHistogramMap *col_histogram_mapping = GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// generate bool histogram for column 1
 	col_histogram_mapping->Insert(GPOS_NEW(mp) ULONG(1), CCardinalityTestUtils::PhistExampleBool(mp));
@@ -407,7 +407,7 @@ CStatisticsTest::EresUnittest_CStatisticsBasic()
 	col_histogram_mapping->Insert(GPOS_NEW(mp) ULONG(2), CCardinalityTestUtils::PhistExampleInt4(mp));
 
 	// array capturing columns for which width information is available
-	UlongDoubleHashMap *colid_width_mapping = GPOS_NEW(mp) UlongDoubleHashMap(mp);
+	UlongToDoubleMap *colid_width_mapping = GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	// width for boolean
 	colid_width_mapping->Insert(GPOS_NEW(mp) ULONG(1), GPOS_NEW(mp) CDouble(1.0));
@@ -436,10 +436,10 @@ CStatisticsTest::EresUnittest_CStatisticsBasic()
 	CCardinalityTestUtils::PrintStats(mp, pstats1);
 
 	// create another statistics structure with a single int4 column with id 10
-	UlongHistogramHashMap *phmulhist2 = GPOS_NEW(mp) UlongHistogramHashMap(mp);
+	UlongToHistogramMap *phmulhist2 = GPOS_NEW(mp) UlongToHistogramMap(mp);
 	phmulhist2->Insert(GPOS_NEW(mp) ULONG(10), PhistExampleInt4Dim(mp));
 
-	UlongDoubleHashMap *phmuldoubleWidth2 = GPOS_NEW(mp) UlongDoubleHashMap(mp);
+	UlongToDoubleMap *phmuldoubleWidth2 = GPOS_NEW(mp) UlongToDoubleMap(mp);
 	phmuldoubleWidth2->Insert(GPOS_NEW(mp) ULONG(10), GPOS_NEW(mp) CDouble(4.0));
 
 	CStatistics *pstats2 = GPOS_NEW(mp) CStatistics(mp, phmulhist2, phmuldoubleWidth2, 100.0 /* rows */, false /* is_empty */);

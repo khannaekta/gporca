@@ -27,12 +27,12 @@ CProjectStatsProcessor::CalcProjStats(IMemoryPool *mp,
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
 	// create hash map from colid -> histogram for resultant structure
-	UlongHistogramHashMap *histograms_new =
-		GPOS_NEW(mp) UlongHistogramHashMap(mp);
+	UlongToHistogramMap *histograms_new =
+		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// column ids on which widths are to be computed
-	UlongDoubleHashMap *colid_width_mapping =
-		GPOS_NEW(mp) UlongDoubleHashMap(mp);
+	UlongToDoubleMap *colid_width_mapping =
+		GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	const ULONG length = projection_colids->Size();
 	for (ULONG ul = 0; ul < length; ul++)

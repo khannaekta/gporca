@@ -79,7 +79,7 @@ CJoinCardinalityTest::EresUnittest_JoinNDVRemain()
 		{5, 100, false, 500} // distinct values spread in both buckets and NDVRemain
 	};
 
-	UlongHistogramHashMap *col_histogram_mapping = GPOS_NEW(mp) UlongHistogramHashMap(mp);
+	UlongToHistogramMap *col_histogram_mapping = GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	const ULONG ulHist = GPOS_ARRAY_SIZE(rghisttc);
 	for (ULONG ul1 = 0; ul1 < ulHist; ul1++)

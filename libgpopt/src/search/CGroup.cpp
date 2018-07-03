@@ -202,8 +202,8 @@ CGroup::CGroup
 			COptimizationContext::Equals
 			);
 	m_plinkmap = GPOS_NEW(mp) LinkMap(mp);
-	m_pstatsmap = GPOS_NEW(mp) StatsMap(mp);
-	m_pcostmap = GPOS_NEW(mp) CostMap(mp);
+	m_pstatsmap = GPOS_NEW(mp) OptCtxtToIStatisticsMap(mp);
+	m_pcostmap = GPOS_NEW(mp) ReqdPropPlanToCostMap(mp);
 }
 
 

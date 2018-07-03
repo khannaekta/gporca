@@ -29,11 +29,11 @@ namespace gpopt
 
 	// hash maps of part constraints indexed by part index id
 	typedef CHashMap<ULONG, CPartConstraint, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-					CleanupDelete<ULONG>, CleanupRelease<CPartConstraint> > PartCnstrMap;
+					CleanupDelete<ULONG>, CleanupRelease<CPartConstraint> > UlongToPartConstraintMap;
 	
 	// map iterator
 	typedef CHashMapIter<ULONG, CPartConstraint, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-		CleanupDelete<ULONG>, CleanupRelease<CPartConstraint> > PartCnstrMapIter;
+		CleanupDelete<ULONG>, CleanupRelease<CPartConstraint> > UlongToPartConstraintMapIter;
 
 	//---------------------------------------------------------------------------
 	//	@class:
@@ -169,16 +169,16 @@ namespace gpopt
 
 			// combine the two given part constraint maps and return the result
 			static
-			PartCnstrMap *PpartcnstrmapCombine
+			UlongToPartConstraintMap *PpartcnstrmapCombine
 				(
 				IMemoryPool *mp,
-				PartCnstrMap *ppartcnstrmapFst,
-				PartCnstrMap *ppartcnstrmapSnd
+				UlongToPartConstraintMap *ppartcnstrmapFst,
+				UlongToPartConstraintMap *ppartcnstrmapSnd
 				);
 
 			// copy the part constraints from the source map into the destination map
 			static
-			void CopyPartConstraints(IMemoryPool *mp, PartCnstrMap *ppartcnstrmapDest, PartCnstrMap *ppartcnstrmapSource);
+			void CopyPartConstraints(IMemoryPool *mp, UlongToPartConstraintMap *ppartcnstrmapDest, UlongToPartConstraintMap *ppartcnstrmapSource);
 
 	}; // class CPartConstraint
 

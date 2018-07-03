@@ -144,7 +144,7 @@ CPartitionPropagationSpec::AppendEnforcers
 		ColRefArrays *pdrgpdrgpcrKeys = NULL;
 		PartKeysArray *pdrgppartkeys = m_ppim->Pdrgppartkeys(scan_id);
 		CPartConstraint *ppartcnstr = m_ppim->PpartcnstrRel(scan_id);
-		PartCnstrMap *ppartcnstrmap = m_ppim->Ppartcnstrmap(scan_id);
+		UlongToPartConstraintMap *ppartcnstrmap = m_ppim->Ppartcnstrmap(scan_id);
 		mdid->AddRef();
 		ppartcnstr->AddRef();
 		ppartcnstrmap->AddRef();
@@ -283,7 +283,7 @@ CPartitionPropagationSpec::FRequiresPartitionPropagation
 	IMDId *mdid = m_ppim->GetRelMdId(part_idx_id);
 	PartKeysArray *pdrgppartkeys = m_ppim->Pdrgppartkeys(part_idx_id);
 	CPartConstraint *ppartcnstr = m_ppim->PpartcnstrRel(part_idx_id);
-	PartCnstrMap *ppartcnstrmap = m_ppim->Ppartcnstrmap(part_idx_id);
+	UlongToPartConstraintMap *ppartcnstrmap = m_ppim->Ppartcnstrmap(part_idx_id);
 	mdid->AddRef();
 	pdrgppartkeys->AddRef();
 	ppartcnstr->AddRef();

@@ -98,7 +98,7 @@ namespace gpopt
 
 			// map of partial plans to their costs
 			typedef CHashMap<CPartialPlan, CCost, CPartialPlan::HashValue, CPartialPlan::Equals,
-						CleanupRelease<CPartialPlan>, CleanupDelete<CCost> > PartialPlanCostMap;
+						CleanupRelease<CPartialPlan>, CleanupDelete<CCost> > PartialPlanToCostMap;
 
 
 			// expression id
@@ -137,7 +137,7 @@ namespace gpopt
 			EOptimizationLevel m_eol;
 
 			// map of partial plans to their cost lower bound
-			PartialPlanCostMap *m_ppartialplancostmap;
+			PartialPlanToCostMap *m_ppartialplancostmap;
 
 			// hashtable of cost contexts
 			ShtCC m_sht;

@@ -4517,7 +4517,7 @@ CTranslatorExprToDXL::PdxlnPartitionSelectorFilter
 	ULONG scan_id = popSelector->ScanId();
 	ULONG ulLevels = popSelector->UlPartLevels();
 	BOOL fPartialScans = ppimDrvd->FPartialScans(scan_id);
-	PartCnstrMap *ppartcnstrmap = ppimDrvd->Ppartcnstrmap(scan_id);
+	UlongToPartConstraintMap *ppartcnstrmap = ppimDrvd->Ppartcnstrmap(scan_id);
 
 	BOOL fPassThrough = FEqPartFiltersAllLevels(pexpr, false /*fCheckGeneralFilters*/) && !fPartialScans;
 #ifdef GPOS_DEBUG

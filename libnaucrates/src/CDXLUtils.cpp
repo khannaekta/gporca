@@ -642,12 +642,12 @@ CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
 	for (ULONG ulIdxRelStat = 0; ulIdxRelStat < ulRelStat; ulIdxRelStat++)
 	{
 		// create hash map from colid -> histogram
-		UlongHistogramHashMap *column_id_histogram_map =
-			GPOS_NEW(mp) UlongHistogramHashMap(mp);
+		UlongToHistogramMap *column_id_histogram_map =
+			GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 		// width hash map
-		UlongDoubleHashMap *column_id_width_map =
-			GPOS_NEW(mp) UlongDoubleHashMap(mp);
+		UlongToDoubleMap *column_id_width_map =
+			GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 		CDXLStatsDerivedRelation *stats_derived_relation_dxl =
 			(*dxl_derived_rel_stats_array)[ulIdxRelStat];

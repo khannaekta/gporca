@@ -41,7 +41,7 @@ namespace gpopt
 			ColRefArrays *m_pdrgpdrgpcr;
 
 			// part constraint map
-			PartCnstrMap *m_ppartcnstrmap;
+			UlongToPartConstraintMap *m_ppartcnstrmap;
 
 			// relation part constraint
 			CPartConstraint *m_part_constraint;
@@ -77,14 +77,14 @@ namespace gpopt
 			CPhysicalPartitionSelector(const CPhysicalPartitionSelector &);
 
 			// check whether part constraint maps match
-			BOOL FMatchPartCnstr(PartCnstrMap *ppartcnstrmap) const;
+			BOOL FMatchPartCnstr(UlongToPartConstraintMap *ppartcnstrmap) const;
 
 			// check whether this operator has a partition selection filter
 			BOOL FHasFilter() const;
 
 			// check whether first part constraint map is contained in the second one
 			static
-			BOOL FSubsetPartCnstr(PartCnstrMap *ppartcnstrmapFst, PartCnstrMap *ppartcnstrmapSnd);
+			BOOL FSubsetPartCnstr(UlongToPartConstraintMap *ppartcnstrmapFst, UlongToPartConstraintMap *ppartcnstrmapSnd);
 
 		public:
 
@@ -95,7 +95,7 @@ namespace gpopt
 				ULONG scan_id,
 				IMDId *mdid,
 				ColRefArrays *pdrgpdrgpcr,
-				PartCnstrMap *ppartcnstrmap,
+				UlongToPartConstraintMap *ppartcnstrmap,
 				CPartConstraint *ppartcnstr,
 				UlongToExprMap *phmulexprEqPredicates,
 				UlongToExprMap *phmulexprPredicates,

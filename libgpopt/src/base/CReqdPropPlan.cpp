@@ -373,7 +373,7 @@ CReqdPropPlan::InitReqdPartitionPropagation
 		ppim->Insert
 			(
 			scan_id,
-			GPOS_NEW(mp) PartCnstrMap(mp), 
+			GPOS_NEW(mp) UlongToPartConstraintMap(mp), 
 			CPartIndexMap::EpimConsumer,
 			0, //ulExpectedPropagators
 			mdid,

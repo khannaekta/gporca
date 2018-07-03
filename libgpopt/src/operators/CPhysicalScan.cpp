@@ -332,7 +332,7 @@ CPhysicalScan::PpimDeriveFromDynamicScan
 	)
 {
 	CPartIndexMap *ppim = GPOS_NEW(mp) CPartIndexMap(mp);
-	PartCnstrMap *ppartcnstrmap = GPOS_NEW(mp) PartCnstrMap(mp);
+	UlongToPartConstraintMap *ppartcnstrmap = GPOS_NEW(mp) UlongToPartConstraintMap(mp);
 	
 	(void) ppartcnstrmap->Insert(GPOS_NEW(mp) ULONG(ulSecondaryPartIndexId), ppartcnstr);
 

@@ -390,7 +390,7 @@ namespace gpopt
 				IMemoryPool *mp, 
 				CMDAccessor *md_accessor, 
 				CColumnFactory *col_factory,
-				PartCnstrMap *ppartcnstrmap,
+				UlongToPartConstraintMap *ppartcnstrmap,
 				ColRefArrays *pdrgpdrgpcrPartKeys,
 				CharPtrArray *pdrgszPartTypes
 				);
@@ -442,7 +442,7 @@ namespace gpopt
 				CMDAccessor *md_accessor,
 				CColumnFactory *col_factory,
 				BOOL fConditional,
-				PartCnstrMap *ppartcnstrmap,
+				UlongToPartConstraintMap *ppartcnstrmap,
 				ColRefArrays *pdrgpdrgpcrKeys,
 				ULONG scan_id,
 				CharPtrArray *pdrgszPartTypes

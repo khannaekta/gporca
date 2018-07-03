@@ -2066,8 +2066,8 @@ CTranslatorDXLToExpr::Ptabdesc
 	const IMDRelation *pmdrel = m_pmda->RetrieveRel(mdid);
 
 	// construct mappings for columns that are not dropped
-	IntUlongHashMap *phmiulAttnoColMapping = GPOS_NEW(m_mp) IntUlongHashMap(m_mp);
-	IntUlongHashMap *phmiulAttnoPosMapping = GPOS_NEW(m_mp) IntUlongHashMap(m_mp);
+	IntToUlongMap *phmiulAttnoColMapping = GPOS_NEW(m_mp) IntToUlongMap(m_mp);
+	IntToUlongMap *phmiulAttnoPosMapping = GPOS_NEW(m_mp) IntToUlongMap(m_mp);
 	UlongToUlongMap *phmululColMapping = GPOS_NEW(m_mp) UlongToUlongMap(m_mp);
 	
 	const ULONG ulAllColumns = pmdrel->ColumnCount();
@@ -2270,7 +2270,7 @@ CTranslatorDXLToExpr::PtabdescFromCTAS
 	const IMDRelation *pmdrel = m_pmda->RetrieveRel(mdid);
 
 	// construct mappings for columns that are not dropped
-	IntUlongHashMap *phmiulAttnoColMapping = GPOS_NEW(m_mp) IntUlongHashMap(m_mp);
+	IntToUlongMap *phmiulAttnoColMapping = GPOS_NEW(m_mp) IntToUlongMap(m_mp);
 	UlongToUlongMap *phmululColMapping = GPOS_NEW(m_mp) UlongToUlongMap(m_mp);
 	
 	const ULONG ulAllColumns = pmdrel->ColumnCount();
@@ -3975,7 +3975,7 @@ CTranslatorDXLToExpr::AddDistributionColumns
 	(
 	CTableDescriptor *ptabdesc,
 	const IMDRelation *pmdrel,
-	IntUlongHashMap *phmiulAttnoColMapping
+	IntToUlongMap *phmiulAttnoColMapping
 	)
 {
 	GPOS_ASSERT(NULL != ptabdesc);

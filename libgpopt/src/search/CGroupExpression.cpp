@@ -82,7 +82,7 @@ CGroupExpression::CGroupExpression
 		GPOS_ASSERT(m_pdrgpgroupSorted->IsSorted());
 	}
 
-	m_ppartialplancostmap = GPOS_NEW(mp) PartialPlanCostMap(mp);
+	m_ppartialplancostmap = GPOS_NEW(mp) PartialPlanToCostMap(mp);
 
 	// initialize cost contexts hash table
 	m_sht.Init

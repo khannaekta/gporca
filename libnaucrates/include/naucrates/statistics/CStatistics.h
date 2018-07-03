@@ -45,7 +45,7 @@ namespace gpnaucrates
 					 gpos::Equals<ULONG>,
 					 CleanupDelete<ULONG>,
 					 CleanupRelease<ULongPtrArray> >
-		UlongUlongArrayHashMap;
+		UlongToUlongPtrArrayMap;
 
 	// iterator
 	typedef CHashMapIter<ULONG,
@@ -54,7 +54,7 @@ namespace gpnaucrates
 						 gpos::Equals<ULONG>,
 						 CleanupDelete<ULONG>,
 						 CleanupRelease<ULongPtrArray> >
-		UlongUlongArrayHashMapIter;
+		UlongToUlongPtrArrayMapIter;
 
 	//---------------------------------------------------------------------------
 	//	@class:
@@ -81,7 +81,7 @@ namespace gpnaucrates
 		// helper method to copy stats on columns that are not excluded by bitset
 		void AddNotExcludedHistograms(IMemoryPool *mp,
 									  CBitSet *excluded_cols,
-									  UlongHistogramHashMap *col_histogram_mapping) const;
+									  UlongToHistogramMap *col_histogram_mapping) const;
 
 	private:
 		// private copy ctor
@@ -91,10 +91,10 @@ namespace gpnaucrates
 		CStatistics &operator=(CStatistics &);
 
 		// hashmap from column ids to histograms
-		UlongHistogramHashMap *m_colid_histogram_mapping;
+		UlongToHistogramMap *m_colid_histogram_mapping;
 
 		// hashmap from column id to width
-		UlongDoubleHashMap *m_colid_width_mapping;
+		UlongToDoubleMap *m_colid_width_mapping;
 
 		// number of rows
 		CDouble m_rows;
@@ -130,23 +130,23 @@ namespace gpnaucrates
 
 		// helper method to add histograms where the column ids have been remapped
 		static void AddHistogramsWithRemap(IMemoryPool *mp,
-										   UlongHistogramHashMap *src_histograms,
-										   UlongHistogramHashMap *dest_histograms,
+										   UlongToHistogramMap *src_histograms,
+										   UlongToHistogramMap *dest_histograms,
 										   UlongToColRefMap *colref_mapping,
 										   BOOL must_exist);
 
 		// helper method to add width information where the column ids have been remapped
 		static void AddWidthInfoWithRemap(IMemoryPool *mp,
-										  UlongDoubleHashMap *src_width,
-										  UlongDoubleHashMap *dest_width,
+										  UlongToDoubleMap *src_width,
+										  UlongToDoubleMap *dest_width,
 										  UlongToColRefMap *colref_mapping,
 										  BOOL must_exist);
 
 	public:
 		// ctor
 		CStatistics(IMemoryPool *mp,
-					UlongHistogramHashMap *col_histogram_mapping,
-					UlongDoubleHashMap *colid_width_mapping,
+					UlongToHistogramMap *col_histogram_mapping,
+					UlongToDoubleMap *colid_width_mapping,
 					CDouble rows,
 					BOOL is_empty,
 					ULONG num_predicates = 0);
@@ -154,12 +154,12 @@ namespace gpnaucrates
 		// dtor
 		virtual ~CStatistics();
 
-		virtual UlongDoubleHashMap *CopyWidths(IMemoryPool *mp) const;
+		virtual UlongToDoubleMap *CopyWidths(IMemoryPool *mp) const;
 
 		virtual void CopyWidthsInto(IMemoryPool *mp,
-									UlongDoubleHashMap *colid_width_mapping) const;
+									UlongToDoubleMap *colid_width_mapping) const;
 
-		virtual UlongHistogramHashMap *CopyHistograms(IMemoryPool *mp) const;
+		virtual UlongToHistogramMap *CopyHistograms(IMemoryPool *mp) const;
 
 		// actual number of rows
 		virtual CDouble Rows() const;
@@ -366,7 +366,7 @@ namespace gpnaucrates
 												  CDouble rows);
 
 		// cap the total number of distinct values (NDV) in buckets to the number of rows
-		static void CapNDVs(CDouble rows, UlongHistogramHashMap *col_histogram_mapping);
+		static void CapNDVs(CDouble rows, UlongToHistogramMap *col_histogram_mapping);
 	};  // class CStatistics
 
 }  // namespace gpnaucrates

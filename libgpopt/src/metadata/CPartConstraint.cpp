@@ -786,14 +786,14 @@ void
 CPartConstraint::CopyPartConstraints
 	(
 	IMemoryPool *mp,
-	PartCnstrMap *ppartcnstrmapDest,
-	PartCnstrMap *ppartcnstrmapSource
+	UlongToPartConstraintMap *ppartcnstrmapDest,
+	UlongToPartConstraintMap *ppartcnstrmapSource
 	)
 {
 	GPOS_ASSERT(NULL != ppartcnstrmapDest);
 	GPOS_ASSERT(NULL != ppartcnstrmapSource);
 
-	PartCnstrMapIter pcmi(ppartcnstrmapSource);
+	UlongToPartConstraintMapIter pcmi(ppartcnstrmapSource);
 
 	while (pcmi.Advance())
 	{
@@ -825,12 +825,12 @@ CPartConstraint::CopyPartConstraints
 //		Combine the two given part constraint maps and return the result
 //
 //---------------------------------------------------------------------------
-PartCnstrMap *
+UlongToPartConstraintMap *
 CPartConstraint::PpartcnstrmapCombine
 	(
 	IMemoryPool *mp,
-	PartCnstrMap *ppartcnstrmapFst,
-	PartCnstrMap *ppartcnstrmapSnd
+	UlongToPartConstraintMap *ppartcnstrmapFst,
+	UlongToPartConstraintMap *ppartcnstrmapSnd
 	)
 {
 	if (NULL == ppartcnstrmapFst && NULL == ppartcnstrmapSnd)
@@ -853,7 +853,7 @@ CPartConstraint::PpartcnstrmapCombine
 	GPOS_ASSERT(NULL != ppartcnstrmapFst);
 	GPOS_ASSERT(NULL != ppartcnstrmapSnd);
 
-	PartCnstrMap *ppartcnstrmap = GPOS_NEW(mp) PartCnstrMap(mp);
+	UlongToPartConstraintMap *ppartcnstrmap = GPOS_NEW(mp) UlongToPartConstraintMap(mp);
 
 	CopyPartConstraints(mp, ppartcnstrmap, ppartcnstrmapFst);
 	CopyPartConstraints(mp, ppartcnstrmap, ppartcnstrmapSnd);

@@ -59,8 +59,8 @@ const ULONG CStatistics::no_card_est_risk_default_val = 1;
 
 // ctor
 CStatistics::CStatistics(IMemoryPool *mp,
-						 UlongHistogramHashMap *col_histogram_mapping,
-						 UlongDoubleHashMap *colid_width_mapping,
+						 UlongToHistogramMap *col_histogram_mapping,
+						 UlongToDoubleMap *colid_width_mapping,
 						 CDouble rows,
 						 BOOL is_empty,
 						 ULONG num_predicates)
@@ -101,10 +101,10 @@ CStatistics::GetWidth(ULONG colid) const
 
 //	cap the total number of distinct values (NDVs) in buckets to the number of rows
 void
-CStatistics::CapNDVs(CDouble rows, UlongHistogramHashMap *col_histogram_mapping)
+CStatistics::CapNDVs(CDouble rows, UlongToHistogramMap *col_histogram_mapping)
 {
 	GPOS_ASSERT(NULL != col_histogram_mapping);
-	UlongHistogramHashMapIter col_hist_mapping(col_histogram_mapping);
+	UlongToHistogramMapIter col_hist_mapping(col_histogram_mapping);
 	while (col_hist_mapping.Advance())
 	{
 		CHistogram *histogram = const_cast<CHistogram *>(col_hist_mapping.Value());
@@ -120,7 +120,7 @@ CStatistics::OsPrint(IOstream &os) const
 	os << "Rows = " << Rows() << std::endl;
 	os << "Rebinds = " << NumRebinds() << std::endl;
 
-	UlongHistogramHashMapIter col_hist_mapping(m_colid_histogram_mapping);
+	UlongToHistogramMapIter col_hist_mapping(m_colid_histogram_mapping);
 	while (col_hist_mapping.Advance())
 	{
 		ULONG colid = *(col_hist_mapping.Key());
@@ -130,7 +130,7 @@ CStatistics::OsPrint(IOstream &os) const
 		os << std::endl;
 	}
 
-	UlongDoubleHashMapIter col_width_map_iterator(m_colid_width_mapping);
+	UlongToDoubleMapIter col_width_map_iterator(m_colid_width_mapping);
 	while (col_width_map_iterator.Advance())
 	{
 		ULONG colid = *(col_width_map_iterator.Key());
@@ -176,7 +176,7 @@ CDouble
 CStatistics::Width() const
 {
 	CDouble total_width(0.0);
-	UlongDoubleHashMapIter col_width_map_iterator(m_colid_width_mapping);
+	UlongToDoubleMapIter col_width_map_iterator(m_colid_width_mapping);
 	while (col_width_map_iterator.Advance())
 	{
 		const CDouble *width = col_width_map_iterator.Value();
@@ -235,12 +235,12 @@ CStatistics::MakeDummyStats(IMemoryPool *mp, ULongPtrArray *colids, CDouble rows
 	GPOS_ASSERT(NULL != colids);
 
 	// hash map from colid -> histogram for resultant structure
-	UlongHistogramHashMap *col_histogram_mapping =
-		GPOS_NEW(mp) UlongHistogramHashMap(mp);
+	UlongToHistogramMap *col_histogram_mapping =
+		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// hashmap from colid -> width (double)
-	UlongDoubleHashMap *colid_width_mapping =
-		GPOS_NEW(mp) UlongDoubleHashMap(mp);
+	UlongToDoubleMap *colid_width_mapping =
+		GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
@@ -302,8 +302,8 @@ CStatistics::MakeDummyStats(IMemoryPool *mp,
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
 	// hash map from colid -> histogram for resultant structure
-	UlongHistogramHashMap *result_col_histogram_mapping =
-		GPOS_NEW(mp) UlongHistogramHashMap(mp);
+	UlongToHistogramMap *result_col_histogram_mapping =
+		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	const ULONG num_col_hist = col_histogram_mapping->Size();
 	for (ULONG ul = 0; ul < num_col_hist; ul++)
@@ -319,7 +319,7 @@ CStatistics::MakeDummyStats(IMemoryPool *mp,
 	}
 
 	// hashmap from colid -> width (double)
-	UlongDoubleHashMap *colid_width_mapping = GPOS_NEW(mp) UlongDoubleHashMap(mp);
+	UlongToDoubleMap *colid_width_mapping = GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	const ULONG num_col_width = col_width_mapping->Size();
 	for (ULONG ul = 0; ul < num_col_width; ul++)
@@ -411,12 +411,12 @@ CStatistics::CalcLASJoinStats(IMemoryPool *mp,
 void
 CStatistics::AddNotExcludedHistograms(IMemoryPool *mp,
 									  CBitSet *excluded_cols,
-									  UlongHistogramHashMap *col_histogram_mapping) const
+									  UlongToHistogramMap *col_histogram_mapping) const
 {
 	GPOS_ASSERT(NULL != excluded_cols);
 	GPOS_ASSERT(NULL != col_histogram_mapping);
 
-	UlongHistogramHashMapIter col_hist_mapping(m_colid_histogram_mapping);
+	UlongToHistogramMapIter col_hist_mapping(m_colid_histogram_mapping);
 	while (col_hist_mapping.Advance())
 	{
 		ULONG colid = *(col_hist_mapping.Key());
@@ -430,10 +430,10 @@ CStatistics::AddNotExcludedHistograms(IMemoryPool *mp,
 	}
 }
 
-UlongDoubleHashMap *
+UlongToDoubleMap *
 CStatistics::CopyWidths(IMemoryPool *mp) const
 {
-	UlongDoubleHashMap *widths_copy = GPOS_NEW(mp) UlongDoubleHashMap(mp);
+	UlongToDoubleMap *widths_copy = GPOS_NEW(mp) UlongToDoubleMap(mp);
 	CStatisticsUtils::AddWidthInfo(mp, m_colid_width_mapping, widths_copy);
 
 	return widths_copy;
@@ -441,21 +441,21 @@ CStatistics::CopyWidths(IMemoryPool *mp) const
 
 void
 CStatistics::CopyWidthsInto(IMemoryPool *mp,
-							UlongDoubleHashMap *colid_width_mapping) const
+							UlongToDoubleMap *colid_width_mapping) const
 {
 	CStatisticsUtils::AddWidthInfo(mp, m_colid_width_mapping, colid_width_mapping);
 }
 
-UlongHistogramHashMap *
+UlongToHistogramMap *
 CStatistics::CopyHistograms(IMemoryPool *mp) const
 {
 	// create hash map from colid -> histogram for resultant structure
-	UlongHistogramHashMap *histograms_copy =
-		GPOS_NEW(mp) UlongHistogramHashMap(mp);
+	UlongToHistogramMap *histograms_copy =
+		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	BOOL is_empty = IsEmpty();
 
-	UlongHistogramHashMapIter col_hist_mapping(m_colid_histogram_mapping);
+	UlongToHistogramMapIter col_hist_mapping(m_colid_histogram_mapping);
 	while (col_hist_mapping.Advance())
 	{
 		ULONG colid = *(col_hist_mapping.Key());
@@ -489,7 +489,7 @@ CStatistics::GetReqdRelationalProps(IMemoryPool *mp) const
 	CColRefSet *colrefs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// add columns from histogram map
-	UlongHistogramHashMapIter col_hist_mapping(m_colid_histogram_mapping);
+	UlongToHistogramMapIter col_hist_mapping(m_colid_histogram_mapping);
 	while (col_hist_mapping.Advance())
 	{
 		ULONG colid = *(col_hist_mapping.Key());
@@ -528,9 +528,9 @@ CStatistics::CopyStats(IMemoryPool *mp) const
 IStatistics *
 CStatistics::ScaleStats(IMemoryPool *mp, CDouble factor) const
 {
-	UlongHistogramHashMap *histograms_new =
-		GPOS_NEW(mp) UlongHistogramHashMap(mp);
-	UlongDoubleHashMap *widths_new = GPOS_NEW(mp) UlongDoubleHashMap(mp);
+	UlongToHistogramMap *histograms_new =
+		GPOS_NEW(mp) UlongToHistogramMap(mp);
+	UlongToDoubleMap *widths_new = GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	CHistogram::AddHistograms(mp, m_colid_histogram_mapping, histograms_new);
 	GPOS_CHECK_ABORT;
@@ -567,9 +567,9 @@ CStatistics::CopyStatsWithRemap(IMemoryPool *mp,
 								BOOL must_exist) const
 {
 	GPOS_ASSERT(NULL != colref_mapping);
-	UlongHistogramHashMap *histograms_new =
-		GPOS_NEW(mp) UlongHistogramHashMap(mp);
-	UlongDoubleHashMap *widths_new = GPOS_NEW(mp) UlongDoubleHashMap(mp);
+	UlongToHistogramMap *histograms_new =
+		GPOS_NEW(mp) UlongToHistogramMap(mp);
+	UlongToDoubleMap *widths_new = GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	AddHistogramsWithRemap(
 		mp, m_colid_histogram_mapping, histograms_new, colref_mapping, must_exist);
@@ -608,7 +608,7 @@ CStatistics::GetColIdsWithStats(IMemoryPool *mp) const
 {
 	ULongPtrArray *colids = GPOS_NEW(mp) ULongPtrArray(mp);
 
-	UlongHistogramHashMapIter col_hist_mapping(m_colid_histogram_mapping);
+	UlongToHistogramMapIter col_hist_mapping(m_colid_histogram_mapping);
 	while (col_hist_mapping.Advance())
 	{
 		ULONG colid = *(col_hist_mapping.Key());
@@ -625,7 +625,7 @@ CStatistics::GetColRefSet(IMemoryPool *mp) const
 	CColRefSet *colrefs = GPOS_NEW(mp) CColRefSet(mp);
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
-	UlongHistogramHashMapIter col_hist_mapping(m_colid_histogram_mapping);
+	UlongToHistogramMapIter col_hist_mapping(m_colid_histogram_mapping);
 	while (col_hist_mapping.Advance())
 	{
 		ULONG colid = *(col_hist_mapping.Key());
@@ -641,8 +641,8 @@ CStatistics::GetColRefSet(IMemoryPool *mp) const
 //	append given histograms to current object where the column ids have been re-mapped
 void
 CStatistics::AddHistogramsWithRemap(IMemoryPool *mp,
-									UlongHistogramHashMap *src_histograms,
-									UlongHistogramHashMap *dest_histograms,
+									UlongToHistogramMap *src_histograms,
+									UlongToHistogramMap *dest_histograms,
 									UlongToColRefMap *colref_mapping,
 									BOOL
 #ifdef GPOS_DEBUG
@@ -671,12 +671,12 @@ CStatistics::AddHistogramsWithRemap(IMemoryPool *mp,
 // add width information where the column ids have been re-mapped
 void
 CStatistics::AddWidthInfoWithRemap(IMemoryPool *mp,
-								   UlongDoubleHashMap *src_width,
-								   UlongDoubleHashMap *dest_width,
+								   UlongToDoubleMap *src_width,
+								   UlongToDoubleMap *dest_width,
 								   UlongToColRefMap *colref_mapping,
 								   BOOL must_exist)
 {
-	UlongDoubleHashMapIter col_width_map_iterator(src_width);
+	UlongToDoubleMapIter col_width_map_iterator(src_width);
 	while (col_width_map_iterator.Advance())
 	{
 		ULONG colid = *(col_width_map_iterator.Key());
@@ -744,7 +744,7 @@ CStatistics::GetDxlStatsDrvdRelation(IMemoryPool *mp, CMDAccessor *md_accessor) 
 	DXLStatsDerivedColArray *dxl_stats_derived_col_array =
 		GPOS_NEW(mp) DXLStatsDerivedColArray(mp);
 
-	UlongHistogramHashMapIter col_hist_mapping(m_colid_histogram_mapping);
+	UlongToHistogramMapIter col_hist_mapping(m_colid_histogram_mapping);
 	while (col_hist_mapping.Advance())
 	{
 		ULONG colid = *(col_hist_mapping.Key());
