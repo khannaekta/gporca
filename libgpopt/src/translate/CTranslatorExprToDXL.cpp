@@ -2873,8 +2873,8 @@ CTranslatorExprToDXL::PdxlnQuantifiedSubplan
 		pcrsUsed->Release();
 	}
 
-	CDXLNode *pdxlnInner = PdxlnRestrictResult(pdxlnInnerChild, pcrInner);
-	if (NULL == pdxlnInner)
+	CDXLNode *inner_dxlnode = PdxlnRestrictResult(pdxlnInnerChild, pcrInner);
+	if (NULL == inner_dxlnode)
 	{
 		GPOS_RAISE(gpopt::ExmaDXL, gpopt::ExmiExpr2DXLUnsupportedFeature, GPOS_WSZ_LIT("Outer references in the project list of a correlated subquery"));
 	}
@@ -2888,7 +2888,7 @@ CTranslatorExprToDXL::PdxlnQuantifiedSubplan
 
 	// construct a subplan node, with the inner child under it
 	CDXLNode *pdxlnSubPlan = GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarSubPlan(m_mp, mdid, dxl_colref_array, dxl_subplan_type, dxlnode_test_expr));
-	pdxlnSubPlan->AddChild(pdxlnInner);
+	pdxlnSubPlan->AddChild(inner_dxlnode);
 
 	// add to hashmap
 #ifdef GPOS_DEBUG
@@ -3068,19 +3068,19 @@ CTranslatorExprToDXL::PdxlnExistentialSubplan
 	
 	CDXLNode *pdxlnInnerChild = CreateDXLNode(pexprInner, NULL /*colref_array*/, pdrgpdsBaseTables, pulNonGatherMotions, pfDML, false /*fRemap*/, false /*fRoot*/);
 	CDXLNode *pdxlnInnerProjList = (*pdxlnInnerChild)[0];
-	CDXLNode *pdxlnInner = NULL;
+	CDXLNode *inner_dxlnode = NULL;
 	if (0 == pdxlnInnerProjList->Arity())
 	{
 		// no requested columns from subplan, add a dummy boolean constant to project list
-		pdxlnInner = PdxlnProjectBoolConst(pdxlnInnerChild, true /*m_bytearray_value*/);
+		inner_dxlnode = PdxlnProjectBoolConst(pdxlnInnerChild, true /*m_bytearray_value*/);
 	}
 	else
 	{
 		// restrict requested columns to required inner column
-		pdxlnInner = PdxlnRestrictResult(pdxlnInnerChild, (*pdrgpcrInner)[0]);
+		inner_dxlnode = PdxlnRestrictResult(pdxlnInnerChild, (*pdrgpcrInner)[0]);
 	}
 	
-	if (NULL == pdxlnInner)
+	if (NULL == inner_dxlnode)
 	{
 		GPOS_RAISE(gpopt::ExmaDXL, gpopt::ExmiExpr2DXLUnsupportedFeature, GPOS_WSZ_LIT("Outer references in the project list of a correlated subquery"));
 	}
@@ -3092,7 +3092,7 @@ CTranslatorExprToDXL::PdxlnExistentialSubplan
 	// construct a subplan node, with the inner child under it
 	CDXLNode *pdxlnSubPlan =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarSubPlan(m_mp, mdid, dxl_colref_array, dxl_subplan_type, NULL /*dxlnode_test_expr*/));
-	pdxlnSubPlan->AddChild(pdxlnInner);
+	pdxlnSubPlan->AddChild(inner_dxlnode);
 
 	// add to hashmap
 #ifdef GPOS_DEBUG
@@ -3131,25 +3131,25 @@ CTranslatorExprToDXL::BuildScalarSubplans
 	{
 		// for each subplan, we need to re-translate inner expression
 		CDXLNode *pdxlnInnerChild = CreateDXLNode(pexprInner, NULL /*colref_array*/, pdrgpdsBaseTables, pulNonGatherMotions, pfDML, false /*fRemap*/, false /*fRoot*/);
-		CDXLNode *pdxlnInner = PdxlnRestrictResult(pdxlnInnerChild, (*pdrgpcrInner)[ul]);
-		if (NULL == pdxlnInner)
+		CDXLNode *inner_dxlnode = PdxlnRestrictResult(pdxlnInnerChild, (*pdrgpcrInner)[ul]);
+		if (NULL == inner_dxlnode)
 		{
 			GPOS_RAISE(gpopt::ExmaDXL, gpopt::ExmiExpr2DXLUnsupportedFeature, GPOS_WSZ_LIT("Outer references in the project list of a correlated subquery"));
 		}
-		pdrgpdxlnInner->Append(pdxlnInner);
+		pdrgpdxlnInner->Append(inner_dxlnode);
 	}
 
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CDXLNode *pdxlnInner = (*pdrgpdxlnInner)[ul];
-		pdxlnInner->AddRef();
+		CDXLNode *inner_dxlnode = (*pdrgpdxlnInner)[ul];
+		inner_dxlnode->AddRef();
 		if (0 < ul)
 		{
 			// if there is more than one subplan, we need to add-ref passed arrays
 			dxl_colref_array->AddRef();
 		}
 		const CColRef *pcrInner = (*pdrgpcrInner)[ul];
-		BuildDxlnSubPlan(pdxlnInner, pcrInner, dxl_colref_array);
+		BuildDxlnSubPlan(inner_dxlnode, pcrInner, dxl_colref_array);
 	}
 
 	pdrgpdxlnInner->Release();

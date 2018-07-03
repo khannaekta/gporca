@@ -1825,7 +1825,7 @@ CTranslatorExprToDXLUtils::PdxlnValuesScan
 		pdrgpdatum->AddRef();
 		const ULONG num_cols = pdrgpdatum->Size();
 		CDXLScalarValuesList *values = GPOS_NEW(mp) CDXLScalarValuesList(mp);
-		CDXLNode *pdxlnValueList = GPOS_NEW(mp) CDXLNode(mp, values);
+		CDXLNode *value_list_dxlnode = GPOS_NEW(mp) CDXLNode(mp, values);
 
 		for (ULONG ulColPos = 0; ulColPos < num_cols; ulColPos++)
 		{
@@ -1834,10 +1834,10 @@ CTranslatorExprToDXLUtils::PdxlnValuesScan
 			const IMDType *pmdtype = md_accessor->RetrieveType(datum->MDId());
 
 			CDXLNode *pdxlnValue = GPOS_NEW(mp) CDXLNode(mp, pmdtype->GetDXLOpScConst(mp, datum));
-			pdxlnValueList->AddChild(pdxlnValue);
+			value_list_dxlnode->AddChild(pdxlnValue);
 		}
 		pdrgpdatum->Release();
-		pdxlnValuesScan->AddChild(pdxlnValueList);
+		pdxlnValuesScan->AddChild(value_list_dxlnode);
 	}
 
 #ifdef GPOS_DEBUG
