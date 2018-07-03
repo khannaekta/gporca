@@ -932,7 +932,7 @@ CStatsPredUtils::ProcessArrayCmp
 	}
 	CExpression *pexprArray = CUtils::PexprScalarArrayChild(pexprPred);
 
-	BOOL fCompareToConstAndScalarIdents = CPredicateUtils::FCompareCastIdentToConstArray(pexprPred) ||
+	BOOL fCompareToConstAndScalarIdents = CPredicateUtils::FArrayCompareCoercibleCastedIdentToConstArray(pexprPred) ||
 										  CPredicateUtils::FCompareScalarIdentToConstAndScalarIdentArray(pexprPred);
 
 	if (!fCompareToConstAndScalarIdents)

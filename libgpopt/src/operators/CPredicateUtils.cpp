@@ -1098,9 +1098,7 @@ CPredicateUtils::FCompareIdentToConst
 	CExpression *pexpr
 	)
 {
-	COperator *pop = pexpr->Pop();
-
-	if (COperator::EopScalarCmp != pop->Eopid())
+	if (!CUtils::FScalarCmp(pexpr))
 	{
 		return false;
 	}
@@ -1109,13 +1107,13 @@ CPredicateUtils::FCompareIdentToConst
 	CExpression *pexprRight = (*pexpr)[1];
 
 	// left side must be scalar ident
-	if (COperator::EopScalarIdent != pexprLeft->Pop()->Eopid())
+	if (!CUtils::FScalarIdent(pexprLeft))
 	{
 		return false;
 	}
 
 	// right side must be a constant
-	if (COperator::EopScalarConst != pexprRight->Pop()->Eopid())
+	if (!CUtils::FScalarConst(pexprRight))
 	{
 		return false;
 	}
@@ -1185,28 +1183,42 @@ CPredicateUtils::FIdentCompareConstIgnoreCast
 	CExpression *pexprLeft = (*pexpr)[0];
 	CExpression *pexprRight = (*pexpr)[1];
 
-	// col IDF const
-	if (COperator::EopScalarIdent == pexprLeft->Pop()->Eopid() && COperator::EopScalarConst == pexprRight->Pop()->Eopid())
+	// col cmp const
+	if (CUtils::FScalarIdent(pexprLeft) && CUtils::FScalarConst(pexprRight))
 	{
 		return true;
 	}
 
-	// cast(col) IDF const
-	if (CScalarIdent::FCastedScId(pexprLeft) && COperator::EopScalarConst == pexprRight->Pop()->Eopid())
+	// cast(col) cmp const
+	if (CScalarIdent::FCastedScId(pexprLeft) && CUtils::FScalarConst(pexprRight))
 	{
 		return true;
 	}
 
-	// col IDF cast(constant)
-	if (COperator::EopScalarIdent == pexprLeft->Pop()->Eopid() && CScalarConst::FCastedConst(pexprRight))
+	// col cmp cast(constant)
+	if (CUtils::FScalarIdent(pexprLeft) && CScalarConst::FCastedConst(pexprRight))
 	{
 		return true;
 	}
 
-	// cast(col) IDF cast(constant)
+	// cast(col) cmp cast(constant)
 	if (CScalarIdent::FCastedScId(pexprLeft) && CScalarConst::FCastedConst(pexprRight))
 	{
 		return true;
+	}
+
+	// col cmp constant-array
+	// cast(col) cmp constant-array
+	// col cmp casted(constant-array)
+	// cast(col) cmp casted(constant-array)
+	if (eopid == COperator::EopScalarArrayCmp)
+	{
+		if ((CUtils::FScalarIdent(pexprLeft) || CScalarIdent::FCastedScId(pexprLeft)) &&
+			(CUtils::FScalarArray(pexprRight) || CUtils::FScalarArrayCoerce(pexprRight)))
+		{
+			CExpression *pexprArray = CUtils::PexprScalarArrayChild(pexpr);
+			return CUtils::FScalarConstArray(pexprArray);
+		}
 	}
 
 	return false;
@@ -1231,21 +1243,87 @@ CPredicateUtils::FIdentINDFConstIgnoreCast
 // +--CScalarArrayCmp Any (=)
 // |--CScalarCast
 // |  +--CScalarIdent
-// +--CScalarConstArray:
+// +--CScalarConst
 BOOL
-CPredicateUtils::FCompareCastIdentToConstArray
+CPredicateUtils::FArrayCompareCoercibleCastedIdentToConst
 	(
 	CExpression *pexpr
 	)
 {
 	GPOS_ASSERT(NULL != pexpr);
 
-	if (CUtils::FScalarArrayCmp(pexpr) &&
-		(CCastUtils::FBinaryCoercibleCast((*pexpr)[0]) &&
-		 CUtils::FScalarIdent((*(*pexpr)[0])[0])))
+	if (!CUtils::FScalarArrayCmp(pexpr))
+	{
+		return false;
+	}
+
+	CExpression *pexprLeft = (*pexpr)[0];
+	CExpression *pexprRight = (*pexpr)[1];
+
+	if (CCastUtils::FBinaryCoercibleCast(pexprLeft) &&
+		 CUtils::FScalarIdent((*pexprLeft)[0]))
+	{
+		return CUtils::FScalarConst(pexprRight);
+	}
+
+	return false;
+}
+
+// is the given expression a comparison between a scalar ident under a scalar cast and a constant array
+// +--CScalarArrayCmp Any (=)
+// |--CScalarCast
+// |  +--CScalarIdent
+// +--CScalarConstArray:
+BOOL
+CPredicateUtils::FArrayCompareCoercibleCastedIdentToConstArray
+	(
+	CExpression *pexpr
+	)
+{
+	GPOS_ASSERT(NULL != pexpr);
+
+	if (!CUtils::FScalarArrayCmp(pexpr))
+	{
+		return false;
+	}
+
+	CExpression *pexprLeft = (*pexpr)[0];
+
+	if (CCastUtils::FBinaryCoercibleCast(pexprLeft) &&
+		 CUtils::FScalarIdent((*pexprLeft)[0]))
 	{
 		CExpression *pexprArray = CUtils::PexprScalarArrayChild(pexpr);
 		return CUtils::FScalarConstArray(pexprArray);
+	}
+
+	return false;
+}
+
+// is the given expression a comparison between a scalar ident under a scalar cast and a constant array
+// +--CScalarCmp
+// |--CScalarCast
+// |  +--CScalarIdent
+// +--CScalarConst
+BOOL
+CPredicateUtils::FCompareCoercibleCastedIdentToConst
+	(
+	CExpression *pexpr
+	)
+{
+	GPOS_ASSERT(NULL != pexpr);
+
+	if (!CUtils::FScalarCmp(pexpr))
+	{
+		return false;
+	}
+
+	CExpression *pexprLeft = (*pexpr)[0];
+	CExpression *pexprRight = (*pexpr)[1];
+
+	if ((CCastUtils::FBinaryCoercibleCast(pexprLeft) &&
+		 CUtils::FScalarIdent((*pexprLeft)[0])))
+	{
+		return CUtils::FScalarConst(pexprRight);
 	}
 
 	return false;
