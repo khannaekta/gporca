@@ -116,8 +116,8 @@ namespace gpos
 		ULONG m_size;
 
 		// each hash chain is an array of hashset elements
-		typedef CDynamicPtrArray<CHashSetElem, CleanupDelete> HashElemChain;
-		HashElemChain **m_chains;
+		typedef CDynamicPtrArray<CHashSetElem, CleanupDelete> HashSetElemArray;
+		HashSetElemArray **m_chains;
 
 		// array for elements
 		// We use CleanupNULL because the elements are owned by the hash table
@@ -131,7 +131,7 @@ namespace gpos
 
 		// lookup appropriate hash chain in static table, may be NULL if
 		// no elements have been inserted yet
-		HashElemChain **
+		HashSetElemArray **
 		GetChain(const T *value) const
 		{
 			GPOS_ASSERT(NULL != m_chains);
@@ -157,7 +157,7 @@ namespace gpos
 		{
 			CHashSetElem hse(const_cast<T *>(value), false /*fOwn*/);
 			CHashSetElem *found_hse = NULL;
-			HashElemChain **chain = GetChain(value);
+			HashSetElemArray **chain = GetChain(value);
 			if (NULL != *chain)
 			{
 				found_hse = (*chain)->Find(&hse);
@@ -173,13 +173,13 @@ namespace gpos
 			: m_mp(mp),
 			  m_num_chains(size),
 			  m_size(0),
-			  m_chains(GPOS_NEW_ARRAY(m_mp, HashElemChain *, m_num_chains)),
+			  m_chains(GPOS_NEW_ARRAY(m_mp, HashSetElemArray *, m_num_chains)),
 			  m_elements(GPOS_NEW(m_mp) Elements(m_mp)),
 			  m_filled_chains(GPOS_NEW(mp) IntPtrArray(mp))
 		{
 			GPOS_ASSERT(size > 0);
 
-			(void) clib::Memset(m_chains, 0, m_num_chains * sizeof(HashElemChain *));
+			(void) clib::Memset(m_chains, 0, m_num_chains * sizeof(HashSetElemArray *));
 		}
 
 		// dtor
@@ -202,10 +202,10 @@ namespace gpos
 				return false;
 			}
 
-			HashElemChain **chain = GetChain(value);
+			HashSetElemArray **chain = GetChain(value);
 			if (NULL == *chain)
 			{
-				*chain = GPOS_NEW(m_mp) HashElemChain(m_mp);
+				*chain = GPOS_NEW(m_mp) HashSetElemArray(m_mp);
 				INT chain_idx = HashFn(value) % m_num_chains;
 				m_filled_chains->Append(GPOS_NEW(m_mp) INT(chain_idx));
 			}
@@ -224,7 +224,7 @@ namespace gpos
 		Contains(const T *value) const
 		{
 			CHashSetElem hse(const_cast<T *>(value), false /*fOwn*/);
-			HashElemChain **chain = GetChain(value);
+			HashSetElemArray **chain = GetChain(value);
 			if (NULL != *chain)
 			{
 				CHashSetElem *found_hse = (*chain)->Find(&hse);

@@ -35,17 +35,17 @@ CHashSetIterTest::EresUnittest_Basic()
 	ULONG rgul[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 	const ULONG ulCnt = GPOS_ARRAY_SIZE(rgul);
 
-	typedef CHashSet<ULONG, HashValue<ULONG>, gpos::Equals<ULONG>, CleanupNULL<ULONG> > Set;
+	typedef CHashSet<ULONG, HashValue<ULONG>, gpos::Equals<ULONG>, CleanupNULL<ULONG> > UlongHashSet;
 
-	typedef CHashSetIter<ULONG, HashValue<ULONG>, gpos::Equals<ULONG>, CleanupNULL<ULONG> > SetIter;
+	typedef CHashSetIter<ULONG, HashValue<ULONG>, gpos::Equals<ULONG>, CleanupNULL<ULONG> > UlongHashSetIter;
 
 	// using N - 2 slots guarantees collisions
-	Set *ps = GPOS_NEW(mp) Set(mp, ulCnt - 2);
+	UlongHashSet *ps = GPOS_NEW(mp) UlongHashSet(mp, ulCnt - 2);
 
 #ifdef GPOS_DEBUG
 
 	// iteration over empty map
-	SetIter siEmpty(ps);
+	UlongHashSetIter siEmpty(ps);
 	GPOS_ASSERT(!siEmpty.Advance());
 
 #endif  // GPOS_DEBUG
@@ -61,7 +61,7 @@ CHashSetIterTest::EresUnittest_Basic()
 		CAutoRef<ULongPtrArray> pdrgpulIterValues(GPOS_NEW(mp) ULongPtrArray(mp));
 
 		// iterate over full set
-		SetIter si(ps);
+		UlongHashSetIter si(ps);
 		while (si.Advance())
 		{
 			pdrgpulIterValues->Append(si.Get());
