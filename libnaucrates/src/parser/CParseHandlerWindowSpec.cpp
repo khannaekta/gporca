@@ -143,7 +143,7 @@ CParseHandlerWindowSpec::EndElement(const XMLCh *const,  // element_uri,
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 	// sorting columns
-	CDXLNode *sort_col_list_dxl = NULL;
+	CDXLNode *sort_col_list_dxlnode = NULL;
 
 	// window frame associated with the window key
 	CDXLWindowFrame *window_frame = NULL;
@@ -164,23 +164,23 @@ CParseHandlerWindowSpec::EndElement(const XMLCh *const,  // element_uri,
 		{
 			CParseHandlerSortColList *sort_col_list_parse_handler =
 				dynamic_cast<CParseHandlerSortColList *>((*this)[0]);
-			sort_col_list_dxl = sort_col_list_parse_handler->CreateDXLNode();
-			sort_col_list_dxl->AddRef();
+			sort_col_list_dxlnode = sort_col_list_parse_handler->CreateDXLNode();
+			sort_col_list_dxlnode->AddRef();
 		}
 	}
 	else if (2 == this->Length())
 	{
 		CParseHandlerSortColList *sort_col_list_parse_handler =
 			dynamic_cast<CParseHandlerSortColList *>((*this)[0]);
-		sort_col_list_dxl = sort_col_list_parse_handler->CreateDXLNode();
-		sort_col_list_dxl->AddRef();
+		sort_col_list_dxlnode = sort_col_list_parse_handler->CreateDXLNode();
+		sort_col_list_dxlnode->AddRef();
 
 		CParseHandlerWindowFrame *window_frame_parse_handler =
 			dynamic_cast<CParseHandlerWindowFrame *>((*this)[1]);
 		window_frame = window_frame_parse_handler->GetWindowFrame();
 	}
 	m_dxl_window_spec_gen = GPOS_NEW(m_mp) CDXLWindowSpec(
-		m_mp, m_part_by_col_identifier_array, m_mdname, sort_col_list_dxl, window_frame);
+		m_mp, m_part_by_col_identifier_array, m_mdname, sort_col_list_dxlnode, window_frame);
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

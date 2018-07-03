@@ -40,7 +40,7 @@ namespace gpdxl
 		CDXLWindowKey(const CDXLWindowKey &);
 
 		// sorting columns
-		CDXLNode *m_sort_col_list_dxl;
+		CDXLNode *m_sort_col_list_dxlnode;
 
 	public:
 		// ctor
@@ -63,13 +63,13 @@ namespace gpdxl
 		}
 
 		// set the list of sort columns
-		void SetSortColList(CDXLNode *sort_col_list_dxl);
+		void SetSortColList(CDXLNode *sort_col_list_dxlnode);
 
 		// sort columns
 		CDXLNode *
 		GetSortColListDXL() const
 		{
-			return m_sort_col_list_dxl;
+			return m_sort_col_list_dxlnode;
 		}
 	};
 

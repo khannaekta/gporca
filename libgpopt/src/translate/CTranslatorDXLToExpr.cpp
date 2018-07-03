@@ -1615,7 +1615,7 @@ CTranslatorDXLToExpr::PexprLogicalLimit
 	GPOS_ASSERT(NULL != dxlnode && EdxlopLogicalLimit == dxlnode->GetOperator()->GetDXLOperator());
 
 	// get children
-	CDXLNode *sort_col_list_dxl = (*dxlnode)[EdxllogicallimitIndexSortColList];
+	CDXLNode *sort_col_list_dxlnode = (*dxlnode)[EdxllogicallimitIndexSortColList];
 	CDXLNode *pdxlnCount = (*dxlnode)[EdxllogicallimitIndexLimitCount];
 	CDXLNode *pdxlnOffset = (*dxlnode)[EdxllogicallimitIndexLimitOffset];
 	CDXLNode *child_dxlnode = (*dxlnode)[EdxllogicallimitIndexChildPlan];
@@ -1658,7 +1658,7 @@ CTranslatorDXLToExpr::PexprLogicalLimit
 	CExpression *pexprChild = PexprLogical(child_dxlnode);
 
 	// translate sort col list
-	COrderSpec *pos = Pos(sort_col_list_dxl);
+	COrderSpec *pos = Pos(sort_col_list_dxlnode);
 	
 	BOOL fNonRemovable = CDXLLogicalLimit::Cast(dxlnode->GetOperator())->IsTopLimitUnderDMLorCTAS();
 	CLogicalLimit *popLimit =

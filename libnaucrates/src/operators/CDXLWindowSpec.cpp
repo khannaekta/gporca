@@ -35,12 +35,12 @@ using namespace gpdxl;
 CDXLWindowSpec::CDXLWindowSpec(IMemoryPool *mp,
 							   ULongPtrArray *partition_by_col_id_array,
 							   CMDName *mdname,
-							   CDXLNode *sort_col_list_dxl,
+							   CDXLNode *sort_col_list_dxlnode,
 							   CDXLWindowFrame *window_frame)
 	: m_mp(mp),
 	  m_partition_by_col_id_array(partition_by_col_id_array),
 	  m_mdname(mdname),
-	  m_sort_col_list_dxl(sort_col_list_dxl),
+	  m_sort_col_list_dxlnode(sort_col_list_dxlnode),
 	  m_window_frame(window_frame)
 {
 	GPOS_ASSERT(NULL != m_mp);
@@ -59,7 +59,7 @@ CDXLWindowSpec::~CDXLWindowSpec()
 {
 	m_partition_by_col_id_array->Release();
 	CRefCount::SafeRelease(m_window_frame);
-	CRefCount::SafeRelease(m_sort_col_list_dxl);
+	CRefCount::SafeRelease(m_sort_col_list_dxlnode);
 	GPOS_DELETE(m_mdname);
 }
 
@@ -93,9 +93,9 @@ CDXLWindowSpec::SerializeToDXL(CXMLSerializer *xml_serializer) const
 	}
 
 	// serialize sorting columns
-	if (NULL != m_sort_col_list_dxl)
+	if (NULL != m_sort_col_list_dxlnode)
 	{
-		m_sort_col_list_dxl->SerializeToDXL(xml_serializer);
+		m_sort_col_list_dxlnode->SerializeToDXL(xml_serializer);
 	}
 
 	// serialize window frames

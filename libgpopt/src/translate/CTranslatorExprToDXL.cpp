@@ -2517,7 +2517,7 @@ CTranslatorExprToDXL::PdxlnSort
 	CDXLNode *child_dxlnode = CreateDXLNode(pexprChild, colref_array, pdrgpdsBaseTables, pulNonGatherMotions, pfDML, false /*fRemap*/, false /*fRoot*/);
 
 	// translate order spec
-	CDXLNode *sort_col_list_dxl = GetSortColListDXL(popSort->Pos());
+	CDXLNode *sort_col_list_dxlnode = GetSortColListDXL(popSort->Pos());
 	
 	// construct project list from child project list
 	GPOS_ASSERT(NULL != child_dxlnode && 1 <= child_dxlnode->Arity());
@@ -2542,7 +2542,7 @@ CTranslatorExprToDXL::PdxlnSort
 	// add children
 	pdxlnSort->AddChild(proj_list_dxlnode);
 	pdxlnSort->AddChild(filter_dxlnode);
-	pdxlnSort->AddChild(sort_col_list_dxl);
+	pdxlnSort->AddChild(sort_col_list_dxlnode);
 	pdxlnSort->AddChild(limit_count);
 	pdxlnSort->AddChild(limit_offset);
 	pdxlnSort->AddChild(child_dxlnode);
@@ -4019,12 +4019,12 @@ CTranslatorExprToDXL::PdxlnMotion
 	CDXLNode *filter_dxlnode = PdxlnFilter(NULL /*pdxlnCond*/);
 
 	// construct sort column list
-	CDXLNode *sort_col_list_dxl = GetSortColListDXL(pexprMotion);
+	CDXLNode *sort_col_list_dxlnode = GetSortColListDXL(pexprMotion);
 
 	// add children
 	pdxlnMotion->AddChild(proj_list_dxlnode);
 	pdxlnMotion->AddChild(filter_dxlnode);
-	pdxlnMotion->AddChild(sort_col_list_dxl);
+	pdxlnMotion->AddChild(sort_col_list_dxlnode);
 
 	if (COperator::EopPhysicalMotionHashDistribute == pexprMotion->Pop()->Eopid())
 	{
@@ -6755,8 +6755,8 @@ CTranslatorExprToDXL::PdxlnWindow
 	for (ULONG ul = 0; ul < ulOsSize; ul++)
 	{
 		CDXLWindowKey *pdxlwk = GPOS_NEW(m_mp) CDXLWindowKey(m_mp);
-		CDXLNode *sort_col_list_dxl = GetSortColListDXL((*popSeqPrj->Pdrgpos())[ul]);
-		pdxlwk->SetSortColList(sort_col_list_dxl);
+		CDXLNode *sort_col_list_dxlnode = GetSortColListDXL((*popSeqPrj->Pdrgpos())[ul]);
+		pdxlwk->SetSortColList(sort_col_list_dxlnode);
 		pdrgpdxlwk->Append(pdxlwk);
 	}
 
@@ -7640,7 +7640,7 @@ CTranslatorExprToDXL::GetSortColListDXL
 {
 	GPOS_ASSERT(NULL != pos);
 	
-	CDXLNode *sort_col_list_dxl = GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarSortColList(m_mp));
+	CDXLNode *sort_col_list_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarSortColList(m_mp));
 	
 	for (ULONG ul = 0; ul < pos->UlSortColumns(); ul++)
 	{
@@ -7676,10 +7676,10 @@ CTranslatorExprToDXL::GetSortColListDXL
 							);
 		
 		CDXLNode *pdxlnSortCol = GPOS_NEW(m_mp) CDXLNode(m_mp, pdxlopSortCol);
-		sort_col_list_dxl->AddChild(pdxlnSortCol);
+		sort_col_list_dxlnode->AddChild(pdxlnSortCol);
 	}
 	
-	return sort_col_list_dxl;
+	return sort_col_list_dxlnode;
 }
 
 //---------------------------------------------------------------------------
@@ -7741,19 +7741,19 @@ CTranslatorExprToDXL::GetSortColListDXL
 	CExpression *pexprMotion
 	)
 {
-	CDXLNode *sort_col_list_dxl = NULL;
+	CDXLNode *sort_col_list_dxlnode = NULL;
 	if (COperator::EopPhysicalMotionGather == pexprMotion->Pop()->Eopid())
 	{
 		// construct a sorting column list node
 		CPhysicalMotionGather *popGather = CPhysicalMotionGather::PopConvert(pexprMotion->Pop());
-		sort_col_list_dxl = GetSortColListDXL(popGather->Pos());
+		sort_col_list_dxlnode = GetSortColListDXL(popGather->Pos());
 	}
 	else
 	{
-		sort_col_list_dxl = GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarSortColList(m_mp));
+		sort_col_list_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarSortColList(m_mp));
 	}
 	
-	return sort_col_list_dxl;
+	return sort_col_list_dxlnode;
 }
 
 //---------------------------------------------------------------------------

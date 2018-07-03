@@ -350,7 +350,7 @@ namespace gpopt
 			CExpression *PexprScalarProjElem(const CDXLNode *pdxlnProjElem);
 			
 			// construct an order spec from a dxl sort col list node
-			COrderSpec *Pos(const CDXLNode *sort_col_list_dxl);
+			COrderSpec *Pos(const CDXLNode *sort_col_list_dxlnode);
 			
 			// translate a dxl node into an expression tree
 			CExpression *Pexpr(const CDXLNode *dxlnode);
