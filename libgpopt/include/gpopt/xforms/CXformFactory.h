@@ -33,7 +33,7 @@ namespace gpopt
 
 			// definition of hash map to maintain mappings
 			typedef CHashMap<CHAR, CXform, gpos::HashValue<CHAR>, CXform::FEqualIds,
-						CleanupDeleteArray<CHAR>, CleanupNULL<CXform> > HMSzXform;
+						CleanupDeleteArray<CHAR>, CleanupNULL<CXform> > XformNameToXformMap;
 
 			// memory pool
 			IMemoryPool *m_mp;
@@ -42,7 +42,7 @@ namespace gpopt
 			CXform *m_rgpxf[CXform::ExfSentinel];
 
 			// name -> xform map
-			HMSzXform *m_phmszxform;
+			XformNameToXformMap *m_phmszxform;
 
 			// bitset of exploration xforms
 			CXformSet *m_pxfsExploration;

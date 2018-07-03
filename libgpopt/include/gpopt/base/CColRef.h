@@ -33,10 +33,10 @@ namespace gpopt
 	
 	// hash map mapping ULONG -> CColRef
 	typedef CHashMap<ULONG, CColRef, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-					CleanupDelete<ULONG>, CleanupNULL<CColRef> > UlongColRefHashMap;
+					CleanupDelete<ULONG>, CleanupNULL<CColRef> > UlongToColRefMap;
 	// iterator
 	typedef CHashMapIter<ULONG, CColRef, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-					CleanupDelete<ULONG>, CleanupNULL<CColRef> > UlongColRefHashMapIter;
+					CleanupDelete<ULONG>, CleanupNULL<CColRef> > UlongToColRefMapIter;
 	
 	//---------------------------------------------------------------------------
 	//	@class:

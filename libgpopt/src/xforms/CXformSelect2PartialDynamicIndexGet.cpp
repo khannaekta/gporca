@@ -323,7 +323,7 @@ CXformSelect2PartialDynamicIndexGet::PexprSelectOverDynamicGet
 	CPartConstraint *ppartcnstr
 	)
 {
-	UlongColRefHashMap *colref_mapping = CUtils::PhmulcrMapping(mp, popGet->PdrgpcrOutput(), pdrgpcrDGet);
+	UlongToColRefMap *colref_mapping = CUtils::PhmulcrMapping(mp, popGet->PdrgpcrOutput(), pdrgpcrDGet);
 
 	// construct a partial dynamic get with the negated constraint
 	CPartConstraint *ppartcnstrPartialDynamicGet = ppartcnstr->PpartcnstrCopyWithRemappedColumns(mp, colref_mapping, true /*must_exist*/);

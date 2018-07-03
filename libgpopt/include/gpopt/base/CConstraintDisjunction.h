@@ -71,7 +71,7 @@ namespace gpopt
 
 			// return a copy of the constraint with remapped columns
 			virtual
-			CConstraint *PcnstrCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			CConstraint *PcnstrCopyWithRemappedColumns(IMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist);
 
 			// scalar expression
 			virtual

@@ -34,7 +34,7 @@ namespace gpopt
 
 			// hash map between expression and a column reference
 			typedef CHashMap<CExpression, CColRef, CExpression::HashValue, CUtils::Equals,
-						CleanupRelease<CExpression>, CleanupNULL<CColRef> > HMExprCr;
+						CleanupRelease<CExpression>, CleanupNULL<CColRef> > ExprToColRefMap;
 
 			// private copy ctor
 			CXformSplitDQA(const CXformSplitDQA &);
@@ -63,7 +63,7 @@ namespace gpopt
 							CMDAccessor *md_accessor,
 							CExpression *pexpr,
 							CExpression *pexprRelational,
-							HMExprCr *phmexprcr,
+							ExprToColRefMap *phmexprcr,
 							ColRefArray *pdrgpcrArgDQA
 							);
 
@@ -76,7 +76,7 @@ namespace gpopt
 				CMDAccessor *md_accessor,
 				CExpression *pexpr,
 				CExpression *pexprRelational,
-				HMExprCr *phmexprcr,
+				ExprToColRefMap *phmexprcr,
 				ColRefArray *pdrgpcrArgDQA,
 				BOOL fScalarAggregate
 				);
@@ -118,7 +118,7 @@ namespace gpopt
 					CMDAccessor *md_accessor,
 					CExpression *pexpr,
 					ExpressionArray *pdrgpexprChildPrEl,
-					HMExprCr *phmexprcr,
+					ExprToColRefMap *phmexprcr,
 					ColRefArray **ppdrgpcrArgDQA
 					);
 

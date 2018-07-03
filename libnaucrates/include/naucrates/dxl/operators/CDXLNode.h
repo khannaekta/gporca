@@ -38,7 +38,7 @@ namespace gpdxl
 					 gpos::Equals<ULONG>,
 					 CleanupDelete<ULONG>,
 					 CleanupRelease<CDXLNode> >
-		IdToDXLNodeMap;
+		IdToCDXLNodeMap;
 
 	//---------------------------------------------------------------------------
 	//	@class:

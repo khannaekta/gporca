@@ -458,7 +458,7 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::PexprProjectOverLeftAntiSemiJoin
 	ULongPtrArray *pdrgpulIndexesOfOuter = pdrgpcrJoinOutput->IndexesOfSubsequence(pdrgpcrOuter);
 	GPOS_ASSERT(NULL != pdrgpulIndexesOfOuter);
 
-	UlongColRefHashMap *colref_mapping = GPOS_NEW(mp) UlongColRefHashMap(mp);
+	UlongToColRefMap *colref_mapping = GPOS_NEW(mp) UlongToColRefMap(mp);
 	const ULONG ulOuterCopyLength = pdrgpcrOuterCopy->Size();
 
 	for (ULONG ul = 0; ul < ulOuterCopyLength; ++ul)

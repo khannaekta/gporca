@@ -106,14 +106,14 @@ namespace gpopt
 
 			// map of partition index ids to filter expressions
 			typedef CHashMap<ULONG, CPartFilter, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-				CleanupDelete<ULONG>, CleanupRelease<CPartFilter> > HMULPartFilter;
+				CleanupDelete<ULONG>, CleanupRelease<CPartFilter> > UlongToPartFilterMap;
 
 			// map iterator
 			typedef CHashMapIter<ULONG, CPartFilter, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-				CleanupDelete<ULONG>, CleanupRelease<CPartFilter> > HMULPartFilterIter;
+				CleanupDelete<ULONG>, CleanupRelease<CPartFilter> > UlongToPartFilterMapIter;
 
 			// hash map from ScanId to CPartFilter
-			HMULPartFilter *m_phmulpf;
+			UlongToPartFilterMap *m_phmulpf;
 
 		public:
 

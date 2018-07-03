@@ -72,7 +72,7 @@ namespace gpopt
 
 			// return a copy of the distribution spec with remapped columns
 			virtual
-			CDistributionSpec *PdsCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			CDistributionSpec *PdsCopyWithRemappedColumns(IMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist);
 
 			// append enforcers to dynamic array for the given plan properties
 			virtual

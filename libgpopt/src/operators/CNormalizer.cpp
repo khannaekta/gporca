@@ -764,7 +764,7 @@ CNormalizer::PushThruSetOp
 			//
 			// this is achieved by passing (must_exist = True) flag below, which enforces
 			// creating column copies for columns not already in the given map
-			UlongColRefHashMap *colref_mapping = CUtils::PhmulcrMapping(mp, pdrgpcrOutput, pdrgpcrChild);
+			UlongToColRefMap *colref_mapping = CUtils::PhmulcrMapping(mp, pdrgpcrOutput, pdrgpcrChild);
 			pexprRemappedConj->Release();
 			pexprRemappedConj = pexprConj->PexprCopyWithRemappedColumns(mp, colref_mapping, true /*must_exist*/);
 			colref_mapping->Release();

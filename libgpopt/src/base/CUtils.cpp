@@ -1551,7 +1551,7 @@ CUtils::PdrgpexprDedup
 {
 	const ULONG size = pdrgpexpr->Size();
 	ExpressionArray *pdrgpexprDedup = GPOS_NEW(mp) ExpressionArray(mp);
-	HSExpr *phsexpr = GPOS_NEW(mp) HSExpr(mp);
+	ExprHashSet *phsexpr = GPOS_NEW(mp) ExprHashSet(mp);
 
 	for (ULONG ul = 0; ul < size; ul++)
 	{
@@ -2393,7 +2393,7 @@ CUtils::PexprLogicalProjectNulls
 	IMemoryPool *mp,
 	ColRefArray *colref_array,
 	CExpression *pexpr,
-	UlongColRefHashMap *colref_mapping
+	UlongToColRefMap *colref_mapping
 	)
 {
 	IDatumArray *pdrgpdatum = CTranslatorExprToDXLUtils::PdrgpdatumNulls(mp, colref_array);
@@ -2411,7 +2411,7 @@ CUtils::PexprScalarProjListConst
 	IMemoryPool *mp,
 	ColRefArray *colref_array,
 	IDatumArray *pdrgpdatum,
-	UlongColRefHashMap *colref_mapping
+	UlongToColRefMap *colref_mapping
 	)
 {
 	GPOS_ASSERT(colref_array->Size() == pdrgpdatum->Size());
@@ -2797,7 +2797,7 @@ CUtils::PdrgpcrsIntersectEquivClasses
 	}
 
 	ColRefToColRefSetMap *phmcscrs = GPOS_NEW(mp) ColRefToColRefSetMap(mp);
-	HMCrCr *phmcscrDone = GPOS_NEW(mp) HMCrCr(mp);
+	ColRefToColRefMap *phmcscrDone = GPOS_NEW(mp) ColRefToColRefMap(mp);
 
 	// populate a hashmap in this loop
 	for (ULONG ulFst = 0; ulFst < ulLenFst; ulFst++)
@@ -3681,7 +3681,7 @@ CColRef *
 CUtils::PcrRemap
 	(
 	const CColRef *colref,
-	UlongColRefHashMap *colref_mapping,
+	UlongToColRefMap *colref_mapping,
 	BOOL
 #ifdef GPOS_DEBUG
 	must_exist
@@ -3710,7 +3710,7 @@ CUtils::PcrsRemap
 	(
 	IMemoryPool *mp,
 	CColRefSet *pcrs,
-	UlongColRefHashMap *colref_mapping,
+	UlongToColRefMap *colref_mapping,
 	BOOL must_exist
 	)
 {
@@ -3737,7 +3737,7 @@ CUtils::PdrgpcrRemap
 	(
 	IMemoryPool *mp,
 	ColRefArray *colref_array,
-	UlongColRefHashMap *colref_mapping,
+	UlongToColRefMap *colref_mapping,
 	BOOL must_exist
 	)
 {
@@ -3764,7 +3764,7 @@ CUtils::PdrgpcrRemapAndCreate
 	(
 	IMemoryPool *mp,
 	ColRefArray *colref_array,
-	UlongColRefHashMap *colref_mapping
+	UlongToColRefMap *colref_mapping
 	)
 {
 	GPOS_ASSERT(NULL != colref_array);
@@ -3806,7 +3806,7 @@ CUtils::PdrgpdrgpcrRemap
 	(
 	IMemoryPool *mp,
 	ColRefArrays *pdrgpdrgpcr,
-	UlongColRefHashMap *colref_mapping,
+	UlongToColRefMap *colref_mapping,
 	BOOL must_exist
 	)
 {
@@ -3831,7 +3831,7 @@ CUtils::PdrgpexprRemap
 	(
 	IMemoryPool *mp,
 	ExpressionArray *pdrgpexpr,
-	UlongColRefHashMap *colref_mapping
+	UlongToColRefMap *colref_mapping
 	)
 {
 	GPOS_ASSERT(NULL != pdrgpexpr);
@@ -3850,7 +3850,7 @@ CUtils::PdrgpexprRemap
 }
 
 // create col ID->ColRef mapping using the given ColRef arrays
-UlongColRefHashMap *
+UlongToColRefMap *
 CUtils::PhmulcrMapping
 	(
 	IMemoryPool *mp,
@@ -3861,7 +3861,7 @@ CUtils::PhmulcrMapping
 	GPOS_ASSERT(NULL != pdrgpcrFrom);
 	GPOS_ASSERT(NULL != pdrgpcrTo);
 
-	UlongColRefHashMap *colref_mapping = GPOS_NEW(mp) UlongColRefHashMap(mp);
+	UlongToColRefMap *colref_mapping = GPOS_NEW(mp) UlongToColRefMap(mp);
 	AddColumnMapping(mp, colref_mapping, pdrgpcrFrom, pdrgpcrTo);
 
 	return colref_mapping;
@@ -3872,7 +3872,7 @@ void
 CUtils::AddColumnMapping
 	(
 	IMemoryPool *mp,
-	UlongColRefHashMap *colref_mapping,
+	UlongToColRefMap *colref_mapping,
 	ColRefArray *pdrgpcrFrom,
 	ColRefArray *pdrgpcrTo
 	)
@@ -3943,7 +3943,7 @@ CUtils::PdrgpcrCopy
 	IMemoryPool *mp,
 	ColRefArray *colref_array,
 	BOOL fAllComputed,
-	UlongColRefHashMap *colref_mapping
+	UlongToColRefMap *colref_mapping
 	)
 {
 	// get column factory from optimizer context object
@@ -4030,7 +4030,7 @@ CUtils::PcrsCTEProducerColumns
 	CLogicalCTEProducer *popProducer = CLogicalCTEProducer::PopConvert(pexprProducer->Pop());
 
 	ColRefArray *pdrgpcrInput = pcrsInput->Pdrgpcr(mp);
-	UlongColRefHashMap *colref_mapping = PhmulcrMapping(mp, popCTEConsumer->Pdrgpcr(), popProducer->Pdrgpcr());
+	UlongToColRefMap *colref_mapping = PhmulcrMapping(mp, popCTEConsumer->Pdrgpcr(), popProducer->Pdrgpcr());
 	ColRefArray *pdrgpcrOutput = PdrgpcrRemap(mp, pdrgpcrInput, colref_mapping, true /*must_exist*/);
 
 	CColRefSet *pcrsCTEProducer = GPOS_NEW(mp) CColRefSet(mp);
@@ -4274,7 +4274,7 @@ CUtils::PcrsExtractColumns
 // Create a hashmap of constraints corresponding to a bool const on the given partkeys
 // true - unbounded intervals with nulls
 // false - empty intervals with no nulls
-HMUlCnstr *
+UlongToConstraintMap *
 CUtils::PhmulcnstrBoolConstOnPartKeys
 	(
 	IMemoryPool *mp,
@@ -4283,7 +4283,7 @@ CUtils::PhmulcnstrBoolConstOnPartKeys
 	)
 {
 	GPOS_ASSERT(NULL != pdrgpdrgpcrPartKey);
-	HMUlCnstr *phmulcnstr = GPOS_NEW(mp) HMUlCnstr(mp);
+	UlongToConstraintMap *phmulcnstr = GPOS_NEW(mp) UlongToConstraintMap(mp);
 
 	const ULONG ulLevels = pdrgpdrgpcrPartKey->Size();
 	for (ULONG ul = 0; ul < ulLevels; ul++)
@@ -4375,7 +4375,7 @@ CUtils::PpartcnstrFromMDPartCnstr
 
 	CExpression *pexprPartCnstr = mdpart_constraint->GetPartConstraintExpr(mp, md_accessor, pdrgpcrOutput);
 
-	HMUlCnstr *phmulcnstr = NULL;
+	UlongToConstraintMap *phmulcnstr = NULL;
 	if (CUtils::FScalarConstTrue(pexprPartCnstr))
 	{
 		phmulcnstr = PhmulcnstrBoolConstOnPartKeys(mp, pdrgpdrgpcrPartKey, true /*m_bytearray_value*/);
@@ -4391,7 +4391,7 @@ CUtils::PpartcnstrFromMDPartCnstr
 		CConstraint *pcnstr = CConstraint::PcnstrFromScalarExpr(mp, pexprPartCnstr, &pdrgpcrs);
 		CRefCount::SafeRelease(pdrgpcrs);
 
-		phmulcnstr = GPOS_NEW(mp) HMUlCnstr(mp);
+		phmulcnstr = GPOS_NEW(mp) UlongToConstraintMap(mp);
 		for (ULONG ul = 0; ul < ulLevels && NULL != pcnstr; ul++)
 		{
 			CColRef *pcrPartKey = PcrExtractPartKey(pdrgpdrgpcrPartKey, ul);
@@ -4863,7 +4863,7 @@ CUtils::ValidateCTEProducerConsumerLocality
 	IMemoryPool *mp,
 	CExpression *pexpr,
 	EExecLocalityType eelt,
-	UlongUlongHashMap *phmulul // Hash Map containing the CTE Producer id and its execution locality
+	UlongToUlongMap *phmulul // Hash Map containing the CTE Producer id and its execution locality
 	)
 {
 	COperator *pop = pexpr->Pop();

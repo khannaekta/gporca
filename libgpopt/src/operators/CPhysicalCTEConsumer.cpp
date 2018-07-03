@@ -32,7 +32,7 @@ CPhysicalCTEConsumer::CPhysicalCTEConsumer
 	IMemoryPool *mp,
 	ULONG id,
 	ColRefArray *colref_array,
-	UlongColRefHashMap *colref_mapping
+	UlongToColRefMap *colref_mapping
 	)
 	:
 	CPhysical(mp),

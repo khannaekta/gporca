@@ -167,7 +167,7 @@ CPartKeys *
 CPartKeys::PpartkeysRemap
 	(
 	IMemoryPool *mp,
-	UlongColRefHashMap *colref_mapping
+	UlongToColRefMap *colref_mapping
 	)
 	const
 {

@@ -78,7 +78,7 @@ CLogicalUnary::PstatsDeriveProject
 	(
 	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
-	HMUlDatum *phmuldatum
+	UlongToIDatumMap *phmuldatum
 	)
 	const
 {

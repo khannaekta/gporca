@@ -66,9 +66,9 @@ CHashMapTest::EresUnittest_Basic()
 					 gpos::Equals<ULONG_PTR>,
 					 CleanupNULL<ULONG_PTR>,
 					 CleanupNULL<CHAR> >
-		HMUlChar;
+		UlongPtrToCharMap;
 
-	HMUlChar *phm = GPOS_NEW(mp) HMUlChar(mp, 128);
+	UlongPtrToCharMap *phm = GPOS_NEW(mp) UlongPtrToCharMap(mp, 128);
 	for (ULONG i = 0; i < ulCnt; ++i)
 	{
 #ifdef GPOS_DEBUG
@@ -119,8 +119,8 @@ CHashMapTest::EresUnittest_Basic()
 					 gpos::Equals<ULONG>,
 					 CleanupDelete<ULONG>,
 					 CleanupDelete<ULONG> >
-		UlongUlongHashMap;
-	UlongUlongHashMap *phm2 = GPOS_NEW(mp) UlongUlongHashMap(mp, 128);
+		UlongToUlongMap;
+	UlongToUlongMap *phm2 = GPOS_NEW(mp) UlongToUlongMap(mp, 128);
 
 	ULONG *pulKey = GPOS_NEW(mp) ULONG(1);
 	ULONG *pulVal1 = GPOS_NEW(mp) ULONG(2);
@@ -175,9 +175,9 @@ CHashMapTest::EresUnittest_Ownership()
 					 gpos::Equals<ULONG_PTR>,
 					 CleanupDelete<ULONG_PTR>,
 					 CleanupDeleteArray<CHAR> >
-		HMUlChar;
+		UlongPtrToCharMap;
 
-	HMUlChar *phm = GPOS_NEW(mp) HMUlChar(mp, 32);
+	UlongPtrToCharMap *phm = GPOS_NEW(mp) UlongPtrToCharMap(mp, 32);
 	for (ULONG i = 0; i < ulCnt; ++i)
 	{
 		ULONG_PTR *pulp = GPOS_NEW(mp) ULONG_PTR(i);

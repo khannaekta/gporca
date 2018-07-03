@@ -40,7 +40,7 @@ namespace gpopt
 			CExpression *m_pexprInlined;
 
 			// map of CTE producer's output column ids to consumer's output columns
-			UlongColRefHashMap *m_phmulcr;
+			UlongToColRefMap *m_phmulcr;
 
 			// output columns
 			CColRefSet *m_pcrsOutput;
@@ -90,7 +90,7 @@ namespace gpopt
 			}
 
 			// column mapping
-			UlongColRefHashMap *Phmulcr() const
+			UlongToColRefMap *Phmulcr() const
 			{
 				return m_phmulcr;
 			}
@@ -114,7 +114,7 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist);
 
 			//-------------------------------------------------------------------------------------
 			// Derived Relational Properties

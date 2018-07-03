@@ -52,11 +52,11 @@ namespace gpopt
 
 	// hash maps
 	typedef CHashMap<ULONG, ExpressionArray, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-					CleanupDelete<ULONG>, CleanupNULL > HMUlPdrgpexpr;
+					CleanupDelete<ULONG>, CleanupNULL > UlongToExprArrayMap;
 
 	// iterator
 	typedef CHashMapIter<ULONG, ExpressionArray, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-		CleanupDelete<ULONG>, CleanupNULL > HMIterUlPdrgpexpr;
+		CleanupDelete<ULONG>, CleanupNULL > UlongToExprArrayMapIter;
 
 	
 	//---------------------------------------------------------------------------
@@ -94,10 +94,10 @@ namespace gpopt
 			CMDAccessor *m_pmda;
 
 			// mappings DXL ColId -> CColRef used to process scalar expressions
-			UlongColRefHashMap *m_phmulcr;
+			UlongToColRefMap *m_phmulcr;
 
 			// mappings CTE Id (in DXL) -> CTE Id (in expr)
-			UlongUlongHashMap *m_phmululCTE;
+			UlongToUlongMap *m_phmululCTE;
 
 			// array of output ColRefId
 			ULongPtrArray *m_pdrgpulOutputColRefs;
@@ -106,7 +106,7 @@ namespace gpopt
 			MDNameArray *m_pdrgpmdname;
 
 			// maintains the mapping between CTE identifier and DXL representation of the corresponding CTE producer
-			IdToDXLNodeMap *m_phmulpdxlnCTEProducer;
+			IdToCDXLNodeMap *m_phmulpdxlnCTEProducer;
 
 			// id of CTE that we are currently processing (gpos::ulong_max for main query)
 			ULONG m_ulCTEId;
@@ -395,7 +395,7 @@ namespace gpopt
 			// look up the column reference in the hash map. We raise an exception if
 			// the column is not found
 			static
-			CColRef *LookupColRef(UlongColRefHashMap *colref_mapping, ULONG colid);
+			CColRef *LookupColRef(UlongToColRefMap *colref_mapping, ULONG colid);
 
 		public:
 			// ctor

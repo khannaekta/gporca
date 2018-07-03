@@ -38,8 +38,8 @@ CPhysicalPartitionSelector::CPhysicalPartitionSelector
 	ColRefArrays *pdrgpdrgpcr,
 	PartCnstrMap *ppartcnstrmap,
 	CPartConstraint *ppartcnstr,
-	HMUlExpr *phmulexprEqPredicates,
-	HMUlExpr *phmulexprPredicates,
+	UlongToExprMap *phmulexprEqPredicates,
+	UlongToExprMap *phmulexprPredicates,
 	CExpression *pexprResidual
 	)
 	:
@@ -77,7 +77,7 @@ CPhysicalPartitionSelector::CPhysicalPartitionSelector
 	(
 	IMemoryPool *mp,
 	IMDId *mdid,
-	HMUlExpr *phmulexprEqPredicates
+	UlongToExprMap *phmulexprEqPredicates
 	)
 	:
 	CPhysical(mp),
@@ -94,7 +94,7 @@ CPhysicalPartitionSelector::CPhysicalPartitionSelector
 	GPOS_ASSERT(mdid->IsValid());
 	GPOS_ASSERT(NULL != phmulexprEqPredicates);
 
-	m_phmulexprPredicates = GPOS_NEW(mp) HMUlExpr(mp);
+	m_phmulexprPredicates = GPOS_NEW(mp) UlongToExprMap(mp);
 	m_pexprCombinedPredicate = PexprCombinedPartPred(mp);
 }
 
@@ -129,8 +129,8 @@ CPhysicalPartitionSelector::~CPhysicalPartitionSelector()
 BOOL
 CPhysicalPartitionSelector::FMatchExprMaps
 	(
-	HMUlExpr *phmulexprFst,
-	HMUlExpr *phmulexprSnd
+	UlongToExprMap *phmulexprFst,
+	UlongToExprMap *phmulexprSnd
 	)
 {
 	GPOS_ASSERT(NULL != phmulexprFst);
@@ -142,7 +142,7 @@ CPhysicalPartitionSelector::FMatchExprMaps
 		return false;
 	}
 
-	HMUlExprIter hmulei(phmulexprFst);
+	UlongToExprMapIter hmulei(phmulexprFst);
 
 	while (hmulei.Advance())
 	{

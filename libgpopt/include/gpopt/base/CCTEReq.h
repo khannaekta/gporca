@@ -115,17 +115,17 @@ namespace gpopt
 
 			// map CTE id to CTE Req entry
 			typedef CHashMap<ULONG, CCTEReqEntry, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-				CleanupDelete<ULONG>, CleanupRelease<CCTEReqEntry> > HMCteReq;
+				CleanupDelete<ULONG>, CleanupRelease<CCTEReqEntry> > UlongToCTEReqEntryMap;
 
 			// map iterator
 			typedef CHashMapIter<ULONG, CCTEReqEntry, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-				CleanupDelete<ULONG>, CleanupRelease<CCTEReqEntry> > HMCteReqIter;
+				CleanupDelete<ULONG>, CleanupRelease<CCTEReqEntry> > UlongToCTEReqEntryMapIter;
 
 			// memory pool
 			IMemoryPool *m_mp;
 
 			// cte map
-			HMCteReq *m_phmcter;
+			UlongToCTEReqEntryMap *m_phmcter;
 
 			// required cte ids (not optional)
 			ULongPtrArray* m_pdrgpulRequired;

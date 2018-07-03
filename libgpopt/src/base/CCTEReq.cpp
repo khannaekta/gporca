@@ -157,7 +157,7 @@ CCTEReq::CCTEReq
 {
 	GPOS_ASSERT(NULL != mp);
 
-	m_phmcter = GPOS_NEW(m_mp) HMCteReq(m_mp);
+	m_phmcter = GPOS_NEW(m_mp) UlongToCTEReqEntryMap(m_mp);
 	m_pdrgpulRequired = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 }
 
@@ -278,7 +278,7 @@ CCTEReq::FSubset
 	}
 
 	// iterate over map entries
-	HMCteReqIter hmcri(m_phmcter);
+	UlongToCTEReqEntryMapIter hmcri(m_phmcter);
 	while (hmcri.Advance())
 	{
 		const CCTEReqEntry *pcre = hmcri.Value();
@@ -349,7 +349,7 @@ CCTEReq::HashValue() const
 	const ULONG ulMaxEntries = 5;
 	ULONG ul = 0;
 
-	HMCteReqIter hmcri(m_phmcter);
+	UlongToCTEReqEntryMapIter hmcri(m_phmcter);
 	while (hmcri.Advance() && ul < ulMaxEntries)
 	{
 		const CCTEReqEntry *pcre = hmcri.Value();
@@ -378,7 +378,7 @@ CCTEReq::PcterUnresolved
 	GPOS_ASSERT(NULL != pcm);
 	CCTEReq *pcterUnresolved = GPOS_NEW(mp) CCTEReq(mp);
 
-	HMCteReqIter hmcri(m_phmcter);
+	UlongToCTEReqEntryMapIter hmcri(m_phmcter);
 	while (hmcri.Advance())
 	{
 		// if a cte is marked as required and it is not found in the given map
@@ -418,7 +418,7 @@ CCTEReq::PcterUnresolvedSequence
 	GPOS_ASSERT(NULL != pcm);
 	CCTEReq *pcterUnresolved = GPOS_NEW(mp) CCTEReq(mp);
 
-	HMCteReqIter hmcri(m_phmcter);
+	UlongToCTEReqEntryMapIter hmcri(m_phmcter);
 	while (hmcri.Advance())
 	{
 		const CCTEReqEntry *pcre = hmcri.Value();
@@ -490,7 +490,7 @@ CCTEReq::PcterAllOptional
 {
 	CCTEReq *pcter = GPOS_NEW(mp) CCTEReq(mp);
 
-	HMCteReqIter hmcri(m_phmcter);
+	UlongToCTEReqEntryMapIter hmcri(m_phmcter);
 	while (hmcri.Advance())
 	{
 		const CCTEReqEntry *pcre = hmcri.Value();
@@ -546,7 +546,7 @@ CCTEReq::OsPrint
 	)
 	const
 {
-	HMCteReqIter hmcri(m_phmcter);
+	UlongToCTEReqEntryMapIter hmcri(m_phmcter);
 	while (hmcri.Advance())
 	{
 		CCTEReqEntry *pcre = const_cast<CCTEReqEntry *>(hmcri.Value());

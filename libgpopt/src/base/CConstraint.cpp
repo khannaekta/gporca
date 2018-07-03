@@ -53,7 +53,7 @@ CConstraint::CConstraint
 	m_pcrsUsed(NULL),
 	m_pexprScalar(NULL)
 {
-	m_phmcontain = GPOS_NEW(m_mp) HMConstraintContainment(m_mp);
+	m_phmcontain = GPOS_NEW(m_mp) ConstraintContainmentMap(m_mp);
 }
 
 //---------------------------------------------------------------------------

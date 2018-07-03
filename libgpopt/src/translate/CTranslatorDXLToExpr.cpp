@@ -85,10 +85,10 @@ CTranslatorDXLToExpr::CTranslatorDXLToExpr
 	m_pcf(NULL)
 {
 	// initialize hash tables
-	m_phmulcr = GPOS_NEW(m_mp) UlongColRefHashMap(m_mp);
+	m_phmulcr = GPOS_NEW(m_mp) UlongToColRefMap(m_mp);
 
 	// initialize hash tables
-	m_phmululCTE = GPOS_NEW(m_mp) UlongUlongHashMap(m_mp);
+	m_phmululCTE = GPOS_NEW(m_mp) UlongToUlongMap(m_mp);
 
 	const ULONG size = GPOS_ARRAY_SIZE(m_rgpfTranslators);
 	for (ULONG ul = 0; ul < size; ul++)
@@ -231,7 +231,7 @@ CTranslatorDXLToExpr::Pexpr
 	GPOS_ASSERT(NULL != dxlnode && NULL != dxlnode->GetOperator());
 	GPOS_ASSERT(NULL != query_output_dxlnode_array);
 	
-	m_phmulpdxlnCTEProducer = GPOS_NEW(m_mp) IdToDXLNodeMap(m_mp);
+	m_phmulpdxlnCTEProducer = GPOS_NEW(m_mp) IdToCDXLNodeMap(m_mp);
 	const ULONG ulCTEs = cte_producers->Size();
 	for (ULONG ul = 0; ul < ulCTEs; ul++)
 	{
@@ -987,7 +987,7 @@ CTranslatorDXLToExpr::FCastingUnknownType
 CColRef *
 CTranslatorDXLToExpr::LookupColRef
 	(
-	UlongColRefHashMap *colref_mapping,
+	UlongToColRefMap *colref_mapping,
 	ULONG colid
 	)
 {
@@ -1689,7 +1689,7 @@ CTranslatorDXLToExpr::PexprLogicalSeqPr
 
 	// maintains the map between window specification position -> list of project elements
 	// used to generate a cascade of window nodes
-	HMUlPdrgpexpr *phmulpdrgpexpr = GPOS_NEW(m_mp) HMUlPdrgpexpr(m_mp);
+	UlongToExprArrayMap *phmulpdrgpexpr = GPOS_NEW(m_mp) UlongToExprArrayMap(m_mp);
 
 	CDXLNode *pdxlnPrL = (*dxlnode)[0];
 	GPOS_ASSERT(EdxlopScalarProjectList == pdxlnPrL->GetOperator()->GetDXLOperator());
@@ -1756,7 +1756,7 @@ CTranslatorDXLToExpr::PexprLogicalSeqPr
 
 	// create the window operators (or when applicable a tree of window operators)
 	CExpression *pexprLgSequence = NULL;
-	HMIterUlPdrgpexpr hmiterulpdrgexpr(phmulpdrgpexpr);
+	UlongToExprArrayMapIter hmiterulpdrgexpr(phmulpdrgpexpr);
 	
 	while (hmiterulpdrgexpr.Advance())
 	{
@@ -2068,7 +2068,7 @@ CTranslatorDXLToExpr::Ptabdesc
 	// construct mappings for columns that are not dropped
 	IntUlongHashMap *phmiulAttnoColMapping = GPOS_NEW(m_mp) IntUlongHashMap(m_mp);
 	IntUlongHashMap *phmiulAttnoPosMapping = GPOS_NEW(m_mp) IntUlongHashMap(m_mp);
-	UlongUlongHashMap *phmululColMapping = GPOS_NEW(m_mp) UlongUlongHashMap(m_mp);
+	UlongToUlongMap *phmululColMapping = GPOS_NEW(m_mp) UlongToUlongMap(m_mp);
 	
 	const ULONG ulAllColumns = pmdrel->ColumnCount();
 	ULONG ulPosNonDropped = 0;
@@ -2271,7 +2271,7 @@ CTranslatorDXLToExpr::PtabdescFromCTAS
 
 	// construct mappings for columns that are not dropped
 	IntUlongHashMap *phmiulAttnoColMapping = GPOS_NEW(m_mp) IntUlongHashMap(m_mp);
-	UlongUlongHashMap *phmululColMapping = GPOS_NEW(m_mp) UlongUlongHashMap(m_mp);
+	UlongToUlongMap *phmululColMapping = GPOS_NEW(m_mp) UlongToUlongMap(m_mp);
 	
 	const ULONG ulAllColumns = pmdrel->ColumnCount();
 	ULONG ulPosNonDropped = 0;

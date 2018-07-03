@@ -44,10 +44,10 @@ namespace gpmd
 						 IMDId::MDIdCompare,
 						 CleanupRelease,
 						 CleanupDelete>
-			MDMap;
+			MDIdToSerializedMDIdMap;
 
 		// metadata objects indexed by their metadata id
-		MDMap *m_mdmap;
+		MDIdToSerializedMDIdMap *m_mdmap;
 
 		// load MD objects in the hash map
 		void LoadMetadataObjectsFromArray(IMemoryPool *mp,

@@ -151,7 +151,7 @@ CScalarProjectList::FHasMultipleDistinctAggs
 	}
 
 	CAutoMemoryPool amp;
-	HMExprDrgPexpr *phmexprdrgpexpr = NULL;
+	ExprToExprArrayMap *phmexprdrgpexpr = NULL;
 	ULONG ulDifferentDQAs = 0;
 	CXformUtils::MapPrjElemsWithDistinctAggs(amp.Pmp(), pexprPrjList, &phmexprdrgpexpr, &ulDifferentDQAs);
 	phmexprdrgpexpr->Release();

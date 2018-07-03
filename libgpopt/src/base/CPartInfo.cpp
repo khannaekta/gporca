@@ -73,7 +73,7 @@ CPartInfo::CPartInfoEntry::PpartinfoentryAddRemappedKeys
 	(
 	IMemoryPool *mp,
 	CColRefSet *pcrs,
-	UlongColRefHashMap *colref_mapping
+	UlongToColRefMap *colref_mapping
 	)
 {
 	GPOS_ASSERT(NULL != pcrs);
@@ -151,7 +151,7 @@ CPartInfo::CPartInfoEntry::PpartinfoentryCopy
 	PartKeysArray *pdrgppartkeysCopy = CPartKeys::PdrgppartkeysCopy(mp, Pdrgppartkeys());
 
 	// copy part constraint using empty remapping to get exact copy
-	UlongColRefHashMap *colref_mapping = GPOS_NEW(mp) UlongColRefHashMap(mp);
+	UlongToColRefMap *colref_mapping = GPOS_NEW(mp) UlongToColRefMap(mp);
 	CPartConstraint *ppartcnstrRel = PpartcnstrRel()->PpartcnstrCopyWithRemappedColumns(mp, colref_mapping, false /*must_exist*/);
 	colref_mapping->Release();
 
@@ -381,7 +381,7 @@ CPartInfo::PpartinfoWithRemappedKeys
 	GPOS_ASSERT(NULL != pdrgpcrDest);
 
 	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrSrc);
-	UlongColRefHashMap *colref_mapping = CUtils::PhmulcrMapping(mp, pdrgpcrSrc, pdrgpcrDest);
+	UlongToColRefMap *colref_mapping = CUtils::PhmulcrMapping(mp, pdrgpcrSrc, pdrgpcrDest);
 
 	PartInfoEntryArray *pdrgppartentries = GPOS_NEW(mp) PartInfoEntryArray(mp);
 

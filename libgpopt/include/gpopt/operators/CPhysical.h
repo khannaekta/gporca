@@ -153,10 +153,10 @@ namespace gpopt
 
 			// map of incoming required columns request to computed column sets
 			typedef CHashMap<CReqdColsRequest, CColRefSet, CReqdColsRequest::HashValue, CReqdColsRequest::Equals,
-						CleanupRelease<CReqdColsRequest>, CleanupRelease<CColRefSet> > HMReqdColsRequest;
+						CleanupRelease<CReqdColsRequest>, CleanupRelease<CColRefSet> > ReqdColsReqToColRefSetMap;
 
 			// hash map of child columns requests
-			HMReqdColsRequest *m_phmrcr;
+			ReqdColsReqToColRefSetMap *m_phmrcr;
 
 			// mutex for locking map of child columns requests during lookup/insertion
 			CMutex m_mutex;
@@ -689,7 +689,7 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist);
 
 			// conversion function
 			static

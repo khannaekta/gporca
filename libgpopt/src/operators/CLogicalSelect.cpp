@@ -41,7 +41,7 @@ CLogicalSelect::CLogicalSelect
 	:
 	CLogicalUnary(mp)
 {
-	m_phmPexprPartPred = GPOS_NEW(mp) HMPexprPartPred(mp);
+	m_phmPexprPartPred = GPOS_NEW(mp) ExprPredToExprPredPartMap(mp);
 }
 
 CLogicalSelect::~CLogicalSelect()

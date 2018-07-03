@@ -109,7 +109,7 @@ namespace gpmd
 		ULONG m_system_columns;
 
 		// mapping of column position to positions excluding dropped columns
-		UlongUlongHashMap *m_colpos_nondrop_colpos_map;
+		UlongToUlongMap *m_colpos_nondrop_colpos_map;
 
 		// mapping of attribute number in the system catalog to the positions of
 		// the non dropped column in the metadata object

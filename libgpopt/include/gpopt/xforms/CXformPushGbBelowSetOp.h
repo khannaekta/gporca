@@ -124,7 +124,7 @@ namespace gpopt
                     if (!pcrsChild->Equals(pcrsOutput))
                     {
                         // use column mapping in SetOp to set child grouping colums
-                        UlongColRefHashMap *colref_mapping = CUtils::PhmulcrMapping(mp, pdrgpcrOutput, pdrgpcrChild);
+                        UlongToColRefMap *colref_mapping = CUtils::PhmulcrMapping(mp, pdrgpcrOutput, pdrgpcrChild);
                         pdrgpcrChildGb = CUtils::PdrgpcrRemap(mp, pdrgpcrGb, colref_mapping, true /*must_exist*/);
                         colref_mapping->Release();
                     }

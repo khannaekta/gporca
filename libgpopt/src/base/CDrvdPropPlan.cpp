@@ -140,7 +140,7 @@ CDrvdPropPlan::CopyCTEProducerPlanProps
 	CDrvdPropCtxtPlan *pdpctxtplan = CDrvdPropCtxtPlan::PdpctxtplanConvert(pdpctxt);
 	CPhysicalCTEConsumer *popCTEConsumer = CPhysicalCTEConsumer::PopConvert(pop);
 	ULONG ulCTEId = popCTEConsumer->UlCTEId();
-	UlongColRefHashMap *colref_mapping = popCTEConsumer->Phmulcr();
+	UlongToColRefMap *colref_mapping = popCTEConsumer->Phmulcr();
 	CDrvdPropPlan *pdpplan = pdpctxtplan->PdpplanCTEProducer(ulCTEId);
 	if (NULL != pdpplan)
 	{

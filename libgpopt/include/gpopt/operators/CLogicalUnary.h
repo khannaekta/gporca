@@ -47,7 +47,7 @@ namespace gpopt
 							(
 							IMemoryPool *mp,
 							CExpressionHandle &exprhdl,
-							HMUlDatum *phmuldatum = NULL
+							UlongToIDatumMap *phmuldatum = NULL
 							)
 							const;
 
@@ -84,7 +84,7 @@ namespace gpopt
 			COperator *PopCopyWithRemappedColumns
 						(
 						IMemoryPool *, //mp,
-						UlongColRefHashMap *, //colref_mapping,
+						UlongToColRefMap *, //colref_mapping,
 						BOOL //must_exist
 						)
 			{

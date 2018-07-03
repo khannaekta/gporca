@@ -86,7 +86,7 @@ namespace gpopt
 			COperator *PopCopyWithRemappedColumns
 				(
 				IMemoryPool *mp,
-				UlongColRefHashMap *colref_mapping,
+				UlongToColRefMap *colref_mapping,
 				BOOL must_exist
 				);
 

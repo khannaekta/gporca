@@ -282,7 +282,7 @@ namespace gpopt
 			BOOL FMatchPattern(CGroupExpression *pgexpr) const;
 			
 			// return a copy of the expression with remapped columns
-			CExpression *PexprCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist) const;
+			CExpression *PexprCopyWithRemappedColumns(IMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist) const;
 
 			// compare entire expression rooted here
 			BOOL Matches(CExpression *pexpr) const;
@@ -333,11 +333,11 @@ namespace gpopt
 
 	// hash map from ULONG to expression
 	typedef CHashMap<ULONG, CExpression, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-					CleanupDelete<ULONG>, CleanupRelease<CExpression> > HMUlExpr;
+					CleanupDelete<ULONG>, CleanupRelease<CExpression> > UlongToExprMap;
 
 	// map iterator
 	typedef CHashMapIter<ULONG, CExpression, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-					CleanupDelete<ULONG>, CleanupRelease<CExpression> > HMUlExprIter;
+					CleanupDelete<ULONG>, CleanupRelease<CExpression> > UlongToExprMapIter;
 
 }
 

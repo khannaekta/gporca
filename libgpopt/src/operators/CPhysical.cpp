@@ -58,7 +58,7 @@ CPhysical::CPhysical
 	}
 	UpdateOptRequests(0 /*ulPropIndex*/, 1 /*ulOrderReqs*/);
 
-	m_phmrcr = GPOS_NEW(mp) HMReqdColsRequest(mp);
+	m_phmrcr = GPOS_NEW(mp) ReqdColsReqToColRefSetMap(mp);
 }
 
 
@@ -193,7 +193,7 @@ COperator *
 CPhysical::PopCopyWithRemappedColumns
 	(
 	IMemoryPool *, //mp,
-	UlongColRefHashMap *, //colref_mapping,
+	UlongToColRefMap *, //colref_mapping,
 	BOOL //must_exist
 	)
 {

@@ -81,7 +81,7 @@ namespace gpnaucrates
 					 gpos::Equals<ULONG>,
 					 CleanupDelete<ULONG>,
 					 CleanupDelete<ULONG> >
-		UlongUlongHashMap;
+		UlongToUlongMap;
 
 	// hash maps mapping INT -> ULONG
 	typedef CHashMap<INT,
@@ -200,7 +200,7 @@ namespace gpnaucrates
 
 		// copy stats with remapped column ids
 		virtual IStatistics *CopyStatsWithRemap(IMemoryPool *mp,
-												UlongColRefHashMap *colref_mapping,
+												UlongToColRefMap *colref_mapping,
 												BOOL must_exist = true) const = 0;
 
 		// return a set of column references we have stats for

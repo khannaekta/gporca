@@ -2419,7 +2419,7 @@ CTranslatorExprToDXL::PdxlnAggregate
 	// already in the project list of the aggregate operator
 
 	const ULONG num_cols = proj_list_dxlnode->Arity();
-	UlongUlongHashMap *phmululPL = GPOS_NEW(m_mp) UlongUlongHashMap(m_mp);
+	UlongToUlongMap *phmululPL = GPOS_NEW(m_mp) UlongToUlongMap(m_mp);
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
 		CDXLNode *pdxlnProjElem = (*proj_list_dxlnode)[ul];

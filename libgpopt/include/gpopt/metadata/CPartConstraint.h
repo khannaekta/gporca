@@ -48,7 +48,7 @@ namespace gpopt
 		private:
 			
 			// constraints for different levels
-			HMUlCnstr *m_phmulcnstr;
+			UlongToConstraintMap *m_phmulcnstr;
 			
 			// levels at which the default partitions are included
 			CBitSet *m_pbsDefaultParts;
@@ -93,7 +93,7 @@ namespace gpopt
 
 			// check if two constaint maps have the same constraints
 			static
-			BOOL FEqualConstrMaps(HMUlCnstr *phmulcnstrFst, HMUlCnstr *phmulcnstrSnd, ULONG ulLevels);
+			BOOL FEqualConstrMaps(UlongToConstraintMap *phmulcnstrFst, UlongToConstraintMap *phmulcnstrSnd, ULONG ulLevels);
 
 			// check if it is possible to produce a disjunction of the two given part
 			// constraints. This is possible if the first ulLevels-1 have the same
@@ -104,7 +104,7 @@ namespace gpopt
 		public:
 
 			// ctors
-			CPartConstraint(IMemoryPool *mp, HMUlCnstr *phmulcnstr, CBitSet *pbsDefaultParts, BOOL is_unbounded, ColRefArrays *pdrgpdrgpcr);
+			CPartConstraint(IMemoryPool *mp, UlongToConstraintMap *phmulcnstr, CBitSet *pbsDefaultParts, BOOL is_unbounded, ColRefArrays *pdrgpdrgpcr);
 			CPartConstraint(IMemoryPool *mp, CConstraint *pcnstr, BOOL fDefaultPartition, BOOL is_unbounded);
 				
 			CPartConstraint(BOOL fUninterpreted);
@@ -158,7 +158,7 @@ namespace gpopt
 			CPartConstraint *PpartcnstrRemaining(IMemoryPool *mp, CPartConstraint *ppartcnstr);
 
 			// return a copy of the part constraint with remapped columns
-			CPartConstraint *PpartcnstrCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			CPartConstraint *PpartcnstrCopyWithRemappedColumns(IMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist);
 
 			// print
 			IOstream &OsPrint(IOstream &) const;

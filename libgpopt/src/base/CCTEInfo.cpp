@@ -45,7 +45,7 @@ CCTEInfo::CCTEInfoEntry::CCTEInfoEntry
 	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != pexprCTEProducer);
 
-	m_phmcrulConsumers = GPOS_NEW(mp) HMCrUl(mp);
+	m_phmcrulConsumers = GPOS_NEW(mp) ColRefToUlongMap(mp);
 }
 
 
@@ -72,7 +72,7 @@ CCTEInfo::CCTEInfoEntry::CCTEInfoEntry
 	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != pexprCTEProducer);
 
-	m_phmcrulConsumers = GPOS_NEW(mp) HMCrUl(mp);
+	m_phmcrulConsumers = GPOS_NEW(mp) ColRefToUlongMap(mp);
 }
 
 
@@ -183,8 +183,8 @@ CCTEInfo::CCTEInfo
 	m_fEnableInlining(true)
 {
 	GPOS_ASSERT(NULL != mp);
-	m_phmulcteinfoentry = GPOS_NEW(m_mp) HMUlCTEInfoEntry(m_mp);
-	m_phmulprodconsmap = GPOS_NEW(m_mp) HMUlProdConsMap(m_mp);
+	m_phmulcteinfoentry = GPOS_NEW(m_mp) UlongToCTEInfoEntryMap(m_mp);
+	m_phmulprodconsmap = GPOS_NEW(m_mp) UlongToProducerConsumerMap(m_mp);
 }
 
 //---------------------------------------------------------------------------
@@ -409,7 +409,7 @@ CCTEInfo::UlConsumersInParent
 	const
 {
 	// get map of given parent
-	const HMUlConsumerMap *phmulconsumermap = m_phmulprodconsmap->Find(&ulParentId);
+	const UlongToConsumerCounterMap *phmulconsumermap = m_phmulprodconsmap->Find(&ulParentId);
 	if (NULL == phmulconsumermap)
 	{
 		return 0;
@@ -445,7 +445,7 @@ CCTEInfo::UlConsumers
 	ULONG ulConsumers = UlConsumersInParent(ulCTEId, gpos::ulong_max);
 
 	// find consumers in other CTEs
-	HMUlCTEInfoEntryIter hmulei(m_phmulcteinfoentry);
+	UlongToCTEInfoEntryMapIter hmulei(m_phmulcteinfoentry);
 	while (hmulei.Advance())
 	{
 		const CCTEInfoEntry *pcteinfoentry = hmulei.Value();
@@ -496,10 +496,10 @@ CCTEInfo::IncrementConsumers
 )
 {
 	// get map of given parent
-	HMUlConsumerMap *phmulconsumermap = const_cast<HMUlConsumerMap *>(m_phmulprodconsmap->Find(&ulParentCTEId));
+	UlongToConsumerCounterMap *phmulconsumermap = const_cast<UlongToConsumerCounterMap *>(m_phmulprodconsmap->Find(&ulParentCTEId));
 	if (NULL == phmulconsumermap)
 	{
-		phmulconsumermap = GPOS_NEW(m_mp) HMUlConsumerMap(m_mp);
+		phmulconsumermap = GPOS_NEW(m_mp) UlongToConsumerCounterMap(m_mp);
 #ifdef GPOS_DEBUG
 		BOOL fInserted =
 #endif
@@ -546,7 +546,7 @@ CCTEInfo::PcterProducers
 {
 	CCTEReq *pcter = GPOS_NEW(mp) CCTEReq(mp);
 
-	HMUlCTEInfoEntryIter hmulei(m_phmulcteinfoentry);
+	UlongToCTEInfoEntryMapIter hmulei(m_phmulcteinfoentry);
 	while (hmulei.Advance())
 	{
 		const CCTEInfoEntry *pcteinfoentry = hmulei.Value();
@@ -573,7 +573,7 @@ CCTEInfo::PdrgPexpr
 	const
 {
 	ExpressionArray *pdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
-	HMUlCTEInfoEntryIter hmulei(m_phmulcteinfoentry);
+	UlongToCTEInfoEntryMapIter hmulei(m_phmulcteinfoentry);
 	while (hmulei.Advance())
 	{
 		CExpression *pexpr = const_cast<CExpression *>(hmulei.Value()->Pexpr());
@@ -601,7 +601,7 @@ CCTEInfo::MapComputedToUsedCols
 	)
 	const
 {
-	HMUlCTEInfoEntryIter hmulei(m_phmulcteinfoentry);
+	UlongToCTEInfoEntryMapIter hmulei(m_phmulcteinfoentry);
 	while (hmulei.Advance())
 	{
 		CExpression *pexprProducer = const_cast<CExpression *>(hmulei.Value()->Pexpr());
@@ -680,14 +680,14 @@ void CCTEInfo::FindConsumersInParent
 	CStack<ULONG> *pstack
 	)
 {
-	HMUlConsumerMap *phmulconsumermap = const_cast<HMUlConsumerMap *>(m_phmulprodconsmap->Find(&ulParentId));
+	UlongToConsumerCounterMap *phmulconsumermap = const_cast<UlongToConsumerCounterMap *>(m_phmulprodconsmap->Find(&ulParentId));
 	if (NULL == phmulconsumermap)
 	{
 		// no map found for given parent - there are no consumers inside it
 		return;
 	}
 
-	HMUlConsumerMapIter hmulci(phmulconsumermap);
+	UlongToConsumerCounterMapIter hmulci(phmulconsumermap);
 	while (hmulci.Advance())
 	{
 		const SConsumerCounter *pconsumercounter = hmulci.Value();
@@ -714,7 +714,7 @@ CCTEInfo::MarkUnusedCTEs()
 	CBitSet *pbsUnusedConsumers = GPOS_NEW(m_mp) CBitSet(m_mp);
 
 	// start with all CTEs
-	HMUlCTEInfoEntryIter hmulei(m_phmulcteinfoentry);
+	UlongToCTEInfoEntryMapIter hmulei(m_phmulcteinfoentry);
 	while (hmulei.Advance())
 	{
 		const CCTEInfoEntry *pcteinfoentry = hmulei.Value();
@@ -735,7 +735,7 @@ CCTEInfo::MarkUnusedCTEs()
 	}
 
 	// now the only CTEs remaining in the bitset are the unused ones. mark them as such
-	HMUlCTEInfoEntryIter hmulei2(m_phmulcteinfoentry);
+	UlongToCTEInfoEntryMapIter hmulei2(m_phmulcteinfoentry);
 	while (hmulei2.Advance())
 	{
 		CCTEInfoEntry *pcteinfoentry = const_cast<CCTEInfoEntry *>(hmulei2.Value());
@@ -758,7 +758,7 @@ CCTEInfo::MarkUnusedCTEs()
 //		to their corresponding producer columns in the given column array
 //
 //---------------------------------------------------------------------------
-UlongColRefHashMap *
+UlongToColRefMap *
 CCTEInfo::PhmulcrConsumerToProducer
 	(
 	IMemoryPool *mp,
@@ -770,7 +770,7 @@ CCTEInfo::PhmulcrConsumerToProducer
 	GPOS_ASSERT(NULL != pcrs);
 	GPOS_ASSERT(NULL != pdrgpcrProducer);
 
-	UlongColRefHashMap *colref_mapping = GPOS_NEW(mp) UlongColRefHashMap(mp);
+	UlongToColRefMap *colref_mapping = GPOS_NEW(mp) UlongToColRefMap(mp);
 
 	CColRefSetIter crsi(*pcrs);
 	while (crsi.Advance())

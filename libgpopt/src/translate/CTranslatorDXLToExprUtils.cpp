@@ -139,7 +139,7 @@ CTranslatorDXLToExprUtils::AddKeySets
 	IMemoryPool *mp,
 	CTableDescriptor *ptabdesc,
 	const IMDRelation *pmdrel,
-	UlongUlongHashMap *phmululColMapping
+	UlongToUlongMap *phmululColMapping
 	)
 {
 	GPOS_ASSERT(NULL != ptabdesc);
@@ -247,7 +247,7 @@ ColRefArray *
 CTranslatorDXLToExprUtils::Pdrgpcr
 	(
 	IMemoryPool *mp,
-	UlongColRefHashMap *colref_mapping,
+	UlongToColRefMap *colref_mapping,
 	const ULongPtrArray *colids
 	)
 {

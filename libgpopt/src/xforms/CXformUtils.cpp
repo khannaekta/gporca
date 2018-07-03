@@ -1908,7 +1908,7 @@ CXformUtils::AddMinAggs
 	CMDAccessor *md_accessor,
 	CColumnFactory *col_factory,
 	ColRefArray *colref_array,
-	HMCrCr *phmcrcr,
+	ColRefToColRefMap *phmcrcr,
 	ExpressionArray *pdrgpexpr,
 	ColRefArray **ppdrgpcrNew
 	)
@@ -2604,7 +2604,7 @@ CXformUtils::PexprAddCTEProducer
 	)
 {
 	ColRefArray *pdrgpcrProd = CUtils::PdrgpcrCopy(mp, colref_array);
-	UlongColRefHashMap *colref_mapping = CUtils::PhmulcrMapping(mp, colref_array, pdrgpcrProd);
+	UlongToColRefMap *colref_mapping = CUtils::PhmulcrMapping(mp, colref_array, pdrgpcrProd);
 	CExpression *pexprRemapped = pexpr->PexprCopyWithRemappedColumns(mp, colref_mapping, true /*must_exist*/);
 	colref_mapping->Release();
 
@@ -4089,7 +4089,7 @@ CXformUtils::PexprRemapColumns
 	ColRefArray *pdrgpcrRemappedB
 	)
 {
-	UlongColRefHashMap *colref_mapping = CUtils::PhmulcrMapping(mp, pdrgpcrA, pdrgpcrRemappedA);
+	UlongToColRefMap *colref_mapping = CUtils::PhmulcrMapping(mp, pdrgpcrA, pdrgpcrRemappedA);
 	GPOS_ASSERT_IMP(NULL == pdrgpcrB, NULL == pdrgpcrRemappedB);
 	if (NULL != pdrgpcrB)
 	{
@@ -4133,7 +4133,7 @@ CXformUtils::PexprPartialDynamicIndexGet
 
 	ColRefArray *pdrgpcrIndexCols = PdrgpcrIndexKeys(mp, popGet->PdrgpcrOutput(), pmdindex, pmdrel);
 
-	UlongColRefHashMap *colref_mapping = NULL;
+	UlongToColRefMap *colref_mapping = NULL;
 
 	if (popGet->PdrgpcrOutput() != pdrgpcrDIG)
 	{
@@ -4469,7 +4469,7 @@ CXformUtils::MapPrjElemsWithDistinctAggs
 	(
 	IMemoryPool *mp,
 	CExpression *pexprPrjList,
-	HMExprDrgPexpr **pphmexprdrgpexpr, // output: created map
+	ExprToExprArrayMap **pphmexprdrgpexpr, // output: created map
 	ULONG *pulDifferentDQAs // output: number of DQAs with different arguments
 	)
 {
@@ -4477,7 +4477,7 @@ CXformUtils::MapPrjElemsWithDistinctAggs
 	GPOS_ASSERT(NULL != pphmexprdrgpexpr);
 	GPOS_ASSERT(NULL != pulDifferentDQAs);
 
-	HMExprDrgPexpr *phmexprdrgpexpr = GPOS_NEW(mp) HMExprDrgPexpr(mp);
+	ExprToExprArrayMap *phmexprdrgpexpr = GPOS_NEW(mp) ExprToExprArrayMap(mp);
 	ULONG ulDifferentDQAs = 0;
 	CExpression *pexprTrue = CUtils::PexprScalarConstBool(mp, true /*m_bytearray_value*/);
 	const ULONG arity = pexprPrjList->Arity();
@@ -4603,13 +4603,13 @@ ExpressionArrays *
 CXformUtils::PdrgpdrgpexprSortedPrjElemsArray
 	(
 	IMemoryPool *mp,
-	HMExprDrgPexpr *phmexprdrgpexpr
+	ExprToExprArrayMap *phmexprdrgpexpr
 	)
 {
 	GPOS_ASSERT(NULL != phmexprdrgpexpr);
 
 	ExpressionArrays *pdrgpdrgpexprPrjElems = GPOS_NEW(mp) ExpressionArrays(mp);
-	HMExprDrgPexprIter hmexprdrgpexpriter(phmexprdrgpexpr);
+	ExprToExprArrayMapIter hmexprdrgpexpriter(phmexprdrgpexpr);
 	while (hmexprdrgpexpriter.Advance())
 	{
 		ExpressionArray *pdrgpexprPrjElems = const_cast<ExpressionArray *>(hmexprdrgpexpriter.Value());
@@ -4680,7 +4680,7 @@ CXformUtils::PexprGbAggOnCTEConsumer2Join
 		return pexprGbAgg;
 	}
 
-	HMExprDrgPexpr *phmexprdrgpexpr = NULL;
+	ExprToExprArrayMap *phmexprdrgpexpr = NULL;
 	ULONG ulDifferentDQAs = 0;
 	MapPrjElemsWithDistinctAggs(mp, pexprPrjList, &phmexprdrgpexpr, &ulDifferentDQAs);
 	if (1 == phmexprdrgpexpr->Size())
@@ -4742,7 +4742,7 @@ CXformUtils::PexprGbAggOnCTEConsumer2Join
 			pcteinfo->IncrementConsumers(ulCTEId);
 
 			// fix Aggs arguments to use new consumer output column
-			UlongColRefHashMap *colref_mapping = CUtils::PhmulcrMapping(mp, pdrgpcrConsumerOutput, pdrgpcrNewConsumerOutput);
+			UlongToColRefMap *colref_mapping = CUtils::PhmulcrMapping(mp, pdrgpcrConsumerOutput, pdrgpcrNewConsumerOutput);
 			ExpressionArray *pdrgpexprNewPrjElems = GPOS_NEW(mp) ExpressionArray(mp);
 			const ULONG ulPrjElems = pdrgpexprPrjElems->Size();
 			for (ULONG ul = 0; ul < ulPrjElems; ul++)

@@ -81,11 +81,11 @@ namespace gpopt
 
 	// map of expression to array of expressions
 	typedef CHashMap<CExpression, ExpressionArray, CExpression::HashValue, CUtils::Equals,
-		CleanupRelease<CExpression>, CleanupRelease<ExpressionArray> > HMExprDrgPexpr;
+		CleanupRelease<CExpression>, CleanupRelease<ExpressionArray> > ExprToExprArrayMap;
 
 	// iterator of map of expression to array of expressions
 	typedef CHashMapIter<CExpression, ExpressionArray, CExpression::HashValue, CUtils::Equals,
-		CleanupRelease<CExpression>, CleanupRelease<ExpressionArray> > HMExprDrgPexprIter;
+		CleanupRelease<CExpression>, CleanupRelease<ExpressionArray> > ExprToExprArrayMapIter;
 
 	// array of array of expressions
 	typedef CDynamicPtrArray<ExpressionArray, CleanupRelease> ExpressionArrays;
@@ -178,7 +178,7 @@ namespace gpopt
 				CMDAccessor *md_accessor,
 				CColumnFactory *col_factory,
 				ColRefArray *colref_array,
-				HMCrCr *phmcrcr,
+				ColRefToColRefMap *phmcrcr,
 				ExpressionArray *pdrgpexpr,
 				ColRefArray **ppdrgpcrNew
 				);
@@ -531,7 +531,7 @@ namespace gpopt
 
 			// iterate over given hash map and return array of arrays of project elements sorted by the column id of the first entries
 			static
-			ExpressionArrays *PdrgpdrgpexprSortedPrjElemsArray(IMemoryPool *mp, HMExprDrgPexpr *phmexprdrgpexpr);
+			ExpressionArrays *PdrgpdrgpexprSortedPrjElemsArray(IMemoryPool *mp, ExprToExprArrayMap *phmexprdrgpexpr);
 
 			// comparator used in sorting arrays of project elements based on the column id of the first entry
 			static
@@ -1102,7 +1102,7 @@ namespace gpopt
 
 			// create a map from the argument of each Distinct Agg to the array of project elements that define Distinct Aggs on the same argument
 			static
-			void MapPrjElemsWithDistinctAggs(IMemoryPool *mp, CExpression *pexprPrjList, HMExprDrgPexpr **pphmexprdrgpexpr, ULONG *pulDifferentDQAs);
+			void MapPrjElemsWithDistinctAggs(IMemoryPool *mp, CExpression *pexprPrjList, ExprToExprArrayMap **pphmexprdrgpexpr, ULONG *pulDifferentDQAs);
 
 			// convert GbAgg with distinct aggregates to a join
 			static

@@ -213,7 +213,7 @@ namespace gpopt
 
 			// return a copy of the order spec with remapped columns
 			virtual
-			COrderSpec *PosCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			COrderSpec *PosCopyWithRemappedColumns(IMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist);
 
 			// return a copy of the order spec after excluding the given columns
 			virtual

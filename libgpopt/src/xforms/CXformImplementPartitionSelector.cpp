@@ -75,7 +75,7 @@ CXformImplementPartitionSelector::Transform
 	pexprRelational->AddRef();
 	mdid->AddRef();
 
-	HMUlExpr *phmulexprFilter = GPOS_NEW(mp) HMUlExpr(mp);
+	UlongToExprMap *phmulexprFilter = GPOS_NEW(mp) UlongToExprMap(mp);
 
 	const ULONG ulLevels = popSelector->UlPartLevels();
 	for (ULONG ul = 0; ul < ulLevels; ul++)

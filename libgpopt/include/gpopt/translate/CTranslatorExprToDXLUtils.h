@@ -471,7 +471,7 @@ namespace gpopt
 
 			// map an array of columns to a new array of columns
 			static
-			ColRefArray *PdrgpcrMapColumns(IMemoryPool *mp, ColRefArray *pdrgpcrInput, HMCrUl *phmcrul, ColRefArray *pdrgpcrMapDest);
+			ColRefArray *PdrgpcrMapColumns(IMemoryPool *mp, ColRefArray *pdrgpcrInput, ColRefToUlongMap *phmcrul, ColRefArray *pdrgpcrMapDest);
 
 			// combine two boolean expressions using the given boolean operator
 			static
@@ -520,7 +520,7 @@ namespace gpopt
 			// build hashmap based on a column array, where the key is the column
 			// and the m_bytearray_value is the index of that column in the array
 			static
-			HMCrUl *PhmcrulColIndex(IMemoryPool *mp, ColRefArray *colref_array);
+			ColRefToUlongMap *PhmcrulColIndex(IMemoryPool *mp, ColRefArray *colref_array);
 			
 			// set statistics of the operator
 			static

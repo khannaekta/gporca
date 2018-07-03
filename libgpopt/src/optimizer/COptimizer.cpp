@@ -355,7 +355,7 @@ COptimizer::CheckCTEConsistency
 	CExpression *pexpr
 	)
 {
-	UlongUlongHashMap *phmulul = GPOS_NEW(mp) UlongUlongHashMap(mp);
+	UlongToUlongMap *phmulul = GPOS_NEW(mp) UlongToUlongMap(mp);
 	CDrvdPropPlan *pdpplanChild = CDrvdPropPlan::Pdpplan(pexpr->PdpDerive());
 	CDistributionSpec *pdsChild = pdpplanChild->Pds();
 

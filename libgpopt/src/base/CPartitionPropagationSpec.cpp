@@ -151,8 +151,8 @@ CPartitionPropagationSpec::AppendEnforcers
 		pexpr->AddRef();
 		
 		// check if there is a predicate on this part index id
-		HMUlExpr *phmulexprEqFilter = GPOS_NEW(mp) HMUlExpr(mp);
-		HMUlExpr *phmulexprFilter = GPOS_NEW(mp) HMUlExpr(mp);
+		UlongToExprMap *phmulexprEqFilter = GPOS_NEW(mp) UlongToExprMap(mp);
+		UlongToExprMap *phmulexprFilter = GPOS_NEW(mp) UlongToExprMap(mp);
 		CExpression *pexprResidual = NULL;
 		if (m_ppfm->FContainsScanId(scan_id))
 		{
@@ -317,8 +317,8 @@ CPartitionPropagationSpec::SplitPartPredicates
 	IMemoryPool *mp,
 	CExpression *pexprScalar,
 	ColRefArrays *pdrgpdrgpcrKeys,
-	HMUlExpr *phmulexprEqFilter,	// output
-	HMUlExpr *phmulexprFilter,		// output
+	UlongToExprMap *phmulexprEqFilter,	// output
+	UlongToExprMap *phmulexprFilter,		// output
 	CExpression **ppexprResidual	// output
 	)
 {

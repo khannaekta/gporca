@@ -43,7 +43,7 @@ namespace gpopt
 				(
 				IMemoryPool *mp,
 				IMDId *mdid,
-				HMUlExpr *phmulexprEqPredicates,
+				UlongToExprMap *phmulexprEqPredicates,
 				CColRef *pcrOid
 				);
 

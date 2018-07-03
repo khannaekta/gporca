@@ -63,8 +63,8 @@ namespace gpopt
 				IMemoryPool *mp,
 				CExpression *pexprScalar,
 				ColRefArrays *pdrgpdrgpcrKeys,
-				HMUlExpr *phmulexprEqFilter,
-				HMUlExpr *phmulexprFilter,
+				UlongToExprMap *phmulexprEqFilter,
+				UlongToExprMap *phmulexprFilter,
 				CExpression **ppexprResidual
 				);
 

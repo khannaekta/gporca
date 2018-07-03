@@ -30,11 +30,11 @@ namespace gpopt
 
 	// hash map from CTE id to corresponding producer plan properties
 	typedef CHashMap<ULONG, CDrvdPropPlan, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-					CleanupDelete<ULONG>, CleanupRelease<CDrvdPropPlan> > HMUlPdp;
+					CleanupDelete<ULONG>, CleanupRelease<CDrvdPropPlan> > UlongToDrvdPropPlanMap;
 
 	// iterator for plan properties map
 	typedef CHashMapIter<ULONG, CDrvdPropPlan, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-					CleanupDelete<ULONG>, CleanupRelease<CDrvdPropPlan> > HMUlPdpIter;
+					CleanupDelete<ULONG>, CleanupRelease<CDrvdPropPlan> > UlongToDrvdPropPlanMapIter;
 
 	// forward declaration
 	class CCTEReq;
@@ -157,17 +157,17 @@ namespace gpopt
 
 			// map CTE id to CTE map entry
 			typedef CHashMap<ULONG, CCTEMapEntry, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-				CleanupDelete<ULONG>, CleanupRelease<CCTEMapEntry> > HMCteMap;
+				CleanupDelete<ULONG>, CleanupRelease<CCTEMapEntry> > UlongToCTEMapEntryMap;
 
 			// map iterator
 			typedef CHashMapIter<ULONG, CCTEMapEntry, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-				CleanupDelete<ULONG>, CleanupRelease<CCTEMapEntry> > HMCteMapIter;
+				CleanupDelete<ULONG>, CleanupRelease<CCTEMapEntry> > UlongToCTEMapEntryMapIter;
 
 			// memory pool
 			IMemoryPool *m_mp;
 
 			// cte map
-			HMCteMap *m_phmcm;
+			UlongToCTEMapEntryMap *m_phmcm;
 
 			// private copy ctor
 			CCTEMap(const CCTEMap&);

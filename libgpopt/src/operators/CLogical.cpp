@@ -1455,7 +1455,7 @@ CLogical::PcrsDist
 
 
 	// mapping base table columns to corresponding column references
-	HMICr *phmicr = GPOS_NEW(mp) HMICr(mp);
+	IntToColRefMap *phmicr = GPOS_NEW(mp) IntToColRefMap(mp);
 	const ULONG num_cols = pdrgpcoldesc->Size();
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{

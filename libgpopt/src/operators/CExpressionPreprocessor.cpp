@@ -1601,7 +1601,7 @@ CExpressionPreprocessor::CollectCTEPredicates
 			GPOS_ASSERT(NULL != pexprProducer);
 
 			CLogicalCTEProducer *popProducer = CLogicalCTEProducer::PopConvert(pexprProducer->Pop());
-			UlongColRefHashMap *colref_mapping = CUtils::PhmulcrMapping(mp, popConsumer->Pdrgpcr(), popProducer->Pdrgpcr());
+			UlongToColRefMap *colref_mapping = CUtils::PhmulcrMapping(mp, popConsumer->Pdrgpcr(), popProducer->Pdrgpcr());
 			CExpression *pexprRemappedScalar = pexprScalar->PexprCopyWithRemappedColumns(mp, colref_mapping, true /*must_exist*/);
 			colref_mapping->Release();
 

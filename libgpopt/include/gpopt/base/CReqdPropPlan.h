@@ -245,7 +245,7 @@ namespace gpopt
 
 			// map input required and derived plan properties into new required plan properties
 			static
-			CReqdPropPlan *PrppRemap(IMemoryPool *mp, CReqdPropPlan *prppInput, CDrvdPropPlan *pdpplanInput, UlongColRefHashMap *colref_mapping);
+			CReqdPropPlan *PrppRemap(IMemoryPool *mp, CReqdPropPlan *prppInput, CDrvdPropPlan *pdpplanInput, UlongToColRefMap *colref_mapping);
 
 			// print function
 			virtual

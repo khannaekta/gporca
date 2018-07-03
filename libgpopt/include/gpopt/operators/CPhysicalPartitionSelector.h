@@ -48,11 +48,11 @@ namespace gpopt
 
 			// expressions used in equality filters; for a filter of the form
 			// pk1 = expr, we only store the expr
-			HMUlExpr *m_phmulexprEqPredicates;
+			UlongToExprMap *m_phmulexprEqPredicates;
 
 			// expressions used in general predicates; we store the whole predicate
 			// in this case (e.g. pk1 > 50)
-			HMUlExpr *m_phmulexprPredicates;
+			UlongToExprMap *m_phmulexprPredicates;
 
 			// residual partition selection expression that cannot be split to
 			// individual levels (e.g. pk1 < 5 OR pk2 = 6)
@@ -62,14 +62,14 @@ namespace gpopt
 			CExpression *m_pexprCombinedPredicate;
 
 			// ctor
-			CPhysicalPartitionSelector(IMemoryPool *mp, IMDId *mdid, HMUlExpr *phmulexprEqPredicates);
+			CPhysicalPartitionSelector(IMemoryPool *mp, IMDId *mdid, UlongToExprMap *phmulexprEqPredicates);
 
 			// return a single combined partition selection predicate
 			CExpression *PexprCombinedPartPred(IMemoryPool *mp) const;
 
 			// check whether two expression maps match
 			static
-			BOOL FMatchExprMaps(HMUlExpr *phmulexprFst, HMUlExpr *phmulexprSnd);
+			BOOL FMatchExprMaps(UlongToExprMap *phmulexprFst, UlongToExprMap *phmulexprSnd);
 
 		private:
 
@@ -97,8 +97,8 @@ namespace gpopt
 				ColRefArrays *pdrgpdrgpcr,
 				PartCnstrMap *ppartcnstrmap,
 				CPartConstraint *ppartcnstr,
-				HMUlExpr *phmulexprEqPredicates,
-				HMUlExpr *phmulexprPredicates,
+				UlongToExprMap *phmulexprEqPredicates,
+				UlongToExprMap *phmulexprPredicates,
 				CExpression *pexprResidual
 				);
 

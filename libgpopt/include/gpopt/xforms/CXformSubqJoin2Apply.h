@@ -33,7 +33,7 @@ namespace gpopt
 
 			// hash map between expression and a column reference
 			typedef CHashMap<CExpression, CColRef, HashPtr<CExpression>, EqualPtr<CExpression>,
-					CleanupRelease<CExpression>, CleanupNULL<CColRef> > HMExprCr;
+					CleanupRelease<CExpression>, CleanupNULL<CColRef> > ExprToColRefMap;
 
 			// private copy ctor
 			CXformSubqJoin2Apply(const CXformSubqJoin2Apply &);
@@ -53,7 +53,7 @@ namespace gpopt
 
 			// replace subqueries with scalar identifier based on given map
 			static
-			CExpression *PexprReplaceSubqueries(IMemoryPool *mp, CExpression *pexprScalar, HMExprCr *phmexprcr);
+			CExpression *PexprReplaceSubqueries(IMemoryPool *mp, CExpression *pexprScalar, ExprToColRefMap *phmexprcr);
 
 			// push down subquery below join
 			static

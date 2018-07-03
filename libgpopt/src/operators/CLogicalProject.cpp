@@ -366,7 +366,7 @@ CLogicalProject::PstatsDerive
 	)
 	const
 {
-	HMUlDatum *phmuldatum = GPOS_NEW(mp) HMUlDatum(mp);
+	UlongToIDatumMap *phmuldatum = GPOS_NEW(mp) UlongToIDatumMap(mp);
 
 	// extract scalar constant expression that can be used for 
 	// statistics calculation

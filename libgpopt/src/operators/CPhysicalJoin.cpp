@@ -37,7 +37,7 @@ CPhysicalJoin::CPhysicalJoin
 	:
 	CPhysical(mp)
 {
-	m_phmpp = GPOS_NEW(mp) HMPartPropagation(mp);
+	m_phmpp = GPOS_NEW(mp) PartPropReqToPartPropSpecMap(mp);
 }
 
 

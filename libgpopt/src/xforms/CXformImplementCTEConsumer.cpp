@@ -91,7 +91,7 @@ CXformImplementCTEConsumer::Transform
 	ColRefArray *colref_array = popCTEConsumer->Pdrgpcr();
 	colref_array->AddRef();
 
-	UlongColRefHashMap *colref_mapping = popCTEConsumer->Phmulcr();
+	UlongToColRefMap *colref_mapping = popCTEConsumer->Phmulcr();
 	GPOS_ASSERT(NULL != colref_mapping);
 	colref_mapping->AddRef();
 

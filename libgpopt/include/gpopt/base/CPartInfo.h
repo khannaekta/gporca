@@ -93,7 +93,7 @@ namespace gpopt
 
 					// create a copy of the current object, and add a set of remapped
 					// part keys to this entry, using the existing keys and the given hashmap
-					CPartInfoEntry *PpartinfoentryAddRemappedKeys(IMemoryPool *mp, CColRefSet *pcrs, UlongColRefHashMap *colref_mapping);
+					CPartInfoEntry *PpartinfoentryAddRemappedKeys(IMemoryPool *mp, CColRefSet *pcrs, UlongToColRefMap *colref_mapping);
 
 					// mdid of partition table
 					virtual

@@ -785,7 +785,7 @@ CReqdPropPlan::PrppRemap
 	IMemoryPool *mp,
 	CReqdPropPlan *prppInput,
 	CDrvdPropPlan *pdpplanInput,
-	UlongColRefHashMap *colref_mapping
+	UlongToColRefMap *colref_mapping
 	)
 {
 	GPOS_ASSERT(NULL != colref_mapping);

@@ -121,7 +121,7 @@ CPartFilterMap::CPartFilterMap
 	IMemoryPool *mp
 	)
 {
-	m_phmulpf = GPOS_NEW(mp) HMULPartFilter(mp);
+	m_phmulpf = GPOS_NEW(mp) UlongToPartFilterMap(mp);
 }
 
 //---------------------------------------------------------------------------
@@ -139,7 +139,7 @@ CPartFilterMap::CPartFilterMap
 	)
 {
 	GPOS_ASSERT(NULL != ppfm);
-	m_phmulpf = GPOS_NEW(mp) HMULPartFilter(mp);
+	m_phmulpf = GPOS_NEW(mp) UlongToPartFilterMap(mp);
 	CopyPartFilterMap(mp, ppfm);
 }
 
@@ -172,7 +172,7 @@ CPartFilterMap::FSubset
 {
 	GPOS_ASSERT(NULL != ppfm);
 
-	HMULPartFilterIter hmulpfi(m_phmulpf);
+	UlongToPartFilterMapIter hmulpfi(m_phmulpf);
 	while (hmulpfi.Advance())
 	{
 		const CPartFilter *ppfCurrent = hmulpfi.Value();
@@ -244,7 +244,7 @@ CPartFilterMap::PdrgpulScanIds
 	const
 {
 	ULongPtrArray *pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
-	HMULPartFilterIter hmulpfi(m_phmulpf);
+	UlongToPartFilterMapIter hmulpfi(m_phmulpf);
 	while (hmulpfi.Advance())
 	{
 		CPartFilter *ppf = const_cast<CPartFilter *>(hmulpfi.Value());
@@ -348,7 +348,7 @@ CPartFilterMap::CopyPartFilterMap
 	GPOS_ASSERT(NULL != ppfmSource);
 	GPOS_ASSERT(this != ppfmSource);
 
-	HMULPartFilterIter hmulpfi(ppfmSource->m_phmulpf);
+	UlongToPartFilterMapIter hmulpfi(ppfmSource->m_phmulpf);
 	while (hmulpfi.Advance())
 	{
 		CPartFilter *ppf = const_cast<CPartFilter *>(hmulpfi.Value());
@@ -386,7 +386,7 @@ CPartFilterMap::OsPrint
 	)
 	const
 {
-	HMULPartFilterIter hmulpfi(m_phmulpf);
+	UlongToPartFilterMapIter hmulpfi(m_phmulpf);
 	while (hmulpfi.Advance())
 	{
 		const CPartFilter *ppf = hmulpfi.Value();

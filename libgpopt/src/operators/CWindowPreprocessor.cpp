@@ -330,7 +330,7 @@ CWindowPreprocessor::PexprSeqPrj2Join
 	// columns that define the aggregates, we avoid recreating new columns during
 	// expression copy by passing must_exist as false
 	ColRefArray *pdrgpcrConsumerOutput = CLogicalCTEConsumer::PopConvert(pexprGbAggConsumer->Pop())->Pdrgpcr();
-	UlongColRefHashMap *colref_mapping = CUtils::PhmulcrMapping(mp, pdrgpcrChildOutput, pdrgpcrConsumerOutput);
+	UlongToColRefMap *colref_mapping = CUtils::PhmulcrMapping(mp, pdrgpcrChildOutput, pdrgpcrConsumerOutput);
 	CExpression *pexprGbAggRemapped = pexprGbAgg->PexprCopyWithRemappedColumns(mp, colref_mapping, false /*must_exist*/);
 	colref_mapping->Release();
 	pdrgpcrChildOutput->Release();

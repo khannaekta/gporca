@@ -153,7 +153,7 @@ CXformSubqJoin2Apply::PexprReplaceSubqueries
 	(
 	IMemoryPool *mp,
 	CExpression *pexprScalar,
-	HMExprCr *phmexprcr
+	ExprToColRefMap *phmexprcr
 	)
 {
 	GPOS_CHECK_STACK_SIZE;
@@ -226,7 +226,7 @@ CXformSubqJoin2Apply::PexprSubqueryPushDown
 	// create new join children by pushing subqueries to Project nodes on top
 	// of corresponding join children
 	ExpressionArray *pdrgpexprNewChildren = GPOS_NEW(mp) ExpressionArray(mp);
-	HMExprCr *phmexprcr = GPOS_NEW(mp) HMExprCr(mp);
+	ExprToColRefMap *phmexprcr = GPOS_NEW(mp) ExprToColRefMap(mp);
 	for (ULONG ulChild = 0; ulChild < arity - 1; ulChild++)
 	{
 		CExpression *pexprChild = (*pexprJoin)[ulChild];

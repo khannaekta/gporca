@@ -90,8 +90,8 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(IMemoryPool *mp,
 	GPOS_ASSERT(NULL != mdcache_obj_array);
 
 	// load metadata objects from the file
-	CAutoRef<MDMap> md_map;
-	m_mdmap = GPOS_NEW(mp) MDMap(mp);
+	CAutoRef<MDIdToSerializedMDIdMap> md_map;
+	m_mdmap = GPOS_NEW(mp) MDIdToSerializedMDIdMap(mp);
 	md_map = m_mdmap;
 
 	const ULONG size = mdcache_obj_array->Size();

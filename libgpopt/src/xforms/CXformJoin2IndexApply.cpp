@@ -641,7 +641,7 @@ CXformJoin2IndexApply::CreatePartialIndexApplyPlan
 		
 		ColRefArray *pdrgpcrOuterNew = pdrgpcrOuter;
 		ColRefArray *pdrgpcrIndexGet = pdrgpcrGet;
-		UlongColRefHashMap *colref_mapping = NULL;
+		UlongToColRefMap *colref_mapping = NULL;
 		if (fFirst)
 		{
 			// For the first child of the union, reuse the initial columns
@@ -650,7 +650,7 @@ CXformJoin2IndexApply::CreatePartialIndexApplyPlan
 		}
 		else
 		{
-			colref_mapping = GPOS_NEW(mp) UlongColRefHashMap(mp);
+			colref_mapping = GPOS_NEW(mp) UlongToColRefMap(mp);
 			pdrgpcrOuterNew = CUtils::PdrgpcrCopy(mp, pdrgpcrOuter, false /*fAllComputed*/, colref_mapping);
 			pdrgpcrIndexGet = CUtils::PdrgpcrCopy(mp, pdrgpcrGet, false /*fAllComputed*/, colref_mapping);
 		}
@@ -782,7 +782,7 @@ CXformJoin2IndexApply::PexprJoinOverCTEConsumer
 	ColRefArray *pdrgpcrOuterNew
 	) const
 {
-	UlongColRefHashMap *colref_mapping =
+	UlongToColRefMap *colref_mapping =
 			CUtils::PhmulcrMapping(mp, popDynamicGet->PdrgpcrOutput(), pdrgpcrDynamicGet);
 
 	// construct a partial dynamic get with the negated constraint

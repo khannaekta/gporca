@@ -41,7 +41,7 @@ CDrvdPropCtxtPlan::CDrvdPropCtxtPlan
 	m_ulExpectedPartitionSelectors(0),
 	m_fUpdateCTEMap(fUpdateCTEMap)
 {
-	m_phmulpdpCTEs = GPOS_NEW(m_mp) HMUlPdp(m_mp);
+	m_phmulpdpCTEs = GPOS_NEW(m_mp) UlongToDrvdPropPlanMap(m_mp);
 }
 
 
@@ -77,7 +77,7 @@ CDrvdPropCtxtPlan::PdpctxtCopy
 	CDrvdPropCtxtPlan *pdpctxtplan = GPOS_NEW(mp) CDrvdPropCtxtPlan(mp);
 	pdpctxtplan->m_ulExpectedPartitionSelectors = m_ulExpectedPartitionSelectors;
 
-	HMUlPdpIter hmulpdpiter(m_phmulpdpCTEs);
+	UlongToDrvdPropPlanMapIter hmulpdpiter(m_phmulpdpCTEs);
 	while (hmulpdpiter.Advance())
 	{
 		ULONG id = *(hmulpdpiter.Key());
@@ -151,7 +151,7 @@ CDrvdPropCtxtPlan::OsPrint
 	const
 {
 	// iterate on local map and print entries
-	HMUlPdpIter hmulpdpiter(m_phmulpdpCTEs);
+	UlongToDrvdPropPlanMapIter hmulpdpiter(m_phmulpdpCTEs);
 	while (hmulpdpiter.Advance())
 	{
 		ULONG id = *(hmulpdpiter.Key());

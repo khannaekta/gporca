@@ -143,13 +143,13 @@ namespace gpopt
 
 			// map partition propagation request to partition propagation spec
 			typedef CHashMap<CPartPropReq, CPartitionPropagationSpec, CPartPropReq::HashValue, CPartPropReq::Equals,
-						CleanupRelease<CPartPropReq>, CleanupRelease<CPartitionPropagationSpec> > HMPartPropagation;
+						CleanupRelease<CPartPropReq>, CleanupRelease<CPartitionPropagationSpec> > PartPropReqToPartPropSpecMap;
 
 			// mutex for locking map of child columns requests during lookup/insertion
 			CMutex m_mutexJoin;
 
 			// partition propagation request map
-			HMPartPropagation *m_phmpp;
+			PartPropReqToPartPropSpecMap *m_phmpp;
 
 			// ctor
 			explicit

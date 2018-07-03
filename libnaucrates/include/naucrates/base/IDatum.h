@@ -33,7 +33,7 @@ namespace gpnaucrates
 					 gpos::Equals<ULONG>,
 					 CleanupDelete<ULONG>,
 					 CleanupRelease<IDatum> >
-		HMUlDatum;
+		UlongToIDatumMap;
 
 	//---------------------------------------------------------------------------
 	//	@class:

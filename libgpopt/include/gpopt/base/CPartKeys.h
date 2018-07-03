@@ -78,7 +78,7 @@ namespace gpopt
 
 			// create a new PartKeys object from the current one by remapping the
 			// keys using the given hashmap
-			CPartKeys *PpartkeysRemap(IMemoryPool *mp, UlongColRefHashMap *colref_mapping) const;
+			CPartKeys *PpartkeysRemap(IMemoryPool *mp, UlongToColRefMap *colref_mapping) const;
 
 			// print
 			IOstream &OsPrint(IOstream &) const;

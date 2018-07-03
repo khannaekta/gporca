@@ -31,7 +31,7 @@ using namespace gpopt;
 CPartConstraint::CPartConstraint
 	(
 	IMemoryPool *mp,
-	HMUlCnstr *phmulcnstr,
+	UlongToConstraintMap *phmulcnstr,
 	CBitSet *pbsDefaultParts,
 	BOOL is_unbounded,
 	ColRefArrays *pdrgpdrgpcr
@@ -76,7 +76,7 @@ CPartConstraint::CPartConstraint
 	GPOS_ASSERT(NULL != pcnstr);
 	GPOS_ASSERT_IMP(is_unbounded, fDefaultPartition);
 
-	m_phmulcnstr = GPOS_NEW(mp) HMUlCnstr(mp);
+	m_phmulcnstr = GPOS_NEW(mp) UlongToConstraintMap(mp);
 #ifdef GPOS_DEBUG
 	BOOL result =
 #endif // GPOS_DEBUG
@@ -253,8 +253,8 @@ CPartConstraint::FEquivalent
 BOOL
 CPartConstraint::FEqualConstrMaps
 	(
-	HMUlCnstr *phmulcnstrFst,
-	HMUlCnstr *phmulcnstrSnd,
+	UlongToConstraintMap *phmulcnstrFst,
+	UlongToConstraintMap *phmulcnstrSnd,
 	ULONG ulLevels
 	)
 {
@@ -475,7 +475,7 @@ CPartConstraint::PpartcnstrRemaining
 		return NULL;
 	}
 
-	HMUlCnstr *phmulcnstr = GPOS_NEW(mp) HMUlCnstr(mp);
+	UlongToConstraintMap *phmulcnstr = GPOS_NEW(mp) UlongToConstraintMap(mp);
 	CBitSet *pbsDefaultParts = GPOS_NEW(mp) CBitSet(mp);
 
 	// constraint on first level
@@ -566,7 +566,7 @@ CPartConstraint *
 CPartConstraint::PpartcnstrCopyWithRemappedColumns
 	(
 	IMemoryPool *mp,
-	UlongColRefHashMap *colref_mapping,
+	UlongToColRefMap *colref_mapping,
 	BOOL must_exist
 	)
 {
@@ -575,7 +575,7 @@ CPartConstraint::PpartcnstrCopyWithRemappedColumns
 		return GPOS_NEW(mp) CPartConstraint(true /*m_fUninterpreted*/);
 	}
 
-	HMUlCnstr *phmulcnstr = GPOS_NEW(mp) HMUlCnstr(mp);
+	UlongToConstraintMap *phmulcnstr = GPOS_NEW(mp) UlongToConstraintMap(mp);
 	ColRefArrays *pdrgpdrgpcr = GPOS_NEW(mp) ColRefArrays(mp);
 
 	for (ULONG ul = 0; ul < m_num_of_part_levels; ul++)
@@ -724,7 +724,7 @@ CPartConstraint::PpartcnstrDisjunction
 		return NULL;
 	}
 
-	HMUlCnstr *phmulcnstr = GPOS_NEW(mp) HMUlCnstr(mp);
+	UlongToConstraintMap *phmulcnstr = GPOS_NEW(mp) UlongToConstraintMap(mp);
 	CBitSet *pbsCombined = GPOS_NEW(mp) CBitSet(mp);
 
 	const ULONG ulLevels = ppartcnstrFst->m_num_of_part_levels;

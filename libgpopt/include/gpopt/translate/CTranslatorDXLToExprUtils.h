@@ -79,7 +79,7 @@ namespace gpopt
 					IMemoryPool *mp,
 					CTableDescriptor *ptabdesc,
 					const IMDRelation *pmdrel,
-					UlongUlongHashMap *phmululColMapping
+					UlongToUlongMap *phmululColMapping
 					);
 
 			// check if a dxl node is a boolean expression of the given type
@@ -93,7 +93,7 @@ namespace gpopt
 
 			// construct a dynamic array of col refs corresponding to the given col ids
 			static
-			ColRefArray *Pdrgpcr(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, const ULongPtrArray *colids);
+			ColRefArray *Pdrgpcr(IMemoryPool *mp, UlongToColRefMap *colref_mapping, const ULongPtrArray *colids);
 
 			// is the given expression is a scalar function that casts
 			static

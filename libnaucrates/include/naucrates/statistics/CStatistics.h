@@ -132,14 +132,14 @@ namespace gpnaucrates
 		static void AddHistogramsWithRemap(IMemoryPool *mp,
 										   UlongHistogramHashMap *src_histograms,
 										   UlongHistogramHashMap *dest_histograms,
-										   UlongColRefHashMap *colref_mapping,
+										   UlongToColRefMap *colref_mapping,
 										   BOOL must_exist);
 
 		// helper method to add width information where the column ids have been remapped
 		static void AddWidthInfoWithRemap(IMemoryPool *mp,
 										  UlongDoubleHashMap *src_width,
 										  UlongDoubleHashMap *dest_width,
-										  UlongColRefHashMap *colref_mapping,
+										  UlongToColRefMap *colref_mapping,
 										  BOOL must_exist);
 
 	public:
@@ -265,7 +265,7 @@ namespace gpnaucrates
 
 		// copy stats with remapped column id
 		virtual IStatistics *CopyStatsWithRemap(IMemoryPool *mp,
-												UlongColRefHashMap *colref_mapping,
+												UlongToColRefMap *colref_mapping,
 												BOOL must_exist) const;
 
 		// return the set of column references we have stats for

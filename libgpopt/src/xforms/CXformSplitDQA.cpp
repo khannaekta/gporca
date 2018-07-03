@@ -112,7 +112,7 @@ CXformSplitDQA::Transform
 	CExpression *pexprRelational = (*pexpr)[0];
 	CExpression *pexprProjectList = (*pexpr)[1];
 
-	HMExprCr *phmexprcr = GPOS_NEW(mp) HMExprCr(mp);
+	ExprToColRefMap *phmexprcr = GPOS_NEW(mp) ExprToColRefMap(mp);
 	ExpressionArray *pdrgpexprChildPrEl = GPOS_NEW(mp) ExpressionArray(mp);
 	ColRefArray *pdrgpcrArgDQA = NULL;
 
@@ -244,7 +244,7 @@ CXformSplitDQA::PexprSplitIntoLocalDQAGlobalAgg
 	CMDAccessor *md_accessor,
 	CExpression *pexpr,
 	CExpression *pexprRelational,
-	HMExprCr *phmexprcr,
+	ExprToColRefMap *phmexprcr,
 	ColRefArray *pdrgpcrArgDQA
 	)
 {
@@ -383,7 +383,7 @@ CXformSplitDQA::PexprSplitHelper
 	CMDAccessor *md_accessor,
 	CExpression *pexpr,
 	CExpression *pexprRelational,
-	HMExprCr *phmexprcr,
+	ExprToColRefMap *phmexprcr,
 	ColRefArray *pdrgpcrArgDQA,
 	BOOL fSpillTo2Level
 	)
@@ -804,7 +804,7 @@ CXformSplitDQA::ExtractDistinctCols
 	CMDAccessor *md_accessor,
 	CExpression *pexpr,
 	ExpressionArray *pdrgpexprChildPrEl,
-	HMExprCr *phmexprcr,
+	ExprToColRefMap *phmexprcr,
 	ColRefArray **ppdrgpcrArgDQA  // output: array of distinct aggs arguments
 	)
 {

@@ -34,7 +34,7 @@ namespace gpopt
 
 	// hash map mapping INT -> CColRef
 	typedef CHashMap<INT, CColRef, gpos::HashValue<INT>, gpos::Equals<INT>,
-					CleanupDelete<INT>, CleanupNULL<CColRef> > HMICr;
+					CleanupDelete<INT>, CleanupNULL<CColRef> > IntToColRefMap;
 
 	//---------------------------------------------------------------------------
 	//	@class:

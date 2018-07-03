@@ -34,7 +34,7 @@ CPhysicalPartitionSelectorDML::CPhysicalPartitionSelectorDML
 	(
 	IMemoryPool *mp,
 	IMDId *mdid,
-	HMUlExpr *phmulexprEqPredicates,
+	UlongToExprMap *phmulexprEqPredicates,
 	CColRef *pcrOid
 	)
 	:

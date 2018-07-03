@@ -203,7 +203,7 @@ CExpressionTest::EresUnittest_SimpleOps()
 		// copy expression
 		CColRef *pcrOld = pdprel->PcrsOutput()->PcrAny();
 		CColRef *new_colref = COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(pcrOld);
-		UlongColRefHashMap *colref_mapping = GPOS_NEW(mp) UlongColRefHashMap(mp);
+		UlongToColRefMap *colref_mapping = GPOS_NEW(mp) UlongToColRefMap(mp);
 
 		BOOL result = colref_mapping->Insert(GPOS_NEW(mp) ULONG(pcrOld->Id()), new_colref);
 		GPOS_ASSERT(result);

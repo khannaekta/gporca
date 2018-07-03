@@ -111,7 +111,7 @@ namespace gpopt
 			// recursively check for a plan with CTE, if both CTEProducer and CTEConsumer are executed on the same locality.
 			// raises an exception if CTE Producer and CTE Consumer does not have the same locality
 			static
-			void ValidateCTEProducerConsumerLocality(IMemoryPool *mp, CExpression *pexpr, EExecLocalityType edt, UlongUlongHashMap *phmulul);
+			void ValidateCTEProducerConsumerLocality(IMemoryPool *mp, CExpression *pexpr, EExecLocalityType edt, UlongToUlongMap *phmulul);
 
 			// check is a comparison between given types or a comparison after casting
 			// one side to an another exists
@@ -324,7 +324,7 @@ namespace gpopt
 				IMemoryPool *mp,
 				ColRefArray *colref_array,
 				CExpression *pexpr,
-				UlongColRefHashMap *colref_mapping = NULL
+				UlongToColRefMap *colref_mapping = NULL
 				);
 
 			// construct a project list using the given columns and datums
@@ -335,7 +335,7 @@ namespace gpopt
 				IMemoryPool *mp,
 				ColRefArray *colref_array,
 				IDatumArray *pdrgpdatum,
-				UlongColRefHashMap *colref_mapping
+				UlongToColRefMap *colref_mapping
 				);
 
 			// generate a project expression
@@ -880,40 +880,40 @@ namespace gpopt
 
 			// return the mapping of the given colref based on the given hashmap
 			static
-			CColRef *PcrRemap(const CColRef *colref, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			CColRef *PcrRemap(const CColRef *colref, UlongToColRefMap *colref_mapping, BOOL must_exist);
 
 			// create a new colrefset corresponding to the given colrefset
 			// and based on the given mapping
 			static
-			CColRefSet *PcrsRemap(IMemoryPool *mp, CColRefSet *pcrs, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			CColRefSet *PcrsRemap(IMemoryPool *mp, CColRefSet *pcrs, UlongToColRefMap *colref_mapping, BOOL must_exist);
 
 			// create an array of column references corresponding to the given array
 			// and based on the given mapping
 			static
-			ColRefArray *PdrgpcrRemap(IMemoryPool *mp, ColRefArray *colref_array, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			ColRefArray *PdrgpcrRemap(IMemoryPool *mp, ColRefArray *colref_array, UlongToColRefMap *colref_mapping, BOOL must_exist);
 
 			// create an array of column references corresponding to the given array
 			// and based on the given mapping and create new colrefs if necessary
 			static
-			ColRefArray *PdrgpcrRemapAndCreate(IMemoryPool *mp, ColRefArray *colref_array, UlongColRefHashMap *colref_mapping);
+			ColRefArray *PdrgpcrRemapAndCreate(IMemoryPool *mp, ColRefArray *colref_array, UlongToColRefMap *colref_mapping);
 
 			// create an array of column arrays corresponding to the given array
 			// and based on the given mapping
 			static
-			ColRefArrays *PdrgpdrgpcrRemap(IMemoryPool *mp, ColRefArrays *pdrgpdrgpcr, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			ColRefArrays *PdrgpdrgpcrRemap(IMemoryPool *mp, ColRefArrays *pdrgpdrgpcr, UlongToColRefMap *colref_mapping, BOOL must_exist);
 
 			// remap given array of expressions with provided column mappings
 			static
-			ExpressionArray *PdrgpexprRemap(IMemoryPool *mp, ExpressionArray *pdrgpexpr, UlongColRefHashMap *colref_mapping);
+			ExpressionArray *PdrgpexprRemap(IMemoryPool *mp, ExpressionArray *pdrgpexpr, UlongToColRefMap *colref_mapping);
 			
 			// create ColRef->ColRef mapping using the given ColRef arrays
 			static
-			UlongColRefHashMap *PhmulcrMapping(IMemoryPool *mp, ColRefArray *pdrgpcrFrom, ColRefArray *pdrgpcrTo);
+			UlongToColRefMap *PhmulcrMapping(IMemoryPool *mp, ColRefArray *pdrgpcrFrom, ColRefArray *pdrgpcrTo);
 
 			// add col ID->ColRef mappings to the given hashmap based on the
 			// given ColRef arrays
 			static
-			void AddColumnMapping(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, ColRefArray *pdrgpcrFrom, ColRefArray *pdrgpcrTo);
+			void AddColumnMapping(IMemoryPool *mp, UlongToColRefMap *colref_mapping, ColRefArray *pdrgpcrFrom, ColRefArray *pdrgpcrTo);
 
 			// create a copy of the array of column references
 			static
@@ -923,7 +923,7 @@ namespace gpopt
 			// types as the given column references.
 			// if the passed map is not null, mappings from old to copied variables are added to it
 			static
-			ColRefArray *PdrgpcrCopy(IMemoryPool *mp, ColRefArray *colref_array, BOOL fAllComputed = false, UlongColRefHashMap *colref_mapping = NULL);
+			ColRefArray *PdrgpcrCopy(IMemoryPool *mp, ColRefArray *colref_array, BOOL fAllComputed = false, UlongToColRefMap *colref_mapping = NULL);
 
 			// equality check between two arrays of column refs. Inputs can be NULL
 			static
@@ -974,7 +974,7 @@ namespace gpopt
 
 			// create a hashmap of constraints corresponding to a bool const on the given partkeys
 			static
-			HMUlCnstr *PhmulcnstrBoolConstOnPartKeys
+			UlongToConstraintMap *PhmulcnstrBoolConstOnPartKeys
 				(
 				IMemoryPool *mp,
 				ColRefArrays *pdrgpdrgpcrPartKey,
@@ -1084,7 +1084,7 @@ namespace gpopt
 	}; // class CUtils
 
 	// hash set from expressions
-	typedef CHashSet<CExpression, CExpression::UlHashDedup, CUtils::Equals, CleanupRelease<CExpression> > HSExpr;
+	typedef CHashSet<CExpression, CExpression::UlHashDedup, CUtils::Equals, CleanupRelease<CExpression> > ExprHashSet;
 
 
 	//---------------------------------------------------------------------------

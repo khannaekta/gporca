@@ -44,7 +44,7 @@ CXformFactory::CXformFactory
 	{
 		m_rgpxf[i] = NULL;
 	}
-	m_phmszxform = GPOS_NEW(mp) HMSzXform(mp);
+	m_phmszxform = GPOS_NEW(mp) XformNameToXformMap(mp);
 	m_pxfsExploration = GPOS_NEW(mp) CXformSet(mp);
 	m_pxfsImplementation = GPOS_NEW(mp) CXformSet(mp);
 }

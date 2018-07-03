@@ -28,7 +28,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CUpperBoundNDVs *
 CUpperBoundNDVs::CopyUpperBoundNDVWithRemap(IMemoryPool *mp,
-											UlongColRefHashMap *colid_to_colref_map) const
+											UlongToColRefMap *colid_to_colref_map) const
 {
 	BOOL mapping_not_found = false;
 

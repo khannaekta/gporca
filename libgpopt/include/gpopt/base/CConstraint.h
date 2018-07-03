@@ -37,11 +37,11 @@ namespace gpopt
 	// we use pointer equality here for fast map lookup -- since we do shallow comparison, we do not take ownership
 	// of pointer values
 	typedef CHashMap<CConstraint, BOOL, gpos::HashPtr<CConstraint>, gpos::EqualPtr<CConstraint>,
-					CleanupNULL<CConstraint>, CleanupNULL<BOOL> > HMConstraintContainment;
+					CleanupNULL<CConstraint>, CleanupNULL<BOOL> > ConstraintContainmentMap;
 
 	// hash map mapping ULONG -> CConstraint
 	typedef CHashMap<ULONG, CConstraint, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-					CleanupDelete<ULONG>, CleanupRelease<CConstraint> > HMUlCnstr;
+					CleanupDelete<ULONG>, CleanupRelease<CConstraint> > UlongToConstraintMap;
 
 	//---------------------------------------------------------------------------
 	//	@class:
@@ -66,7 +66,7 @@ namespace gpopt
 		private:
 
 			// containment map
-			HMConstraintContainment *m_phmcontain;
+			ConstraintContainmentMap *m_phmcontain;
 
 			// constant true
 			static
@@ -208,7 +208,7 @@ namespace gpopt
 
 			// return a copy of the constraint with remapped columns
 			virtual
-			CConstraint *PcnstrCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist) = 0;
+			CConstraint *PcnstrCopyWithRemappedColumns(IMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist) = 0;
 
 			// return constraint on a given column
 			virtual
