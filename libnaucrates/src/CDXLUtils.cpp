@@ -706,11 +706,11 @@ CDXLUtils::ParseDXLToBucketsArray(IMemoryPool *mp,
 {
 	BucketArray *stats_buckets_array = GPOS_NEW(mp) BucketArray(mp);
 
-	const DXLBucketPtrArray *buckets_dxl_array = dxl_derived_col_stats->TransformHistogramToDXLBucketArray();
-	const ULONG num_of_buckets = buckets_dxl_array->Size();
+	const DXLBucketPtrArray *dxl_bucket_array = dxl_derived_col_stats->TransformHistogramToDXLBucketArray();
+	const ULONG num_of_buckets = dxl_bucket_array->Size();
 	for (ULONG ul = 0; ul < num_of_buckets; ul++)
 	{
-		CDXLBucket *bucket_dxl = (*buckets_dxl_array)[ul];
+		CDXLBucket *bucket_dxl = (*dxl_bucket_array)[ul];
 
 		// translate the lower and upper bounds of the bucket
 		IDatum *datum_lower_bound =
