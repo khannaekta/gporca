@@ -26,15 +26,15 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerManager::CParseHandlerManager(CDXLMemoryManager *memory_manager_dxl,
+CParseHandlerManager::CParseHandlerManager(CDXLMemoryManager *dxl_memory_manager,
 										   SAX2XMLReader *sax_2_xml_reader)
-	: m_memory_manager_dxl(memory_manager_dxl),
+	: m_dxl_memory_manager(dxl_memory_manager),
 	  m_xml_reader(sax_2_xml_reader),
 	  m_curr_parse_handler(NULL),
 	  m_iteration_since_last_abortcheck(0)
 {
 	m_parse_handler_stack =
-		GPOS_NEW(memory_manager_dxl->Pmp()) ParseHandlerStack(memory_manager_dxl->Pmp());
+		GPOS_NEW(dxl_memory_manager->Pmp()) ParseHandlerStack(dxl_memory_manager->Pmp());
 }
 
 //---------------------------------------------------------------------------

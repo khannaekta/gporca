@@ -783,7 +783,7 @@ namespace gpdxl
 		static IMemoryPool *m_mp;
 
 		// local dxl memory manager
-		static CDXLMemoryManager *m_memory_manager_dxl;
+		static CDXLMemoryManager *m_dxl_memory_manager;
 
 		// create a string in Xerces XMLCh* format
 		static XMLCh *XmlstrFromWsz(const WCHAR *wsz);

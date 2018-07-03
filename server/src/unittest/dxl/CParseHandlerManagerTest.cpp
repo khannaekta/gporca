@@ -66,15 +66,15 @@ CParseHandlerManagerTest::EresUnittest_Basic()
 	IMemoryPool *mp = amp.Pmp();
 		
 	// create XML reader and a parse handler manager for it
-	CDXLMemoryManager *memory_manager_dxl = GPOS_NEW(mp) CDXLMemoryManager(mp);
+	CDXLMemoryManager *dxl_memory_manager = GPOS_NEW(mp) CDXLMemoryManager(mp);
 
 	SAX2XMLReader* parser = NULL;
 	{
 		CAutoTraceFlag atf(EtraceSimulateOOM, false);
-		parser = XMLReaderFactory::createXMLReader(memory_manager_dxl);
+		parser = XMLReaderFactory::createXMLReader(dxl_memory_manager);
 	}
 
-	CParseHandlerManager *parse_handler_mgr = GPOS_NEW(mp) CParseHandlerManager(memory_manager_dxl, parser);
+	CParseHandlerManager *parse_handler_mgr = GPOS_NEW(mp) CParseHandlerManager(dxl_memory_manager, parser);
 	
 	// create some parse handlers
 	CParseHandlerPlan *pphPlan = GPOS_NEW(mp) CParseHandlerPlan(mp, parse_handler_mgr, NULL);
@@ -101,7 +101,7 @@ CParseHandlerManagerTest::EresUnittest_Basic()
 	// cleanup
 	GPOS_DELETE(parse_handler_mgr);
 	delete parser;
-	GPOS_DELETE(memory_manager_dxl);
+	GPOS_DELETE(dxl_memory_manager);
 	GPOS_DELETE(pphPlan);
 	GPOS_DELETE(pphHJ);
 
