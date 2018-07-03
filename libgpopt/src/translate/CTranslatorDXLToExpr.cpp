@@ -1832,14 +1832,14 @@ CTranslatorDXLToExpr::PexprLogicalSeqPr
 ColRefArray *
 CTranslatorDXLToExpr::PdrgpcrPartitionByCol
 	(
-	const ULongPtrArray *partition_by_col_id_array
+	const ULongPtrArray *partition_by_colid_array
 	)
 {
-	const ULONG size = partition_by_col_id_array->Size();
+	const ULONG size = partition_by_colid_array->Size();
 	ColRefArray *colref_array = GPOS_NEW(m_mp) ColRefArray(m_mp);
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		const ULONG *pulColId = (*partition_by_col_id_array)[ul];
+		const ULONG *pulColId = (*partition_by_colid_array)[ul];
 
 		// get its column reference from the hash map
 		CColRef *colref =  LookupColRef(m_phmulcr, *pulColId);

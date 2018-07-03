@@ -32,7 +32,7 @@ CParseHandlerWindowSpec::CParseHandlerWindowSpec(IMemoryPool *mp,
 												 CParseHandlerManager *parse_handler_mgr,
 												 CParseHandlerBase *parse_handler_root)
 	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
-	  m_part_by_col_identifier_array(NULL),
+	  m_part_by_colid_array(NULL),
 	  m_dxl_window_spec_gen(NULL),
 	  m_mdname(NULL),
 	  m_has_window_frame(false)
@@ -72,12 +72,12 @@ CParseHandlerWindowSpec::StartElement(const XMLCh *const element_uri,
 
 		const XMLCh *xml_part_cols = CDXLOperatorFactory::ExtractAttrValue(
 			attrs, EdxltokenPartKeys, EdxltokenPhysicalWindow);
-		m_part_by_col_identifier_array =
+		m_part_by_colid_array =
 			CDXLOperatorFactory::ExtractIntsToUlongArray(m_parse_handler_mgr->GetDXLMemoryManager(),
 														 xml_part_cols,
 														 EdxltokenPartKeys,
 														 EdxltokenPhysicalWindow);
-		GPOS_ASSERT(NULL != m_part_by_col_identifier_array);
+		GPOS_ASSERT(NULL != m_part_by_colid_array);
 	}
 	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarSortColList),
 										   element_local_name))
@@ -180,7 +180,7 @@ CParseHandlerWindowSpec::EndElement(const XMLCh *const,  // element_uri,
 		window_frame = window_frame_parse_handler->GetWindowFrame();
 	}
 	m_dxl_window_spec_gen = GPOS_NEW(m_mp) CDXLWindowSpec(
-		m_mp, m_part_by_col_identifier_array, m_mdname, sort_col_list_dxlnode, window_frame);
+		m_mp, m_part_by_colid_array, m_mdname, sort_col_list_dxlnode, window_frame);
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

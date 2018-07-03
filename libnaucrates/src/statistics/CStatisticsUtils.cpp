@@ -762,9 +762,9 @@ CStatisticsUtils::GetColsNonUpdatableHistForDisj(IMemoryPool *mp,
 		{
 			// the child predicate only operates on a subset of all the columns
 			// used in the disjunction
-			for (ULONG used_col_idx = 0; used_col_idx < num_disj_used_col; used_col_idx++)
+			for (ULONG used_colidx = 0; used_colidx < num_disj_used_col; used_colidx++)
 			{
-				ULONG colid = *(*disjuncts)[used_col_idx];
+				ULONG colid = *(*disjuncts)[used_colidx];
 				if (!child_bitset->Get(colid))
 				{
 					(void) non_updateable_bitset->ExchangeSet(colid);
@@ -1254,9 +1254,9 @@ CStatisticsUtils::GetGrpColIdToUpperBoundNDVIdxMap(
 			// key columns else consider all grouping columns
 			const CColRef *grouping_colref = col_factory->LookupColRef(colid);
 			const ULONG upper_bound_ndv_idx = stats->GetIndexUpperBoundNDVs(grouping_colref);
-			const ULongPtrArray *ndv_col_id =
+			const ULongPtrArray *ndv_colid =
 				grp_colid_upper_bound_ndv_idx_map->Find(&upper_bound_ndv_idx);
-			if (NULL == ndv_col_id)
+			if (NULL == ndv_colid)
 			{
 				ULongPtrArray *colids_new = GPOS_NEW(mp) ULongPtrArray(mp);
 				colids_new->Append(GPOS_NEW(mp) ULONG(colid));
@@ -1269,7 +1269,7 @@ CStatisticsUtils::GetGrpColIdToUpperBoundNDVIdxMap(
 			}
 			else
 			{
-				(const_cast<ULongPtrArray *>(ndv_col_id))
+				(const_cast<ULongPtrArray *>(ndv_colid))
 					->Append(GPOS_NEW(mp) ULONG(colid));
 			}
 		}
@@ -1587,10 +1587,10 @@ CStatisticsUtils::AddGrpColStats(IMemoryPool *mp,
 	while (grp_col_refset_iter.Advance())
 	{
 		CColRef *colref = grp_col_refset_iter.Pcr();
-		ULONG grp_col_id = colref->Id();
+		ULONG grp_colid = colref->Id();
 
 		CDouble num_distinct_vals(CHistogram::MinDistinct);
-		const CHistogram *histogram = input_stats->GetHistogram(grp_col_id);
+		const CHistogram *histogram = input_stats->GetHistogram(grp_colid);
 		if (NULL != histogram)
 		{
 			CHistogram *result_histogram = histogram->MakeGroupByHistogramNormalize(
@@ -1599,14 +1599,14 @@ CStatisticsUtils::AddGrpColStats(IMemoryPool *mp,
 			{
 				result_histogram->SetNDVScaled();
 			}
-			AddHistogram(mp, grp_col_id, result_histogram, output_histograms);
+			AddHistogram(mp, grp_colid, result_histogram, output_histograms);
 			GPOS_DELETE(result_histogram);
 		}
 
-		const CDouble *width = input_stats->GetWidth(grp_col_id);
+		const CDouble *width = input_stats->GetWidth(grp_colid);
 		if (NULL != width)
 		{
-			output_col_widths->Insert(GPOS_NEW(mp) ULONG(grp_col_id),
+			output_col_widths->Insert(GPOS_NEW(mp) ULONG(grp_colid),
 									  GPOS_NEW(mp) CDouble(*width));
 		}
 	}

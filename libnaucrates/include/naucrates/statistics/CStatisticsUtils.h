@@ -159,7 +159,7 @@ namespace gpnaucrates
 		// utility function to print column stats before/after applying filter
 		static void PrintColStats(IMemoryPool *mp,
 								  CStatsPred *pred_stats,
-								  ULONG cond_col_id,
+								  ULONG cond_colid,
 								  CHistogram *histogram,
 								  CDouble last_scale_factor,
 								  BOOL is_filter_applied_before);
@@ -178,7 +178,7 @@ namespace gpnaucrates
 										 CDouble local_rows,
 										 CHistogram *previous_histogram,
 										 UlongHistogramHashMap *disjunctive_result_histograms,
-										 ULONG last_col_id);
+										 ULONG last_colid);
 
 		// given a disjunction filter, generate a bit set of columns whose
 		// histogram buckets cannot be changed by applying the predicates in the

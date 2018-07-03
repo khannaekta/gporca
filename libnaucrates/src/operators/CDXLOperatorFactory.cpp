@@ -271,11 +271,11 @@ CDXLOperatorFactory::MakeDXLRoutedMotion(CDXLMemoryManager *dxl_memory_manager,
 	// get the memory pool from the memory manager
 	IMemoryPool *mp = dxl_memory_manager->Pmp();
 
-	ULONG segment_col_id = CDXLOperatorFactory::ExtractConvertAttrValueToUlong(
+	ULONG segment_colid = CDXLOperatorFactory::ExtractConvertAttrValueToUlong(
 		dxl_memory_manager, attrs, EdxltokenSegmentIdCol, EdxltokenPhysicalRoutedDistributeMotion);
 
 	CDXLPhysicalRoutedDistributeMotion *dxl_op =
-		GPOS_NEW(mp) CDXLPhysicalRoutedDistributeMotion(mp, segment_col_id);
+		GPOS_NEW(mp) CDXLPhysicalRoutedDistributeMotion(mp, segment_colid);
 	SetSegmentInfo(dxl_memory_manager, dxl_op, attrs, EdxltokenPhysicalRoutedDistributeMotion);
 
 	return dxl_op;
@@ -1486,8 +1486,8 @@ CDXLOperatorFactory::MakeDXLColRef(CDXLMemoryManager *dxl_memory_manager,
 
 	// parse column id
 	ULONG id = 0;
-	const XMLCh *col_id_xml = attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenColId));
-	if (NULL == col_id_xml)
+	const XMLCh *colid_xml = attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenColId));
+	if (NULL == colid_xml)
 	{
 		GPOS_RAISE(gpdxl::ExmaDXL,
 				   gpdxl::ExmiDXLMissingAttribute,
@@ -1495,7 +1495,7 @@ CDXLOperatorFactory::MakeDXLColRef(CDXLMemoryManager *dxl_memory_manager,
 				   CDXLTokens::GetDXLTokenStr(target_elem)->GetBuffer());
 	}
 
-	id = XMLString::parseInt(col_id_xml, dxl_memory_manager);
+	id = XMLString::parseInt(colid_xml, dxl_memory_manager);
 
 	CWStringDynamic *col_name =
 		CDXLUtils::CreateDynamicStringFromXMLChArray(dxl_memory_manager, column_name_xml);
@@ -2028,8 +2028,8 @@ ULONG
 CDXLOperatorFactory::ParseGroupingColId(CDXLMemoryManager *dxl_memory_manager,
 										const Attributes &attrs)
 {
-	const CWStringConst *grouping_col_id_str = CDXLTokens::GetDXLTokenStr(EdxltokenGroupingCol);
-	const CWStringConst *col_id_str = CDXLTokens::GetDXLTokenStr(EdxltokenColId);
+	const CWStringConst *grouping_colid_str = CDXLTokens::GetDXLTokenStr(EdxltokenGroupingCol);
+	const CWStringConst *colid_str = CDXLTokens::GetDXLTokenStr(EdxltokenColId);
 
 	// get grouping column id from attributes
 	INT colid = ExtractConvertAttrValueToInt(
@@ -2039,8 +2039,8 @@ CDXLOperatorFactory::ParseGroupingColId(CDXLMemoryManager *dxl_memory_manager,
 	{
 		GPOS_RAISE(gpdxl::ExmaDXL,
 				   gpdxl::ExmiDXLInvalidAttributeValue,
-				   col_id_str->GetBuffer(),
-				   grouping_col_id_str->GetBuffer());
+				   colid_str->GetBuffer(),
+				   grouping_colid_str->GetBuffer());
 	}
 
 	return (ULONG) colid;

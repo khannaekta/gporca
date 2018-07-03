@@ -39,7 +39,7 @@ namespace gpdxl
 		IMemoryPool *m_mp;
 
 		// partition-by column identifiers
-		ULongPtrArray *m_partition_by_col_id_array;
+		ULongPtrArray *m_partition_by_colid_array;
 
 		// name of window specification
 		CMDName *m_mdname;
@@ -56,7 +56,7 @@ namespace gpdxl
 	public:
 		// ctor
 		CDXLWindowSpec(IMemoryPool *mp,
-					   ULongPtrArray *partition_by_col_id_array,
+					   ULongPtrArray *partition_by_colid_array,
 					   CMDName *mdname,
 					   CDXLNode *sort_col_list_dxlnode,
 					   CDXLWindowFrame *window_frame);
@@ -81,7 +81,7 @@ namespace gpdxl
 		ULongPtrArray *
 		GetPartitionByColIdArray() const
 		{
-			return m_partition_by_col_id_array;
+			return m_partition_by_colid_array;
 		}
 
 		// sort columns

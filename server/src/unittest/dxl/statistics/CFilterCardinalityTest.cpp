@@ -1032,7 +1032,7 @@ CFilterCardinalityTest::EresUnittest_CStatisticsAccumulateCard()
 	UlongHistogramHashMap *col_histogram_mapping = GPOS_NEW(mp) UlongHistogramHashMap(mp);
 
 	// array capturing columns for which width information is available
-	UlongDoubleHashMap *col_id_width_mapping = GPOS_NEW(mp) UlongDoubleHashMap(mp);
+	UlongDoubleHashMap *colid_width_mapping = GPOS_NEW(mp) UlongDoubleHashMap(mp);
 
 	const ULONG num_cols = 3;
 	for (ULONG ul = 0; ul < num_cols; ul ++)
@@ -1041,14 +1041,14 @@ CFilterCardinalityTest::EresUnittest_CStatisticsAccumulateCard()
 		col_histogram_mapping->Insert(GPOS_NEW(mp) ULONG(ul), CCardinalityTestUtils::PhistExampleInt4(mp));
 
 		// width for int
-		col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(ul), GPOS_NEW(mp) CDouble(4.0));
+		colid_width_mapping->Insert(GPOS_NEW(mp) ULONG(ul), GPOS_NEW(mp) CDouble(4.0));
 	}
 
 	CStatistics *stats = GPOS_NEW(mp) CStatistics
 									(
 									mp,
 									col_histogram_mapping,
-									col_id_width_mapping,
+									colid_width_mapping,
 									CDouble(1000.0) /* rows */,
 									false /* is_empty() */
 									);

@@ -146,7 +146,7 @@ namespace gpnaucrates
 		// ctor
 		CStatistics(IMemoryPool *mp,
 					UlongHistogramHashMap *col_histogram_mapping,
-					UlongDoubleHashMap *col_id_width_mapping,
+					UlongDoubleHashMap *colid_width_mapping,
 					CDouble rows,
 					BOOL is_empty,
 					ULONG num_predicates = 0);
@@ -157,7 +157,7 @@ namespace gpnaucrates
 		virtual UlongDoubleHashMap *CopyWidths(IMemoryPool *mp) const;
 
 		virtual void CopyWidthsInto(IMemoryPool *mp,
-									UlongDoubleHashMap *col_id_width_mapping) const;
+									UlongDoubleHashMap *colid_width_mapping) const;
 
 		virtual UlongHistogramHashMap *CopyHistograms(IMemoryPool *mp) const;
 
@@ -336,7 +336,7 @@ namespace gpnaucrates
 		// create a dummy statistics object
 		static CStatistics *MakeDummyStats(IMemoryPool *mp,
 										   ULongPtrArray *col_histogram_mapping,
-										   ULongPtrArray *col_id_width_mapping,
+										   ULongPtrArray *colid_width_mapping,
 										   CDouble rows);
 
 		// default column width

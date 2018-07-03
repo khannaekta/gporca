@@ -1109,13 +1109,13 @@ CMDAccessor::RecordColumnStats
 	BOOL fSystemCol,
 	BOOL fEmptyTable,
 	UlongHistogramHashMap *col_histogram_mapping,
-	UlongDoubleHashMap *col_id_width_mapping,
+	UlongDoubleHashMap *colid_width_mapping,
 	CStatisticsConfig *stats_config
 	)
 {
 	GPOS_ASSERT(NULL != rel_mdid);
 	GPOS_ASSERT(NULL != col_histogram_mapping);
-	GPOS_ASSERT(NULL != col_id_width_mapping);
+	GPOS_ASSERT(NULL != colid_width_mapping);
 
 	// get the column statistics
 	const IMDColStats *pmdcolstats = Pmdcolstats(mp, rel_mdid, ulPos);
@@ -1123,7 +1123,7 @@ CMDAccessor::RecordColumnStats
 
 	// fetch the column width and insert it into the hashmap
 	CDouble *width = GPOS_NEW(mp) CDouble(pmdcolstats->Width());
-	col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid), width);
+	colid_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid), width);
 
 	// extract the the histogram and insert it into the hashmap
 	const IMDRelation *pmdrel = RetrieveRel(rel_mdid);
@@ -1199,7 +1199,7 @@ CMDAccessor::Pstats
 	const IMDRelation *pmdrel = RetrieveRel(rel_mdid);
 
 	UlongHistogramHashMap *col_histogram_mapping = GPOS_NEW(mp) UlongHistogramHashMap(mp);
-	UlongDoubleHashMap *col_id_width_mapping = GPOS_NEW(mp) UlongDoubleHashMap(mp);
+	UlongDoubleHashMap *colid_width_mapping = GPOS_NEW(mp) UlongDoubleHashMap(mp);
 
 	CColRefSetIter crsiHist(*pcrsHist);
 	while (crsiHist.Advance())
@@ -1223,7 +1223,7 @@ CMDAccessor::Pstats
 			pcrtable->FSystemCol(),
 			fEmptyTable,
 			col_histogram_mapping,
-			col_id_width_mapping,
+			colid_width_mapping,
 			stats_config
 			);
 	}
@@ -1244,7 +1244,7 @@ CMDAccessor::Pstats
 		ULONG ulPos = pmdrel->GetPosFromAttno(attno);
 
 		CDouble *width = GPOS_NEW(mp) CDouble(pmdrel->ColWidth(ulPos));
-		col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid), width);
+		colid_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid), width);
 	}
 
 	CDouble rows = std::max(DOUBLE(1.0), pmdRelStats->Rows().Get());
@@ -1253,7 +1253,7 @@ CMDAccessor::Pstats
 							(
 							mp,
 							col_histogram_mapping,
-							col_id_width_mapping,
+							colid_width_mapping,
 							rows,
 							fEmptyTable
 							);

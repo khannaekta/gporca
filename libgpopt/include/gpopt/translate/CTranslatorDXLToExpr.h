@@ -148,7 +148,7 @@ namespace gpopt
 
 			// create the array of column reference used in the partition by column
 			// list of a window specification
-			ColRefArray *PdrgpcrPartitionByCol(const ULongPtrArray *partition_by_col_id_array);
+			ColRefArray *PdrgpcrPartitionByCol(const ULongPtrArray *partition_by_colid_array);
 
 			// translate a DXL logical window into an expr logical project
 			CExpression *PexprCreateWindow(const CDXLNode *pdxlnLgProject);

@@ -31,7 +31,7 @@ CProjectStatsProcessor::CalcProjStats(IMemoryPool *mp,
 		GPOS_NEW(mp) UlongHistogramHashMap(mp);
 
 	// column ids on which widths are to be computed
-	UlongDoubleHashMap *col_id_width_mapping =
+	UlongDoubleHashMap *colid_width_mapping =
 		GPOS_NEW(mp) UlongDoubleHashMap(mp);
 
 	const ULONG length = projection_colids->Size();
@@ -100,12 +100,12 @@ CProjectStatsProcessor::CalcProjStats(IMemoryPool *mp,
 			GPOS_ASSERT(NULL != colref);
 
 			CDouble width = CStatisticsUtils::DefaultColumnWidth(colref->RetrieveType());
-			col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid),
+			colid_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid),
 										 GPOS_NEW(mp) CDouble(width));
 		}
 		else
 		{
-			col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid),
+			colid_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid),
 										 GPOS_NEW(mp) CDouble(*width));
 		}
 	}
@@ -115,7 +115,7 @@ CProjectStatsProcessor::CalcProjStats(IMemoryPool *mp,
 	CStatistics *projection_stats =
 		GPOS_NEW(mp) CStatistics(mp,
 										  histograms_new,
-										  col_id_width_mapping,
+										  colid_width_mapping,
 										  input_rows,
 										  input_stats->IsEmpty(),
 										  input_stats->GetNumberOfPredicates());

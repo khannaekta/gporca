@@ -33,18 +33,18 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLWindowSpec::CDXLWindowSpec(IMemoryPool *mp,
-							   ULongPtrArray *partition_by_col_id_array,
+							   ULongPtrArray *partition_by_colid_array,
 							   CMDName *mdname,
 							   CDXLNode *sort_col_list_dxlnode,
 							   CDXLWindowFrame *window_frame)
 	: m_mp(mp),
-	  m_partition_by_col_id_array(partition_by_col_id_array),
+	  m_partition_by_colid_array(partition_by_colid_array),
 	  m_mdname(mdname),
 	  m_sort_col_list_dxlnode(sort_col_list_dxlnode),
 	  m_window_frame(window_frame)
 {
 	GPOS_ASSERT(NULL != m_mp);
-	GPOS_ASSERT(NULL != m_partition_by_col_id_array);
+	GPOS_ASSERT(NULL != m_partition_by_colid_array);
 }
 
 //---------------------------------------------------------------------------
@@ -57,7 +57,7 @@ CDXLWindowSpec::CDXLWindowSpec(IMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLWindowSpec::~CDXLWindowSpec()
 {
-	m_partition_by_col_id_array->Release();
+	m_partition_by_colid_array->Release();
 	CRefCount::SafeRelease(m_window_frame);
 	CRefCount::SafeRelease(m_sort_col_list_dxlnode);
 	GPOS_DELETE(m_mdname);
@@ -77,14 +77,14 @@ CDXLWindowSpec::SerializeToDXL(CXMLSerializer *xml_serializer) const
 	const CWStringConst *element_name = CDXLTokens::GetDXLTokenStr(EdxltokenWindowSpec);
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
-	GPOS_ASSERT(NULL != m_partition_by_col_id_array);
+	GPOS_ASSERT(NULL != m_partition_by_colid_array);
 
 	// serialize partition keys
-	CWStringDynamic *partition_by_col_id_string =
-		CDXLUtils::Serialize(m_mp, m_partition_by_col_id_array);
+	CWStringDynamic *partition_by_colid_string =
+		CDXLUtils::Serialize(m_mp, m_partition_by_colid_array);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenPartKeys),
-								 partition_by_col_id_string);
-	GPOS_DELETE(partition_by_col_id_string);
+								 partition_by_colid_string);
+	GPOS_DELETE(partition_by_colid_string);
 
 	if (NULL != m_mdname)
 	{

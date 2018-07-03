@@ -26,13 +26,13 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalWindow::CDXLPhysicalWindow(IMemoryPool *mp,
-									   ULongPtrArray *part_by_col_identifier_array,
+									   ULongPtrArray *part_by_colid_array,
 									   CDXLWindowKeyArray *window_key_array)
 	: CDXLPhysical(mp),
-	  m_part_by_col_identifier_array(part_by_col_identifier_array),
+	  m_part_by_colid_array(part_by_colid_array),
 	  m_dxl_window_key_array(window_key_array)
 {
-	GPOS_ASSERT(NULL != m_part_by_col_identifier_array);
+	GPOS_ASSERT(NULL != m_part_by_colid_array);
 	GPOS_ASSERT(NULL != m_dxl_window_key_array);
 }
 
@@ -46,7 +46,7 @@ CDXLPhysicalWindow::CDXLPhysicalWindow(IMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLPhysicalWindow::~CDXLPhysicalWindow()
 {
-	m_part_by_col_identifier_array->Release();
+	m_part_by_colid_array->Release();
 	m_dxl_window_key_array->Release();
 }
 
@@ -89,7 +89,7 @@ CDXLPhysicalWindow::GetOpNameStr() const
 ULONG
 CDXLPhysicalWindow::PartByColsCount() const
 {
-	return m_part_by_col_identifier_array->Size();
+	return m_part_by_colid_array->Size();
 }
 
 //---------------------------------------------------------------------------
@@ -138,7 +138,7 @@ CDXLPhysicalWindow::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNod
 
 	// serialize partition keys
 	CWStringDynamic *part_by_cols_str =
-		CDXLUtils::Serialize(m_mp, m_part_by_col_identifier_array);
+		CDXLUtils::Serialize(m_mp, m_part_by_colid_array);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenPartKeys), part_by_cols_str);
 	GPOS_DELETE(part_by_cols_str);
 
@@ -179,7 +179,7 @@ CDXLPhysicalWindow::AssertValid(const CDXLNode *dxlnode, BOOL validate_children)
 {
 	// assert proj list and filter are valid
 	CDXLPhysical::AssertValid(dxlnode, validate_children);
-	GPOS_ASSERT(NULL != m_part_by_col_identifier_array);
+	GPOS_ASSERT(NULL != m_part_by_colid_array);
 	GPOS_ASSERT(NULL != m_dxl_window_key_array);
 	GPOS_ASSERT(EdxlwindowIndexSentinel == dxlnode->Arity());
 	CDXLNode *child_dxlnode = (*dxlnode)[EdxlwindowIndexChild];

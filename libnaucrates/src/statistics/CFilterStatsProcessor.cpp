@@ -205,7 +205,7 @@ CFilterStatsProcessor::MakeHistHashMapConjFilter(IMemoryPool *mp,
 
 	// properties of last seen column
 	CDouble last_scale_factor(1.0);
-	ULONG last_col_id = gpos::ulong_max;
+	ULONG last_colid = gpos::ulong_max;
 
 	// iterate over filters and update corresponding histograms
 	const ULONG filters = conjunctive_pred_stats->GetNumPreds();
@@ -231,7 +231,7 @@ CFilterStatsProcessor::MakeHistHashMapConjFilter(IMemoryPool *mp,
 
 		// the histogram to apply filter on
 		CHistogram *hist_before = NULL;
-		if (IsNewStatsColumn(colid, last_col_id))
+		if (IsNewStatsColumn(colid, last_colid))
 		{
 			scale_factors->Append(GPOS_NEW(mp) CDouble(last_scale_factor));
 			last_scale_factor = CDouble(1.0);
@@ -249,7 +249,7 @@ CFilterStatsProcessor::MakeHistHashMapConjFilter(IMemoryPool *mp,
 													filter_colids,
 													hist_before,
 													&last_scale_factor,
-													&last_col_id);
+													&last_colid);
 			GPOS_DELETE(hist_before);
 
 			GPOS_ASSERT(NULL != result_histogram);
@@ -320,7 +320,7 @@ CFilterStatsProcessor::MakeHistHashMapConjFilter(IMemoryPool *mp,
 				result_histograms = disjunctive_histograms_after;
 			}
 
-			last_col_id = colid;
+			last_colid = colid;
 			disjunctive_input_histograms->Release();
 		}
 	}
@@ -365,7 +365,7 @@ CFilterStatsProcessor::MakeHistHashMapDisjFilter(IMemoryPool *mp,
 		GPOS_NEW(mp) UlongHistogramHashMap(mp);
 
 	CHistogram *previous_histogram = NULL;
-	ULONG previous_col_id = gpos::ulong_max;
+	ULONG previous_colid = gpos::ulong_max;
 	CDouble previous_scale_factor(input_rows);
 
 	CDouble cumulative_rows(CStatistics::MinRows.Get());
@@ -389,7 +389,7 @@ CFilterStatsProcessor::MakeHistHashMapDisjFilter(IMemoryPool *mp,
 			continue;
 		}
 
-		if (IsNewStatsColumn(colid, previous_col_id))
+		if (IsNewStatsColumn(colid, previous_colid))
 		{
 			scale_factors->Append(GPOS_NEW(mp) CDouble(previous_scale_factor.Get()));
 			CStatisticsUtils::UpdateDisjStatistics(mp,
@@ -398,7 +398,7 @@ CFilterStatsProcessor::MakeHistHashMapDisjFilter(IMemoryPool *mp,
 												   cumulative_rows,
 												   previous_histogram,
 												   disjunctive_result_histograms,
-												   previous_col_id);
+												   previous_colid);
 			previous_histogram = NULL;
 		}
 
@@ -406,7 +406,7 @@ CFilterStatsProcessor::MakeHistHashMapDisjFilter(IMemoryPool *mp,
 		CHistogram *disjunctive_child_col_histogram = NULL;
 
 		BOOL is_pred_simple = !CStatsPredUtils::IsConjOrDisjPred(child_pred_stats);
-		BOOL is_col_id_present = (gpos::ulong_max != colid);
+		BOOL is_colid_present = (gpos::ulong_max != colid);
 		UlongHistogramHashMap *child_histograms = NULL;
 		CDouble child_scale_factor(1.0);
 
@@ -418,7 +418,7 @@ CFilterStatsProcessor::MakeHistHashMapDisjFilter(IMemoryPool *mp,
 																   filter_colids,
 																   histogram,
 																   &child_scale_factor,
-																   &previous_col_id);
+																   &previous_colid);
 
 			CHistogram *input_histogram = input_histograms->Find(&colid);
 			GPOS_ASSERT(NULL != input_histogram);
@@ -441,7 +441,7 @@ CFilterStatsProcessor::MakeHistHashMapDisjFilter(IMemoryPool *mp,
 			GPOS_ASSERT_IMP(CStatsPred::EsptDisj == child_pred_stats->GetPredStatsType(),
 							gpos::ulong_max != colid);
 
-			if (is_col_id_present)
+			if (is_colid_present)
 			{
 				// conjunction or disjunction uses only a single column
 				disjunctive_child_col_histogram =
@@ -450,7 +450,7 @@ CFilterStatsProcessor::MakeHistHashMapDisjFilter(IMemoryPool *mp,
 		}
 
 		CDouble num_rows_disj_child = input_rows / child_scale_factor;
-		if (is_col_id_present)
+		if (is_colid_present)
 		{
 			// 1. a simple predicate (a == 5), (b LIKE "%%GOOD%%")
 			// 2. conjunctive / disjunctive predicate where each of its component are predicates on the same column
@@ -481,7 +481,7 @@ CFilterStatsProcessor::MakeHistHashMapDisjFilter(IMemoryPool *mp,
 
 			previous_scale_factor =
 				input_rows / std::max(CStatistics::MinRows.Get(), cumulative_rows.Get());
-			previous_col_id = colid;
+			previous_colid = colid;
 		}
 		else
 		{
@@ -506,7 +506,7 @@ CFilterStatsProcessor::MakeHistHashMapDisjFilter(IMemoryPool *mp,
 
 			previous_histogram = NULL;
 			previous_scale_factor = child_scale_factor;
-			previous_col_id = colid;
+			previous_colid = colid;
 		}
 
 		CRefCount::SafeRelease(child_histograms);
@@ -519,7 +519,7 @@ CFilterStatsProcessor::MakeHistHashMapDisjFilter(IMemoryPool *mp,
 										   cumulative_rows,
 										   previous_histogram,
 										   disjunctive_result_histograms,
-										   previous_col_id);
+										   previous_colid);
 	previous_histogram = NULL;
 	scale_factors->Append(GPOS_NEW(mp) CDouble(
 		std::max(CStatistics::MinRows.Get(), previous_scale_factor.Get())));
@@ -546,7 +546,7 @@ CFilterStatsProcessor::MakeHistSimpleFilter(IMemoryPool *mp,
 											CBitSet *filter_colids,
 											CHistogram *hist_before,
 											CDouble *last_scale_factor,
-											ULONG *target_last_col_id)
+											ULONG *target_last_colid)
 {
 	if (CStatsPred::EsptPoint == pred_stats->GetPredStatsType())
 	{
@@ -556,7 +556,7 @@ CFilterStatsProcessor::MakeHistSimpleFilter(IMemoryPool *mp,
 								   filter_colids,
 								   hist_before,
 								   last_scale_factor,
-								   target_last_col_id);
+								   target_last_colid);
 	}
 
 	if (CStatsPred::EsptLike == pred_stats->GetPredStatsType())
@@ -568,7 +568,7 @@ CFilterStatsProcessor::MakeHistSimpleFilter(IMemoryPool *mp,
 								  filter_colids,
 								  hist_before,
 								  last_scale_factor,
-								  target_last_col_id);
+								  target_last_colid);
 	}
 
 	CStatsPredUnsupported *unsupported_pred_stats =
@@ -579,7 +579,7 @@ CFilterStatsProcessor::MakeHistSimpleFilter(IMemoryPool *mp,
 								   filter_colids,
 								   hist_before,
 								   last_scale_factor,
-								   target_last_col_id);
+								   target_last_colid);
 }
 
 // create a new histograms after applying the point filter
@@ -589,7 +589,7 @@ CFilterStatsProcessor::MakeHistPointFilter(IMemoryPool *mp,
 										   CBitSet *filter_colids,
 										   CHistogram *hist_before,
 										   CDouble *last_scale_factor,
-										   ULONG *target_last_col_id)
+										   ULONG *target_last_colid)
 {
 	GPOS_ASSERT(NULL != pred_stats);
 	GPOS_ASSERT(NULL != filter_colids);
@@ -610,7 +610,7 @@ CFilterStatsProcessor::MakeHistPointFilter(IMemoryPool *mp,
 	GPOS_ASSERT(DOUBLE(1.0) <= local_scale_factor.Get());
 
 	*last_scale_factor = *last_scale_factor * local_scale_factor;
-	*target_last_col_id = colid;
+	*target_last_colid = colid;
 
 	return result_histogram;
 }
@@ -623,7 +623,7 @@ CFilterStatsProcessor::MakeHistUnsupportedPred(IMemoryPool *mp,
 											   CBitSet *filter_colids,
 											   CHistogram *hist_before,
 											   CDouble *last_scale_factor,
-											   ULONG *target_last_col_id)
+											   ULONG *target_last_colid)
 {
 	GPOS_ASSERT(NULL != pred_stats);
 	GPOS_ASSERT(NULL != filter_colids);
@@ -639,7 +639,7 @@ CFilterStatsProcessor::MakeHistUnsupportedPred(IMemoryPool *mp,
 	GPOS_ASSERT(NULL != result_histogram);
 
 	*last_scale_factor = *last_scale_factor * pred_stats->ScaleFactor();
-	*target_last_col_id = colid;
+	*target_last_colid = colid;
 
 	return result_histogram;
 }
@@ -651,7 +651,7 @@ CFilterStatsProcessor::MakeHistLikeFilter(IMemoryPool *mp,
 										  CBitSet *filter_colids,
 										  CHistogram *hist_before,
 										  CDouble *last_scale_factor,
-										  ULONG *target_last_col_id)
+										  ULONG *target_last_colid)
 {
 	GPOS_ASSERT(NULL != pred_stats);
 	GPOS_ASSERT(NULL != filter_colids);
@@ -664,16 +664,16 @@ CFilterStatsProcessor::MakeHistLikeFilter(IMemoryPool *mp,
 	CHistogram *result_histogram = hist_before->CopyHistogram(mp);
 
 	*last_scale_factor = *last_scale_factor * pred_stats->DefaultScaleFactor();
-	*target_last_col_id = colid;
+	*target_last_colid = colid;
 
 	return result_histogram;
 }
 
 // check if the column is a new column for statistic calculation
 BOOL
-CFilterStatsProcessor::IsNewStatsColumn(ULONG colid, ULONG last_col_id)
+CFilterStatsProcessor::IsNewStatsColumn(ULONG colid, ULONG last_colid)
 {
-	return (gpos::ulong_max == colid || colid != last_col_id);
+	return (gpos::ulong_max == colid || colid != last_colid);
 }
 
 // EOF

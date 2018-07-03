@@ -113,14 +113,14 @@ CMCVTest::EresUnittest_SortInt4MCVs()
 	col_histogram_mapping->Insert(GPOS_NEW(mp) ULONG(1), phistMCV);
 
 	// column width for int4
-	UlongDoubleHashMap *col_id_width_mapping = GPOS_NEW(mp) UlongDoubleHashMap(mp);
-	col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(1), GPOS_NEW(mp) CDouble(4.0));
+	UlongDoubleHashMap *colid_width_mapping = GPOS_NEW(mp) UlongDoubleHashMap(mp);
+	colid_width_mapping->Insert(GPOS_NEW(mp) ULONG(1), GPOS_NEW(mp) CDouble(4.0));
 
 	CStatistics *stats = GPOS_NEW(mp) CStatistics
 									(
 									mp,
 									col_histogram_mapping,
-									col_id_width_mapping,
+									colid_width_mapping,
 									1000.0 /* rows */,
 									false /* is_empty */
 									);
@@ -234,15 +234,15 @@ CMCVTest::EresUnittest_MergeHistMCV()
 		col_histogram_mapping->Insert(GPOS_NEW(mp) ULONG(colid), phistMerged);
 
 		// column width for int4
-		UlongDoubleHashMap *col_id_width_mapping = GPOS_NEW(mp) UlongDoubleHashMap(mp);
+		UlongDoubleHashMap *colid_width_mapping = GPOS_NEW(mp) UlongDoubleHashMap(mp);
 		CDouble width = pdxlstatsdercolMCV->Width();
-		col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid), GPOS_NEW(mp) CDouble(width));
+		colid_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid), GPOS_NEW(mp) CDouble(width));
 
 		CStatistics *stats = GPOS_NEW(mp) CStatistics
 										(
 										mp,
 										col_histogram_mapping,
-										col_id_width_mapping,
+										colid_width_mapping,
 										pdxlstatsderrelMCV->Rows(),
 										pdxlstatsderrelMCV->IsEmpty()
 										);

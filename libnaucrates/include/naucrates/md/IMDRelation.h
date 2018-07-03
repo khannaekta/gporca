@@ -77,7 +77,7 @@ namespace gpmd
 
 	protected:
 		// serialize an array of column ids into a comma-separated string
-		static CWStringDynamic *ColumnsToStr(IMemoryPool *mp, ULongPtrArray *col_id_array);
+		static CWStringDynamic *ColumnsToStr(IMemoryPool *mp, ULongPtrArray *colid_array);
 
 	public:
 		// object type

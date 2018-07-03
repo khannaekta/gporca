@@ -133,10 +133,10 @@ CJoinCardinalityTest::EresUnittest_JoinNDVRemain()
 	for (ULONG ul2 = 0; ul2 < ulTestCases && (GPOS_FAILED != eres); ul2++)
 	{
 		SStatsJoinNDVRemainTestCase elem = rgjoinndvrtc[ul2];
-		ULONG col_id1 = elem.m_ulCol1;
-		ULONG col_id2 = elem.m_ulCol2;
-		CHistogram *histogram1 = col_histogram_mapping->Find(&col_id1);
-		CHistogram *histogram2 = col_histogram_mapping->Find(&col_id2);
+		ULONG colid1 = elem.m_ulCol1;
+		ULONG colid2 = elem.m_ulCol2;
+		CHistogram *histogram1 = col_histogram_mapping->Find(&colid1);
+		CHistogram *histogram2 = col_histogram_mapping->Find(&colid2);
 
 		CHistogram *join_histogram = histogram1->MakeJoinHistogram(mp, CStatsPred::EstatscmptEq, histogram2);
 
