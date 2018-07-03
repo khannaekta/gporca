@@ -124,14 +124,14 @@ CParseHandlerLogicalConstTable::EndElement(const XMLCh *const,  // element_uri,
 
 		CParseHandlerColDescr *col_descr_parse_handler =
 			dynamic_cast<CParseHandlerColDescr *>((*this)[0]);
-		GPOS_ASSERT(NULL != col_descr_parse_handler->GetColumnDescrDXLArray());
+		GPOS_ASSERT(NULL != col_descr_parse_handler->GetDXLColumnDescrArray());
 
-		ColumnDescrDXLArray *col_descr_dxl_array =
-			col_descr_parse_handler->GetColumnDescrDXLArray();
-		col_descr_dxl_array->AddRef();
+		DXLColumnDescrArray *dxl_col_descr_array =
+			col_descr_parse_handler->GetDXLColumnDescrArray();
+		dxl_col_descr_array->AddRef();
 
 		CDXLLogicalConstTable *lg_const_table_get_dxl_op = GPOS_NEW(m_memory_pool)
-			CDXLLogicalConstTable(m_memory_pool, col_descr_dxl_array, m_const_tuples_datum_array);
+			CDXLLogicalConstTable(m_memory_pool, dxl_col_descr_array, m_const_tuples_datum_array);
 		m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, lg_const_table_get_dxl_op);
 
 #ifdef GPOS_DEBUG

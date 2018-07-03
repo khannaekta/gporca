@@ -130,9 +130,9 @@ CParseHandlerTableDescr::EndElement(const XMLCh *const,  // element_uri,
 	CParseHandlerColDescr *col_descr_parse_handler =
 		dynamic_cast<CParseHandlerColDescr *>((*this)[0]);
 
-	GPOS_ASSERT(NULL != col_descr_parse_handler->GetColumnDescrDXLArray());
+	GPOS_ASSERT(NULL != col_descr_parse_handler->GetDXLColumnDescrArray());
 
-	ColumnDescrDXLArray *column_descr_dxl_array = col_descr_parse_handler->GetColumnDescrDXLArray();
+	DXLColumnDescrArray *column_descr_dxl_array = col_descr_parse_handler->GetDXLColumnDescrArray();
 	column_descr_dxl_array->AddRef();
 	m_table_descr_dxl->SetColumnDescriptors(column_descr_dxl_array);
 

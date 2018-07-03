@@ -5390,7 +5390,7 @@ CTranslatorExprToDXL::PdxlnCTAS
 	GPOS_ASSERT(ulColumns == vartypemod_array->Size());
 
 	// translate col descriptors
-	ColumnDescrDXLArray *col_descr_dxl_array = GPOS_NEW(m_memory_pool) ColumnDescrDXLArray(m_memory_pool);
+	DXLColumnDescrArray *dxl_col_descr_array = GPOS_NEW(m_memory_pool) DXLColumnDescrArray(m_memory_pool);
 	for (ULONG ul = 0; ul < ulColumns; ul++)
 	{
 		const CColumnDescriptor *pcd = ptabdesc->Pcoldesc(ul);
@@ -5415,7 +5415,7 @@ CTranslatorExprToDXL::PdxlnCTAS
 											pcd->Width()
 											);
 
-		col_descr_dxl_array->Append(pdxlcd);
+		dxl_col_descr_array->Append(pdxlcd);
 	}
 
 	ULongPtrArray *pdrgpulDistr = NULL;
@@ -5444,7 +5444,7 @@ CTranslatorExprToDXL::PdxlnCTAS
 									m_memory_pool,
 									mdname_schema,
 									GPOS_NEW(m_memory_pool) CMDName(m_memory_pool, pmdrel->Mdname().GetMDName()),
-									col_descr_dxl_array,
+									dxl_col_descr_array,
 									pmdrel->GetDxlCtasStorageOption(),
 									pmdrel->GetRelDistribution(),
 									pdrgpulDistr,

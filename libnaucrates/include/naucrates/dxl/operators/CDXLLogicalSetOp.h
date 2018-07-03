@@ -53,7 +53,7 @@ namespace gpdxl
 		EdxlSetOpType m_set_operation_dxl_type;
 
 		// list of output column descriptors
-		ColumnDescrDXLArray *m_col_descr_array;
+		DXLColumnDescrArray *m_col_descr_array;
 
 		// array of input colid arrays
 		ULongPtrArray2D *m_input_colids_arrays;
@@ -65,7 +65,7 @@ namespace gpdxl
 		// ctor
 		CDXLLogicalSetOp(IMemoryPool *memory_pool,
 						 EdxlSetOpType edxlsetoptype,
-						 ColumnDescrDXLArray *pdrgdxlcd,
+						 DXLColumnDescrArray *pdrgdxlcd,
 						 ULongPtrArray2D *array_2D,
 						 BOOL fCastAcrossInput);
 
@@ -86,8 +86,8 @@ namespace gpdxl
 		}
 
 		// array of output columns
-		const ColumnDescrDXLArray *
-		GetColumnDescrDXLArray() const
+		const DXLColumnDescrArray *
+		GetDXLColumnDescrArray() const
 		{
 			return m_col_descr_array;
 		}

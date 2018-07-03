@@ -34,7 +34,7 @@ using namespace gpdxl;
 CDXLPhysicalCTAS::CDXLPhysicalCTAS(IMemoryPool *memory_pool,
 								   CMDName *mdname_schema,
 								   CMDName *mdname_rel,
-								   ColumnDescrDXLArray *col_descr_dxl_array,
+								   DXLColumnDescrArray *dxl_col_descr_array,
 								   CDXLCtasStorageOptions *dxl_ctas_opt,
 								   IMDRelation::Ereldistrpolicy rel_distr_policy,
 								   ULongPtrArray *distr_column_pos_array,
@@ -46,7 +46,7 @@ CDXLPhysicalCTAS::CDXLPhysicalCTAS(IMemoryPool *memory_pool,
 	: CDXLPhysical(memory_pool),
 	  m_mdname_schema(mdname_schema),
 	  m_mdname_rel(mdname_rel),
-	  m_col_descr_array(col_descr_dxl_array),
+	  m_col_descr_array(dxl_col_descr_array),
 	  m_dxl_ctas_storage_option(dxl_ctas_opt),
 	  m_rel_distr_policy(rel_distr_policy),
 	  m_distr_column_pos_array(distr_column_pos_array),
@@ -57,12 +57,12 @@ CDXLPhysicalCTAS::CDXLPhysicalCTAS(IMemoryPool *memory_pool,
 	  m_vartypemod_array(vartypemod_array)
 {
 	GPOS_ASSERT(NULL != mdname_rel);
-	GPOS_ASSERT(NULL != col_descr_dxl_array);
+	GPOS_ASSERT(NULL != dxl_col_descr_array);
 	GPOS_ASSERT(NULL != dxl_ctas_opt);
 	GPOS_ASSERT_IFF(IMDRelation::EreldistrHash == rel_distr_policy, NULL != distr_column_pos_array);
 	GPOS_ASSERT(NULL != src_colids_array);
 	GPOS_ASSERT(NULL != vartypemod_array);
-	GPOS_ASSERT(col_descr_dxl_array->Size() == vartypemod_array->Size());
+	GPOS_ASSERT(dxl_col_descr_array->Size() == vartypemod_array->Size());
 	GPOS_ASSERT(IMDRelation::ErelstorageSentinel > rel_storage_type);
 	GPOS_ASSERT(IMDRelation::EreldistrSentinel > rel_distr_policy);
 }

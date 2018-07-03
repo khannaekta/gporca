@@ -30,12 +30,12 @@ CDXLLogicalTVF::CDXLLogicalTVF(IMemoryPool *memory_pool,
 							   IMDId *mdid_func,
 							   IMDId *mdid_return_type,
 							   CMDName *mdname,
-							   ColumnDescrDXLArray *pdrgdxlcd)
+							   DXLColumnDescrArray *pdrgdxlcd)
 	: CDXLLogical(memory_pool),
 	  m_func_mdid(mdid_func),
 	  m_return_type_mdid(mdid_return_type),
 	  m_mdname(mdname),
-	  m_col_descr_dxl_array(pdrgdxlcd)
+	  m_dxl_col_descr_array(pdrgdxlcd)
 {
 	GPOS_ASSERT(m_func_mdid->IsValid());
 	GPOS_ASSERT(m_return_type_mdid->IsValid());
@@ -51,7 +51,7 @@ CDXLLogicalTVF::CDXLLogicalTVF(IMemoryPool *memory_pool,
 //---------------------------------------------------------------------------
 CDXLLogicalTVF::~CDXLLogicalTVF()
 {
-	m_col_descr_dxl_array->Release();
+	m_dxl_col_descr_array->Release();
 	m_func_mdid->Release();
 	m_return_type_mdid->Release();
 	GPOS_DELETE(m_mdname);
@@ -96,7 +96,7 @@ CDXLLogicalTVF::GetOpNameStr() const
 ULONG
 CDXLLogicalTVF::Arity() const
 {
-	return m_col_descr_dxl_array->Size();
+	return m_dxl_col_descr_array->Size();
 }
 
 //---------------------------------------------------------------------------
@@ -110,7 +110,7 @@ CDXLLogicalTVF::Arity() const
 const CDXLColDescr *
 CDXLLogicalTVF::GetColumnDescrAt(ULONG ul) const
 {
-	return (*m_col_descr_dxl_array)[ul];
+	return (*m_dxl_col_descr_array)[ul];
 }
 
 //---------------------------------------------------------------------------
@@ -157,11 +157,11 @@ CDXLLogicalTVF::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *d
 	// serialize columns
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
 								CDXLTokens::GetDXLTokenStr(EdxltokenColumns));
-	GPOS_ASSERT(NULL != m_col_descr_dxl_array);
+	GPOS_ASSERT(NULL != m_dxl_col_descr_array);
 
 	for (ULONG ul = 0; ul < Arity(); ul++)
 	{
-		CDXLColDescr *pdxlcd = (*m_col_descr_dxl_array)[ul];
+		CDXLColDescr *pdxlcd = (*m_dxl_col_descr_array)[ul];
 		pdxlcd->SerializeToDXL(xml_serializer);
 	}
 

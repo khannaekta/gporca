@@ -204,13 +204,13 @@ CParseHandlerPhysicalCTAS::EndElement(const XMLCh *const,  // element_uri,
 		dynamic_cast<CParseHandlerPhysicalOp *>((*this)[4]);
 
 	GPOS_ASSERT(NULL != prop_parse_handler->GetProperties());
-	GPOS_ASSERT(NULL != col_descr_parse_handler->GetColumnDescrDXLArray());
+	GPOS_ASSERT(NULL != col_descr_parse_handler->GetDXLColumnDescrArray());
 	GPOS_ASSERT(NULL != ctas_options_parse_handler->GetDxlCtasStorageOption());
 	GPOS_ASSERT(NULL != proj_list_parse_handler->CreateDXLNode());
 	GPOS_ASSERT(NULL != child_parse_handler->CreateDXLNode());
 
-	ColumnDescrDXLArray *col_descr_dxl_array = col_descr_parse_handler->GetColumnDescrDXLArray();
-	col_descr_dxl_array->AddRef();
+	DXLColumnDescrArray *dxl_col_descr_array = col_descr_parse_handler->GetDXLColumnDescrArray();
+	dxl_col_descr_array->AddRef();
 
 	CDXLCtasStorageOptions *ctas_options = ctas_options_parse_handler->GetDxlCtasStorageOption();
 	ctas_options->AddRef();
@@ -220,7 +220,7 @@ CParseHandlerPhysicalCTAS::EndElement(const XMLCh *const,  // element_uri,
 				 GPOS_NEW(m_memory_pool) CDXLPhysicalCTAS(m_memory_pool,
 														  m_mdname_schema,
 														  m_mdname,
-														  col_descr_dxl_array,
+														  dxl_col_descr_array,
 														  ctas_options,
 														  m_rel_distr_policy,
 														  m_distr_column_pos_array,

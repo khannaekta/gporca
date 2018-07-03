@@ -39,7 +39,7 @@ CDXLTableDescr::CDXLTableDescr(IMemoryPool *memory_pool,
 	  m_execute_as_user_id(ulExecuteAsUser)
 {
 	GPOS_ASSERT(NULL != m_mdname);
-	m_column_descr_dxl_array = GPOS_NEW(memory_pool) ColumnDescrDXLArray(memory_pool);
+	m_column_descr_dxl_array = GPOS_NEW(memory_pool) DXLColumnDescrArray(memory_pool);
 }
 
 
@@ -124,7 +124,7 @@ CDXLTableDescr::GetExecuteAsUserId() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLTableDescr::SetColumnDescriptors(ColumnDescrDXLArray *column_descr_dxl_array)
+CDXLTableDescr::SetColumnDescriptors(DXLColumnDescrArray *column_descr_dxl_array)
 {
 	CRefCount::SafeRelease(m_column_descr_dxl_array);
 	m_column_descr_dxl_array = column_descr_dxl_array;

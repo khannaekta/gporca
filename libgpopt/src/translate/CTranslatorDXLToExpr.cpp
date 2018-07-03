@@ -514,7 +514,7 @@ CTranslatorDXLToExpr::PexprLogicalTVF
 	}
 
 	// construct the mapping between the DXL ColId and CColRef
-	ConstructDXLColId2ColRefMapping(dxl_op->GetColumnDescrDXLArray(), popTVF->PdrgpcrOutput());
+	ConstructDXLColId2ColRefMapping(dxl_op->GetDXLColumnDescrArray(), popTVF->PdrgpcrOutput());
 
 	return pexpr;
 }
@@ -1052,15 +1052,15 @@ CTranslatorDXLToExpr::PcrCreate
 DrgPcr *
 CTranslatorDXLToExpr::Pdrgpcr
 	(
-	const ColumnDescrDXLArray *col_descr_dxl_array
+	const DXLColumnDescrArray *dxl_col_descr_array
 	)
 {
-	GPOS_ASSERT(NULL != col_descr_dxl_array);
+	GPOS_ASSERT(NULL != dxl_col_descr_array);
 	DrgPcr *pdrgpcrOutput = GPOS_NEW(m_memory_pool) DrgPcr(m_memory_pool);
-	ULONG ulOutputCols = col_descr_dxl_array->Size();
+	ULONG ulOutputCols = dxl_col_descr_array->Size();
 	for (ULONG ul = 0; ul < ulOutputCols; ul++)
 	{
-		CDXLColDescr *pdxlcd = (*col_descr_dxl_array)[ul];
+		CDXLColDescr *pdxlcd = (*dxl_col_descr_array)[ul];
 		IMDId *mdid = pdxlcd->MDIdType();
 		const IMDType *pmdtype = m_pmda->RetrieveType(mdid);
 
@@ -1084,14 +1084,14 @@ CTranslatorDXLToExpr::Pdrgpcr
 void
 CTranslatorDXLToExpr::ConstructDXLColId2ColRefMapping
 	(
-	const ColumnDescrDXLArray *col_descr_dxl_array,
+	const DXLColumnDescrArray *dxl_col_descr_array,
 	const DrgPcr *colref_array
 	)
 {
-	GPOS_ASSERT(NULL != col_descr_dxl_array);
+	GPOS_ASSERT(NULL != dxl_col_descr_array);
 	GPOS_ASSERT(NULL != colref_array);
 
-	const ULONG ulColumns = col_descr_dxl_array->Size();
+	const ULONG ulColumns = dxl_col_descr_array->Size();
 	GPOS_ASSERT(colref_array->Size() == ulColumns);
 
 	// construct the mapping between the DXL ColId and CColRef
@@ -1100,7 +1100,7 @@ CTranslatorDXLToExpr::ConstructDXLColId2ColRefMapping
 		CColRef *colref = (*colref_array)[ul];
 		GPOS_ASSERT(NULL != colref);
 
-		const CDXLColDescr *pdxlcd = (*col_descr_dxl_array)[ul];
+		const CDXLColDescr *pdxlcd = (*dxl_col_descr_array)[ul];
 		GPOS_ASSERT(NULL != pdxlcd && !pdxlcd->IsDropped());
 
 		// copy key
@@ -2193,11 +2193,11 @@ CTranslatorDXLToExpr::RegisterMDRelationCtas
 	pdxlopCTAS->GetDxlCtasStorageOption()->AddRef();
 	
 	MDColumnPtrArray *mdcol_array = GPOS_NEW(m_memory_pool) MDColumnPtrArray(m_memory_pool);
-	ColumnDescrDXLArray *col_descr_dxl_array = pdxlopCTAS->GetColumnDescrDXLArray();
-	const ULONG length = col_descr_dxl_array->Size();
+	DXLColumnDescrArray *dxl_col_descr_array = pdxlopCTAS->GetDXLColumnDescrArray();
+	const ULONG length = dxl_col_descr_array->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CDXLColDescr *pdxlcd = (*col_descr_dxl_array)[ul];
+		CDXLColDescr *pdxlcd = (*dxl_col_descr_array)[ul];
 		pdxlcd->MDIdType()->AddRef();
 		
 		CMDColumn *pmdcol = GPOS_NEW(m_memory_pool) CMDColumn
@@ -2307,8 +2307,8 @@ CTranslatorDXLToExpr::PtabdescFromCTAS
 						);
 
 	// populate column information from the dxl table descriptor
-	ColumnDescrDXLArray *col_descr_dxl_array = pdxlopCTAS->GetColumnDescrDXLArray();
-	const ULONG ulColumns = col_descr_dxl_array->Size();
+	DXLColumnDescrArray *dxl_col_descr_array = pdxlopCTAS->GetDXLColumnDescrArray();
+	const ULONG ulColumns = dxl_col_descr_array->Size();
 	for (ULONG ul = 0; ul < ulColumns; ul++)
 	{
 		BOOL is_nullable = false;
@@ -2317,7 +2317,7 @@ CTranslatorDXLToExpr::PtabdescFromCTAS
 			is_nullable = pmdrel->GetMdCol(ul)->IsNullable();
 		}
 
-		const CDXLColDescr *pdxlcoldesc = (*col_descr_dxl_array)[ul];
+		const CDXLColDescr *pdxlcoldesc = (*dxl_col_descr_array)[ul];
 
 		GPOS_ASSERT(pdxlcoldesc->MDIdType()->IsValid());
 		const IMDType *pmdtype = m_pmda->RetrieveType(pdxlcoldesc->MDIdType());
@@ -2406,15 +2406,15 @@ CTranslatorDXLToExpr::PexprLogicalConstTableGet
 {
 	CDXLLogicalConstTable *pdxlopConstTable = CDXLLogicalConstTable::Cast(pdxlnConstTable->GetOperator());
 
-	const ColumnDescrDXLArray *col_descr_dxl_array = pdxlopConstTable->GetColumnDescrDXLArray();
+	const DXLColumnDescrArray *dxl_col_descr_array = pdxlopConstTable->GetDXLColumnDescrArray();
 
 	// translate the column descriptors
 	DrgPcoldesc *pdrgpcoldesc = GPOS_NEW(m_memory_pool) DrgPcoldesc(m_memory_pool);
-	const ULONG ulColumns = col_descr_dxl_array->Size();
+	const ULONG ulColumns = dxl_col_descr_array->Size();
 
 	for (ULONG ulColIdx = 0; ulColIdx < ulColumns; ulColIdx++)
 	{
-		CDXLColDescr *pdxlcd = (*col_descr_dxl_array)[ulColIdx];
+		CDXLColDescr *pdxlcd = (*dxl_col_descr_array)[ulColIdx];
 		const IMDType *pmdtype = m_pmda->RetrieveType(pdxlcd->MDIdType());
 		CName name(m_memory_pool, pdxlcd->MdName()->GetMDName());
 
@@ -2452,7 +2452,7 @@ CTranslatorDXLToExpr::PexprLogicalConstTableGet
 															);
 
 	// construct the mapping between the DXL ColId and CColRef
-	ConstructDXLColId2ColRefMapping(pdxlopConstTable->GetColumnDescrDXLArray(), popConstTableGet->PdrgpcrOutput());
+	ConstructDXLColId2ColRefMapping(pdxlopConstTable->GetDXLColumnDescrArray(), popConstTableGet->PdrgpcrOutput());
 
 	return GPOS_NEW(m_memory_pool) CExpression(m_memory_pool, popConstTableGet);
 }
