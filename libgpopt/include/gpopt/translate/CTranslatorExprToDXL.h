@@ -276,7 +276,7 @@ namespace gpopt
 				DrgPds *pdrgpdsBaseTables, 
 				ULONG *pulNonGatherMotions,
 				BOOL *pfDML,
-				EdxlAggStrategy agg_strategy_dxl,
+				EdxlAggStrategy dxl_agg_strategy,
 				const ColRefArray *pdrgpcrGroupingCols,
 				CColRefSet *pcrsKeys
 				);

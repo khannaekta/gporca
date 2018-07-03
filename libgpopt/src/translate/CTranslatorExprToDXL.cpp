@@ -2255,26 +2255,26 @@ CTranslatorExprToDXL::PdxlnAggregate
 				COperator::EopPhysicalHashAgg == op_id ||
 				COperator::EopPhysicalScalarAgg == op_id);
 
-	EdxlAggStrategy agg_strategy_dxl = EdxlaggstrategySentinel;
+	EdxlAggStrategy dxl_agg_strategy = EdxlaggstrategySentinel;
 
 	switch (op_id)
 	{
 		case COperator::EopPhysicalStreamAgg:
 						{
 							popAgg = CPhysicalStreamAgg::PopConvert(pexprAgg->Pop());
-							agg_strategy_dxl = EdxlaggstrategySorted;
+							dxl_agg_strategy = EdxlaggstrategySorted;
 							break;
 						}
 		case COperator::EopPhysicalHashAgg:
 						{
 							popAgg = CPhysicalHashAgg::PopConvert(pexprAgg->Pop());
-							agg_strategy_dxl = EdxlaggstrategyHashed;
+							dxl_agg_strategy = EdxlaggstrategyHashed;
 							break;
 						}
 		case COperator::EopPhysicalScalarAgg:
 						{
 							popAgg = CPhysicalScalarAgg::PopConvert(pexprAgg->Pop());
-							agg_strategy_dxl = EdxlaggstrategyPlain;
+							dxl_agg_strategy = EdxlaggstrategyPlain;
 							break;
 						}
 		default:
@@ -2292,7 +2292,7 @@ CTranslatorExprToDXL::PdxlnAggregate
 			pdrgpdsBaseTables, 
 			pulNonGatherMotions,
 			pfDML,
-			agg_strategy_dxl,
+			dxl_agg_strategy,
 			pdrgpcrGroupingCols,
 			NULL /*pcrsKeys*/
 			);
@@ -2322,7 +2322,7 @@ CTranslatorExprToDXL::PdxlnAggregateDedup
 	GPOS_ASSERT(COperator::EopPhysicalStreamAggDeduplicate == op_id ||
 				COperator::EopPhysicalHashAggDeduplicate == op_id);
 
-	EdxlAggStrategy agg_strategy_dxl = EdxlaggstrategySentinel;
+	EdxlAggStrategy dxl_agg_strategy = EdxlaggstrategySentinel;
 	const ColRefArray *pdrgpcrGroupingCols = NULL;
 	CColRefSet *pcrsKeys = GPOS_NEW(m_mp) CColRefSet(m_mp);
 
@@ -2331,14 +2331,14 @@ CTranslatorExprToDXL::PdxlnAggregateDedup
 		CPhysicalStreamAggDeduplicate *popAggDedup = CPhysicalStreamAggDeduplicate::PopConvert(pexprAgg->Pop());
 		pcrsKeys->Include(popAggDedup->PdrgpcrKeys());
 		pdrgpcrGroupingCols = popAggDedup->PdrgpcrGroupingCols();
-		agg_strategy_dxl = EdxlaggstrategySorted;
+		dxl_agg_strategy = EdxlaggstrategySorted;
 	}
 	else
 	{
 		CPhysicalHashAggDeduplicate *popAggDedup = CPhysicalHashAggDeduplicate::PopConvert(pexprAgg->Pop());
 		pcrsKeys->Include(popAggDedup->PdrgpcrKeys());
 		pdrgpcrGroupingCols = popAggDedup->PdrgpcrGroupingCols();
-		agg_strategy_dxl = EdxlaggstrategyHashed;
+		dxl_agg_strategy = EdxlaggstrategyHashed;
 	}
 
 	CDXLNode *pdxlnAgg = PdxlnAggregate
@@ -2348,7 +2348,7 @@ CTranslatorExprToDXL::PdxlnAggregateDedup
 							pdrgpdsBaseTables, 
 							pulNonGatherMotions,
 							pfDML,
-							agg_strategy_dxl,
+							dxl_agg_strategy,
 							pdrgpcrGroupingCols,
 							pcrsKeys
 							);
@@ -2373,7 +2373,7 @@ CTranslatorExprToDXL::PdxlnAggregate
 	DrgPds *pdrgpdsBaseTables, 
 	ULONG *pulNonGatherMotions,
 	BOOL *pfDML,
-	EdxlAggStrategy agg_strategy_dxl,
+	EdxlAggStrategy dxl_agg_strategy,
 	const ColRefArray *pdrgpcrGroupingCols,
 	CColRefSet *pcrsKeys
 	)
@@ -2468,7 +2468,7 @@ CTranslatorExprToDXL::PdxlnAggregate
 	
 	phmululPL->Release();
 
-	CDXLPhysicalAgg *pdxlopAgg = GPOS_NEW(m_mp) CDXLPhysicalAgg(m_mp, agg_strategy_dxl, stream_safe);
+	CDXLPhysicalAgg *pdxlopAgg = GPOS_NEW(m_mp) CDXLPhysicalAgg(m_mp, dxl_agg_strategy, stream_safe);
 	pdxlopAgg->SetGroupingCols(pdrgpulGroupingCols);
 
 	CDXLNode *pdxlnAgg = GPOS_NEW(m_mp) CDXLNode(m_mp, pdxlopAgg);
