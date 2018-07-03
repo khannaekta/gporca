@@ -1743,7 +1743,7 @@ CTranslatorExprToDXL::PdxlnCTEProducer
 
 	// extract the CTE id and the array of colids
 	const ULONG ulCTEId = popCTEProducer->UlCTEId();
-	ULongPtrArray *col_ids = CUtils::Pdrgpul(m_mp, popCTEProducer->Pdrgpcr());
+	ULongPtrArray *colids = CUtils::Pdrgpul(m_mp, popCTEProducer->Pdrgpcr());
 
 	GPOS_ASSERT(NULL != pexprCTEProducer->Prpp());
 	ColRefArray *pdrgpcrRequired = popCTEProducer->Pdrgpcr();
@@ -1759,7 +1759,7 @@ CTranslatorExprToDXL::PdxlnCTEProducer
 	CDXLNode *pdxlnCTEProducer = GPOS_NEW(m_mp) CDXLNode
 										(
 										m_mp,
-										GPOS_NEW(m_mp) CDXLPhysicalCTEProducer(m_mp, ulCTEId, col_ids),
+										GPOS_NEW(m_mp) CDXLPhysicalCTEProducer(m_mp, ulCTEId, colids),
 										pdxlnPrL,
 										child_dxlnode
 										);
@@ -1798,7 +1798,7 @@ CTranslatorExprToDXL::PdxlnCTEConsumer
 	// extract the CTE id and the array of colids
 	const ULONG ulCTEId = popCTEConsumer->UlCTEId();
 	ColRefArray *colref_array = popCTEConsumer->Pdrgpcr();
-	ULongPtrArray *col_ids = CUtils::Pdrgpul(m_mp, colref_array);
+	ULongPtrArray *colids = CUtils::Pdrgpul(m_mp, colref_array);
 
 	CColRefSet *pcrsOutput = GPOS_NEW(m_mp) CColRefSet(m_mp);
 	pcrsOutput->Include(colref_array);
@@ -1809,7 +1809,7 @@ CTranslatorExprToDXL::PdxlnCTEConsumer
 	CDXLNode *pdxlnCTEConsumer = GPOS_NEW(m_mp) CDXLNode
 										(
 										m_mp,
-										GPOS_NEW(m_mp) CDXLPhysicalCTEConsumer(m_mp, ulCTEId, col_ids),
+										GPOS_NEW(m_mp) CDXLPhysicalCTEConsumer(m_mp, ulCTEId, colids),
 										pdxlnPrL
 										);
 
@@ -5678,20 +5678,20 @@ CTranslatorExprToDXL::PdxlnRowTrigger
 	INT type = popRowTrigger->GetType();
 
 	CColRefSet *pcrsRequired = GPOS_NEW(m_mp) CColRefSet(m_mp);
-	ULongPtrArray *col_ids_old = NULL;
-	ULongPtrArray *col_ids_new = NULL;
+	ULongPtrArray *colids_old = NULL;
+	ULongPtrArray *colids_new = NULL;
 
 	ColRefArray *pdrgpcrOld = popRowTrigger->PdrgpcrOld();
 	if (NULL != pdrgpcrOld)
 	{
-		col_ids_old = CUtils::Pdrgpul(m_mp, pdrgpcrOld);
+		colids_old = CUtils::Pdrgpul(m_mp, pdrgpcrOld);
 		pcrsRequired->Include(pdrgpcrOld);
 	}
 
 	ColRefArray *pdrgpcrNew = popRowTrigger->PdrgpcrNew();
 	if (NULL != pdrgpcrNew)
 	{
-		col_ids_new = CUtils::Pdrgpul(m_mp, pdrgpcrNew);
+		colids_new = CUtils::Pdrgpul(m_mp, pdrgpcrNew);
 		pcrsRequired->Include(pdrgpcrNew);
 	}
 
@@ -5705,8 +5705,8 @@ CTranslatorExprToDXL::PdxlnRowTrigger
 													m_mp,
 													rel_mdid,
 													type,
-													col_ids_old,
-													col_ids_new
+													colids_old,
+													colids_new
 													);
 
 	// project list
@@ -6732,7 +6732,7 @@ CTranslatorExprToDXL::PdxlnWindow
 
 	CPhysicalSequenceProject *popSeqPrj = CPhysicalSequenceProject::PopConvert(pexprSeqPrj->Pop());
 	CDistributionSpec *pds = popSeqPrj->Pds();
-	ULongPtrArray *col_ids = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
+	ULongPtrArray *colids = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 	ExpressionArray *pdrgpexprPartCol = NULL;
 	if (CDistributionSpec::EdtHashed == pds->Edt())
 	{
@@ -6743,7 +6743,7 @@ CTranslatorExprToDXL::PdxlnWindow
 		{
 			CExpression *pexpr = (*pdrgpexprPartCol)[ul];
 			CScalarIdent *popScId = CScalarIdent::PopConvert(pexpr->Pop());
-			col_ids->Append(GPOS_NEW(m_mp) ULONG(popScId->Pcr()->Id()));
+			colids->Append(GPOS_NEW(m_mp) ULONG(popScId->Pcr()->Id()));
 		}
 	}
 
@@ -6804,7 +6804,7 @@ CTranslatorExprToDXL::PdxlnWindow
 	CDXLNode *filter_dxlnode = PdxlnFilter(NULL /* pdxlnCond */);
 
 	// construct a Window node	
-	CDXLPhysicalWindow *pdxlopWindow = GPOS_NEW(m_mp) CDXLPhysicalWindow(m_mp, col_ids, pdrgpdxlwk);
+	CDXLPhysicalWindow *pdxlopWindow = GPOS_NEW(m_mp) CDXLPhysicalWindow(m_mp, colids, pdrgpdxlwk);
 	CDXLNode *pdxlnWindow = GPOS_NEW(m_mp) CDXLNode(m_mp, pdxlopWindow);
 	pdxlnWindow->SetProperties(dxl_properties);
 
@@ -7261,15 +7261,15 @@ CTranslatorExprToDXL::GetProperties
 	CDouble width = CStatistics::DefaultColumnWidth;
 	CReqdPropPlan *prpp = pexpr->Prpp();
 	CColRefSet *pcrs = prpp->PcrsRequired();
-	ULongPtrArray *col_ids = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
-	pcrs->ExtractColIds(m_mp, col_ids);
+	ULongPtrArray *colids = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
+	pcrs->ExtractColIds(m_mp, colids);
 	CWStringDynamic *width_str = GPOS_NEW(m_mp) CWStringDynamic(m_mp);
 
 	if (NULL != stats)
 	{
-		width = stats->Width(col_ids);
+		width = stats->Width(colids);
 	}
-	col_ids->Release();
+	colids->Release();
 	width_str->AppendFormat(GPOS_WSZ_LIT("%lld"), (LINT) width.Get());
 
 	// get the cost from expression node

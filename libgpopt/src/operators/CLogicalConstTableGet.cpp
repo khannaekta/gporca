@@ -351,20 +351,20 @@ CLogicalConstTableGet::PstatsDerive
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 	CReqdPropRelational *prprel = CReqdPropRelational::GetReqdRelationalProps(exprhdl.Prp());
 	CColRefSet *pcrs = prprel->PcrsStat();
-	ULongPtrArray *col_ids = GPOS_NEW(mp) ULongPtrArray(mp);
-	pcrs->ExtractColIds(mp, col_ids);
+	ULongPtrArray *colids = GPOS_NEW(mp) ULongPtrArray(mp);
+	pcrs->ExtractColIds(mp, colids);
 	ULongPtrArray *pdrgpulColWidth = CUtils::Pdrgpul(mp, m_pdrgpcrOutput);
 
 	IStatistics *stats = CStatistics::MakeDummyStats
 										(
 										mp,
-										col_ids,
+										colids,
 										pdrgpulColWidth,
 										m_pdrgpdrgpdatum->Size()
 										);
 
 	// clean up
-	col_ids->Release();
+	colids->Release();
 	pdrgpulColWidth->Release();
 
 	return stats;

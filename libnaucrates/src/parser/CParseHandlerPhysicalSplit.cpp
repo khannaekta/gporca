@@ -67,19 +67,19 @@ CParseHandlerPhysicalSplit::StartElement(const XMLCh *const,  // element_uri,
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
-	const XMLCh *delete_col_ids =
+	const XMLCh *delete_colids =
 		CDXLOperatorFactory::ExtractAttrValue(attrs, EdxltokenDeleteCols, EdxltokenPhysicalSplit);
 	m_deletion_colid_array =
 		CDXLOperatorFactory::ExtractIntsToUlongArray(m_parse_handler_mgr->GetDXLMemoryManager(),
-													 delete_col_ids,
+													 delete_colids,
 													 EdxltokenDeleteCols,
 													 EdxltokenPhysicalSplit);
 
-	const XMLCh *insert_col_ids =
+	const XMLCh *insert_colids =
 		CDXLOperatorFactory::ExtractAttrValue(attrs, EdxltokenInsertCols, EdxltokenPhysicalSplit);
 	m_insert_colid_array =
 		CDXLOperatorFactory::ExtractIntsToUlongArray(m_parse_handler_mgr->GetDXLMemoryManager(),
-													 insert_col_ids,
+													 insert_colids,
 													 EdxltokenInsertCols,
 													 EdxltokenPhysicalSplit);
 

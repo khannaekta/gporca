@@ -475,14 +475,14 @@ CStatisticsTest::EresUnittest_CStatisticsBasic()
 	CCardinalityTestUtils::PrintStats(mp, pstats5);
 
 	// union all
-	ULongPtrArray *col_ids = GPOS_NEW(mp) ULongPtrArray(mp);
-	col_ids->Append(GPOS_NEW(mp) ULONG(1));
-	col_ids->Append(GPOS_NEW(mp) ULONG(2));
-	col_ids->AddRef();
-	col_ids->AddRef();
-	col_ids->AddRef();
+	ULongPtrArray *colids = GPOS_NEW(mp) ULongPtrArray(mp);
+	colids->Append(GPOS_NEW(mp) ULONG(1));
+	colids->Append(GPOS_NEW(mp) ULONG(2));
+	colids->AddRef();
+	colids->AddRef();
+	colids->AddRef();
 
-	CStatistics *pstats6 = CUnionAllStatsProcessor::CreateStatsForUnionAll(mp, stats, stats, col_ids, col_ids, col_ids);
+	CStatistics *pstats6 = CUnionAllStatsProcessor::CreateStatsForUnionAll(mp, stats, stats, colids, colids, colids);
 
 	GPOS_TRACE(GPOS_WSZ_LIT("pstats6 = pstats1 union all pstats1"));
 	CCardinalityTestUtils::PrintStats(mp, pstats6);
@@ -504,7 +504,7 @@ CStatisticsTest::EresUnittest_CStatisticsBasic()
 	join_preds_stats->Release();
 	GCs->Release();
 	aggs->Release();
-	col_ids->Release();
+	colids->Release();
 	pexprGet->Release();
 
 	return GPOS_OK;

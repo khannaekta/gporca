@@ -28,19 +28,19 @@ using namespace gpdxl;
 CDXLPhysicalRowTrigger::CDXLPhysicalRowTrigger(IMemoryPool *mp,
 											   IMDId *rel_mdid,
 											   INT type,
-											   ULongPtrArray *col_ids_old,
-											   ULongPtrArray *col_ids_new)
+											   ULongPtrArray *colids_old,
+											   ULongPtrArray *colids_new)
 	: CDXLPhysical(mp),
 	  m_rel_mdid(rel_mdid),
 	  m_type(type),
-	  m_col_ids_old(col_ids_old),
-	  m_col_ids_new(col_ids_new)
+	  m_colids_old(colids_old),
+	  m_colids_new(colids_new)
 {
 	GPOS_ASSERT(rel_mdid->IsValid());
 	GPOS_ASSERT(0 != type);
-	GPOS_ASSERT(NULL != col_ids_new || NULL != col_ids_old);
-	GPOS_ASSERT_IMP(NULL != col_ids_new && NULL != col_ids_old,
-					col_ids_new->Size() == col_ids_old->Size());
+	GPOS_ASSERT(NULL != colids_new || NULL != colids_old);
+	GPOS_ASSERT_IMP(NULL != colids_new && NULL != colids_old,
+					colids_new->Size() == colids_old->Size());
 }
 
 //---------------------------------------------------------------------------
@@ -54,8 +54,8 @@ CDXLPhysicalRowTrigger::CDXLPhysicalRowTrigger(IMemoryPool *mp,
 CDXLPhysicalRowTrigger::~CDXLPhysicalRowTrigger()
 {
 	m_rel_mdid->Release();
-	CRefCount::SafeRelease(m_col_ids_old);
-	CRefCount::SafeRelease(m_col_ids_new);
+	CRefCount::SafeRelease(m_colids_old);
+	CRefCount::SafeRelease(m_colids_new);
 }
 
 //---------------------------------------------------------------------------
@@ -103,16 +103,16 @@ CDXLPhysicalRowTrigger::SerializeToDXL(CXMLSerializer *xml_serializer,
 	m_rel_mdid->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenRelationMdid));
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenMDType), m_type);
 
-	if (NULL != m_col_ids_old)
+	if (NULL != m_colids_old)
 	{
-		CWStringDynamic *pstrColsOld = CDXLUtils::Serialize(m_mp, m_col_ids_old);
+		CWStringDynamic *pstrColsOld = CDXLUtils::Serialize(m_mp, m_colids_old);
 		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenOldCols), pstrColsOld);
 		GPOS_DELETE(pstrColsOld);
 	}
 
-	if (NULL != m_col_ids_new)
+	if (NULL != m_colids_new)
 	{
-		CWStringDynamic *pstrColsNew = CDXLUtils::Serialize(m_mp, m_col_ids_new);
+		CWStringDynamic *pstrColsNew = CDXLUtils::Serialize(m_mp, m_colids_new);
 		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenNewCols), pstrColsNew);
 		GPOS_DELETE(pstrColsNew);
 	}

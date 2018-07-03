@@ -126,7 +126,7 @@ namespace gpopt
 			OsPrint(IOstream &os, ULONG ulLenMax = gpos::ulong_max) const;
 
 			// extract all column ids
-			void ExtractColIds(IMemoryPool *mp, ULongPtrArray *col_ids) const;
+			void ExtractColIds(IMemoryPool *mp, ULongPtrArray *colids) const;
 
 			// are the columns in the column reference set covered by the array of column ref sets
 			static

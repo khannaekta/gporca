@@ -594,20 +594,20 @@ CStatisticsUtils::PrintColStats(IMemoryPool *mp,
 //---------------------------------------------------------------------------
 void
 CStatisticsUtils::ExtractUsedColIds(IMemoryPool *mp,
-									CBitSet *col_ids_bitset,
+									CBitSet *colids_bitset,
 									CStatsPred *pred_stats,
-									ULongPtrArray *col_ids)
+									ULongPtrArray *colids)
 {
-	GPOS_ASSERT(NULL != col_ids_bitset);
+	GPOS_ASSERT(NULL != colids_bitset);
 	GPOS_ASSERT(NULL != pred_stats);
-	GPOS_ASSERT(NULL != col_ids);
+	GPOS_ASSERT(NULL != colids);
 
 	if (gpos::ulong_max != pred_stats->GetColId())
 	{
 		// the predicate is on a single column
 
-		(void) col_ids_bitset->ExchangeSet(pred_stats->GetColId());
-		col_ids->Append(GPOS_NEW(mp) ULONG(pred_stats->GetColId()));
+		(void) colids_bitset->ExchangeSet(pred_stats->GetColId());
+		colids->Append(GPOS_NEW(mp) ULONG(pred_stats->GetColId()));
 
 		return;
 	}
@@ -639,17 +639,17 @@ CStatisticsUtils::ExtractUsedColIds(IMemoryPool *mp,
 
 		if (gpos::ulong_max != colid)
 		{
-			if (!col_ids_bitset->Get(colid))
+			if (!colids_bitset->Get(colid))
 			{
-				(void) col_ids_bitset->ExchangeSet(colid);
-				col_ids->Append(GPOS_NEW(mp) ULONG(colid));
+				(void) colids_bitset->ExchangeSet(colid);
+				colids->Append(GPOS_NEW(mp) ULONG(colid));
 			}
 		}
 		else if (CStatsPred::EsptUnsupported != curr_stats_pred->GetPredStatsType())
 		{
 			GPOS_ASSERT(CStatsPred::EsptConj == curr_stats_pred->GetPredStatsType() ||
 						CStatsPred::EsptDisj == curr_stats_pred->GetPredStatsType());
-			ExtractUsedColIds(mp, col_ids_bitset, curr_stats_pred, col_ids);
+			ExtractUsedColIds(mp, colids_bitset, curr_stats_pred, colids);
 		}
 	}
 }
@@ -753,10 +753,10 @@ CStatisticsUtils::GetColsNonUpdatableHistForDisj(IMemoryPool *mp,
 	{
 		CStatsPred *child_pred_stats = pred_stats->GetPredStats(child_index);
 		CBitSet *child_bitset = GPOS_NEW(mp) CBitSet(mp);
-		ULongPtrArray *child_col_ids = GPOS_NEW(mp) ULongPtrArray(mp);
-		ExtractUsedColIds(mp, child_bitset, child_pred_stats, child_col_ids);
+		ULongPtrArray *child_colids = GPOS_NEW(mp) ULongPtrArray(mp);
+		ExtractUsedColIds(mp, child_bitset, child_pred_stats, child_colids);
 
-		const ULONG length = child_col_ids->Size();
+		const ULONG length = child_colids->Size();
 		GPOS_ASSERT(length <= num_disj_used_col);
 		if (length < num_disj_used_col)
 		{
@@ -773,7 +773,7 @@ CStatisticsUtils::GetColsNonUpdatableHistForDisj(IMemoryPool *mp,
 		}
 
 		// clean up
-		child_col_ids->Release();
+		child_colids->Release();
 		child_bitset->Release();
 	}
 
@@ -1258,13 +1258,13 @@ CStatisticsUtils::GetGrpColIdToUpperBoundNDVIdxMap(
 				grp_colid_upper_bound_ndv_idx_map->Find(&upper_bound_ndv_idx);
 			if (NULL == ndv_col_id)
 			{
-				ULongPtrArray *col_ids_new = GPOS_NEW(mp) ULongPtrArray(mp);
-				col_ids_new->Append(GPOS_NEW(mp) ULONG(colid));
+				ULongPtrArray *colids_new = GPOS_NEW(mp) ULongPtrArray(mp);
+				colids_new->Append(GPOS_NEW(mp) ULONG(colid));
 #ifdef GPOS_DEBUG
 				BOOL fres =
 #endif  // GPOS_DEBUG
 					grp_colid_upper_bound_ndv_idx_map->Insert(
-						GPOS_NEW(mp) ULONG(upper_bound_ndv_idx), col_ids_new);
+						GPOS_NEW(mp) ULONG(upper_bound_ndv_idx), colids_new);
 				GPOS_ASSERT(fres);
 			}
 			else

@@ -175,7 +175,7 @@ namespace gpnaucrates
 		virtual CDouble GetSkew(ULONG colid) const;
 
 		// what is the width in bytes of set of column id's
-		virtual CDouble Width(ULongPtrArray *col_ids) const;
+		virtual CDouble Width(ULongPtrArray *colids) const;
 
 		// what is the width in bytes of set of column references
 		virtual CDouble Width(IMemoryPool *mp, CColRefSet *colrefs) const;
@@ -311,11 +311,11 @@ namespace gpnaucrates
 		static CStatistics *
 		MakeEmptyStats(IMemoryPool *mp)
 		{
-			ULongPtrArray *col_ids = GPOS_NEW(mp) ULongPtrArray(mp);
-			CStatistics *stats = MakeDummyStats(mp, col_ids, DefaultRelationRows);
+			ULongPtrArray *colids = GPOS_NEW(mp) ULongPtrArray(mp);
+			CStatistics *stats = MakeDummyStats(mp, colids, DefaultRelationRows);
 
 			// clean up
-			col_ids->Release();
+			colids->Release();
 
 			return stats;
 		}
@@ -330,7 +330,7 @@ namespace gpnaucrates
 
 		// create a dummy statistics object
 		static CStatistics *MakeDummyStats(IMemoryPool *mp,
-										   ULongPtrArray *col_ids,
+										   ULongPtrArray *colids,
 										   CDouble rows);
 
 		// create a dummy statistics object
@@ -362,7 +362,7 @@ namespace gpnaucrates
 		// add upper bound ndvs information for a given set of columns
 		static void CreateAndInsertUpperBoundNDVs(IMemoryPool *mp,
 												  CStatistics *stats,
-												  ULongPtrArray *col_ids,
+												  ULongPtrArray *colids,
 												  CDouble rows);
 
 		// cap the total number of distinct values (NDV) in buckets to the number of rows

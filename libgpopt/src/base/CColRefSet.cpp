@@ -421,7 +421,7 @@ void
 CColRefSet::ExtractColIds
 	(
 	IMemoryPool *mp,
-	ULongPtrArray *col_ids
+	ULongPtrArray *colids
 	)
 	const
 {
@@ -430,7 +430,7 @@ CColRefSet::ExtractColIds
 	{
 		CColRef *colref = crsi.Pcr();
 		ULONG colid = colref->Id();
-		col_ids->Append(GPOS_NEW(mp) ULONG(colid));
+		colids->Append(GPOS_NEW(mp) ULONG(colid));
 	}
 }
 

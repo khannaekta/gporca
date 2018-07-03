@@ -1273,13 +1273,13 @@ CLogical::PstatsDeriveDummy
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 	CReqdPropRelational *prprel = CReqdPropRelational::GetReqdRelationalProps(exprhdl.Prp());
 	CColRefSet *pcrs = prprel->PcrsStat();
-	ULongPtrArray *col_ids = GPOS_NEW(mp) ULongPtrArray(mp);
-	pcrs->ExtractColIds(mp, col_ids);
+	ULongPtrArray *colids = GPOS_NEW(mp) ULongPtrArray(mp);
+	pcrs->ExtractColIds(mp, colids);
 
-	IStatistics *stats = CStatistics::MakeDummyStats(mp, col_ids, rows);
+	IStatistics *stats = CStatistics::MakeDummyStats(mp, colids, rows);
 
 	// clean up
-	col_ids->Release();
+	colids->Release();
 
 	return stats;
 }

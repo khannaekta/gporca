@@ -29,7 +29,7 @@ namespace gpnaucrates
 		// create a new histogram after applying the filter that is not an AND/OR predicate
 		static CHistogram *MakeHistSimpleFilter(IMemoryPool *mp,
 												CStatsPred *pred_stats,
-												CBitSet *filter_col_ids,
+												CBitSet *filter_colids,
 												CHistogram *hist_before,
 												CDouble *last_scale_factor,
 												ULONG *target_last_col_id);
@@ -37,7 +37,7 @@ namespace gpnaucrates
 		// create a new histogram after applying a point filter
 		static CHistogram *MakeHistPointFilter(IMemoryPool *mp,
 											   CStatsPredPoint *pred_stats,
-											   CBitSet *filter_col_ids,
+											   CBitSet *filter_colids,
 											   CHistogram *hist_before,
 											   CDouble *last_scale_factor,
 											   ULONG *target_last_col_id);
@@ -45,7 +45,7 @@ namespace gpnaucrates
 		// create a new histogram after applying a LIKE filter
 		static CHistogram *MakeHistLikeFilter(IMemoryPool *mp,
 											  CStatsPredLike *pred_stats,
-											  CBitSet *filter_col_ids,
+											  CBitSet *filter_colids,
 											  CHistogram *hist_before,
 											  CDouble *last_scale_factor,
 											  ULONG *target_last_col_id);
@@ -53,7 +53,7 @@ namespace gpnaucrates
 		// create a new histogram for an unsupported predicate
 		static CHistogram *MakeHistUnsupportedPred(IMemoryPool *mp,
 												   CStatsPredUnsupported *pred_stats,
-												   CBitSet *filter_col_ids,
+												   CBitSet *filter_colids,
 												   CHistogram *hist_before,
 												   CDouble *last_scale_factor,
 												   ULONG *target_last_col_id);

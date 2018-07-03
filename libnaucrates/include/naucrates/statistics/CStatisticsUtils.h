@@ -166,9 +166,9 @@ namespace gpnaucrates
 
 		// extract all the column identifiers used in the statistics filter
 		static void ExtractUsedColIds(IMemoryPool *mp,
-									  CBitSet *col_ids_bitset,
+									  CBitSet *colids_bitset,
 									  CStatsPred *pred_stats,
-									  ULongPtrArray *col_ids);
+									  ULongPtrArray *colids);
 
 		// given the previously generated histogram, update the intermediate
 		// result of the disjunction

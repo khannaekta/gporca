@@ -93,7 +93,7 @@ namespace gpopt
 
 			// construct a dynamic array of col refs corresponding to the given col ids
 			static
-			ColRefArray *Pdrgpcr(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, const ULongPtrArray *col_ids);
+			ColRefArray *Pdrgpcr(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, const ULongPtrArray *colids);
 
 			// is the given expression is a scalar function that casts
 			static

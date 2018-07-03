@@ -417,7 +417,7 @@ namespace gpopt
 				(
 				const CDXLNode *dxlnode,
 				ColRefArray *colref_array,
-				ULongPtrArray *col_ids = NULL);
+				ULongPtrArray *colids = NULL);
 
 			// return the array of query output column reference id
 			ULongPtrArray *PdrgpulOutputColRefs();

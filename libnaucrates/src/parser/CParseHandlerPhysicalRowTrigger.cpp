@@ -75,10 +75,10 @@ CParseHandlerPhysicalRowTrigger::StartElement(const XMLCh *const,  // element_ur
 		EdxltokenPhysicalRowTrigger);
 
 	const XMLCh *xmlszOldColIds = attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenOldCols));
-	ULongPtrArray *col_ids_old = NULL;
+	ULongPtrArray *colids_old = NULL;
 	if (NULL != xmlszOldColIds)
 	{
-		col_ids_old =
+		colids_old =
 			CDXLOperatorFactory::ExtractIntsToUlongArray(m_parse_handler_mgr->GetDXLMemoryManager(),
 														 xmlszOldColIds,
 														 EdxltokenOldCols,
@@ -86,10 +86,10 @@ CParseHandlerPhysicalRowTrigger::StartElement(const XMLCh *const,  // element_ur
 	}
 
 	const XMLCh *xmlszNewColIds = attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenNewCols));
-	ULongPtrArray *col_ids_new = NULL;
+	ULongPtrArray *colids_new = NULL;
 	if (NULL != xmlszNewColIds)
 	{
-		col_ids_new =
+		colids_new =
 			CDXLOperatorFactory::ExtractIntsToUlongArray(m_parse_handler_mgr->GetDXLMemoryManager(),
 														 xmlszNewColIds,
 														 EdxltokenNewCols,
@@ -97,7 +97,7 @@ CParseHandlerPhysicalRowTrigger::StartElement(const XMLCh *const,  // element_ur
 	}
 
 	m_dxl_op = GPOS_NEW(m_mp)
-		CDXLPhysicalRowTrigger(m_mp, rel_mdid, type, col_ids_old, col_ids_new);
+		CDXLPhysicalRowTrigger(m_mp, rel_mdid, type, colids_old, colids_new);
 
 	// parse handler for physical operator
 	CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(

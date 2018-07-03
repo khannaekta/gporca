@@ -83,7 +83,7 @@ namespace gpdxl
 						 BOOL is_temporary,
 						 BOOL has_oids,
 						 IMDRelation::Erelstoragetype rel_storage_type,
-						 ULongPtrArray *src_col_ids_array,
+						 ULongPtrArray *src_colids_array,
 						 IntPtrArray *vartypemod_array);
 
 		// dtor

@@ -86,13 +86,13 @@ CLogicalUnary::PstatsDeriveProject
 	IStatistics *child_stats = exprhdl.Pstats(0);
 	CReqdPropRelational *prprel = CReqdPropRelational::GetReqdRelationalProps(exprhdl.Prp());
 	CColRefSet *pcrs = prprel->PcrsStat();
-	ULongPtrArray *col_ids = GPOS_NEW(mp) ULongPtrArray(mp);
-	pcrs->ExtractColIds(mp, col_ids);
+	ULongPtrArray *colids = GPOS_NEW(mp) ULongPtrArray(mp);
+	pcrs->ExtractColIds(mp, colids);
 
-	IStatistics *stats = CProjectStatsProcessor::CalcProjStats(mp, dynamic_cast<CStatistics *>(child_stats), col_ids, phmuldatum);
+	IStatistics *stats = CProjectStatsProcessor::CalcProjStats(mp, dynamic_cast<CStatistics *>(child_stats), colids, phmuldatum);
 
 	// clean up
-	col_ids->Release();
+	colids->Release();
 
 	return stats;
 }
