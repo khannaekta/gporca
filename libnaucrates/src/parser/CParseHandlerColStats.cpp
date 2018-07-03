@@ -188,10 +188,10 @@ CParseHandlerColStats::EndElement(const XMLCh *const,  // element_uri,
 		CParseHandlerColStatsBucket *parse_handler_col_stats_bucket =
 			dynamic_cast<CParseHandlerColStatsBucket *>((*this)[ul]);
 
-		CDXLBucket *bucket_dxl = parse_handler_col_stats_bucket->GetDXLBucketAt();
-		bucket_dxl->AddRef();
+		CDXLBucket *dxl_bucket = parse_handler_col_stats_bucket->GetDXLBucketAt();
+		dxl_bucket->AddRef();
 
-		dxl_stats_bucket_array->Append(bucket_dxl);
+		dxl_stats_bucket_array->Append(dxl_bucket);
 	}
 
 	m_imd_obj = GPOS_NEW(m_mp) CDXLColStats(m_mp,

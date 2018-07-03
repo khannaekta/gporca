@@ -42,7 +42,7 @@ CParseHandlerColStatsBucket::CParseHandlerColStatsBucket(IMemoryPool *mp,
 	  m_upper_bound_dxl_datum(NULL),
 	  m_is_lower_closed(false),
 	  m_is_upper_closed(false),
-	  m_bucket_dxl(NULL)
+	  m_dxl_bucket(NULL)
 {
 }
 
@@ -56,7 +56,7 @@ CParseHandlerColStatsBucket::CParseHandlerColStatsBucket(IMemoryPool *mp,
 //---------------------------------------------------------------------------
 CParseHandlerColStatsBucket::~CParseHandlerColStatsBucket()
 {
-	m_bucket_dxl->Release();
+	m_dxl_bucket->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -70,7 +70,7 @@ CParseHandlerColStatsBucket::~CParseHandlerColStatsBucket()
 CDXLBucket *
 CParseHandlerColStatsBucket::GetDXLBucketAt() const
 {
-	return m_bucket_dxl;
+	return m_dxl_bucket;
 }
 
 //---------------------------------------------------------------------------
@@ -153,7 +153,7 @@ CParseHandlerColStatsBucket::EndElement(const XMLCh *const,  // element_uri,
 	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenColumnStatsBucket),
 									  element_local_name))
 	{
-		m_bucket_dxl = GPOS_NEW(m_mp) CDXLBucket(m_lower_bound_dxl_datum,
+		m_dxl_bucket = GPOS_NEW(m_mp) CDXLBucket(m_lower_bound_dxl_datum,
 														  m_upper_bound_dxl_datum,
 														  m_is_lower_closed,
 														  m_is_upper_closed,

@@ -63,7 +63,7 @@ namespace gpdxl
 		BOOL m_is_upper_closed;
 
 		// dxl bucket object
-		CDXLBucket *m_bucket_dxl;
+		CDXLBucket *m_dxl_bucket;
 
 		// private copy ctor
 		CParseHandlerColStatsBucket(const CParseHandlerColStatsBucket &);
