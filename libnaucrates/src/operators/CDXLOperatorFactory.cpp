@@ -2353,41 +2353,41 @@ CDXLOperatorFactory::GetDatumVal(CDXLMemoryManager *dxl_memory_manager,
 
 	SDXLDatumFactoryElem translators_mapping[] = {
 		// native support
-		{CMDIdGPDB::m_mdid_int2.OidObjectId(), &CDXLOperatorFactory::GetDatumInt2},
-		{CMDIdGPDB::m_mdid_int4.OidObjectId(), &CDXLOperatorFactory::GetDatumInt4},
-		{CMDIdGPDB::m_mdid_int8.OidObjectId(), &CDXLOperatorFactory::GetDatumInt8},
-		{CMDIdGPDB::m_mdid_bool.OidObjectId(), &CDXLOperatorFactory::GetDatumBool},
-		{CMDIdGPDB::m_mdid_oid.OidObjectId(), &CDXLOperatorFactory::GetDatumOid},
+		{CMDIdGPDB::m_mdid_int2.Oid(), &CDXLOperatorFactory::GetDatumInt2},
+		{CMDIdGPDB::m_mdid_int4.Oid(), &CDXLOperatorFactory::GetDatumInt4},
+		{CMDIdGPDB::m_mdid_int8.Oid(), &CDXLOperatorFactory::GetDatumInt8},
+		{CMDIdGPDB::m_mdid_bool.Oid(), &CDXLOperatorFactory::GetDatumBool},
+		{CMDIdGPDB::m_mdid_oid.Oid(), &CDXLOperatorFactory::GetDatumOid},
 		// types with long int mapping
-		{CMDIdGPDB::m_mdid_bpchar.OidObjectId(), &CDXLOperatorFactory::GetDatumStatsLintMappable},
-		{CMDIdGPDB::m_mdid_varchar.OidObjectId(), &CDXLOperatorFactory::GetDatumStatsLintMappable},
-		{CMDIdGPDB::m_mdid_text.OidObjectId(), &CDXLOperatorFactory::GetDatumStatsLintMappable},
-		{CMDIdGPDB::m_mdid_cash.OidObjectId(), &CDXLOperatorFactory::GetDatumStatsLintMappable},
+		{CMDIdGPDB::m_mdid_bpchar.Oid(), &CDXLOperatorFactory::GetDatumStatsLintMappable},
+		{CMDIdGPDB::m_mdid_varchar.Oid(), &CDXLOperatorFactory::GetDatumStatsLintMappable},
+		{CMDIdGPDB::m_mdid_text.Oid(), &CDXLOperatorFactory::GetDatumStatsLintMappable},
+		{CMDIdGPDB::m_mdid_cash.Oid(), &CDXLOperatorFactory::GetDatumStatsLintMappable},
 		// non-integer numeric types
-		{CMDIdGPDB::m_mdid_numeric.OidObjectId(),
+		{CMDIdGPDB::m_mdid_numeric.Oid(),
 		 &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
-		{CMDIdGPDB::m_mdid_float4.OidObjectId(), &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
-		{CMDIdGPDB::m_mdid_float8.OidObjectId(), &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
+		{CMDIdGPDB::m_mdid_float4.Oid(), &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
+		{CMDIdGPDB::m_mdid_float8.Oid(), &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
 		// network-related types
-		{CMDIdGPDB::m_mdid_inet.OidObjectId(), &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
-		{CMDIdGPDB::m_mdid_cidr.OidObjectId(), &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
-		{CMDIdGPDB::m_mdid_macaddr.OidObjectId(),
+		{CMDIdGPDB::m_mdid_inet.Oid(), &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
+		{CMDIdGPDB::m_mdid_cidr.Oid(), &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
+		{CMDIdGPDB::m_mdid_macaddr.Oid(),
 		 &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
 		// time-related types
-		{CMDIdGPDB::m_mdid_date.OidObjectId(), &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
-		{CMDIdGPDB::m_mdid_time.OidObjectId(), &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
-		{CMDIdGPDB::m_mdid_timeTz.OidObjectId(), &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
-		{CMDIdGPDB::m_mdid_timestamp.OidObjectId(),
+		{CMDIdGPDB::m_mdid_date.Oid(), &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
+		{CMDIdGPDB::m_mdid_time.Oid(), &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
+		{CMDIdGPDB::m_mdid_timeTz.Oid(), &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
+		{CMDIdGPDB::m_mdid_timestamp.Oid(),
 		 &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
-		{CMDIdGPDB::m_mdid_timestampTz.OidObjectId(),
+		{CMDIdGPDB::m_mdid_timestampTz.Oid(),
 		 &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
-		{CMDIdGPDB::m_mdid_abs_time.OidObjectId(),
+		{CMDIdGPDB::m_mdid_abs_time.Oid(),
 		 &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
-		{CMDIdGPDB::m_mdid_relative_time.OidObjectId(),
+		{CMDIdGPDB::m_mdid_relative_time.Oid(),
 		 &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
-		{CMDIdGPDB::m_mdid_interval.OidObjectId(),
+		{CMDIdGPDB::m_mdid_interval.Oid(),
 		 &CDXLOperatorFactory::GetDatumStatsDoubleMappable},
-		{CMDIdGPDB::m_mdid_time_interval.OidObjectId(),
+		{CMDIdGPDB::m_mdid_time_interval.Oid(),
 		 &CDXLOperatorFactory::GetDatumStatsDoubleMappable}};
 
 	const ULONG translators_mapping_len = GPOS_ARRAY_SIZE(translators_mapping);
@@ -2396,7 +2396,7 @@ CDXLOperatorFactory::GetDatumVal(CDXLMemoryManager *dxl_memory_manager,
 	for (ULONG ul = 0; ul < translators_mapping_len; ul++)
 	{
 		SDXLDatumFactoryElem elem = translators_mapping[ul];
-		if (gpdb_mdid->OidObjectId() == elem.oid)
+		if (gpdb_mdid->Oid() == elem.oid)
 		{
 			func = elem.pf;
 			break;

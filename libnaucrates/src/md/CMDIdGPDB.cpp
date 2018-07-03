@@ -117,7 +117,7 @@ CMDIdGPDB::CMDIdGPDB(CSystemId sysid, OID oid)
 	  m_minor_version(0),
 	  m_str(m_mdid_array, GPOS_ARRAY_SIZE(m_mdid_array))
 {
-	if (CMDIdGPDB::m_mdid_invalid_key.OidObjectId() == oid)
+	if (CMDIdGPDB::m_mdid_invalid_key.Oid() == oid)
 	{
 		// construct an invalid mdid 0.0.0
 		m_major_version = 0;
@@ -143,7 +143,7 @@ CMDIdGPDB::CMDIdGPDB(OID oid)
 	  m_minor_version(0),
 	  m_str(m_mdid_array, GPOS_ARRAY_SIZE(m_mdid_array))
 {
-	if (CMDIdGPDB::m_mdid_invalid_key.OidObjectId() == oid)
+	if (CMDIdGPDB::m_mdid_invalid_key.Oid() == oid)
 	{
 		// construct an invalid mdid 0.0.0
 		m_major_version = 0;
@@ -186,7 +186,7 @@ CMDIdGPDB::CMDIdGPDB(OID oid, ULONG version_major, ULONG version_minor)
 CMDIdGPDB::CMDIdGPDB(const CMDIdGPDB &mdid_source)
 	: IMDId(),
 	  m_sysid(mdid_source.Sysid()),
-	  m_oid(mdid_source.OidObjectId()),
+	  m_oid(mdid_source.Oid()),
 	  m_major_version(mdid_source.VersionMajor()),
 	  m_minor_version(mdid_source.VersionMinor()),
 	  m_str(m_mdid_array, GPOS_ARRAY_SIZE(m_mdid_array))
@@ -231,14 +231,14 @@ CMDIdGPDB::GetBuffer() const
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CMDIdGPDB::OidObjectId
+//		CMDIdGPDB::Oid
 //
 //	@doc:
 //		Returns the object id
 //
 //---------------------------------------------------------------------------
 OID
-CMDIdGPDB::OidObjectId() const
+CMDIdGPDB::Oid() const
 {
 	return m_oid;
 }
@@ -292,7 +292,7 @@ CMDIdGPDB::Equals(const IMDId *mdid) const
 
 	const CMDIdGPDB *mdidGPDB = CMDIdGPDB::CastMdid(const_cast<IMDId *>(mdid));
 
-	return (m_oid == mdidGPDB->OidObjectId() && m_major_version == mdidGPDB->VersionMajor() &&
+	return (m_oid == mdidGPDB->Oid() && m_major_version == mdidGPDB->VersionMajor() &&
 			m_minor_version == mdidGPDB->VersionMinor());
 }
 
@@ -335,7 +335,7 @@ CMDIdGPDB::Serialize(CXMLSerializer *xml_serializer, const CWStringConst *attrib
 IOstream &
 CMDIdGPDB::OsPrint(IOstream &os) const
 {
-	os << "(" << OidObjectId() << "," << VersionMajor() << "." << VersionMinor() << ")";
+	os << "(" << Oid() << "," << VersionMajor() << "." << VersionMinor() << ")";
 	return os;
 }
 

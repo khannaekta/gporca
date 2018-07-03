@@ -271,7 +271,7 @@ CParseHandlerMDType::IsBuiltInType(const IMDId *mdid) const
 
 	const CMDIdGPDB *mdidGPDB = CMDIdGPDB::CastMdid(mdid);
 
-	switch (mdidGPDB->OidObjectId())
+	switch (mdidGPDB->Oid())
 	{
 		case GPDB_INT2:
 		case GPDB_INT4:
@@ -351,7 +351,7 @@ CParseHandlerMDType::EndElement(const XMLCh *const,  // element_uri,
 
 		const CMDIdGPDB *pmdidGPDB = CMDIdGPDB::CastMdid(m_mdid);
 
-		switch (pmdidGPDB->OidObjectId())
+		switch (pmdidGPDB->Oid())
 		{
 			case GPDB_INT2:
 				m_imd_obj = GPOS_NEW(m_mp) CMDTypeInt2GPDB(m_mp);

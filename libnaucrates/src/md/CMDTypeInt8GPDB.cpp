@@ -65,7 +65,7 @@ CMDTypeInt8GPDB::CMDTypeInt8GPDB(IMemoryPool *mp) : m_mp(mp)
 	m_dxl_str = CDXLUtils::SerializeMDObj(
 		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 
-	GPOS_ASSERT(GPDB_INT8_OID == CMDIdGPDB::CastMdid(m_mdid)->OidObjectId());
+	GPOS_ASSERT(GPDB_INT8_OID == CMDIdGPDB::CastMdid(m_mdid)->Oid());
 	m_mdid->AddRef();
 	m_datum_null =
 		GPOS_NEW(mp) CDatumInt8GPDB(m_mdid, 1 /* m_bytearray_value */, true /* is_null */);

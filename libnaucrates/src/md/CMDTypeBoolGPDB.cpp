@@ -62,7 +62,7 @@ CMDTypeBoolGPDB::CMDTypeBoolGPDB(IMemoryPool *mp) : m_mp(mp)
 
 	m_mdid->AddRef();
 
-	GPOS_ASSERT(GPDB_BOOL_OID == CMDIdGPDB::CastMdid(m_mdid)->OidObjectId());
+	GPOS_ASSERT(GPDB_BOOL_OID == CMDIdGPDB::CastMdid(m_mdid)->Oid());
 	m_datum_null = GPOS_NEW(mp)
 		CDatumBoolGPDB(m_mdid, false /* m_bytearray_value */, true /* is_null */);
 }

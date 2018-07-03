@@ -64,10 +64,10 @@ CMDIdCast::Serialize()
 	// serialize mdid as SystemType.mdidSrc.mdidDest
 	m_str.AppendFormat(GPOS_WSZ_LIT("%d.%d.%d.%d;%d.%d.%d"),
 					   MdidType(),
-					   m_mdid_src->OidObjectId(),
+					   m_mdid_src->Oid(),
 					   m_mdid_src->VersionMajor(),
 					   m_mdid_src->VersionMinor(),
-					   m_mdid_dest->OidObjectId(),
+					   m_mdid_dest->Oid(),
 					   m_mdid_dest->VersionMajor(),
 					   m_mdid_dest->VersionMinor());
 }

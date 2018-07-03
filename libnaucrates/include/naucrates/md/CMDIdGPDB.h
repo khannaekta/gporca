@@ -90,7 +90,7 @@ namespace gpmd
 		}
 
 		// oid
-		virtual OID OidObjectId() const;
+		virtual OID Oid() const;
 
 		// major version
 		virtual ULONG VersionMajor() const;

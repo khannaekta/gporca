@@ -187,7 +187,7 @@ CXformUpdate2DML::Transform
 		// generate a project operator
 		IMDId *pmdidTable = ptabdesc->MDId();
 
-		OID oidTable = CMDIdGPDB::CastMdid(pmdidTable)->OidObjectId();
+		OID oidTable = CMDIdGPDB::CastMdid(pmdidTable)->Oid();
 		CExpression *pexprOid = CUtils::PexprScalarConstOid(mp, oidTable);
 
 		pexprProject = CUtils::PexprAddProjection(mp, pexprAssertConstraints, pexprOid);

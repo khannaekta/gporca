@@ -372,7 +372,7 @@ CMDTypeGenericGPDB::GetDatumVal(IMemoryPool *mp, IDatum *datum) const
 BOOL
 CMDTypeGenericGPDB::IsAmbiguous() const
 {
-	OID oid = CMDIdGPDB::CastMdid(m_mdid)->OidObjectId();
+	OID oid = CMDIdGPDB::CastMdid(m_mdid)->Oid();
 	// This should match the IsPolymorphicType() macro in GPDB's pg_type.h
 	return (GPDB_ANYELEMENT_OID == oid || GPDB_ANYARRAY_OID == oid || GPDB_ANYNONARRAY_OID == oid ||
 			GPDB_ANYENUM_OID == oid);
@@ -400,7 +400,7 @@ CMDTypeGenericGPDB::CreateDXLDatumVal(IMemoryPool *mp,
 	GPOS_ASSERT(IMDId::EmdidGPDB == mdid->MdidType());
 
 	const CMDIdGPDB *const pmdidGPDB = CMDIdGPDB::CastMdid(mdid);
-	switch (pmdidGPDB->OidObjectId())
+	switch (pmdidGPDB->Oid())
 	{
 		// numbers
 		case GPDB_NUMERIC:

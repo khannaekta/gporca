@@ -1275,7 +1275,7 @@ CXformUtils::PexprLogicalDMLOverProject
 		BOOL fGeneratePartOid = CUtils::FGeneratePartOid(ptabdesc->MDId());
 		if (fGeneratePartOid)
 		{
-			OID oidTable = CMDIdGPDB::CastMdid(rel_mdid)->OidObjectId();
+			OID oidTable = CMDIdGPDB::CastMdid(rel_mdid)->Oid();
 			pdrgpexprProjected->Append(CUtils::PexprScalarConstOid(mp, oidTable));
 		}
 

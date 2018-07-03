@@ -44,7 +44,7 @@ CMDIdGPDBCtas::CMDIdGPDBCtas(OID oid)
 //
 //---------------------------------------------------------------------------
 CMDIdGPDBCtas::CMDIdGPDBCtas(const CMDIdGPDBCtas &mdid_source)
-	: CMDIdGPDB(mdid_source.Sysid(), mdid_source.OidObjectId())
+	: CMDIdGPDB(mdid_source.Sysid(), mdid_source.Oid())
 {
 	GPOS_ASSERT(mdid_source.IsValid());
 	GPOS_ASSERT(IMDId::EmdidGPDBCtas == mdid_source.MdidType());
@@ -70,7 +70,7 @@ CMDIdGPDBCtas::Equals(const IMDId *mdid) const
 
 	const CMDIdGPDBCtas *mdidGPDBCTAS = CMDIdGPDBCtas::CastMdid(const_cast<IMDId *>(mdid));
 
-	return m_oid == mdidGPDBCTAS->OidObjectId();
+	return m_oid == mdidGPDBCTAS->Oid();
 }
 
 //---------------------------------------------------------------------------
@@ -98,7 +98,7 @@ CMDIdGPDBCtas::IsValid() const
 IOstream &
 CMDIdGPDBCtas::OsPrint(IOstream &os) const
 {
-	os << "(" << OidObjectId() << "," << VersionMajor() << "." << VersionMinor() << ")";
+	os << "(" << Oid() << "," << VersionMajor() << "." << VersionMinor() << ")";
 	return os;
 }
 

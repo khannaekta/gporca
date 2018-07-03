@@ -59,7 +59,7 @@ CMDTypeOidGPDB::CMDTypeOidGPDB(IMemoryPool *mp) : m_mp(mp)
 	m_dxl_str = CDXLUtils::SerializeMDObj(
 		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 
-	GPOS_ASSERT(GPDB_OID_OID == CMDIdGPDB::CastMdid(m_mdid)->OidObjectId());
+	GPOS_ASSERT(GPDB_OID_OID == CMDIdGPDB::CastMdid(m_mdid)->Oid());
 	m_mdid->AddRef();
 	m_datum_null =
 		GPOS_NEW(mp) CDatumOidGPDB(m_mdid, 1 /* m_bytearray_value */, true /* is_null */);
