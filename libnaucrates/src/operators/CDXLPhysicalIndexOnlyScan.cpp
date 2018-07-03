@@ -28,9 +28,9 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLPhysicalIndexOnlyScan::CDXLPhysicalIndexOnlyScan(IMemoryPool *mp,
 													 CDXLTableDescr *table_descr,
-													 CDXLIndexDescr *index_descr_dxl,
+													 CDXLIndexDescr *dxl_index_descr,
 													 EdxlIndexScanDirection idx_scan_direction)
-	: CDXLPhysicalIndexScan(mp, table_descr, index_descr_dxl, idx_scan_direction)
+	: CDXLPhysicalIndexScan(mp, table_descr, dxl_index_descr, idx_scan_direction)
 {
 }
 

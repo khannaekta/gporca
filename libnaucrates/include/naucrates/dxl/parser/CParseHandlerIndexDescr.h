@@ -37,7 +37,7 @@ namespace gpdxl
 	{
 	private:
 		// the index descriptor to construct
-		CDXLIndexDescr *m_index_descr_dxl;
+		CDXLIndexDescr *m_dxl_index_descr;
 
 		// private copy ctor
 		CParseHandlerIndexDescr(const CParseHandlerIndexDescr &);

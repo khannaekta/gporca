@@ -575,11 +575,11 @@ CTranslatorExprToDXL::PdxlnIndexScan
 	CMDName *pmdnameIndex = GPOS_NEW(m_mp) CMDName(m_mp, pindexdesc->Name().Pstr());
 	IMDId *pmdidIndex = pindexdesc->MDId();
 	pmdidIndex->AddRef();
-	CDXLIndexDescr *index_descr_dxl = GPOS_NEW(m_mp) CDXLIndexDescr(m_mp, pmdidIndex, pmdnameIndex);
+	CDXLIndexDescr *dxl_index_descr = GPOS_NEW(m_mp) CDXLIndexDescr(m_mp, pmdidIndex, pmdnameIndex);
 
 	// TODO: vrgahavan; we assume that the index are always forward access.
 	// create the physical index scan operator
-	CDXLPhysicalIndexScan *dxl_op = GPOS_NEW(m_mp) CDXLPhysicalIndexScan(m_mp, table_descr, index_descr_dxl, EdxlisdForward);
+	CDXLPhysicalIndexScan *dxl_op = GPOS_NEW(m_mp) CDXLPhysicalIndexScan(m_mp, table_descr, dxl_index_descr, EdxlisdForward);
 	CDXLNode *pdxlnIndexScan = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 
 	// set properties
@@ -652,8 +652,8 @@ CTranslatorExprToDXL::PdxlnBitmapIndexProbe
 	IMDId *pmdidIndex = pindexdesc->MDId();
 	pmdidIndex->AddRef();
 
-	CDXLIndexDescr *index_descr_dxl = GPOS_NEW(m_mp) CDXLIndexDescr(m_mp, pmdidIndex, pmdnameIndex);
-	CDXLScalarBitmapIndexProbe *dxl_op = GPOS_NEW(m_mp) CDXLScalarBitmapIndexProbe(m_mp, index_descr_dxl);
+	CDXLIndexDescr *dxl_index_descr = GPOS_NEW(m_mp) CDXLIndexDescr(m_mp, pmdidIndex, pmdnameIndex);
+	CDXLScalarBitmapIndexProbe *dxl_op = GPOS_NEW(m_mp) CDXLScalarBitmapIndexProbe(m_mp, dxl_index_descr);
 	CDXLNode *pdxlnBitmapIndexProbe = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 
 	// translate index predicates
@@ -1142,7 +1142,7 @@ CTranslatorExprToDXL::PdxlnDynamicIndexScan
 	CMDName *pmdnameIndex = GPOS_NEW(m_mp) CMDName(m_mp, pindexdesc->Name().Pstr());
 	IMDId *pmdidIndex = pindexdesc->MDId();
 	pmdidIndex->AddRef();
-	CDXLIndexDescr *index_descr_dxl = GPOS_NEW(m_mp) CDXLIndexDescr(m_mp, pmdidIndex, pmdnameIndex);
+	CDXLIndexDescr *dxl_index_descr = GPOS_NEW(m_mp) CDXLIndexDescr(m_mp, pmdidIndex, pmdnameIndex);
 
 	// TODO: vrgahavan; we assume that the index are always forward access.
 	// create the physical index scan operator
@@ -1155,7 +1155,7 @@ CTranslatorExprToDXL::PdxlnDynamicIndexScan
 													table_descr,
 													popDIS->UlSecondaryScanId(),
 													popDIS->ScanId(),
-													index_descr_dxl,
+													dxl_index_descr,
 													EdxlisdForward
 													)
 									);

@@ -41,7 +41,7 @@ namespace gpdxl
 		ULONG m_part_index_id_printable;
 
 		// index descriptor associated with the scanned table
-		CDXLIndexDescr *m_index_descr_dxl;
+		CDXLIndexDescr *m_dxl_index_descr;
 
 		// scan direction of the index
 		EdxlIndexScanDirection m_index_scan_dir;
@@ -64,7 +64,7 @@ namespace gpdxl
 									 CDXLTableDescr *table_descr,
 									 ULONG part_idx_id,
 									 ULONG part_idx_id_printable,
-									 CDXLIndexDescr *index_descr_dxl,
+									 CDXLIndexDescr *dxl_index_descr,
 									 EdxlIndexScanDirection idx_scan_direction);
 
 		//dtor

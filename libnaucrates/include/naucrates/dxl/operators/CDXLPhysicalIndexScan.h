@@ -44,7 +44,7 @@ namespace gpdxl
 		CDXLTableDescr *m_dxl_table_descr;
 
 		// index descriptor associated with the scanned table
-		CDXLIndexDescr *m_index_descr_dxl;
+		CDXLIndexDescr *m_dxl_index_descr;
 
 		// scan direction of the index
 		EdxlIndexScanDirection m_index_scan_dir;
@@ -56,7 +56,7 @@ namespace gpdxl
 		//ctor
 		CDXLPhysicalIndexScan(IMemoryPool *mp,
 							  CDXLTableDescr *table_descr,
-							  CDXLIndexDescr *index_descr_dxl,
+							  CDXLIndexDescr *dxl_index_descr,
 							  EdxlIndexScanDirection idx_scan_direction);
 
 		//dtor

@@ -39,7 +39,7 @@ XERCES_CPP_NAMESPACE_USE
 CParseHandlerIndexDescr::CParseHandlerIndexDescr(IMemoryPool *mp,
 												 CParseHandlerManager *parse_handler_mgr,
 												 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root), m_index_descr_dxl(NULL)
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root), m_dxl_index_descr(NULL)
 {
 }
 
@@ -53,7 +53,7 @@ CParseHandlerIndexDescr::CParseHandlerIndexDescr(IMemoryPool *mp,
 //---------------------------------------------------------------------------
 CParseHandlerIndexDescr::~CParseHandlerIndexDescr()
 {
-	CRefCount::SafeRelease(m_index_descr_dxl);
+	CRefCount::SafeRelease(m_dxl_index_descr);
 }
 
 //---------------------------------------------------------------------------
@@ -67,7 +67,7 @@ CParseHandlerIndexDescr::~CParseHandlerIndexDescr()
 CDXLIndexDescr *
 CParseHandlerIndexDescr::GetDXLIndexDescr()
 {
-	return m_index_descr_dxl;
+	return m_dxl_index_descr;
 }
 
 //---------------------------------------------------------------------------
@@ -93,7 +93,7 @@ CParseHandlerIndexDescr::StartElement(const XMLCh *const,  // element_uri,
 	}
 
 	// generate the index descriptor
-	m_index_descr_dxl =
+	m_dxl_index_descr =
 		CDXLOperatorFactory::MakeDXLIndexDescr(m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 }
 

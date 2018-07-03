@@ -28,15 +28,15 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLPhysicalIndexScan::CDXLPhysicalIndexScan(IMemoryPool *mp,
 											 CDXLTableDescr *table_descr,
-											 CDXLIndexDescr *index_descr_dxl,
+											 CDXLIndexDescr *dxl_index_descr,
 											 EdxlIndexScanDirection idx_scan_direction)
 	: CDXLPhysical(mp),
 	  m_dxl_table_descr(table_descr),
-	  m_index_descr_dxl(index_descr_dxl),
+	  m_dxl_index_descr(dxl_index_descr),
 	  m_index_scan_dir(idx_scan_direction)
 {
 	GPOS_ASSERT(NULL != m_dxl_table_descr);
-	GPOS_ASSERT(NULL != m_index_descr_dxl);
+	GPOS_ASSERT(NULL != m_dxl_index_descr);
 }
 
 //---------------------------------------------------------------------------
@@ -49,7 +49,7 @@ CDXLPhysicalIndexScan::CDXLPhysicalIndexScan(IMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLPhysicalIndexScan::~CDXLPhysicalIndexScan()
 {
-	m_index_descr_dxl->Release();
+	m_dxl_index_descr->Release();
 	m_dxl_table_descr->Release();
 }
 
@@ -92,7 +92,7 @@ CDXLPhysicalIndexScan::GetOpNameStr() const
 const CDXLIndexDescr *
 CDXLPhysicalIndexScan::GetDXLIndexDescr() const
 {
-	return m_index_descr_dxl;
+	return m_dxl_index_descr;
 }
 
 //---------------------------------------------------------------------------
@@ -147,7 +147,7 @@ CDXLPhysicalIndexScan::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXL
 	node->SerializeChildrenToDXL(xml_serializer);
 
 	// serialize index descriptor
-	m_index_descr_dxl->SerializeToDXL(xml_serializer);
+	m_dxl_index_descr->SerializeToDXL(xml_serializer);
 
 	// serialize table descriptor
 	m_dxl_table_descr->SerializeToDXL(xml_serializer);
@@ -175,9 +175,9 @@ CDXLPhysicalIndexScan::AssertValid(const CDXLNode *node, BOOL validate_children)
 	GPOS_ASSERT(3 == node->Arity());
 
 	// assert validity of the index descriptor
-	GPOS_ASSERT(NULL != m_index_descr_dxl);
-	GPOS_ASSERT(NULL != m_index_descr_dxl->MdName());
-	GPOS_ASSERT(m_index_descr_dxl->MdName()->GetMDName()->IsValid());
+	GPOS_ASSERT(NULL != m_dxl_index_descr);
+	GPOS_ASSERT(NULL != m_dxl_index_descr->MdName());
+	GPOS_ASSERT(m_dxl_index_descr->MdName()->GetMDName()->IsValid());
 
 	// assert validity of the table descriptor
 	GPOS_ASSERT(NULL != m_dxl_table_descr);

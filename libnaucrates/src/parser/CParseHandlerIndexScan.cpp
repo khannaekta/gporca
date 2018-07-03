@@ -191,20 +191,20 @@ CParseHandlerIndexScan::EndElementHelper(const XMLCh *const element_local_name,
 	CDXLTableDescr *dxl_table_descr = table_descr_parse_handler->GetDXLTableDescr();
 	dxl_table_descr->AddRef();
 
-	CDXLIndexDescr *index_descr_dxl = index_descr_parse_handler->GetDXLIndexDescr();
-	index_descr_dxl->AddRef();
+	CDXLIndexDescr *dxl_index_descr = index_descr_parse_handler->GetDXLIndexDescr();
+	dxl_index_descr->AddRef();
 
 	CDXLPhysical *dxl_op = NULL;
 	if (EdxltokenPhysicalIndexOnlyScan == token_type)
 	{
 		dxl_op = GPOS_NEW(m_mp) CDXLPhysicalIndexOnlyScan(
-			m_mp, dxl_table_descr, index_descr_dxl, m_index_scan_dir);
+			m_mp, dxl_table_descr, dxl_index_descr, m_index_scan_dir);
 		m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 	}
 	else if (EdxltokenPhysicalIndexScan == token_type)
 	{
 		dxl_op = GPOS_NEW(m_mp) CDXLPhysicalIndexScan(
-			m_mp, dxl_table_descr, index_descr_dxl, m_index_scan_dir);
+			m_mp, dxl_table_descr, dxl_index_descr, m_index_scan_dir);
 		m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 	}
 	else
@@ -215,7 +215,7 @@ CParseHandlerIndexScan::EndElementHelper(const XMLCh *const element_local_name,
 																	  dxl_table_descr,
 																	  part_idx_id,
 																	  part_idx_id_printable,
-																	  index_descr_dxl,
+																	  dxl_index_descr,
 																	  m_index_scan_dir);
 		m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 	}
