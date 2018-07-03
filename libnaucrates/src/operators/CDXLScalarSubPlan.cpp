@@ -31,7 +31,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CDXLScalarSubPlan::CDXLScalarSubPlan(IMemoryPool *memory_pool,
 									 IMDId *first_col_type_mdid,
-									 DrgPdxlcr *dxl_colref_array,
+									 DXLColRefArray *dxl_colref_array,
 									 EdxlSubPlanType dxl_subplan_type,
 									 CDXLNode *dxlnode_test_expr)
 	: CDXLScalar(memory_pool),

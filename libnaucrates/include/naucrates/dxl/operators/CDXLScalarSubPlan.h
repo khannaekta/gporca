@@ -54,7 +54,7 @@ namespace gpdxl
 		IMDId *m_first_col_type_mdid;
 
 		// array of outer column references
-		DrgPdxlcr *m_dxl_colref_array;
+		DXLColRefArray *m_dxl_colref_array;
 
 		// subplan type
 		EdxlSubPlanType m_dxl_subplan_type;
@@ -69,7 +69,7 @@ namespace gpdxl
 		// ctor/dtor
 		CDXLScalarSubPlan(IMemoryPool *memory_pool,
 						  IMDId *first_col_type_mdid,
-						  DrgPdxlcr *dxl_colref_array,
+						  DXLColRefArray *dxl_colref_array,
 						  EdxlSubPlanType dxl_subplan_type,
 						  CDXLNode *dxlnode_test_expr);
 
@@ -89,7 +89,7 @@ namespace gpdxl
 		IMDId *GetFirstColTypeMdId() const;
 
 		// outer references
-		const DrgPdxlcr *
+		const DXLColRefArray *
 		GetDxlOuterColRefsArray() const
 		{
 			return m_dxl_colref_array;

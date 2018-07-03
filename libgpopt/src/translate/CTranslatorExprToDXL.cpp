@@ -2635,7 +2635,7 @@ void
 CTranslatorExprToDXL::BuildSubplansForCorrelatedLOJ
 	(
 	CExpression *pexprCorrelatedLOJ,
-	DrgPdxlcr *dxl_colref_array,
+	DXLColRefArray *dxl_colref_array,
 	CDXLNode **ppdxlnScalar, // output: scalar condition after replacing inner child reference with subplan
 	DrgPds *pdrgpdsBaseTables,
 	ULONG *pulNonGatherMotions,
@@ -2703,7 +2703,7 @@ void
 CTranslatorExprToDXL::BuildSubplans
 	(
 	CExpression *pexprCorrelatedNLJoin,
-	DrgPdxlcr *dxl_colref_array,
+	DXLColRefArray *dxl_colref_array,
 	CDXLNode **ppdxlnScalar, // output: scalar condition after replacing inner child reference with subplan
 	DrgPds *pdrgpdsBaseTables, 
 	ULONG *pulNonGatherMotions,
@@ -2832,7 +2832,7 @@ CTranslatorExprToDXL::PdxlnQuantifiedSubplan
 	(
 	DrgPcr *pdrgpcrInner,
 	CExpression *pexprCorrelatedNLJoin,
-	DrgPdxlcr *dxl_colref_array,
+	DXLColRefArray *dxl_colref_array,
 	DrgPds *pdrgpdsBaseTables, 
 	ULONG *pulNonGatherMotions,
 	BOOL *pfDML
@@ -3046,7 +3046,7 @@ CTranslatorExprToDXL::PdxlnExistentialSubplan
 	(
 	DrgPcr *pdrgpcrInner,
 	CExpression *pexprCorrelatedNLJoin,
-	DrgPdxlcr *dxl_colref_array,
+	DXLColRefArray *dxl_colref_array,
 	DrgPds *pdrgpdsBaseTables, 
 	ULONG *pulNonGatherMotions,
 	BOOL *pfDML
@@ -3118,7 +3118,7 @@ CTranslatorExprToDXL::BuildScalarSubplans
 	(
 	DrgPcr *pdrgpcrInner,
 	CExpression *pexprInner,
-	DrgPdxlcr *dxl_colref_array,
+	DXLColRefArray *dxl_colref_array,
 	DrgPds *pdrgpdsBaseTables, 
 	ULONG *pulNonGatherMotions,
 	BOOL *pfDML
@@ -3208,7 +3208,7 @@ CTranslatorExprToDXL::PdxlnCorrelatedNLJoin
 	CExpression *pexprScalar = (*pexpr)[2];
 
 	// outer references in the inner child
-	DrgPdxlcr *dxl_colref_array = GPOS_NEW(m_memory_pool) DrgPdxlcr(m_memory_pool);
+	DXLColRefArray *dxl_colref_array = GPOS_NEW(m_memory_pool) DXLColRefArray(m_memory_pool);
 
 	CColRefSet *outer_refs = PcrsOuterRefsForCorrelatedNLJoin(pexpr);
 	CColRefSetIter crsi(*outer_refs);
@@ -3304,7 +3304,7 @@ CTranslatorExprToDXL::BuildDxlnSubPlan
 	(
 	CDXLNode *pdxlnRelChild,
 	const CColRef *colref,
-	DrgPdxlcr *dxl_colref_array
+	DXLColRefArray *dxl_colref_array
 	)
 {
 	GPOS_ASSERT(NULL != colref);
@@ -3338,7 +3338,7 @@ CDXLNode *
 CTranslatorExprToDXL::PdxlnBooleanScalarWithSubPlan
 	(
 	CDXLNode *pdxlnRelChild,
-	DrgPdxlcr *dxl_colref_array
+	DXLColRefArray *dxl_colref_array
 	)
 {
 	// create a new project element (const:true), and replace the first child with it
