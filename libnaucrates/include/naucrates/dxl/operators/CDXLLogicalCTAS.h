@@ -193,7 +193,7 @@ namespace gpdxl
 #endif  // GPOS_DEBUG
 
 		// check if given column is defined by operator
-		virtual BOOL IsColDefined(ULONG col_id) const;
+		virtual BOOL IsColDefined(ULONG colid) const;
 
 		// serialize operator in DXL format
 		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;

@@ -381,7 +381,7 @@ namespace gpnaucrates
 		// translate the histogram into a derived column stats
 		CDXLStatsDerivedColumn *TranslateToDXLDerivedColumnStats(IMemoryPool *mp,
 																 CMDAccessor *md_accessor,
-																 ULONG col_id,
+																 ULONG colid,
 																 CDouble width) const;
 
 		// randomly pick a bucket index

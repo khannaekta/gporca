@@ -37,8 +37,8 @@ CProjectStatsProcessor::CalcProjStats(IMemoryPool *mp,
 	const ULONG length = projection_colids->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		ULONG col_id = *(*projection_colids)[ul];
-		const CHistogram *histogram = input_stats->GetHistogram(col_id);
+		ULONG colid = *(*projection_colids)[ul];
+		const CHistogram *histogram = input_stats->GetHistogram(colid);
 
 		if (NULL == histogram)
 		{
@@ -49,7 +49,7 @@ CProjectStatsProcessor::CalcProjStats(IMemoryPool *mp,
 			BOOL is_well_defined = false;
 			if (NULL != datum_map)
 			{
-				IDatum *datum = datum_map->Find(&col_id);
+				IDatum *datum = datum_map->Find(&colid);
 				if (NULL != datum)
 				{
 					is_well_defined = true;
@@ -65,7 +65,7 @@ CProjectStatsProcessor::CalcProjStats(IMemoryPool *mp,
 			}
 
 			CHistogram *proj_col_histogram = NULL;
-			CColRef *colref = col_factory->LookupColRef(col_id);
+			CColRef *colref = col_factory->LookupColRef(colid);
 			GPOS_ASSERT(NULL != colref);
 
 			if (0 == proj_col_bucket->Size() &&
@@ -84,28 +84,28 @@ CProjectStatsProcessor::CalcProjStats(IMemoryPool *mp,
 													 CHistogram::DefaultNDVFreqRemain);
 			}
 
-			histograms_new->Insert(GPOS_NEW(mp) ULONG(col_id), proj_col_histogram);
+			histograms_new->Insert(GPOS_NEW(mp) ULONG(colid), proj_col_histogram);
 		}
 		else
 		{
-			histograms_new->Insert(GPOS_NEW(mp) ULONG(col_id),
+			histograms_new->Insert(GPOS_NEW(mp) ULONG(colid),
 								   histogram->CopyHistogram(mp));
 		}
 
 		// look up width
-		const CDouble *width = input_stats->GetWidth(col_id);
+		const CDouble *width = input_stats->GetWidth(colid);
 		if (NULL == width)
 		{
-			CColRef *colref = col_factory->LookupColRef(col_id);
+			CColRef *colref = col_factory->LookupColRef(colid);
 			GPOS_ASSERT(NULL != colref);
 
 			CDouble width = CStatisticsUtils::DefaultColumnWidth(colref->RetrieveType());
-			col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(col_id),
+			col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid),
 										 GPOS_NEW(mp) CDouble(width));
 		}
 		else
 		{
-			col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(col_id),
+			col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid),
 										 GPOS_NEW(mp) CDouble(*width));
 		}
 	}

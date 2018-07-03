@@ -57,7 +57,7 @@ namespace gpnaucrates
 
 	public:
 		// ctor
-		CStatsPredPoint(ULONG col_id, CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point);
+		CStatsPredPoint(ULONG colid, CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point);
 
 		// ctor
 		CStatsPredPoint(IMemoryPool *mp,

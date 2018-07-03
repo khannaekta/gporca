@@ -1253,7 +1253,7 @@ CDXLOperatorFactory::MakeDXLSortCol(CDXLMemoryManager *dxl_memory_manager, const
 	IMemoryPool *mp = dxl_memory_manager->Pmp();
 
 	// get column id from attributes
-	ULONG col_id = ExtractConvertAttrValueToUlong(
+	ULONG colid = ExtractConvertAttrValueToUlong(
 		dxl_memory_manager, attrs, EdxltokenColId, EdxltokenScalarSortCol);
 
 	// get sorting operator name
@@ -1276,7 +1276,7 @@ CDXLOperatorFactory::MakeDXLSortCol(CDXLMemoryManager *dxl_memory_manager, const
 	GPOS_DELETE(sort_op_name);
 
 	return GPOS_NEW(mp)
-		CDXLScalarSortCol(mp, col_id, sort_op_id, sort_op_name_copy, nulls_first);
+		CDXLScalarSortCol(mp, colid, sort_op_id, sort_op_name_copy, nulls_first);
 }
 
 //---------------------------------------------------------------------------
@@ -2032,10 +2032,10 @@ CDXLOperatorFactory::ParseGroupingColId(CDXLMemoryManager *dxl_memory_manager,
 	const CWStringConst *col_id_str = CDXLTokens::GetDXLTokenStr(EdxltokenColId);
 
 	// get grouping column id from attributes
-	INT col_id = ExtractConvertAttrValueToInt(
+	INT colid = ExtractConvertAttrValueToInt(
 		dxl_memory_manager, attrs, EdxltokenColId, EdxltokenGroupingCol);
 
-	if (col_id < 0)
+	if (colid < 0)
 	{
 		GPOS_RAISE(gpdxl::ExmaDXL,
 				   gpdxl::ExmiDXLInvalidAttributeValue,
@@ -2043,7 +2043,7 @@ CDXLOperatorFactory::ParseGroupingColId(CDXLMemoryManager *dxl_memory_manager,
 				   grouping_col_id_str->GetBuffer());
 	}
 
-	return (ULONG) col_id;
+	return (ULONG) colid;
 }
 
 //---------------------------------------------------------------------------

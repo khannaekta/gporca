@@ -230,13 +230,13 @@ CMCVTest::EresUnittest_MergeHistMCV()
 		UlongHistogramHashMap *col_histogram_mapping = GPOS_NEW(mp) UlongHistogramHashMap(mp);
 
 		// generate int histogram for column 1
-		ULONG col_id = pdxlstatsdercolMCV->GetColId();
-		col_histogram_mapping->Insert(GPOS_NEW(mp) ULONG(col_id), phistMerged);
+		ULONG colid = pdxlstatsdercolMCV->GetColId();
+		col_histogram_mapping->Insert(GPOS_NEW(mp) ULONG(colid), phistMerged);
 
 		// column width for int4
 		UlongDoubleHashMap *col_id_width_mapping = GPOS_NEW(mp) UlongDoubleHashMap(mp);
 		CDouble width = pdxlstatsdercolMCV->Width();
-		col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(col_id), GPOS_NEW(mp) CDouble(width));
+		col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid), GPOS_NEW(mp) CDouble(width));
 
 		CStatistics *stats = GPOS_NEW(mp) CStatistics
 										(

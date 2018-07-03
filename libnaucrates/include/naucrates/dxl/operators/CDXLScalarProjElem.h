@@ -66,9 +66,9 @@ namespace gpdxl
 
 		// check if given column is defined by operator
 		virtual BOOL
-		IsColDefined(ULONG col_id) const
+		IsColDefined(ULONG colid) const
 		{
-			return (Id() == col_id);
+			return (Id() == colid);
 		}
 
 		// conversion function

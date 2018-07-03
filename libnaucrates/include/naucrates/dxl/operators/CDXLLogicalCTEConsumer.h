@@ -68,7 +68,7 @@ namespace gpdxl
 		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
 		// check if given column is defined by operator
-		virtual BOOL IsColDefined(ULONG col_id) const;
+		virtual BOOL IsColDefined(ULONG colid) const;
 
 #ifdef GPOS_DEBUG
 		// checks whether the operator has valid structure, i.e. number and

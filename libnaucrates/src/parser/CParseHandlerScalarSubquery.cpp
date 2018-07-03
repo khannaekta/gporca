@@ -61,9 +61,9 @@ CParseHandlerScalarSubquery::StartElement(const XMLCh *const,  // element_uri,
 	}
 
 	// parse column id
-	ULONG col_id = CDXLOperatorFactory::ExtractConvertAttrValueToUlong(
+	ULONG colid = CDXLOperatorFactory::ExtractConvertAttrValueToUlong(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenColId, EdxltokenScalarSubquery);
-	m_dxl_op = GPOS_NEW(m_mp) CDXLScalarSubquery(m_mp, col_id);
+	m_dxl_op = GPOS_NEW(m_mp) CDXLScalarSubquery(m_mp, colid);
 
 	// parse handler for child node
 	CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(

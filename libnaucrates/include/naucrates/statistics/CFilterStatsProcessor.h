@@ -86,7 +86,7 @@ namespace gpnaucrates
 			CDouble *scale_factor);
 
 		// check if the column is a new column for statistic calculation
-		static BOOL IsNewStatsColumn(ULONG col_id, ULONG last_col_id);
+		static BOOL IsNewStatsColumn(ULONG colid, ULONG last_col_id);
 
 	public:
 		// filter

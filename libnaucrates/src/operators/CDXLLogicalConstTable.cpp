@@ -162,9 +162,9 @@ CDXLLogicalConstTable::SerializeToDXL(CXMLSerializer *xml_serializer,
 		DXLDatumArray *pdrgpdxldatum = (*m_const_tuples_datum_array)[tuple_idx];
 
 		const ULONG num_of_cols = pdrgpdxldatum->Size();
-		for (ULONG col_idx = 0; col_idx < num_of_cols; col_idx++)
+		for (ULONG idx = 0; idx < num_of_cols; idx++)
 		{
-			CDXLDatum *dxl_datum = (*pdrgpdxldatum)[col_idx];
+			CDXLDatum *dxl_datum = (*pdrgpdxldatum)[idx];
 			dxl_datum->Serialize(xml_serializer, pstrElemNameDatum);
 		}
 
@@ -185,13 +185,13 @@ CDXLLogicalConstTable::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 BOOL
-CDXLLogicalConstTable::IsColDefined(ULONG col_id) const
+CDXLLogicalConstTable::IsColDefined(ULONG colid) const
 {
 	const ULONG size = Arity();
 	for (ULONG descr_idx = 0; descr_idx < size; descr_idx++)
 	{
 		ULONG id = GetColumnDescrAt(descr_idx)->Id();
-		if (id == col_id)
+		if (id == colid)
 		{
 			return true;
 		}

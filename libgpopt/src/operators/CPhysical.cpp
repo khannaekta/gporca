@@ -1276,8 +1276,8 @@ CPhysical::GetSkew
 			{
 				// consider only hashed distribution direct columns for now
 				CScalarIdent *popScId = CScalarIdent::PopConvert(pexpr->Pop());
-				ULONG col_id = popScId->Pcr()->Id();
-				CDouble dSkewCol = stats->GetSkew(col_id);
+				ULONG colid = popScId->Pcr()->Id();
+				CDouble dSkewCol = stats->GetSkew(colid);
 				if (dSkewCol > dSkew)
 				{
 					dSkew = dSkewCol;

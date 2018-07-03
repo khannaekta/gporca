@@ -122,13 +122,13 @@ CDXLLogicalGet::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 BOOL
-CDXLLogicalGet::IsColDefined(ULONG col_id) const
+CDXLLogicalGet::IsColDefined(ULONG colid) const
 {
 	const ULONG size = m_dxl_table_descr->Arity();
 	for (ULONG descr_id = 0; descr_id < size; descr_id++)
 	{
 		ULONG id = m_dxl_table_descr->GetColumnDescrAt(descr_id)->Id();
-		if (id == col_id)
+		if (id == colid)
 		{
 			return true;
 		}

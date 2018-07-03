@@ -53,7 +53,7 @@ namespace gpnaucrates
 
 	public:
 		// ctor
-		CStatsPredLike(ULONG col_id,
+		CStatsPredLike(ULONG colid,
 					   CExpression *expr_left,
 					   CExpression *expr_right,
 					   CDouble default_scale_factor);

@@ -87,13 +87,13 @@ CDXLLogicalCTEConsumer::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDXLLogicalCTEConsumer::IsColDefined(ULONG col_id) const
+CDXLLogicalCTEConsumer::IsColDefined(ULONG colid) const
 {
 	const ULONG size = m_output_colids_array->Size();
 	for (ULONG idx = 0; idx < size; idx++)
 	{
 		ULONG id = *((*m_output_colids_array)[idx]);
-		if (id == col_id)
+		if (id == colid)
 		{
 			return true;
 		}

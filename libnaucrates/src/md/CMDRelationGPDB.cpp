@@ -289,10 +289,10 @@ CMDRelationGPDB::NonDroppedColAt(ULONG pos) const
 		return pos;
 	}
 
-	ULONG *col_id = m_colpos_nondrop_colpos_map->Find(&pos);
+	ULONG *colid = m_colpos_nondrop_colpos_map->Find(&pos);
 
-	GPOS_ASSERT(NULL != col_id);
-	return *col_id;
+	GPOS_ASSERT(NULL != colid);
+	return *colid;
 }
 
 //---------------------------------------------------------------------------

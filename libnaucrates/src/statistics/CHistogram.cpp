@@ -1752,7 +1752,7 @@ CBucket *CHistogram::operator[](ULONG pos) const
 CDXLStatsDerivedColumn *
 CHistogram::TranslateToDXLDerivedColumnStats(IMemoryPool *mp,
 											 CMDAccessor *md_accessor,
-											 ULONG col_id,
+											 ULONG colid,
 											 CDouble width) const
 {
 	DXLBucketPtrArray *dxl_stats_bucket_array =
@@ -1780,7 +1780,7 @@ CHistogram::TranslateToDXLDerivedColumnStats(IMemoryPool *mp,
 	}
 
 	return GPOS_NEW(mp) CDXLStatsDerivedColumn(
-		col_id, width, m_null_freq, m_distinct_remaining, m_freq_remaining, dxl_stats_bucket_array);
+		colid, width, m_null_freq, m_distinct_remaining, m_freq_remaining, dxl_stats_bucket_array);
 }
 
 // randomly pick a bucket index based on bucket frequency values
@@ -1949,9 +1949,9 @@ CHistogram::AddHistograms(IMemoryPool *mp,
 	UlongHistogramHashMapIter col_hist_mapping(src_histograms);
 	while (col_hist_mapping.Advance())
 	{
-		ULONG col_id = *(col_hist_mapping.Key());
+		ULONG colid = *(col_hist_mapping.Key());
 		const CHistogram *histogram = col_hist_mapping.Value();
-		CStatisticsUtils::AddHistogram(mp, col_id, histogram, dest_histograms);
+		CStatisticsUtils::AddHistogram(mp, colid, histogram, dest_histograms);
 	}
 }
 
@@ -1973,16 +1973,16 @@ CHistogram::AddDummyHistogramAndWidthInfo(IMemoryPool *mp,
 	// for computed aggregates, we're not going to be very smart right now
 	for (ULONG ul = 0; ul < count; ul++)
 	{
-		ULONG col_id = *(*columns)[ul];
+		ULONG colid = *(*columns)[ul];
 
-		CColRef *col_ref = col_factory->LookupColRef(col_id);
+		CColRef *col_ref = col_factory->LookupColRef(colid);
 		GPOS_ASSERT(NULL != col_ref);
 
 		CHistogram *histogram = CHistogram::MakeDefaultHistogram(mp, col_ref, is_empty);
-		output_histograms->Insert(GPOS_NEW(mp) ULONG(col_id), histogram);
+		output_histograms->Insert(GPOS_NEW(mp) ULONG(colid), histogram);
 
 		CDouble width = CStatisticsUtils::DefaultColumnWidth(col_ref->RetrieveType());
-		output_col_widths->Insert(GPOS_NEW(mp) ULONG(col_id),
+		output_col_widths->Insert(GPOS_NEW(mp) ULONG(colid),
 								  GPOS_NEW(mp) CDouble(width));
 	}
 }
@@ -1999,12 +1999,12 @@ CHistogram::AddEmptyHistogram(IMemoryPool *mp,
 	UlongHistogramHashMapIter col_hist_mapping(input_histograms);
 	while (col_hist_mapping.Advance())
 	{
-		ULONG col_id = *(col_hist_mapping.Key());
+		ULONG colid = *(col_hist_mapping.Key());
 
 		// empty histogram
 		CHistogram *histogram = GPOS_NEW(mp)
 			CHistogram(GPOS_NEW(mp) BucketArray(mp), false /* is_well_defined */);
-		output_histograms->Insert(GPOS_NEW(mp) ULONG(col_id), histogram);
+		output_histograms->Insert(GPOS_NEW(mp) ULONG(colid), histogram);
 	}
 }
 

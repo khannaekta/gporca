@@ -579,7 +579,7 @@ void
 CStatisticsTest::StatsFilterInt4
 	(
 	IMemoryPool *mp,
-	ULONG col_id,
+	ULONG colid,
 	INT iLower,
 	INT iUpper,
 	StatsPredPtrArry *pdrgpstatspred
@@ -587,14 +587,14 @@ CStatisticsTest::StatsFilterInt4
 {
 	CStatsPredPoint *pstatspred1 = GPOS_NEW(mp) CStatsPredPoint
 												(
-												col_id,
+												colid,
 												CStatsPred::EstatscmptGEq,
 												CTestUtils::PpointInt4(mp, iLower)
 												);
 
 	CStatsPredPoint *pstatspred2 = GPOS_NEW(mp) CStatsPredPoint
 												(
-												col_id,
+												colid,
 												CStatsPred::EstatscmptL,
 												CTestUtils::PpointInt4(mp, iUpper)
 												);
@@ -608,14 +608,14 @@ void
 CStatisticsTest::StatsFilterBool
 	(
 	IMemoryPool *mp,
-	ULONG col_id,
+	ULONG colid,
 	BOOL fValue,
 	StatsPredPtrArry *pdrgpstatspred
 	)
 {
 	CStatsPredPoint *pstatspred1 = GPOS_NEW(mp) CStatsPredPoint
 												(
-												col_id,
+												colid,
 												CStatsPred::EstatscmptEq,
 												CTestUtils::PpointBool(mp, fValue)
 												);
@@ -628,7 +628,7 @@ void
 CStatisticsTest::StatsFilterNumeric
 	(
 	IMemoryPool *mp,
-	ULONG col_id,
+	ULONG colid,
 	CWStringDynamic *pstrLowerEncoded,
 	CWStringDynamic *pstrUpperEncoded,
 	CDouble dValLower,
@@ -638,14 +638,14 @@ CStatisticsTest::StatsFilterNumeric
 {
 	CStatsPredPoint *pstatspred1 = GPOS_NEW(mp) CStatsPredPoint
 												(
-												col_id,
+												colid,
 												CStatsPred::EstatscmptGEq,
 												CCardinalityTestUtils::PpointNumeric(mp, pstrLowerEncoded, dValLower)
 												);
 
 	CStatsPredPoint *pstatspred2 = GPOS_NEW(mp) CStatsPredPoint
 												(
-												col_id,
+												colid,
 												CStatsPred::EstatscmptL,
 												CCardinalityTestUtils::PpointNumeric(mp, pstrUpperEncoded, dValUpper)
 												);
@@ -659,7 +659,7 @@ void
 CStatisticsTest::StatsFilterGeneric
 	(
 	IMemoryPool *mp,
-	ULONG col_id,
+	ULONG colid,
 	OID oid,
 	CWStringDynamic *pstrLowerEncoded,
 	CWStringDynamic *pstrUpperEncoded,
@@ -670,14 +670,14 @@ CStatisticsTest::StatsFilterGeneric
 {
 	CStatsPredPoint *pstatspred1 = GPOS_NEW(mp) CStatsPredPoint
 												(
-												col_id,
+												colid,
 												CStatsPred::EstatscmptGEq,
 												CCardinalityTestUtils::PpointGeneric(mp, oid, pstrLowerEncoded, lValueLower)
 												);
 
 	CStatsPredPoint *pstatspred2 = GPOS_NEW(mp) CStatsPredPoint
 												(
-												col_id,
+												colid,
 												CStatsPred::EstatscmptL,
 												CCardinalityTestUtils::PpointGeneric(mp, oid, pstrUpperEncoded, lValueUpper)
 												);

@@ -24,16 +24,16 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CStatsPredLike::CStatsPredLike(ULONG col_id,
+CStatsPredLike::CStatsPredLike(ULONG colid,
 							   CExpression *expr_left,
 							   CExpression *expr_right,
 							   CDouble default_scale_factor)
-	: CStatsPred(col_id),
+	: CStatsPred(colid),
 	  m_expr_left(expr_left),
 	  m_expr_right(expr_right),
 	  m_default_scale_factor(default_scale_factor)
 {
-	GPOS_ASSERT(gpos::ulong_max != col_id);
+	GPOS_ASSERT(gpos::ulong_max != colid);
 	GPOS_ASSERT(NULL != expr_left);
 	GPOS_ASSERT(NULL != expr_right);
 	GPOS_ASSERT(0 < default_scale_factor);

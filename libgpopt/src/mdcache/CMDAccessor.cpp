@@ -1104,7 +1104,7 @@ CMDAccessor::RecordColumnStats
 	(
 	IMemoryPool *mp,
 	IMDId *rel_mdid,
-	ULONG col_id,
+	ULONG colid,
 	ULONG ulPos,
 	BOOL fSystemCol,
 	BOOL fEmptyTable,
@@ -1123,14 +1123,14 @@ CMDAccessor::RecordColumnStats
 
 	// fetch the column width and insert it into the hashmap
 	CDouble *width = GPOS_NEW(mp) CDouble(pmdcolstats->Width());
-	col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(col_id), width);
+	col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid), width);
 
 	// extract the the histogram and insert it into the hashmap
 	const IMDRelation *pmdrel = RetrieveRel(rel_mdid);
 	IMDId *mdid_type = pmdrel->GetMdCol(ulPos)->MDIdType();
 	CHistogram *histogram = GetHistogram(mp, mdid_type, pmdcolstats);
 	GPOS_ASSERT(NULL != histogram);
-	col_histogram_mapping->Insert(GPOS_NEW(mp) ULONG(col_id), histogram);
+	col_histogram_mapping->Insert(GPOS_NEW(mp) ULONG(colid), histogram);
 
 	BOOL fGuc = GPOS_FTRACE(EopttracePrintColsWithMissingStats);
 	BOOL fRecordMissingStats = !fEmptyTable && fGuc && !fSystemCol
@@ -1210,7 +1210,7 @@ CMDAccessor::Pstats
 		CColRefTable *pcrtable = CColRefTable::PcrConvert(pcrHist);
 
 		// extract the column identifier, position of the attribute in the system catalog
-		ULONG col_id = pcrtable->Id();
+		ULONG colid = pcrtable->Id();
 		INT attno = pcrtable->AttrNum();
 		ULONG ulPos = pmdrel->GetPosFromAttno(attno);
 
@@ -1218,7 +1218,7 @@ CMDAccessor::Pstats
 			(
 			mp,
 			rel_mdid,
-			col_id,
+			colid,
 			ulPos,
 			pcrtable->FSystemCol(),
 			fEmptyTable,
@@ -1239,12 +1239,12 @@ CMDAccessor::Pstats
 		CColRefTable *pcrtable = CColRefTable::PcrConvert(pcrWidth);
 
 		// extract the column identifier, position of the attribute in the system catalog
-		ULONG col_id = pcrtable->Id();
+		ULONG colid = pcrtable->Id();
 		INT attno = pcrtable->AttrNum();
 		ULONG ulPos = pmdrel->GetPosFromAttno(attno);
 
 		CDouble *width = GPOS_NEW(mp) CDouble(pmdrel->ColWidth(ulPos));
-		col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(col_id), width);
+		col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid), width);
 	}
 
 	CDouble rows = std::max(DOUBLE(1.0), pmdRelStats->Rows().Get());

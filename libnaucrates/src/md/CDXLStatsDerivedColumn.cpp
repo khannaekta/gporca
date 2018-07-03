@@ -26,13 +26,13 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLStatsDerivedColumn::CDXLStatsDerivedColumn(ULONG col_id,
+CDXLStatsDerivedColumn::CDXLStatsDerivedColumn(ULONG colid,
 											   CDouble width,
 											   CDouble null_freq,
 											   CDouble distinct_remaining,
 											   CDouble freq_remaining,
 											   DXLBucketPtrArray *dxl_stats_bucket_array)
-	: m_colid(col_id),
+	: m_colid(colid),
 	  m_width(width),
 	  m_null_freq(null_freq),
 	  m_distinct_remaining(distinct_remaining),

@@ -188,7 +188,7 @@ namespace gpnaucrates
 
 		// helper method to add a histogram to a map
 		static void AddHistogram(IMemoryPool *mp,
-								 ULONG col_id,
+								 ULONG colid,
 								 const CHistogram *histogram,
 								 UlongHistogramHashMap *col_histogram_mapping,
 								 BOOL replace_old = false);

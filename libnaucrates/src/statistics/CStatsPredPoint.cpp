@@ -27,10 +27,10 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CStatsPredPoint::CStatsPredPoint(ULONG col_id,
+CStatsPredPoint::CStatsPredPoint(ULONG colid,
 								 CStatsPred::EStatsCmpType stats_cmp_type,
 								 CPoint *point)
-	: CStatsPred(col_id), m_stats_cmp_type(stats_cmp_type), m_pred_point(point)
+	: CStatsPred(colid), m_stats_cmp_type(stats_cmp_type), m_pred_point(point)
 {
 	GPOS_ASSERT(NULL != point);
 }

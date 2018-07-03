@@ -790,7 +790,7 @@ CFilterCardinalityTest::EresUnittest_CStatisticsBasicsFromDXLNumeric()
 
 		SStatsCmpValElem statsCmpValElem = rgStatsCmpValElem[ul];
 
-		StatsPredPtrArry *pdrgpstatspred = PdrgppredfilterNumeric(mp, 1 /*col_id*/, statsCmpValElem);
+		StatsPredPtrArry *pdrgpstatspred = PdrgppredfilterNumeric(mp, 1 /*colid*/, statsCmpValElem);
 		CStatsPredConj *pred_stats = GPOS_NEW(mp) CStatsPredConj(pdrgpstatspred);
 		GPOS_RESULT eres = EresUnittest_CStatisticsCompare
 							(
@@ -823,7 +823,7 @@ StatsPredPtrArry *
 CFilterCardinalityTest::PdrgpstatspredInteger
 	(
 	IMemoryPool *mp,
-	ULONG col_id,
+	ULONG colid,
 	CStatsPred::EStatsCmpType stats_cmp_type,
 	INT *piVals,
 	ULONG ulVals
@@ -834,7 +834,7 @@ CFilterCardinalityTest::PdrgpstatspredInteger
 	StatsPredPtrArry *pdrgpstatspred = GPOS_NEW(mp) StatsPredPtrArry(mp);
 	for (ULONG ul = 0; ul < ulVals; ul++)
 	{
-		pdrgpstatspred->Append(GPOS_NEW(mp) CStatsPredPoint(col_id, stats_cmp_type, CTestUtils::PpointInt4(mp, piVals[ul])));
+		pdrgpstatspred->Append(GPOS_NEW(mp) CStatsPredPoint(colid, stats_cmp_type, CTestUtils::PpointInt4(mp, piVals[ul])));
 	}
 
 	return pdrgpstatspred;
@@ -845,7 +845,7 @@ StatsPredPtrArry *
 CFilterCardinalityTest::PdrgppredfilterNumeric
 	(
 	IMemoryPool *mp,
-	ULONG col_id,
+	ULONG colid,
 	SStatsCmpValElem statsCmpValElem
 	)
 {
@@ -854,7 +854,7 @@ CFilterCardinalityTest::PdrgppredfilterNumeric
 	CWStringDynamic *pstrNumeric = GPOS_NEW(mp) CWStringDynamic(mp, statsCmpValElem.m_wsz);
 	CStatsPredPoint *pred_stats = GPOS_NEW(mp) CStatsPredPoint
 													(
-													col_id,
+													colid,
 													statsCmpValElem.m_stats_cmp_type,
 													CCardinalityTestUtils::PpointNumeric(mp, pstrNumeric, statsCmpValElem.m_value)
 													);

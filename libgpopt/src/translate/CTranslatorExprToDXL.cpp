@@ -310,11 +310,11 @@ CTranslatorExprToDXL::PdxlnTranslate
 		CDXLScalarProjElem *pdxlopPrElOld = CDXLScalarProjElem::Cast(pdxlnPrElOld->GetOperator());
 		GPOS_ASSERT(1 == pdxlnPrElOld->Arity());
 		CDXLNode *child_dxlnode = (*pdxlnPrElOld)[0];
-		const ULONG col_id = pdxlopPrElOld->Id();
+		const ULONG colid = pdxlopPrElOld->Id();
 
 		// create a new project element node with the col id and new column name
 		// and add the scalar child
-		CDXLNode *pdxlnPrElNew = GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjElem(m_mp, col_id, mdname));
+		CDXLNode *pdxlnPrElNew = GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjElem(m_mp, colid, mdname));
 		child_dxlnode->AddRef();
 		pdxlnPrElNew->AddChild(child_dxlnode);
 
@@ -2423,14 +2423,14 @@ CTranslatorExprToDXL::PdxlnAggregate
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
 		CDXLNode *pdxlnProjElem = (*proj_list_dxlnode)[ul];
-		ULONG col_id = CDXLScalarProjElem::Cast(pdxlnProjElem->GetOperator())->Id();
+		ULONG colid = CDXLScalarProjElem::Cast(pdxlnProjElem->GetOperator())->Id();
 
-		if (NULL == phmululPL->Find(&col_id))
+		if (NULL == phmululPL->Find(&colid))
 		{
 #ifdef GPOS_DEBUG
 			BOOL fRes =
 #endif
-			phmululPL->Insert(GPOS_NEW(m_mp) ULONG(col_id), GPOS_NEW(m_mp) ULONG(col_id));
+			phmululPL->Insert(GPOS_NEW(m_mp) ULONG(colid), GPOS_NEW(m_mp) ULONG(colid));
 			GPOS_ASSERT(fRes);
 		}
 	}
@@ -2453,15 +2453,15 @@ CTranslatorExprToDXL::PdxlnAggregate
 
 		pdrgpulGroupingCols->Append(GPOS_NEW(m_mp) ULONG(pcrGroupingCol->Id()));
 
-		ULONG col_id = pcrGroupingCol->Id();
-		if (NULL == phmululPL->Find(&col_id))
+		ULONG colid = pcrGroupingCol->Id();
+		if (NULL == phmululPL->Find(&colid))
 		{
 			CDXLNode *pdxlnProjElem = CTranslatorExprToDXLUtils::PdxlnProjElem(m_mp, m_phmcrdxln, pcrGroupingCol);
 			proj_list_dxlnode->AddChild(pdxlnProjElem);
 #ifdef GPOS_DEBUG
 		BOOL fRes =
 #endif
-				phmululPL->Insert(GPOS_NEW(m_mp) ULONG(col_id), GPOS_NEW(m_mp) ULONG(col_id));
+				phmululPL->Insert(GPOS_NEW(m_mp) ULONG(colid), GPOS_NEW(m_mp) ULONG(colid));
 			GPOS_ASSERT(fRes);
 		}
 	}

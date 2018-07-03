@@ -71,7 +71,7 @@ namespace gpnaucrates
 
 	public:
 		// ctor
-		explicit CStatsPred(ULONG col_id) : m_colid(col_id)
+		explicit CStatsPred(ULONG colid) : m_colid(colid)
 		{
 		}
 

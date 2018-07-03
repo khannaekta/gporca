@@ -140,7 +140,7 @@ namespace gpnaucrates
 		virtual CDouble NumRebinds() const = 0;
 
 		// skew estimate for given column
-		virtual CDouble GetSkew(ULONG col_id) const = 0;
+		virtual CDouble GetSkew(ULONG colid) const = 0;
 
 		// what is the width in bytes
 		virtual CDouble Width() const = 0;

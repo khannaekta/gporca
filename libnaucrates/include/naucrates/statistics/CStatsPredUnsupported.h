@@ -43,8 +43,8 @@ namespace gpnaucrates
 
 	public:
 		// ctors
-		CStatsPredUnsupported(ULONG col_id, CStatsPred::EStatsCmpType stats_pred_type);
-		CStatsPredUnsupported(ULONG col_id,
+		CStatsPredUnsupported(ULONG colid, CStatsPred::EStatsCmpType stats_pred_type);
+		CStatsPredUnsupported(ULONG colid,
 							  CStatsPred::EStatsCmpType stats_pred_type,
 							  CDouble default_scale_factor);
 

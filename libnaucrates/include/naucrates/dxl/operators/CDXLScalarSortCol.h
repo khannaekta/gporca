@@ -52,7 +52,7 @@ namespace gpdxl
 	public:
 		// ctor/dtor
 		CDXLScalarSortCol(IMemoryPool *mp,
-						  ULONG col_id,
+						  ULONG colid,
 						  IMDId *sort_op_id,
 						  CWStringConst *pstrTypeName,
 						  BOOL fSortNullsFirst);

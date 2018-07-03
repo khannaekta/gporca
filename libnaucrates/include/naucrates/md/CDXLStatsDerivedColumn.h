@@ -60,7 +60,7 @@ namespace gpmd
 
 	public:
 		// ctor
-		CDXLStatsDerivedColumn(ULONG col_id,
+		CDXLStatsDerivedColumn(ULONG colid,
 							   CDouble width,
 							   CDouble null_freq,
 							   CDouble distinct_remaining,

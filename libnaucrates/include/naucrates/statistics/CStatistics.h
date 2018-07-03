@@ -172,7 +172,7 @@ namespace gpnaucrates
 		}
 
 		// skew estimate for given column
-		virtual CDouble GetSkew(ULONG col_id) const;
+		virtual CDouble GetSkew(ULONG colid) const;
 
 		// what is the width in bytes of set of column id's
 		virtual CDouble Width(ULongPtrArray *col_ids) const;
@@ -192,16 +192,16 @@ namespace gpnaucrates
 
 		// look up the histogram of a particular column
 		virtual const CHistogram *
-		GetHistogram(ULONG col_id) const
+		GetHistogram(ULONG colid) const
 		{
-			return m_colid_histogram_mapping->Find(&col_id);
+			return m_colid_histogram_mapping->Find(&colid);
 		}
 
 		// look up the number of distinct values of a particular column
 		virtual CDouble GetNDVs(const CColRef *colref);
 
 		// look up the width of a particular column
-		virtual const CDouble *GetWidth(ULONG col_id) const;
+		virtual const CDouble *GetWidth(ULONG colid) const;
 
 		// the risk of errors in cardinality estimation
 		virtual ULONG

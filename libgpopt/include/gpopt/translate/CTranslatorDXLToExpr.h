@@ -129,7 +129,7 @@ namespace gpopt
 				Edxlopid edxlopid,
 				IMDId *scalar_op_mdid,
 				const CWStringConst *str,
-				ULONG col_id,
+				ULONG colid,
 				CDXLNode *pdxlnLogicalChild,
 				CDXLNode *pdxlnScalarChild
 				);
@@ -186,7 +186,7 @@ namespace gpopt
 						const IMDType *pmdtype,
 						INT type_modifier,
 						BOOL fStoreMapping,
-						ULONG col_id
+						ULONG colid
 						);
 
 			// check if we currently support the casting of such column types
@@ -395,7 +395,7 @@ namespace gpopt
 			// look up the column reference in the hash map. We raise an exception if
 			// the column is not found
 			static
-			CColRef *LookupColRef(UlongColRefHashMap *colref_mapping, ULONG col_id);
+			CColRef *LookupColRef(UlongColRefHashMap *colref_mapping, ULONG colid);
 
 		public:
 			// ctor

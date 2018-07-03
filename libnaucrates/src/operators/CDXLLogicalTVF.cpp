@@ -122,13 +122,13 @@ CDXLLogicalTVF::GetColumnDescrAt(ULONG ul) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDXLLogicalTVF::IsColDefined(ULONG col_id) const
+CDXLLogicalTVF::IsColDefined(ULONG colid) const
 {
 	const ULONG size = Arity();
 	for (ULONG ulDescr = 0; ulDescr < size; ulDescr++)
 	{
 		ULONG id = GetColumnDescrAt(ulDescr)->Id();
-		if (id == col_id)
+		if (id == colid)
 		{
 			return true;
 		}

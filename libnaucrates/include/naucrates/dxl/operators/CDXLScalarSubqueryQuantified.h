@@ -61,7 +61,7 @@ namespace gpdxl
 		CDXLScalarSubqueryQuantified(IMemoryPool *mp,
 									 IMDId *scalar_op_mdid,
 									 CMDName *mdname,
-									 ULONG col_id);
+									 ULONG colid);
 
 		// dtor
 		virtual ~CDXLScalarSubqueryQuantified();

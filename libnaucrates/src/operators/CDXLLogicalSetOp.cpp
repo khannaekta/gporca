@@ -180,13 +180,13 @@ CDXLLogicalSetOp::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode 
 //
 //---------------------------------------------------------------------------
 BOOL
-CDXLLogicalSetOp::IsColDefined(ULONG col_id) const
+CDXLLogicalSetOp::IsColDefined(ULONG colid) const
 {
 	const ULONG size = Arity();
 	for (ULONG descr_id = 0; descr_id < size; descr_id++)
 	{
 		ULONG id = GetColumnDescrAt(descr_id)->Id();
-		if (id == col_id)
+		if (id == colid)
 		{
 			return true;
 		}
