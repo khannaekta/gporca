@@ -86,7 +86,7 @@ namespace gpdxl
 		SysidPtrArray *m_system_id_array;
 
 		// list of parsed statistics objects
-		DXLStatsDerivedRelArray *m_stats_derived_rel_dxl_array;
+		DXLStatsDerivedRelArray *m_dxl_stats_derived_rel_array;
 
 		// search strategy
 		SearchStageArray *m_search_stage_array;

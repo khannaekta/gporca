@@ -36,7 +36,7 @@ namespace gpdxl
 	{
 	private:
 		// list of derived table statistics
-		DXLStatsDerivedRelArray *m_stats_derived_rel_dxl_array;
+		DXLStatsDerivedRelArray *m_dxl_stats_derived_rel_array;
 
 		// private copy ctor
 		CParseHandlerStatistics(const CParseHandlerStatistics &);
