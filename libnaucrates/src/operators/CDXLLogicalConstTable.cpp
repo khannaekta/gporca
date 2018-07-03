@@ -164,8 +164,8 @@ CDXLLogicalConstTable::SerializeToDXL(CXMLSerializer *xml_serializer,
 		const ULONG num_of_cols = pdrgpdxldatum->Size();
 		for (ULONG col_idx = 0; col_idx < num_of_cols; col_idx++)
 		{
-			CDXLDatum *datum_dxl = (*pdrgpdxldatum)[col_idx];
-			datum_dxl->Serialize(xml_serializer, pstrElemNameDatum);
+			CDXLDatum *dxl_datum = (*pdrgpdxldatum)[col_idx];
+			dxl_datum->Serialize(xml_serializer, pstrElemNameDatum);
 		}
 
 		xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),

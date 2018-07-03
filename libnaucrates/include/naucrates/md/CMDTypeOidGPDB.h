@@ -203,7 +203,7 @@ namespace gpmd
 
 		// create typed datum from DXL datum
 		virtual IDatum *GetDatumForDXLDatum(IMemoryPool *mp,
-											const CDXLDatum *datum_dxl) const;
+											const CDXLDatum *dxl_datum) const;
 
 		// generate the DXL datum from IDatum
 		virtual CDXLDatum *GetDatumVal(IMemoryPool *mp, IDatum *datum) const;

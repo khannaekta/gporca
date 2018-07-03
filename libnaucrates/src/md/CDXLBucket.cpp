@@ -33,8 +33,8 @@ CDXLBucket::CDXLBucket(CDXLDatum *dxl_datum_lower,
 					   BOOL is_upper_closed,
 					   CDouble frequency,
 					   CDouble distinct)
-	: m_lower_bound_datum_dxl(dxl_datum_lower),
-	  m_upper_bound_datum_dxl(dxl_datum_upper),
+	: m_lower_bound_dxl_datum(dxl_datum_lower),
+	  m_upper_bound_dxl_datum(dxl_datum_upper),
 	  m_is_lower_closed(is_lower_closed),
 	  m_is_upper_closed(is_upper_closed),
 	  m_frequency(frequency),
@@ -56,8 +56,8 @@ CDXLBucket::CDXLBucket(CDXLDatum *dxl_datum_lower,
 //---------------------------------------------------------------------------
 CDXLBucket::~CDXLBucket()
 {
-	m_lower_bound_datum_dxl->Release();
-	m_upper_bound_datum_dxl->Release();
+	m_lower_bound_dxl_datum->Release();
+	m_upper_bound_dxl_datum->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -71,7 +71,7 @@ CDXLBucket::~CDXLBucket()
 const CDXLDatum *
 CDXLBucket::GetDXLDatumLower() const
 {
-	return m_lower_bound_datum_dxl;
+	return m_lower_bound_dxl_datum;
 }
 
 //---------------------------------------------------------------------------
@@ -85,7 +85,7 @@ CDXLBucket::GetDXLDatumLower() const
 const CDXLDatum *
 CDXLBucket::GetDXLDatumUpper() const
 {
-	return m_upper_bound_datum_dxl;
+	return m_upper_bound_dxl_datum;
 }
 
 //---------------------------------------------------------------------------
@@ -136,11 +136,11 @@ CDXLBucket::Serialize(CXMLSerializer *xml_serializer) const
 
 	SerializeBoundaryValue(xml_serializer,
 						   CDXLTokens::GetDXLTokenStr(EdxltokenStatsBucketLowerBound),
-						   m_lower_bound_datum_dxl,
+						   m_lower_bound_dxl_datum,
 						   m_is_lower_closed);
 	SerializeBoundaryValue(xml_serializer,
 						   CDXLTokens::GetDXLTokenStr(EdxltokenStatsBucketUpperBound),
-						   m_upper_bound_datum_dxl,
+						   m_upper_bound_dxl_datum,
 						   m_is_upper_closed);
 
 	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
@@ -160,13 +160,13 @@ CDXLBucket::Serialize(CXMLSerializer *xml_serializer) const
 void
 CDXLBucket::SerializeBoundaryValue(CXMLSerializer *xml_serializer,
 								   const CWStringConst *elem_str,
-								   CDXLDatum *datum_dxl,
+								   CDXLDatum *dxl_datum,
 								   BOOL is_bound_closed) const
 {
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), elem_str);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenStatsBoundClosed),
 								 is_bound_closed);
-	datum_dxl->Serialize(xml_serializer);
+	dxl_datum->Serialize(xml_serializer);
 	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), elem_str);
 }
 

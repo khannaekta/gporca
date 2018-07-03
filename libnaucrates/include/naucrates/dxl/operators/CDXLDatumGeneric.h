@@ -85,14 +85,14 @@ namespace gpdxl
 
 		// conversion function
 		static CDXLDatumGeneric *
-		Cast(CDXLDatum *datum_dxl)
+		Cast(CDXLDatum *dxl_datum)
 		{
-			GPOS_ASSERT(NULL != datum_dxl);
-			GPOS_ASSERT(CDXLDatum::EdxldatumGeneric == datum_dxl->GetDatumType() ||
-						CDXLDatum::EdxldatumStatsDoubleMappable == datum_dxl->GetDatumType() ||
-						CDXLDatum::EdxldatumStatsLintMappable == datum_dxl->GetDatumType());
+			GPOS_ASSERT(NULL != dxl_datum);
+			GPOS_ASSERT(CDXLDatum::EdxldatumGeneric == dxl_datum->GetDatumType() ||
+						CDXLDatum::EdxldatumStatsDoubleMappable == dxl_datum->GetDatumType() ||
+						CDXLDatum::EdxldatumStatsLintMappable == dxl_datum->GetDatumType());
 
-			return dynamic_cast<CDXLDatumGeneric *>(datum_dxl);
+			return dynamic_cast<CDXLDatumGeneric *>(dxl_datum);
 		}
 
 		// statistics related APIs

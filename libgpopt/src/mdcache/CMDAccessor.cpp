@@ -1361,12 +1361,12 @@ CMDAccessor::GetDatum
 	(
 	IMemoryPool *mp,
 	IMDId *mdid_type,
-	const CDXLDatum *datum_dxl
+	const CDXLDatum *dxl_datum
 	)
 {
 	const IMDType *pmdtype = RetrieveType(mdid_type);
 		
-	return pmdtype->GetDatumForDXLDatum(mp, datum_dxl);
+	return pmdtype->GetDatumForDXLDatum(mp, dxl_datum);
 }
 
 //---------------------------------------------------------------------------

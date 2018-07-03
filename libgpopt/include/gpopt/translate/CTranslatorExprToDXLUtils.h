@@ -270,7 +270,7 @@ namespace gpopt
 			// check if the given constant m_bytearray_value for a particular distribution column can be used
 			// to identify which segment to direct dispatch to.
 			static
-			BOOL FDirectDispatchable(const CColRef *pcrDistrCol, const CDXLDatum *datum_dxl);
+			BOOL FDirectDispatchable(const CColRef *pcrDistrCol, const CDXLDatum *dxl_datum);
 
 		public:
 		

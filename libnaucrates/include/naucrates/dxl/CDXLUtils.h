@@ -305,7 +305,7 @@ namespace gpdxl
 		// translate the optimizer datum from dxl datum object
 		static IDatum *GetDatum(IMemoryPool *mp,
 								CMDAccessor *md_accessor,
-								const CDXLDatum *datum_dxl);
+								const CDXLDatum *dxl_datum);
 
 		// serialize Datum with given tag
 		static void SerializeBound(IDatum *new_length,

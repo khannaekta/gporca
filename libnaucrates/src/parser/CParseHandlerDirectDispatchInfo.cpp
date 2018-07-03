@@ -90,9 +90,9 @@ CParseHandlerDirectDispatchInfo::StartElement(const XMLCh *const,  //element_uri
 	{
 		GPOS_ASSERT(NULL != m_dxl_datum_array);
 
-		CDXLDatum *datum_dxl = CDXLOperatorFactory::GetDatumVal(
+		CDXLDatum *dxl_datum = CDXLOperatorFactory::GetDatumVal(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenDirectDispatchInfo);
-		m_dxl_datum_array->Append(datum_dxl);
+		m_dxl_datum_array->Append(dxl_datum);
 	}
 	else
 	{

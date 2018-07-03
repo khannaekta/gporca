@@ -2922,8 +2922,8 @@ CTranslatorExprToDXL::PdxlnProjectBoolConst
 	IMDId *mdid = pmdtypebool->MDId();
 	mdid->AddRef();
 
-	CDXLDatumBool *datum_dxl = GPOS_NEW(m_mp) CDXLDatumBool(m_mp, mdid, false /* is_null */,  value);
-	CDXLScalarConstValue *pdxlopConstValue = GPOS_NEW(m_mp) CDXLScalarConstValue(m_mp, datum_dxl);
+	CDXLDatumBool *dxl_datum = GPOS_NEW(m_mp) CDXLDatumBool(m_mp, mdid, false /* is_null */,  value);
+	CDXLScalarConstValue *pdxlopConstValue = GPOS_NEW(m_mp) CDXLScalarConstValue(m_mp, dxl_datum);
 	CColRef *colref = m_pcf->PcrCreate(pmdtypebool, default_type_modifier);
 	CDXLNode *pdxlnPrEl = PdxlnProjElem(colref, GPOS_NEW(m_mp) CDXLNode(m_mp, pdxlopConstValue));
 
@@ -3346,8 +3346,8 @@ CTranslatorExprToDXL::PdxlnBooleanScalarWithSubPlan
 	IMDId *mdid = pmdtypebool->MDId();
 	mdid->AddRef();
 
-	CDXLDatumBool *datum_dxl = GPOS_NEW(m_mp) CDXLDatumBool(m_mp, mdid, false /* is_null */, true /* m_bytearray_value */);
-	CDXLScalarConstValue *pdxlopConstValue = GPOS_NEW(m_mp) CDXLScalarConstValue(m_mp, datum_dxl);
+	CDXLDatumBool *dxl_datum = GPOS_NEW(m_mp) CDXLDatumBool(m_mp, mdid, false /* is_null */, true /* m_bytearray_value */);
+	CDXLScalarConstValue *pdxlopConstValue = GPOS_NEW(m_mp) CDXLScalarConstValue(m_mp, dxl_datum);
 
 	CColRef *colref = m_pcf->PcrCreate(pmdtypebool, default_type_modifier);
 
@@ -5528,20 +5528,20 @@ CTranslatorExprToDXL::GetDXLDirectDispatchInfo
 	GPOS_ASSERT(1 >= pci->Pdrgprng()->Size());
 
 	DXLDatumArray *pdrgpdxldatum = GPOS_NEW(m_mp) DXLDatumArray(m_mp);
-	CDXLDatum *datum_dxl = NULL;
+	CDXLDatum *dxl_datum = NULL;
 
 	if (1 == pci->Pdrgprng()->Size())
 	{
 		const CRange *prng = (*pci->Pdrgprng())[0];
-		datum_dxl = CTranslatorExprToDXLUtils::GetDatumVal(m_mp, m_pmda, prng->PdatumLeft());
+		dxl_datum = CTranslatorExprToDXLUtils::GetDatumVal(m_mp, m_pmda, prng->PdatumLeft());
 	}
 	else
 	{
 		GPOS_ASSERT(pci->FIncludesNull());
-		datum_dxl = pcrDistrCol->RetrieveType()->GetDXLDatumNull(m_mp);
+		dxl_datum = pcrDistrCol->RetrieveType()->GetDXLDatumNull(m_mp);
 	}
 
-	pdrgpdxldatum->Append(datum_dxl);
+	pdrgpdxldatum->Append(dxl_datum);
 
 	pcnstrDistrCol->Release();
 

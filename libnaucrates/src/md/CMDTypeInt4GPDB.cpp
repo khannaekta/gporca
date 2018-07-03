@@ -221,11 +221,11 @@ CMDTypeInt4GPDB::Serialize(CXMLSerializer *xml_serializer) const
 IDatum *
 CMDTypeInt4GPDB::GetDatumForDXLConstVal(const CDXLScalarConstValue *dxl_op) const
 {
-	CDXLDatumInt4 *datum_dxl = CDXLDatumInt4::Cast(const_cast<CDXLDatum *>(dxl_op->GetDatumVal()));
-	GPOS_ASSERT(datum_dxl->IsPassedByValue());
+	CDXLDatumInt4 *dxl_datum = CDXLDatumInt4::Cast(const_cast<CDXLDatum *>(dxl_op->GetDatumVal()));
+	GPOS_ASSERT(dxl_datum->IsPassedByValue());
 
 	return GPOS_NEW(m_mp)
-		CDatumInt4GPDB(m_mdid->Sysid(), datum_dxl->Value(), datum_dxl->IsNull());
+		CDatumInt4GPDB(m_mdid->Sysid(), dxl_datum->Value(), dxl_datum->IsNull());
 }
 
 //---------------------------------------------------------------------------
@@ -237,9 +237,9 @@ CMDTypeInt4GPDB::GetDatumForDXLConstVal(const CDXLScalarConstValue *dxl_op) cons
 //
 //---------------------------------------------------------------------------
 IDatum *
-CMDTypeInt4GPDB::GetDatumForDXLDatum(IMemoryPool *mp, const CDXLDatum *datum_dxl) const
+CMDTypeInt4GPDB::GetDatumForDXLDatum(IMemoryPool *mp, const CDXLDatum *dxl_datum) const
 {
-	CDXLDatumInt4 *int4_dxl_datum = CDXLDatumInt4::Cast(const_cast<CDXLDatum *>(datum_dxl));
+	CDXLDatumInt4 *int4_dxl_datum = CDXLDatumInt4::Cast(const_cast<CDXLDatum *>(dxl_datum));
 	GPOS_ASSERT(int4_dxl_datum->IsPassedByValue());
 	INT val = int4_dxl_datum->Value();
 	BOOL is_null = int4_dxl_datum->IsNull();
@@ -279,10 +279,10 @@ CMDTypeInt4GPDB::GetDXLOpScConst(IMemoryPool *mp, IDatum *datum) const
 	CDatumInt4GPDB *int4gpdb_datum = dynamic_cast<CDatumInt4GPDB *>(datum);
 
 	m_mdid->AddRef();
-	CDXLDatumInt4 *datum_dxl = GPOS_NEW(mp)
+	CDXLDatumInt4 *dxl_datum = GPOS_NEW(mp)
 		CDXLDatumInt4(mp, m_mdid, int4gpdb_datum->IsNull(), int4gpdb_datum->Value());
 
-	return GPOS_NEW(mp) CDXLScalarConstValue(mp, datum_dxl);
+	return GPOS_NEW(mp) CDXLScalarConstValue(mp, dxl_datum);
 }
 
 //---------------------------------------------------------------------------

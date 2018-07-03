@@ -74,12 +74,12 @@ namespace gpdxl
 
 		// conversion function
 		static CDXLDatumInt2 *
-		Cast(CDXLDatum *datum_dxl)
+		Cast(CDXLDatum *dxl_datum)
 		{
-			GPOS_ASSERT(NULL != datum_dxl);
-			GPOS_ASSERT(CDXLDatum::EdxldatumInt2 == datum_dxl->GetDatumType());
+			GPOS_ASSERT(NULL != dxl_datum);
+			GPOS_ASSERT(CDXLDatum::EdxldatumInt2 == dxl_datum->GetDatumType());
 
-			return dynamic_cast<CDXLDatumInt2 *>(datum_dxl);
+			return dynamic_cast<CDXLDatumInt2 *>(dxl_datum);
 		}
 	};
 }  // namespace gpdxl

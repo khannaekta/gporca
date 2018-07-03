@@ -887,9 +887,9 @@ CDXLOperatorFactory::MakeDXLConstValue(CDXLMemoryManager *memory_manager_dxl,
 {
 	// get the memory pool from the memory manager
 	IMemoryPool *mp = memory_manager_dxl->Pmp();
-	CDXLDatum *datum_dxl = GetDatumVal(memory_manager_dxl, attrs, EdxltokenScalarConstValue);
+	CDXLDatum *dxl_datum = GetDatumVal(memory_manager_dxl, attrs, EdxltokenScalarConstValue);
 
-	return GPOS_NEW(mp) CDXLScalarConstValue(mp, datum_dxl);
+	return GPOS_NEW(mp) CDXLScalarConstValue(mp, dxl_datum);
 }
 
 //---------------------------------------------------------------------------

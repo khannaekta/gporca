@@ -61,8 +61,8 @@ CTranslatorExprToDXLUtils::PdxlnInt4Const
 	const IMDTypeInt4 *pmdtypeint4 = md_accessor->PtMDType<IMDTypeInt4>();
 	pmdtypeint4->MDId()->AddRef();
 	
-	CDXLDatumInt4 *datum_dxl = GPOS_NEW(mp) CDXLDatumInt4(mp, pmdtypeint4->MDId(), false /*is_null*/, val);
-	CDXLScalarConstValue *pdxlConst = GPOS_NEW(mp) CDXLScalarConstValue(mp, datum_dxl);
+	CDXLDatumInt4 *dxl_datum = GPOS_NEW(mp) CDXLDatumInt4(mp, pmdtypeint4->MDId(), false /*is_null*/, val);
+	CDXLScalarConstValue *pdxlConst = GPOS_NEW(mp) CDXLScalarConstValue(mp, dxl_datum);
 	
 	return GPOS_NEW(mp) CDXLNode(mp, pdxlConst);
 }
@@ -88,8 +88,8 @@ CTranslatorExprToDXLUtils::PdxlnBoolConst
 	const IMDTypeBool *pmdtype = md_accessor->PtMDType<IMDTypeBool>();
 	pmdtype->MDId()->AddRef();
 	
-	CDXLDatumBool *datum_dxl = GPOS_NEW(mp) CDXLDatumBool(mp, pmdtype->MDId(), false /*is_null*/, value);
-	CDXLScalarConstValue *pdxlConst = GPOS_NEW(mp) CDXLScalarConstValue(mp, datum_dxl);
+	CDXLDatumBool *dxl_datum = GPOS_NEW(mp) CDXLDatumBool(mp, pmdtype->MDId(), false /*is_null*/, value);
+	CDXLScalarConstValue *pdxlConst = GPOS_NEW(mp) CDXLScalarConstValue(mp, dxl_datum);
 	
 	return GPOS_NEW(mp) CDXLNode(mp, pdxlConst);
 }
@@ -384,8 +384,8 @@ CTranslatorExprToDXLUtils::PdxlnPropagationExpressionForPartConstraints
 	
 	// add a dummy m_bytearray_value for the top and bottom level else cases
 	const IMDType *pmdtypeVoid = md_accessor->RetrieveType(mdid_return_type);
-	CDXLDatum *datum_dxl = pmdtypeVoid->GetDXLDatumNull(mp);
-	CDXLNode *pdxlnNullConst = GPOS_NEW(mp) CDXLNode(mp, GPOS_NEW(mp) CDXLScalarConstValue(mp, datum_dxl));
+	CDXLDatum *dxl_datum = pmdtypeVoid->GetDXLDatumNull(mp);
+	CDXLNode *pdxlnNullConst = GPOS_NEW(mp) CDXLNode(mp, GPOS_NEW(mp) CDXLScalarConstValue(mp, dxl_datum));
 	pdxlnScalarLeafIfStmt->AddChild(pdxlnNullConst);
 	
 	if (2 == pdxlnScalarRootIfStmt->Arity())
@@ -607,8 +607,8 @@ CTranslatorExprToDXLUtils::PdxlnPartialScanTestRange
 		}
 		GPOS_ASSERT(datum->Matches(prng->PdatumRight()));
 
-		CDXLDatum *datum_dxl = GetDatumVal(mp, md_accessor, datum);
-		CDXLNode *pdxlnScalar = GPOS_NEW(mp) CDXLNode(mp, GPOS_NEW(mp) CDXLScalarConstValue(mp, datum_dxl));
+		CDXLDatum *dxl_datum = GetDatumVal(mp, md_accessor, datum);
+		CDXLNode *pdxlnScalar = GPOS_NEW(mp) CDXLNode(mp, GPOS_NEW(mp) CDXLScalarConstValue(mp, dxl_datum));
 		// TODO: what if part key type is varchar, the m_bytearray_value type is text?
 		const IMDType *pmdtype = md_accessor->RetrieveType(pmdidPartKeyType);
 		IMDId *result_type_mdid = pmdtype->GetArrayTypeMdid();
@@ -745,8 +745,8 @@ CTranslatorExprToDXLUtils::PdxlnRangePointPredicate
 										GPOS_NEW(mp) CDXLScalarPartBound(mp, ulPartLevel, pmdidPartKeyType, is_lower_bound)
 										);
 
-	CDXLDatum *datum_dxl = GetDatumVal(mp, md_accessor, datum);
-	CDXLNode *pdxlnPoint = GPOS_NEW(mp) CDXLNode(mp, GPOS_NEW(mp) CDXLScalarConstValue(mp, datum_dxl));
+	CDXLDatum *dxl_datum = GetDatumVal(mp, md_accessor, datum);
+	CDXLNode *pdxlnPoint = GPOS_NEW(mp) CDXLNode(mp, GPOS_NEW(mp) CDXLScalarConstValue(mp, dxl_datum));
 	 	
 	// generate a predicate of the form "point < col" / "point > col"
 	pmdidCmpExl->AddRef();
@@ -1317,9 +1317,9 @@ CTranslatorExprToDXLUtils::FScalarConstTrue
 		const IMDType *pmdtype = md_accessor->RetrieveType(pdxlopConst->GetDatumVal()->MDId());
 		if (IMDType::EtiBool ==  pmdtype->GetDatumType())
 		{
-			CDXLDatumBool *datum_dxl = CDXLDatumBool::Cast(const_cast<CDXLDatum*>(pdxlopConst->GetDatumVal()));
+			CDXLDatumBool *dxl_datum = CDXLDatumBool::Cast(const_cast<CDXLDatum*>(pdxlopConst->GetDatumVal()));
 
-			return (!datum_dxl->IsNull() && datum_dxl->GetValue());
+			return (!dxl_datum->IsNull() && dxl_datum->GetValue());
 		}
 	}
 
@@ -1350,8 +1350,8 @@ CTranslatorExprToDXLUtils::FScalarConstFalse
 		const IMDType *pmdtype = md_accessor->RetrieveType(pdxlopConst->GetDatumVal()->MDId());
 		if (IMDType::EtiBool ==  pmdtype->GetDatumType())
 		{
-			CDXLDatumBool *datum_dxl = CDXLDatumBool::Cast(const_cast<CDXLDatum*>(pdxlopConst->GetDatumVal()));
-			return (!datum_dxl->IsNull() && !datum_dxl->GetValue());
+			CDXLDatumBool *dxl_datum = CDXLDatumBool::Cast(const_cast<CDXLDatum*>(pdxlopConst->GetDatumVal()));
+			return (!dxl_datum->IsNull() && !dxl_datum->GetValue());
 		}
 	}
 
@@ -2103,16 +2103,16 @@ CTranslatorExprToDXLUtils::GetDXLDirectDispatchInfo
 		
 		CConstraint *pcnstrDistrCol = pcnstr->Pcnstr(mp, pcrDistrCol);
 		
-		CDXLDatum *datum_dxl = PdxldatumFromPointConstraint(mp, md_accessor, pcrDistrCol, pcnstrDistrCol);
+		CDXLDatum *dxl_datum = PdxldatumFromPointConstraint(mp, md_accessor, pcrDistrCol, pcnstrDistrCol);
 		CRefCount::SafeRelease(pcnstrDistrCol);
 
-		if (NULL != datum_dxl && FDirectDispatchable(pcrDistrCol, datum_dxl))
+		if (NULL != dxl_datum && FDirectDispatchable(pcrDistrCol, dxl_datum))
 		{
-			pdrgpdxldatum->Append(datum_dxl);
+			pdrgpdxldatum->Append(dxl_datum);
 		}
 		else
 		{
-			CRefCount::SafeRelease(datum_dxl);
+			CRefCount::SafeRelease(dxl_datum);
 
 			fSuccess = false;
 			break;
@@ -2163,21 +2163,21 @@ CTranslatorExprToDXLUtils::PdxlddinfoSingleDistrKey
 	
 	if (CPredicateUtils::FConstColumn(pcnstrDistrCol, pcrDistrCol))
 	{
-		CDXLDatum *datum_dxl = PdxldatumFromPointConstraint(mp, md_accessor, pcrDistrCol, pcnstrDistrCol);
-		GPOS_ASSERT(NULL != datum_dxl);
+		CDXLDatum *dxl_datum = PdxldatumFromPointConstraint(mp, md_accessor, pcrDistrCol, pcnstrDistrCol);
+		GPOS_ASSERT(NULL != dxl_datum);
 
-		if (FDirectDispatchable(pcrDistrCol, datum_dxl))
+		if (FDirectDispatchable(pcrDistrCol, dxl_datum))
 		{
 			DXLDatumArray *pdrgpdxldatum = GPOS_NEW(mp) DXLDatumArray(mp);
 
-			datum_dxl->AddRef();
-			pdrgpdxldatum->Append(datum_dxl);
+			dxl_datum->AddRef();
+			pdrgpdxldatum->Append(dxl_datum);
 		
 			pdrgpdrgpdxldatum = GPOS_NEW(mp) DXLDatumArrays(mp);
 			pdrgpdrgpdxldatum->Append(pdrgpdxldatum);
 		}
 
-		datum_dxl->Release();
+		dxl_datum->Release();
 	}
 	else if (CPredicateUtils::FColumnDisjunctionOfConst(pcnstrDistrCol, pcrDistrCol))
 	{
@@ -2208,13 +2208,13 @@ BOOL
 CTranslatorExprToDXLUtils::FDirectDispatchable
 	(
 	const CColRef *pcrDistrCol,
-	const CDXLDatum *datum_dxl
+	const CDXLDatum *dxl_datum
 	)
 {
 	GPOS_ASSERT(NULL != pcrDistrCol);
-	GPOS_ASSERT(NULL != datum_dxl);
+	GPOS_ASSERT(NULL != dxl_datum);
 
-	IMDId *pmdidDatum = datum_dxl->MDId();
+	IMDId *pmdidDatum = dxl_datum->MDId();
 	IMDId *pmdidDistrCol = pcrDistrCol->RetrieveType()->MDId();
 
 	// since all integer values are up-casted to int64, the hash m_bytearray_value will be
@@ -2254,20 +2254,20 @@ CTranslatorExprToDXLUtils::PdxldatumFromPointConstraint
 	CConstraintInterval *pci = dynamic_cast<CConstraintInterval *>(pcnstrDistrCol);
 	GPOS_ASSERT(1 >= pci->Pdrgprng()->Size());
 	
-	CDXLDatum *datum_dxl = NULL;
+	CDXLDatum *dxl_datum = NULL;
 	
 	if (1 == pci->Pdrgprng()->Size())
 	{
 		const CRange *prng = (*pci->Pdrgprng())[0];
-		datum_dxl = CTranslatorExprToDXLUtils::GetDatumVal(mp, md_accessor, prng->PdatumLeft());
+		dxl_datum = CTranslatorExprToDXLUtils::GetDatumVal(mp, md_accessor, prng->PdatumLeft());
 	}
 	else
 	{
 		GPOS_ASSERT(pci->FIncludesNull());
-		datum_dxl = pcrDistrCol->RetrieveType()->GetDXLDatumNull(mp);
+		dxl_datum = pcrDistrCol->RetrieveType()->GetDXLDatumNull(mp);
 	}
 	
-	return datum_dxl;
+	return dxl_datum;
 }
 
 //---------------------------------------------------------------------------
@@ -2293,21 +2293,21 @@ CTranslatorExprToDXLUtils::PdrgpdrgpdxldatumFromDisjPointConstraint
 	{
 		DXLDatumArrays *pdrgpdrgpdxldatum = NULL;
 
-		CDXLDatum *datum_dxl = PdxldatumFromPointConstraint(mp, md_accessor, pcrDistrCol, pcnstrDistrCol);
+		CDXLDatum *dxl_datum = PdxldatumFromPointConstraint(mp, md_accessor, pcrDistrCol, pcnstrDistrCol);
 
-		if (FDirectDispatchable(pcrDistrCol, datum_dxl))
+		if (FDirectDispatchable(pcrDistrCol, dxl_datum))
 		{
 			DXLDatumArray *pdrgpdxldatum = GPOS_NEW(mp) DXLDatumArray(mp);
 
-			datum_dxl->AddRef();
-			pdrgpdxldatum->Append(datum_dxl);
+			dxl_datum->AddRef();
+			pdrgpdxldatum->Append(dxl_datum);
 
 			pdrgpdrgpdxldatum = GPOS_NEW(mp) DXLDatumArrays(mp);
 			pdrgpdrgpdxldatum->Append(pdrgpdxldatum);
 		}
 
 		// clean up
-		datum_dxl->Release();
+		dxl_datum->Release();
 
 		return pdrgpdrgpdxldatum;
 	}
@@ -2325,12 +2325,12 @@ CTranslatorExprToDXLUtils::PdrgpdrgpdxldatumFromDisjPointConstraint
 	{
 		CRange *prng = (*pdrgprng)[ul];
 		GPOS_ASSERT(prng->FPoint());
-		CDXLDatum *datum_dxl = CTranslatorExprToDXLUtils::GetDatumVal(mp, md_accessor, prng->PdatumLeft());
+		CDXLDatum *dxl_datum = CTranslatorExprToDXLUtils::GetDatumVal(mp, md_accessor, prng->PdatumLeft());
 
-		if (!FDirectDispatchable(pcrDistrCol, datum_dxl))
+		if (!FDirectDispatchable(pcrDistrCol, dxl_datum))
 		{
 			// clean up
-			datum_dxl->Release();
+			dxl_datum->Release();
 			pdrgpdrgpdxdatum->Release();
 
 			return NULL;
@@ -2338,25 +2338,25 @@ CTranslatorExprToDXLUtils::PdrgpdrgpdxldatumFromDisjPointConstraint
 
 		DXLDatumArray *pdrgpdxldatum = GPOS_NEW(mp) DXLDatumArray(mp);
 
-		pdrgpdxldatum->Append(datum_dxl);
+		pdrgpdxldatum->Append(dxl_datum);
 		pdrgpdrgpdxdatum->Append(pdrgpdxldatum);
 	}
 	
 	if (pcnstrInterval->FIncludesNull())
 	{
-		CDXLDatum *datum_dxl = pcrDistrCol->RetrieveType()->GetDXLDatumNull(mp);
+		CDXLDatum *dxl_datum = pcrDistrCol->RetrieveType()->GetDXLDatumNull(mp);
 
-		if (!FDirectDispatchable(pcrDistrCol, datum_dxl))
+		if (!FDirectDispatchable(pcrDistrCol, dxl_datum))
 		{
 			// clean up
-			datum_dxl->Release();
+			dxl_datum->Release();
 			pdrgpdrgpdxdatum->Release();
 
 			return NULL;
 		}
 
 		DXLDatumArray *pdrgpdxldatum = GPOS_NEW(mp) DXLDatumArray(mp);
-		pdrgpdxldatum->Append(datum_dxl);
+		pdrgpdxldatum->Append(dxl_datum);
 		pdrgpdrgpdxdatum->Append(pdrgpdxldatum);
 	}
 	

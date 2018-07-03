@@ -38,8 +38,8 @@ CParseHandlerColStatsBucket::CParseHandlerColStatsBucket(IMemoryPool *mp,
 	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_base),
 	  m_frequency(0.0),
 	  m_distinct(0.0),
-	  m_lower_bound_datum_dxl(NULL),
-	  m_upper_bound_datum_dxl(NULL),
+	  m_lower_bound_dxl_datum(NULL),
+	  m_upper_bound_dxl_datum(NULL),
 	  m_is_lower_closed(false),
 	  m_is_upper_closed(false),
 	  m_bucket_dxl(NULL)
@@ -108,7 +108,7 @@ CParseHandlerColStatsBucket::StartElement(const XMLCh *const,  // element_uri,
 										   element_local_name))
 	{
 		// parse lower bound
-		m_lower_bound_datum_dxl = CDXLOperatorFactory::GetDatumVal(
+		m_lower_bound_dxl_datum = CDXLOperatorFactory::GetDatumVal(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenStatsBucketLowerBound);
 		m_is_lower_closed = CDXLOperatorFactory::ExtractConvertAttrValueToBool(
 			m_parse_handler_mgr->GetDXLMemoryManager(),
@@ -120,7 +120,7 @@ CParseHandlerColStatsBucket::StartElement(const XMLCh *const,  // element_uri,
 										   element_local_name))
 	{
 		// parse upper bound
-		m_upper_bound_datum_dxl = CDXLOperatorFactory::GetDatumVal(
+		m_upper_bound_dxl_datum = CDXLOperatorFactory::GetDatumVal(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenStatsBucketUpperBound);
 		m_is_upper_closed = CDXLOperatorFactory::ExtractConvertAttrValueToBool(
 			m_parse_handler_mgr->GetDXLMemoryManager(),
@@ -153,8 +153,8 @@ CParseHandlerColStatsBucket::EndElement(const XMLCh *const,  // element_uri,
 	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenColumnStatsBucket),
 									  element_local_name))
 	{
-		m_bucket_dxl = GPOS_NEW(m_mp) CDXLBucket(m_lower_bound_datum_dxl,
-														  m_upper_bound_datum_dxl,
+		m_bucket_dxl = GPOS_NEW(m_mp) CDXLBucket(m_lower_bound_dxl_datum,
+														  m_upper_bound_dxl_datum,
 														  m_is_lower_closed,
 														  m_is_upper_closed,
 														  m_frequency,
