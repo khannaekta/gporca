@@ -74,7 +74,7 @@ CSearchStrategyTest::Optimize
 	(
 	IMemoryPool *memory_pool,
 	Pfpexpr pfnGenerator,
-	DrgPss *search_stage_array,
+	SearchStageArray *search_stage_array,
 	PfnOptimize pfnOptimize
 	)
 {
@@ -154,7 +154,7 @@ CSearchStrategyTest::EresUnittest_Parsing()
 	CAutoMemoryPool amp;
 	IMemoryPool *memory_pool = amp.Pmp();
 	CParseHandlerDXL *pphDXL = CDXLUtils::GetParseHandlerForDXLFile(memory_pool,"../data/dxl/search/strategy0.xml", NULL);
-	DrgPss *search_stage_array = pphDXL->GetSearchStageArray();
+	SearchStageArray *search_stage_array = pphDXL->GetSearchStageArray();
 	const ULONG size = search_stage_array->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
@@ -186,7 +186,7 @@ CSearchStrategyTest::EresUnittest_Timeout()
 	IMemoryPool *memory_pool = amp.Pmp();
 	CAutoTraceFlag atf(EopttracePrintOptimizationStatistics, true);
 	CParseHandlerDXL *pphDXL = CDXLUtils::GetParseHandlerForDXLFile(memory_pool,"../data/dxl/search/timeout-strategy.xml", NULL);
-	DrgPss *search_stage_array = pphDXL->GetSearchStageArray();
+	SearchStageArray *search_stage_array = pphDXL->GetSearchStageArray();
 	search_stage_array->AddRef();
 	Optimize(memory_pool, CTestUtils::PexprLogicalNAryJoin, search_stage_array, CSchedulerTest::BuildMemoMultiThreaded);
 
@@ -225,13 +225,13 @@ CSearchStrategyTest::EresUnittest_ParsingWithException()
 //		Generate a search strategy with random xform allocation
 //
 //---------------------------------------------------------------------------
-DrgPss *
+SearchStageArray *
 CSearchStrategyTest::PdrgpssRandom
 	(
 	IMemoryPool *memory_pool
 	)
 {
-	DrgPss *search_stage_array = GPOS_NEW(memory_pool) DrgPss(memory_pool);
+	SearchStageArray *search_stage_array = GPOS_NEW(memory_pool) SearchStageArray(memory_pool);
 	CXformSet *pxfsFst = GPOS_NEW(memory_pool) CXformSet(memory_pool);
 	CXformSet *pxfsSnd = GPOS_NEW(memory_pool) CXformSet(memory_pool);
 

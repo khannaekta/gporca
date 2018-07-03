@@ -184,7 +184,7 @@ CPartConstraintTest::PcnstrInterval
 	CExpression *pexprConstRight = CUtils::PexprScalarConstInt4(memory_pool, ulRight);
 
 	// AND
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	pdrgpexpr->Append(CUtils::PexprScalarCmp(memory_pool, colref, pexprConstLeft, IMDType::EcmptGEq));
 	pdrgpexpr->Append(CUtils::PexprScalarCmp(memory_pool, colref, pexprConstRight, IMDType::EcmptL));
 

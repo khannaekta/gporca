@@ -202,7 +202,7 @@ CXformJoin2IndexApply::CreateHomogeneousBtreeIndexApplyAlternatives
 	) const
 {
 	// array of expressions in the scalar expression
-	DrgPexpr *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pexprScalar);
+	ExpressionArray *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pexprScalar);
 	GPOS_ASSERT(pdrgpexpr->Size() > 0);
 
 	// find the indexes whose included columns meet the required columns
@@ -284,7 +284,7 @@ CXformJoin2IndexApply::CreateAlternativesForBtreeIndex
 	CExpression *pexprOuter,
 	CExpression *pexprInner,
 	CMDAccessor *md_accessor,
-	DrgPexpr *pdrgpexprConjuncts,
+	ExpressionArray *pdrgpexprConjuncts,
 	CColRefSet *pcrsScalarExpr,
 	CColRefSet *outer_refs,
 	CColRefSet *pcrsReqd,
@@ -313,7 +313,7 @@ CXformJoin2IndexApply::CreateAlternativesForBtreeIndex
 	{
 		// second child has residual predicates, create an apply of outer and inner
 		// and add it to xform results
-		DrgPcr *colref_array = outer_refs->Pdrgpcr(memory_pool);
+		ColRefArray *colref_array = outer_refs->Pdrgpcr(memory_pool);
 		pexprOuter->AddRef();
 		CExpression *pexprIndexApply =
 			GPOS_NEW(memory_pool) CExpression
@@ -395,7 +395,7 @@ void CXformJoin2IndexApply::CreateHomogeneousBitmapIndexApplyAlternatives
 	{
 		// second child has residual predicates, create an apply of outer and inner
 		// and add it to xform results
-		DrgPcr *colref_array = outer_refs->Pdrgpcr(memory_pool);
+		ColRefArray *colref_array = outer_refs->Pdrgpcr(memory_pool);
 		pexprOuter->AddRef();
 		CExpression *pexprIndexApply =
 			GPOS_NEW(memory_pool) CExpression
@@ -527,11 +527,11 @@ CXformJoin2IndexApply::CreatePartialIndexApplyAlternatives
     const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdescInner->MDId());
 	
     // array of expressions in the scalar expression
-	DrgPexpr *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pexprScalar);
+	ExpressionArray *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pexprScalar);
 	
 	GPOS_ASSERT(0 < pdrgpexpr->Size());
 	
-	DrgPdrgPpartdig *pdrgpdrgppartdig = CXformUtils::PdrgpdrgppartdigCandidates
+	PartDynamicIndexGetInfoArrays *pdrgpdrgppartdig = CXformUtils::PdrgpdrgppartdigCandidates
 										(
 										memory_pool,
 										COptCtxt::PoctxtFromTLS()->Pmda(),
@@ -551,7 +551,7 @@ CXformJoin2IndexApply::CreatePartialIndexApplyAlternatives
 	const ULONG ulCandidates = pdrgpdrgppartdig->Size();
 	for (ULONG ul = 0; ul < ulCandidates; ul++)
 	{
-		DrgPpartdig *pdrgppartdig = (*pdrgpdrgppartdig)[ul];
+		PartDynamicIndexGetInfoArray *pdrgppartdig = (*pdrgpdrgppartdig)[ul];
 		if (0 < pdrgppartdig->Size())
 		{
 			CreatePartialIndexApplyPlan
@@ -594,7 +594,7 @@ CXformJoin2IndexApply::CreatePartialIndexApplyPlan
 	CExpression *pexprScalar,
 	CColRefSet *outer_refs,
 	CLogicalDynamicGet *popDynamicGet,
-	DrgPpartdig *pdrgppartdig,
+	PartDynamicIndexGetInfoArray *pdrgppartdig,
 	const IMDRelation *pmdrel,
 	CXformResult *pxfres
 	) const
@@ -605,16 +605,16 @@ CXformJoin2IndexApply::CreatePartialIndexApplyPlan
 		return;
 	}
 
-	DrgPcr *pdrgpcrGet = popDynamicGet->PdrgpcrOutput();
+	ColRefArray *pdrgpcrGet = popDynamicGet->PdrgpcrOutput();
 	const ULONG ulCTEId = COptCtxt::PoctxtFromTLS()->Pcteinfo()->next_id();
 
 	// outer references mentioned in the scan filter: we need them to generate the IndexApply
-	DrgPcr *pdrgpcrOuterRefsInScan = outer_refs->Pdrgpcr(memory_pool);
+	ColRefArray *pdrgpcrOuterRefsInScan = outer_refs->Pdrgpcr(memory_pool);
 
 	// columns from the outer branch of the IndexApply or Join
 	// we will create copies of these columns because every CTE consumer needs to have its
 	// own column ids
-	DrgPcr *pdrgpcrOuter = CDrvdPropRelational::GetRelationalProperties(pexprOuter->PdpDerive())->PcrsOutput()->Pdrgpcr(memory_pool);
+	ColRefArray *pdrgpcrOuter = CDrvdPropRelational::GetRelationalProperties(pexprOuter->PdpDerive())->PcrsOutput()->Pdrgpcr(memory_pool);
 
 	// positions in pdrgpcrOuter of the outer references mentioned in the scan filter
 	// we need them because each time we create copies of pdrgpcrOuter, we will extract the
@@ -626,9 +626,9 @@ CXformJoin2IndexApply::CreatePartialIndexApplyPlan
 	(void) CXformUtils::PexprAddCTEProducer(memory_pool, ulCTEId, pdrgpcrOuter, pexprOuter);
 	BOOL fFirst = true;
 
-	DrgPcr *pdrgpcrOutput = NULL;
-	DrgPexpr *pdrgpexprInput = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
-	DrgDrgPcr *pdrgpdrgpcrInput = GPOS_NEW(memory_pool) DrgDrgPcr(memory_pool);
+	ColRefArray *pdrgpcrOutput = NULL;
+	ExpressionArray *pdrgpexprInput = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ColRefArrays *pdrgpdrgpcrInput = GPOS_NEW(memory_pool) ColRefArrays(memory_pool);
 
 	for (ULONG ul = 0; ul < ulPartialIndexes; ul++)
 	{
@@ -636,11 +636,11 @@ CXformJoin2IndexApply::CreatePartialIndexApplyPlan
 
 		const IMDIndex *pmdindex = ppartdig->m_pmdindex;
 		CPartConstraint *ppartcnstr = ppartdig->m_part_constraint;
-		DrgPexpr *pdrgpexprIndex = ppartdig->m_pdrgpexprIndex;
-		DrgPexpr *pdrgpexprResidual = ppartdig->m_pdrgpexprResidual;
+		ExpressionArray *pdrgpexprIndex = ppartdig->m_pdrgpexprIndex;
+		ExpressionArray *pdrgpexprResidual = ppartdig->m_pdrgpexprResidual;
 		
-		DrgPcr *pdrgpcrOuterNew = pdrgpcrOuter;
-		DrgPcr *pdrgpcrIndexGet = pdrgpcrGet;
+		ColRefArray *pdrgpcrOuterNew = pdrgpcrOuter;
+		ColRefArray *pdrgpcrIndexGet = pdrgpcrGet;
 		UlongColRefHashMap *colref_mapping = NULL;
 		if (fFirst)
 		{
@@ -699,7 +699,7 @@ CXformJoin2IndexApply::CreatePartialIndexApplyPlan
 		// if we failed to create a DynamicIndexScan, we give up
 		GPOS_ASSERT(NULL != pexprUnionAllChild);
 
-		DrgPcr *pdrgpcrNew = NULL;
+		ColRefArray *pdrgpcrNew = NULL;
 		if (NULL == colref_mapping)
 		{
 			pdrgpcrNew = CDrvdPropRelational::GetRelationalProperties(pexprUnionAllChild->PdpDerive())->PcrsOutput()->Pdrgpcr(memory_pool);
@@ -776,10 +776,10 @@ CXformJoin2IndexApply::PexprJoinOverCTEConsumer
 	CLogicalDynamicGet *popDynamicGet,
 	ULONG ulCTEId,
 	CExpression *pexprScalar,
-	DrgPcr *pdrgpcrDynamicGet,
+	ColRefArray *pdrgpcrDynamicGet,
 	CPartConstraint *ppartcnstr,
-	DrgPcr *pdrgpcrOuter,
-	DrgPcr *pdrgpcrOuterNew
+	ColRefArray *pdrgpcrOuter,
+	ColRefArray *pdrgpcrOuterNew
 	) const
 {
 	UlongColRefHashMap *colref_mapping =
@@ -848,18 +848,18 @@ CXformJoin2IndexApply::PexprIndexApplyOverCTEConsumer
 	IMemoryPool *memory_pool,
 	ULONG ulOriginOpId,
 	CLogicalDynamicGet *popDynamicGet,
-	DrgPexpr *pdrgpexprIndex,
-	DrgPexpr *pdrgpexprResidual,
-	DrgPcr *pdrgpcrIndexGet,
+	ExpressionArray *pdrgpexprIndex,
+	ExpressionArray *pdrgpexprResidual,
+	ColRefArray *pdrgpcrIndexGet,
 	const IMDIndex *pmdindex,
 	const IMDRelation *pmdrel,
 	BOOL fFirst,
 	ULONG ulCTEId,
 	CPartConstraint *ppartcnstr,
 	CColRefSet *outer_refs,
-	DrgPcr *pdrgpcrOuter,
-	DrgPcr *pdrgpcrOuterNew,
-	DrgPcr *pdrgpcrOuterRefsInScan,
+	ColRefArray *pdrgpcrOuter,
+	ColRefArray *pdrgpcrOuterNew,
+	ColRefArray *pdrgpcrOuterRefsInScan,
 	ULongPtrArray *pdrgpulIndexesOfRefsInScan
 	) const
 {
@@ -885,7 +885,7 @@ CXformJoin2IndexApply::PexprIndexApplyOverCTEConsumer
 	}
 
 	// create an apply of outer and inner and add it to the union
-	DrgPcr *pdrgpcrOuterRefsInScanNew = pdrgpcrOuterRefsInScan;
+	ColRefArray *pdrgpcrOuterRefsInScanNew = pdrgpcrOuterRefsInScan;
 	if (fFirst)
 	{
 		pdrgpcrOuterRefsInScanNew->AddRef();
@@ -919,14 +919,14 @@ CExpression *
 CXformJoin2IndexApply::PexprConstructUnionAll
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *pdrgpcrLeftSchema,
-	DrgPcr *pdrgpcrRightSchema,
+	ColRefArray *pdrgpcrLeftSchema,
+	ColRefArray *pdrgpcrRightSchema,
 	CExpression *pexprLeftChild,
 	CExpression *pexprRightChild,
 	ULONG scan_id
 	) const
 {
-	DrgDrgPcr *pdrgpdrgpcrInput = GPOS_NEW(memory_pool) DrgDrgPcr(memory_pool);
+	ColRefArrays *pdrgpdrgpcrInput = GPOS_NEW(memory_pool) ColRefArrays(memory_pool);
 	pdrgpdrgpcrInput->Append(pdrgpcrLeftSchema);
 	pdrgpdrgpcrInput->Append(pdrgpcrRightSchema);
 	pdrgpcrLeftSchema->AddRef();
@@ -967,7 +967,7 @@ CXformJoin2IndexApply::AddUnionPlanForPartialIndexes
 
 	// if scalar expression involves the partitioning key, keep a SELECT node
 	// on top for the purposes of partition selection
-	DrgDrgPcr *pdrgpdrgpcrPartKeys = popDynamicGet->PdrgpdrgpcrPart();
+	ColRefArrays *pdrgpdrgpcrPartKeys = popDynamicGet->PdrgpdrgpcrPart();
 	CExpression *pexprPredOnPartKey = CPredicateUtils::PexprExtractPredicatesOnPartKeys
 										(
 										memory_pool,

@@ -34,11 +34,11 @@ using namespace gpopt;
 CPhysicalAgg::CPhysicalAgg
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array,
-	DrgPcr *pdrgpcrMinimal, // minimal grouping columns based on FD's
+	ColRefArray *colref_array,
+	ColRefArray *pdrgpcrMinimal, // minimal grouping columns based on FD's
 	COperator::EGbAggType egbaggtype,
 	BOOL fGeneratesDuplicates,
-	DrgPcr *pdrgpcrArgDQA,
+	ColRefArray *pdrgpcrArgDQA,
 	BOOL fMultiStage
 	)
 	:
@@ -168,7 +168,7 @@ CPhysicalAgg::PcrsRequiredAgg
 	CExpressionHandle &exprhdl,
 	CColRefSet *pcrsRequired,
 	ULONG child_index,
-	DrgPcr *pdrgpcrGrp
+	ColRefArray *pdrgpcrGrp
 	)
 {
 	GPOS_ASSERT(NULL != pdrgpcrGrp);
@@ -203,8 +203,8 @@ CPhysicalAgg::PdsRequiredAgg
 	CDistributionSpec *pdsInput,
 	ULONG child_index,
 	ULONG  ulOptReq,
-	DrgPcr *pdrgpcgGrp,
-	DrgPcr *pdrgpcrGrpMinimal
+	ColRefArray *pdrgpcgGrp,
+	ColRefArray *pdrgpcrGrpMinimal
 	)
 	const
 {
@@ -256,7 +256,7 @@ CDistributionSpec *
 CPhysicalAgg::PdsMaximalHashed
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array
+	ColRefArray *colref_array
 	)
 {
 	GPOS_ASSERT(NULL != colref_array);
@@ -293,8 +293,8 @@ CPhysicalAgg::PdsRequiredGlobalAgg
 	CExpressionHandle &exprhdl,
 	CDistributionSpec *pdsInput,
 	ULONG child_index,
-	DrgPcr *pdrgpcrGrp,
-	DrgPcr *pdrgpcrGrpMinimal,
+	ColRefArray *pdrgpcrGrp,
+	ColRefArray *pdrgpcrGrpMinimal,
 	ULONG  ulOptReq
 	)
 	const
@@ -357,7 +357,7 @@ CPhysicalAgg::PdsRequiredIntermediateAgg
 		return PdsMaximalHashed(memory_pool, m_pdrgpcr);
 	}
 
-	DrgPcr *colref_array = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	ColRefArray *colref_array = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 	const ULONG length = m_pdrgpcr->Size() - m_pdrgpcrArgDQA->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{

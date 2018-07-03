@@ -45,8 +45,8 @@ using namespace gpopt;
 CPhysicalSerialUnionAll::CPhysicalSerialUnionAll
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *pdrgpcrOutput,
-	DrgDrgPcr *pdrgpdrgpcrInput,
+	ColRefArray *pdrgpcrOutput,
+	ColRefArrays *pdrgpdrgpcrInput,
 	ULONG ulScanIdPartialIndex
 	)
 	:

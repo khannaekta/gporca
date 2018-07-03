@@ -64,10 +64,10 @@ CXformGbAggDedup2HashAggDedup::Transform
 
 	IMemoryPool *memory_pool = pxfctxt->Pmp();
 	CLogicalGbAggDeduplicate *popAggDedup = CLogicalGbAggDeduplicate::PopConvert(pexpr->Pop());
-	DrgPcr *colref_array = popAggDedup->Pdrgpcr();
+	ColRefArray *colref_array = popAggDedup->Pdrgpcr();
 	colref_array->AddRef();
 
-	DrgPcr *pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
+	ColRefArray *pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
 	pdrgpcrKeys->AddRef();
 
 	// extract components

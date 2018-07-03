@@ -31,8 +31,8 @@ CIndexDescriptor::CIndexDescriptor
 	IMemoryPool *memory_pool,
 	IMDId *pmdidIndex,
 	const CName &name,
-	DrgPcoldesc *pdrgcoldescKeyCols,
-	DrgPcoldesc *pdrgcoldescIncludedCols,
+	ColumnDescrArray *pdrgcoldescKeyCols,
+	ColumnDescrArray *pdrgcoldescIncludedCols,
 	BOOL is_clustered
 	)
 	:
@@ -114,12 +114,12 @@ CIndexDescriptor::Pindexdesc
 {
 	CWStringConst strIndexName(memory_pool, pmdindex->Mdname().GetMDName()->GetBuffer());
 
-	DrgPcoldesc *pdrgpcoldesc = ptabdesc->Pdrgpcoldesc();
+	ColumnDescrArray *pdrgpcoldesc = ptabdesc->Pdrgpcoldesc();
 
 	pmdindex->MDId()->AddRef();
 
 	// array of index column descriptors
-	DrgPcoldesc *pdrgcoldescKey = GPOS_NEW(memory_pool) DrgPcoldesc(memory_pool);
+	ColumnDescrArray *pdrgcoldescKey = GPOS_NEW(memory_pool) ColumnDescrArray(memory_pool);
 
 	for (ULONG ul = 0; ul < pmdindex->Keys(); ul++)
 	{
@@ -129,7 +129,7 @@ CIndexDescriptor::Pindexdesc
 	}
 
 	// array of included column descriptors
-	DrgPcoldesc *pdrgcoldescIncluded = GPOS_NEW(memory_pool) DrgPcoldesc(memory_pool);
+	ColumnDescrArray *pdrgcoldescIncluded = GPOS_NEW(memory_pool) ColumnDescrArray(memory_pool);
 	for (ULONG ul = 0; ul < pmdindex->IncludedCols(); ul++)
 	{
 		CColumnDescriptor *pcoldesc = (*pdrgpcoldesc)[ul];

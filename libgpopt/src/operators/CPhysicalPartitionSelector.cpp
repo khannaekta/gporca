@@ -35,7 +35,7 @@ CPhysicalPartitionSelector::CPhysicalPartitionSelector
 	IMemoryPool *memory_pool,
 	ULONG scan_id,
 	IMDId *mdid,
-	DrgDrgPcr *pdrgpdrgpcr,
+	ColRefArrays *pdrgpdrgpcr,
 	PartCnstrMap *ppartcnstrmap,
 	CPartConstraint *ppartcnstr,
 	HMUlExpr *phmulexprEqPredicates,
@@ -384,7 +384,7 @@ CPhysicalPartitionSelector::PexprCombinedPartPred
 	)
 	const
 {
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 
 	const ULONG ulLevels = UlPartLevels();
 	for (ULONG ul = 0; ul < ulLevels; ul++)
@@ -627,7 +627,7 @@ CPhysicalPartitionSelector::PppsRequired
 		}
 
 		IMDId *mdid = ppimInput->GetRelMdId(scan_id);
-		DrgPpartkeys *pdrgppartkeys = ppimInput->Pdrgppartkeys(scan_id);
+		PartKeysArray *pdrgppartkeys = ppimInput->Pdrgppartkeys(scan_id);
 		PartCnstrMap *ppartcnstrmap = ppimInput->Ppartcnstrmap(scan_id);
 		CPartConstraint *ppartcnstr = ppimInput->PpartcnstrRel(scan_id);
 		CPartIndexMap::EPartIndexManipulator epim = ppimInput->Epim(scan_id);
@@ -767,7 +767,7 @@ CPhysicalPartitionSelector::PpimDerive
 		m_ppartcnstrmap->AddRef();
 		m_part_constraint->AddRef();
 
-		DrgPpartkeys *pdrgppartkeys = GPOS_NEW(memory_pool) DrgPpartkeys(memory_pool);
+		PartKeysArray *pdrgppartkeys = GPOS_NEW(memory_pool) PartKeysArray(memory_pool);
 		pdrgppartkeys->Append(GPOS_NEW(memory_pool) CPartKeys(m_pdrgpdrgpcr));
 
 		ppim->Insert(m_scan_id, m_ppartcnstrmap, CPartIndexMap::EpimPropagator, 0 /*ulExpectedPropagators*/, MDId(), pdrgppartkeys, m_part_constraint);

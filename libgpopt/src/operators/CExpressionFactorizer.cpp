@@ -71,7 +71,7 @@ CExpressionFactorizer::PexprProcessDisjDescendents
 
 	// recursively process children
 	const ULONG arity = pexpr->Arity();
-	DrgPexpr *pdrgpexprChildren = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprChildren = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		CExpression *pexprChild = PexprProcessDisjDescendents
@@ -103,8 +103,8 @@ void CExpressionFactorizer::AddFactor
 	(
 	IMemoryPool *memory_pool,
 	CExpression *pexpr,
-	DrgPexpr *pdrgpexprFactors,
-	DrgPexpr *pdrgpexprResidual,
+	ExpressionArray *pdrgpexprFactors,
+	ExpressionArray *pdrgpexprResidual,
 	ExprMap *pexprmapFactors,
 	ULONG
 #ifdef GPOS_DEBUG
@@ -176,7 +176,7 @@ CExpressionFactorizer::PexprmapFactors
 	{
 		CExpression *pexprDisj = (*pexpr)[ulOuter];
 
-		DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+		ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 		pexprDisj->AddRef();
 		pdrgpexpr->Append(pexprDisj);
 
@@ -243,8 +243,8 @@ CExpressionFactorizer::PexprFactorizeDisj
 	// build factors map
 	ExprMap *pexprmapFactors = PexprmapFactors(memory_pool, pexpr);
 
-	DrgPexpr *pdrgpexprResidual = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
-	DrgPexpr *pdrgpexprFactors = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprResidual = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexprFactors = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 
 	// iterate over child expressions and factorize them
 	const ULONG ulDisjuncts = pexpr->Arity();
@@ -253,7 +253,7 @@ CExpressionFactorizer::PexprFactorizeDisj
 		CExpression *pexprDisj = (*pexpr)[ulOuter];
 		if (CPredicateUtils::FAnd(pexprDisj))
 		{
-			DrgPexpr *pdrgpexprConjuncts = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+			ExpressionArray *pdrgpexprConjuncts = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 			const ULONG size = pexprDisj->Arity();
 			for (ULONG ulInner = 0; ulInner < size; ulInner++)
 			{
@@ -460,7 +460,7 @@ CExpressionFactorizer::FOpSourceIdOrComputedColumn
 //		or construct a new array and add it to the map.
 //
 //---------------------------------------------------------------------------
-DrgPdrgPexpr *
+ExpressionArrays *
 CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForSourceId
 	(
 	IMemoryPool *memory_pool,
@@ -470,7 +470,7 @@ CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForSourceId
 	)
 {
 	GPOS_ASSERT(NULL != psrc2array);
-	DrgPdrgPexpr *pdrgpdrgpexpr = psrc2array->Find(&ulOpSourceId);
+	ExpressionArrays *pdrgpdrgpexpr = psrc2array->Find(&ulOpSourceId);
 
 	// if there is no entry, we start recording expressions that will become disjuncts
 	// corresponding to the source operator we are considering
@@ -483,7 +483,7 @@ CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForSourceId
 		{
 			return NULL;
 		}
-		pdrgpdrgpexpr = GPOS_NEW(memory_pool) DrgPdrgPexpr(memory_pool);
+		pdrgpdrgpexpr = GPOS_NEW(memory_pool) ExpressionArrays(memory_pool);
 	#ifdef GPOS_DEBUG
 		BOOL fInserted =
 	#endif // GPOS_DEBUG
@@ -504,7 +504,7 @@ CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForSourceId
 // 		or construct a new array and add it to the map.
 //
 //---------------------------------------------------------------------------
-DrgPdrgPexpr *
+ExpressionArrays *
 CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForColumn
 	(
 	IMemoryPool *memory_pool,
@@ -514,7 +514,7 @@ CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForColumn
 	)
 {
 	GPOS_ASSERT(NULL != pcol2array);
-	DrgPdrgPexpr *pdrgpdrgpexpr = pcol2array->Find(colref);
+	ExpressionArrays *pdrgpdrgpexpr = pcol2array->Find(colref);
 
 	// if there is no entry, we start recording expressions that will become disjuncts
 	// corresponding to the computed column we are considering
@@ -527,7 +527,7 @@ CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForColumn
 		{
 			return NULL;
 		}
-		pdrgpdrgpexpr = GPOS_NEW(memory_pool) DrgPdrgPexpr(memory_pool);
+		pdrgpdrgpexpr = GPOS_NEW(memory_pool) ExpressionArrays(memory_pool);
 	#ifdef GPOS_DEBUG
 		BOOL fInserted =
 	#endif // GPOS_DEBUG
@@ -569,7 +569,7 @@ CExpressionFactorizer::StoreBaseOpToColumnExpr
 		return;
 	}
 
-	DrgPdrgPexpr *pdrgpdrgpexpr = NULL;
+	ExpressionArrays *pdrgpdrgpexpr = NULL;
 
 	if (gpos::ulong_max != ulOpSourceId)
 	{
@@ -605,13 +605,13 @@ CExpressionFactorizer::StoreBaseOpToColumnExpr
 		return;
 	}
 
-	DrgPexpr *pdrgpexpr = NULL;
+	ExpressionArray *pdrgpexpr = NULL;
 	// there are only two cases we need to consider
 	// the first one is that we found the current source operator in all previous disjuncts
 	// and now we are starting a new sub-array for a new disjunct
 	if (ulPosition == pdrgpdrgpexpr->Size())
 	{
-		pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+		pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 		pdrgpdrgpexpr->Append(pdrgpexpr);
 	}
 	// the second case is that we found additional conjuncts for the current source operator
@@ -654,7 +654,7 @@ CExpressionFactorizer::PexprAddInferredFilters
 	GPOS_ASSERT(NULL != psrc2array);
 
 	SourceToArrayPosMapIter src2arrayIter(psrc2array);
-	DrgPexpr *pdrgpexprPrefilters = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprPrefilters = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	pexpr->AddRef();
 	pdrgpexprPrefilters->Append(pexpr);
 	const ULONG ulDisjChildren = pexpr->Arity();
@@ -686,15 +686,15 @@ void
 CExpressionFactorizer::AddInferredFiltersFromArray
 	(
 	IMemoryPool *memory_pool,
-	const DrgPdrgPexpr *pdrgpdrgpexpr,
+	const ExpressionArrays *pdrgpdrgpexpr,
 	ULONG ulDisjChildrenLength,
-	DrgPexpr *pdrgpexprInferredFilters
+	ExpressionArray *pdrgpexprInferredFilters
 	)
 {
 	const ULONG ulEntryLength = (pdrgpdrgpexpr == NULL) ? 0 : pdrgpdrgpexpr->Size();
 	if (ulEntryLength == ulDisjChildrenLength)
 	{
-		DrgPexpr *pdrgpexprDisjuncts = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+		ExpressionArray *pdrgpexprDisjuncts = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 		for (ULONG ul = 0; ul < ulEntryLength; ++ul)
 		{
 			(*pdrgpdrgpexpr)[ul]->AddRef();

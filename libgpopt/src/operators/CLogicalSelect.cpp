@@ -262,7 +262,7 @@ CLogicalSelect::PexprPartPred
 		return pexprPredOnPartKey;
 	}
 
-	DrgPpartkeys *pdrgppartkeys = ppartinfo->Pdrgppartkeys(0 /*ulPos*/);
+	PartKeysArray *pdrgppartkeys = ppartinfo->Pdrgppartkeys(0 /*ulPos*/);
 	const ULONG ulKeySets = pdrgppartkeys->Size();
 	for (ULONG ul = 0; NULL == pexprPredOnPartKey && ul < ulKeySets; ul++)
 	{

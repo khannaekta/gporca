@@ -9,7 +9,7 @@ using namespace gpopt;
 
 CDistributionSpecHashedNoOp::CDistributionSpecHashedNoOp
 	(
-	DrgPexpr *pdrgpexpr
+	ExpressionArray *pdrgpexpr
 	)
 :
 CDistributionSpecHashed(pdrgpexpr, true)
@@ -32,11 +32,11 @@ CDistributionSpecHashedNoOp::AppendEnforcers
 	IMemoryPool *memory_pool,
 	CExpressionHandle &exprhdl,
 	CReqdPropPlan *,
-	DrgPexpr *pdrgpexpr,
+	ExpressionArray *pdrgpexpr,
 	CExpression *pexpr
 	)
 {
-	CDrvdProp *pdp = exprhdl.Pdp();
+	DrvdPropArray *pdp = exprhdl.Pdp();
 	CDistributionSpec *pdsChild = CDrvdPropPlan::Pdpplan(pdp)->Pds();
 	CDistributionSpecHashed *pdsChildHashed = dynamic_cast<CDistributionSpecHashed *>(pdsChild);
 
@@ -45,7 +45,7 @@ CDistributionSpecHashedNoOp::AppendEnforcers
 		return;
 	}
 
-	DrgPexpr *pdrgpexprNoOpRedistributionColumns = pdsChildHashed->Pdrgpexpr();
+	ExpressionArray *pdrgpexprNoOpRedistributionColumns = pdsChildHashed->Pdrgpexpr();
 	pdrgpexprNoOpRedistributionColumns->AddRef();
 	CDistributionSpecHashedNoOp* pdsNoOp = GPOS_NEW(memory_pool) CDistributionSpecHashedNoOp(pdrgpexprNoOpRedistributionColumns);
 	pexpr->AddRef();

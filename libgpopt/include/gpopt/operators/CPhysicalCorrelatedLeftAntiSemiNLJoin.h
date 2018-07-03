@@ -34,7 +34,7 @@ namespace gpopt
 		private:
 
 			// columns from inner child used in correlated execution
-			DrgPcr *m_pdrgpcrInner;
+			ColRefArray *m_pdrgpcrInner;
 
 			// origin subquery id
 			EOperatorId m_eopidOriginSubq;
@@ -48,7 +48,7 @@ namespace gpopt
 			CPhysicalCorrelatedLeftAntiSemiNLJoin
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *pdrgpcrInner,
+				ColRefArray *pdrgpcrInner,
 				EOperatorId eopidOriginSubq
 				)
 				:
@@ -153,7 +153,7 @@ namespace gpopt
 
 			// return required inner columns
 			virtual
-			DrgPcr *PdrgPcrInner() const
+			ColRefArray *PdrgPcrInner() const
 			{
 				return m_pdrgpcrInner;
 			}

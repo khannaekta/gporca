@@ -100,7 +100,7 @@ CLogicalProject::PkcDeriveKeys
 //		Return equivalence class from scalar ident project element
 //
 //---------------------------------------------------------------------------
-DrgPcrs *
+ColRefSetArray *
 CLogicalProject::PdrgpcrsEquivClassFromScIdent
 	(
 	IMemoryPool *memory_pool,
@@ -136,7 +136,7 @@ CLogicalProject::PdrgpcrsEquivClassFromScIdent
 			!CColRefTable::PcrConvert(const_cast<CColRef*>(pcrScIdent))->IsNullable())
 	{
 		// equivalence class
-		DrgPcrs *pdrgpcrs = GPOS_NEW(memory_pool) DrgPcrs(memory_pool);
+		ColRefSetArray *pdrgpcrs = GPOS_NEW(memory_pool) ColRefSetArray(memory_pool);
 
 		CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 		pcrs->Include(pcrPrEl);
@@ -163,8 +163,8 @@ CLogicalProject::ExtractConstraintFromScConst
 	(
 	IMemoryPool *memory_pool,
 	CExpression *pexprPrEl,
-	DrgPcnstr *pdrgpcnstr, // array of range constraints
-	DrgPcrs *pdrgpcrs // array of equivalence class
+	ConstraintArray *pdrgpcnstr, // array of range constraints
+	ColRefSetArray *pdrgpcrs // array of equivalence class
 	)
 {
 	GPOS_ASSERT(NULL != pexprPrEl);
@@ -186,7 +186,7 @@ CLogicalProject::ExtractConstraintFromScConst
 	CScalarConst *popConst = CScalarConst::PopConvert(pexprScalar->Pop());
 	IDatum *datum = popConst->GetDatum();
 
-	DrgPrng *pdrgprng = GPOS_NEW(memory_pool) DrgPrng(memory_pool);
+	RangeArray *pdrgprng = GPOS_NEW(memory_pool) RangeArray(memory_pool);
 	BOOL is_null = datum->IsNull();
 	if (!is_null)
 	{
@@ -231,8 +231,8 @@ CLogicalProject::PpcDeriveConstraint
 	CExpression *pexprPrL = exprhdl.PexprScalarChild(1);
 	GPOS_ASSERT(NULL != pexprPrL);
 
-	DrgPcnstr *pdrgpcnstr = GPOS_NEW(memory_pool) DrgPcnstr(memory_pool);
-	DrgPcrs *pdrgpcrs = GPOS_NEW(memory_pool) DrgPcrs(memory_pool);
+	ConstraintArray *pdrgpcnstr = GPOS_NEW(memory_pool) ConstraintArray(memory_pool);
+	ColRefSetArray *pdrgpcrs = GPOS_NEW(memory_pool) ColRefSetArray(memory_pool);
 
 	const ULONG ulProjElems = pexprPrL->Arity();
 	for (ULONG ul = 0; ul < ulProjElems; ul++)
@@ -246,12 +246,12 @@ CLogicalProject::PpcDeriveConstraint
 		}
 		else
 		{
-			DrgPcrs *pdrgpcrsChild = PdrgpcrsEquivClassFromScIdent(memory_pool, pexprPrEl);
+			ColRefSetArray *pdrgpcrsChild = PdrgpcrsEquivClassFromScIdent(memory_pool, pexprPrEl);
 
 			if (NULL != pdrgpcrsChild)
 			{
 				// merge with the equivalence classes we have so far
-				DrgPcrs *pdrgpcrsMerged = CUtils::PdrgpcrsMergeEquivClasses(memory_pool, pdrgpcrs, pdrgpcrsChild);
+				ColRefSetArray *pdrgpcrsMerged = CUtils::PdrgpcrsMergeEquivClasses(memory_pool, pdrgpcrs, pdrgpcrsChild);
 
 				// clean up
 				pdrgpcrs->Release();
@@ -273,11 +273,11 @@ CLogicalProject::PpcDeriveConstraint
 	CPropConstraint *ppcChild = exprhdl.GetRelationalProperties(0 /*ulChild*/)->Ppc();
 
 	// equivalence classes coming from child
-	DrgPcrs *pdrgpcrsChild = ppcChild->PdrgpcrsEquivClasses();
+	ColRefSetArray *pdrgpcrsChild = ppcChild->PdrgpcrsEquivClasses();
 	if (NULL != pdrgpcrsChild)
 	{
 		// merge with the equivalence classes we have so far
-		DrgPcrs *pdrgpcrsMerged = CUtils::PdrgpcrsMergeEquivClasses(memory_pool, pdrgpcrs, pdrgpcrsChild);
+		ColRefSetArray *pdrgpcrsMerged = CUtils::PdrgpcrsMergeEquivClasses(memory_pool, pdrgpcrs, pdrgpcrsChild);
 
 		// clean up
 		pdrgpcrs->Release();

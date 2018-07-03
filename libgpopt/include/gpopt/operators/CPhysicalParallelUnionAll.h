@@ -18,7 +18,7 @@ namespace gpopt
 			DrgPds *const m_pdrgpds;
 
 		public:
-			CPhysicalParallelUnionAll(IMemoryPool *memory_pool, DrgPcr *pdrgpcrOutput, DrgDrgPcr *pdrgpdrgpcrInput,
+			CPhysicalParallelUnionAll(IMemoryPool *memory_pool, ColRefArray *pdrgpcrOutput, ColRefArrays *pdrgpdrgpcrInput,
 									  ULONG ulScanIdPartialIndex);
 
 			virtual EOperatorId Eopid() const;

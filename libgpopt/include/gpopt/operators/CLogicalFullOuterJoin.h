@@ -96,7 +96,7 @@ namespace gpopt
 				)
 				const
 			{
-				return GPOS_NEW(memory_pool) CPropConstraint(memory_pool, GPOS_NEW(memory_pool) DrgPcrs(memory_pool), NULL /*pcnstr*/);
+				return GPOS_NEW(memory_pool) CPropConstraint(memory_pool, GPOS_NEW(memory_pool) ColRefSetArray(memory_pool), NULL /*pcnstr*/);
 			}
 
 			// promise level for stat derivation

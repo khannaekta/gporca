@@ -56,8 +56,8 @@ CLogicalRowTrigger::CLogicalRowTrigger
 	IMemoryPool *memory_pool,
 	IMDId *rel_mdid,
 	INT type,
-	DrgPcr *pdrgpcrOld,
-	DrgPcr *pdrgpcrNew
+	ColRefArray *pdrgpcrOld,
+	ColRefArray *pdrgpcrNew
 	)
 	:
 	CLogical(memory_pool),
@@ -242,13 +242,13 @@ CLogicalRowTrigger::PopCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcrOld = NULL;
+	ColRefArray *pdrgpcrOld = NULL;
 	if (NULL != m_pdrgpcrOld)
 	{
 		pdrgpcrOld = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrOld, colref_mapping, must_exist);
 	}
 
-	DrgPcr *pdrgpcrNew = NULL;
+	ColRefArray *pdrgpcrNew = NULL;
 	if (NULL != m_pdrgpcrNew)
 	{
 		pdrgpcrNew = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrNew, colref_mapping, must_exist);

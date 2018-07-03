@@ -265,7 +265,7 @@ namespace gpopt
 			}
 
 			virtual BOOL
-			FValidContext(IMemoryPool *memory_pool, COptimizationContext *poc, DrgPoc *pdrgpocChild) const;
+			FValidContext(IMemoryPool *memory_pool, COptimizationContext *poc, OptimizationContextArray *pdrgpocChild) const;
 
 	}; // class CPhysicalSpool
 

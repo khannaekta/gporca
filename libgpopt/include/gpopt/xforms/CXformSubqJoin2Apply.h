@@ -47,8 +47,8 @@ namespace gpopt
 				(
 				IMemoryPool *memory_pool,
 				CExpression *pexpr,
-				DrgPcrs *pdrgpcrs,
-				DrgPdrgPexpr *pdrgpdrgpexprSubqs
+				ColRefSetArray *pdrgpcrs,
+				ExpressionArrays *pdrgpdrgpexprSubqs
 				);
 
 			// replace subqueries with scalar identifier based on given map

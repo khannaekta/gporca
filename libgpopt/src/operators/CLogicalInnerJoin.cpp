@@ -137,8 +137,8 @@ CLogicalInnerJoin::FFewerConj
 	GPOS_ASSERT(pgroupScalarFst->FScalar());
 	GPOS_ASSERT(pgroupScalarSnd->FScalar());
 
-	DrgPexpr *pdrgpexprConjFst = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pgroupScalarFst->PexprScalar());
-	DrgPexpr *pdrgpexprConjSnd = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pgroupScalarSnd->PexprScalar());
+	ExpressionArray *pdrgpexprConjFst = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pgroupScalarFst->PexprScalar());
+	ExpressionArray *pdrgpexprConjSnd = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pgroupScalarSnd->PexprScalar());
 
 	ULONG ulConjFst = pdrgpexprConjFst->Size();
 	ULONG ulConjSnd = pdrgpexprConjSnd->Size();

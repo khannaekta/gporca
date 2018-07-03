@@ -33,9 +33,9 @@ using namespace gpopt;
 CPhysicalConstTableGet::CPhysicalConstTableGet
 	(
 	IMemoryPool *memory_pool,
-	DrgPcoldesc *pdrgpcoldesc,
-	DrgPdrgPdatum *pdrgpdrgpdatum,
-	DrgPcr *pdrgpcrOutput
+	ColumnDescrArray *pdrgpcoldesc,
+	IDatumArrays *pdrgpdrgpdatum,
+	ColRefArray *pdrgpcrOutput
 	)
 	:
 	CPhysical(memory_pool),
@@ -392,7 +392,7 @@ const
 				os << "; ";
 			}
 			os << "(";
-			DrgPdatum *pdrgpdatum = (*m_pdrgpdrgpdatum)[ulA];
+			IDatumArray *pdrgpdatum = (*m_pdrgpdrgpdatum)[ulA];
 
 			const ULONG length = pdrgpdatum->Size();
 			for (ULONG ulB = 0; ulB < length; ulB++)

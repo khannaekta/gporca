@@ -116,7 +116,7 @@ CGroupProxy::MoveDuplicateGExpr
 void
 CGroupProxy::InitProperties
 	(
-	CDrvdProp *pdp
+	DrvdPropArray *pdp
 	)
 {
 	m_pgroup->InitProperties(pdp);

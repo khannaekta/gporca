@@ -241,7 +241,7 @@ CConstraintTest::EresUnittest_CConjunction()
 	CConstraintConjunction *pcconj2 = Pcstconjunction(memory_pool, mdid, pcr2);
 	PrintConstraint(memory_pool, pcconj2);
 
-	DrgPcnstr *pdrgpcst = GPOS_NEW(memory_pool) DrgPcnstr(memory_pool);
+	ConstraintArray *pdrgpcst = GPOS_NEW(memory_pool) ConstraintArray(memory_pool);
 	pcconj1->AddRef();
 	pcconj2->AddRef();
 	pdrgpcst->Append(pcconj1);
@@ -295,7 +295,7 @@ CConstraintTest::Pcstconjunction
 	// second interval
 	CConstraintInterval *pciSecond = PciSecondInterval(memory_pool, mdid, colref);
 
-	DrgPcnstr *pdrgpcst = GPOS_NEW(memory_pool) DrgPcnstr(memory_pool);
+	ConstraintArray *pdrgpcst = GPOS_NEW(memory_pool) ConstraintArray(memory_pool);
 	pdrgpcst->Append(pciFirst);
 	pdrgpcst->Append(pciSecond);
 
@@ -324,7 +324,7 @@ CConstraintTest::Pcstdisjunction
 	// second interval
 	CConstraintInterval *pciSecond = PciSecondInterval(memory_pool, mdid, colref);
 
-	DrgPcnstr *pdrgpcst = GPOS_NEW(memory_pool) DrgPcnstr(memory_pool);
+	ConstraintArray *pdrgpcst = GPOS_NEW(memory_pool) ConstraintArray(memory_pool);
 	pdrgpcst->Append(pciFirst);
 	pdrgpcst->Append(pciSecond);
 
@@ -375,7 +375,7 @@ CConstraintTest::EresUnittest_CDisjunction()
 	CConstraintDisjunction *pcdisj2 = Pcstdisjunction(memory_pool, mdid, pcr2);
 	PrintConstraint(memory_pool, pcdisj2);
 
-	DrgPcnstr *pdrgpcst = GPOS_NEW(memory_pool) DrgPcnstr(memory_pool);
+	ConstraintArray *pdrgpcst = GPOS_NEW(memory_pool) ConstraintArray(memory_pool);
 	pcdisj1->AddRef();
 	pcdisj2->AddRef();
 	pdrgpcst->Append(pcdisj1);
@@ -551,7 +551,7 @@ CConstraintTest::EresUnittest_CConstraintFromScalarExpr()
 	CColRefSet *pcrs2 = CDrvdPropRelational::GetRelationalProperties(pexprGet2->PdpDerive())->PcrsOutput();
 	CColRef *pcr2 =  pcrs2->PcrAny();
 
-	DrgPcrs *pdrgpcrs = NULL;
+	ColRefSetArray *pdrgpcrs = NULL;
 
 	// expression with 1 column
 	CExpression *pexpr = PexprScalarCmp(memory_pool, &mda, pcr1, IMDType::EcmptG, 15);
@@ -564,7 +564,7 @@ CConstraintTest::EresUnittest_CConstraintFromScalarExpr()
 	pexpr->Release();
 
 	// expression with 2 columns
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	pdrgpexpr->Append(PexprScalarCmp(memory_pool, &mda, pcr1, IMDType::EcmptG, 15));
 	pdrgpexpr->Append(PexprScalarCmp(memory_pool, &mda, pcr2, IMDType::EcmptL, 20));
 
@@ -643,7 +643,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalConvertsTo()
 	CColRef *colref =  pcrs->PcrAny();
 
 	// create constraint
-	DrgPrng *pdrgprng = Pdrgprng(memory_pool, mdid, rgRangeInfoIn, GPOS_ARRAY_SIZE(rgRangeInfoIn));
+	RangeArray *pdrgprng = Pdrgprng(memory_pool, mdid, rgRangeInfoIn, GPOS_ARRAY_SIZE(rgRangeInfoIn));
 	CConstraintInterval *pcnstin = GPOS_NEW(memory_pool) CConstraintInterval(memory_pool, colref, pdrgprng, true);
 
 	PrintConstraint(memory_pool, pcnstin);
@@ -711,7 +711,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalPexpr()
 	CColRefSet *pcrs = CDrvdPropRelational::GetRelationalProperties(pexprGet->PdpDerive())->PcrsOutput();
 	CColRef *colref =  pcrs->PcrAny();
 
-	DrgPrng *pdrgprng = NULL;
+	RangeArray *pdrgprng = NULL;
 	CConstraintInterval *pcnstin = NULL;
 	CExpression *pexpr = NULL;
 	CConstraintInterval *pcnstNotIn = NULL;
@@ -1002,7 +1002,7 @@ CConstraintTest::EresUnittest_CIntervalFromScalarBoolOp
 	)
 {
 	// AND
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	pdrgpexpr->Append(PexprScalarCmp(memory_pool, md_accessor, colref, IMDType::EcmptL, 5));
 	pdrgpexpr->Append(PexprScalarCmp(memory_pool, md_accessor, colref, IMDType::EcmptGEq, 0));
 
@@ -1016,7 +1016,7 @@ CConstraintTest::EresUnittest_CIntervalFromScalarBoolOp
 	(void) pexpr->Release();
 
 	// OR
-	pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	pdrgpexpr->Append(PexprScalarCmp(memory_pool, md_accessor, colref, IMDType::EcmptL, 5));
 	pdrgpexpr->Append(PexprScalarCmp(memory_pool, md_accessor, colref, IMDType::EcmptGEq, 10));
 
@@ -1030,7 +1030,7 @@ CConstraintTest::EresUnittest_CIntervalFromScalarBoolOp
 	pexpr->Release();
 
 	// NOT
-	pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	pdrgpexpr->Append(CUtils::PexprIsNull(memory_pool, CUtils::PexprScalarIdent(memory_pool, colref)));
 
 	pexpr = CUtils::PexprScalarBoolOp(memory_pool, CScalarBoolOp::EboolopNot, pdrgpexpr);
@@ -1103,7 +1103,7 @@ CConstraintTest::PciFirstInterval
 				{CRange::EriExcluded, 20, CRange::EriExcluded, 1000},
 			};
 
-	DrgPrng *pdrgprng = Pdrgprng(memory_pool, mdid, rgRangeInfo, GPOS_ARRAY_SIZE(rgRangeInfo));
+	RangeArray *pdrgprng = Pdrgprng(memory_pool, mdid, rgRangeInfo, GPOS_ARRAY_SIZE(rgRangeInfo));
 
 	return GPOS_NEW(memory_pool) CConstraintInterval(memory_pool, colref, pdrgprng, true /*is_null*/);
 }
@@ -1131,7 +1131,7 @@ CConstraintTest::PciSecondInterval
 				{CRange::EriExcluded, 10, CRange::EriExcluded, 25},
 			};
 
-	DrgPrng *pdrgprng = Pdrgprng(memory_pool, mdid, rgRangeInfo, GPOS_ARRAY_SIZE(rgRangeInfo));
+	RangeArray *pdrgprng = Pdrgprng(memory_pool, mdid, rgRangeInfo, GPOS_ARRAY_SIZE(rgRangeInfo));
 
 	return GPOS_NEW(memory_pool) CConstraintInterval(memory_pool, colref, pdrgprng, false /*is_null*/);
 }
@@ -1144,7 +1144,7 @@ CConstraintTest::PciSecondInterval
 //		Construct an array of ranges to be used to create an interval
 //
 //---------------------------------------------------------------------------
-DrgPrng *
+RangeArray *
 CConstraintTest::Pdrgprng
 	(
 	IMemoryPool *memory_pool,
@@ -1153,7 +1153,7 @@ CConstraintTest::Pdrgprng
 	ULONG ulRanges
 	)
 {
-	DrgPrng *pdrgprng = GPOS_NEW(memory_pool) DrgPrng(memory_pool);
+	RangeArray *pdrgprng = GPOS_NEW(memory_pool) RangeArray(memory_pool);
 
 	for (ULONG ul = 0; ul < ulRanges; ul++)
 	{
@@ -1210,7 +1210,7 @@ void
 CConstraintTest::PrintEquivClasses
 	(
 	IMemoryPool *memory_pool,
-	DrgPcrs *pdrgpcrs,
+	ColRefSetArray *pdrgpcrs,
 	BOOL fExpected
 	)
 {

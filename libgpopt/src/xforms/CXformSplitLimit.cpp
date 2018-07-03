@@ -108,7 +108,7 @@ CXformSplitLimit::Transform
 
 	// get relational properties
 	CDrvdPropRelational *pdprel =
-			CDrvdPropRelational::GetRelationalProperties(pexprRelational->Pdp(CDrvdProp::EptRelational));
+			CDrvdPropRelational::GetRelationalProperties(pexprRelational->Pdp(DrvdPropArray::EptRelational));
 
 	// TODO: , Feb 20, 2012, we currently only split limit with offset 0.
 	if (!CUtils::FHasZeroOffset(pexpr) || 0 < pdprel->PcrsOuter()->Size())

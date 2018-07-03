@@ -40,8 +40,8 @@ using namespace gpopt;
 CJoinOrderGreedy::CJoinOrderGreedy
 	(
 	IMemoryPool *pmp,
-	DrgPexpr *pdrgpexprComponents,
-	DrgPexpr *pdrgpexprConjuncts
+	ExpressionArray *pdrgpexprComponents,
+	ExpressionArray *pdrgpexprConjuncts
 	)
 	:
 	CJoinOrder(pmp, pdrgpexprComponents, pdrgpexprConjuncts),
@@ -95,7 +95,7 @@ CJoinOrderGreedy::MarkUsedEdges()
 	}
 
 	CExpression *pexprScalar = (*pexpr) [pexpr->Arity() - 1];
-	DrgPexpr *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(m_memory_pool, pexprScalar);
+	ExpressionArray *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(m_memory_pool, pexprScalar);
 	const ULONG ulSize = pdrgpexpr->Size();
 
 	for (ULONG ulEdge = 0; ulEdge < m_ulEdges; ulEdge++)

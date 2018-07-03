@@ -54,7 +54,7 @@ namespace gpopt
 			CTableDescriptor *m_ptabdesc;
 			
 			// source columns
-			DrgPcr *m_pdrgpcrSource;
+			ColRefArray *m_pdrgpcrSource;
 						
 			// set of modified columns from the target table
 			CBitSet *m_pbsModified;
@@ -89,7 +89,7 @@ namespace gpopt
 				IMemoryPool *memory_pool,
 				EDMLOperator edmlop,
 				CTableDescriptor *ptabdesc,
-				DrgPcr *colref_array,
+				ColRefArray *colref_array,
 				CBitSet *pbsModified,
 				CColRef *pcrAction,
 				CColRef *pcrTableOid,
@@ -123,7 +123,7 @@ namespace gpopt
 			}
 
 			// source columns
-			DrgPcr *PdrgpcrSource() const
+			ColRefArray *PdrgpcrSource() const
 			{
 				return m_pdrgpcrSource;
 			}

@@ -237,8 +237,8 @@ namespace gpopt
 				CExpression *pexprPred,
 				CExpression *pexprOuter,
 				CExpression *pexprInner,
-				DrgPexpr *pdrgpexprOuter,
-				DrgPexpr *pdrgpexprInner
+				ExpressionArray *pdrgpexprOuter,
+				ExpressionArray *pdrgpexprInner
 				);
 			
 			// helper to add filter on part key
@@ -442,8 +442,8 @@ namespace gpopt
 				(
 				IMemoryPool *memory_pool,
 				CExpression *pexpr,
-				DrgPexpr *pdrgpexprOuter,
-				DrgPexpr *pdrgpexprInner,
+				ExpressionArray *pdrgpexprOuter,
+				ExpressionArray *pdrgpexprInner,
 				CExpression **ppexprResult // output: join expression to be tarnsformed to hash join
 				);
 

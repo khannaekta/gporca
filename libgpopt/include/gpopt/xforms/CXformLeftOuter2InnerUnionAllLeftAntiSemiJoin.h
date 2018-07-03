@@ -66,11 +66,11 @@ namespace gpopt
 			CExpression *PexprLeftAntiSemiJoinWithInnerGroupBy
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *pdrgpcrOuter,
-				DrgPcr *pdrgpcrOuterCopy,
+				ColRefArray *pdrgpcrOuter,
+				ColRefArray *pdrgpcrOuterCopy,
 				CColRefSet *pcrsScalar,
 				CColRefSet *pcrsInner,
-				DrgPcr *pdrgpcrJoinOutput,
+				ColRefArray *pdrgpcrJoinOutput,
 				ULONG ulCTEJoinId,
 				ULONG ulCTEOuterId
 				);
@@ -81,13 +81,13 @@ namespace gpopt
 			CExpression *PexprProjectOverLeftAntiSemiJoin
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *pdrgpcrOuter,
+				ColRefArray *pdrgpcrOuter,
 				CColRefSet *pcrsScalar,
 				CColRefSet *pcrsInner,
-				DrgPcr *pdrgpcrJoinOutput,
+				ColRefArray *pdrgpcrJoinOutput,
 				ULONG ulCTEJoinId,
 				ULONG ulCTEOuterId,
-				DrgPcr **ppdrgpcrProjectOutput
+				ColRefArray **ppdrgpcrProjectOutput
 				);
 
 		public:

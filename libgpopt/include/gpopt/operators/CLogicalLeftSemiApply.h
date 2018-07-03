@@ -45,14 +45,14 @@ namespace gpopt
 				:
 				CLogicalApply(memory_pool)
 			{
-				m_pdrgpcrInner = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+				m_pdrgpcrInner = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 			}
 
 			// ctor
 			CLogicalLeftSemiApply
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *pdrgpcrInner,
+				ColRefArray *pdrgpcrInner,
 				EOperatorId eopidOriginSubq
 				)
 				:

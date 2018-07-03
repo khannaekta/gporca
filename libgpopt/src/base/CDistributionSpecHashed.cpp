@@ -34,7 +34,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CDistributionSpecHashed::CDistributionSpecHashed
 	(
-	DrgPexpr *pdrgpexpr,
+	ExpressionArray *pdrgpexpr,
 	BOOL fNullsColocated
 	)
 	:
@@ -57,7 +57,7 @@ CDistributionSpecHashed::CDistributionSpecHashed
 //---------------------------------------------------------------------------
 CDistributionSpecHashed::CDistributionSpecHashed
 	(
-	DrgPexpr *pdrgpexpr,
+	ExpressionArray *pdrgpexpr,
 	BOOL fNullsColocated,
 	CDistributionSpecHashed *pdshashedEquiv
 	)
@@ -101,7 +101,7 @@ CDistributionSpecHashed::PdsCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	const ULONG length = m_pdrgpexpr->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
@@ -234,7 +234,7 @@ CDistributionSpecHashed::PdshashedExcludeColumns
 {
 	GPOS_ASSERT(NULL != pcrs);
 
-	DrgPexpr *pdrgpexprNew = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprNew = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	const ULONG ulExprs = m_pdrgpexpr->Size();
 	for (ULONG ul = 0; ul < ulExprs; ul++)
 	{
@@ -306,7 +306,7 @@ CDistributionSpecHashed::AppendEnforcers
 	prpp
 #endif // GPOS_DEBUG
 	,
-	DrgPexpr *pdrgpexpr,
+	ExpressionArray *pdrgpexpr,
 	CExpression *pexpr
 	)
 {
@@ -468,18 +468,18 @@ CDistributionSpecHashed *
 CDistributionSpecHashed::PdshashedMaximal
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array,
+	ColRefArray *colref_array,
 	BOOL fNullsColocated
 	)
 {
 	GPOS_ASSERT(NULL != colref_array);
 	GPOS_ASSERT(0 < colref_array->Size());
 
-	DrgPcr *pdrgpcrHashable = CUtils::PdrgpcrRedistributableSubset(memory_pool, colref_array);
+	ColRefArray *pdrgpcrHashable = CUtils::PdrgpcrRedistributableSubset(memory_pool, colref_array);
 	CDistributionSpecHashed *pdshashed = NULL;
 	if (0 < pdrgpcrHashable->Size())
 	{
-		DrgPexpr *pdrgpexpr = CUtils::PdrgpexprScalarIdents(memory_pool, pdrgpcrHashable);
+		ExpressionArray *pdrgpexpr = CUtils::PdrgpexprScalarIdents(memory_pool, pdrgpcrHashable);
 		pdshashed = GPOS_NEW(memory_pool) CDistributionSpecHashed(pdrgpexpr, fNullsColocated);
 	}
 	pdrgpcrHashable->Release();

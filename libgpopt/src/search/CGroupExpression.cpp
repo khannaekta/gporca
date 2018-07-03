@@ -48,7 +48,7 @@ CGroupExpression::CGroupExpression
 	(
 	IMemoryPool *memory_pool,
 	COperator *pop,
-	DrgPgroup *pdrgpgroup,
+	GroupArray *pdrgpgroup,
 	CXform::EXformId exfid,
 	CGroupExpression *pgexprOrigin,
 	BOOL fIntermediate
@@ -75,7 +75,7 @@ CGroupExpression::CGroupExpression
 	// store sorted array of children for faster comparison
 	if (1 < pdrgpgroup->Size() && !pop->FInputOrderSensitive())
 	{
-		m_pdrgpgroupSorted = GPOS_NEW(memory_pool) DrgPgroup(memory_pool, pdrgpgroup->Size());
+		m_pdrgpgroupSorted = GPOS_NEW(memory_pool) GroupArray(memory_pool, pdrgpgroup->Size());
 		m_pdrgpgroupSorted->AppendArray(pdrgpgroup);
 		m_pdrgpgroupSorted->Sort();
 		
@@ -264,7 +264,7 @@ CGroupExpression::FValidContext
 	(
 	IMemoryPool *memory_pool,
 	COptimizationContext *poc,
-	DrgPoc *pdrgpocChild
+	OptimizationContextArray *pdrgpocChild
 	)
 {
 	GPOS_ASSERT(m_pop->FPhysical());
@@ -325,7 +325,7 @@ BOOL
 CGroupExpression::FCostContextExists
 	(
 	COptimizationContext *poc,
-	DrgPoc *pdrgpoc
+	OptimizationContextArray *pdrgpoc
 	)
 {
 	GPOS_ASSERT(NULL != poc);
@@ -457,7 +457,7 @@ CGroupExpression::PccComputeCost
 	IMemoryPool *memory_pool,
 	COptimizationContext *poc,
 	ULONG ulOptReq,
-	DrgPoc *pdrgpoc, // array of child contexts
+	OptimizationContextArray *pdrgpoc, // array of child contexts
 	BOOL fPruned,	// is created cost context pruned based on cost bound
 	CCost costLowerBound	// lower bound on the cost of plan carried by cost context
 	)
@@ -621,8 +621,8 @@ CGroupExpression::CostCompute
 	GPOS_ASSERT(NULL != pcc);
 
 	// prepare cost array
-	DrgPoc *pdrgpoc = pcc->Pdrgpoc();
-	DrgPcost *pdrgpcostChildren = GPOS_NEW(memory_pool) DrgPcost(memory_pool);
+	OptimizationContextArray *pdrgpoc = pcc->Pdrgpoc();
+	CostArray *pdrgpcostChildren = GPOS_NEW(memory_pool) CostArray(memory_pool);
 	const ULONG length = pdrgpoc->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
@@ -701,7 +701,7 @@ CGroupExpression::PccLookup
 //		Lookup all valid cost contexts matching given optimization context
 //
 //---------------------------------------------------------------------------
-DrgPcc *
+CostContextArray *
 CGroupExpression::PdrgpccLookupAll
 	(
 	IMemoryPool *memory_pool,
@@ -709,7 +709,7 @@ CGroupExpression::PdrgpccLookupAll
 	)
 {
 	GPOS_ASSERT(NULL != poc);
-	DrgPcc *pdrgpcc = GPOS_NEW(memory_pool) DrgPcc(memory_pool);
+	CostContextArray *pdrgpcc = GPOS_NEW(memory_pool) CostContextArray(memory_pool);
 
 	CCostContext *pccFound = NULL;
 	BOOL fValid = false;
@@ -1016,7 +1016,7 @@ ULONG
 CGroupExpression::HashValue
 	(
 	COperator *pop,
-	DrgPgroup *pdrgpgroup
+	GroupArray *pdrgpgroup
 	)
 {
 	GPOS_ASSERT(NULL != pop);
@@ -1124,7 +1124,7 @@ CGroupExpression::PrintXform
 			<< "Input:" << std::endl << *pexpr
 			<< "Output:" << std::endl
 			<< "Alternatives:" << std::endl;
-		DrgPexpr *pdrgpexpr = pxfres->Pdrgpexpr();
+		ExpressionArray *pdrgpexpr = pxfres->Pdrgpexpr();
 		ULONG ulStart = pdrgpexpr->Size() - ulNumResults;
 		ULONG end = pdrgpexpr->Size();
 

@@ -29,7 +29,7 @@ using namespace gpopt;
 CPropConstraint::CPropConstraint
 	(
 	IMemoryPool *memory_pool,
-	DrgPcrs *pdrgpcrs,
+	ColRefSetArray *pdrgpcrs,
 	CConstraint *pcnstr
 	)
 	:
@@ -71,7 +71,7 @@ CPropConstraint::InitHashMap
 	)
 {
 	GPOS_ASSERT(NULL == m_phmcrcrs);
-	m_phmcrcrs = GPOS_NEW(memory_pool) HMCrCrs(memory_pool);
+	m_phmcrcrs = GPOS_NEW(memory_pool) ColRefToColRefSetMap(memory_pool);
 	const ULONG ulEquiv = m_pdrgpcrs->Size();
 	for (ULONG ul = 0; ul < ulEquiv; ul++)
 	{

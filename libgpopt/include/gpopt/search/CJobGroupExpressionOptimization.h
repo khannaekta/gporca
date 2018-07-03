@@ -84,7 +84,7 @@ namespace gpopt
 			ULONG m_ulOptReq;
 
 			// array of child groups optimization contexts
-			DrgPoc *m_pdrgpoc;
+			OptimizationContextArray *m_pdrgpoc;
 
 			// stats context to be used during costing
 			StatsArray *m_pdrgpstatCurrentCtxt;

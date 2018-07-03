@@ -170,7 +170,7 @@ namespace gpopt
 					}
 
 					// add given columns to consumers column map
-					void AddConsumerCols(DrgPcr *colref_array);
+					void AddConsumerCols(ColRefArray *colref_array);
 
 					// return position of given consumer column in consumer output
 					ULONG UlConsumerColPos(CColRef *colref);
@@ -261,7 +261,7 @@ namespace gpopt
 			CCTEReq *PcterProducers(IMemoryPool *memory_pool) const;
 
 			// return an array of all stored CTE expressions
-			DrgPexpr *PdrgPexpr(IMemoryPool *memory_pool) const;
+			ExpressionArray *PdrgPexpr(IMemoryPool *memory_pool) const;
 
 			// disable CTE inlining
 			void DisableInlining()
@@ -283,13 +283,13 @@ namespace gpopt
 			void MapComputedToUsedCols(CColumnFactory *col_factory) const;
 
 			// add given columns to consumers column map
-			void AddConsumerCols(ULONG ulCTEId, DrgPcr *colref_array);
+			void AddConsumerCols(ULONG ulCTEId, ColRefArray *colref_array);
 
 			// return position of given consumer column in consumer output
 			ULONG UlConsumerColPos(ULONG ulCTEId, CColRef *colref);
 
 			// return a map from Id's of consumer columns in the given column set to their corresponding producer columns
-			UlongColRefHashMap *PhmulcrConsumerToProducer(IMemoryPool *memory_pool, ULONG ulCTEId, CColRefSet *pcrs, DrgPcr *pdrgpcrProducer);
+			UlongColRefHashMap *PhmulcrConsumerToProducer(IMemoryPool *memory_pool, ULONG ulCTEId, CColRefSet *pcrs, ColRefArray *pdrgpcrProducer);
 
 	}; // CCTEInfo
 }

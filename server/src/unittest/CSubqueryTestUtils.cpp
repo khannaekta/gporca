@@ -320,7 +320,7 @@ CSubqueryTestUtils::PexprSelectWithAggSubqueryOverJoin
 	}
 
 	// generate N-Ary join
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	pdrgpexpr->Append(pexprR);
 	pdrgpexpr->Append(pexprS);
 	pdrgpexpr->Append(pexprPred);
@@ -933,7 +933,7 @@ CSubqueryTestUtils::PexprSelectWith2LevelsCorrSubquery
 		CExpression *pexprOuterSubq = (*(*pexpr)[1])[1];
 		CExpression *pexprInnerSubq = (*(*(*pexprOuterSubq)[0])[1])[1];
 		CExpression *pexprInnerSelect = (*(*pexprInnerSubq)[0])[0];
-		DrgPexpr *pdrgpexpr = (*pexprInnerSelect)[1]->PdrgPexpr();
+		ExpressionArray *pdrgpexpr = (*pexprInnerSelect)[1]->PdrgPexpr();
 
 		CColRef *pcrOuter = CDrvdPropRelational::GetRelationalProperties(pexpr->PdpDerive())->PcrsOutput()->PcrAny();
 		CColRef *pcrInner = CDrvdPropRelational::GetRelationalProperties(pexprInnerSelect->PdpDerive())->PcrsOutput()->PcrAny();
@@ -1037,7 +1037,7 @@ CSubqueryTestUtils::PexprSubquery
 		CExpression *pexprCorrelated = CUtils::PexprScalarEqCmp(memory_pool, pcrOuter, pcrInner);
 
 		// generate AND expression of correlated and non-correlated predicates
-		DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+		ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 		pdrgpexpr->Append(pexprCorrelated);
 		pdrgpexpr->Append(pexprNonCorrelated);
 		pexprPred = CUtils::PexprScalarBoolOp(memory_pool, CScalarBoolOp::EboolopAnd, pdrgpexpr);
@@ -1159,7 +1159,7 @@ CSubqueryTestUtils::PexprUndecorrelatableSubquery
 	CExpression *pexprPred = CUtils::PexprScalarEqCmp(memory_pool, pcrOuter, CUtils::PexprScalarConstInt4(memory_pool, 5 /*val*/));
 
 	// generate OR expression of  predicates
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	pdrgpexpr->Append(pexprSubquery);
 	pdrgpexpr->Append(pexprPred);
 
@@ -1349,7 +1349,7 @@ CSubqueryTestUtils::PexprSubqueryAgg
 	CExpression *pexprProjList = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CScalarProjectList(memory_pool), pexprProjElem);
 
 	// generate empty grouping columns list
-	DrgPcr *colref_array = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	ColRefArray *colref_array = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 
 	// generate a group by on top of select expression
 	CExpression *pexprLogicalGbAgg = CUtils::PexprLogicalGbAggGlobal(memory_pool, colref_array, pexprSelect, pexprProjList);
@@ -1404,7 +1404,7 @@ CSubqueryTestUtils::PexprSelectWithSubqueryBoolOp
 	CExpression *pexprSubqueryExists = PexprSubqueryExistential(memory_pool, COperator::EopScalarSubqueryExists, pexprOuter, pexprGet2, fCorrelated);
 
 	// generate AND expression of all predicates
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	pdrgpexpr->Append(pexprPred1);
 	pdrgpexpr->Append(pexprPred2);
 	pdrgpexpr->Append(pexprSubqueryExists);
@@ -1440,7 +1440,7 @@ CSubqueryTestUtils::PexprProjectWithSubqueries
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	// generate an array of project elements holding subquery expressions
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 
 	CColRef *pcrComputed = NULL;
 	CExpression *pexprPrjElem = NULL;
@@ -1658,7 +1658,7 @@ CSubqueryTestUtils::PexprSelectWithTrimmableExistentialSubquery
 	(*pexprInner)[0]->AddRef();
 	(*pexprInner)[1]->AddRef();
 	CExpression *pexprGbAgg =
-		CUtils::PexprLogicalGbAggGlobal(memory_pool, GPOS_NEW(memory_pool) DrgPcr(memory_pool), (*pexprInner)[0], (*pexprInner)[1]);
+		CUtils::PexprLogicalGbAggGlobal(memory_pool, GPOS_NEW(memory_pool) ColRefArray(memory_pool), (*pexprInner)[0], (*pexprInner)[1]);
 	pexprInner->Release();
 
 	// create existential subquery
@@ -1836,7 +1836,7 @@ CSubqueryTestUtils::PexprSubqueryWithDisjunction
 									);
 	pexprSubquery->AddRef();
 
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	pdrgpexpr->Append(pexprSubquery);
 	pdrgpexpr->Append(pexprSubquery);
 

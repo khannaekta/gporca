@@ -73,10 +73,10 @@ CXformGbAggDedup2StreamAggDedup::Transform
 	pexprScalar->AddRef();
 
 	CLogicalGbAggDeduplicate *popAggDedup = CLogicalGbAggDeduplicate::PopConvert(pexpr->Pop());
-	DrgPcr *colref_array = popAggDedup->Pdrgpcr();
+	ColRefArray *colref_array = popAggDedup->Pdrgpcr();
 	colref_array->AddRef();
 
-	DrgPcr *pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
+	ColRefArray *pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
 	pdrgpcrKeys->AddRef();
 
 	// create alternative expression

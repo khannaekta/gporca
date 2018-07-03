@@ -433,7 +433,7 @@ CStatsPredUtils::CreateStatsPredConj(IMemoryPool *memory_pool,
 									 CColRefSet *outer_refs)
 {
 	GPOS_ASSERT(NULL != scalar_expr);
-	DrgPexpr *pred_expr_conjuncts = CPredicateUtils::PdrgpexprConjuncts(memory_pool, scalar_expr);
+	ExpressionArray *pred_expr_conjuncts = CPredicateUtils::PdrgpexprConjuncts(memory_pool, scalar_expr);
 	const ULONG size = pred_expr_conjuncts->Size();
 
 	StatsPredPtrArry *pred_stats_array = GPOS_NEW(memory_pool) StatsPredPtrArry(memory_pool);
@@ -498,7 +498,7 @@ CStatsPredUtils::CreateStatsPredDisj(IMemoryPool *memory_pool,
 	CExpression *expr_copy = CExpressionUtils::PexprDedupChildren(memory_pool, predicate_expr);
 
 	// extract the components of the OR tree
-	DrgPexpr *disjunct_expr = CPredicateUtils::PdrgpexprDisjuncts(memory_pool, expr_copy);
+	ExpressionArray *disjunct_expr = CPredicateUtils::PdrgpexprDisjuncts(memory_pool, expr_copy);
 	const ULONG size = disjunct_expr->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
@@ -666,7 +666,7 @@ BOOL
 CStatsPredUtils::IsConjunction(IMemoryPool *memory_pool, CExpression *predicate_expr)
 {
 	GPOS_ASSERT(NULL != predicate_expr);
-	DrgPexpr *expr_conjuncts = CPredicateUtils::PdrgpexprConjuncts(memory_pool, predicate_expr);
+	ExpressionArray *expr_conjuncts = CPredicateUtils::PdrgpexprConjuncts(memory_pool, predicate_expr);
 	const ULONG size = expr_conjuncts->Size();
 	expr_conjuncts->Release();
 
@@ -1020,9 +1020,9 @@ CStatsPredJoin *
 CStatsPredUtils::ExtractJoinStatsFromJoinPred(
 	IMemoryPool *memory_pool,
 	CExpression *join_pred_expr,
-	DrgPcrs *output_col_refsets,  // array of output columns of join's relational inputs
+	ColRefSetArray *output_col_refsets,  // array of output columns of join's relational inputs
 	CColRefSet *outer_refs,
-	DrgPexpr *unsupported_expr_array)
+	ExpressionArray *unsupported_expr_array)
 {
 	GPOS_ASSERT(NULL != join_pred_expr);
 	GPOS_ASSERT(NULL != output_col_refsets);
@@ -1093,7 +1093,7 @@ StatsPredJoinArray *
 CStatsPredUtils::ExtractJoinStatsFromJoinPredArray(
 	IMemoryPool *memory_pool,
 	CExpression *scalar_expr,
-	DrgPcrs *output_col_refsets,  // array of output columns of join's relational inputs
+	ColRefSetArray *output_col_refsets,  // array of output columns of join's relational inputs
 	CColRefSet *outer_refs,
 	CStatsPred **unsupported_stats_pred_array)
 {
@@ -1102,10 +1102,10 @@ CStatsPredUtils::ExtractJoinStatsFromJoinPredArray(
 
 	StatsPredJoinArray *join_preds_stats = GPOS_NEW(memory_pool) StatsPredJoinArray(memory_pool);
 
-	DrgPexpr *unsupported_expr_array = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *unsupported_expr_array = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 
 	// extract all the conjuncts
-	DrgPexpr *expr_conjuncts = CPredicateUtils::PdrgpexprConjuncts(memory_pool, scalar_expr);
+	ExpressionArray *expr_conjuncts = CPredicateUtils::PdrgpexprConjuncts(memory_pool, scalar_expr);
 	const ULONG size = expr_conjuncts->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
@@ -1155,7 +1155,7 @@ CStatsPredUtils::ExtractJoinStatsFromExpr(
 	IMemoryPool *memory_pool,
 	CExpressionHandle &expr_handle,
 	CExpression *pexprScalarInput,
-	DrgPcrs *output_col_refsets,  // array of output columns of join's relational inputs
+	ColRefSetArray *output_col_refsets,  // array of output columns of join's relational inputs
 	CColRefSet *outer_refs)
 {
 	GPOS_ASSERT(NULL != output_col_refsets);
@@ -1196,7 +1196,7 @@ CStatsPredUtils::ExtractJoinStatsFromExprHandle(IMemoryPool *memory_pool,
 		return GPOS_NEW(memory_pool) StatsPredJoinArray(memory_pool);
 	}
 
-	DrgPcrs *output_col_refsets = GPOS_NEW(memory_pool) DrgPcrs(memory_pool);
+	ColRefSetArray *output_col_refsets = GPOS_NEW(memory_pool) ColRefSetArray(memory_pool);
 	const ULONG size = expr_handle.Arity();
 	for (ULONG ul = 0; ul < size - 1; ul++)
 	{

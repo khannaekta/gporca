@@ -35,15 +35,15 @@ namespace gpopt
 			typedef CExpression *(*Pfpexpr)(IMemoryPool*);
 
 			// type definition for of optimize function
-			typedef void (*PfnOptimize)(IMemoryPool *, CExpression *, DrgPss *);
+			typedef void (*PfnOptimize)(IMemoryPool *, CExpression *, SearchStageArray *);
 
 			// generate random search strategy
 			static
-			DrgPss *PdrgpssRandom(IMemoryPool *memory_pool);
+			SearchStageArray *PdrgpssRandom(IMemoryPool *memory_pool);
 
 			// run optimize function on given expression
 			static
-			void Optimize(IMemoryPool *memory_pool, Pfpexpr pfnGenerator, DrgPss *search_stage_array, PfnOptimize pfnOptimize);
+			void Optimize(IMemoryPool *memory_pool, Pfpexpr pfnGenerator, SearchStageArray *search_stage_array, PfnOptimize pfnOptimize);
 
 		public:
 

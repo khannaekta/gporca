@@ -72,7 +72,7 @@ namespace gpopt
 				IMemoryPool *, //memory_pool,
 				CExpressionHandle &, // exprhdl
 				CReqdPropPlan *, //prpp,
-				DrgPexpr * , // pdrgpexpr,
+				ExpressionArray * , // pdrgpexpr,
 				CExpression * // pexpr
 				);
 

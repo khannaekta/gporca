@@ -36,7 +36,7 @@ namespace gpopt
 
 			// helper for mapping subquery function arguments into columns
 			static
-			DrgPcr *PdrgpcrSubqueries
+			ColRefArray *PdrgpcrSubqueries
 				(
 				IMemoryPool *memory_pool,
 				CExpression *pexprCTEProducer,

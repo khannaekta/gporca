@@ -67,7 +67,7 @@ CParseHandlerSearchStrategy::StartElement(const XMLCh *const element_uri,
 	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenSearchStrategy),
 									  element_local_name))
 	{
-		m_search_stage_array = GPOS_NEW(m_memory_pool) DrgPss(m_memory_pool);
+		m_search_stage_array = GPOS_NEW(m_memory_pool) SearchStageArray(m_memory_pool);
 	}
 	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenSearchStage),
 										   element_local_name))

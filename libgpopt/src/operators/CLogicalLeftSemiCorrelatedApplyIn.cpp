@@ -42,7 +42,7 @@ CLogicalLeftSemiCorrelatedApplyIn::CLogicalLeftSemiCorrelatedApplyIn
 CLogicalLeftSemiCorrelatedApplyIn::CLogicalLeftSemiCorrelatedApplyIn
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *pdrgpcrInner,
+	ColRefArray *pdrgpcrInner,
 	EOperatorId eopidOriginSubq
 	)
 	:
@@ -86,7 +86,7 @@ CLogicalLeftSemiCorrelatedApplyIn::PopCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcrInner = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrInner, colref_mapping, must_exist);
+	ColRefArray *pdrgpcrInner = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrInner, colref_mapping, must_exist);
 
 	return GPOS_NEW(memory_pool) CLogicalLeftSemiCorrelatedApplyIn(memory_pool, pdrgpcrInner, m_eopidOriginSubq);
 }

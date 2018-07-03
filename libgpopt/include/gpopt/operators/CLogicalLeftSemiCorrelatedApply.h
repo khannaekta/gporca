@@ -43,7 +43,7 @@ namespace gpopt
 			CLogicalLeftSemiCorrelatedApply(IMemoryPool *memory_pool);
 
 			// ctor
-			CLogicalLeftSemiCorrelatedApply(IMemoryPool *memory_pool,  DrgPcr *pdrgpcrInner, EOperatorId eopidOriginSubq);
+			CLogicalLeftSemiCorrelatedApply(IMemoryPool *memory_pool,  ColRefArray *pdrgpcrInner, EOperatorId eopidOriginSubq);
 
 			// dtor
 			virtual

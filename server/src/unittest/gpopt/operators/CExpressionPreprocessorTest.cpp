@@ -469,7 +469,7 @@ CExpressionPreprocessorTest::PexprWindowFuncWithLOJHelper
 	)
 {
 	// add window function on top of join expression
-	DrgPcr *pdrgpcrPartitionBy = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	ColRefArray *pdrgpcrPartitionBy = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 	pdrgpcrPartitionBy->Append(pcrPartitionBy);
 
 	// add Select node on top of window function
@@ -1230,15 +1230,15 @@ CExpressionPreprocessorTest::EresUnittest_UnnestSubqueries()
 		CExpression *pexprPredSnd = pfSnd(memory_pool, pexprGet);
 
 		BOOL fNegateChildren = elem.m_fNegateChildren;
-		DrgPexpr *pdrgpexprAndOr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+		ExpressionArray *pdrgpexprAndOr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 
 		if (fNegateChildren)
 		{
-			DrgPexpr *pdrgpexprFst = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+			ExpressionArray *pdrgpexprFst = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 			pdrgpexprFst->Append(pexprPredFst);
 			pdrgpexprAndOr->Append(CUtils::PexprScalarBoolOp(memory_pool, CScalarBoolOp::EboolopNot , pdrgpexprFst));
 
-			DrgPexpr *pdrgpexprSnd = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+			ExpressionArray *pdrgpexprSnd = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 			pdrgpexprSnd->Append(pexprPredSnd);
 			pdrgpexprAndOr->Append(CUtils::PexprScalarBoolOp(memory_pool, CScalarBoolOp::EboolopNot , pdrgpexprSnd));
 		}
@@ -1251,7 +1251,7 @@ CExpressionPreprocessorTest::EresUnittest_UnnestSubqueries()
 		CScalarBoolOp::EBoolOperator eboolop = elem.m_eboolop;
 		CExpression *pexprAndOr = CUtils::PexprScalarBoolOp(memory_pool, eboolop , pdrgpexprAndOr);
 
-		DrgPexpr *pdrgpexprNot = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+		ExpressionArray *pdrgpexprNot = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 		pdrgpexprNot->Append(pexprAndOr);
 
 		CExpression *pexpr = GPOS_NEW(memory_pool) CExpression
@@ -1606,12 +1606,12 @@ CExpression *
 CExpressionPreprocessorTest::PexprCreateConjunction
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array
+	ColRefArray *colref_array
 	)
 {
 	GPOS_ASSERT(NULL != colref_array);
 
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	ULONG length = colref_array->Size();
 	for (ULONG ul = 0; ul < length; ++ul)
 	{
@@ -1653,20 +1653,20 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessOrPrefilters()
 	CExpression *pexprJoin = CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(memory_pool);
 
 	CColRefSet *pcrsInner = CDrvdPropRelational::GetRelationalProperties((*pexprJoin)[1]->PdpDerive())->PcrsOutput();
-	DrgPcr *pdrgpcrInner = pcrsInner->Pdrgpcr(memory_pool);
+	ColRefArray *pdrgpcrInner = pcrsInner->Pdrgpcr(memory_pool);
 	GPOS_ASSERT(pdrgpcrInner != NULL);
 	GPOS_ASSERT(3 <= pdrgpcrInner->Size());
 
 	CColRefSet *outer_refs = CDrvdPropRelational::GetRelationalProperties((*pexprJoin)[0]->PdpDerive())->PcrsOutput();
-	DrgPcr *pdrgpcrOuter = outer_refs->Pdrgpcr(memory_pool);
+	ColRefArray *pdrgpcrOuter = outer_refs->Pdrgpcr(memory_pool);
 	GPOS_ASSERT(pdrgpcrOuter != NULL);
 	GPOS_ASSERT(3 <= pdrgpcrOuter->Size());
 
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 
 	// every disjunct has one or two comparisons on various outer columns and one comparison on
 	// the first inner column, so we expect to have prefilters both on the outer and the inner tables
-	DrgPcr *pdrgpcrDisjunct = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	ColRefArray *pdrgpcrDisjunct = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 	CColRef *pcr0_0 = (*pdrgpcrOuter)[0];
 	pdrgpcrDisjunct->Append(pcr0_0);
 	CColRef *pcr1_0 = (*pdrgpcrInner)[0];
@@ -1674,7 +1674,7 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessOrPrefilters()
 	pdrgpexpr->Append(PexprCreateConjunction(memory_pool, pdrgpcrDisjunct));
 	pdrgpcrDisjunct->Release();
 
-	pdrgpcrDisjunct = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	pdrgpcrDisjunct = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 	CColRef *pcr0_1 = (*pdrgpcrOuter)[1];
 	pdrgpcrDisjunct->Append(pcr0_1);
 	CColRef *pcr0_2 = (*pdrgpcrOuter)[2];
@@ -1683,7 +1683,7 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessOrPrefilters()
 	pdrgpexpr->Append(PexprCreateConjunction(memory_pool, pdrgpcrDisjunct));
 	pdrgpcrDisjunct->Release();
 
-	pdrgpcrDisjunct = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	pdrgpcrDisjunct = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 	pdrgpcrDisjunct->Append(pcr0_2);
 	pdrgpcrDisjunct->Append(pcr1_0);
 	pdrgpexpr->Append(PexprCreateConjunction(memory_pool, pdrgpcrDisjunct));
@@ -1858,19 +1858,19 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessOrPrefiltersPartialPush()
 	CExpression *pexprJoin = CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(memory_pool);
 
 	CColRefSet *pcrsInner = CDrvdPropRelational::GetRelationalProperties((*pexprJoin)[1]->PdpDerive())->PcrsOutput();
-	DrgPcr *pdrgpcrInner = pcrsInner->Pdrgpcr(memory_pool);
+	ColRefArray *pdrgpcrInner = pcrsInner->Pdrgpcr(memory_pool);
 	GPOS_ASSERT(NULL != pdrgpcrInner);
 	GPOS_ASSERT(3 <= pdrgpcrInner->Size());
 
 	CColRefSet *outer_refs = CDrvdPropRelational::GetRelationalProperties((*pexprJoin)[0]->PdpDerive())->PcrsOutput();
-	DrgPcr *pdrgpcrOuter = outer_refs->Pdrgpcr(memory_pool);
+	ColRefArray *pdrgpcrOuter = outer_refs->Pdrgpcr(memory_pool);
 	GPOS_ASSERT(NULL != pdrgpcrOuter);
 	GPOS_ASSERT(3 <= pdrgpcrOuter->Size());
 
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 
 	// first disjunct has conditions on both tables that can be pushed
-	DrgPcr *pdrgpcrDisjunct = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	ColRefArray *pdrgpcrDisjunct = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 	CColRef *pcr0_0 = (*pdrgpcrOuter)[0];
 	pdrgpcrDisjunct->Append(pcr0_0);
 	CColRef *pcr1_0 = (*pdrgpcrInner)[0];
@@ -1879,7 +1879,7 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessOrPrefiltersPartialPush()
 	pdrgpcrDisjunct->Release();
 
 	// second disjunct has only a condition on the inner branch
-	pdrgpcrDisjunct = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	pdrgpcrDisjunct = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 	CColRef *pcr1_2 = (*pdrgpcrInner)[2];
 	pdrgpcrDisjunct->Append(pcr1_2);
 	pdrgpexpr->Append(PexprCreateConjunction(memory_pool, pdrgpcrDisjunct));
@@ -1984,7 +1984,7 @@ CExpressionPreprocessorTest::EresUnittest_CollapseInnerJoinHelper
 	GPOS_ASSERT(NULL != popJoin);
 
 	// (1) generate two nested outer joins
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	rgpexpr[0]->AddRef();
 	pdrgpexpr->Append(rgpexpr[0]);
 	rgpexpr[1]->AddRef();
@@ -1992,7 +1992,7 @@ CExpressionPreprocessorTest::EresUnittest_CollapseInnerJoinHelper
 	CTestUtils::EqualityPredicate(memory_pool, rgpdprel[0]->PcrsOutput(), rgpdprel[1]->PcrsOutput(), pdrgpexpr);
 	CExpression *pexprLOJ1 = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CLogicalLeftOuterJoin(memory_pool), pdrgpexpr);
 
-	pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	rgpexpr[2]->AddRef();
 	pdrgpexpr->Append(rgpexpr[2]);
 	pdrgpexpr->Append(pexprLOJ1);
@@ -2000,7 +2000,7 @@ CExpressionPreprocessorTest::EresUnittest_CollapseInnerJoinHelper
 	CExpression *pexprLOJ2 = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CLogicalLeftOuterJoin(memory_pool), pdrgpexpr);
 
 	// (2) add Inner/NAry Join on top of outer join
-	pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	pdrgpexpr->Append(pexprLOJ2);
 	rgpexpr[3]->AddRef();
 	pdrgpexpr->Append(rgpexpr[3]);
@@ -2009,7 +2009,7 @@ CExpressionPreprocessorTest::EresUnittest_CollapseInnerJoinHelper
 	CExpression *pexprJoin1 = GPOS_NEW(memory_pool) CExpression(memory_pool, popJoin, pdrgpexpr);
 
 	// (3) add another Inner/NAry Join on top of Inner/NAry Join
-	pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	pdrgpexpr->Append(pexprJoin1);
 	rgpexpr[4]->AddRef();
 	pdrgpexpr->Append(rgpexpr[4]);
@@ -2018,7 +2018,7 @@ CExpressionPreprocessorTest::EresUnittest_CollapseInnerJoinHelper
 	CExpression *pexprJoin2 = GPOS_NEW(memory_pool) CExpression(memory_pool, popJoin, pdrgpexpr);
 
 	// (4) add another Inner/NAry Join on top of Inner/NAry Join
-	pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	pdrgpexpr->Append(pexprJoin2);
 	rgpexpr[5]->AddRef();
 	pdrgpexpr->Append(rgpexpr[5]);
@@ -2298,7 +2298,7 @@ CExpressionPreprocessorTest::PexprCreateConvertableArray
 	CExpression *pexprArrayComp = (*pexpr->PdrgPexpr())[1];
 	GPOS_ASSERT(CUtils::FScalarArrayCmp(pexprArrayComp));
 
-	DrgPexpr *pdrgexprDisjChildren = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgexprDisjChildren = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	pdrgexprDisjChildren->Append(pexprArrayComp);
 	pdrgexprDisjChildren->Append(CUtils::PexprScalarCmp(memory_pool, pcrLeft, CUtils::PexprScalarConstInt4(memory_pool, 6 /*val*/), ecmptype));
 	pdrgexprDisjChildren->Append(CUtils::PexprScalarCmp(memory_pool, pcrLeft, CUtils::PexprScalarConstInt4(memory_pool, 7 /*val*/), ecmptype));
@@ -2403,7 +2403,7 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessConvert2InPredicateDeepExpre
 	popGet->AddRef();
 
 	// get a column ref from the outermost Get expression
-	CAutoRef<DrgPcr> apdrgpcr(CDrvdPropRelational::GetRelationalProperties(apexprGet->PdpDerive())->PcrsOutput()->Pdrgpcr(memory_pool));
+	CAutoRef<ColRefArray> apdrgpcr(CDrvdPropRelational::GetRelationalProperties(apexprGet->PdpDerive())->PcrsOutput()->Pdrgpcr(memory_pool));
 	GPOS_ASSERT(1 < apdrgpcr->Size());
 	CColRef *pcrLeft = (*apdrgpcr)[0];
 	CColRef *pcrRight = (*apdrgpcr)[1];

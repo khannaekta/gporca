@@ -56,7 +56,7 @@ namespace gpopt
 			virtual
 			void AddProps
 				(
-				CDrvdProp * // pdp
+				DrvdPropArray * // pdp
 				)
 			{
 				// derived scalar context is currently empty

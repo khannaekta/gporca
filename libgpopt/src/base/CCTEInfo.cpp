@@ -102,7 +102,7 @@ CCTEInfo::CCTEInfoEntry::~CCTEInfoEntry()
 void
 CCTEInfo::CCTEInfoEntry::AddConsumerCols
 	(
-	DrgPcr *colref_array
+	ColRefArray *colref_array
 	)
 {
 	GPOS_ASSERT(NULL != colref_array);
@@ -565,14 +565,14 @@ CCTEInfo::PcterProducers
 //		Return an array of all stored CTE expressions
 //
 //---------------------------------------------------------------------------
-DrgPexpr *
+ExpressionArray *
 CCTEInfo::PdrgPexpr
 	(
 	IMemoryPool *memory_pool
 	)
 	const
 {
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	HMUlCTEInfoEntryIter hmulei(m_phmulcteinfoentry);
 	while (hmulei.Advance())
 	{
@@ -623,7 +623,7 @@ void
 CCTEInfo::AddConsumerCols
 	(
 	ULONG ulCTEId,
-	DrgPcr *colref_array
+	ColRefArray *colref_array
 	)
 {
 	GPOS_ASSERT(NULL != colref_array);
@@ -764,7 +764,7 @@ CCTEInfo::PhmulcrConsumerToProducer
 	IMemoryPool *memory_pool,
 	ULONG ulCTEId,
 	CColRefSet *pcrs, // set of columns to check
-	DrgPcr *pdrgpcrProducer // producer columns
+	ColRefArray *pdrgpcrProducer // producer columns
 	)
 {
 	GPOS_ASSERT(NULL != pcrs);

@@ -363,7 +363,7 @@ CReqdPropPlan::InitReqdPartitionPropagation
 	{
 		ULONG scan_id = ppartinfo->ScanId(ul);
 		IMDId *mdid = ppartinfo->GetRelMdId(ul);
-		DrgPpartkeys *pdrgppartkeys = ppartinfo->Pdrgppartkeys(ul);
+		PartKeysArray *pdrgppartkeys = ppartinfo->Pdrgppartkeys(ul);
 		CPartConstraint *ppartcnstr = ppartinfo->Ppartcnstr(ul);
 
 		mdid->AddRef();

@@ -14,8 +14,8 @@ namespace gpopt
 	CPhysicalParallelUnionAll::CPhysicalParallelUnionAll
 		(
 			IMemoryPool *memory_pool,
-			DrgPcr *pdrgpcrOutput,
-			DrgDrgPcr *pdrgpdrgpcrInput,
+			ColRefArray *pdrgpcrOutput,
+			ColRefArrays *pdrgpdrgpcrInput,
 			ULONG ulScanIdPartialIndex
 		) : CPhysicalUnionAll
 		(
@@ -65,8 +65,8 @@ namespace gpopt
 		}
 		else
 		{
-			DrgPcr *pdrgpcrChildInputColumns = (*PdrgpdrgpcrInput())[child_index];
-			DrgPexpr *pdrgpexprFakeRequestedColumns = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+			ColRefArray *pdrgpcrChildInputColumns = (*PdrgpdrgpcrInput())[child_index];
+			ExpressionArray *pdrgpexprFakeRequestedColumns = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 
 			CColRef *pcrFirstColumn = (*pdrgpcrChildInputColumns)[0];
 			CExpression *pexprScalarIdent = CUtils::PexprScalarIdent(memory_pool, pcrFirstColumn);

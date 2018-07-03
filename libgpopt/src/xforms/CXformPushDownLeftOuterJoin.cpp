@@ -124,8 +124,8 @@ CXformPushDownLeftOuterJoin::Transform
 	CExpression *pexprLOJScalarChild = (*pexpr)[2];
 
 	CColRefSet *pcrsLOJUsed = CDrvdPropScalar::GetDrvdScalarProps(pexprLOJScalarChild->PdpDerive())->PcrsUsed();
-	DrgPexpr *pdrgpexprLOJChildren = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
-	DrgPexpr *pdrgpexprNAryJoinChildren = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprLOJChildren = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexprNAryJoinChildren = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 
 	const ULONG arity = pexprNAryJoin->Arity();
 	CExpression *pexprNAryJoinScalarChild = (*pexprNAryJoin)[arity - 1];
@@ -154,7 +154,7 @@ CXformPushDownLeftOuterJoin::Transform
 		pexprLOJOuterChild = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CLogicalNAryJoin(memory_pool), pdrgpexprLOJChildren);
 
 		// reconstruct LOJ children and add only the created child
-		pdrgpexprLOJChildren = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+		pdrgpexprLOJChildren = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 		pdrgpexprLOJChildren->Append(pexprLOJOuterChild);
 	}
 

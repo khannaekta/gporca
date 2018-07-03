@@ -38,7 +38,7 @@ namespace gpopt
 		protected:
 
 			// columns used from Apply's inner child
-			DrgPcr *m_pdrgpcrInner;
+			ColRefArray *m_pdrgpcrInner;
 
 			// origin subquery id
 			EOperatorId m_eopidOriginSubq;
@@ -48,7 +48,7 @@ namespace gpopt
 			CLogicalApply(IMemoryPool *memory_pool);
 
 			// ctor
-			CLogicalApply(IMemoryPool *memory_pool, DrgPcr *pdrgpcrInner, EOperatorId eopidOriginSubq);
+			CLogicalApply(IMemoryPool *memory_pool, ColRefArray *pdrgpcrInner, EOperatorId eopidOriginSubq);
 
 			// dtor
 			virtual
@@ -68,7 +68,7 @@ namespace gpopt
 			}
 
 			// inner column references accessor
-			DrgPcr *PdrgPcrInner() const
+			ColRefArray *PdrgPcrInner() const
 			{
 				return m_pdrgpcrInner;
 			}

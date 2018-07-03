@@ -648,7 +648,7 @@ CJobGroupExpressionOptimization::EevtOptimizeSelf
 	// compute group expression cost under current context
 	COptimizationContext *poc = pjgeo->m_poc;
 	CGroupExpression *pgexpr = pjgeo->m_pgexpr;
-	DrgPoc *pdrgpoc = pjgeo->m_pdrgpoc;
+	OptimizationContextArray *pdrgpoc = pjgeo->m_pdrgpoc;
 	ULONG ulOptReq = pjgeo->m_ulOptReq;
 
 	CCostContext *pcc = pgexpr->PccComputeCost(psc->GetGlobalMemoryPool(), poc, ulOptReq, pdrgpoc, false /*fPruned*/, CCost(0.0));

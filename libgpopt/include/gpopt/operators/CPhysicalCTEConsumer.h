@@ -32,7 +32,7 @@ namespace gpopt
 			ULONG m_id;
 
 			// cte columns
-			DrgPcr *m_pdrgpcr;
+			ColRefArray *m_pdrgpcr;
 
 			// hashmap for all the columns in the CTE expression
 			UlongColRefHashMap *m_phmulcr;
@@ -43,7 +43,7 @@ namespace gpopt
 		public:
 
 			// ctor
-			CPhysicalCTEConsumer(IMemoryPool *memory_pool, ULONG id, DrgPcr *colref_array, UlongColRefHashMap *colref_mapping);
+			CPhysicalCTEConsumer(IMemoryPool *memory_pool, ULONG id, ColRefArray *colref_array, UlongColRefHashMap *colref_mapping);
 
 			// dtor
 			virtual
@@ -69,7 +69,7 @@ namespace gpopt
 			}
 
 			// cte columns
-			DrgPcr *Pdrgpcr() const
+			ColRefArray *Pdrgpcr() const
 			{
 				return m_pdrgpcr;
 			}

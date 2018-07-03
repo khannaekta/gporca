@@ -99,7 +99,7 @@ CSubqueryHandler::PexprReplace
 	}
 
 	// process children
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 
 	const ULONG arity = pexprInput->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
@@ -625,7 +625,7 @@ CSubqueryHandler::PexprInnerSelect
 			"subquery's column is not nullable");
 
 	CExpression *pexprIsNull = CUtils::PexprIsNull(memory_pool, CUtils::PexprScalarIdent(memory_pool, pcrInner));
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	pexprPredicate->AddRef();
 	pdrgpexpr->Append(pexprPredicate);
 	pdrgpexpr->Append(pexprIsNull);
@@ -745,7 +745,7 @@ CSubqueryHandler::FCreateGrpCols
 	CExpression *pexprInner,
 	BOOL fExistential,
 	BOOL fOuterRefsUnderInner,
-	DrgPcr **ppdrgpcr, // output: constructed grouping columns
+	ColRefArray **ppdrgpcr, // output: constructed grouping columns
 	BOOL *pfGbOnInner // output: is Gb created on inner expression
 	)
 {
@@ -767,7 +767,7 @@ CSubqueryHandler::FCreateGrpCols
 		fGbOnInner = CPredicateUtils::FSimpleEqualityUsingCols(memory_pool, pexprScalar, pcrsInnerOutput);
 	}
 
-	DrgPcr *colref_array = NULL;
+	ColRefArray *colref_array = NULL;
 	if (fGbOnInner)
 	{
 		CColRefSet *pcrsUsed = CDrvdPropScalar::GetDrvdScalarProps(pexprScalar->PdpDerive())->PcrsUsed();
@@ -787,7 +787,7 @@ CSubqueryHandler::FCreateGrpCols
 			return false;
 		}
 
-		DrgPcr *pdrgpcrSystemCols = COptCtxt::PoctxtFromTLS()->PdrgpcrSystemCols();
+		ColRefArray *pdrgpcrSystemCols = COptCtxt::PoctxtFromTLS()->PdrgpcrSystemCols();
 		if (NULL != pdrgpcrSystemCols && 0 < pdrgpcrSystemCols->Size())
 		{
 			CColRefSet *pcrsSystemCols = GPOS_NEW(memory_pool) CColRefSet(memory_pool, pdrgpcrSystemCols);
@@ -802,7 +802,7 @@ CSubqueryHandler::FCreateGrpCols
 		}
 
 		// generate a group by on outer columns
-		DrgPcr *pdrgpcrKey = NULL;
+		ColRefArray *pdrgpcrKey = NULL;
 		colref_array = CUtils::PdrgpcrGroupingKey(memory_pool, pexprOuter, &pdrgpcrKey);
 		pdrgpcrKey->Release(); // key is not used here
 	}
@@ -879,7 +879,7 @@ CSubqueryHandler::FCreateOuterApplyForExistOrQuant
 {
 	BOOL fExistential = CUtils::FExistentialSubquery(pexprSubquery->Pop());
 
-	DrgPcr *colref_array = NULL;
+	ColRefArray *colref_array = NULL;
 	BOOL fGbOnInner = false;
 	if (!FCreateGrpCols(memory_pool, pexprOuter, pexprInner, fExistential, fOuterRefsUnderInner, &colref_array, &fGbOnInner))
 	{
@@ -1052,7 +1052,7 @@ CSubqueryHandler::FCreateCorrelatedApplyForQuantifiedSubquery
 	CColRef *pcrBool = CScalarProjectElement::PopConvert((*(*pexprProjectConstTrue)[1])[0]->Pop())->Pcr();
 
 	// add the created column and subquery column to required inner columns
-	DrgPcr *pdrgpcrInner = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	ColRefArray *pdrgpcrInner = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 	pdrgpcrInner->Append(pcrBool);
 	pdrgpcrInner->Append(colref);
 
@@ -1121,7 +1121,7 @@ CSubqueryHandler::FCreateCorrelatedApplyForExistentialSubquery
 	CColRef *pcrBool = CScalarProjectElement::PopConvert((*(*pexprProjectConstTrue)[1])[0]->Pop())->Pcr();
 
 	// add the created column and subquery column to required inner columns
-	DrgPcr *pdrgpcrInner = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	ColRefArray *pdrgpcrInner = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 	pdrgpcrInner->Append(pcrBool);
 	pdrgpcrInner->Append(colref);
 
@@ -1770,7 +1770,7 @@ CSubqueryHandler::FRecursiveHandler
 
 	// save the current logical expression
 	CExpression *pexprCurrentOuter = pexprOuter;
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	const ULONG arity = pexprScalar->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
@@ -1961,7 +1961,7 @@ CSubqueryHandler::FProcessScalarOperator
 		*ppexprResidualScalar = pexprPruned;
 
 		// cleanup unncessary conjuncts
-		DrgPexpr *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(memory_pool, *ppexprResidualScalar);
+		ExpressionArray *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(memory_pool, *ppexprResidualScalar);
 		(*ppexprResidualScalar)->Release();
 		*ppexprResidualScalar = CPredicateUtils::PexprConjunction(memory_pool, pdrgpexpr);
 	}

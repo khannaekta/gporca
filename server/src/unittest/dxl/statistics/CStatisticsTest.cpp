@@ -227,13 +227,13 @@ CStatisticsTest::EresUnittest_GbAggWithRepeatedGbCols()
 	CColRefSet *colrefs = pdprel->PcrsOutput();
 
 	// create first GbAgg expression: GbAgg on top of given expression
-	DrgPcr *pdrgpcr1 = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	ColRefArray *pdrgpcr1 = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 	pdrgpcr1->Append(colrefs->PcrFirst());
 	CExpression *pexprGbAgg1 =
 		CUtils::PexprLogicalGbAggGlobal(memory_pool, pdrgpcr1, pexpr, GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CScalarProjectList(memory_pool)));
 
 	// create second GbAgg expression: GbAgg with repeated base column on top of given expression
-	DrgPcr *pdrgpcr2 = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	ColRefArray *pdrgpcr2 = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 	pdrgpcr2->Append(colrefs->PcrFirst());
 	pdrgpcr2->Append(colrefs->PcrFirst());
 	pexpr->AddRef();
@@ -244,7 +244,7 @@ CStatisticsTest::EresUnittest_GbAggWithRepeatedGbCols()
 	pexpr->AddRef();
 	CExpression *pexprPrj = CUtils::PexprAddProjection(memory_pool, pexpr, CUtils::PexprScalarIdent(memory_pool, colrefs->PcrFirst()));
 	CColRef *pcrComputed = CScalarProjectElement::PopConvert((*(*pexprPrj)[1])[0]->Pop())->Pcr();
-	DrgPcr *pdrgpcr3 = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	ColRefArray *pdrgpcr3 = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 	pdrgpcr3->Append(colrefs->PcrFirst());
 	pdrgpcr3->Append(pcrComputed);
 	CExpression *pexprGbAgg3 =

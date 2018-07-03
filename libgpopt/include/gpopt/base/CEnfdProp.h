@@ -97,7 +97,7 @@ namespace gpopt
 				(
 				IMemoryPool *memory_pool,
 				CReqdPropPlan *prpp,
-				DrgPexpr *pdrgpexpr,			// array of enforcer expressions
+				ExpressionArray *pdrgpexpr,			// array of enforcer expressions
 				CExpression *pexprChild,	// leaf in the target group where enforcers will be added
 				CEnfdProp::EPropEnforcingType epet,
 				CExpressionHandle &exprhdl

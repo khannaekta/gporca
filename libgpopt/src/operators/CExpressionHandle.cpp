@@ -303,7 +303,7 @@ CExpressionHandle::CopyGroupProps()
 	GPOS_ASSERT(NULL == m_pdp);
 
 	// add-ref group properties
-	CDrvdProp *pdp = m_pgexpr->Pgroup()->Pdp();
+	DrvdPropArray *pdp = m_pgexpr->Pgroup()->Pdp();
 	pdp->AddRef();
 	m_pdp = pdp;
 
@@ -312,7 +312,7 @@ CExpressionHandle::CopyGroupProps()
 	m_pdrgpdp = GPOS_NEW(m_memory_pool) DrgPdp(m_memory_pool, arity);
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CDrvdProp *pdpChild = (*m_pgexpr)[ul]->Pdp();
+		DrvdPropArray *pdpChild = (*m_pgexpr)[ul]->Pdp();
 		pdpChild->AddRef();
 		m_pdrgpdp->Append(pdpChild);
 	}
@@ -334,7 +334,7 @@ CExpressionHandle::CopyExprProps()
 	GPOS_ASSERT(NULL == m_pdp);
 
 	// add-ref expression properties
-	CDrvdProp *pdp = m_pexpr->PdpDerive();
+	DrvdPropArray *pdp = m_pexpr->PdpDerive();
 	pdp->AddRef();
 	m_pdp = pdp;
 
@@ -343,7 +343,7 @@ CExpressionHandle::CopyExprProps()
 	m_pdrgpdp = GPOS_NEW(m_memory_pool) DrgPdp(m_memory_pool, arity);
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CDrvdProp *pdpChild = (*m_pexpr)[ul]->PdpDerive();
+		DrvdPropArray *pdpChild = (*m_pexpr)[ul]->PdpDerive();
 		pdpChild->AddRef();
 		m_pdrgpdp->Append(pdpChild);
 	}
@@ -366,7 +366,7 @@ CExpressionHandle::CopyCostCtxtProps()
 	GPOS_ASSERT(NULL == m_pdp);
 
 	// add-ref context properties
-	CDrvdProp *pdp = m_pcc->Pdpplan();
+	DrvdPropArray *pdp = m_pcc->Pdpplan();
 	pdp->AddRef();
 	m_pdp = pdp;
 
@@ -440,7 +440,7 @@ CExpressionHandle::DeriveProps
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		CExpression *pexprChild = (*m_pexpr)[ul];
-		CDrvdProp *pdp = pexprChild->PdpDerive(pdpctxt);
+		DrvdPropArray *pdp = pexprChild->PdpDerive(pdpctxt);
 		pdp->AddRef();
 		m_pdrgpdp->Append(pdp);
 
@@ -921,7 +921,7 @@ CExpressionHandle::InitReqdProps
 	}
 	
 	// compute required properties of children
-	m_pdrgprp = GPOS_NEW(m_memory_pool) DrgPrp(m_memory_pool);
+	m_pdrgprp = GPOS_NEW(m_memory_pool) ReqdPropArray(m_memory_pool);
 
 	// initialize array with input requirements,
 	// the initial requirements are only place holders in the array
@@ -1229,7 +1229,7 @@ CExpressionHandle::GetRelationalProperties
 		if (Pexpr()->Pop()->FPhysical())
 		{
 			// relational props were copied from memo, return props directly
-			return CDrvdPropRelational::GetRelationalProperties((*Pexpr())[child_index]->Pdp(CDrvdProp::EptRelational));
+			return CDrvdPropRelational::GetRelationalProperties((*Pexpr())[child_index]->Pdp(DrvdPropArray::EptRelational));
 		}
 
 		// return props after calling derivation function
@@ -1253,7 +1253,7 @@ CExpressionHandle::GetRelationalProperties
 
 	GPOS_ASSERT(child_index < m_pdrgpdp->Size());
 
-	CDrvdProp *pdp = (*m_pdrgpdp)[child_index];
+	DrvdPropArray *pdp = (*m_pdrgpdp)[child_index];
 
 	return CDrvdPropRelational::GetRelationalProperties(pdp);
 }
@@ -1275,7 +1275,7 @@ CExpressionHandle::GetRelationalProperties() const
 		if (Pexpr()->Pop()->FPhysical())
 		{
 			// relational props were copied from memo, return props directly
-			return CDrvdPropRelational::GetRelationalProperties(Pexpr()->Pdp(CDrvdProp::EptRelational));
+			return CDrvdPropRelational::GetRelationalProperties(Pexpr()->Pdp(DrvdPropArray::EptRelational));
 		}
 		// return props after calling derivation function
 		return CDrvdPropRelational::GetRelationalProperties(Pexpr()->PdpDerive());
@@ -1330,7 +1330,7 @@ CExpressionHandle::Pdpplan
 {
 	GPOS_ASSERT(child_index < m_pdrgpdp->Size());
 
-	CDrvdProp *pdp = (*m_pdrgpdp)[child_index];
+	DrvdPropArray *pdp = (*m_pdrgpdp)[child_index];
 
 	return CDrvdPropPlan::Pdpplan(pdp);
 }
@@ -1355,7 +1355,7 @@ CExpressionHandle::GetDrvdScalarProps
 	if (NULL != Pexpr() && NULL == m_pdrgpdp)
 	{
 		// handle is used for required property computation
-		CDrvdProp *pdp = (*Pexpr())[child_index]->PdpDerive();
+		DrvdPropArray *pdp = (*Pexpr())[child_index]->PdpDerive();
 		return CDrvdPropScalar::GetDrvdScalarProps(pdp);
 	}
 
@@ -1376,7 +1376,7 @@ CExpressionHandle::GetDrvdScalarProps
 
 	GPOS_ASSERT(child_index < m_pdrgpdp->Size());
 
-	CDrvdProp *pdp = (*m_pdrgpdp)[child_index];
+	DrvdPropArray *pdp = (*m_pdrgpdp)[child_index];
 
 	return CDrvdPropScalar::GetDrvdScalarProps(pdp);
 }

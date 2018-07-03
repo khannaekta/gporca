@@ -31,7 +31,7 @@ CPhysicalCTEConsumer::CPhysicalCTEConsumer
 	(
 	IMemoryPool *memory_pool,
 	ULONG id,
-	DrgPcr *colref_array,
+	ColRefArray *colref_array,
 	UlongColRefHashMap *colref_mapping
 	)
 	:

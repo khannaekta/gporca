@@ -77,7 +77,7 @@ CXformGbAgg2HashAgg::Exfp
 	const
 {
 	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(exprhdl.Pop());
-	DrgPcr *colref_array = popAgg->Pdrgpcr();
+	ColRefArray *colref_array = popAgg->Pdrgpcr();
 	if (0 == colref_array->Size() ||
 		exprhdl.GetDrvdScalarProps(1 /*child_index*/)->FHasSubquery() ||
 		!CUtils::FComparisonPossible(colref_array, IMDType::EcmptEq) ||
@@ -123,7 +123,7 @@ CXformGbAgg2HashAgg::Transform
 
 	IMemoryPool *memory_pool = pxfctxt->Pmp();	
 	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
-	DrgPcr *colref_array = popAgg->Pdrgpcr();
+	ColRefArray *colref_array = popAgg->Pdrgpcr();
 	colref_array->AddRef();
 	
 	// extract components
@@ -134,7 +134,7 @@ CXformGbAgg2HashAgg::Transform
 	pexprRel->AddRef();
 	pexprScalar->AddRef();
 
-	DrgPcr *pdrgpcrArgDQA = popAgg->PdrgpcrArgDQA();
+	ColRefArray *pdrgpcrArgDQA = popAgg->PdrgpcrArgDQA();
 	if (pdrgpcrArgDQA != NULL && 0 != pdrgpcrArgDQA->Size())
 	{
 		GPOS_ASSERT(NULL != pdrgpcrArgDQA);

@@ -93,7 +93,7 @@ CXformGbAgg2ScalarAgg::Transform
 
 	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
 	IMemoryPool *memory_pool = pxfctxt->Pmp();
-	DrgPcr *colref_array = popAgg->Pdrgpcr();
+	ColRefArray *colref_array = popAgg->Pdrgpcr();
 	colref_array->AddRef();
 	
 	// extract components
@@ -104,7 +104,7 @@ CXformGbAgg2ScalarAgg::Transform
 	pexprRel->AddRef();
 	pexprScalar->AddRef();
 
-	DrgPcr *pdrgpcrArgDQA = popAgg->PdrgpcrArgDQA();
+	ColRefArray *pdrgpcrArgDQA = popAgg->PdrgpcrArgDQA();
 	if (pdrgpcrArgDQA != NULL && 0 != pdrgpcrArgDQA->Size())
 	{
 		pdrgpcrArgDQA->AddRef();

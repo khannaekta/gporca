@@ -23,7 +23,7 @@ namespace gpopt
 	class CPartKeys;
 
 	// array of part keys
-	typedef CDynamicPtrArray<CPartKeys, CleanupRelease> DrgPpartkeys;
+	typedef CDynamicPtrArray<CPartKeys, CleanupRelease> PartKeysArray;
 
 	//---------------------------------------------------------------------------
 	//	@class:
@@ -38,7 +38,7 @@ namespace gpopt
 		private:
 
 			// partitioning keys
-			DrgDrgPcr *m_pdrgpdrgpcr;
+			ColRefArrays *m_pdrgpdrgpcr;
 
 			// number of levels
 			ULONG m_num_of_part_levels;
@@ -50,7 +50,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CPartKeys(DrgDrgPcr *pdrgpdrgpcr);
+			CPartKeys(ColRefArrays *pdrgpdrgpcr);
 
 			// dtor
 			~CPartKeys();
@@ -59,7 +59,7 @@ namespace gpopt
 			CColRef *PcrKey(ULONG ulLevel) const;
 
 			// return array of keys
-			DrgDrgPcr *Pdrgpdrgpcr() const
+			ColRefArrays *Pdrgpdrgpcr() const
 			{
 				return m_pdrgpdrgpcr;
 			}
@@ -85,7 +85,7 @@ namespace gpopt
 
 			// copy array of part keys into given memory pool
 			static
-			DrgPpartkeys *PdrgppartkeysCopy(IMemoryPool *memory_pool, const DrgPpartkeys *pdrgppartkeys);
+			PartKeysArray *PdrgppartkeysCopy(IMemoryPool *memory_pool, const PartKeysArray *pdrgppartkeys);
 
 #ifdef GPOS_DEBUG
 			// debug print for interactive debugging sessions only

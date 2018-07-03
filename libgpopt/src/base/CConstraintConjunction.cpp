@@ -29,7 +29,7 @@ using namespace gpopt;
 CConstraintConjunction::CConstraintConjunction
 	(
 	IMemoryPool *memory_pool,
-	DrgPcnstr *pdrgpcnstr
+	ConstraintArray *pdrgpcnstr
 	)
 	:
 	CConstraint(memory_pool),
@@ -104,7 +104,7 @@ CConstraintConjunction::FConstraint
 	)
 	const
 {
-	DrgPcnstr *pdrgpcnstrCol = m_phmcolconstr->Find(colref);
+	ConstraintArray *pdrgpcnstrCol = m_phmcolconstr->Find(colref);
 	return (NULL != pdrgpcnstrCol && 0 < pdrgpcnstrCol->Size());
 }
 
@@ -127,7 +127,7 @@ CConstraintConjunction::PcnstrCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcnstr *pdrgpcnstr = GPOS_NEW(memory_pool) DrgPcnstr(memory_pool);
+	ConstraintArray *pdrgpcnstr = GPOS_NEW(memory_pool) ConstraintArray(memory_pool);
 	const ULONG length = m_pdrgpcnstr->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
@@ -154,13 +154,13 @@ CConstraintConjunction::Pcnstr
 	)
 {
 	// all children referencing given column
-	DrgPcnstr *pdrgpcnstrCol = m_phmcolconstr->Find(colref);
+	ConstraintArray *pdrgpcnstrCol = m_phmcolconstr->Find(colref);
 	if (NULL == pdrgpcnstrCol)
 	{
 		return NULL;
 	}
 
-	DrgPcnstr *pdrgpcnstr = GPOS_NEW(memory_pool) DrgPcnstr(memory_pool);
+	ConstraintArray *pdrgpcnstr = GPOS_NEW(memory_pool) ConstraintArray(memory_pool);
 
 	const ULONG length = pdrgpcnstrCol->Size();
 	for (ULONG ul = 0; ul < length; ul++)
@@ -195,7 +195,7 @@ CConstraintConjunction::Pcnstr
 {
 	const ULONG length = m_pdrgpcnstr->Size();
 
-	DrgPcnstr *pdrgpcnstr = GPOS_NEW(memory_pool) DrgPcnstr(memory_pool);
+	ConstraintArray *pdrgpcnstr = GPOS_NEW(memory_pool) ConstraintArray(memory_pool);
 
 	for (ULONG ul = 0; ul < length; ul++)
 	{

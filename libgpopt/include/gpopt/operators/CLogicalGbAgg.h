@@ -37,10 +37,10 @@ namespace gpopt
 			CLogicalGbAgg(const CLogicalGbAgg &);
 			
 			// array of grouping columns
-			DrgPcr *m_pdrgpcr;
+			ColRefArray *m_pdrgpcr;
 
 			// minimal grouping columns based on FD's
-			DrgPcr *m_pdrgpcrMinimal;
+			ColRefArray *m_pdrgpcrMinimal;
 
 			// local / intermediate / global aggregate
 			COperator::EGbAggType m_egbaggtype;
@@ -52,7 +52,7 @@ namespace gpopt
 
 			// array of columns used in distinct qualified aggregates (DQA)
 			// used only in the case of intermediate aggregates
-			DrgPcr *m_pdrgpcrArgDQA;
+			ColRefArray *m_pdrgpcrArgDQA;
 
 			// compute required stats columns for a GbAgg
 			CColRefSet *PcrsStatGbAgg
@@ -61,7 +61,7 @@ namespace gpopt
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsInput,
 				ULONG child_index,
-				DrgPcr *pdrgpcrGrp
+				ColRefArray *pdrgpcrGrp
 				)
 				const;
 
@@ -75,7 +75,7 @@ namespace gpopt
 			CLogicalGbAgg
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *colref_array,
+				ColRefArray *colref_array,
 				COperator::EGbAggType egbaggtype
 				);
 
@@ -83,18 +83,18 @@ namespace gpopt
 			CLogicalGbAgg
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *colref_array,
+				ColRefArray *colref_array,
 				COperator::EGbAggType egbaggtype,
 				BOOL fGeneratesDuplicates,
-				DrgPcr *pdrgpcrArgDQA
+				ColRefArray *pdrgpcrArgDQA
 				);
 
 			// ctor
 			CLogicalGbAgg
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *colref_array,
-				DrgPcr *pdrgpcrMinimal,
+				ColRefArray *colref_array,
+				ColRefArray *pdrgpcrMinimal,
 				COperator::EGbAggType egbaggtype
 				);
 
@@ -102,11 +102,11 @@ namespace gpopt
 			CLogicalGbAgg
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *colref_array,
-				DrgPcr *pdrgpcrMinimal,
+				ColRefArray *colref_array,
+				ColRefArray *pdrgpcrMinimal,
 				COperator::EGbAggType egbaggtype,
 				BOOL fGeneratesDuplicates,
-				DrgPcr *pdrgpcrArgDQA
+				ColRefArray *pdrgpcrArgDQA
 				);
 
 			// dtor
@@ -143,13 +143,13 @@ namespace gpopt
 			ULONG HashValue() const;
 
 			// grouping columns accessor
-			DrgPcr *Pdrgpcr() const
+			ColRefArray *Pdrgpcr() const
 			{
 				return m_pdrgpcr;
 			}
 
 			// array of columns used in distinct qualified aggregates (DQA)
-			DrgPcr *PdrgpcrArgDQA() const
+			ColRefArray *PdrgpcrArgDQA() const
 			{
 				return m_pdrgpcrArgDQA;
 			}
@@ -167,7 +167,7 @@ namespace gpopt
 			}
 
 			// minimal grouping columns accessor
-			DrgPcr *PdrgpcrMinimal() const
+			ColRefArray *PdrgpcrMinimal() const
 			{
 				return m_pdrgpcrMinimal;
 			}
@@ -273,7 +273,7 @@ namespace gpopt
 				(
 				IMemoryPool *memory_pool,
 				IStatistics *child_stats,
-				DrgPcr *pdrgpcrGroupingCols,
+				ColRefArray *pdrgpcrGroupingCols,
 				ULongPtrArray *pdrgpulComputedCols,
 				CBitSet *keys
 				);

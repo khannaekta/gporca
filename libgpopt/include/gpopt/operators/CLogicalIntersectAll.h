@@ -43,8 +43,8 @@ namespace gpopt
 			CLogicalIntersectAll
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *pdrgpcrOutput,
-				DrgDrgPcr *pdrgpdrgpcrInput
+				ColRefArray *pdrgpcrOutput,
+				ColRefArrays *pdrgpdrgpcrInput
 				);
 
 			// dtor
@@ -150,8 +150,8 @@ namespace gpopt
 				(
 				IMemoryPool *memory_pool,
 				CExpressionHandle &exprhdl,
-				DrgDrgPcr *pdrgpdrgpcrInput,
-				DrgPcrs *output_colrefsets
+				ColRefArrays *pdrgpdrgpcrInput,
+				ColRefSetArray *output_colrefsets
 				);
 
 	}; // class CLogicalIntersectAll

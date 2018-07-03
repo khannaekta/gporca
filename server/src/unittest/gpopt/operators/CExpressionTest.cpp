@@ -365,7 +365,7 @@ CExpressionTest::EresUnittest_BitmapGet()
 					pexprIndexCond
 					);
 
-	DrgPcr *pdrgpcrTable = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	ColRefArray *pdrgpcrTable = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 	for (ULONG ul = 0; ul < num_cols; ++ul)
 	{
 		const IMDColumn *pmdcol = pmdrel->GetMdCol(ul);
@@ -767,7 +767,7 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidOrder()
 	CColRefSet *pcrsGet = CDrvdPropRelational::GetRelationalProperties(pexprGet->PdpDerive())->PcrsOutput();
 	CColRefSet *pcrsGetCopy = GPOS_NEW(memory_pool) CColRefSet(memory_pool, *pcrsGet);
 
-	DrgPcr *pdrgpcrGet = pcrsGetCopy->Pdrgpcr(memory_pool);
+	ColRefArray *pdrgpcrGet = pcrsGetCopy->Pdrgpcr(memory_pool);
 	GPOS_ASSERT(2 <= pdrgpcrGet->Size());
 
 	COrderSpec *pos = GPOS_NEW(memory_pool) COrderSpec(memory_pool);
@@ -1140,7 +1140,7 @@ CExpressionTest::EresCheckCachedReqdCols
 		}
 
 		// add plan props of current child to derived props array
-		CDrvdProp *pdp = pexprChild->PdpDerive();
+		DrvdPropArray *pdp = pexprChild->PdpDerive();
 		pdp->AddRef();
 		pdrgpdp->Append(pdp);
 	}
@@ -1294,17 +1294,17 @@ CExpressionTest::EresUnittest_InvalidSetOp()
 		CExpression *pexprGet2 = CTestUtils::PexprLogicalGet(memory_pool, ptabdesc2, &strAlias2);
 
 		// create output columns of SetOp from output columns of first Get expression
-		DrgPcr *pdrgpcrOutput = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+		ColRefArray *pdrgpcrOutput = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 		pdrgpcrOutput->Append(pcrsOutput1->PcrFirst());
 
 		// create input columns of SetOp while including an outer reference in inner child
-		DrgDrgPcr *pdrgpdrgpcrInput = GPOS_NEW(memory_pool) DrgDrgPcr(memory_pool);
+		ColRefArrays *pdrgpdrgpcrInput = GPOS_NEW(memory_pool) ColRefArrays(memory_pool);
 
-		DrgPcr *pdrgpcr1 = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+		ColRefArray *pdrgpcr1 = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 		pdrgpcr1->Append(pcrsOutput1->PcrFirst());
 		pdrgpdrgpcrInput->Append(pdrgpcr1);
 
-		DrgPcr *pdrgpcr2 = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+		ColRefArray *pdrgpcr2 = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 		CColRef *pcrOuterRef = COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(pcrsOutput1->PcrFirst());
 		pdrgpcr2->Append(pcrOuterRef);
 		pdrgpdrgpcrInput->Append(pdrgpcr2);

@@ -91,7 +91,7 @@ CColumnFactory::~CColumnFactory()
 void
 CColumnFactory::Initialize()
 {
-	m_phmcrcrs = GPOS_NEW(m_memory_pool) HMCrCrs(m_memory_pool);
+	m_phmcrcrs = GPOS_NEW(m_memory_pool) ColRefToColRefSetMap(m_memory_pool);
 }
 
 //---------------------------------------------------------------------------

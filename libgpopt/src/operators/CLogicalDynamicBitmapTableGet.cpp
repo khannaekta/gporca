@@ -42,8 +42,8 @@ CLogicalDynamicBitmapTableGet::CLogicalDynamicBitmapTableGet
 	ULONG ulOriginOpId,
 	const CName *pnameTableAlias,
 	ULONG ulPartIndex,
-	DrgPcr *pdrgpcrOutput,
-	DrgDrgPcr *pdrgpdrgpcrPart,
+	ColRefArray *pdrgpcrOutput,
+	ColRefArrays *pdrgpdrgpcrPart,
 	ULONG ulSecondaryPartIndexId,
 	BOOL is_partial,
 	CPartConstraint *ppartcnstr,
@@ -235,7 +235,7 @@ CLogicalDynamicBitmapTableGet::PopCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcrOutput = NULL;
+	ColRefArray *pdrgpcrOutput = NULL;
 	if (must_exist)
 	{
 		pdrgpcrOutput = CUtils::PdrgpcrRemapAndCreate(memory_pool, m_pdrgpcrOutput, colref_mapping);
@@ -248,7 +248,7 @@ CLogicalDynamicBitmapTableGet::PopCopyWithRemappedColumns
 
 	m_ptabdesc->AddRef();
 
-	DrgDrgPcr *pdrgpdrgpcrPart = CUtils::PdrgpdrgpcrRemap(memory_pool, m_pdrgpdrgpcrPart, colref_mapping, must_exist);
+	ColRefArrays *pdrgpdrgpcrPart = CUtils::PdrgpdrgpcrRemap(memory_pool, m_pdrgpdrgpcrPart, colref_mapping, must_exist);
 	CPartConstraint *ppartcnstr = m_part_constraint->PpartcnstrCopyWithRemappedColumns(memory_pool, colref_mapping, must_exist);
 	CPartConstraint *ppartcnstrRel = m_ppartcnstrRel->PpartcnstrCopyWithRemappedColumns(memory_pool, colref_mapping, must_exist);
 

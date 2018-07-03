@@ -21,7 +21,7 @@ namespace gpopt
 	
 	// forward declarations
 	class CGroupExpression;
-	class CDrvdProp;
+	class DrvdPropArray;
 	class COptimizationContext;
 	
 	//---------------------------------------------------------------------------
@@ -70,8 +70,8 @@ namespace gpopt
 			// set hash join keys
 			void SetHashJoinKeys
 				(
-				DrgPexpr *pdrgpexprOuter,
-				DrgPexpr *pdrgpexprInner
+				ExpressionArray *pdrgpexprOuter,
+				ExpressionArray *pdrgpexprInner
 				)
 			{
 				m_pgroup->SetHashJoinKeys(pdrgpexprOuter, pdrgpexprInner);
@@ -84,7 +84,7 @@ namespace gpopt
 			void MoveDuplicateGExpr(CGroupExpression *pgexpr);
 
 			// initialize group's properties;
-			void InitProperties(CDrvdProp *pdp);
+			void InitProperties(DrvdPropArray *pdp);
 
 			// initialize group's stat;
 			void InitStats(IStatistics *stats);

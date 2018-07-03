@@ -88,8 +88,8 @@ CXformSubqJoin2Apply::CollectSubqueries
 	(
 	IMemoryPool *memory_pool,
 	CExpression *pexpr,
-	DrgPcrs *pdrgpcrs,
-	DrgPdrgPexpr *pdrgpdrgpexprSubqs // array-of-arrays indexed on join child index.
+	ColRefSetArray *pdrgpcrs,
+	ExpressionArrays *pdrgpdrgpexprSubqs // array-of-arrays indexed on join child index.
 									//  i^{th} entry is an array corresponding to subqueries collected for join child #i
 	)
 {
@@ -169,7 +169,7 @@ CXformSubqJoin2Apply::PexprReplaceSubqueries
 
 	// recursively process children
 	const ULONG arity = pexprScalar->Arity();
-	DrgPexpr *pdrgpexprChildren = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprChildren = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		CExpression *pexprChild = PexprReplaceSubqueries(memory_pool, (*pexprScalar)[ul], phmexprcr);
@@ -208,8 +208,8 @@ CXformSubqJoin2Apply::PexprSubqueryPushDown
 	CExpression *join_pred_expr = (*pexprJoin)[arity - 1];
 
 	// collect output columns of all logical children
-	DrgPcrs *pdrgpcrs = GPOS_NEW(memory_pool) DrgPcrs(memory_pool);
-	DrgPdrgPexpr *pdrgpdrgpexprSubqs = GPOS_NEW(memory_pool) DrgPdrgPexpr(memory_pool);
+	ColRefSetArray *pdrgpcrs = GPOS_NEW(memory_pool) ColRefSetArray(memory_pool);
+	ExpressionArrays *pdrgpdrgpexprSubqs = GPOS_NEW(memory_pool) ExpressionArrays(memory_pool);
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
 		CExpression *pexprChild = (*pexprJoin)[ul];
@@ -217,7 +217,7 @@ CXformSubqJoin2Apply::PexprSubqueryPushDown
 		pcrsOutput->AddRef();
 		pdrgpcrs->Append(pcrsOutput);
 
-		pdrgpdrgpexprSubqs->Append(GPOS_NEW(memory_pool) DrgPexpr(memory_pool));
+		pdrgpdrgpexprSubqs->Append(GPOS_NEW(memory_pool) ExpressionArray(memory_pool));
 	}
 
 	// collect subqueries that exclusively use columns from each join child
@@ -225,7 +225,7 @@ CXformSubqJoin2Apply::PexprSubqueryPushDown
 
 	// create new join children by pushing subqueries to Project nodes on top
 	// of corresponding join children
-	DrgPexpr *pdrgpexprNewChildren = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprNewChildren = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	HMExprCr *phmexprcr = GPOS_NEW(memory_pool) HMExprCr(memory_pool);
 	for (ULONG ulChild = 0; ulChild < arity - 1; ulChild++)
 	{
@@ -233,7 +233,7 @@ CXformSubqJoin2Apply::PexprSubqueryPushDown
 		pexprChild->AddRef();
 		CExpression *pexprNewChild = pexprChild;
 
-		DrgPexpr *pdrgpexprSubqs = (*pdrgpdrgpexprSubqs)[ulChild];
+		ExpressionArray *pdrgpexprSubqs = (*pdrgpdrgpexprSubqs)[ulChild];
 		const ULONG ulSubqs = pdrgpexprSubqs->Size();
 		if (0 < ulSubqs)
 		{

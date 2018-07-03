@@ -422,7 +422,7 @@ CICGTest::EresUnittest_PreferHashJoinVersusIndexJoinWhenRiskIsHigh()
 	CAutoTraceFlag atf(EopttraceEnableRedistributeBroadcastHashJoin, true /*m_bytearray_value*/);
 
 	// When the risk threshold is infinite, we should pick index join
-	DrgPcp *pdrgpcpUnlimited = GPOS_NEW(memory_pool) DrgPcp(memory_pool);
+	CostModelParamsArray *pdrgpcpUnlimited = GPOS_NEW(memory_pool) CostModelParamsArray(memory_pool);
 	ICostModelParams::SCostParam *pcpUnlimited =
 		GPOS_NEW(memory_pool) ICostModelParams::SCostParam(
 			CCostModelParamsGPDB::EcpIndexJoinAllowedRiskThreshold,
@@ -449,7 +449,7 @@ CICGTest::EresUnittest_PreferHashJoinVersusIndexJoinWhenRiskIsHigh()
 	}
 
 	// When the risk threshold is zero, we should not pick index join
-	DrgPcp *pdrgpcpNoIndexJoin = GPOS_NEW(memory_pool) DrgPcp(memory_pool);
+	CostModelParamsArray *pdrgpcpNoIndexJoin = GPOS_NEW(memory_pool) CostModelParamsArray(memory_pool);
 	ICostModelParams::SCostParam *pcpNoIndexJoin = GPOS_NEW(memory_pool) ICostModelParams::SCostParam
 								(
 								CCostModelParamsGPDB::EcpIndexJoinAllowedRiskThreshold,

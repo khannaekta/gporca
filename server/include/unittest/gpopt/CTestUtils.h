@@ -357,7 +357,7 @@ namespace gpopt
 			
 			// generate an n-ary join expression
 			static
-			CExpression *PexprLogicalNAryJoin(IMemoryPool *memory_pool, DrgPexpr *pdrgpexpr);
+			CExpression *PexprLogicalNAryJoin(IMemoryPool *memory_pool, ExpressionArray *pdrgpexpr);
 
 			// generate an n-ary join expression using given array of relation names
 			static
@@ -501,7 +501,7 @@ namespace gpopt
 
 			// generate a logical sequence expression
 			static
-			CExpression *PexprLogicalSequence(IMemoryPool *memory_pool, DrgPexpr *pdrgpexpr); 
+			CExpression *PexprLogicalSequence(IMemoryPool *memory_pool, ExpressionArray *pdrgpexpr); 
 
 			// generate a logical sequence expression
 			static
@@ -529,7 +529,7 @@ namespace gpopt
 							
 			// generate a query context from an array of required column references
 			static
-			CQueryContext *PqcGenerate(IMemoryPool *memory_pool, CExpression *pexpr, DrgPcr *colref_array);
+			CQueryContext *PqcGenerate(IMemoryPool *memory_pool, CExpression *pexpr, ColRefArray *colref_array);
 
 			// generate a dummy query context for testing
 			static
@@ -545,7 +545,7 @@ namespace gpopt
 
 			// equality predicate shortcut
 			static
-			void EqualityPredicate(IMemoryPool *memory_pool, CColRefSet *pcrsLeft, CColRefSet *pcrsRight, DrgPexpr *pdrgpexpr);
+			void EqualityPredicate(IMemoryPool *memory_pool, CColRefSet *pcrsLeft, CColRefSet *pcrsRight, ExpressionArray *pdrgpexpr);
 
 			// int2 point
 			static
@@ -707,7 +707,7 @@ namespace gpopt
 				ULONG ulSessionId,
 				ULONG ulCmdId,
 				FnDXLPlanChecker *pfdpc,
-				DrgPcp *pdrgpcp
+				CostModelParamsArray *pdrgpcp
 				);
 
 			// generate cost model used in tests
@@ -816,7 +816,7 @@ namespace gpopt
 
 			// create Equivalence Class based on the breakpoints
 			static
-			DrgPcrs *
+			ColRefSetArray *
 			createEquivalenceClasses(IMemoryPool *memory_pool, CColRefSet *pcrs, INT setBoundary[]);
 	}; // class CTestUtils
 
@@ -880,11 +880,11 @@ namespace gpopt
 
 		// extract first partition key
 		CLogicalGet *popGetPartitioned = CLogicalGet::PopConvert(pexprGetPartitioned->Pop());
-		const DrgDrgPcr *pdrgpdrgpcr = popGetPartitioned->PdrgpdrgpcrPartColumns();
+		const ColRefArrays *pdrgpdrgpcr = popGetPartitioned->PdrgpdrgpcrPartColumns();
 
 		GPOS_ASSERT(pdrgpdrgpcr != NULL);
 		GPOS_ASSERT(0 < pdrgpdrgpcr->Size());
-		DrgPcr *colref_array = (*pdrgpdrgpcr)[0];
+		ColRefArray *colref_array = (*pdrgpdrgpcr)[0];
 		GPOS_ASSERT(1 == colref_array->Size());
 		CColRef *pcrPartKey = (*colref_array)[0];
 
@@ -1008,7 +1008,7 @@ namespace gpopt
 		GPOS_ASSERT(1 == pcrsOuterRef->Size());
 		CColRef *colref = pcrsOuterRef->PcrFirst();
 
-		DrgPcr *colref_array = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+		ColRefArray *colref_array = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 		colref_array->Append(colref);
 		COperator *pop = GPOS_NEW(memory_pool) T(memory_pool, colref_array, COperator::EopScalarSubquery);
 		return GPOS_NEW(memory_pool) CExpression(memory_pool, pop, pexprOuter, pexprInner, pexprPredicate);

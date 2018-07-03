@@ -260,7 +260,7 @@ CPhysicalMotionHashDistribute::PdsRequired
 	}
 	else
 	{
-		DrgPexpr *pdrgpexpr = pdsNoOp->Pdrgpexpr();
+		ExpressionArray *pdrgpexpr = pdsNoOp->Pdrgpexpr();
 		pdrgpexpr->AddRef();
 		CDistributionSpecHashed* pdsHashed = GPOS_NEW(memory_pool) CDistributionSpecHashed(pdrgpexpr, pdsNoOp->FNullsColocated());
 		return pdsHashed;

@@ -142,7 +142,7 @@ namespace gpopt
 
 			// return required inner columns -- overloaded by correlated join children
 			virtual
-			DrgPcr *PdrgPcrInner() const
+			ColRefArray *PdrgPcrInner() const
 			{
 				return NULL;
 			}

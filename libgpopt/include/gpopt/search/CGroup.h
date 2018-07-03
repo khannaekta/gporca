@@ -38,7 +38,7 @@ namespace gpopt
 	// forward declarations
 	class CGroup;
 	class CGroupExpression;
-	class CDrvdProp;
+	class DrvdPropArray;
 	class CDrvdPropCtxtPlan;
 	class CGroupProxy;
 	class COptimizationContext;
@@ -49,7 +49,7 @@ namespace gpopt
 
 	// type definitions
 	// array of groups
-	typedef CDynamicPtrArray<CGroup, CleanupNULL> DrgPgroup;
+	typedef CDynamicPtrArray<CGroup, CleanupNULL> GroupArray;
 	
 	// map required plan props to cost lower bound of corresponding plan
 	typedef CHashMap<CReqdPropPlan, CCost, CReqdPropPlan::UlHashForCostBounding, CReqdPropPlan::FEqualForCostBounding,
@@ -193,10 +193,10 @@ namespace gpopt
 			BOOL m_fScalar;
 
 			// hash join keys for outer child (only for scalar groups)
-			DrgPexpr *m_pdrgpexprHashJoinKeysOuter;
+			ExpressionArray *m_pdrgpexprHashJoinKeysOuter;
 
 			// hash join keys for inner child (only for scalar groups)
-			DrgPexpr *m_pdrgpexprHashJoinKeysInner;
+			ExpressionArray *m_pdrgpexprHashJoinKeysInner;
 
 			// list of group expressions
 			CList<CGroupExpression> m_listGExprs;
@@ -205,7 +205,7 @@ namespace gpopt
 			CList<CGroupExpression> m_listDupGExprs;
 
 			// group derived properties
-			CDrvdProp *m_pdp;
+			DrvdPropArray *m_pdp;
 
 			// group stats
 			IStatistics *m_pstats;
@@ -287,7 +287,7 @@ namespace gpopt
 			void SetState(EState estNewState);
 
 			// set hash join keys
-			void SetHashJoinKeys(DrgPexpr *pdrgpexprOuter, DrgPexpr *pdrgpexprInner);
+			void SetHashJoinKeys(ExpressionArray *pdrgpexprOuter, ExpressionArray *pdrgpexprInner);
 
 			// insert new group expression
 			void Insert(CGroupExpression *pgexpr);
@@ -296,7 +296,7 @@ namespace gpopt
 			void MoveDuplicateGExpr(CGroupExpression *pgexpr);
 
 			// initialize group's properties
-			void InitProperties(CDrvdProp *pdp);
+			void InitProperties(DrvdPropArray *pdp);
 
 			// initialize group's stats
 			void InitStats(IStatistics *stats);
@@ -379,7 +379,7 @@ namespace gpopt
 			}
 			
 			// group properties accessor
-			CDrvdProp *Pdp() const
+			DrvdPropArray *Pdp() const
 			{
 				return m_pdp;
 			}
@@ -406,13 +406,13 @@ namespace gpopt
 			}
 
 			// hash join keys of outer child
-			DrgPexpr *PdrgpexprHashJoinKeysOuter() const
+			ExpressionArray *PdrgpexprHashJoinKeysOuter() const
 			{
 				return m_pdrgpexprHashJoinKeysOuter;
 			}
 
 			// hash join keys of inner child
-			DrgPexpr *PdrgpexprHashJoinKeysInner() const
+			ExpressionArray *PdrgpexprHashJoinKeysInner() const
 			{
 				return m_pdrgpexprHashJoinKeysInner;
 			}
@@ -599,16 +599,16 @@ namespace gpopt
 			static
 			BOOL FMatchGroups
 				(
-				DrgPgroup *pdrgpgroupFst,
-				DrgPgroup *pdrgpgroupSnd
+				GroupArray *pdrgpgroupFst,
+				GroupArray *pdrgpgroupSnd
 				);
 
 			// matching of pairs of arrays of groups while skipping scalar groups
 			static
 			BOOL FMatchNonScalarGroups
 				(
-				DrgPgroup *pdrgpgroupFst,
-				DrgPgroup *pdrgpgroupSnd
+				GroupArray *pdrgpgroupFst,
+				GroupArray *pdrgpgroupSnd
 				);
 
 			// determine if a pair of groups are duplicates

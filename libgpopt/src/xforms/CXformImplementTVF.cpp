@@ -121,14 +121,14 @@ CXformImplementTVF::Transform
 
 	CWStringConst *str = GPOS_NEW(memory_pool) CWStringConst(popTVF->Pstr()->GetBuffer());
 
-	DrgPcoldesc *pdrgpcoldesc = popTVF->Pdrgpcoldesc();
+	ColumnDescrArray *pdrgpcoldesc = popTVF->Pdrgpcoldesc();
 	pdrgpcoldesc->AddRef();
 
-	DrgPcr *pdrgpcrOutput = popTVF->PdrgpcrOutput();
+	ColRefArray *pdrgpcrOutput = popTVF->PdrgpcrOutput();
 	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 	pcrs->Include(pdrgpcrOutput);
 
-	DrgPexpr *pdrgpexpr = pexpr->PdrgPexpr();
+	ExpressionArray *pdrgpexpr = pexpr->PdrgPexpr();
 
 	CPhysicalTVF *pphTVF = GPOS_NEW(memory_pool) CPhysicalTVF(memory_pool, mdid_func, mdid_return_type, str, pdrgpcoldesc, pcrs);
 

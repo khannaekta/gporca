@@ -50,7 +50,7 @@ namespace gpopt
 			ULONG m_scan_id;
 
 			// partition keys
-			DrgDrgPcr *m_pdrgpdrgpcrPart;
+			ColRefArrays *m_pdrgpdrgpcrPart;
 
 			// secondary scan id in case of partial scan
 			ULONG m_ulSecondaryScanId;
@@ -74,8 +74,8 @@ namespace gpopt
 				ULONG ulOriginOpId,
 				const CName *pnameAlias,
 				ULONG scan_id,
-				DrgPcr *pdrgpcrOutput,
-				DrgDrgPcr *pdrgpdrgpcrParts,
+				ColRefArray *pdrgpcrOutput,
+				ColRefArrays *pdrgpdrgpcrParts,
 				ULONG ulSecondaryScanId,
 				CPartConstraint *ppartcnstr,
 				CPartConstraint *ppartcnstrRel
@@ -104,7 +104,7 @@ namespace gpopt
 			}
 
 			// partition keys
-			DrgDrgPcr *PdrgpdrgpcrPart() const
+			ColRefArrays *PdrgpdrgpcrPart() const
 			{
 				return m_pdrgpdrgpcrPart;
 			}

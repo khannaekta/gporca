@@ -88,8 +88,8 @@ CEngine::CEngine
 	m_pmemo = GPOS_NEW(memory_pool) CMemo(memory_pool);
 	m_pexprEnforcerPattern = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool));
 	m_xforms = GPOS_NEW(memory_pool) CXformSet(memory_pool);
-	m_pdrgpulpXformCalls = GPOS_NEW(memory_pool) DrgPulp(memory_pool);
-	m_pdrgpulpXformTimes = GPOS_NEW(memory_pool) DrgPulp(memory_pool);
+	m_pdrgpulpXformCalls = GPOS_NEW(memory_pool) ULONGPtrArray(memory_pool);
+	m_pdrgpulpXformTimes = GPOS_NEW(memory_pool) ULONGPtrArray(memory_pool);
 }
 
 
@@ -151,7 +151,7 @@ void
 CEngine::Init
 	(
 	CQueryContext *pqc,
-	DrgPss *search_stage_array
+	SearchStageArray *search_stage_array
 	)
 {
 	GPOS_ASSERT(NULL == m_pqc);
@@ -208,7 +208,7 @@ void
 CEngine::AddEnforcers
 	(
 	CGroupExpression *pgexpr, // belongs to group where we need to add enforcers
-	DrgPexpr *pdrgpexprEnforcers
+	ExpressionArray *pdrgpexprEnforcers
 	)
 {
 	GPOS_ASSERT(NULL != pdrgpexprEnforcers);
@@ -240,7 +240,7 @@ void
 CEngine::InsertExpressionChildren
 	(
 	CExpression *pexpr,
-	DrgPgroup *pdrgpgroupChildren,
+	GroupArray *pdrgpgroupChildren,
 	CXform::EXformId exfidOrigin,
 	CGroupExpression *pgexprOrigin
 	)
@@ -315,7 +315,7 @@ CEngine::PgroupInsert
 	GPOS_ASSERT_IMP(NULL != pgroupOrigin, NULL == pgroupTarget);
 
 	// insert expression's children to memo by recursive call
-	DrgPgroup *pdrgpgroupChildren = GPOS_NEW(m_memory_pool) DrgPgroup(m_memory_pool, pexpr->Arity());
+	GroupArray *pdrgpgroupChildren = GPOS_NEW(m_memory_pool) GroupArray(m_memory_pool, pexpr->Arity());
 	InsertExpressionChildren(pexpr, pdrgpgroupChildren, exfidOrigin, pgexprOrigin);
 
 	COperator *pop = pexpr->Pop();
@@ -1052,7 +1052,7 @@ CEngine::PccOptimizeChild
 //		Optimize child groups of a given group expression;
 //
 //---------------------------------------------------------------------------
-DrgPoc *
+OptimizationContextArray *
 CEngine::PdrgpocOptimizeChildren
 	(
 	CExpressionHandle &exprhdl, // initialized with required properties
@@ -1067,7 +1067,7 @@ CEngine::PdrgpocOptimizeChildren
 	if (0 == arity)
 	{
 		// return empty array if no children
-		return GPOS_NEW(m_memory_pool) DrgPoc(m_memory_pool);
+		return GPOS_NEW(m_memory_pool) OptimizationContextArray(m_memory_pool);
 	}
 
 	// create array of child derived properties
@@ -1171,7 +1171,7 @@ CEngine::OptimizeGroupExpression
 			exprhdl.InitReqdProps(poc->Prpp());
 
 			// optimize child groups
-			DrgPoc *pdrgpoc = PdrgpocOptimizeChildren(exprhdl, poc, ul);
+			OptimizationContextArray *pdrgpoc = PdrgpocOptimizeChildren(exprhdl, poc, ul);
 
 			if (NULL != pdrgpoc && FCheckEnfdProps(m_memory_pool, pgexpr, poc, ul, pdrgpoc))
 			{
@@ -1399,7 +1399,7 @@ CEngine::RecursiveOptimize()
 //		to handle requirements
 //
 //---------------------------------------------------------------------------
-DrgPoc *
+OptimizationContextArray *
 CEngine::PdrgpocChildren
 	(
 	IMemoryPool *memory_pool,
@@ -1408,7 +1408,7 @@ CEngine::PdrgpocChildren
 {
 	GPOS_ASSERT(NULL != exprhdl.Pgexpr());
 
-	DrgPoc *pdrgpoc = GPOS_NEW(memory_pool) DrgPoc(memory_pool);
+	OptimizationContextArray *pdrgpoc = GPOS_NEW(memory_pool) OptimizationContextArray(memory_pool);
 	const ULONG arity = exprhdl.Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
@@ -2189,7 +2189,7 @@ CEngine::FCheckEnfdProps
 	CGroupExpression *pgexpr,
 	COptimizationContext *poc,
 	ULONG ulOptReq,
-	DrgPoc *pdrgpoc
+	OptimizationContextArray *pdrgpoc
 	)
 {
 	GPOS_CHECK_ABORT;
@@ -2278,7 +2278,7 @@ CEngine::FCheckEnfdProps
 		return false;
 	}
 
-	DrgPexpr *pdrgpexprEnforcers = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprEnforcers = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 
 	// extract a leaf pattern from target group
 	CBinding binding;
@@ -2342,7 +2342,7 @@ CEngine::FValidCTEAndPartitionProperties
 BOOL
 CEngine::FChildrenOptimized
 	(
-	DrgPoc *pdrgpoc
+	OptimizationContextArray *pdrgpoc
 	)
 {
 	GPOS_ASSERT(NULL != pdrgpoc);

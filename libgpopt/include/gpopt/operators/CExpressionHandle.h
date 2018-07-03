@@ -67,7 +67,7 @@ namespace gpopt
 
 			// derived properties of attached expr/gexpr;
 			// set during derived property computation
-			CDrvdProp *m_pdp;
+			DrvdPropArray *m_pdp;
 
 			// statistics of attached expr/gexpr;
 			// set during derived stats computation
@@ -84,7 +84,7 @@ namespace gpopt
 			StatsArray *m_pdrgpstat;
 
 			// array of children's required properties
-			DrgPrp *m_pdrgprp;
+			ReqdPropArray *m_pdrgprp;
 
 			// private copy ctor
 			CExpressionHandle(const CExpressionHandle &);
@@ -178,7 +178,7 @@ namespace gpopt
 			CDrvdPropScalar *GetDrvdScalarProps(ULONG child_index) const;
 
 			// derived properties of attached expr/gexpr
-			CDrvdProp *Pdp() const
+			DrvdPropArray *Pdp() const
 			{
 				return m_pdp;
 			}

@@ -23,7 +23,7 @@ namespace gpopt
 	class CFunctionalDependency;
 
 	// definition of array of functional dependencies
-	typedef CDynamicPtrArray<CFunctionalDependency, CleanupRelease> DrgPfd;
+	typedef CDynamicPtrArray<CFunctionalDependency, CleanupRelease> FunctionalDependencyArray;
 
 	using namespace gpos;
 
@@ -100,19 +100,19 @@ namespace gpopt
 
 			// hash function
 			static
-			ULONG HashValue(const DrgPfd *pdrgpfd);
+			ULONG HashValue(const FunctionalDependencyArray *pdrgpfd);
 
 			// equality function
 			static
-			BOOL Equals(const DrgPfd *pdrgpfdFst, const DrgPfd *pdrgpfdSnd);
+			BOOL Equals(const FunctionalDependencyArray *pdrgpfdFst, const FunctionalDependencyArray *pdrgpfdSnd);
 
 			// create a set of all keys in the passed FD's array
 			static
-			CColRefSet *PcrsKeys(IMemoryPool *memory_pool, const DrgPfd *pdrgpfd);
+			CColRefSet *PcrsKeys(IMemoryPool *memory_pool, const FunctionalDependencyArray *pdrgpfd);
 
 			// create an array of all keys in the passed FD's array
 			static
-			DrgPcr *PdrgpcrKeys(IMemoryPool *memory_pool, const DrgPfd *pdrgpfd);
+			ColRefArray *PdrgpcrKeys(IMemoryPool *memory_pool, const FunctionalDependencyArray *pdrgpfd);
 			
 
 	}; // class CFunctionalDependency

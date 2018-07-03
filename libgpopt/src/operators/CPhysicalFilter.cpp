@@ -237,12 +237,12 @@ CPhysicalFilter::PppsRequired
 		CExpression *pexprScalar = exprhdl.PexprScalarChild(1 /*child_index*/);
 
 		CExpression *pexprCmp = NULL;
-		DrgPpartkeys *pdrgppartkeys = ppimReqd->Pdrgppartkeys(part_idx_id);
+		PartKeysArray *pdrgppartkeys = ppimReqd->Pdrgppartkeys(part_idx_id);
 		const ULONG ulKeysets = pdrgppartkeys->Size();
 		for (ULONG ulKey = 0; NULL == pexprCmp && ulKey < ulKeysets; ulKey++)
 		{
 			// get partition key
-			DrgDrgPcr *pdrgpdrgpcrPartKeys = (*pdrgppartkeys)[ulKey]->Pdrgpdrgpcr();
+			ColRefArrays *pdrgpdrgpcrPartKeys = (*pdrgppartkeys)[ulKey]->Pdrgpdrgpcr();
 
 			// try to generate a request with dynamic partition selection		
 			pexprCmp = CPredicateUtils::PexprExtractPredicatesOnPartKeys

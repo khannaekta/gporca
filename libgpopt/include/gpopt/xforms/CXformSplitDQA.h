@@ -45,11 +45,11 @@ namespace gpopt
 							(
 							IMemoryPool *memory_pool,
 							CExpression *pexprRelational,
-							DrgPexpr *pdrgpexprPrElFirstStage,
-							DrgPexpr *pdrgpexprPrElSecondStage,
-							DrgPexpr *pdrgpexprPrElThirdStage,
-							DrgPcr *pdrgpcrArgDQA,
-							DrgPcr *pdrgpcrLastStage,
+							ExpressionArray *pdrgpexprPrElFirstStage,
+							ExpressionArray *pdrgpexprPrElSecondStage,
+							ExpressionArray *pdrgpexprPrElThirdStage,
+							ColRefArray *pdrgpcrArgDQA,
+							ColRefArray *pdrgpcrLastStage,
 							BOOL fSplit2LevelsOnly,
 							BOOL fAddDistinctColToLocalGb
 							);
@@ -64,7 +64,7 @@ namespace gpopt
 							CExpression *pexpr,
 							CExpression *pexprRelational,
 							HMExprCr *phmexprcr,
-							DrgPcr *pdrgpcrArgDQA
+							ColRefArray *pdrgpcrArgDQA
 							);
 
 			// helper function to split DQA
@@ -77,7 +77,7 @@ namespace gpopt
 				CExpression *pexpr,
 				CExpression *pexprRelational,
 				HMExprCr *phmexprcr,
-				DrgPcr *pdrgpcrArgDQA,
+				ColRefArray *pdrgpcrArgDQA,
 				BOOL fScalarAggregate
 				);
 
@@ -92,9 +92,9 @@ namespace gpopt
 					CColumnFactory *col_factory,
 					CMDAccessor *md_accessor,
 					CExpression *pexprPrEl,
-					DrgPexpr *pdrgpexprPrElFirstStage,
-					DrgPexpr *pdrgpexprPrElSecondStage,
-					DrgPexpr *pdrgpexprPrElLastStage,
+					ExpressionArray *pdrgpexprPrElFirstStage,
+					ExpressionArray *pdrgpexprPrElSecondStage,
+					ExpressionArray *pdrgpexprPrElLastStage,
 					BOOL fSplit2LevelsOnly
 					);
 
@@ -117,9 +117,9 @@ namespace gpopt
 					CColumnFactory *col_factory,
 					CMDAccessor *md_accessor,
 					CExpression *pexpr,
-					DrgPexpr *pdrgpexprChildPrEl,
+					ExpressionArray *pdrgpexprChildPrEl,
 					HMExprCr *phmexprcr,
-					DrgPcr **ppdrgpcrArgDQA
+					ColRefArray **ppdrgpcrArgDQA
 					);
 
 			// return the column reference of the argument to the aggregate function
@@ -130,7 +130,7 @@ namespace gpopt
 						CMDAccessor *md_accessor,
 						CColumnFactory *col_factory,
 						CExpression *pexprArg,
-						DrgPexpr *pdrgpexprChildPrEl
+						ExpressionArray *pdrgpexprChildPrEl
 						);
 
 		public:

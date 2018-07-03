@@ -51,11 +51,11 @@ namespace gpopt
 	using namespace gpdxl;
 
 	// hash maps
-	typedef CHashMap<ULONG, DrgPexpr, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
+	typedef CHashMap<ULONG, ExpressionArray, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
 					CleanupDelete<ULONG>, CleanupNULL > HMUlPdrgpexpr;
 
 	// iterator
-	typedef CHashMapIter<ULONG, DrgPexpr, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
+	typedef CHashMapIter<ULONG, ExpressionArray, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
 		CleanupDelete<ULONG>, CleanupNULL > HMIterUlPdrgpexpr;
 
 	
@@ -103,7 +103,7 @@ namespace gpopt
 			ULongPtrArray *m_pdrgpulOutputColRefs;
 
 			// array of output column names
-			DrgPmdname *m_pdrgpmdname;
+			MDNameArray *m_pdrgpmdname;
 
 			// maintains the mapping between CTE identifier and DXL representation of the corresponding CTE producer
 			IdToDXLNodeMap *m_phmulpdxlnCTEProducer;
@@ -148,7 +148,7 @@ namespace gpopt
 
 			// create the array of column reference used in the partition by column
 			// list of a window specification
-			DrgPcr *PdrgpcrPartitionByCol(const ULongPtrArray *partition_by_col_id_array);
+			ColRefArray *PdrgpcrPartitionByCol(const ULongPtrArray *partition_by_col_id_array);
 
 			// translate a DXL logical window into an expr logical project
 			CExpression *PexprCreateWindow(const CDXLNode *pdxlnLgProject);
@@ -171,12 +171,12 @@ namespace gpopt
 				const CDXLNode *pdxlnSetOp,
 				ULONG child_index,
 				CExpression **ppexprChild, // output: generated child expression
-				DrgPcr **ppdrgpcrChild, // output: generated child input columns
-				DrgPexpr **ppdrgpexprChildProjElems // output: project elements to remap child input columns
+				ColRefArray **ppdrgpcrChild, // output: generated child input columns
+				ExpressionArray **ppdrgpexprChildProjElems // output: project elements to remap child input columns
 				);
 
 			// preprocess inputs to the set operator (adding casts to columns  when needed)
-			DrgPexpr *PdrgpexprPreprocessSetOpInputs(const CDXLNode *dxlnode, DrgDrgPcr *pdrgdrgpcrInput, ULongPtrArray *pdrgpulOutput);
+			ExpressionArray *PdrgpexprPreprocessSetOpInputs(const CDXLNode *dxlnode, ColRefArrays *pdrgdrgpcrInput, ULongPtrArray *pdrgpulOutput);
 
 			// create new column reference and add to the hashmap maintaining
 			// the mapping between DXL ColIds and column reference.
@@ -375,7 +375,7 @@ namespace gpopt
 				);
 
 			// translate children of a DXL node
-			DrgPexpr *PdrgpexprChildren(const CDXLNode *dxlnode);
+			ExpressionArray *PdrgpexprChildren(const CDXLNode *dxlnode);
 
 			// construct a table descriptor from DXL
 			CTableDescriptor *Ptabdesc(CDXLTableDescr *table_descr);
@@ -387,10 +387,10 @@ namespace gpopt
 			void RegisterMDRelationCtas(CDXLLogicalCTAS *pdxlopCTAS);
 
 			// create an array of column references from an array of dxl column references
-			DrgPcr *Pdrgpcr(const DXLColumnDescrArray *dxl_col_descr_array);
+			ColRefArray *Pdrgpcr(const DXLColumnDescrArray *dxl_col_descr_array);
 
 			// construct the mapping between the DXL ColId and CColRef
-			void ConstructDXLColId2ColRefMapping(const DXLColumnDescrArray *dxl_col_descr_array, const DrgPcr *colref_array);
+			void ConstructDXLColId2ColRefMapping(const DXLColumnDescrArray *dxl_col_descr_array, const ColRefArray *colref_array);
 
 			// look up the column reference in the hash map. We raise an exception if
 			// the column is not found
@@ -416,14 +416,14 @@ namespace gpopt
 			CExpression *PexprTranslateScalar
 				(
 				const CDXLNode *dxlnode,
-				DrgPcr *colref_array,
+				ColRefArray *colref_array,
 				ULongPtrArray *col_ids = NULL);
 
 			// return the array of query output column reference id
 			ULongPtrArray *PdrgpulOutputColRefs();
 
 			// return the array of output column names
-			DrgPmdname *Pdrgpmdname()
+			MDNameArray *Pdrgpmdname()
 			{
 				GPOS_ASSERT(NULL != m_pdrgpmdname);
 				return m_pdrgpmdname;

@@ -266,8 +266,8 @@ CWindowFrame::OsPrint
 BOOL
 CWindowFrame::Equals
 	(
-	const DrgPwf *pdrgpwfFirst,
-	const DrgPwf *pdrgpwfSecond
+	const WindowFrameArray *pdrgpwfFirst,
+	const WindowFrameArray *pdrgpwfSecond
 	)
 {
 	if (NULL == pdrgpwfFirst || NULL == pdrgpwfSecond)
@@ -302,7 +302,7 @@ CWindowFrame::Equals
 ULONG
 CWindowFrame::HashValue
 	(
-	const DrgPwf *pdrgpwf,
+	const WindowFrameArray *pdrgpwf,
 	ULONG ulMaxSize
 	)
 {
@@ -330,7 +330,7 @@ IOstream &
 CWindowFrame::OsPrint
 	(
 	IOstream &os,
-	const DrgPwf *pdrgpwf
+	const WindowFrameArray *pdrgpwf
 	)
 {
 	os	<< "[";

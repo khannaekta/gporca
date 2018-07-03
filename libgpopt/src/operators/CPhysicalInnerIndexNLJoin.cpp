@@ -37,7 +37,7 @@ using namespace gpopt;
 CPhysicalInnerIndexNLJoin::CPhysicalInnerIndexNLJoin
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array
+	ColRefArray *colref_array
 	)
 	:
 	CPhysicalInnerNLJoin(memory_pool),

@@ -38,7 +38,7 @@ namespace gpopt
 			// ctors
 			explicit
 			CPhysicalTableScan(IMemoryPool *memory_pool);
-			CPhysicalTableScan(IMemoryPool *, const CName *, CTableDescriptor *, DrgPcr *);
+			CPhysicalTableScan(IMemoryPool *, const CName *, CTableDescriptor *, ColRefArray *);
 
 			// ident accessors
 			virtual 

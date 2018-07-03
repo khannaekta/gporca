@@ -49,9 +49,9 @@ CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate
 CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array,
+	ColRefArray *colref_array,
 	COperator::EGbAggType egbaggtype,
-	DrgPcr *pdrgpcrKeys
+	ColRefArray *pdrgpcrKeys
 	)
 	:
 	CLogicalGbAgg(memory_pool, colref_array, egbaggtype),
@@ -71,10 +71,10 @@ CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate
 CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array,
-	DrgPcr *pdrgpcrMinimal,
+	ColRefArray *colref_array,
+	ColRefArray *pdrgpcrMinimal,
 	COperator::EGbAggType egbaggtype,
-	DrgPcr *pdrgpcrKeys
+	ColRefArray *pdrgpcrKeys
 	)
 	:
 	CLogicalGbAgg(memory_pool, colref_array, pdrgpcrMinimal, egbaggtype),
@@ -113,15 +113,15 @@ CLogicalGbAggDeduplicate::PopCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcr *colref_array = CUtils::PdrgpcrRemap(memory_pool, Pdrgpcr(), colref_mapping, must_exist);
+	ColRefArray *colref_array = CUtils::PdrgpcrRemap(memory_pool, Pdrgpcr(), colref_mapping, must_exist);
 
-	DrgPcr *pdrgpcrMinimal = PdrgpcrMinimal();
+	ColRefArray *pdrgpcrMinimal = PdrgpcrMinimal();
 	if (NULL != pdrgpcrMinimal)
 	{
 		pdrgpcrMinimal = CUtils::PdrgpcrRemap(memory_pool, pdrgpcrMinimal, colref_mapping, must_exist);
 	}
 
-	DrgPcr *pdrgpcrKeys = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrKeys, colref_mapping, must_exist);
+	ColRefArray *pdrgpcrKeys = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrKeys, colref_mapping, must_exist);
 
 	return GPOS_NEW(memory_pool) CLogicalGbAggDeduplicate(memory_pool, colref_array, pdrgpcrMinimal, Egbaggtype(), pdrgpcrKeys);
 }

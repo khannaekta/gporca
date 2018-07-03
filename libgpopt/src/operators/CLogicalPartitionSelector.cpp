@@ -52,7 +52,7 @@ CLogicalPartitionSelector::CLogicalPartitionSelector
 	(
 	IMemoryPool *memory_pool,
 	IMDId *mdid,
-	DrgPexpr *pdrgpexprFilters,
+	ExpressionArray *pdrgpexprFilters,
 	CColRef *pcrOid
 	)
 	:
@@ -139,7 +139,7 @@ CLogicalPartitionSelector::PopCopyWithRemappedColumns
 	)
 {
 	CColRef *pcrOid = CUtils::PcrRemap(m_pcrOid, colref_mapping, must_exist);
-	DrgPexpr *pdrgpexpr = CUtils::PdrgpexprRemap(memory_pool, m_pdrgpexprFilters, colref_mapping);
+	ExpressionArray *pdrgpexpr = CUtils::PdrgpexprRemap(memory_pool, m_pdrgpexprFilters, colref_mapping);
 
 	m_mdid->AddRef();
 

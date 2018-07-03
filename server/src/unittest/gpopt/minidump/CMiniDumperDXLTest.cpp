@@ -153,7 +153,7 @@ CMiniDumperDXLTest::EresUnittest_Basic()
 													);
 		
 		gpdxl::ULongPtrArray *pdrgul = pdxltr->PdrgpulOutputColRefs();
-		gpmd::DrgPmdname *pdrgpmdname = pdxltr->Pdrgpmdname();
+		gpmd::MDNameArray *pdrgpmdname = pdxltr->Pdrgpmdname();
 
 		ULONG ulSegments = GPOPT_TEST_SEGMENTS;
 		CQueryContext *pqc = CQueryContext::PqcGenerate(memory_pool, pexprTranslated, pdrgul, pdrgpmdname, true /*fDeriveStats*/);

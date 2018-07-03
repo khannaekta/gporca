@@ -178,7 +178,7 @@ namespace gpdbcost
 		public:
 
 			// ctor
-			CCostModelGPDBLegacy(IMemoryPool *memory_pool, ULONG ulSegments, DrgPcp *pdrgpcp = NULL);
+			CCostModelGPDBLegacy(IMemoryPool *memory_pool, ULONG ulSegments, CostModelParamsArray *pdrgpcp = NULL);
 
 			// dtor
 			virtual

@@ -79,8 +79,8 @@ CXformImplementSequenceProject::Transform
 	// extract members of logical sequence project operator
 	CLogicalSequenceProject *popLogicalSequenceProject = CLogicalSequenceProject::PopConvert(pexpr->Pop());
 	CDistributionSpec *pds = popLogicalSequenceProject->Pds();
-	DrgPos *pdrgpos = popLogicalSequenceProject->Pdrgpos();
-	DrgPwf *pdrgpwf = popLogicalSequenceProject->Pdrgpwf();
+	OrderSpecArray *pdrgpos = popLogicalSequenceProject->Pdrgpos();
+	WindowFrameArray *pdrgpwf = popLogicalSequenceProject->Pdrgpwf();
 	pds->AddRef();
 	pdrgpos->AddRef();
 	pdrgpwf->AddRef();

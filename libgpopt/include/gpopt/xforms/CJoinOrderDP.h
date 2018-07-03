@@ -96,27 +96,27 @@ namespace gpopt
 
 			// hash map from component to best join order
 			typedef CHashMap<CBitSet, CExpression, UlHashBitSet, FEqualBitSet,
-				CleanupRelease<CBitSet>, CleanupRelease<CExpression> > HMBSExpr;
+				CleanupRelease<CBitSet>, CleanupRelease<CExpression> > BitSetToExpressionMap;
 
 			// hash map from component pair to connecting edges
 			typedef CHashMap<SComponentPair, CExpression, SComponentPair::HashValue, SComponentPair::Equals,
-				CleanupRelease<SComponentPair>, CleanupRelease<CExpression> > HMCompLink;
+				CleanupRelease<SComponentPair>, CleanupRelease<CExpression> > ComponentPairToExpressionMap;
 
 			// hash map from expression to cost of best join order
 			typedef CHashMap<CExpression, CDouble, CExpression::HashValue, CUtils::Equals,
-				CleanupRelease<CExpression>, CleanupDelete<CDouble> > HMExprCost;
+				CleanupRelease<CExpression>, CleanupDelete<CDouble> > ExpressionToCostMap;
 
 			// lookup table for links
-			HMCompLink *m_phmcomplink;
+			ComponentPairToExpressionMap *m_phmcomplink;
 
 			// dynamic programming table
-			HMBSExpr *m_phmbsexpr;
+			BitSetToExpressionMap *m_phmbsexpr;
 
 			// map of expressions to its cost
-			HMExprCost *m_phmexprcost;
+			ExpressionToCostMap *m_phmexprcost;
 
 			// array of top-k join expression
-			DrgPexpr *m_pdrgpexprTopKOrders;
+			ExpressionArray *m_pdrgpexprTopKOrders;
 
 			// dummy expression to used for non-joinable components
 			CExpression *m_pexprDummy;
@@ -166,11 +166,11 @@ namespace gpopt
 
 			// generate all subsets of the given array of elements
 			static
-			void GenerateSubsets(IMemoryPool *memory_pool, CBitSet *pbsCurrent, ULONG *pulElems, ULONG size, ULONG ulIndex, DrgPbs *pdrgpbsSubsets);
+			void GenerateSubsets(IMemoryPool *memory_pool, CBitSet *pbsCurrent, ULONG *pulElems, ULONG size, ULONG ulIndex, BitSetArray *pdrgpbsSubsets);
 
 			// driver of subset generation
 			static
-			DrgPbs *PdrgpbsSubsets(IMemoryPool *memory_pool, CBitSet *pbs);
+			BitSetArray *PdrgpbsSubsets(IMemoryPool *memory_pool, CBitSet *pbs);
 
 		public:
 
@@ -178,8 +178,8 @@ namespace gpopt
 			CJoinOrderDP
 				(
 				IMemoryPool *memory_pool,
-				DrgPexpr *pdrgpexprComponents,
-				DrgPexpr *pdrgpexprConjuncts
+				ExpressionArray *pdrgpexprComponents,
+				ExpressionArray *pdrgpexprConjuncts
 				);
 
 			// dtor
@@ -191,7 +191,7 @@ namespace gpopt
 			CExpression *PexprExpand();
 
 			// best join orders
-			DrgPexpr *PdrgpexprTopK() const
+			ExpressionArray *PdrgpexprTopK() const
 			{
 				return m_pdrgpexprTopKOrders;
 			}

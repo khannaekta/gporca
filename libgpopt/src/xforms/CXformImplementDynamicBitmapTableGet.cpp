@@ -78,12 +78,12 @@ CXformImplementDynamicBitmapTableGet::Transform
 
 	CName *pname = GPOS_NEW(memory_pool) CName(memory_pool, popLogical->Name());
 
-	DrgPcr *pdrgpcrOutput = popLogical->PdrgpcrOutput();
+	ColRefArray *pdrgpcrOutput = popLogical->PdrgpcrOutput();
 
 	GPOS_ASSERT(NULL != pdrgpcrOutput);
 	pdrgpcrOutput->AddRef();
 
-	DrgDrgPcr *pdrgpdrgpcrPart = popLogical->PdrgpdrgpcrPart();
+	ColRefArrays *pdrgpdrgpcrPart = popLogical->PdrgpdrgpcrPart();
 	pdrgpdrgpcrPart->AddRef();
 
 	CPartConstraint *ppartcnstr = popLogical->Ppartcnstr();

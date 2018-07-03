@@ -51,8 +51,8 @@ namespace gpopt
 			CPhysicalInnerHashJoin
 				(
 				IMemoryPool *memory_pool,
-				DrgPexpr *pdrgpexprOuterKeys,
-				DrgPexpr *pdrgpexprInnerKeys
+				ExpressionArray *pdrgpexprOuterKeys,
+				ExpressionArray *pdrgpexprInnerKeys
 				);
 
 			// dtor

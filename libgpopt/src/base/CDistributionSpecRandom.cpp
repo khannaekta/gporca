@@ -114,7 +114,7 @@ CDistributionSpecRandom::AppendEnforcers
 	prpp
 #endif // GPOS_DEBUG
 	,
-	DrgPexpr *pdrgpexpr,
+	ExpressionArray *pdrgpexpr,
 	CExpression *pexpr
 	)
 {

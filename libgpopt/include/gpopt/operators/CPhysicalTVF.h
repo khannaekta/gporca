@@ -43,7 +43,7 @@ namespace gpopt
 			const IMDFunction *m_pmdfunc;
 
 			// array of column descriptors: the schema of the function result
-			DrgPcoldesc *m_pdrgpcoldesc;
+			ColumnDescrArray *m_pdrgpcoldesc;
 
 			// output columns
 			CColRefSet *m_pcrsOutput;
@@ -60,7 +60,7 @@ namespace gpopt
 				IMDId *mdid_func,
 				IMDId *mdid_return_type,
 				CWStringConst *str,
-				DrgPcoldesc *pdrgpcoldesc,
+				ColumnDescrArray *pdrgpcoldesc,
 				CColRefSet *pcrsOutput
 				);
 
@@ -101,7 +101,7 @@ namespace gpopt
 			}
 
 			// col descr accessor
-			DrgPcoldesc *Pdrgpcoldesc() const
+			ColumnDescrArray *Pdrgpcoldesc() const
 			{
 				return m_pdrgpcoldesc;
 			}

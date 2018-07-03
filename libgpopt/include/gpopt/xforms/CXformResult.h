@@ -32,7 +32,7 @@ namespace gpopt
 		private:
 
 			// set of alternatives
-			DrgPexpr *m_pdrgpexpr;
+			ExpressionArray *m_pdrgpexpr;
 
 			// cursor for retrieval
 			ULONG m_ulExpr;
@@ -51,7 +51,7 @@ namespace gpopt
 
 			// accessor
 			inline
-			DrgPexpr *Pdrgpexpr() const
+			ExpressionArray *Pdrgpexpr() const
 			{
 				return m_pdrgpexpr;
 			}

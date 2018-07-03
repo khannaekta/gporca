@@ -73,7 +73,7 @@ CDrvdPropPlan::~CDrvdPropPlan()
 CDrvdPropPlan *
 CDrvdPropPlan::Pdpplan
 	(
-	CDrvdProp *pdp
+	DrvdPropArray *pdp
 	)
 {
 	GPOS_ASSERT(NULL != pdp);

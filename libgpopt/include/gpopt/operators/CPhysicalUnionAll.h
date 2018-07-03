@@ -18,23 +18,23 @@ namespace gpopt
 		private:
 
 			// output column array
-			DrgPcr *const m_pdrgpcrOutput;
+			ColRefArray *const m_pdrgpcrOutput;
 
 			// input column array
-			DrgDrgPcr *const m_pdrgpdrgpcrInput;
+			ColRefArrays *const m_pdrgpdrgpcrInput;
 
 			// if this union is needed for partial indexes then store the scan
 			// id, otherwise this will be gpos::ulong_max
 			const ULONG m_ulScanIdPartialIndex;
 
 			// set representation of input columns
-			DrgPcrs *m_pdrgpcrsInput;
+			ColRefSetArray *m_pdrgpcrsInput;
 
 			// array of child hashed distributions -- used locally for distribution derivation
 			DrgPds *const m_pdrgpds;
 
 			// map given array of scalar ident expressions to positions of UnionAll input columns in the given child;
-			ULongPtrArray *PdrgpulMap(IMemoryPool *memory_pool, DrgPexpr *pdrgpexpr, ULONG child_index) const;
+			ULongPtrArray *PdrgpulMap(IMemoryPool *memory_pool, ExpressionArray *pdrgpexpr, ULONG child_index) const;
 
 			// derive hashed distribution from child operators
 			CDistributionSpecHashed *PdshashedDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
@@ -58,8 +58,8 @@ namespace gpopt
 			CPhysicalUnionAll
 				(
 					IMemoryPool *memory_pool,
-					DrgPcr *pdrgpcrOutput,
-					DrgDrgPcr *pdrgpdrgpcrInput,
+					ColRefArray *pdrgpcrOutput,
+					ColRefArrays *pdrgpdrgpcrInput,
 					ULONG ulScanIdPartialIndex
 				);
 
@@ -82,10 +82,10 @@ namespace gpopt
 			BOOL FInputOrderSensitive() const;
 
 			// accessor of output column array
-			DrgPcr *PdrgpcrOutput() const;
+			ColRefArray *PdrgpcrOutput() const;
 
 			// accessor of input column array
-			DrgDrgPcr *PdrgpdrgpcrInput() const;
+			ColRefArrays *PdrgpdrgpcrInput() const;
 
 			// if this unionall is needed for partial indexes then return the scan
 			// id, otherwise return gpos::ulong_max

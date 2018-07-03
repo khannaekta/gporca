@@ -36,7 +36,7 @@ namespace gpopt
 		public:
 
 			// ctor
-			CPhysicalLeftAntiSemiHashJoinNotIn(IMemoryPool *memory_pool, DrgPexpr *pdrgpexprOuterKeys, DrgPexpr *pdrgpexprInnerKeys);
+			CPhysicalLeftAntiSemiHashJoinNotIn(IMemoryPool *memory_pool, ExpressionArray *pdrgpexprOuterKeys, ExpressionArray *pdrgpexprInnerKeys);
 
 			// ident accessors
 			virtual

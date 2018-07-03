@@ -151,7 +151,7 @@ CJoinStatsProcessor::CalcAllJoinStats(IMemoryPool *memory_pool,
 	{
 		IStatistics *current_stats = (*statistics_array)[i];
 
-		DrgPcrs *output_colrefsets = GPOS_NEW(memory_pool) DrgPcrs(memory_pool);
+		ColRefSetArray *output_colrefsets = GPOS_NEW(memory_pool) ColRefSetArray(memory_pool);
 		output_colrefsets->Append(stats->GetColRefSet(memory_pool));
 		output_colrefsets->Append(current_stats->GetColRefSet(memory_pool));
 
@@ -261,7 +261,7 @@ CJoinStatsProcessor::SetResultingJoinStats(IMemoryPool *memory_pool,
 			memory_pool, join_col_ids, result_col_hist_mapping);
 	}
 
-	DrgPdouble *join_conds_scale_factors = GPOS_NEW(memory_pool) DrgPdouble(memory_pool);
+	CDoubleArray *join_conds_scale_factors = GPOS_NEW(memory_pool) CDoubleArray(memory_pool);
 	const ULONG num_join_conds = join_pred_stats_info->Size();
 
 	BOOL output_is_empty = false;
@@ -376,7 +376,7 @@ CDouble
 CJoinStatsProcessor::CalcJoinCardinality(CStatisticsConfig *stats_config,
 										 CDouble left_num_rows,
 										 CDouble right_num_rows,
-										 DrgPdouble *join_conds_scale_factors,
+										 CDoubleArray *join_conds_scale_factors,
 										 IStatistics::EStatsJoinType join_type)
 {
 	GPOS_ASSERT(NULL != stats_config);

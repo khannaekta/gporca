@@ -56,7 +56,7 @@ namespace gpopt
 				CDistributionSpec::EdtReplicated == edt);
 	}
 
-	void CDistributionSpecUniversal::AppendEnforcers(IMemoryPool *, CExpressionHandle &, CReqdPropPlan *, DrgPexpr *,
+	void CDistributionSpecUniversal::AppendEnforcers(IMemoryPool *, CExpressionHandle &, CReqdPropPlan *, ExpressionArray *,
 													 CExpression *)
 	{
 		GPOS_ASSERT(!"attempt to enforce UNIVERSAL distribution");

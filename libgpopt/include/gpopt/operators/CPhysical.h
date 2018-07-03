@@ -34,7 +34,7 @@ namespace gpopt
 	using namespace gpos;
 
 	// arrays of unsigned integer arrays
-	typedef CDynamicPtrArray<ULONG_PTR, CleanupDeleteArray> DrgPulp;
+	typedef CDynamicPtrArray<ULONG_PTR, CleanupDeleteArray> ULONGPtrArray;
 
 	// forward declaration
 	class CPartIndexMap;
@@ -168,7 +168,7 @@ namespace gpopt
 			ULONG m_rgulOptReqs[GPOPT_PLAN_PROPS];
 
 			// array of expanded requests
-			DrgPulp *m_pdrgpulpOptReqsExpanded;
+			ULONGPtrArray *m_pdrgpulpOptReqsExpanded;
 
 			// total number of optimization requests
 			ULONG m_ulTotalOptRequests;
@@ -246,7 +246,7 @@ namespace gpopt
 
 			// compute distribution spec from the table descriptor
 			static
-			CDistributionSpec *PdsCompute(IMemoryPool *memory_pool, const CTableDescriptor *ptabdesc, DrgPcr *pdrgpcrOutput);
+			CDistributionSpec *PdsCompute(IMemoryPool *memory_pool, const CTableDescriptor *ptabdesc, ColRefArray *pdrgpcrOutput);
 
 			// helper for a simple case of computing child's required sort order
 			static
@@ -423,7 +423,7 @@ namespace gpopt
 
 			// create base container of derived properties
 			virtual
-			CDrvdProp *PdpCreate(IMemoryPool *memory_pool) const;
+			DrvdPropArray *PdpCreate(IMemoryPool *memory_pool) const;
 
 			// create base container of required properties
 			virtual
@@ -619,7 +619,7 @@ namespace gpopt
 				(
 				IMemoryPool *, // memory_pool
 				COptimizationContext *, // poc,
-				DrgPoc * // pdrgpocChild
+				OptimizationContextArray * // pdrgpocChild
 				)
 				const
 			{

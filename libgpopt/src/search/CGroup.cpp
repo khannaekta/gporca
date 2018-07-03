@@ -501,14 +501,14 @@ CGroup::SetId
 void
 CGroup::InitProperties
 	(
-	CDrvdProp *pdp
+	DrvdPropArray *pdp
 	)
 {
 	GPOS_ASSERT(m_lock.IsOwned());
 	GPOS_ASSERT(NULL == m_pdp);
 	GPOS_ASSERT(NULL != pdp);
-	GPOS_ASSERT_IMP(FScalar(), CDrvdProp::EptScalar == pdp->Ept());
-	GPOS_ASSERT_IMP(!FScalar(), CDrvdProp::EptRelational == pdp->Ept());
+	GPOS_ASSERT_IMP(FScalar(), DrvdPropArray::EptScalar == pdp->Ept());
+	GPOS_ASSERT_IMP(!FScalar(), DrvdPropArray::EptRelational == pdp->Ept());
 
 	m_pdp = pdp;
 }
@@ -568,8 +568,8 @@ CGroup::SetState
 void
 CGroup::SetHashJoinKeys
 	(
-	DrgPexpr *pdrgpexprOuter,
-	DrgPexpr *pdrgpexprInner
+	ExpressionArray *pdrgpexprOuter,
+	ExpressionArray *pdrgpexprInner
 	)
 {
 	GPOS_ASSERT(m_fScalar);
@@ -770,8 +770,8 @@ CGroup::PgexprNext
 BOOL
 CGroup::FMatchGroups
 	(
-	DrgPgroup *pdrgpgroupFst, 
-	DrgPgroup *pdrgpgroupSnd
+	GroupArray *pdrgpgroupFst, 
+	GroupArray *pdrgpgroupSnd
 	)
 {
 	ULONG arity = pdrgpgroupFst->Size();
@@ -801,8 +801,8 @@ CGroup::FMatchGroups
 BOOL
 CGroup::FMatchNonScalarGroups
 	(
-	DrgPgroup *pdrgpgroupFst,
-	DrgPgroup *pdrgpgroupSnd
+	GroupArray *pdrgpgroupFst,
+	GroupArray *pdrgpgroupSnd
 	)
 {
 	GPOS_ASSERT(NULL != pdrgpgroupFst);
@@ -1069,7 +1069,7 @@ CGroup::CreateScalarExpression()
 		return;
 	}
 
-	DrgPexpr *pdrgpexpr = GPOS_NEW(m_memory_pool) DrgPexpr(m_memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(m_memory_pool) ExpressionArray(m_memory_pool);
 	const ULONG arity = pgexprFirst->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
@@ -1165,7 +1165,7 @@ CGroup::RecursiveBuildTreeMap
 	GPOS_ASSERT(NULL != ptmap);
 	GPOS_ASSERT_IMP(NULL != pccParent, child_index < pccParent->Pgexpr()->Arity());
 
-	DrgPcc *pdrgpcc = pgexprCurrent->PdrgpccLookupAll(memory_pool, poc);
+	CostContextArray *pdrgpcc = pgexprCurrent->PdrgpccLookupAll(memory_pool, poc);
 	const ULONG ulCCSize = pdrgpcc->Size();
 
 	if (0 == ulCCSize)
@@ -1187,7 +1187,7 @@ CGroup::RecursiveBuildTreeMap
 			ptmap->Insert(pccParent, child_index, pccCurrent);
 		}
 
-		DrgPoc *pdrgpoc = pccCurrent->Pdrgpoc();
+		OptimizationContextArray *pdrgpoc = pccCurrent->Pdrgpoc();
 		if (NULL != pdrgpoc)
 		{
 			// process children recursively

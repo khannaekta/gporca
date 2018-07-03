@@ -118,7 +118,7 @@ CBinding::PexprFinalize
 	(
 	IMemoryPool *memory_pool,
 	CGroupExpression *pgexpr,
-	DrgPexpr *pdrgpexpr
+	ExpressionArray *pdrgpexpr
 	)
 {
 	COperator *pop = pgexpr->Pop();
@@ -167,7 +167,7 @@ CBinding::PexprExtract
 		return GPOS_NEW(memory_pool) CExpression(memory_pool, pgexpr->Pop(), pgexpr);
 	}
 
-	DrgPexpr *pdrgpexpr = NULL;
+	ExpressionArray *pdrgpexpr = NULL;
 	ULONG arity = pgexpr->Arity();
 	if (0 == arity && NULL != pexprLast)
 	{
@@ -177,7 +177,7 @@ CBinding::PexprExtract
 	else
 	{
 		// attempt binding to children
-		pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+		pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 		if (!FExtractChildren(memory_pool, pgexpr, pexprPattern, pexprLast, pdrgpexpr))
 		{
 			pdrgpexpr->Release();
@@ -206,7 +206,7 @@ CBinding::FInitChildCursors
 	IMemoryPool *memory_pool,
 	CGroupExpression *pgexpr,
 	CExpression *pexprPattern,
-	DrgPexpr *pdrgpexpr
+	ExpressionArray *pdrgpexpr
 	)
 {
 	GPOS_ASSERT(NULL != pexprPattern);
@@ -251,7 +251,7 @@ CBinding::FAdvanceChildCursors
 	CGroupExpression *pgexpr,
 	CExpression *pexprPattern,
 	CExpression *pexprLast,
-	DrgPexpr *pdrgpexpr
+	ExpressionArray *pdrgpexpr
 	)
 {
 	GPOS_ASSERT(NULL != pexprPattern);
@@ -330,7 +330,7 @@ CBinding::FExtractChildren
 	CGroupExpression *pgexpr,
 	CExpression *pexprPattern,
 	CExpression *pexprLast,
-	DrgPexpr *pdrgpexpr
+	ExpressionArray *pdrgpexpr
 	)
 {
 	GPOS_CHECK_STACK_SIZE;

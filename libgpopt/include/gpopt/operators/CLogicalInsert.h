@@ -37,7 +37,7 @@ namespace gpopt
 			CTableDescriptor *m_ptabdesc;
 
 			// source columns
-			DrgPcr *m_pdrgpcrSource;
+			ColRefArray *m_pdrgpcrSource;
 
 			// private copy ctor
 			CLogicalInsert(const CLogicalInsert &);
@@ -49,7 +49,7 @@ namespace gpopt
 			CLogicalInsert(IMemoryPool *memory_pool);
 
 			// ctor
-			CLogicalInsert(IMemoryPool *memory_pool, CTableDescriptor *ptabdesc, DrgPcr *colref_array);
+			CLogicalInsert(IMemoryPool *memory_pool, CTableDescriptor *ptabdesc, ColRefArray *colref_array);
 
 			// dtor
 			virtual
@@ -70,7 +70,7 @@ namespace gpopt
 			}
 
 			// source columns
-			DrgPcr *PdrgpcrSource() const
+			ColRefArray *PdrgpcrSource() const
 			{
 				return m_pdrgpcrSource;
 			}

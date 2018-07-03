@@ -50,8 +50,8 @@ CLogicalIntersectAll::CLogicalIntersectAll
 CLogicalIntersectAll::CLogicalIntersectAll
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *pdrgpcrOutput,
-	DrgDrgPcr *pdrgpdrgpcrInput
+	ColRefArray *pdrgpcrOutput,
+	ColRefArrays *pdrgpdrgpcrInput
 	)
 	:
 	CLogicalSetOp(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput)
@@ -119,8 +119,8 @@ CLogicalIntersectAll::PopCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcrOutput = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrOutput, colref_mapping, must_exist);
-	DrgDrgPcr *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(memory_pool, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
+	ColRefArray *pdrgpcrOutput = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrOutput, colref_mapping, must_exist);
+	ColRefArrays *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(memory_pool, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
 
 	return GPOS_NEW(memory_pool) CLogicalIntersectAll(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput);
 }
@@ -179,8 +179,8 @@ CLogicalIntersectAll::PstatsDerive
 	(
 	IMemoryPool *memory_pool,
 	CExpressionHandle &exprhdl,
-	DrgDrgPcr *pdrgpdrgpcrInput,
-	DrgPcrs *output_colrefsets // output of relational children
+	ColRefArrays *pdrgpdrgpcrInput,
+	ColRefSetArray *output_colrefsets // output of relational children
 	)
 {
 	GPOS_ASSERT(2 == exprhdl.Arity());
@@ -230,7 +230,7 @@ CLogicalIntersectAll::PstatsDerive
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 
-	DrgPcrs *output_colrefsets = GPOS_NEW(memory_pool) DrgPcrs(memory_pool);
+	ColRefSetArray *output_colrefsets = GPOS_NEW(memory_pool) ColRefSetArray(memory_pool);
 	const ULONG size = m_pdrgpdrgpcrInput->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{

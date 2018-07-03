@@ -41,7 +41,7 @@ CLogicalBitmapTableGet::CLogicalBitmapTableGet
 	CTableDescriptor *ptabdesc,
 	ULONG ulOriginOpId,
 	const CName *pnameTableAlias,
-	DrgPcr *pdrgpcrOutput
+	ColRefArray *pdrgpcrOutput
 	)
 	:
 	CLogical(memory_pool),
@@ -251,7 +251,7 @@ CLogicalBitmapTableGet::PopCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcrOutput = NULL;
+	ColRefArray *pdrgpcrOutput = NULL;
 	if (must_exist)
 	{
 		pdrgpcrOutput = CUtils::PdrgpcrRemapAndCreate(memory_pool, m_pdrgpcrOutput, colref_mapping);

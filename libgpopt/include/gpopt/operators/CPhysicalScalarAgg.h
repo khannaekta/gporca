@@ -40,11 +40,11 @@ namespace gpopt
 			CPhysicalScalarAgg
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *colref_array,
-				DrgPcr *pdrgpcrMinimal, // minimal grouping columns based on FD's
+				ColRefArray *colref_array,
+				ColRefArray *pdrgpcrMinimal, // minimal grouping columns based on FD's
 				COperator::EGbAggType egbaggtype,
 				BOOL fGeneratesDuplicates,
-				DrgPcr *pdrgpcrArgDQA,
+				ColRefArray *pdrgpcrArgDQA,
 				BOOL fMultiStage
 				);
 

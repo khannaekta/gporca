@@ -32,8 +32,8 @@ CPhysicalRowTrigger::CPhysicalRowTrigger
 	IMemoryPool *memory_pool,
 	IMDId *rel_mdid,
 	INT type,
-	DrgPcr *pdrgpcrOld,
-	DrgPcr *pdrgpcrNew
+	ColRefArray *pdrgpcrOld,
+	ColRefArray *pdrgpcrNew
 	)
 	:
 	CPhysical(memory_pool),
@@ -398,8 +398,8 @@ CPhysicalRowTrigger::Matches
 
 	CPhysicalRowTrigger *popRowTrigger = CPhysicalRowTrigger::PopConvert(pop);
 
-	DrgPcr *pdrgpcrOld = popRowTrigger->PdrgpcrOld();
-	DrgPcr *pdrgpcrNew = popRowTrigger->PdrgpcrNew();
+	ColRefArray *pdrgpcrOld = popRowTrigger->PdrgpcrOld();
+	ColRefArray *pdrgpcrNew = popRowTrigger->PdrgpcrNew();
 
 	return m_rel_mdid->Equals(popRowTrigger->GetRelMdId()) &&
 			m_type == popRowTrigger->GetType() &&

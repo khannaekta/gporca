@@ -33,7 +33,7 @@ CKeyCollection::CKeyCollection
 {
 	GPOS_ASSERT(NULL != memory_pool);
 	
-	m_pdrgpcrs = GPOS_NEW(memory_pool) DrgPcrs(memory_pool);
+	m_pdrgpcrs = GPOS_NEW(memory_pool) ColRefSetArray(memory_pool);
 }
 
 
@@ -56,7 +56,7 @@ CKeyCollection::CKeyCollection
 {
 	GPOS_ASSERT(NULL != pcrs && 0 < pcrs->Size());
 	
-	m_pdrgpcrs = GPOS_NEW(memory_pool) DrgPcrs(memory_pool);
+	m_pdrgpcrs = GPOS_NEW(memory_pool) ColRefSetArray(memory_pool);
 
 	// we own the set
 	Add(pcrs);
@@ -74,7 +74,7 @@ CKeyCollection::CKeyCollection
 CKeyCollection::CKeyCollection
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array
+	ColRefArray *colref_array
 	)
 	:
 	m_memory_pool(memory_pool),
@@ -83,7 +83,7 @@ CKeyCollection::CKeyCollection
 	GPOS_ASSERT(NULL != memory_pool);
 	GPOS_ASSERT(NULL != colref_array && 0 < colref_array->Size());
 	
-	m_pdrgpcrs = GPOS_NEW(memory_pool) DrgPcrs(memory_pool);
+	m_pdrgpcrs = GPOS_NEW(memory_pool) ColRefSetArray(memory_pool);
 	
 	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 	pcrs->Include(colref_array);
@@ -183,7 +183,7 @@ BOOL
 CKeyCollection::FKey
 	(
 	IMemoryPool *memory_pool,
-	const DrgPcr *colref_array
+	const ColRefArray *colref_array
 	)
 	const
 {
@@ -205,15 +205,15 @@ CKeyCollection::FKey
 //		Return first subsumed key as column array
 //
 //---------------------------------------------------------------------------
-DrgPcr *
+ColRefArray *
 CKeyCollection::PdrgpcrTrim
 	(
 	IMemoryPool *memory_pool,
-	const DrgPcr *colref_array
+	const ColRefArray *colref_array
 	)
 	const
 {
-	DrgPcr *pdrgpcrTrim = NULL;
+	ColRefArray *pdrgpcrTrim = NULL;
 	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 	pcrs->Include(colref_array);
 
@@ -240,7 +240,7 @@ CKeyCollection::PdrgpcrTrim
 //		Extract a key
 //
 //---------------------------------------------------------------------------
-DrgPcr *
+ColRefArray *
 CKeyCollection::PdrgpcrKey
 	(
 	IMemoryPool *memory_pool
@@ -254,7 +254,7 @@ CKeyCollection::PdrgpcrKey
 
 	GPOS_ASSERT(NULL != (*m_pdrgpcrs)[0]);
 
-	DrgPcr *colref_array = (*m_pdrgpcrs)[0]->Pdrgpcr(memory_pool);
+	ColRefArray *colref_array = (*m_pdrgpcrs)[0]->Pdrgpcr(memory_pool);
 	return colref_array;
 }
 
@@ -267,7 +267,7 @@ CKeyCollection::PdrgpcrKey
 //		Extract a hashable key
 //
 //---------------------------------------------------------------------------
-DrgPcr *
+ColRefArray *
 CKeyCollection::PdrgpcrHashableKey
 	(
 	IMemoryPool *memory_pool
@@ -277,7 +277,7 @@ CKeyCollection::PdrgpcrHashableKey
 	const ULONG ulSets = m_pdrgpcrs->Size();
 	for(ULONG ul = 0; ul < ulSets; ul++)
 	{
-		DrgPcr *pdrgpcrKey = (*m_pdrgpcrs)[ul]->Pdrgpcr(memory_pool);
+		ColRefArray *pdrgpcrKey = (*m_pdrgpcrs)[ul]->Pdrgpcr(memory_pool);
 		if (CUtils::IsHashable(pdrgpcrKey))
 		{
 			return pdrgpcrKey;
@@ -298,7 +298,7 @@ CKeyCollection::PdrgpcrHashableKey
 //		Extract the key at a position
 //
 //---------------------------------------------------------------------------
-DrgPcr *
+ColRefArray *
 CKeyCollection::PdrgpcrKey
 	(
 	IMemoryPool *memory_pool,
@@ -313,7 +313,7 @@ CKeyCollection::PdrgpcrKey
 	
 	GPOS_ASSERT(NULL != (*m_pdrgpcrs)[ulIndex]);
 	
-	DrgPcr *colref_array = (*m_pdrgpcrs)[ulIndex]->Pdrgpcr(memory_pool);
+	ColRefArray *colref_array = (*m_pdrgpcrs)[ulIndex]->Pdrgpcr(memory_pool);
 	return colref_array;
 }
 

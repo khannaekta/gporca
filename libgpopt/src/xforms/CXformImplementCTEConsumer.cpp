@@ -88,7 +88,7 @@ CXformImplementCTEConsumer::Transform
 	// extract components for alternative
 	ULONG id = popCTEConsumer->UlCTEId();
 
-	DrgPcr *colref_array = popCTEConsumer->Pdrgpcr();
+	ColRefArray *colref_array = popCTEConsumer->Pdrgpcr();
 	colref_array->AddRef();
 
 	UlongColRefHashMap *colref_mapping = popCTEConsumer->Phmulcr();

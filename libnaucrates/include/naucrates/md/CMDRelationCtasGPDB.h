@@ -97,7 +97,7 @@ namespace gpmd
 		IntPtrArray *m_vartypemod_array;
 
 		// array of column widths
-		DrgPdouble *m_col_width_array;
+		CDoubleArray *m_col_width_array;
 
 		// private copy ctor
 		CMDRelationCtasGPDB(const CMDRelationCtasGPDB &);

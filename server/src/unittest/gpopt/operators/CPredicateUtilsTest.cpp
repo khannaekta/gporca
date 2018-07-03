@@ -75,7 +75,7 @@ CPredicateUtilsTest::EresUnittest_Conjunctions()
 					);
 
 	// build conjunction
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	const ULONG ulConjs = 3;
 	for (ULONG ul = 0; ul < ulConjs; ul++)
 	{
@@ -84,7 +84,7 @@ CPredicateUtilsTest::EresUnittest_Conjunctions()
 	CExpression *pexprConjunction = CUtils::PexprScalarBoolOp(memory_pool, CScalarBoolOp::EboolopAnd, pdrgpexpr);
 	
 	// break into conjuncts
-	DrgPexpr *pdrgpexprExtract = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pexprConjunction);
+	ExpressionArray *pdrgpexprExtract = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pexprConjunction);
 	GPOS_ASSERT(pdrgpexprExtract->Size() == ulConjs);
 	
 	// collapse into single conjunct
@@ -151,7 +151,7 @@ CPredicateUtilsTest::EresUnittest_Disjunctions()
 					);
 
 	// build disjunction
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	const ULONG ulDisjs = 3;
 	for (ULONG ul = 0; ul < ulDisjs; ul++)
 	{
@@ -160,7 +160,7 @@ CPredicateUtilsTest::EresUnittest_Disjunctions()
 	CExpression *pexprDisjunction = CUtils::PexprScalarBoolOp(memory_pool, CScalarBoolOp::EboolopOr, pdrgpexpr);
 
 	// break into disjuncts
-	DrgPexpr *pdrgpexprExtract = CPredicateUtils::PdrgpexprDisjuncts(memory_pool, pexprDisjunction);
+	ExpressionArray *pdrgpexprExtract = CPredicateUtils::PdrgpexprDisjuncts(memory_pool, pexprDisjunction);
 	GPOS_ASSERT(pdrgpexprExtract->Size() == ulDisjs);
 
 	// collapse into single disjunct
@@ -215,7 +215,7 @@ CPredicateUtilsTest::EresUnittest_Disjunctions()
 
 
 	{
-		DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+		ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 		CExpression *pexprCmp3 = CUtils::PexprScalarCmp(memory_pool, pcr2, pcr1, IMDType::EcmptG);
 		CExpression *pexprCmp4 = CUtils::PexprScalarCmp(memory_pool, CUtils::PexprScalarConstInt4(memory_pool, 200 /*val*/), pcr3, IMDType::EcmptL);
 		pexprCmp1->AddRef();
@@ -272,7 +272,7 @@ CPredicateUtilsTest::EresUnittest_PlainEqualities()
 	CExpression *pexprLeft = CTestUtils::PexprLogicalGet(memory_pool);
 	CExpression *pexprRight = CTestUtils::PexprLogicalGet(memory_pool);
 
-	DrgPexpr *pdrgpexprOriginal = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprOriginal = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 
 	CColRefSet *pcrsLeft = CDrvdPropRelational::GetRelationalProperties(pexprLeft->PdpDerive())->PcrsOutput();
 	CColRefSet *pcrsRight = CDrvdPropRelational::GetRelationalProperties(pexprRight->PdpDerive())->PcrsOutput();
@@ -302,7 +302,7 @@ CPredicateUtilsTest::EresUnittest_PlainEqualities()
 
 	GPOS_ASSERT(3 == pdrgpexprOriginal->Size());
 
-	DrgPexpr *pdrgpexprResult = CPredicateUtils::PdrgpexprPlainEqualities(memory_pool, pdrgpexprOriginal);
+	ExpressionArray *pdrgpexprResult = CPredicateUtils::PdrgpexprPlainEqualities(memory_pool, pdrgpexprOriginal);
 
 	GPOS_ASSERT(1 == pdrgpexprResult->Size());
 
@@ -390,8 +390,8 @@ CPredicateUtilsTest::EresUnittest_Implication()
 		at.Os() << "Minimized join predicate:" << std::endl << *pexprMinimizedPred <<std::endl;
 	}
 
-	DrgPexpr *pdrgpexprOriginalConjuncts = CPredicateUtils::PdrgpexprConjuncts(memory_pool,  (*pexprConstraints)[2]);
-	DrgPexpr *pdrgpexprNewConjuncts = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pexprMinimizedPred);
+	ExpressionArray *pdrgpexprOriginalConjuncts = CPredicateUtils::PdrgpexprConjuncts(memory_pool,  (*pexprConstraints)[2]);
+	ExpressionArray *pdrgpexprNewConjuncts = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pexprMinimizedPred);
 
 	GPOS_ASSERT(pdrgpexprNewConjuncts->Size() < pdrgpexprOriginalConjuncts->Size());
 

@@ -39,7 +39,7 @@ CScalarArray::CScalarArray
 {
 	GPOS_ASSERT(elem_type_mdid->IsValid());
 	GPOS_ASSERT(array_type_mdid->IsValid());
-	m_pdrgPconst = GPOS_NEW(memory_pool) DrgPconst(memory_pool);
+	m_pdrgPconst = GPOS_NEW(memory_pool) ScalarConstArray(memory_pool);
 }
 
 
@@ -50,7 +50,7 @@ CScalarArray::CScalarArray
 	IMDId *elem_type_mdid,
 	IMDId *array_type_mdid,
 	BOOL is_multidimenstional,
-	DrgPconst *pdrgPconst
+	ScalarConstArray *pdrgPconst
 	)
 :
 CScalar(memory_pool),
@@ -187,7 +187,7 @@ CScalarArray::MDIdType() const
 	return m_pmdidArray;
 }
 
-DrgPconst *
+ScalarConstArray *
 CScalarArray::PdrgPconst() const
 {
 	return m_pdrgPconst;

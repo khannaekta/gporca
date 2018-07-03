@@ -6,28 +6,28 @@
 
 using namespace gpopt;
 
-DrgPcnstr *
+ConstraintArray *
 CColConstraintsHashMapper::PdrgPcnstrLookup
 	(
 		CColRef *colref
 	)
 {
-	DrgPcnstr *pdrgpcnstrCol = m_phmColConstr->Find(colref);
+	ConstraintArray *pdrgpcnstrCol = m_phmColConstr->Find(colref);
 	pdrgpcnstrCol->AddRef();
 	return pdrgpcnstrCol;
 }
 
 // mapping between columns and single column constraints in array of constraints
 static
-HMColConstr *
+ColRefToConstraintArrayMap *
 PhmcolconstrSingleColConstr
 	(
 		IMemoryPool *memory_pool,
-		DrgPcnstr *drgPcnstr
+		ConstraintArray *drgPcnstr
 	)
 {
-	CAutoRef<DrgPcnstr> arpdrgpcnstr(drgPcnstr);
-	HMColConstr *phmcolconstr = GPOS_NEW(memory_pool) HMColConstr(memory_pool);
+	CAutoRef<ConstraintArray> arpdrgpcnstr(drgPcnstr);
+	ColRefToConstraintArrayMap *phmcolconstr = GPOS_NEW(memory_pool) ColRefToConstraintArrayMap(memory_pool);
 
 	const ULONG length = arpdrgpcnstr->Size();
 
@@ -39,10 +39,10 @@ PhmcolconstrSingleColConstr
 		if (1 == pcrs->Size())
 		{
 			CColRef *colref = pcrs->PcrFirst();
-			DrgPcnstr *pcnstrMapped = phmcolconstr->Find(colref);
+			ConstraintArray *pcnstrMapped = phmcolconstr->Find(colref);
 			if (NULL == pcnstrMapped)
 			{
-				pcnstrMapped = GPOS_NEW(memory_pool) DrgPcnstr(memory_pool);
+				pcnstrMapped = GPOS_NEW(memory_pool) ConstraintArray(memory_pool);
 				phmcolconstr->Insert(colref, pcnstrMapped);
 			}
 			pcnstrChild->AddRef();
@@ -56,7 +56,7 @@ PhmcolconstrSingleColConstr
 CColConstraintsHashMapper::CColConstraintsHashMapper
 	(
 		IMemoryPool *memory_pool,
-		DrgPcnstr *pdrgpcnstr
+		ConstraintArray *pdrgpcnstr
 	) :
 	m_phmColConstr(PhmcolconstrSingleColConstr(memory_pool, pdrgpcnstr))
 {

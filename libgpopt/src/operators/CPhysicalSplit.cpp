@@ -33,8 +33,8 @@ using namespace gpopt;
 CPhysicalSplit::CPhysicalSplit
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *pdrgpcrDelete,
-	DrgPcr *pdrgpcrInsert,
+	ColRefArray *pdrgpcrDelete,
+	ColRefArray *pdrgpcrInsert,
 	CColRef *pcrCtid,
 	CColRef *pcrSegmentId,
 	CColRef *pcrAction,

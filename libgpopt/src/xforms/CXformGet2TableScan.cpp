@@ -99,7 +99,7 @@ CXformGet2TableScan::Transform
 	CTableDescriptor *ptabdesc = popGet->Ptabdesc();
 	ptabdesc->AddRef();
 	
-	DrgPcr *pdrgpcrOutput = popGet->PdrgpcrOutput();
+	ColRefArray *pdrgpcrOutput = popGet->PdrgpcrOutput();
 	GPOS_ASSERT(NULL != pdrgpcrOutput);
 
 	pdrgpcrOutput->AddRef();

@@ -46,8 +46,8 @@ using namespace gpopt;
 CPhysicalHashJoin::CPhysicalHashJoin
 	(
 	IMemoryPool *memory_pool,
-	DrgPexpr *pdrgpexprOuterKeys,
-	DrgPexpr *pdrgpexprInnerKeys
+	ExpressionArray *pdrgpexprOuterKeys,
+	ExpressionArray *pdrgpexprInnerKeys
 	)
 	:
 	CPhysicalJoin(memory_pool),
@@ -129,7 +129,7 @@ CPhysicalHashJoin::CreateHashRedistributeRequests
 	GPOS_ASSERT(NULL != m_pdrgpexprOuterKeys);
 	GPOS_ASSERT(NULL != m_pdrgpexprInnerKeys);
 
-	DrgPexpr *pdrgpexpr = NULL;
+	ExpressionArray *pdrgpexpr = NULL;
 	if (EceoRightToLeft == Eceo())
 	{
 		pdrgpexpr = m_pdrgpexprInnerKeys;
@@ -145,7 +145,7 @@ CPhysicalHashJoin::CreateHashRedistributeRequests
 	{
 		for (ULONG ul = 0; ul < ulExprs; ul++)
 		{
-			DrgPexpr *pdrgpexprCurrent = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+			ExpressionArray *pdrgpexprCurrent = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 			CExpression *pexpr = (*pdrgpexpr)[ul];
 			pexpr->AddRef();
 			pdrgpexprCurrent->Append(pexpr);
@@ -312,20 +312,20 @@ CPhysicalHashJoin::PdshashedMatching
 {
 	GPOS_ASSERT(2 > ulSourceChild);
 
-	DrgPexpr *pdrgpexprSource = m_pdrgpexprOuterKeys;
-	DrgPexpr *pdrgpexprTarget = m_pdrgpexprInnerKeys;
+	ExpressionArray *pdrgpexprSource = m_pdrgpexprOuterKeys;
+	ExpressionArray *pdrgpexprTarget = m_pdrgpexprInnerKeys;
 	if (1 == ulSourceChild)
 	{
 		pdrgpexprSource = m_pdrgpexprInnerKeys;
 		pdrgpexprTarget = m_pdrgpexprOuterKeys;
 	}
 
-	const DrgPexpr *pdrgpexprDist = pdshashed->Pdrgpexpr();
+	const ExpressionArray *pdrgpexprDist = pdshashed->Pdrgpexpr();
 	const ULONG ulDlvrdSize = pdrgpexprDist->Size();
 	const ULONG ulSourceSize = pdrgpexprSource->Size();
 
-	DrgPexpr *pdrgpexprSourceNoCast = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
-	DrgPexpr *pdrgpexprTargetNoCast = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprSourceNoCast = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexprTargetNoCast = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	for (ULONG ul = 0; ul < ulSourceSize; ul++)
 	{
 		CExpression *pexpr = CCastUtils::PexprWithoutBinaryCoercibleCasts((*pdrgpexprSource)[ul]);
@@ -338,7 +338,7 @@ CPhysicalHashJoin::PdshashedMatching
 	}
 
 	// construct an array of target key expressions matching source key expressions
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	for (ULONG ulDlvrdIdx = 0; ulDlvrdIdx < ulDlvrdSize; ulDlvrdIdx++)
 	{
 		CExpression *pexprDlvrd = CCastUtils::PexprWithoutBinaryCoercibleCasts((*pdrgpexprDist)[ulDlvrdIdx]);
@@ -522,7 +522,7 @@ CPhysicalHashJoin::PdshashedPassThru
 
 	// since incoming request is hashed, we attempt here to propagate this request to outer child
 	CColRefSet *pcrsOuterOutput = exprhdl.GetRelationalProperties(0 /*child_index*/)->PcrsOutput();
-	DrgPexpr *pdrgpexprIncomingRequest = pdshashedInput->Pdrgpexpr();
+	ExpressionArray *pdrgpexprIncomingRequest = pdshashedInput->Pdrgpexpr();
 	CColRefSet *pcrsAllUsed = CUtils::PcrsExtractColumns(memory_pool, pdrgpexprIncomingRequest);
 	BOOL fSubset = pcrsOuterOutput->ContainsAll(pcrsAllUsed);
 	BOOL fDisjoint = pcrsOuterOutput->IsDisjoint(pcrsAllUsed);
@@ -538,7 +538,7 @@ CPhysicalHashJoin::PdshashedPassThru
 	{
 		 // incoming request intersects with columns from outer child,
 		 // we restrict the request to outer child columns only, then we pass it through
-		 DrgPexpr *pdrgpexprChildRequest = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+		 ExpressionArray *pdrgpexprChildRequest = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 		 const ULONG size = pdrgpexprIncomingRequest->Size();
 		 for (ULONG ul = 0; ul < size; ul++)
 		 {

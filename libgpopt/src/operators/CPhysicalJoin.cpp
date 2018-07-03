@@ -476,8 +476,8 @@ CPhysicalJoin::FHashJoinCompatible
 	CColRefSet *pcrsUsedPredOuter = CDrvdPropScalar::GetDrvdScalarProps(pexprPredOuter->PdpDerive())->PcrsUsed();
 	CColRefSet *pcrsUsedPredInner = CDrvdPropScalar::GetDrvdScalarProps(pexprPredInner->PdpDerive())->PcrsUsed();
 
-	CColRefSet *outer_refs = CDrvdPropRelational::GetRelationalProperties(pexprOuter->Pdp(CDrvdProp::EptRelational))->PcrsOutput();
-	CColRefSet *pcrsInner = CDrvdPropRelational::GetRelationalProperties(pexprInner->Pdp(CDrvdProp::EptRelational))->PcrsOutput();
+	CColRefSet *outer_refs = CDrvdPropRelational::GetRelationalProperties(pexprOuter->Pdp(DrvdPropArray::EptRelational))->PcrsOutput();
+	CColRefSet *pcrsInner = CDrvdPropRelational::GetRelationalProperties(pexprInner->Pdp(DrvdPropArray::EptRelational))->PcrsOutput();
 
 	// make sure that each predicate child uses columns from a different join child
 	// in order to reject predicates of the form 'X Join Y on f(X.a, Y.b) = 5'
@@ -588,8 +588,8 @@ CPhysicalJoin::AddHashKeys
 		pexprInner
 #endif // GPOS_DEBUG
 	,
-	DrgPexpr *pdrgpexprOuter,	// array of outer hash keys
-	DrgPexpr *pdrgpexprInner	// array of inner hash keys
+	ExpressionArray *pdrgpexprOuter,	// array of outer hash keys
+	ExpressionArray *pdrgpexprInner	// array of inner hash keys
 	)
 {
 	GPOS_ASSERT(FHashJoinCompatible(pexprPred, pexprOuter, pexprInner));
@@ -655,8 +655,8 @@ CPhysicalJoin::FHashJoinPossible
 	(
 	IMemoryPool *memory_pool,
 	CExpression *pexpr,
-	DrgPexpr *pdrgpexprOuter,
-	DrgPexpr *pdrgpexprInner,
+	ExpressionArray *pdrgpexprOuter,
+	ExpressionArray *pdrgpexprInner,
 	CExpression **ppexprResult // output : join expression to be transformed to hash join
 	)
 {
@@ -668,7 +668,7 @@ CPhysicalJoin::FHashJoinPossible
 	GPOS_ASSERT(NULL != ppexprResult);
 
 	// introduce explicit casting, if needed
-	DrgPexpr *pdrgpexpr = CCastUtils::PdrgpexprCastEquality(memory_pool,  (*pexpr)[2]);
+	ExpressionArray *pdrgpexpr = CCastUtils::PdrgpexprCastEquality(memory_pool,  (*pexpr)[2]);
 
 	// identify hashkeys
 	ULONG ulPreds = pdrgpexpr->Size();
@@ -820,12 +820,12 @@ CPhysicalJoin::PexprJoinPredOnPartKeys
 	GPOS_ASSERT(NULL != pcrsAllowedRefs);
 
 	CExpression *pexprPred = NULL;
-	DrgPpartkeys *pdrgppartkeys = ppimSource->Pdrgppartkeys(part_idx_id);
+	PartKeysArray *pdrgppartkeys = ppimSource->Pdrgppartkeys(part_idx_id);
 	const ULONG ulKeysets = pdrgppartkeys->Size();
 	for (ULONG ulKey = 0; NULL == pexprPred && ulKey < ulKeysets; ulKey++)
 	{
 		// get partition key
-		DrgDrgPcr *pdrgpdrgpcrPartKeys = (*pdrgppartkeys)[ulKey]->Pdrgpdrgpcr();
+		ColRefArrays *pdrgpdrgpcrPartKeys = (*pdrgppartkeys)[ulKey]->Pdrgpdrgpcr();
 
 		// try to generate a request with dynamic partition selection
 		pexprPred = CPredicateUtils::PexprExtractPredicatesOnPartKeys
@@ -1148,7 +1148,7 @@ CPhysicalJoin::PppsRequiredCompute
 			{
 				// always push through required partition propagation for consumers on the
 				// outer side of the nested loop join
-				DrgPpartkeys *pdrgppartkeys = ppartinfo->PdrgppartkeysByScanId(part_idx_id);
+				PartKeysArray *pdrgppartkeys = ppartinfo->PdrgppartkeysByScanId(part_idx_id);
 				GPOS_ASSERT(NULL != pdrgppartkeys);
 				pdrgppartkeys->AddRef();
 
@@ -1167,7 +1167,7 @@ CPhysicalJoin::PppsRequiredCompute
 			{
 				// always push through required partition propagation for consumers on the
 				// inner side of the hash join
-				DrgPpartkeys *pdrgppartkeys = exprhdl.GetRelationalProperties(1 /*child_index*/)->Ppartinfo()->PdrgppartkeysByScanId(part_idx_id);
+				PartKeysArray *pdrgppartkeys = exprhdl.GetRelationalProperties(1 /*child_index*/)->Ppartinfo()->PdrgppartkeysByScanId(part_idx_id);
 				GPOS_ASSERT(NULL != pdrgppartkeys);
 				pdrgppartkeys->AddRef();
 

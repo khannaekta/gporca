@@ -28,7 +28,7 @@ using namespace gpopt;
 //		Create base container of derived properties
 //
 //---------------------------------------------------------------------------
-CDrvdProp *
+DrvdPropArray *
 CScalar::PdpCreate
 	(
 	IMemoryPool *memory_pool

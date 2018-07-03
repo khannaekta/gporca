@@ -45,10 +45,10 @@ namespace gpopt
 			ULONG m_scan_id;
 			
 			// output columns
-			DrgPcr *m_pdrgpcrOutput;
+			ColRefArray *m_pdrgpcrOutput;
 			
 			// partition keys
-			DrgDrgPcr *m_pdrgpdrgpcrPart;
+			ColRefArrays *m_pdrgpdrgpcrPart;
 
 			// secondary scan id in case of a partial scan
 			ULONG m_ulSecondaryScanId;
@@ -87,8 +87,8 @@ namespace gpopt
 				const CName *pnameAlias,
 				CTableDescriptor *ptabdesc,
 				ULONG scan_id,
-				DrgPcr *colref_array,
-				DrgDrgPcr *pdrgpdrgpcrPart,
+				ColRefArray *colref_array,
+				ColRefArrays *pdrgpdrgpcrPart,
 				ULONG ulSecondaryScanId,
 				BOOL is_partial,
 				CPartConstraint *ppartcnstr, 
@@ -109,7 +109,7 @@ namespace gpopt
 
 			// accessors
 			virtual
-			DrgPcr *PdrgpcrOutput() const
+			ColRefArray *PdrgpcrOutput() const
 			{
 				return m_pdrgpcrOutput;
 			}
@@ -144,7 +144,7 @@ namespace gpopt
 			
 			// return the partition columns
 			virtual
-			DrgDrgPcr *PdrgpdrgpcrPart() const
+			ColRefArrays *PdrgpdrgpcrPart() const
 			{
 				return m_pdrgpdrgpcrPart;
 			}

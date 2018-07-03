@@ -29,7 +29,7 @@ namespace gpopt
 		private:
 
 			// array of keys from the join's child
-			DrgPcr *m_pdrgpcrKeys;
+			ColRefArray *m_pdrgpcrKeys;
 
 			// private copy ctor
 			CPhysicalStreamAggDeduplicate(const CPhysicalStreamAggDeduplicate &);
@@ -40,10 +40,10 @@ namespace gpopt
 			CPhysicalStreamAggDeduplicate
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *colref_array,
-				DrgPcr *pdrgpcrMinimal,
+				ColRefArray *colref_array,
+				ColRefArray *pdrgpcrMinimal,
 				COperator::EGbAggType egbaggtype,
-				DrgPcr *pdrgpcrKeys,
+				ColRefArray *pdrgpcrKeys,
 				BOOL fGeneratesDuplicates,
 				BOOL fMultiStage
 				);
@@ -67,7 +67,7 @@ namespace gpopt
 			}
 
 			// array of keys from the join's child
-			DrgPcr *PdrgpcrKeys() const
+			ColRefArray *PdrgpcrKeys() const
 			{
 				return m_pdrgpcrKeys;
 			}

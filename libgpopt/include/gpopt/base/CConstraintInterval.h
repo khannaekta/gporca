@@ -27,7 +27,7 @@ namespace gpopt
 {
 
 	// range array
-	typedef CDynamicPtrArray<CRange, CleanupRelease> DrgPrng;
+	typedef CDynamicPtrArray<CRange, CleanupRelease> RangeArray;
 
 	using namespace gpos;
 	using namespace gpmd;
@@ -51,7 +51,7 @@ namespace gpopt
 			const CColRef *m_pcr;
 
 			// array of ranges
-			DrgPrng *m_pdrgprng;
+			RangeArray *m_pdrgprng;
 
 			// does the interval include the null m_bytearray_value
 			BOOL m_fIncludesNull;
@@ -64,16 +64,16 @@ namespace gpopt
 			void AddRemainingRanges
 					(
 					IMemoryPool *memory_pool,
-					DrgPrng *pdrgprngSrc,
+					RangeArray *pdrgprngSrc,
 					ULONG ulStart,
-					DrgPrng *pdrgprngDest
+					RangeArray *pdrgprngDest
 					);
 
 			// append the given range to the array or extend the last element
 			void AppendOrExtend
 					(
 					IMemoryPool *memory_pool,
-					DrgPrng *pdrgprng,
+					RangeArray *pdrgprng,
 					CRange *prange
 					);
 
@@ -85,7 +85,7 @@ namespace gpopt
 					CRange *prangeFirst,
 					CRange *prangeSecond,
 					CRange **pprangeResidual,
-					DrgPrng *pdrgprngResidual
+					RangeArray *pdrgprngResidual
 					);
 
 			// type of this interval
@@ -153,7 +153,7 @@ namespace gpopt
 
 			// creates a range like [x,x] where x is a constant
 			static
-			DrgPrng *PciRangeFromColConstCmp(IMemoryPool *memory_pool,
+			RangeArray *PciRangeFromColConstCmp(IMemoryPool *memory_pool,
 											 IMDType::ECmpType cmp_type,
 											 const CScalarConst *popScConst);
 
@@ -163,7 +163,7 @@ namespace gpopt
 		public:
 
 			// ctor
-			CConstraintInterval(IMemoryPool *memory_pool, const CColRef *colref, DrgPrng *pdrgprng, BOOL is_null);
+			CConstraintInterval(IMemoryPool *memory_pool, const CColRef *colref, RangeArray *pdrgprng, BOOL is_null);
 
 			// dtor
 			virtual
@@ -183,7 +183,7 @@ namespace gpopt
 			}
 
 			// all ranges in interval
-			DrgPrng *Pdrgprng() const
+			RangeArray *Pdrgprng() const
 			{
 				return m_pdrgprng;
 			}

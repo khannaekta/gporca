@@ -26,7 +26,7 @@ CLogicalIndexApply::CLogicalIndexApply
 CLogicalIndexApply::CLogicalIndexApply
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *pdrgpcrOuterRefs,
+	ColRefArray *pdrgpcrOuterRefs,
 	BOOL fOuterJoin
 	)
 	:
@@ -128,7 +128,7 @@ CLogicalIndexApply::PopCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcr *colref_array = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrOuterRefs, colref_mapping, must_exist);
+	ColRefArray *colref_array = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrOuterRefs, colref_mapping, must_exist);
 
 	return GPOS_NEW(memory_pool) CLogicalIndexApply(memory_pool, colref_array, m_fOuterJoin);
 }

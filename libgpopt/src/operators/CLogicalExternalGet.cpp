@@ -72,7 +72,7 @@ CLogicalExternalGet::CLogicalExternalGet
 	IMemoryPool *memory_pool,
 	const CName *pnameAlias,
 	CTableDescriptor *ptabdesc,
-	DrgPcr *pdrgpcrOutput
+	ColRefArray *pdrgpcrOutput
 	)
 	:
 	CLogicalGet(memory_pool, pnameAlias, ptabdesc, pdrgpcrOutput)
@@ -119,7 +119,7 @@ CLogicalExternalGet::PopCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcrOutput = NULL;
+	ColRefArray *pdrgpcrOutput = NULL;
 	if (must_exist)
 	{
 		pdrgpcrOutput = CUtils::PdrgpcrRemapAndCreate(memory_pool, PdrgpcrOutput(), colref_mapping);

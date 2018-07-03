@@ -95,14 +95,14 @@ CFunctionalDependencyTest::EresUnittest_Basics()
 	GPOS_ASSERT(pfdFst->Equals(pfdSnd));
 	GPOS_ASSERT(pfdFst->HashValue() == pfdSnd->HashValue());
 
-	 DrgPfd *pdrgpfd = GPOS_NEW(memory_pool) DrgPfd(memory_pool);
+	 FunctionalDependencyArray *pdrgpfd = GPOS_NEW(memory_pool) FunctionalDependencyArray(memory_pool);
 	 pfdFst->AddRef();
 	 pdrgpfd->Append(pfdFst);
 	 pfdSnd->AddRef();
 	 pdrgpfd->Append(pfdSnd);
 	 GPOS_ASSERT(CFunctionalDependency::Equals(pdrgpfd, pdrgpfd));
 
-	 DrgPcr *colref_array = CFunctionalDependency::PdrgpcrKeys(memory_pool, pdrgpfd);
+	 ColRefArray *colref_array = CFunctionalDependency::PdrgpcrKeys(memory_pool, pdrgpfd);
 	 CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
 	 pcrs->Include(colref_array);
 	 CColRefSet *pcrsKeys = CFunctionalDependency::PcrsKeys(memory_pool, pdrgpfd);

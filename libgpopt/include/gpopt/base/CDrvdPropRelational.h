@@ -47,7 +47,7 @@ namespace gpopt
 	//		of an expression.
 	//
 	//---------------------------------------------------------------------------
-	class CDrvdPropRelational : public CDrvdProp
+	class CDrvdPropRelational : public DrvdPropArray
 	{
 
 		private:
@@ -68,7 +68,7 @@ namespace gpopt
 			CKeyCollection *m_pkc;
 			
 			// functional dependencies
-			DrgPfd *m_pdrgpfd;
+			FunctionalDependencyArray *m_pdrgpfd;
 			
 			// max card
 			CMaxCard m_maxcard;
@@ -94,15 +94,15 @@ namespace gpopt
 
 			// helper for getting applicable FDs from child
 			static
-			DrgPfd *PdrgpfdChild(IMemoryPool *memory_pool, ULONG child_index, CExpressionHandle &exprhdl);
+			FunctionalDependencyArray *PdrgpfdChild(IMemoryPool *memory_pool, ULONG child_index, CExpressionHandle &exprhdl);
 
 			// helper for creating local FDs
 			static
-			DrgPfd *PdrgpfdLocal(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			FunctionalDependencyArray *PdrgpfdLocal(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
 
 			// helper for deriving FD's
 			static
-			DrgPfd *Pdrgpfd(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			FunctionalDependencyArray *Pdrgpfd(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
 
 		public:
 
@@ -154,7 +154,7 @@ namespace gpopt
 			}
 		
 			// functional dependencies
-			DrgPfd *Pdrgpfd() const
+			FunctionalDependencyArray *Pdrgpfd() const
 			{
 				return m_pdrgpfd;
 			}
@@ -203,7 +203,7 @@ namespace gpopt
 
 			// shorthand for conversion
 			static
-			CDrvdPropRelational *GetRelationalProperties(CDrvdProp *pdp);
+			CDrvdPropRelational *GetRelationalProperties(DrvdPropArray *pdp);
 
 			// check for satisfying required plan properties
 			virtual

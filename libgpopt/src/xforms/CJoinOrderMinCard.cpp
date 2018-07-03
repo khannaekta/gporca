@@ -39,8 +39,8 @@ using namespace gpopt;
 CJoinOrderMinCard::CJoinOrderMinCard
 	(
 	IMemoryPool *memory_pool,
-	DrgPexpr *pdrgpexprComponents,
-	DrgPexpr *pdrgpexprConjuncts
+	ExpressionArray *pdrgpexprComponents,
+	ExpressionArray *pdrgpexprConjuncts
 	)
 	:
 	CJoinOrder(memory_pool, pdrgpexprComponents, pdrgpexprConjuncts),
@@ -93,7 +93,7 @@ CJoinOrderMinCard::MarkUsedEdges()
 	}
 
 	CExpression *pexprScalar = (*pexpr) [pexpr->Arity() - 1];
-	DrgPexpr *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(m_memory_pool, pexprScalar);
+	ExpressionArray *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(m_memory_pool, pexprScalar);
 	const ULONG size = pdrgpexpr->Size();
 
 	for (ULONG ulEdge = 0; ulEdge < m_ulEdges; ulEdge++)

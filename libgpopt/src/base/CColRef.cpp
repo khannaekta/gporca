@@ -134,7 +134,7 @@ ULongPtrArray *
 CColRef::Pdrgpul
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array
+	ColRefArray *colref_array
 	)
 {
 	ULongPtrArray *pdrgpul = GPOS_NEW(memory_pool) ULongPtrArray(memory_pool);
@@ -159,8 +159,8 @@ CColRef::Pdrgpul
 BOOL
 CColRef::Equals
 	(
-	const DrgPcr *pdrgpcr1,
-	const DrgPcr *pdrgpcr2
+	const ColRefArray *pdrgpcr1,
+	const ColRefArray *pdrgpcr2
 	)
 {
 	if (NULL == pdrgpcr1 || NULL == pdrgpcr2)
@@ -176,8 +176,8 @@ CColRef::Equals
 BOOL
 CColRef::Equals
 	(
-	const DrgDrgPcr *pdrgdrgpcr1,
-	const DrgDrgPcr *pdrgdrgpcr2
+	const ColRefArrays *pdrgdrgpcr1,
+	const ColRefArrays *pdrgdrgpcr2
 	)
 {
 	ULONG ulLen1 = (pdrgdrgpcr1 == NULL) ? 0 : pdrgdrgpcr1->Size();

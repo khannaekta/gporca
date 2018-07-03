@@ -42,10 +42,10 @@ namespace gpopt
 			CTableDescriptor *m_ptabdesc;
 			
 			// output columns
-			DrgPcr *m_pdrgpcrOutput;
+			ColRefArray *m_pdrgpcrOutput;
 			
 			// partition keys
-			DrgDrgPcr *m_pdrgpdrgpcrPart;
+			ColRefArrays *m_pdrgpdrgpcrPart;
 
 			// distribution columns (empty for master only tables)
 			CColRefSet *m_pcrsDist;
@@ -74,7 +74,7 @@ namespace gpopt
 				IMemoryPool *memory_pool,
 				const CName *pnameAlias,
 				CTableDescriptor *ptabdesc,
-				DrgPcr *pdrgpcrOutput
+				ColRefArray *pdrgpcrOutput
 				);
 
 			// dtor
@@ -103,7 +103,7 @@ namespace gpopt
 			}
 
 			// accessors
-			DrgPcr *PdrgpcrOutput() const
+			ColRefArray *PdrgpcrOutput() const
 			{
 				return m_pdrgpcrOutput;
 			}
@@ -121,7 +121,7 @@ namespace gpopt
 			}
 			
 			// partition columns
-			DrgDrgPcr *
+			ColRefArrays *
 			PdrgpdrgpcrPartColumns() const
 			{
 				return m_pdrgpdrgpcrPart;

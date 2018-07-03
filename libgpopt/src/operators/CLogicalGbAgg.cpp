@@ -61,7 +61,7 @@ CLogicalGbAgg::CLogicalGbAgg
 CLogicalGbAgg::CLogicalGbAgg
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array,
+	ColRefArray *colref_array,
 	COperator::EGbAggType egbaggtype
 	)
 	:
@@ -97,10 +97,10 @@ CLogicalGbAgg::CLogicalGbAgg
 CLogicalGbAgg::CLogicalGbAgg
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array,
+	ColRefArray *colref_array,
 	COperator::EGbAggType egbaggtype,
 	BOOL fGeneratesDuplicates,
-	DrgPcr *pdrgpcrArgDQA
+	ColRefArray *pdrgpcrArgDQA
 	)
 	:
 	CLogicalUnary(memory_pool),
@@ -129,8 +129,8 @@ CLogicalGbAgg::CLogicalGbAgg
 CLogicalGbAgg::CLogicalGbAgg
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array,
-	DrgPcr *pdrgpcrMinimal,
+	ColRefArray *colref_array,
+	ColRefArray *pdrgpcrMinimal,
 	COperator::EGbAggType egbaggtype
 	)
 	:
@@ -168,11 +168,11 @@ CLogicalGbAgg::CLogicalGbAgg
 CLogicalGbAgg::CLogicalGbAgg
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array,
-	DrgPcr *pdrgpcrMinimal,
+	ColRefArray *colref_array,
+	ColRefArray *pdrgpcrMinimal,
 	COperator::EGbAggType egbaggtype,
 	BOOL fGeneratesDuplicates,
-	DrgPcr *pdrgpcrArgDQA
+	ColRefArray *pdrgpcrArgDQA
 	)
 	:
 	CLogicalUnary(memory_pool),
@@ -231,14 +231,14 @@ CLogicalGbAgg::PopCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcr *colref_array = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcr, colref_mapping, must_exist);
-	DrgPcr *pdrgpcrMinimal = NULL;
+	ColRefArray *colref_array = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcr, colref_mapping, must_exist);
+	ColRefArray *pdrgpcrMinimal = NULL;
 	if (NULL != m_pdrgpcrMinimal)
 	{
 		pdrgpcrMinimal = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrMinimal, colref_mapping, must_exist);
 	}
 
-	DrgPcr *pdrgpcrArgDQA = NULL;
+	ColRefArray *pdrgpcrArgDQA = NULL;
 	if (NULL != m_pdrgpcrArgDQA)
 	{
 		pdrgpcrArgDQA = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrArgDQA, colref_mapping, must_exist);
@@ -365,7 +365,7 @@ CLogicalGbAgg::PcrsStatGbAgg
 	CExpressionHandle &exprhdl,
 	CColRefSet *pcrsInput,
 	ULONG child_index,
-	DrgPcr *pdrgpcrGrp
+	ColRefArray *pdrgpcrGrp
 	)
 	const
 {
@@ -618,7 +618,7 @@ CLogicalGbAgg::PstatsDerive
 	(
 	IMemoryPool *memory_pool,
 	IStatistics *child_stats,
-	DrgPcr *pdrgpcrGroupingCols,
+	ColRefArray *pdrgpcrGroupingCols,
 	ULongPtrArray *pdrgpulComputedCols,
 	CBitSet *keys
 	)

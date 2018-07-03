@@ -31,10 +31,10 @@ namespace gpopt
 {
 	// cleanup function for arrays
 	class CExpression;	
-	typedef CDynamicPtrArray<CExpression, CleanupRelease> DrgPexpr;
+	typedef CDynamicPtrArray<CExpression, CleanupRelease> ExpressionArray;
 
 	// array of arrays of expression pointers
-	typedef CDynamicPtrArray<DrgPexpr, CleanupRelease> DrgPdrgPexpr;
+	typedef CDynamicPtrArray<ExpressionArray, CleanupRelease> ExpressionArrays;
 
 	class CGroupExpression;
 	class CDrvdPropPlan;
@@ -63,7 +63,7 @@ namespace gpopt
 			COperator *m_pop;
 			
 			// array of children
-			DrgPexpr *m_pdrgpexpr;
+			ExpressionArray *m_pdrgpexpr;
 
 			// derived relational properties
 			CDrvdPropRelational *m_pdprel;
@@ -93,12 +93,12 @@ namespace gpopt
 			ULONG m_ulOriginGrpExprId;
 
 			// set expression's derivable property
-			void SetPdp(CDrvdProp *pdp, const CDrvdProp::EPropType ept);
+			void SetPdp(DrvdPropArray *pdp, const DrvdPropArray::EPropType ept);
 
 #ifdef GPOS_DEBUG
 
 			// assert valid property derivation
-			void AssertValidPropDerivation(const CDrvdProp::EPropType ept);
+			void AssertValidPropDerivation(const DrvdPropArray::EPropType ept);
 
 			// print expression properties
 			void PrintProperties(IOstream &os, CPrintPrefix &pfx) const;
@@ -164,7 +164,7 @@ namespace gpopt
 				(
 				IMemoryPool *memory_pool,
 				COperator *pop,
-				DrgPexpr *pdrgpexpr
+				ExpressionArray *pdrgpexpr
 				);
 			
 			// ctor for n-ary expression with origin group expression
@@ -173,7 +173,7 @@ namespace gpopt
 				IMemoryPool *memory_pool,
 				COperator *pop,
 				CGroupExpression *pgexpr,
-				DrgPexpr *pdrgpexpr,
+				ExpressionArray *pdrgpexpr,
 				IStatistics *input_stats,
 				CCost cost = GPOPT_INVALID_COST
 				);
@@ -182,7 +182,7 @@ namespace gpopt
 			CExpression
 				(
 				IMemoryPool *memory_pool,
-				CDrvdProp *pdprop
+				DrvdPropArray *pdprop
 				);
 			
 			// dtor
@@ -213,7 +213,7 @@ namespace gpopt
 			}
 		
 			// accessor of children array
-			DrgPexpr *PdrgPexpr() const
+			ExpressionArray *PdrgPexpr() const
 			{
 				return m_pdrgpexpr;
 			}
@@ -231,7 +231,7 @@ namespace gpopt
 			}
 
 			// get expression's derived property given its type
-			CDrvdProp *Pdp(const CDrvdProp::EPropType ept) const;
+			DrvdPropArray *Pdp(const DrvdPropArray::EPropType ept) const;
 
 			// get derived statistics object
 			const IStatistics *Pstats() const
@@ -246,16 +246,16 @@ namespace gpopt
 			}
 
 			// get the suitable derived property type based on operator
-			CDrvdProp::EPropType Ept() const;
+			DrvdPropArray::EPropType Ept() const;
 
 			// derive properties, determine the suitable derived property type internally
-			CDrvdProp *PdpDerive(CDrvdPropCtxt *pdpctxt = NULL);
+			DrvdPropArray *PdpDerive(CDrvdPropCtxt *pdpctxt = NULL);
 
 			// derive statistics
 			IStatistics *PstatsDerive(CReqdPropRelational *prprel, StatsArray *stats_ctxt);
 
 			// reset a derived property
-			void ResetDerivedProperty(CDrvdProp::EPropType ept);
+			void ResetDerivedProperty(DrvdPropArray::EPropType ept);
 
 			// reset all derived properties
 			void ResetDerivedProperties();
@@ -318,7 +318,7 @@ namespace gpopt
 
 			// rehydrate expression from a given cost context and child expressions
 			static
-			CExpression *PexprRehydrate(IMemoryPool *memory_pool, CCostContext *pcc, DrgPexpr *pdrgpexpr, CDrvdPropCtxtPlan *pdpctxtplan);
+			CExpression *PexprRehydrate(IMemoryPool *memory_pool, CCostContext *pcc, ExpressionArray *pdrgpexpr, CDrvdPropCtxtPlan *pdpctxtplan);
 
 
 	}; // class CExpression

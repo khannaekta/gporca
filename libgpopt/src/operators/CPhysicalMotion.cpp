@@ -34,7 +34,7 @@ CPhysicalMotion::FValidContext
 	(
 	IMemoryPool *,
 	COptimizationContext *poc,
-	DrgPoc *pdrgpocChild
+	OptimizationContextArray *pdrgpocChild
 	)
 	const
 {

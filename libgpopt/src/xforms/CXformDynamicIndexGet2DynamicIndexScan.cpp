@@ -78,11 +78,11 @@ CXformDynamicIndexGet2DynamicIndexScan::Transform
 	CIndexDescriptor *pindexdesc = popIndexGet->Pindexdesc();
 	pindexdesc->AddRef();
 	
-	DrgPcr *pdrgpcrOutput = popIndexGet->PdrgpcrOutput();
+	ColRefArray *pdrgpcrOutput = popIndexGet->PdrgpcrOutput();
 	GPOS_ASSERT(NULL != pdrgpcrOutput);
 	pdrgpcrOutput->AddRef();
 	
-	DrgDrgPcr *pdrgpdrgpcrPart = popIndexGet->PdrgpdrgpcrPart();
+	ColRefArrays *pdrgpdrgpcrPart = popIndexGet->PdrgpdrgpcrPart();
 	pdrgpdrgpcrPart->AddRef();
 	
 	CPartConstraint *ppartcnstr = popIndexGet->Ppartcnstr();

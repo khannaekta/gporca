@@ -64,7 +64,7 @@ CMDRelationCtasGPDB::CMDRelationCtasGPDB(IMemoryPool *memory_pool,
 
 	m_attrno_nondrop_col_pos_map = GPOS_NEW(m_memory_pool) IntUlongHashMap(m_memory_pool);
 	m_nondrop_col_pos_array = GPOS_NEW(m_memory_pool) ULongPtrArray(m_memory_pool);
-	m_col_width_array = GPOS_NEW(memory_pool) DrgPdouble(memory_pool);
+	m_col_width_array = GPOS_NEW(memory_pool) CDoubleArray(memory_pool);
 
 	const ULONG arity = mdcol_array->Size();
 	for (ULONG ul = 0; ul < arity; ul++)

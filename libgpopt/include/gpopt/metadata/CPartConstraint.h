@@ -63,7 +63,7 @@ namespace gpopt
 			BOOL m_fUninterpreted;
 
 			// partition keys
-			DrgDrgPcr *m_pdrgpdrgpcr;
+			ColRefArrays *m_pdrgpdrgpcr;
 
 			// combined constraint
 			CConstraint *m_pcnstrCombined;
@@ -104,7 +104,7 @@ namespace gpopt
 		public:
 
 			// ctors
-			CPartConstraint(IMemoryPool *memory_pool, HMUlCnstr *phmulcnstr, CBitSet *pbsDefaultParts, BOOL is_unbounded, DrgDrgPcr *pdrgpdrgpcr);
+			CPartConstraint(IMemoryPool *memory_pool, HMUlCnstr *phmulcnstr, CBitSet *pbsDefaultParts, BOOL is_unbounded, ColRefArrays *pdrgpdrgpcr);
 			CPartConstraint(IMemoryPool *memory_pool, CConstraint *pcnstr, BOOL fDefaultPartition, BOOL is_unbounded);
 				
 			CPartConstraint(BOOL fUninterpreted);
@@ -129,7 +129,7 @@ namespace gpopt
 			}
 
 			// partition keys
-			DrgDrgPcr *Pdrgpdrgpcr() const
+			ColRefArrays *Pdrgpdrgpcr() const
 			{
 				return m_pdrgpdrgpcr;
 			}

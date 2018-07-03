@@ -500,7 +500,7 @@ CMDAccessorTest::EresUnittest_CheckConstraint()
 
 	// create the array of column reference for the table columns
 	// for the DXL to Expr translation
-	DrgPcr *colref_array = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	ColRefArray *colref_array = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 	const ULONG num_cols = pmdrel->ColumnCount() - pmdrel->SystemColumnsCount();
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
@@ -576,7 +576,7 @@ CMDAccessorTest::EresUnittest_IndexPartConstraint()
 
 	// create the array of column reference for the table columns
 	// for the DXL to Expr translation
-	DrgPcr *colref_array = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	ColRefArray *colref_array = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 	const ULONG num_cols = pmdrel->ColumnCount() - pmdrel->SystemColumnsCount();
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{

@@ -1509,7 +1509,7 @@ CHistogram::MakeUnionHistogramNormalize(IMemoryPool *memory_pool,
 	BucketArray *histogram_buckets = GPOS_NEW(memory_pool) BucketArray(memory_pool);
 
 	// number of tuples in each bucket of the resulting histogram
-	DrgPdouble *num_tuples_per_bucket = GPOS_NEW(memory_pool) DrgPdouble(memory_pool);
+	CDoubleArray *num_tuples_per_bucket = GPOS_NEW(memory_pool) CDoubleArray(memory_pool);
 
 	CDouble cumulative_num_rows(0.0);
 	while (NULL != bucket1 && NULL != bucket2)
@@ -1635,7 +1635,7 @@ CHistogram::MakeUnionHistogramNormalize(IMemoryPool *memory_pool,
 CHistogram *
 CHistogram::MakeHistogramUpdateFreq(IMemoryPool *memory_pool,
 									BucketArray *histogram_buckets,
-									DrgPdouble *dest_bucket_freqs,
+									CDoubleArray *dest_bucket_freqs,
 									CDouble *result_num_rows_output,
 									CDouble num_null_rows,
 									CDouble num_NDV_remain,
@@ -1698,7 +1698,7 @@ CHistogram::AddResidualUnionBucket(IMemoryPool *memory_pool,
 								   CDouble rows,
 								   BOOL bucket_is_residual,
 								   ULONG index,
-								   DrgPdouble *dest_bucket_freqs) const
+								   CDoubleArray *dest_bucket_freqs) const
 {
 	GPOS_ASSERT(NULL != histogram_buckets);
 	GPOS_ASSERT(NULL != dest_bucket_freqs);
@@ -1721,7 +1721,7 @@ CHistogram::AddBuckets(IMemoryPool *memory_pool,
 					   BucketArray *src_buckets,
 					   BucketArray *dest_buckets,
 					   CDouble rows,
-					   DrgPdouble *dest_bucket_freqs,
+					   CDoubleArray *dest_bucket_freqs,
 					   ULONG begin,
 					   ULONG end)
 {

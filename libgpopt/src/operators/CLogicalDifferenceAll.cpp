@@ -49,8 +49,8 @@ CLogicalDifferenceAll::CLogicalDifferenceAll
 CLogicalDifferenceAll::CLogicalDifferenceAll
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *pdrgpcrOutput,
-	DrgDrgPcr *pdrgpdrgpcrInput
+	ColRefArray *pdrgpcrOutput,
+	ColRefArrays *pdrgpdrgpcrInput
 	)
 	:
 	CLogicalSetOp(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput)
@@ -110,8 +110,8 @@ CLogicalDifferenceAll::PopCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcrOutput = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrOutput, colref_mapping, must_exist);
-	DrgDrgPcr *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(memory_pool, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
+	ColRefArray *pdrgpcrOutput = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrOutput, colref_mapping, must_exist);
+	ColRefArrays *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(memory_pool, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
 
 	return GPOS_NEW(memory_pool) CLogicalDifferenceAll(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput);
 }
@@ -157,7 +157,7 @@ CLogicalDifferenceAll::PstatsDerive
 
 	// difference all is transformed into a LASJ,
 	// we follow the same route to compute statistics
-	DrgPcrs *output_colrefsets = GPOS_NEW(memory_pool) DrgPcrs(memory_pool);
+	ColRefSetArray *output_colrefsets = GPOS_NEW(memory_pool) ColRefSetArray(memory_pool);
 	const ULONG size = m_pdrgpdrgpcrInput->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{

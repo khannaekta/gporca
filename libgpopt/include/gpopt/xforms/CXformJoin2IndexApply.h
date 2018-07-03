@@ -53,7 +53,7 @@ namespace gpopt
 				CExpression *pexprOuter,
 				CExpression *pexprInner,
 				CMDAccessor *md_accessor,
-				DrgPexpr *pdrgpexprConjuncts,
+				ExpressionArray *pdrgpexprConjuncts,
 				CColRefSet *pcrsScalarExpr,
 				CColRefSet *outer_refs,
 				CColRefSet *pcrsReqd,
@@ -99,7 +99,7 @@ namespace gpopt
 					CExpression *pexprScalar,
 					CColRefSet *outer_refs,
 					CLogicalDynamicGet *popDynamicGet,
-					DrgPpartdig *pdrgppartdig,
+					PartDynamicIndexGetInfoArray *pdrgppartdig,
 					const IMDRelation *pmdrel,
 					CXformResult *pxfres
 					) const;
@@ -113,10 +113,10 @@ namespace gpopt
 				CLogicalDynamicGet *popDynamicGet,
 				ULONG ulCTEId,
 				CExpression *pexprScalar,
-				DrgPcr *pdrgpcrDynamicGet,
+				ColRefArray *pdrgpcrDynamicGet,
 				CPartConstraint *ppartcnstr,
-				DrgPcr *pdrgpcrOuter,
-				DrgPcr *pdrgpcrOuterNew
+				ColRefArray *pdrgpcrOuter,
+				ColRefArray *pdrgpcrOuterNew
 				) const;
 
 			// create an index apply with a CTE consumer on the outer branch
@@ -126,18 +126,18 @@ namespace gpopt
 				IMemoryPool *memory_pool,
 				ULONG ulOriginOpId,
 				CLogicalDynamicGet *popDynamicGet,
-				DrgPexpr *pdrgpexprIndex,
-				DrgPexpr *pdrgpexprResidual,
-				DrgPcr *pdrgpcrIndexGet,
+				ExpressionArray *pdrgpexprIndex,
+				ExpressionArray *pdrgpexprResidual,
+				ColRefArray *pdrgpcrIndexGet,
 				const IMDIndex *pmdindex,
 				const IMDRelation *pmdrel,
 				BOOL fFirst,
 				ULONG ulCTEId,
 				CPartConstraint *ppartcnstr,
 				CColRefSet *outer_refs,
-				DrgPcr *pdrgpcrOuter,
-				DrgPcr *pdrgpcrOuterNew,
-				DrgPcr *pdrgpcrOuterRefsInScan,
+				ColRefArray *pdrgpcrOuter,
+				ColRefArray *pdrgpcrOuterNew,
+				ColRefArray *pdrgpcrOuterRefsInScan,
 				ULongPtrArray *pdrgpulIndexesOfRefsInScan
 				) const;
 
@@ -145,8 +145,8 @@ namespace gpopt
 			CExpression *PexprConstructUnionAll
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *pdrgpcrLeftSchema,
-				DrgPcr *pdrgpcrRightSchema,
+				ColRefArray *pdrgpcrLeftSchema,
+				ColRefArray *pdrgpcrRightSchema,
 				CExpression *pexprLeftChild,
 				CExpression *pexprRightChild,
 				ULONG scan_id
@@ -223,7 +223,7 @@ namespace gpopt
 			CLogicalApply *PopLogicalApply
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *pdrgpcrOuterRefs
+				ColRefArray *pdrgpcrOuterRefs
 				) const = 0;
 
 		public:

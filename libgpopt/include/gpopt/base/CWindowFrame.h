@@ -24,7 +24,7 @@ namespace gpopt
 {
 	// type definition of corresponding dynamic pointer array
 	class CWindowFrame;
-	typedef CDynamicPtrArray<CWindowFrame, CleanupRelease> DrgPwf;
+	typedef CDynamicPtrArray<CWindowFrame, CleanupRelease> WindowFrameArray;
 
 	using namespace gpos;
 
@@ -186,15 +186,15 @@ namespace gpopt
 
 			// matching function over frame arrays
 			static
-			BOOL Equals(const DrgPwf *pdrgpwfFirst, const DrgPwf *pdrgpwfSecond);
+			BOOL Equals(const WindowFrameArray *pdrgpwfFirst, const WindowFrameArray *pdrgpwfSecond);
 
 			// combine hash values of a maximum number of entries
 			static
-			ULONG HashValue(const DrgPwf *pdrgpwfFirst, ULONG ulMaxSize);
+			ULONG HashValue(const WindowFrameArray *pdrgpwfFirst, ULONG ulMaxSize);
 
 			// print array of window frame objects
 			static
-			IOstream &OsPrint(IOstream &os, const DrgPwf *pdrgpwf);
+			IOstream &OsPrint(IOstream &os, const WindowFrameArray *pdrgpwf);
 
 			// check if a given window frame is empty
 			static

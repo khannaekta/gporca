@@ -70,17 +70,17 @@ namespace gpopt
 			CColRefSet *m_pcrsLocalUsed;
 
 			// output column generation given a list of column descriptors
-			DrgPcr *PdrgpcrCreateMapping
+			ColRefArray *PdrgpcrCreateMapping
 					(
 					IMemoryPool *memory_pool,
-					const DrgPcoldesc *pdrgpcoldesc,
+					const ColumnDescrArray *pdrgpcoldesc,
 					ULONG ulOpSourceId
 					)
 					const;
 
 			// initialize the array of partition columns
-			DrgDrgPcr *
-			PdrgpdrgpcrCreatePartCols(IMemoryPool *memory_pool, DrgPcr *colref_array, const ULongPtrArray *pdrgpulPart);
+			ColRefArrays *
+			PdrgpdrgpcrCreatePartCols(IMemoryPool *memory_pool, ColRefArray *colref_array, const ULongPtrArray *pdrgpulPart);
 
 			// derive dummy statistics
 			IStatistics *PstatsDeriveDummy(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CDouble rows) const;
@@ -130,7 +130,7 @@ namespace gpopt
 				
 			// helper function for computing the keys in a base relation
 			static
-			CKeyCollection *PkcKeysBaseTable(IMemoryPool *memory_pool, const DrgPbs *pdrgpbsKeys, const DrgPcr *pdrgpcrOutput);
+			CKeyCollection *PkcKeysBaseTable(IMemoryPool *memory_pool, const BitSetArray *pdrgpbsKeys, const ColRefArray *pdrgpcrOutput);
 			
 			// helper for the common case of passing through partition consumer info
 			static
@@ -142,7 +142,7 @@ namespace gpopt
 
 			// derive constraint property from a table/index get
 			static
-			CPropConstraint *PpcDeriveConstraintFromTable(IMemoryPool *memory_pool, const CTableDescriptor *ptabdesc, const DrgPcr *pdrgpcrOutput);
+			CPropConstraint *PpcDeriveConstraintFromTable(IMemoryPool *memory_pool, const CTableDescriptor *ptabdesc, const ColRefArray *pdrgpcrOutput);
 
 			// derive constraint property from a table/index get with predicates
 			static
@@ -151,7 +151,7 @@ namespace gpopt
 							IMemoryPool *memory_pool,
 							CExpressionHandle &exprhdl,
 							const CTableDescriptor *ptabdesc,
-							const DrgPcr *pdrgpcrOutput
+							const ColRefArray *pdrgpcrOutput
 							);
 
 			// shorthand to addref and pass through constraint from a given child
@@ -176,7 +176,7 @@ namespace gpopt
 				(
 				IMemoryPool *memory_pool,
 				const IMDIndex *pmdindex,
-				DrgPcr *colref_array,
+				ColRefArray *colref_array,
 				const CTableDescriptor *ptabdesc
 				);
 
@@ -218,7 +218,7 @@ namespace gpopt
 
 			// create derived properties container
 			virtual
-			CDrvdProp *PdpCreate(IMemoryPool *memory_pool) const;
+			DrvdPropArray *PdpCreate(IMemoryPool *memory_pool) const;
 
 			// derive output columns
 			virtual
@@ -367,7 +367,7 @@ namespace gpopt
 			
 			// extract the output columns descriptor from a logical get or dynamic get operator
 			static
-			DrgPcr *PdrgpcrOutputFromLogicalGet(CLogical *pop);
+			ColRefArray *PdrgpcrOutputFromLogicalGet(CLogical *pop);
 			
 			// extract the table name from a logical get or dynamic get operator
 			static
@@ -375,7 +375,7 @@ namespace gpopt
 
 			// return the set of distribution columns
 			static
-			CColRefSet *PcrsDist(IMemoryPool *memory_pool, const CTableDescriptor *ptabdesc, const DrgPcr *colref_array);
+			CColRefSet *PcrsDist(IMemoryPool *memory_pool, const CTableDescriptor *ptabdesc, const ColRefArray *colref_array);
 
 			// derive constraint property when expression has relational children and predicates
 			static

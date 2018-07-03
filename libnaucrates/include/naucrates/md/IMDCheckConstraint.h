@@ -59,7 +59,7 @@ namespace gpmd
 		// the scalar expression of the check constraint
 		virtual CExpression *GetCheckConstraintExpr(IMemoryPool *memory_pool,
 													CMDAccessor *md_accessor,
-													DrgPcr *colref_array) const = 0;
+													ColRefArray *colref_array) const = 0;
 	};
 }  // namespace gpmd
 

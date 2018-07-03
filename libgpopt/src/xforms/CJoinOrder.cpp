@@ -213,8 +213,8 @@ CJoinOrder::SEdge::OsPrint
 CJoinOrder::CJoinOrder
 	(
 	IMemoryPool *memory_pool,
-	DrgPexpr *pdrgpexpr,
-	DrgPexpr *pdrgpexprConj
+	ExpressionArray *pdrgpexpr,
+	ExpressionArray *pdrgpexprConj
 	)
 	:
 	m_memory_pool(memory_pool),
@@ -328,7 +328,7 @@ CJoinOrder::PcompCombine
 	CBitSet *pbs = GPOS_NEW(m_memory_pool) CBitSet(m_memory_pool);
 	pbs->Union(pcompOuter->m_pbs);
 	pbs->Union(pcompInner->m_pbs);
-	DrgPexpr *pdrgpexpr = GPOS_NEW(m_memory_pool) DrgPexpr(m_memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(m_memory_pool) ExpressionArray(m_memory_pool);
 	for (ULONG ul = 0; ul < m_ulEdges; ul++)
 	{
 		SEdge *pedge = m_rgpedge[ul];

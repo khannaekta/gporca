@@ -74,7 +74,7 @@ namespace gpopt
                 CExpression *pexprResult = NULL;
 
                 TApply *popApply = TApply::PopConvert(pexprApply->Pop());
-                DrgPcr *colref_array = popApply->PdrgPcrInner();
+                ColRefArray *colref_array = popApply->PdrgPcrInner();
                 GPOS_ASSERT(NULL != colref_array);
                 GPOS_ASSERT(1 == colref_array->Size());
 
@@ -118,13 +118,13 @@ namespace gpopt
 
 			// helper function to attempt decorrelating Apply's inner child
 			static
-			BOOL FDecorrelate(IMemoryPool *memory_pool, CExpression *pexprApply, CExpression **ppexprInner, DrgPexpr **ppdrgpexpr)
+			BOOL FDecorrelate(IMemoryPool *memory_pool, CExpression *pexprApply, CExpression **ppexprInner, ExpressionArray **ppdrgpexpr)
             {
                 GPOS_ASSERT(NULL != pexprApply);
                 GPOS_ASSERT(NULL != ppexprInner);
                 GPOS_ASSERT(NULL != ppdrgpexpr);
 
-                *ppdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+                *ppdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 
                 CExpression *pexprPredicateOrig = (*pexprApply)[2];
 
@@ -173,7 +173,7 @@ namespace gpopt
                 }
 
                 IMemoryPool *memory_pool = pxfctxt->Pmp();
-                DrgPexpr *pdrgpexpr = NULL;
+                ExpressionArray *pdrgpexpr = NULL;
                 CExpression *pexprInner = NULL;
                 if (!FDecorrelate(memory_pool, pexprApply, &pexprInner, &pdrgpexpr))
                 {

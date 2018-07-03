@@ -38,10 +38,10 @@ namespace gpopt
 			CDistributionSpec *m_pds;
 
 			// order specs of child window functions
-			DrgPos *m_pdrgpos;
+			OrderSpecArray *m_pdrgpos;
 
 			// frames of child window functions
-			DrgPwf *m_pdrgpwf;
+			WindowFrameArray *m_pdrgpwf;
 
 			// order spec to request from child
 			COrderSpec *m_pos;
@@ -65,8 +65,8 @@ namespace gpopt
 				(
 				IMemoryPool *memory_pool,
 				CDistributionSpec *pds,
-				DrgPos *pdrgpos,
-				DrgPwf *pdrgpwf
+				OrderSpecArray *pdrgpos,
+				WindowFrameArray *pdrgpwf
 				);
 
 			// dtor
@@ -94,13 +94,13 @@ namespace gpopt
 			}
 
 			// order by keys
-			DrgPos *Pdrgpos() const
+			OrderSpecArray *Pdrgpos() const
 			{
 				return m_pdrgpos;
 			}
 
 			// frame specifications
-			DrgPwf *Pdrgpwf() const
+			WindowFrameArray *Pdrgpwf() const
 			{
 				return m_pdrgpwf;
 			}

@@ -37,7 +37,7 @@ namespace gpopt
 	typedef  COptimizationContext * OPTCTXT_PTR;
 
 	// array of optimization contexts
-	typedef CDynamicPtrArray<COptimizationContext, CleanupRelease> DrgPoc;
+	typedef CDynamicPtrArray<COptimizationContext, CleanupRelease> OptimizationContextArray;
 
 	//---------------------------------------------------------------------------
 	//	@class:
@@ -352,7 +352,7 @@ namespace gpopt
 
 			// compare array of contexts based on context ids
 			static
-			BOOL FEqualContextIds(DrgPoc *pdrgpocFst, DrgPoc *pdrgpocSnd);
+			BOOL FEqualContextIds(OptimizationContextArray *pdrgpocFst, OptimizationContextArray *pdrgpocSnd);
 
 			// compute required properties to CTE producer based on plan properties of CTE consumer
 			static

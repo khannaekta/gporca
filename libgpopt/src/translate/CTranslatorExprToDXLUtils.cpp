@@ -109,7 +109,7 @@ CTranslatorExprToDXLUtils::PdxlnPartialScanTest
 	CMDAccessor *md_accessor, 
 	CColumnFactory *col_factory,
 	const CPartConstraint *ppartcnstr,
-	DrgDrgPcr *pdrgpdrgpcrPartKeys,
+	ColRefArrays *pdrgpdrgpcrPartKeys,
 	CharPtrArray *pdrgszPartTypes
 	)
 {	
@@ -119,7 +119,7 @@ CTranslatorExprToDXLUtils::PdxlnPartialScanTest
 	for (ULONG ul = 0; ul < ulLevels; ul++)
 	{
 		CConstraint *pcnstr = ppartcnstr->Pcnstr(ul);
-		DrgDrgPcr *pdrgpdrgpcr = ppartcnstr->Pdrgpdrgpcr();
+		ColRefArrays *pdrgpdrgpcr = ppartcnstr->Pdrgpdrgpcr();
 		BOOL fRangePart = (IMDRelation::ErelpartitionRange == *(*pdrgszPartTypes)[ul]);
 		CDXLNode *pdxlnPartialScanTest = PdxlnPartialScanTest(memory_pool, md_accessor, col_factory, pcnstr, pdrgpdrgpcr, fRangePart);
 
@@ -218,7 +218,7 @@ CTranslatorExprToDXLUtils::PdxlnPartialScanTest
 	CMDAccessor *md_accessor, 
 	CColumnFactory *col_factory,
 	CConstraint *pcnstr,
-	DrgDrgPcr *pdrgpdrgpcrPartKeys,
+	ColRefArrays *pdrgpdrgpcrPartKeys,
 	BOOL fRangePart
 	)
 {
@@ -269,9 +269,9 @@ CTranslatorExprToDXLUtils::PdxlnPartialScanTestConjDisj
 	IMemoryPool *memory_pool, 
 	CMDAccessor *md_accessor, 
 	CColumnFactory *col_factory,
-	DrgPcnstr *pdrgpcnstr,
+	ConstraintArray *pdrgpcnstr,
 	BOOL fConjunction,
-	DrgDrgPcr *pdrgpdrgpcrPartKeys,
+	ColRefArrays *pdrgpdrgpcrPartKeys,
 	BOOL fRangePart
 	)
 {	
@@ -329,7 +329,7 @@ CTranslatorExprToDXLUtils::PdxlnPropagationExpressionForPartConstraints
 	CMDAccessor *md_accessor, 
 	CColumnFactory *col_factory,
 	PartCnstrMap *ppartcnstrmap,
-	DrgDrgPcr *pdrgpdrgpcrPartKeys,
+	ColRefArrays *pdrgpdrgpcrPartKeys,
 	CharPtrArray *pdrgszPartTypes
 	)
 {	
@@ -413,7 +413,7 @@ CTranslatorExprToDXLUtils::PdxlnPartialScanTestConjunction
 	CMDAccessor *md_accessor, 
 	CColumnFactory *col_factory,
 	CConstraint *pcnstr,
-	DrgDrgPcr *pdrgpdrgpcrPartKeys,
+	ColRefArrays *pdrgpdrgpcrPartKeys,
 	BOOL fRangePart
 	)
 {	
@@ -421,7 +421,7 @@ CTranslatorExprToDXLUtils::PdxlnPartialScanTestConjunction
 	
 	CConstraintConjunction *pcnstrConj = dynamic_cast<CConstraintConjunction *>(pcnstr);
 	
-	DrgPcnstr *pdrgpcnstr = pcnstrConj->Pdrgpcnstr();
+	ConstraintArray *pdrgpcnstr = pcnstrConj->Pdrgpcnstr();
 	return PdxlnPartialScanTestConjDisj(memory_pool, md_accessor, col_factory, pdrgpcnstr, true /*fConjunction*/, pdrgpdrgpcrPartKeys, fRangePart);
 }
 
@@ -441,7 +441,7 @@ CTranslatorExprToDXLUtils::PdxlnPartialScanTestDisjunction
 	CMDAccessor *md_accessor, 
 	CColumnFactory *col_factory,
 	CConstraint *pcnstr,
-	DrgDrgPcr *pdrgpdrgpcrPartKeys,
+	ColRefArrays *pdrgpdrgpcrPartKeys,
 	BOOL fRangePart
 	)
 {	
@@ -449,7 +449,7 @@ CTranslatorExprToDXLUtils::PdxlnPartialScanTestDisjunction
 	
 	CConstraintDisjunction *pcnstrDisj = dynamic_cast<CConstraintDisjunction *>(pcnstr);
 	
-	DrgPcnstr *pdrgpcnstr = pcnstrDisj->Pdrgpcnstr();
+	ConstraintArray *pdrgpcnstr = pcnstrDisj->Pdrgpcnstr();
 	return PdxlnPartialScanTestConjDisj(memory_pool, md_accessor, col_factory, pdrgpcnstr, false /*fConjunction*/, pdrgpdrgpcrPartKeys, fRangePart);
 }
 
@@ -469,7 +469,7 @@ CTranslatorExprToDXLUtils::PdxlnPartialScanTestNegation
 	CMDAccessor *md_accessor, 
 	CColumnFactory *col_factory,
 	CConstraint *pcnstr,
-	DrgDrgPcr *pdrgpdrgpcrPartKeys,
+	ColRefArrays *pdrgpdrgpcrPartKeys,
 	BOOL fRangePart
 	)
 {	
@@ -499,7 +499,7 @@ CTranslatorExprToDXLUtils::PdxlnPartialScanTestInterval
 	IMemoryPool *memory_pool, 
 	CMDAccessor *md_accessor, 
 	CConstraint *pcnstr,
-	DrgDrgPcr *pdrgpdrgpcrPartKeys,
+	ColRefArrays *pdrgpdrgpcrPartKeys,
 	BOOL fRangePart
 	)
 {	
@@ -511,7 +511,7 @@ CTranslatorExprToDXLUtils::PdxlnPartialScanTestInterval
 	IMDId *pmdidPartKeyType = pcrPartKey->RetrieveType()->MDId();
 	ULONG ulPartLevel = UlPartKeyLevel(pcrPartKey, pdrgpdrgpcrPartKeys);
 
-	DrgPrng *pdrgprng = pcnstrInterval->Pdrgprng();
+	RangeArray *pdrgprng = pcnstrInterval->Pdrgprng();
 	const ULONG ulRanges = pdrgprng->Size();
 	 
 	GPOS_ASSERT(0 < ulRanges);
@@ -546,7 +546,7 @@ ULONG
 CTranslatorExprToDXLUtils::UlPartKeyLevel
 	(
 	const CColRef *colref,
-	DrgDrgPcr *pdrgpdrgpcr
+	ColRefArrays *pdrgpdrgpcr
 	)
 {
 	GPOS_ASSERT(0 < pdrgpdrgpcr->Size() && "No partitioning keys found");
@@ -1372,7 +1372,7 @@ CTranslatorExprToDXLUtils::PdxlnProjListFromChildProjList
 	(
 	IMemoryPool *memory_pool,
 	CColumnFactory *col_factory,
-	HMCrDxln *phmcrdxln, 
+	ColRefToDXLNodeMap *phmcrdxln, 
 	const CDXLNode *pdxlnProjListChild
 	)
 {
@@ -1409,7 +1409,7 @@ CTranslatorExprToDXLUtils::PdxlnPrLPartitionSelector
 	IMemoryPool *memory_pool,
 	CMDAccessor *md_accessor,
 	CColumnFactory *col_factory,
-	HMCrDxln *phmcrdxln,
+	ColRefToDXLNodeMap *phmcrdxln,
 	BOOL fUseChildProjList,
 	CDXLNode *pdxlnPrLChild,
 	CColRef *pcrOid,
@@ -1465,7 +1465,7 @@ CTranslatorExprToDXLUtils::PdxlnPropExprPartitionSelector
 	CColumnFactory *col_factory,
 	BOOL fConditional,
 	PartCnstrMap *ppartcnstrmap,
-	DrgDrgPcr *pdrgpdrgpcrKeys,
+	ColRefArrays *pdrgpdrgpcrKeys,
 	ULONG scan_id,
 	CharPtrArray *pdrgszPartTypes
 	)
@@ -1493,7 +1493,7 @@ CTranslatorExprToDXLUtils::PdxlnProjElem
 	(
 	IMemoryPool *memory_pool,
 	CColumnFactory *col_factory,
-	HMCrDxln *phmcrdxln, 
+	ColRefToDXLNodeMap *phmcrdxln, 
 	const CDXLNode *pdxlnChildProjElem
 	)
 {
@@ -1525,7 +1525,7 @@ void
 CTranslatorExprToDXLUtils::ReplaceSubplan
 	(
 	IMemoryPool *memory_pool,
-	HMCrDxln *phmcrdxlnSubplans,  // map of col ref to subplan
+	ColRefToDXLNodeMap *phmcrdxlnSubplans,  // map of col ref to subplan
 	const CColRef *colref, // key of entry in the passed map
 	CDXLScalarProjElem *pdxlopPrEl // project element to use for creating DXL col ref to replace subplan
 	)
@@ -1566,7 +1566,7 @@ CDXLNode *
 CTranslatorExprToDXLUtils::PdxlnProjElem
 	(
 	IMemoryPool *memory_pool,
-	HMCrDxln *phmcrdxlnSubplans, // map of col ref -> subplan: can be modified by this function
+	ColRefToDXLNodeMap *phmcrdxlnSubplans, // map of col ref -> subplan: can be modified by this function
 	const CColRef *colref
 	)
 {
@@ -1607,8 +1607,8 @@ CDXLNode *
 CTranslatorExprToDXLUtils::PdxlnIdent
 	(
 	IMemoryPool *memory_pool,
-	HMCrDxln *phmcrdxlnSubplans,
-	HMCrDxln *phmcrdxlnIndexLookup,
+	ColRefToDXLNodeMap *phmcrdxlnSubplans,
+	ColRefToDXLNodeMap *phmcrdxlnIndexLookup,
 	const CColRef *colref
 	)
 {
@@ -1652,14 +1652,14 @@ CTranslatorExprToDXLUtils::PdxlnIdent
 //		Create an array of NULL datums for a given array of columns
 //
 //---------------------------------------------------------------------------
-DrgPdatum *
+IDatumArray *
 CTranslatorExprToDXLUtils::PdrgpdatumNulls
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array
+	ColRefArray *colref_array
 	)
 {
-	DrgPdatum *pdrgpdatum = GPOS_NEW(memory_pool) DrgPdatum(memory_pool);
+	IDatumArray *pdrgpdatum = GPOS_NEW(memory_pool) IDatumArray(memory_pool);
 
 	const ULONG size = colref_array->Size();
 	for (ULONG ul = 0; ul < size; ul++)
@@ -1687,7 +1687,7 @@ BOOL
 CTranslatorExprToDXLUtils::FProjectListMatch
 	(
 	CDXLNode *pdxlnPrL,
-	DrgPcr *colref_array
+	ColRefArray *colref_array
 	)
 {
 	GPOS_ASSERT(NULL != pdxlnPrL);
@@ -1726,13 +1726,13 @@ CTranslatorExprToDXLUtils::FProjectListMatch
 //		the destination array is used
 //
 //---------------------------------------------------------------------------
-DrgPcr *
+ColRefArray *
 CTranslatorExprToDXLUtils::PdrgpcrMapColumns
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *pdrgpcrInput,
+	ColRefArray *pdrgpcrInput,
 	HMCrUl *phmcrul,
-	DrgPcr *pdrgpcrMapDest
+	ColRefArray *pdrgpcrMapDest
 	)
 {
 	GPOS_ASSERT(NULL != phmcrul);
@@ -1743,7 +1743,7 @@ CTranslatorExprToDXLUtils::PdrgpcrMapColumns
 		return NULL;
 	}
 
-	DrgPcr *pdrgpcrNew = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	ColRefArray *pdrgpcrNew = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 
 	const ULONG length = pdrgpcrInput->Size();
 	for (ULONG ul = 0; ul < length; ul++)
@@ -1808,7 +1808,7 @@ CTranslatorExprToDXLUtils::PdxlnValuesScan
 	IMemoryPool *memory_pool,
 	CDXLPhysicalProperties *dxl_properties,
 	CDXLNode *pdxlnPrL,
-	DrgPdrgPdatum *pdrgpdrgdatum
+	IDatumArrays *pdrgpdrgdatum
 	)
 {
 	CDXLPhysicalValuesScan *dxl_op = GPOS_NEW(memory_pool) CDXLPhysicalValuesScan(memory_pool);
@@ -1821,7 +1821,7 @@ CTranslatorExprToDXLUtils::PdxlnValuesScan
 
 	for (ULONG ulTuplePos = 0; ulTuplePos < ulTuples; ulTuplePos++)
 	{
-		DrgPdatum *pdrgpdatum = (*pdrgpdrgdatum)[ulTuplePos];
+		IDatumArray *pdrgpdatum = (*pdrgpdrgdatum)[ulTuplePos];
 		pdrgpdatum->AddRef();
 		const ULONG num_cols = pdrgpdatum->Size();
 		CDXLScalarValuesList *values = GPOS_NEW(memory_pool) CDXLScalarValuesList(memory_pool);
@@ -1945,7 +1945,7 @@ HMCrUl *
 CTranslatorExprToDXLUtils::PhmcrulColIndex
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array
+	ColRefArray *colref_array
 	)
 {
 	HMCrUl *phmcrul = GPOS_NEW(memory_pool) HMCrUl(memory_pool);
@@ -2047,7 +2047,7 @@ CTranslatorExprToDXLUtils::SetDirectDispatchInfo
 	GPOS_ASSERT(NULL != ppc->Pcnstr());
 	
 	CDistributionSpecHashed *pdsHashed = CDistributionSpecHashed::PdsConvert(pds);
-	DrgPexpr *pdrgpexprHashed = pdsHashed->Pdrgpexpr();
+	ExpressionArray *pdrgpexprHashed = pdsHashed->Pdrgpexpr();
 	
 	CDXLDirectDispatchInfo *dxl_direct_dispatch_info = GetDXLDirectDispatchInfo(memory_pool, md_accessor, pdrgpexprHashed, ppc->Pcnstr());
 	
@@ -2071,7 +2071,7 @@ CTranslatorExprToDXLUtils::GetDXLDirectDispatchInfo
 	(
 	IMemoryPool *memory_pool, 
 	CMDAccessor *md_accessor,
-	DrgPexpr *pdrgpexprHashed, 
+	ExpressionArray *pdrgpexprHashed, 
 	CConstraint *pcnstr
 	)
 {
@@ -2316,7 +2316,7 @@ CTranslatorExprToDXLUtils::PdrgpdrgpdxldatumFromDisjPointConstraint
 	
 	CConstraintInterval *pcnstrInterval = dynamic_cast<CConstraintInterval *>(pcnstrDistrCol);
 
-	DrgPrng *pdrgprng = pcnstrInterval->Pdrgprng();
+	RangeArray *pdrgprng = pcnstrInterval->Pdrgprng();
 
 	const ULONG ulRanges = pdrgprng->Size();
 	DXLDatumArrays *pdrgpdrgpdxdatum = GPOS_NEW(memory_pool) DXLDatumArrays(memory_pool);

@@ -40,10 +40,10 @@ namespace gpopt
 				(
 				IMemoryPool *memory_pool,
 				CExpression *pexprSeqPrj,
-				DrgPexpr **ppdrgpexprDistinctAggsPrjElems,
-				DrgPexpr **ppdrgpexprOtherPrjElems,
-				DrgPos **ppdrgposOther,
-				DrgPwf **ppdrgpwfOther
+				ExpressionArray **ppdrgpexprDistinctAggsPrjElems,
+				ExpressionArray **ppdrgpexprOtherPrjElems,
+				OrderSpecArray **ppdrgposOther,
+				WindowFrameArray **ppdrgpwfOther
 				);
 
 			// split given SeqPrj expression into:
@@ -70,7 +70,7 @@ namespace gpopt
 
 			// extract grouping columns from given expression
 			static
-			DrgPcr *PdrgpcrGrpCols(CExpression *pexprJoinDQAs);
+			ColRefArray *PdrgpcrGrpCols(CExpression *pexprJoinDQAs);
 
 			// transform sequence project expression into an inner join expression
 			static

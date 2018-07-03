@@ -116,7 +116,7 @@ CTreeMapTest::CNode::CNode
 	(
 	IMemoryPool *, // memory_pool
 	ULONG *pulData,
-	DrgPnd *pdrgpnd
+	NodeArray *pdrgpnd
 	)
 	:
 	m_ulData(gpos::ulong_max),
@@ -156,7 +156,7 @@ CTreeMapTest::Pnd
 	(
 	IMemoryPool *memory_pool,
 	ULONG *pul,
-	DrgPnd *pdrgpnd,
+	NodeArray *pdrgpnd,
 	BOOL *fTestTrue
 	)
 {

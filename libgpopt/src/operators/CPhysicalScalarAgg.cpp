@@ -32,11 +32,11 @@ using namespace gpopt;
 CPhysicalScalarAgg::CPhysicalScalarAgg
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array,
-	DrgPcr *pdrgpcrMinimal,
+	ColRefArray *colref_array,
+	ColRefArray *pdrgpcrMinimal,
 	COperator::EGbAggType egbaggtype,
 	BOOL fGeneratesDuplicates,
-	DrgPcr *pdrgpcrArgDQA,
+	ColRefArray *pdrgpcrArgDQA,
 	BOOL fMultiStage
 	)
 	:

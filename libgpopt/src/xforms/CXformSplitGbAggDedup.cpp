@@ -94,18 +94,18 @@ CXformSplitGbAggDedup::Transform
 	(void) PopulateLocalGlobalProjectList(memory_pool, pexprProjectList, &pexprProjectListLocal, &pexprProjectListGlobal);
 	GPOS_ASSERT(NULL != pexprProjectListLocal && NULL != pexprProjectListLocal);
 
-	DrgPcr *colref_array = popAggDedup->Pdrgpcr();
+	ColRefArray *colref_array = popAggDedup->Pdrgpcr();
 	colref_array->AddRef();
 	colref_array->AddRef();
 
-	DrgPcr *pdrgpcrMinimal = popAggDedup->PdrgpcrMinimal();
+	ColRefArray *pdrgpcrMinimal = popAggDedup->PdrgpcrMinimal();
 	if (NULL != pdrgpcrMinimal)
 	{
 		pdrgpcrMinimal->AddRef();
 		pdrgpcrMinimal->AddRef();
 	}
 
-	DrgPcr *pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
+	ColRefArray *pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
 	pdrgpcrKeys->AddRef();
 	pdrgpcrKeys->AddRef();
 

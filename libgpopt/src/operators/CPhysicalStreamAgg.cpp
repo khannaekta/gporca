@@ -35,11 +35,11 @@ using namespace gpopt;
 CPhysicalStreamAgg::CPhysicalStreamAgg
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array,
-	DrgPcr *pdrgpcrMinimal,
+	ColRefArray *colref_array,
+	ColRefArray *pdrgpcrMinimal,
 	COperator::EGbAggType egbaggtype,
 	BOOL fGeneratesDuplicates,
-	DrgPcr *pdrgpcrArgDQA,
+	ColRefArray *pdrgpcrArgDQA,
 	BOOL fMultiStage
 	)
 	:
@@ -63,7 +63,7 @@ void
 CPhysicalStreamAgg::InitOrderSpec
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *pdrgpcrOrder
+	ColRefArray *pdrgpcrOrder
 	)
 {
 	GPOS_ASSERT(NULL != pdrgpcrOrder);
@@ -115,7 +115,7 @@ CPhysicalStreamAgg::PosCovering
 	(
 	IMemoryPool *memory_pool,
 	COrderSpec *posRequired,
-	DrgPcr *pdrgpcrGrp
+	ColRefArray *pdrgpcrGrp
 	)
 	const
 {
@@ -188,7 +188,7 @@ CPhysicalStreamAgg::PosRequiredStreamAgg
 	child_index
 #endif // GPOS_DEBUG
 	,
-	DrgPcr *pdrgpcrGrp
+	ColRefArray *pdrgpcrGrp
 	)
 	const
 {

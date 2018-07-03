@@ -33,7 +33,7 @@ namespace gpopt
 	class CReqdPropRelational;
 
 	// dynamic array for operators
-	typedef CDynamicPtrArray<COperator, CleanupRelease> DrgPop;
+	typedef CDynamicPtrArray<COperator, CleanupRelease> OperatorArray;
 
 	// hash map mapping CColRef -> CColRef
 	typedef CHashMap<CColRef, CColRef, CColRef::HashValue, CColRef::Equals,
@@ -361,7 +361,7 @@ namespace gpopt
 			
 			// create container for derived properties
 			virtual
-			CDrvdProp *PdpCreate(IMemoryPool *memory_pool) const = 0;
+			DrvdPropArray *PdpCreate(IMemoryPool *memory_pool) const = 0;
 
 			// create container for required properties
 			virtual

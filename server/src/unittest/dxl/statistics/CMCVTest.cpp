@@ -78,7 +78,7 @@ CMCVTest::EresUnittest_SortInt4MCVs()
 	CPoint *point1 = CTestUtils::PpointInt4(memory_pool, 5);
 	CPoint *point2 = CTestUtils::PpointInt4(memory_pool, 1);
 	CPoint *point3 = CTestUtils::PpointInt4(memory_pool, 10);
-	DrgPdatum *pdrgpdatumMCV = GPOS_NEW(memory_pool) DrgPdatum(memory_pool);
+	IDatumArray *pdrgpdatumMCV = GPOS_NEW(memory_pool) IDatumArray(memory_pool);
 	IDatum *datum1 = point1->GetDatum();
 	IDatum *datum2 = point2->GetDatum();
 	IDatum *datum3 = point3->GetDatum();
@@ -90,7 +90,7 @@ CMCVTest::EresUnittest_SortInt4MCVs()
 	pdrgpdatumMCV->Append(datum3);
 
 	// create corresponding frequencies
-	DrgPdouble *pdrgpdFreq = GPOS_NEW(memory_pool) DrgPdouble(memory_pool);
+	CDoubleArray *pdrgpdFreq = GPOS_NEW(memory_pool) CDoubleArray(memory_pool);
 	// in GPDB, MCVs are stored in descending frequencies
 	pdrgpdFreq->Append(GPOS_NEW(memory_pool) CDouble(0.4));
 	pdrgpdFreq->Append(GPOS_NEW(memory_pool) CDouble(0.2));

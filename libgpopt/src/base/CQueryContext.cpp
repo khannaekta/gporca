@@ -34,8 +34,8 @@ CQueryContext::CQueryContext
 	IMemoryPool *memory_pool,
 	CExpression *pexpr,
 	CReqdPropPlan *prpp,
-	DrgPcr *colref_array,
-	DrgPmdname *pdrgpmdname,
+	ColRefArray *colref_array,
+	MDNameArray *pdrgpmdname,
 	BOOL fDeriveStats
 	)
 	:
@@ -149,7 +149,7 @@ CQueryContext::SetSystemCols
 	GPOS_ASSERT(NULL == m_pdrgpcrSystemCols);
 	GPOS_ASSERT(NULL != m_pdrgpcr);
 
-	m_pdrgpcrSystemCols = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	m_pdrgpcrSystemCols = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 	const ULONG ulReqdCols = m_pdrgpcr->Size();
 	for (ULONG ul = 0; ul < ulReqdCols; ul++)
 	{
@@ -177,14 +177,14 @@ CQueryContext::PqcGenerate
 	IMemoryPool *memory_pool,
 	CExpression * pexpr,
 	ULongPtrArray *pdrgpulQueryOutputColRefId,
-	DrgPmdname *pdrgpmdname,
+	MDNameArray *pdrgpmdname,
 	BOOL fDeriveStats
 	)
 {
 	GPOS_ASSERT(NULL != pexpr && NULL != pdrgpulQueryOutputColRefId);
 
 	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
-	DrgPcr *colref_array = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+	ColRefArray *colref_array = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 
 	COptCtxt *poptctxt = COptCtxt::PoctxtFromTLS();
 	CColumnFactory *col_factory = poptctxt->Pcf();

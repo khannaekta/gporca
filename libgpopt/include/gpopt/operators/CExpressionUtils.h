@@ -49,16 +49,16 @@ namespace gpopt
 				BOOL fAnd,
 				BOOL fOr,
 				BOOL fNotChildren,
-				DrgPexpr *pdrgpexpr
+				ExpressionArray *pdrgpexpr
 				);
 
 			// append the unnested children of given expression to given array
 			static
-			void AppendChildren(IMemoryPool *memory_pool, CExpression *pexpr, DrgPexpr *pdrgpexpr);
+			void AppendChildren(IMemoryPool *memory_pool, CExpression *pexpr, ExpressionArray *pdrgpexpr);
 
 			// return an array of expression children after being unnested
 			static
-			DrgPexpr *PdrgpexprUnnestChildren(IMemoryPool *memory_pool, CExpression *pexpr);
+			ExpressionArray *PdrgpexprUnnestChildren(IMemoryPool *memory_pool, CExpression *pexpr);
 
 			// push not expression one level down the given expression
 			static

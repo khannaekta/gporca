@@ -37,10 +37,10 @@ namespace gpopt
 			INT m_type;
 
 			// old columns
-			DrgPcr *m_pdrgpcrOld;
+			ColRefArray *m_pdrgpcrOld;
 
 			// new columns
-			DrgPcr *m_pdrgpcrNew;
+			ColRefArray *m_pdrgpcrNew;
 
 			// stability
 			IMDFunction::EFuncStbl m_efs;
@@ -69,8 +69,8 @@ namespace gpopt
 				IMemoryPool *memory_pool,
 				IMDId *rel_mdid,
 				INT type,
-				DrgPcr *pdrgpcrOld,
-				DrgPcr *pdrgpcrNew
+				ColRefArray *pdrgpcrOld,
+				ColRefArray *pdrgpcrNew
 				);
 
 			// dtor
@@ -104,13 +104,13 @@ namespace gpopt
 			}
 
 			// old columns
-			DrgPcr *PdrgpcrOld() const
+			ColRefArray *PdrgpcrOld() const
 			{
 				return m_pdrgpcrOld;
 			}
 
 			// new columns
-			DrgPcr *PdrgpcrNew() const
+			ColRefArray *PdrgpcrNew() const
 			{
 				return m_pdrgpcrNew;
 			}

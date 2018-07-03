@@ -54,8 +54,8 @@ CLogicalConstTableGet::CLogicalConstTableGet
 CLogicalConstTableGet::CLogicalConstTableGet
 	(
 	IMemoryPool *memory_pool,
-	DrgPcoldesc *pdrgpcoldesc,
-	DrgPdrgPdatum *pdrgpdrgpdatum
+	ColumnDescrArray *pdrgpcoldesc,
+	IDatumArrays *pdrgpdrgpdatum
 	)
 	:
 	CLogical(memory_pool),
@@ -72,7 +72,7 @@ CLogicalConstTableGet::CLogicalConstTableGet
 #ifdef GPOS_DEBUG
 	for (ULONG ul = 0; ul < pdrgpdrgpdatum->Size(); ul++)
 	{
-		DrgPdatum *pdrgpdatum = (*pdrgpdrgpdatum)[ul];
+		IDatumArray *pdrgpdatum = (*pdrgpdrgpdatum)[ul];
 		GPOS_ASSERT(pdrgpdatum->Size() == pdrgpcoldesc->Size());
 	}
 #endif
@@ -89,8 +89,8 @@ CLogicalConstTableGet::CLogicalConstTableGet
 CLogicalConstTableGet::CLogicalConstTableGet
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *pdrgpcrOutput,
-	DrgPdrgPdatum *pdrgpdrgpdatum
+	ColRefArray *pdrgpcrOutput,
+	IDatumArrays *pdrgpdrgpdatum
 	)
 	:
 	CLogical(memory_pool),
@@ -107,7 +107,7 @@ CLogicalConstTableGet::CLogicalConstTableGet
 #ifdef GPOS_DEBUG
 	for (ULONG ul = 0; ul < pdrgpdrgpdatum->Size(); ul++)
 	{
-		DrgPdatum *pdrgpdatum = (*pdrgpdrgpdatum)[ul];
+		IDatumArray *pdrgpdatum = (*pdrgpdrgpdatum)[ul];
 		GPOS_ASSERT(pdrgpdatum->Size() == m_pdrgpcoldesc->Size());
 	}
 #endif
@@ -141,8 +141,8 @@ CLogicalConstTableGet::HashValue() const
 {
 	ULONG ulHash = gpos::CombineHashes(COperator::HashValue(),
 								gpos::CombineHashes(
-										gpos::HashPtr<DrgPcoldesc>(m_pdrgpcoldesc),
-										gpos::HashPtr<DrgPdrgPdatum>(m_pdrgpdrgpdatum)));
+										gpos::HashPtr<ColumnDescrArray>(m_pdrgpcoldesc),
+										gpos::HashPtr<IDatumArrays>(m_pdrgpdrgpdatum)));
 	ulHash = gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrOutput));
 
 	return ulHash;
@@ -192,7 +192,7 @@ CLogicalConstTableGet::PopCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcr *colref_array = NULL;
+	ColRefArray *colref_array = NULL;
 	if (must_exist)
 	{
 		colref_array = CUtils::PdrgpcrRemapAndCreate(memory_pool, m_pdrgpcrOutput, colref_mapping);
@@ -292,16 +292,16 @@ CLogicalConstTableGet::PxfsCandidates
 //		Construct column descriptors from column references
 //
 //---------------------------------------------------------------------------
-DrgPcoldesc *
+ColumnDescrArray *
 CLogicalConstTableGet::PdrgpcoldescMapping
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *colref_array
+	ColRefArray *colref_array
 	)
 	const
 {
 	GPOS_ASSERT(NULL != colref_array);
-	DrgPcoldesc *pdrgpcoldesc = GPOS_NEW(memory_pool) DrgPcoldesc(memory_pool);
+	ColumnDescrArray *pdrgpcoldesc = GPOS_NEW(memory_pool) ColumnDescrArray(memory_pool);
 
 	const ULONG length = colref_array->Size();
 	for (ULONG ul = 0; ul < length; ul++)
@@ -403,7 +403,7 @@ CLogicalConstTableGet::OsPrint
 				os << "; ";
 			}
 			os << "(";
-			DrgPdatum *pdrgpdatum = (*m_pdrgpdrgpdatum)[ulA];
+			IDatumArray *pdrgpdatum = (*m_pdrgpdrgpdatum)[ulA];
 			
 			const ULONG length = pdrgpdatum->Size();
 			for (ULONG ulB = 0; ulB < length; ulB++)

@@ -105,7 +105,7 @@ namespace gpopt
 #endif // GPOS_DEBUG
 
 			// create a conjunction of comparisons using the given columns
-			static CExpression *PexprCreateConjunction(IMemoryPool *memory_pool, DrgPcr *colref_array);
+			static CExpression *PexprCreateConjunction(IMemoryPool *memory_pool, ColRefArray *colref_array);
 
 			// Helper for preprocessing window functions with outer references
 			static

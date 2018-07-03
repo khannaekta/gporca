@@ -34,7 +34,7 @@ namespace gpopt
 		private:
 
 			// array of distribution expressions
-			DrgPexpr *m_pdrgpexpr;
+			ExpressionArray *m_pdrgpexpr;
 			
 			// are NULLS consistently distributed
 			BOOL m_fNullsColocated;
@@ -73,10 +73,10 @@ namespace gpopt
 		public:
 		
 			// ctor
-			CDistributionSpecHashed(DrgPexpr *pdrgpexpr, BOOL fNullsColocated);
+			CDistributionSpecHashed(ExpressionArray *pdrgpexpr, BOOL fNullsColocated);
 			
 			// ctor
-			CDistributionSpecHashed(DrgPexpr *pdrgpexpr, BOOL fNullsColocated, CDistributionSpecHashed *pdshashedEquiv);
+			CDistributionSpecHashed(ExpressionArray *pdrgpexpr, BOOL fNullsColocated, CDistributionSpecHashed *pdshashedEquiv);
 
 			// dtor
 			virtual 
@@ -96,7 +96,7 @@ namespace gpopt
 			}
 
 			// expression array accessor
-			DrgPexpr *Pdrgpexpr() const
+			ExpressionArray *Pdrgpexpr() const
 			{
 				return m_pdrgpexpr;
 			}
@@ -142,7 +142,7 @@ namespace gpopt
 
 			// append enforcers to dynamic array for the given plan properties
 			virtual
-			void AppendEnforcers(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CReqdPropPlan *prpp, DrgPexpr *pdrgpexpr, CExpression *pexpr);
+			void AppendEnforcers(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CReqdPropPlan *prpp, ExpressionArray *pdrgpexpr, CExpression *pexpr);
 
 			// hash function for hashed distribution spec
 			virtual
@@ -164,7 +164,7 @@ namespace gpopt
 			CDistributionSpecHashed *PdshashedMaximal
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *colref_array,
+				ColRefArray *colref_array,
 				BOOL fNullsColocated
 				);
 

@@ -134,14 +134,14 @@ CMemo::Add
 	GPOS_ASSERT(!pexprOrigin->Pop()->FPhysical() && "Physical operators do not create new groups");
 
 	// extract expression props
-	CDrvdProp *pdp = NULL;
+	DrvdPropArray *pdp = NULL;
 	if (pexprOrigin->Pop()->FScalar())
 	{
-		pdp = pexprOrigin->Pdp(CDrvdProp::EptScalar);
+		pdp = pexprOrigin->Pdp(DrvdPropArray::EptScalar);
 	}
 	else
 	{
-		pdp = pexprOrigin->Pdp(CDrvdProp::EptRelational);
+		pdp = pexprOrigin->Pdp(DrvdPropArray::EptRelational);
 	}
 	GPOS_ASSERT(NULL != pdp);
 
@@ -369,7 +369,7 @@ CMemo::PexprExtractPlan
 		return NULL;
 	}
 
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	// Get the length of groups for the best group expression
 	// i.e. given the best expression is
 	// 0: CScalarCmp (>=) [ 1 7 ]

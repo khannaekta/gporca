@@ -41,10 +41,10 @@ namespace gpopt
 			CWStringConst *m_pstr;
 			
 			// array of column descriptors: the schema of the function result
-			DrgPcoldesc *m_pdrgpcoldesc;
+			ColumnDescrArray *m_pdrgpcoldesc;
 				
 			// output columns
-			DrgPcr *m_pdrgpcrOutput;
+			ColRefArray *m_pdrgpcrOutput;
 			
 			// function stability
 			IMDFunction::EFuncStbl m_efs;
@@ -70,7 +70,7 @@ namespace gpopt
 				IMDId *mdid_func,
 				IMDId *mdid_return_type,
 				CWStringConst *str,
-				DrgPcoldesc *pdrgpcoldesc
+				ColumnDescrArray *pdrgpcoldesc
 				);
 
 			CLogicalTVF
@@ -79,8 +79,8 @@ namespace gpopt
 				IMDId *mdid_func,
 				IMDId *mdid_return_type,
 				CWStringConst *str,
-				DrgPcoldesc *pdrgpcoldesc,
-				DrgPcr *pdrgpcrOutput
+				ColumnDescrArray *pdrgpcoldesc,
+				ColRefArray *pdrgpcrOutput
 				);
 
 			// dtor
@@ -120,13 +120,13 @@ namespace gpopt
 			}
 
 			// col descr accessor
-			DrgPcoldesc *Pdrgpcoldesc() const
+			ColumnDescrArray *Pdrgpcoldesc() const
 			{
 				return m_pdrgpcoldesc;
 			}
 			
 			// accessors
-			DrgPcr *PdrgpcrOutput() const
+			ColRefArray *PdrgpcrOutput() const
 			{
 				return m_pdrgpcrOutput;
 			}
@@ -175,7 +175,7 @@ namespace gpopt
 				)
 				const
 			{
-				return GPOS_NEW(memory_pool) CPropConstraint(memory_pool, GPOS_NEW(memory_pool) DrgPcrs(memory_pool), NULL /*pcnstr*/);
+				return GPOS_NEW(memory_pool) CPropConstraint(memory_pool, GPOS_NEW(memory_pool) ColRefSetArray(memory_pool), NULL /*pcnstr*/);
 			}
 
 			// derive function properties

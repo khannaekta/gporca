@@ -111,11 +111,11 @@ namespace gpopt
 			COperator *m_pop;
 			
 			// array of child groups
-			DrgPgroup *m_pdrgpgroup;
+			GroupArray *m_pdrgpgroup;
 			
 			// sorted array of children groups for faster comparison 
 			// of order-insensitive operators
-			DrgPgroup *m_pdrgpgroupSorted;
+			GroupArray *m_pdrgpgroupSorted;
 			
 			// back pointer to group
 			CGroup *m_pgroup;
@@ -181,7 +181,7 @@ namespace gpopt
 			void SetOptimizationLevel();
 
 			// check validity of group expression
-			BOOL FValidContext(IMemoryPool *memory_pool, COptimizationContext *poc, DrgPoc *pdrgpocChild);
+			BOOL FValidContext(IMemoryPool *memory_pool, COptimizationContext *poc, OptimizationContextArray *pdrgpocChild);
 			
 			// remove cost context in hash table
 			CCostContext *PccRemove(COptimizationContext *poc, ULONG ulOptReq);
@@ -220,7 +220,7 @@ namespace gpopt
 				(
 				IMemoryPool *memory_pool,
 				COperator *pop,
-				DrgPgroup *pdrgpgroup,
+				GroupArray *pdrgpgroup,
 				CXform::EXformId exfid,
 				CGroupExpression *pgexprOrigin,
 				BOOL fIntermediate
@@ -250,10 +250,10 @@ namespace gpopt
 			void CleanupContexts();
 
 			// check if cost context already exists in group expression hash table
-			BOOL FCostContextExists(COptimizationContext *poc, DrgPoc *pdrgpoc);
+			BOOL FCostContextExists(COptimizationContext *poc, OptimizationContextArray *pdrgpoc);
 
 			// compute and store expression's cost under a given context
-			CCostContext *PccComputeCost(IMemoryPool *memory_pool, COptimizationContext *poc, ULONG ulOptReq, DrgPoc *pdrgpoc, BOOL fPruned, CCost costLowerBound);
+			CCostContext *PccComputeCost(IMemoryPool *memory_pool, COptimizationContext *poc, ULONG ulOptReq, OptimizationContextArray *pdrgpoc, BOOL fPruned, CCost costLowerBound);
 
 			// compute a cost lower bound for plans, rooted by current group expression, and satisfying the given required properties
 			CCost CostLowerBound(IMemoryPool *memory_pool, CReqdPropPlan *prppInput, CCostContext *pccChild, ULONG child_index);
@@ -377,7 +377,7 @@ namespace gpopt
 			
 			// static hash function for operator and group references
 			static
-			ULONG HashValue(COperator *pop, DrgPgroup *drgpgroup);
+			ULONG HashValue(COperator *pop, GroupArray *drgpgroup);
 			
 			// static hash function for group expression
 			static
@@ -414,7 +414,7 @@ namespace gpopt
 			// check if transition to the given state is completed
 			BOOL FTransitioned(EState estate) const;
 
-			DrgPgroup *Pdrgpgroup() const
+			GroupArray *Pdrgpgroup() const
 			{
 				return m_pdrgpgroup;
 			}
@@ -423,7 +423,7 @@ namespace gpopt
 			CCostContext *PccLookup(COptimizationContext *poc, ULONG ulOptReq);
 
 			// lookup all cost contexts matching given optimization context
-			DrgPcc *PdrgpccLookupAll(IMemoryPool *memory_pool, COptimizationContext *poc);
+			CostContextArray *PdrgpccLookupAll(IMemoryPool *memory_pool, COptimizationContext *poc);
 
 			// insert a cost context in hash table
 			CCostContext *PccInsert(CCostContext *pcc);

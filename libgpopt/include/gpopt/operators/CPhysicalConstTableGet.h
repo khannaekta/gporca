@@ -32,13 +32,13 @@ namespace gpopt
 		private:
 
 			// array of column descriptors: the schema of the const table
-			DrgPcoldesc *m_pdrgpcoldesc;
+			ColumnDescrArray *m_pdrgpcoldesc;
 		
 			// array of datum arrays
-			DrgPdrgPdatum *m_pdrgpdrgpdatum;
+			IDatumArrays *m_pdrgpdrgpdatum;
 			
 			// output columns
-			DrgPcr *m_pdrgpcrOutput;
+			ColRefArray *m_pdrgpcrOutput;
 			
 			// private copy ctor
 			CPhysicalConstTableGet(const CPhysicalConstTableGet &);
@@ -49,9 +49,9 @@ namespace gpopt
 			CPhysicalConstTableGet
 				(
 				IMemoryPool *memory_pool,
-				DrgPcoldesc *pdrgpcoldesc,
-				DrgPdrgPdatum *pdrgpdrgpconst,
-				DrgPcr *pdrgpcrOutput
+				ColumnDescrArray *pdrgpcoldesc,
+				IDatumArrays *pdrgpdrgpconst,
+				ColRefArray *pdrgpcrOutput
 				);
 
 			// dtor
@@ -72,19 +72,19 @@ namespace gpopt
 			}
 
 			// col descr accessor
-			DrgPcoldesc *Pdrgpcoldesc() const
+			ColumnDescrArray *Pdrgpcoldesc() const
 			{
 				return m_pdrgpcoldesc;
 			}
 			
 			// const table values accessor
-			DrgPdrgPdatum *Pdrgpdrgpdatum () const
+			IDatumArrays *Pdrgpdrgpdatum () const
 			{
 				return m_pdrgpdrgpdatum;
 			}
 			
 			// output columns accessors
-			DrgPcr *PdrgpcrOutput() const
+			ColRefArray *PdrgpcrOutput() const
 			{
 				return m_pdrgpcrOutput;
 			}

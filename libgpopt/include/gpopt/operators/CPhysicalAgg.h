@@ -37,7 +37,7 @@ namespace gpopt
 			CPhysicalAgg(const CPhysicalAgg &);
 			
 			// array of grouping columns
-			DrgPcr *m_pdrgpcr;
+			ColRefArray *m_pdrgpcr;
 
 			// aggregate type (local / intermediate / global)
 			COperator::EGbAggType m_egbaggtype;
@@ -52,8 +52,8 @@ namespace gpopt
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsInput,
 				ULONG child_index,
-				DrgPcr *pdrgpcrGrp,
-				DrgPcr *pdrgpcrGrpMinimal,
+				ColRefArray *pdrgpcrGrp,
+				ColRefArray *pdrgpcrGrpMinimal,
 				ULONG  ulOptReq
 				)
 				const;
@@ -61,12 +61,12 @@ namespace gpopt
 			// compute a maximal hashed distribution using the given columns,
 			// if no such distribution can be created, return a Singleton distribution
 			static
-			CDistributionSpec *PdsMaximalHashed(IMemoryPool *memory_pool, DrgPcr *colref_array);
+			CDistributionSpec *PdsMaximalHashed(IMemoryPool *memory_pool, ColRefArray *colref_array);
 
 		protected:
 
 			// array of minimal grouping columns based on FDs
-			DrgPcr *m_pdrgpcrMinimal;
+			ColRefArray *m_pdrgpcrMinimal;
 
 			// could the local / intermediate / global aggregate generate
 			// duplicate values for the same group across segments
@@ -74,7 +74,7 @@ namespace gpopt
 
 			// array of columns used in distinct qualified aggregates (DQA)
 			// used only in the case of intermediate aggregates
-			DrgPcr *m_pdrgpcrArgDQA;
+			ColRefArray *m_pdrgpcrArgDQA;
 
 			// is agg part of multi-stage aggregation
 			BOOL m_fMultiStage;
@@ -86,7 +86,7 @@ namespace gpopt
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsRequired,
 				ULONG child_index,
-				DrgPcr *pdrgpcrGrp
+				ColRefArray *pdrgpcrGrp
 				);
 
 			// compute required distribution of the n-th child
@@ -97,8 +97,8 @@ namespace gpopt
 				CDistributionSpec *pdsInput,
 				ULONG child_index,
 				ULONG  ulOptReq,
-				DrgPcr *pdrgpcgGrp,
-				DrgPcr *pdrgpcrGrpMinimal
+				ColRefArray *pdrgpcgGrp,
+				ColRefArray *pdrgpcrGrpMinimal
 				)
 				const;
 
@@ -108,11 +108,11 @@ namespace gpopt
 			CPhysicalAgg
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *colref_array,
-				DrgPcr *pdrgpcrMinimal, // FD's on grouping columns
+				ColRefArray *colref_array,
+				ColRefArray *pdrgpcrMinimal, // FD's on grouping columns
 				COperator::EGbAggType egbaggtype,
 				BOOL fGeneratesDuplicates,
-				DrgPcr *pdrgpcrArgDQA,
+				ColRefArray *pdrgpcrArgDQA,
 				BOOL fMultiStage
 				);
 
@@ -128,14 +128,14 @@ namespace gpopt
 			}
 
 			virtual
-			const DrgPcr *PdrgpcrGroupingCols() const
+			const ColRefArray *PdrgpcrGroupingCols() const
 			{
 				return m_pdrgpcr;
 			}
 
 			// array of columns used in distinct qualified aggregates (DQA)
 			virtual
-			const DrgPcr *PdrgpcrArgDQA() const
+			const ColRefArray *PdrgpcrArgDQA() const
 			{
 				return m_pdrgpcrArgDQA;
 			}

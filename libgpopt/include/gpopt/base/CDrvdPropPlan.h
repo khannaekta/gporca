@@ -43,7 +43,7 @@ namespace gpopt
 	//		rewindability, partition propagation spec and CTE map.
 	//
 	//---------------------------------------------------------------------------
-	class CDrvdPropPlan : public CDrvdProp
+	class CDrvdPropPlan : public DrvdPropArray
 	{
 
 		private:
@@ -93,7 +93,7 @@ namespace gpopt
 
 			// short hand for conversion
 			static
-			CDrvdPropPlan *Pdpplan(CDrvdProp *pdp);
+			CDrvdPropPlan *Pdpplan(DrvdPropArray *pdp);
 
 			// sort order accessor
 			COrderSpec *Pos() const

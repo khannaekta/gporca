@@ -105,7 +105,7 @@ CPhysical::UpdateOptRequests
 
 	CRefCount::SafeRelease(m_pdrgpulpOptReqsExpanded);
 	m_pdrgpulpOptReqsExpanded = NULL;
-	m_pdrgpulpOptReqsExpanded = GPOS_NEW(m_memory_pool) DrgPulp(m_memory_pool);
+	m_pdrgpulpOptReqsExpanded = GPOS_NEW(m_memory_pool) ULONGPtrArray(m_memory_pool);
 	for (ULONG ulOrder = 0; ulOrder < ulOrderRequests; ulOrder++)
 	{
 		for (ULONG ulDistr = 0; ulDistr < ulDistrRequests; ulDistr++)
@@ -171,7 +171,7 @@ CPhysical::LookupRequest
 //		Create base container of derived properties
 //
 //---------------------------------------------------------------------------
-CDrvdProp *
+DrvdPropArray *
 CPhysical::PdpCreate
 	(
 	IMemoryPool *memory_pool
@@ -279,7 +279,7 @@ CPhysical::PdsCompute
 	(
 	IMemoryPool *memory_pool,
 	const CTableDescriptor *ptabdesc,
-	DrgPcr *pdrgpcrOutput
+	ColRefArray *pdrgpcrOutput
 	)
 {
 	CDistributionSpec *pds = NULL;
@@ -296,8 +296,8 @@ CPhysical::PdsCompute
 			
 		case IMDRelation::EreldistrHash:
 		{
-			const DrgPcoldesc *pdrgpcoldesc = ptabdesc->PdrgpcoldescDist();
-			DrgPcr *colref_array = GPOS_NEW(memory_pool) DrgPcr(memory_pool);
+			const ColumnDescrArray *pdrgpcoldesc = ptabdesc->PdrgpcoldescDist();
+			ColRefArray *colref_array = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
 			
 			const ULONG size = pdrgpcoldesc->Size();
 			for (ULONG ul = 0; ul < size; ul++)
@@ -311,7 +311,7 @@ CPhysical::PdsCompute
 				colref_array->Append(colref);
 			}
 
-			DrgPexpr *pdrgpexpr = CUtils::PdrgpexprScalarIdents(memory_pool, colref_array);
+			ExpressionArray *pdrgpexpr = CUtils::PdrgpexprScalarIdents(memory_pool, colref_array);
 			colref_array->Release();
 
 			pds = GPOS_NEW(memory_pool) CDistributionSpecHashed(pdrgpexpr, true /*fNullsColocated*/);
@@ -863,7 +863,7 @@ CPhysical::PppsRequiredPushThruNAry
 		// clean up
 		pbsPartConsumer->Release();
 
-		DrgPpartkeys *pdrgppartkeys = exprhdl.GetRelationalProperties(child_index)->Ppartinfo()->PdrgppartkeysByScanId(part_idx_id);
+		PartKeysArray *pdrgppartkeys = exprhdl.GetRelationalProperties(child_index)->Ppartinfo()->PdrgppartkeysByScanId(part_idx_id);
 		GPOS_ASSERT(NULL != pdrgppartkeys);
 		pdrgppartkeys->AddRef();
 
@@ -1267,7 +1267,7 @@ CPhysical::GetSkew
 	if (CDistributionSpec::EdtHashed == pds->Edt())
 	{
 		CDistributionSpecHashed *pdshashed = CDistributionSpecHashed::PdsConvert(pds);
-		const DrgPexpr *pdrgpexpr = pdshashed->Pdrgpexpr();
+		const ExpressionArray *pdrgpexpr = pdshashed->Pdrgpexpr();
 		const ULONG size = pdrgpexpr->Size();
 		for (ULONG ul = 0; ul < size; ul++)
 		{

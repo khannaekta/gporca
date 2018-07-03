@@ -44,7 +44,7 @@ namespace gpopt
 			CTableDescriptor *m_ptabdesc;
 			
 			// output columns
-			DrgPcr *m_pdrgpcrOutput;
+			ColRefArray *m_pdrgpcrOutput;
 			
 			// distribution
 			CDistributionSpec *m_pds;
@@ -60,7 +60,7 @@ namespace gpopt
 				IMemoryPool *memory_pool,
 				ULONG part_idx_id,
 				IMDId *rel_mdid,
-				DrgDrgPcr *pdrgpdrgpcrPart,
+				ColRefArrays *pdrgpdrgpcrPart,
 				ULONG ulSecondaryPartIndexId,
 				CPartConstraint *ppartcnstr,
 				CPartConstraint *ppartcnstrRel,
@@ -85,7 +85,7 @@ namespace gpopt
 			CExpression *PexprMatchEqualitySide
 				(
 				CExpression *pexprToMatch,
-				DrgPexpr *pdrgpexpr // array of predicates to inspect
+				ExpressionArray *pdrgpexpr // array of predicates to inspect
 				);
 
 			// private copy ctor
@@ -94,7 +94,7 @@ namespace gpopt
 		public:
 		
 			// ctors
-			CPhysicalScan(IMemoryPool *memory_pool, const CName *pname, CTableDescriptor *, DrgPcr *colref_array);
+			CPhysicalScan(IMemoryPool *memory_pool, const CName *pname, CTableDescriptor *, ColRefArray *colref_array);
 
 			// dtor
 			virtual 
@@ -109,7 +109,7 @@ namespace gpopt
 		
 			// output columns
 			virtual
-			DrgPcr *PdrgpcrOutput() const
+			ColRefArray *PdrgpcrOutput() const
 			{
 				return m_pdrgpcrOutput;
 			}

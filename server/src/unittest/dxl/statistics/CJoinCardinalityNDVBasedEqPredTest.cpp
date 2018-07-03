@@ -112,7 +112,7 @@ namespace gpnaucrates
 
 		CExpression *pexprLgGet = CTestUtils::PexprLogicalGet(memory_pool);
 		CLogicalGet *popGet = CLogicalGet::PopConvert(pexprLgGet->Pop());
-		DrgPcr *colref_array = popGet->PdrgpcrOutput();
+		ColRefArray *colref_array = popGet->PdrgpcrOutput();
 
 		// use the colid available in the input xml file
 		CColRef *pcrLeft = (*colref_array)[2];
@@ -172,7 +172,7 @@ namespace gpnaucrates
 
 		CExpression *pexprLgGet = CTestUtils::PexprLogicalGet(memory_pool);
 		CLogicalGet *popGet = CLogicalGet::PopConvert(pexprLgGet->Pop());
-		DrgPcr *colref_array = popGet->PdrgpcrOutput();
+		ColRefArray *colref_array = popGet->PdrgpcrOutput();
 
 		// use the colid available in the input xml file
 		CColRef *pcrLeft1 = (*colref_array)[2];
@@ -234,7 +234,7 @@ namespace gpnaucrates
 
 		CExpression *pexprLgGet = CTestUtils::PexprLogicalGet(memory_pool);
 		CLogicalGet *popGet = CLogicalGet::PopConvert(pexprLgGet->Pop());
-		DrgPcr *colref_array = popGet->PdrgpcrOutput();
+		ColRefArray *colref_array = popGet->PdrgpcrOutput();
 
 		// use the colid available in the input xml file
 		CColRef *pcrLeft = (*colref_array)[2];

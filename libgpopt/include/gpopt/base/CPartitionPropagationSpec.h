@@ -62,7 +62,7 @@ namespace gpopt
 				(
 				IMemoryPool *memory_pool,
 				CExpression *pexprScalar,
-				DrgDrgPcr *pdrgpdrgpcrKeys,
+				ColRefArrays *pdrgpdrgpcrKeys,
 				HMUlExpr *phmulexprEqFilter,
 				HMUlExpr *phmulexprFilter,
 				CExpression **ppexprResidual
@@ -73,23 +73,23 @@ namespace gpopt
 			CExpression *PexprResidualFilter
 				(
 				IMemoryPool *memory_pool,
-				DrgPexpr *pdrgpexpr,
+				ExpressionArray *pdrgpexpr,
 				CBitSet *pbsUsed
 				);
 
 			// return an array of predicates on the given partitioning key given
 			// an array of predicates on all keys
-			DrgPexpr *PdrgpexprPredicatesOnKey
+			ExpressionArray *PdrgpexprPredicatesOnKey
 				(
 				IMemoryPool *memory_pool,
-				DrgPexpr *pdrgpexpr,
+				ExpressionArray *pdrgpexpr,
 				CColRef *colref,
 				CColRefSet *pcrsKeys,
 				CBitSet **ppbs
 				);
 
 			// return a colrefset containing all the part keys
-			CColRefSet *PcrsKeys(IMemoryPool *memory_pool, DrgDrgPcr *pdrgpdrgpcrKeys);
+			CColRefSet *PcrsKeys(IMemoryPool *memory_pool, ColRefArrays *pdrgpdrgpcrKeys);
 
 			// return the filter expression for the given Scan Id
 			CExpression *PexprFilter(IMemoryPool *memory_pool, ULONG scan_id);
@@ -117,7 +117,7 @@ namespace gpopt
 
 			// append enforcers to dynamic array for the given plan properties
 			virtual
-			void AppendEnforcers(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CReqdPropPlan *prpp, DrgPexpr *pdrgpexpr, CExpression *pexpr);
+			void AppendEnforcers(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CReqdPropPlan *prpp, ExpressionArray *pdrgpexpr, CExpression *pexpr);
 
 			// hash function
 			virtual

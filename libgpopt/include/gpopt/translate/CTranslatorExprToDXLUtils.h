@@ -87,7 +87,7 @@ namespace gpopt
 			// find the partitioning level of the given part key, given the whole
 			// array of part keys
 			static
-			ULONG UlPartKeyLevel(const CColRef *colref, DrgDrgPcr *pdrgpdrgpcr);
+			ULONG UlPartKeyLevel(const CColRef *colref, ColRefArrays *pdrgpdrgpcr);
 
 			// construct a test for a partial scan given a part constraint
 			static 
@@ -97,7 +97,7 @@ namespace gpopt
 				CMDAccessor *md_accessor, 
 				CColumnFactory *col_factory,
 				CConstraint *pcnstr,
-				DrgDrgPcr *pdrgpdrgpcrPartKeys,
+				ColRefArrays *pdrgpdrgpcrPartKeys,
 				BOOL fRangePart
 				);
 			
@@ -108,9 +108,9 @@ namespace gpopt
 				IMemoryPool *memory_pool, 
 				CMDAccessor *md_accessor, 
 				CColumnFactory *col_factory,
-				DrgPcnstr *pdrgpcnstr,
+				ConstraintArray *pdrgpcnstr,
 				BOOL fConjunction,
-				DrgDrgPcr *pdrgpdrgpcrPartKeys,
+				ColRefArrays *pdrgpdrgpcrPartKeys,
 				BOOL fRangePart
 				);
 			
@@ -122,7 +122,7 @@ namespace gpopt
 				CMDAccessor *md_accessor, 
 				CColumnFactory *col_factory,
 				CConstraint *pcnstr,
-				DrgDrgPcr *pdrgpdrgpcrPartKeys,
+				ColRefArrays *pdrgpdrgpcrPartKeys,
 				BOOL fRangePart
 				);
 			
@@ -134,7 +134,7 @@ namespace gpopt
 				CMDAccessor *md_accessor, 
 				CColumnFactory *col_factory,
 				CConstraint *pcnstr,
-				DrgDrgPcr *pdrgpdrgpcrPartKeys,
+				ColRefArrays *pdrgpdrgpcrPartKeys,
 				BOOL fRangePart
 				);
 			
@@ -146,7 +146,7 @@ namespace gpopt
 				CMDAccessor *md_accessor, 
 				CColumnFactory *col_factory,
 				CConstraint *pcnstr,
-				DrgDrgPcr *pdrgpdrgpcrPartKeys,
+				ColRefArrays *pdrgpdrgpcrPartKeys,
 				BOOL fRangePart
 				);
 			
@@ -157,7 +157,7 @@ namespace gpopt
 				IMemoryPool *memory_pool, 
 				CMDAccessor *md_accessor, 
 				CConstraint *pcnstr,
-				DrgDrgPcr *pdrgpdrgpcrPartKeys,
+				ColRefArrays *pdrgpdrgpcrPartKeys,
 				BOOL fRangePart
 				);
 
@@ -252,7 +252,7 @@ namespace gpopt
 				(
 				IMemoryPool *memory_pool, 
 				CMDAccessor *md_accessor,
-				DrgPexpr *pdrgpexprHashed, 
+				ExpressionArray *pdrgpexprHashed, 
 				CConstraint *pcnstr
 				);
 			
@@ -378,7 +378,7 @@ namespace gpopt
 				CMDAccessor *md_accessor, 
 				CColumnFactory *col_factory,
 				const CPartConstraint *ppartcnstr,
-				DrgDrgPcr *pdrgpdrgpcrPartKeys,
+				ColRefArrays *pdrgpdrgpcrPartKeys,
 				CharPtrArray *pdrgszPartTypes
 				);
 			
@@ -391,7 +391,7 @@ namespace gpopt
 				CMDAccessor *md_accessor, 
 				CColumnFactory *col_factory,
 				PartCnstrMap *ppartcnstrmap,
-				DrgDrgPcr *pdrgpdrgpcrPartKeys,
+				ColRefArrays *pdrgpdrgpcrPartKeys,
 				CharPtrArray *pdrgszPartTypes
 				);
 			
@@ -406,7 +406,7 @@ namespace gpopt
 			// check whether a project list has the same columns in the given array
 			// and in the same order
 			static
-			BOOL FProjectListMatch(CDXLNode *pdxlnPrL, DrgPcr *colref_array);
+			BOOL FProjectListMatch(CDXLNode *pdxlnPrL, ColRefArray *colref_array);
 
 			// create a project list by creating references to the columns of the given
 			// project list of the child node
@@ -415,7 +415,7 @@ namespace gpopt
 				(
 				IMemoryPool *memory_pool, 
 				CColumnFactory *col_factory, 
-				HMCrDxln *phmcrdxln, 
+				ColRefToDXLNodeMap *phmcrdxln, 
 				const CDXLNode *pdxlnProjListChild
 				);
 
@@ -426,7 +426,7 @@ namespace gpopt
 				IMemoryPool *memory_pool,
 				CMDAccessor *md_accessor,
 				CColumnFactory *col_factory,
-				HMCrDxln *phmcrdxln,
+				ColRefToDXLNodeMap *phmcrdxln,
 				BOOL fUseChildProjList,
 				CDXLNode *pdxlnPrLChild,
 				CColRef *pcrOid,
@@ -443,7 +443,7 @@ namespace gpopt
 				CColumnFactory *col_factory,
 				BOOL fConditional,
 				PartCnstrMap *ppartcnstrmap,
-				DrgDrgPcr *pdrgpdrgpcrKeys,
+				ColRefArrays *pdrgpdrgpcrKeys,
 				ULONG scan_id,
 				CharPtrArray *pdrgszPartTypes
 				);
@@ -451,27 +451,27 @@ namespace gpopt
 			// create a DXL project elem node from as a scalar identifier for the
 			// child project element node
 			static
-			CDXLNode *PdxlnProjElem(IMemoryPool *memory_pool, CColumnFactory *col_factory, HMCrDxln *phmcrdxln, const CDXLNode *pdxlnProjElemChild);
+			CDXLNode *PdxlnProjElem(IMemoryPool *memory_pool, CColumnFactory *col_factory, ColRefToDXLNodeMap *phmcrdxln, const CDXLNode *pdxlnProjElemChild);
 			
 			// create a scalar identifier node for the given column reference
 			static
-			CDXLNode *PdxlnIdent(IMemoryPool *memory_pool, HMCrDxln *phmcrdxlnSubplans, HMCrDxln *phmcrdxlnIndexLookup, const CColRef *colref);
+			CDXLNode *PdxlnIdent(IMemoryPool *memory_pool, ColRefToDXLNodeMap *phmcrdxlnSubplans, ColRefToDXLNodeMap *phmcrdxlnIndexLookup, const CColRef *colref);
 			
 			// replace subplan entry in the given map with a dxl column reference
 			static
-			void ReplaceSubplan(IMemoryPool *memory_pool, HMCrDxln *phmcrdxlnSubplans, const CColRef *colref, CDXLScalarProjElem *pdxlopPrEl);
+			void ReplaceSubplan(IMemoryPool *memory_pool, ColRefToDXLNodeMap *phmcrdxlnSubplans, const CColRef *colref, CDXLScalarProjElem *pdxlopPrEl);
 
 			// create a project elem from a given col ref
 			static
-			CDXLNode *PdxlnProjElem(IMemoryPool *memory_pool, HMCrDxln *phmcrdxlnSubplans, const CColRef *colref);
+			CDXLNode *PdxlnProjElem(IMemoryPool *memory_pool, ColRefToDXLNodeMap *phmcrdxlnSubplans, const CColRef *colref);
 
 			// construct an array of NULL datums for a given array of columns
 			static
-			DrgPdatum *PdrgpdatumNulls(IMemoryPool *memory_pool, DrgPcr *colref_array);
+			IDatumArray *PdrgpdatumNulls(IMemoryPool *memory_pool, ColRefArray *colref_array);
 
 			// map an array of columns to a new array of columns
 			static
-			DrgPcr *PdrgpcrMapColumns(IMemoryPool *memory_pool, DrgPcr *pdrgpcrInput, HMCrUl *phmcrul, DrgPcr *pdrgpcrMapDest);
+			ColRefArray *PdrgpcrMapColumns(IMemoryPool *memory_pool, ColRefArray *pdrgpcrInput, HMCrUl *phmcrul, ColRefArray *pdrgpcrMapDest);
 
 			// combine two boolean expressions using the given boolean operator
 			static
@@ -514,13 +514,13 @@ namespace gpopt
 				IMemoryPool *memory_pool,
 				CDXLPhysicalProperties *dxl_properties,
 				CDXLNode *pdxlnPrL,
-				DrgPdrgPdatum *pdrgpdrgdatum
+				IDatumArrays *pdrgpdrgdatum
 				);
 
 			// build hashmap based on a column array, where the key is the column
 			// and the m_bytearray_value is the index of that column in the array
 			static
-			HMCrUl *PhmcrulColIndex(IMemoryPool *memory_pool, DrgPcr *colref_array);
+			HMCrUl *PhmcrulColIndex(IMemoryPool *memory_pool, ColRefArray *colref_array);
 			
 			// set statistics of the operator
 			static

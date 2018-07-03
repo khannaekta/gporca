@@ -37,7 +37,7 @@ CPhysicalDML::CPhysicalDML
 	IMemoryPool *memory_pool,
 	CLogicalDML::EDMLOperator edmlop,
 	CTableDescriptor *ptabdesc,
-	DrgPcr *pdrgpcrSource,
+	ColRefArray *pdrgpcrSource,
 	CBitSet *pbsModified,
 	CColRef *pcrAction,
 	CColRef *pcrTableOid,
@@ -487,7 +487,7 @@ CPhysicalDML::PosComputeRequired
 {
 	COrderSpec *pos = GPOS_NEW(memory_pool) COrderSpec(memory_pool);
 
-	const DrgPbs *pdrgpbsKeys = ptabdesc->PdrgpbsKeys();
+	const BitSetArray *pdrgpbsKeys = ptabdesc->PdrgpbsKeys();
 	if (1 < pdrgpbsKeys->Size() && CLogicalDML::EdmlUpdate == m_edmlop)
 	{
 		// if this is an update on the target table's keys, enforce order on 

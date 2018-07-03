@@ -44,8 +44,8 @@ namespace gpopt
 			CLogicalDifferenceAll
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *pdrgpcrOutput,
-				DrgDrgPcr *pdrgpdrgpcrInput
+				ColRefArray *pdrgpcrOutput,
+				ColRefArrays *pdrgpdrgpcrInput
 				);
 
 			// dtor

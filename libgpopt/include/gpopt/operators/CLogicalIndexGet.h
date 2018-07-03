@@ -50,7 +50,7 @@ namespace gpopt
 			const CName *m_pnameAlias;
 
 			// output columns
-			DrgPcr *m_pdrgpcrOutput;
+			ColRefArray *m_pdrgpcrOutput;
 
 			// set representation of output columns
 			CColRefSet *m_pcrsOutput;
@@ -77,7 +77,7 @@ namespace gpopt
 				CTableDescriptor *ptabdesc,
 				ULONG ulOriginOpId,
 				const CName *pnameAlias,
-				DrgPcr *pdrgpcrOutput
+				ColRefArray *pdrgpcrOutput
 				);
 
 			// dtor
@@ -106,7 +106,7 @@ namespace gpopt
 			}
 
 			// array of output columns
-			DrgPcr *PdrgpcrOutput() const
+			ColRefArray *PdrgpcrOutput() const
 			{
 				return m_pdrgpcrOutput;
 			}

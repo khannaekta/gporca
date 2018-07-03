@@ -16,7 +16,7 @@ CDatumSortedSet::CDatumSortedSet
 	const IComparator *pcomp
 	)
 	:
-	DrgPdatum(memory_pool),
+	IDatumArray(memory_pool),
 	m_fIncludesNull(false)
 {
 	GPOS_ASSERT(COperator::EopScalarArray == pexprArray->Pop()->Eopid());
@@ -24,7 +24,7 @@ CDatumSortedSet::CDatumSortedSet
 	const ULONG ulArrayExprArity = CUtils::UlScalarArrayArity(pexprArray);
 	GPOS_ASSERT(0 < ulArrayExprArity);
 
-	gpos::CAutoRef<DrgPdatum> aprngdatum(GPOS_NEW(memory_pool) DrgPdatum(memory_pool));
+	gpos::CAutoRef<IDatumArray> aprngdatum(GPOS_NEW(memory_pool) IDatumArray(memory_pool));
 	for (ULONG ul = 0; ul < ulArrayExprArity; ul++)
 	{
 		CScalarConst *popScConst = CUtils::PScalarArrayConstChildAt(pexprArray, ul);

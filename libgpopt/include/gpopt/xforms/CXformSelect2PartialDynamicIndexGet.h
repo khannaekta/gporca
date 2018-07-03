@@ -49,7 +49,7 @@ namespace gpopt
 					(
 					IMemoryPool *memory_pool,
 					CExpression *pexpr,
-					DrgPpartdig *pdrgppartdig,
+					PartDynamicIndexGetInfoArray *pdrgppartdig,
 					const IMDRelation *pmdrel,
 					CXformResult *pxfres
 					)
@@ -65,7 +65,7 @@ namespace gpopt
 				IMemoryPool *memory_pool,
 				CLogicalDynamicGet *popGet,
 				CExpression *pexprScalar,
-				DrgPcr *pdrgpcrDGet,
+				ColRefArray *pdrgpcrDGet,
 				CPartConstraint *ppartcnstr
 				);
 			

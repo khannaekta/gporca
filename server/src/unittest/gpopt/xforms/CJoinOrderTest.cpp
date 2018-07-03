@@ -136,14 +136,14 @@ CJoinOrderTest::EresUnittest_ExpandMinCard()
 		exprhdl.Attach(pexprNAryJoin);
 		exprhdl.DeriveStats(memory_pool, memory_pool, NULL /*prprel*/, NULL /*stats_ctxt*/);
 
-		DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+		ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 		for (ULONG ul = 0; ul < ulRels; ul++)
 		{
 			CExpression *pexprChild = (*pexprNAryJoin)[ul];
 			pexprChild->AddRef();
 			pdrgpexpr->Append(pexprChild);
 		}
-		DrgPexpr *pdrgpexprPred = CPredicateUtils::PdrgpexprConjuncts(memory_pool, (*pexprNAryJoin)[ulRels]);
+		ExpressionArray *pdrgpexprPred = CPredicateUtils::PdrgpexprConjuncts(memory_pool, (*pexprNAryJoin)[ulRels]);
 		pdrgpexpr->AddRef();
 		pdrgpexprPred->AddRef();
 		CJoinOrderMinCard jomc(memory_pool, pdrgpexpr, pdrgpexprPred);

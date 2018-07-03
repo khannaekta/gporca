@@ -28,8 +28,8 @@ using namespace gpopt;
 CPhysicalLeftAntiSemiHashJoinNotIn::CPhysicalLeftAntiSemiHashJoinNotIn
 	(
 	IMemoryPool *memory_pool,
-	DrgPexpr *pdrgpexprOuterKeys,
-	DrgPexpr *pdrgpexprInnerKeys
+	ExpressionArray *pdrgpexprOuterKeys,
+	ExpressionArray *pdrgpexprInnerKeys
 	)
 	:
 	CPhysicalLeftAntiSemiHashJoin(memory_pool, pdrgpexprOuterKeys, pdrgpexprInnerKeys)

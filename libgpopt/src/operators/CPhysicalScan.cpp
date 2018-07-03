@@ -37,7 +37,7 @@ CPhysicalScan::CPhysicalScan
 	IMemoryPool *memory_pool,
 	const CName *pnameAlias,
 	CTableDescriptor *ptabdesc,
-	DrgPcr *pdrgpcrOutput
+	ColRefArray *pdrgpcrOutput
 	)
 	:
 	CPhysical(memory_pool),
@@ -167,7 +167,7 @@ CExpression *
 CPhysicalScan::PexprMatchEqualitySide
 	(
 	CExpression *pexprToMatch,
-	DrgPexpr *pdrgpexpr // array of predicates to inspect
+	ExpressionArray *pdrgpexpr // array of predicates to inspect
 	)
 {
 	GPOS_ASSERT(NULL != pexprToMatch);
@@ -233,11 +233,11 @@ CPhysicalScan::PdshashedDeriveWithOuterRefs
 	GPOS_ASSERT(CDistributionSpec::EdtHashed == m_pds->Edt());
 
 	CExpression *pexprIndexPred = exprhdl.PexprScalarChild(0 /*child_index*/);
-	DrgPexpr *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pexprIndexPred);
+	ExpressionArray *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pexprIndexPred);
 
-	DrgPexpr *pdrgpexprMatching = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprMatching = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	CDistributionSpecHashed *pdshashed = CDistributionSpecHashed::PdsConvert(m_pds);
-	DrgPexpr *pdrgpexprHashed = pdshashed->Pdrgpexpr();
+	ExpressionArray *pdrgpexprHashed = pdshashed->Pdrgpexpr();
 	const ULONG size = pdrgpexprHashed->Size();
 
 	BOOL fSuccess = true;
@@ -324,7 +324,7 @@ CPhysicalScan::PpimDeriveFromDynamicScan
 	IMemoryPool *memory_pool,
 	ULONG part_idx_id,
 	IMDId *rel_mdid,
-	DrgDrgPcr *pdrgpdrgpcrPart,
+	ColRefArrays *pdrgpdrgpcrPart,
 	ULONG ulSecondaryPartIndexId,
 	CPartConstraint *ppartcnstr,
 	CPartConstraint *ppartcnstrRel,
@@ -336,7 +336,7 @@ CPhysicalScan::PpimDeriveFromDynamicScan
 	
 	(void) ppartcnstrmap->Insert(GPOS_NEW(memory_pool) ULONG(ulSecondaryPartIndexId), ppartcnstr);
 
-	DrgPpartkeys *pdrgppartkeys = GPOS_NEW(memory_pool) DrgPpartkeys(memory_pool);
+	PartKeysArray *pdrgppartkeys = GPOS_NEW(memory_pool) PartKeysArray(memory_pool);
 	pdrgppartkeys->Append(GPOS_NEW(memory_pool) CPartKeys(pdrgpdrgpcrPart));
 
 	ppim->Insert(part_idx_id, ppartcnstrmap, CPartIndexMap::EpimConsumer, ulExpectedPropagators, rel_mdid, pdrgppartkeys, ppartcnstrRel);

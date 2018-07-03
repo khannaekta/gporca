@@ -110,10 +110,10 @@ CXformSimplifyLeftOuterJoin::Transform
 	GPOS_ASSERT(CUtils::FScalarConstFalse(pexprScalar));
 
 	// extract output columns of inner child
-	DrgPcr *colref_array = CDrvdPropRelational::GetRelationalProperties(pexprInner->PdpDerive())->PcrsOutput()->Pdrgpcr(memory_pool);
+	ColRefArray *colref_array = CDrvdPropRelational::GetRelationalProperties(pexprInner->PdpDerive())->PcrsOutput()->Pdrgpcr(memory_pool);
 
 	// generate empty constant table with the same columns
-	COperator *popCTG = GPOS_NEW(memory_pool) CLogicalConstTableGet(memory_pool, colref_array, GPOS_NEW(memory_pool) DrgPdrgPdatum(memory_pool));
+	COperator *popCTG = GPOS_NEW(memory_pool) CLogicalConstTableGet(memory_pool, colref_array, GPOS_NEW(memory_pool) IDatumArrays(memory_pool));
 	pexprResult =
 		GPOS_NEW(memory_pool) CExpression
 			(

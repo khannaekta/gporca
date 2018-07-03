@@ -119,7 +119,7 @@ namespace gpmd
 		ULongPtrArray *m_nondrop_col_pos_array;
 
 		// array of column widths including dropped columns
-		DrgPdouble *m_col_width_array;
+		CDoubleArray *m_col_width_array;
 
 		// private copy ctor
 		CMDRelationGPDB(const CMDRelationGPDB &);

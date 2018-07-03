@@ -37,8 +37,8 @@ CPhysicalSequenceProject::CPhysicalSequenceProject
 	(
 	IMemoryPool *memory_pool,
 	CDistributionSpec *pds,
-	DrgPos *pdrgpos,
-	DrgPwf *pdrgpwf
+	OrderSpecArray *pdrgpos,
+	WindowFrameArray *pdrgpwf
 	)
 	:
 	CPhysical(memory_pool),
@@ -83,7 +83,7 @@ CPhysicalSequenceProject::CreateOrderSpec
 	{
 		CDistributionSpecHashed *pdshashed = CDistributionSpecHashed::PdsConvert(m_pds);
 
-		const DrgPexpr *pdrgpexpr = pdshashed->Pdrgpexpr();
+		const ExpressionArray *pdrgpexpr = pdshashed->Pdrgpexpr();
 		const ULONG size = pdrgpexpr->Size();
 		for (ULONG ul = 0; ul < size; ul++)
 		{

@@ -62,7 +62,7 @@ namespace gpopt
 				(
 				IMemoryPool *memory_pool,
 				CQueryContext *pqc,
-				DrgPss *search_stage_array
+				SearchStageArray *search_stage_array
 				);
 
 			// translate an optimizer expression into a DXL tree 
@@ -72,8 +72,8 @@ namespace gpopt
 						IMemoryPool *memory_pool,
 						CMDAccessor *md_accessor,
 						CExpression *pexpr,
-						DrgPcr *colref_array,
-						DrgPmdname *pdrgpmdname,
+						ColRefArray *colref_array,
+						MDNameArray *pdrgpmdname,
 						ULONG ulHosts
 						);
 
@@ -111,7 +111,7 @@ namespace gpopt
 						ULONG ulHosts,							// number of hosts (data nodes) in the system
 						ULONG ulSessionId,						// session id used for logging and minidumps
 						ULONG ulCmdId,							// command id used for logging and minidumps
-						DrgPss *search_stage_array,						// search strategy
+						SearchStageArray *search_stage_array,						// search strategy
 						COptimizerConfig *optimizer_config,				// optimizer configurations
 						const CHAR *szMinidumpFileName = NULL	// name of minidump file to be created
 						);

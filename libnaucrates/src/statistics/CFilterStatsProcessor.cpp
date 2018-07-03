@@ -197,7 +197,7 @@ CFilterStatsProcessor::MakeHistHashMapConjFilter(IMemoryPool *memory_pool,
 	conjunctive_pred_stats->Sort();
 
 	CBitSet *filter_col_ids = GPOS_NEW(memory_pool) CBitSet(memory_pool);
-	DrgPdouble *scale_factors = GPOS_NEW(memory_pool) DrgPdouble(memory_pool);
+	CDoubleArray *scale_factors = GPOS_NEW(memory_pool) CDoubleArray(memory_pool);
 
 	// create copy of the original hash map of colid -> histogram
 	UlongHistogramHashMap *result_histograms =
@@ -359,7 +359,7 @@ CFilterStatsProcessor::MakeHistHashMapDisjFilter(IMemoryPool *memory_pool,
 	disjunctive_pred_stats->Sort();
 
 	CBitSet *filter_col_ids = GPOS_NEW(memory_pool) CBitSet(memory_pool);
-	DrgPdouble *scale_factors = GPOS_NEW(memory_pool) DrgPdouble(memory_pool);
+	CDoubleArray *scale_factors = GPOS_NEW(memory_pool) CDoubleArray(memory_pool);
 
 	UlongHistogramHashMap *disjunctive_result_histograms =
 		GPOS_NEW(memory_pool) UlongHistogramHashMap(memory_pool);

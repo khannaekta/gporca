@@ -27,7 +27,7 @@ namespace gpopt
 	class CReqdProp;
 
 	// dynamic array for required properties
-	typedef CDynamicPtrArray<CReqdProp, CleanupRelease> DrgPrp;
+	typedef CDynamicPtrArray<CReqdProp, CleanupRelease> ReqdPropArray;
 
 	//---------------------------------------------------------------------------
 	//	@class:

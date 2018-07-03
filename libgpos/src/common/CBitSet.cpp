@@ -347,10 +347,10 @@ CBitSet::Union(const CBitSet *pbsOther)
 	CBitSetLink *bsl_other = NULL;
 
 	// dynamic array of CBitSetLink
-	typedef CDynamicPtrArray<CBitSetLink, CleanupNULL> DrgBSL;
+	typedef CDynamicPtrArray<CBitSetLink, CleanupNULL> BitSetLinkArray;
 
-	CAutoRef<DrgBSL> a_drgpbsl;
-	a_drgpbsl = GPOS_NEW(m_memory_pool) DrgBSL(m_memory_pool);
+	CAutoRef<BitSetLinkArray> a_drgpbsl;
+	a_drgpbsl = GPOS_NEW(m_memory_pool) BitSetLinkArray(m_memory_pool);
 
 	// iterate through other's links and copy missing links to array
 	for (bsl_other = pbsOther->m_bsllist.First(); bsl_other != NULL;

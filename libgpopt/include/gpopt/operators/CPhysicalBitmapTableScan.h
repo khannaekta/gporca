@@ -53,7 +53,7 @@ namespace gpopt
 				CTableDescriptor *ptabdesc,
 				ULONG ulOriginOpId,
 				const CName *pnameTableAlias,
-				DrgPcr *pdrgpcrOutput
+				ColRefArray *pdrgpcrOutput
 				);
 
 			// dtor

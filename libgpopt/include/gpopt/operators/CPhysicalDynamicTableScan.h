@@ -44,8 +44,8 @@ namespace gpopt
 				CTableDescriptor *ptabdesc,
 				ULONG ulOriginOpId,
 				ULONG scan_id,
-				DrgPcr *colref_array,
-				DrgDrgPcr *pdrgpdrgpcrParts,
+				ColRefArray *colref_array,
+				ColRefArrays *pdrgpdrgpcrParts,
 				ULONG ulSecondaryScanId,
 				CPartConstraint *ppartcnstr,
 				CPartConstraint *ppartcnstrRel

@@ -31,7 +31,7 @@ namespace gpopt
 		private:
 
 			// columns from outer child used for index lookup in inner child
-			DrgPcr *m_pdrgpcrOuterRefs;
+			ColRefArray *m_pdrgpcrOuterRefs;
 
 			// private copy ctor
 			CPhysicalInnerIndexNLJoin(const CPhysicalInnerIndexNLJoin &);
@@ -39,7 +39,7 @@ namespace gpopt
 		public:
 
 			// ctor
-			CPhysicalInnerIndexNLJoin(IMemoryPool *memory_pool, DrgPcr *colref_array);
+			CPhysicalInnerIndexNLJoin(IMemoryPool *memory_pool, ColRefArray *colref_array);
 
 			// dtor
 			virtual
@@ -64,7 +64,7 @@ namespace gpopt
 			BOOL Matches(COperator *pop) const;
 
 			// outer column references accessor
-			DrgPcr *PdrgPcrOuterRefs() const
+			ColRefArray *PdrgPcrOuterRefs() const
 			{
 				return m_pdrgpcrOuterRefs;
 			}

@@ -23,10 +23,10 @@ namespace gpopt
 
 	// fwd declarations
 	class CDrvdPropCtxt;
-	class CDrvdProp;
+	class DrvdPropArray;
 
 	// dynamic array for properties
-	typedef CDynamicPtrArray<CDrvdPropCtxt, CleanupRelease> DrgPdpctxt;
+	typedef CDynamicPtrArray<CDrvdPropCtxt, CleanupRelease> DrvdPropCtxtArray;
 
 	//---------------------------------------------------------------------------
 	//	@class:
@@ -56,7 +56,7 @@ namespace gpopt
 
 			// add props to context
 			virtual
-			void AddProps(CDrvdProp *pdp) = 0;
+			void AddProps(DrvdPropArray *pdp) = 0;
 
 		public:
 
@@ -125,7 +125,7 @@ namespace gpopt
 			static
 			void AddDerivedProps
 				(
-				CDrvdProp *pdp,
+				DrvdPropArray *pdp,
 				CDrvdPropCtxt *pdpctxt
 				)
 			{

@@ -2101,8 +2101,8 @@ CDXLOperatorFactory::MakeMdIdFromStr(CDXLMemoryManager *memory_manager_dxl,
 	XMLCh *mdid_type = mdid_components.nextToken();
 
 	// collect the remaining tokens in an array
-	DrgPxmlsz *remaining_tokens =
-		GPOS_NEW(memory_manager_dxl->Pmp()) DrgPxmlsz(memory_manager_dxl->Pmp());
+	XMLChArray *remaining_tokens =
+		GPOS_NEW(memory_manager_dxl->Pmp()) XMLChArray(memory_manager_dxl->Pmp());
 
 	XMLCh *xml_val = NULL;
 	while (NULL != (xml_val = mdid_components.nextToken()))
@@ -2159,7 +2159,7 @@ CDXLOperatorFactory::MakeMdIdFromStr(CDXLMemoryManager *memory_manager_dxl,
 //---------------------------------------------------------------------------
 CMDIdGPDB *
 CDXLOperatorFactory::GetGPDBMdId(CDXLMemoryManager *memory_manager_dxl,
-								 DrgPxmlsz *remaining_tokens,
+								 XMLChArray *remaining_tokens,
 								 Edxltoken target_attr,
 								 Edxltoken target_elem)
 {
@@ -2192,7 +2192,7 @@ CDXLOperatorFactory::GetGPDBMdId(CDXLMemoryManager *memory_manager_dxl,
 //---------------------------------------------------------------------------
 CMDIdGPDB *
 CDXLOperatorFactory::GetGPDBCTASMdId(CDXLMemoryManager *memory_manager_dxl,
-									 DrgPxmlsz *remaining_tokens,
+									 XMLChArray *remaining_tokens,
 									 Edxltoken target_attr,
 									 Edxltoken target_elem)
 {
@@ -2216,7 +2216,7 @@ CDXLOperatorFactory::GetGPDBCTASMdId(CDXLMemoryManager *memory_manager_dxl,
 //---------------------------------------------------------------------------
 CMDIdColStats *
 CDXLOperatorFactory::GetColStatsMdId(CDXLMemoryManager *memory_manager_dxl,
-									 DrgPxmlsz *remaining_tokens,
+									 XMLChArray *remaining_tokens,
 									 Edxltoken target_attr,
 									 Edxltoken target_elem)
 {
@@ -2242,7 +2242,7 @@ CDXLOperatorFactory::GetColStatsMdId(CDXLMemoryManager *memory_manager_dxl,
 //---------------------------------------------------------------------------
 CMDIdRelStats *
 CDXLOperatorFactory::GetRelStatsMdId(CDXLMemoryManager *memory_manager_dxl,
-									 DrgPxmlsz *remaining_tokens,
+									 XMLChArray *remaining_tokens,
 									 Edxltoken target_attr,
 									 Edxltoken target_elem)
 {
@@ -2265,7 +2265,7 @@ CDXLOperatorFactory::GetRelStatsMdId(CDXLMemoryManager *memory_manager_dxl,
 //---------------------------------------------------------------------------
 CMDIdCast *
 CDXLOperatorFactory::GetCastFuncMdId(CDXLMemoryManager *memory_manager_dxl,
-									 DrgPxmlsz *remaining_tokens,
+									 XMLChArray *remaining_tokens,
 									 Edxltoken target_attr,
 									 Edxltoken target_elem)
 {
@@ -2273,7 +2273,7 @@ CDXLOperatorFactory::GetCastFuncMdId(CDXLMemoryManager *memory_manager_dxl,
 
 	CMDIdGPDB *mdid_src =
 		GetGPDBMdId(memory_manager_dxl, remaining_tokens, target_attr, target_elem);
-	DrgPxmlsz *dest_xml = GPOS_NEW(memory_manager_dxl->Pmp()) DrgPxmlsz(memory_manager_dxl->Pmp());
+	XMLChArray *dest_xml = GPOS_NEW(memory_manager_dxl->Pmp()) XMLChArray(memory_manager_dxl->Pmp());
 
 	for (ULONG ul = GPDXL_GPDB_MDID_COMPONENTS; ul < GPDXL_GPDB_MDID_COMPONENTS * 2; ul++)
 	{
@@ -2296,7 +2296,7 @@ CDXLOperatorFactory::GetCastFuncMdId(CDXLMemoryManager *memory_manager_dxl,
 //---------------------------------------------------------------------------
 CMDIdScCmp *
 CDXLOperatorFactory::GetScCmpMdId(CDXLMemoryManager *memory_manager_dxl,
-								  DrgPxmlsz *remaining_tokens,
+								  XMLChArray *remaining_tokens,
 								  Edxltoken target_attr,
 								  Edxltoken target_elem)
 {
@@ -2304,7 +2304,7 @@ CDXLOperatorFactory::GetScCmpMdId(CDXLMemoryManager *memory_manager_dxl,
 
 	CMDIdGPDB *left_mdid =
 		GetGPDBMdId(memory_manager_dxl, remaining_tokens, target_attr, target_elem);
-	DrgPxmlsz *right_xml = GPOS_NEW(memory_manager_dxl->Pmp()) DrgPxmlsz(memory_manager_dxl->Pmp());
+	XMLChArray *right_xml = GPOS_NEW(memory_manager_dxl->Pmp()) XMLChArray(memory_manager_dxl->Pmp());
 
 	for (ULONG ul = GPDXL_GPDB_MDID_COMPONENTS; ul < GPDXL_GPDB_MDID_COMPONENTS * 2 + 1; ul++)
 	{

@@ -36,7 +36,7 @@ CPhysicalTableScan::CPhysicalTableScan
 	IMemoryPool *memory_pool,
 	const CName *pnameAlias,
 	CTableDescriptor *ptabdesc,
-	DrgPcr *pdrgpcrOutput
+	ColRefArray *pdrgpcrOutput
 	)
 	:
 	CPhysicalScan(memory_pool, pnameAlias, ptabdesc, pdrgpcrOutput)

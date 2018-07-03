@@ -29,7 +29,7 @@
 #include "gpos/common/CDouble.h"
 
 // dynamic array of XML strings
-typedef CDynamicPtrArray<XMLCh, CleanupNULL> DrgPxmlsz;
+typedef CDynamicPtrArray<XMLCh, CleanupNULL> XMLChArray;
 
 // fwd decl
 namespace gpmd
@@ -514,37 +514,37 @@ namespace gpdxl
 
 		// parse a GPDB mdid object from an array of its components
 		static CMDIdGPDB *GetGPDBMdId(CDXLMemoryManager *memory_manager_dxl,
-									  DrgPxmlsz *remaining_tokens,
+									  XMLChArray *remaining_tokens,
 									  Edxltoken target_attr,
 									  Edxltoken target_elem);
 
 		// parse a GPDB CTAS mdid object from an array of its components
 		static CMDIdGPDB *GetGPDBCTASMdId(CDXLMemoryManager *memory_manager_dxl,
-										  DrgPxmlsz *remaining_tokens,
+										  XMLChArray *remaining_tokens,
 										  Edxltoken target_attr,
 										  Edxltoken target_elem);
 
 		// parse a column stats mdid object from an array of its components
 		static CMDIdColStats *GetColStatsMdId(CDXLMemoryManager *memory_manager_dxl,
-											  DrgPxmlsz *remaining_tokens,
+											  XMLChArray *remaining_tokens,
 											  Edxltoken target_attr,
 											  Edxltoken target_elem);
 
 		// parse a relation stats mdid object from an array of its components
 		static CMDIdRelStats *GetRelStatsMdId(CDXLMemoryManager *memory_manager_dxl,
-											  DrgPxmlsz *remaining_tokens,
+											  XMLChArray *remaining_tokens,
 											  Edxltoken target_attr,
 											  Edxltoken target_elem);
 
 		// parse a cast func mdid from the array of its components
 		static CMDIdCast *GetCastFuncMdId(CDXLMemoryManager *memory_manager_dxl,
-										  DrgPxmlsz *remaining_tokens,
+										  XMLChArray *remaining_tokens,
 										  Edxltoken target_attr,
 										  Edxltoken target_elem);
 
 		// parse a comparison operator mdid from the array of its components
 		static CMDIdScCmp *GetScCmpMdId(CDXLMemoryManager *memory_manager_dxl,
-										DrgPxmlsz *remaining_tokens,
+										XMLChArray *remaining_tokens,
 										Edxltoken target_attr,
 										Edxltoken target_elem);
 

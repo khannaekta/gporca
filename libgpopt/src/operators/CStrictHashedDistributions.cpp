@@ -9,8 +9,8 @@ using namespace gpopt;
 CStrictHashedDistributions::CStrictHashedDistributions
 (
 IMemoryPool *memory_pool,
-DrgPcr *pdrgpcrOutput,
-DrgDrgPcr *pdrgpdrgpcrInput
+ColRefArray *pdrgpcrOutput,
+ColRefArrays *pdrgpdrgpcrInput
 )
 :
 DrgPds(memory_pool)
@@ -19,8 +19,8 @@ DrgPds(memory_pool)
 	const ULONG arity = pdrgpdrgpcrInput->Size();
 	for (ULONG ulChild = 0; ulChild < arity; ulChild++)
 	{
-		DrgPcr *colref_array = (*pdrgpdrgpcrInput)[ulChild];
-		DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+		ColRefArray *colref_array = (*pdrgpdrgpcrInput)[ulChild];
+		ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 		for (ULONG ulCol = 0; ulCol < num_cols; ulCol++)
 		{
 			CColRef *colref = (*colref_array)[ulCol];

@@ -13,7 +13,7 @@ namespace gpopt
 {
 	// A sorted and uniq'd array of pointers to datums
 	// It facilitates the construction of CConstraintInterval
-	class CDatumSortedSet : public DrgPdatum
+	class CDatumSortedSet : public IDatumArray
 	{
 		private:
 			BOOL m_fIncludesNull;

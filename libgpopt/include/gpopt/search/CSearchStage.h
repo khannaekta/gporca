@@ -27,7 +27,7 @@ namespace gpopt
 	class CExpression;
 
 	// definition of array of search stages
-	typedef CDynamicPtrArray<CSearchStage, CleanupDelete> DrgPss;
+	typedef CDynamicPtrArray<CSearchStage, CleanupDelete> SearchStageArray;
 
 
 	//---------------------------------------------------------------------------
@@ -143,7 +143,7 @@ namespace gpopt
 
 			// generate default search strategy
 			static
-			DrgPss *PdrgpssDefault(IMemoryPool *memory_pool);
+			SearchStageArray *PdrgpssDefault(IMemoryPool *memory_pool);
 
 	};
 

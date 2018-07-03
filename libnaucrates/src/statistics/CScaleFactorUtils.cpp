@@ -45,7 +45,7 @@ const CDouble CScaleFactorUtils::InvalidScaleFactor(0.0);
 //---------------------------------------------------------------------------
 CDouble
 CScaleFactorUtils::CumulativeJoinScaleFactor(const CStatisticsConfig *stats_config,
-											 DrgPdouble *join_conds_scale_factors)
+											 CDoubleArray *join_conds_scale_factors)
 {
 	GPOS_ASSERT(NULL != stats_config);
 	GPOS_ASSERT(NULL != join_conds_scale_factors);
@@ -147,7 +147,7 @@ CScaleFactorUtils::DampedGroupByScaleFactor(const CStatisticsConfig *stats_confi
 //
 //---------------------------------------------------------------------------
 void
-CScaleFactorUtils::SortScalingFactor(DrgPdouble *scale_factors, BOOL is_descending)
+CScaleFactorUtils::SortScalingFactor(CDoubleArray *scale_factors, BOOL is_descending)
 {
 	GPOS_ASSERT(NULL != scale_factors);
 	const ULONG num_cols = scale_factors->Size();
@@ -250,7 +250,7 @@ CScaleFactorUtils::DoubleCmpFunc(const CDouble *double_val1,
 //---------------------------------------------------------------------------
 CDouble
 CScaleFactorUtils::CalcScaleFactorCumulativeConj(const CStatisticsConfig *stats_config,
-												 DrgPdouble *scale_factors)
+												 CDoubleArray *scale_factors)
 {
 	GPOS_ASSERT(NULL != stats_config);
 	GPOS_ASSERT(NULL != scale_factors);
@@ -289,7 +289,7 @@ CScaleFactorUtils::CalcScaleFactorCumulativeConj(const CStatisticsConfig *stats_
 //---------------------------------------------------------------------------
 CDouble
 CScaleFactorUtils::CalcScaleFactorCumulativeDisj(const CStatisticsConfig *stats_config,
-												 DrgPdouble *scale_factors,
+												 CDoubleArray *scale_factors,
 												 CDouble total_rows)
 {
 	GPOS_ASSERT(NULL != stats_config);

@@ -56,7 +56,7 @@ namespace gpopt
 				IMemoryPool *memory_pool,
 				const CName *pnameAlias,
 				CTableDescriptor *ptabdesc,
-				DrgPcr *pdrgpcrOutput
+				ColRefArray *pdrgpcrOutput
 				);
 
 			// ident accessors

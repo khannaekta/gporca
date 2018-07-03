@@ -97,7 +97,7 @@ CXformExpandNAryJoinMinCard::Transform
 	const ULONG arity = pexpr->Arity();
 	GPOS_ASSERT(arity >= 3);
 
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
 		CExpression *pexprChild = (*pexpr)[ul];
@@ -106,7 +106,7 @@ CXformExpandNAryJoinMinCard::Transform
 	}
 
 	CExpression *pexprScalar = (*pexpr)[arity - 1];
-	DrgPexpr *pdrgpexprPreds = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pexprScalar);
+	ExpressionArray *pdrgpexprPreds = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pexprScalar);
 
 	// create a join order based on cardinality of intermediate results
 	CJoinOrderMinCard jomc(memory_pool, pdrgpexpr, pdrgpexprPreds);

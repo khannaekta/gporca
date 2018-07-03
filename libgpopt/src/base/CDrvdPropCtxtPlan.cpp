@@ -105,10 +105,10 @@ CDrvdPropCtxtPlan::PdpctxtCopy
 void
 CDrvdPropCtxtPlan::AddProps
 	(
-	CDrvdProp *pdp
+	DrvdPropArray *pdp
 	)
 {
-	if (CDrvdProp::EptPlan != pdp->Ept())
+	if (DrvdPropArray::EptPlan != pdp->Ept())
 	{
 		// passed property is not a plan property container
 		return;

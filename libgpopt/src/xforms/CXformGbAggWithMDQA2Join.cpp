@@ -110,7 +110,7 @@ CXformGbAggWithMDQA2Join::PexprMDQAs2Join
 	CExpression *pexprChild = (*pexpr)[0];
 
 	CColRefSet *pcrsChildOutput = CDrvdPropRelational::GetRelationalProperties(pexprChild->PdpDerive())->PcrsOutput();
-	DrgPcr *pdrgpcrChildOutput = pcrsChildOutput->Pdrgpcr(memory_pool);
+	ColRefArray *pdrgpcrChildOutput = pcrsChildOutput->Pdrgpcr(memory_pool);
 
 	// create a CTE producer based on child expression
 	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
@@ -217,7 +217,7 @@ CXformGbAggWithMDQA2Join::PexprTransform
 
 	// recursively process child expressions
 	const ULONG arity = pexpr->Arity();
-	DrgPexpr *pdrgpexprChildren = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprChildren = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		CExpression *pexprChild = PexprTransform(memory_pool, (*pexpr)[ul]);

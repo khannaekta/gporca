@@ -34,7 +34,7 @@ namespace gpopt
 			ULONG m_id;
 
 			// mapped cte columns
-			DrgPcr *m_pdrgpcr;
+			ColRefArray *m_pdrgpcr;
 
 			// inlined expression
 			CExpression *m_pexprInlined;
@@ -58,7 +58,7 @@ namespace gpopt
 			CLogicalCTEConsumer(IMemoryPool *memory_pool);
 
 			// ctor
-			CLogicalCTEConsumer(IMemoryPool *memory_pool, ULONG id, DrgPcr *colref_array);
+			CLogicalCTEConsumer(IMemoryPool *memory_pool, ULONG id, ColRefArray *colref_array);
 
 			// dtor
 			virtual
@@ -84,7 +84,7 @@ namespace gpopt
 			}
 
 			// cte columns
-			DrgPcr *Pdrgpcr() const
+			ColRefArray *Pdrgpcr() const
 			{
 				return m_pdrgpcr;
 			}

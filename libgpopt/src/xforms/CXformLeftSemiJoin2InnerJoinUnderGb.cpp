@@ -108,8 +108,8 @@ CXformLeftSemiJoin2InnerJoinUnderGb::Transform
 	pexprInner->AddRef();
 	pexprScalar->AddRef();
 
-	DrgPcr *pdrgpcrKeys = NULL;
-	DrgPcr *pdrgpcrGrouping = CUtils::PdrgpcrGroupingKey(memory_pool, pexprOuter, &pdrgpcrKeys);
+	ColRefArray *pdrgpcrKeys = NULL;
+	ColRefArray *pdrgpcrGrouping = CUtils::PdrgpcrGroupingKey(memory_pool, pexprOuter, &pdrgpcrKeys);
 	GPOS_ASSERT(NULL != pdrgpcrKeys);
 
 	CExpression *pexprInnerJoin =

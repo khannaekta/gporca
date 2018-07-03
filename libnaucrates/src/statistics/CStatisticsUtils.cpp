@@ -113,8 +113,8 @@ CStatisticsUtils::NextPoint(IMemoryPool *memory_pool, CMDAccessor *md_accessor, 
 CHistogram *
 CStatisticsUtils::TransformMCVToHist(IMemoryPool *memory_pool,
 									 const IMDType *,  // mdtype,
-									 DrgPdatum *mcv_datums,
-									 DrgPdouble *freq_array,
+									 IDatumArray *mcv_datums,
+									 CDoubleArray *freq_array,
 									 ULONG num_mcv_values)
 {
 	GPOS_ASSERT(mcv_datums->Size() == num_mcv_values);
@@ -1076,7 +1076,7 @@ CStatisticsUtils::DeriveStatsForDynamicScan(IMemoryPool *memory_pool,
 	IStatistics *part_selector_stats = part_filter_map->Pstats(part_idx_id);
 	CExpression *scalar_expr = part_filter_map->Pexpr(part_idx_id);
 
-	DrgPcrs *output_colrefs = GPOS_NEW(memory_pool) DrgPcrs(memory_pool);
+	ColRefSetArray *output_colrefs = GPOS_NEW(memory_pool) ColRefSetArray(memory_pool);
 	output_colrefs->Append(base_table_stats->GetColRefSet(memory_pool));
 	output_colrefs->Append(part_selector_stats->GetColRefSet(memory_pool));
 
@@ -1291,7 +1291,7 @@ CStatisticsUtils::AddNdvForAllGrpCols(
 	IMemoryPool *memory_pool,
 	const CStatistics *input_stats,
 	const ULongPtrArray *grouping_columns,  // array of grouping column ids from a source
-	DrgPdouble *output_ndvs					// output array of ndvs
+	CDoubleArray *output_ndvs					// output array of ndvs
 )
 {
 	GPOS_ASSERT(NULL != grouping_columns);
@@ -1331,7 +1331,7 @@ CStatisticsUtils::AddNdvForAllGrpCols(
 //		than the card of filter table. Else we add the NDVs for all grouping
 //      columns as is.
 //---------------------------------------------------------------------------
-DrgPdouble *
+CDoubleArray *
 CStatisticsUtils::ExtractNDVForGrpCols(IMemoryPool *memory_pool,
 									   const CStatisticsConfig *stats_config,
 									   const IStatistics *stats,
@@ -1344,7 +1344,7 @@ CStatisticsUtils::ExtractNDVForGrpCols(IMemoryPool *memory_pool,
 
 	CStatistics *input_stats = CStatistics::CastStats(const_cast<IStatistics *>(stats));
 
-	DrgPdouble *ndvs = GPOS_NEW(memory_pool) DrgPdouble(memory_pool);
+	CDoubleArray *ndvs = GPOS_NEW(memory_pool) CDoubleArray(memory_pool);
 
 	UlongUlongArrayHashMap *grp_colid_upper_bound_ndv_idx_map =
 		GetGrpColIdToUpperBoundNDVIdxMap(memory_pool, input_stats, grp_cols_refset, keys);
@@ -1469,7 +1469,7 @@ CStatisticsUtils::MaxNumGroupsForGivenSrcGprCols(IMemoryPool *memory_pool,
 	CColRef *first_colref = col_factory->LookupColRef(*(*src_grouping_cols)[0]);
 	CDouble upper_bound_ndvs = input_stats->GetColUpperBoundNDVs(first_colref);
 
-	DrgPdouble *ndvs = GPOS_NEW(memory_pool) DrgPdouble(memory_pool);
+	CDoubleArray *ndvs = GPOS_NEW(memory_pool) CDoubleArray(memory_pool);
 	AddNdvForAllGrpCols(memory_pool, input_stats, src_grouping_cols, ndvs);
 
 	// take the minimum of (a) the estimated number of groups from the columns of this source,
@@ -1512,7 +1512,7 @@ CStatisticsUtils::Groups(IMemoryPool *memory_pool,
 	CColRefSet *grp_col_for_stats =
 		MakeGroupByColsForStats(memory_pool, grouping_cols, computed_groupby_cols);
 
-	DrgPdouble *ndvs =
+	CDoubleArray *ndvs =
 		ExtractNDVForGrpCols(memory_pool, stats_config, stats, grp_col_for_stats, keys);
 	CDouble groups =
 		std::min(std::max(CStatistics::MinRows.Get(), GetCumulativeNDVs(stats_config, ndvs).Get()),
@@ -1536,7 +1536,7 @@ CStatisticsUtils::Groups(IMemoryPool *memory_pool,
 //		from the array of NDVs of the individual grouping columns
 //---------------------------------------------------------------------------
 CDouble
-CStatisticsUtils::GetCumulativeNDVs(const CStatisticsConfig *stats_config, DrgPdouble *ndvs)
+CStatisticsUtils::GetCumulativeNDVs(const CStatisticsConfig *stats_config, CDoubleArray *ndvs)
 {
 	GPOS_ASSERT(NULL != stats_config);
 	GPOS_ASSERT(NULL != ndvs);

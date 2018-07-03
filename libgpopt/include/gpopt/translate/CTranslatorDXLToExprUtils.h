@@ -70,7 +70,7 @@ namespace gpopt
 
 			// create a datum array from a dxl datum array
 			static
-			DrgPdatum *Pdrgpdatum(IMemoryPool *memory_pool, CMDAccessor *md_accessor, const DXLDatumArray *pdrgpdatum);
+			IDatumArray *Pdrgpdatum(IMemoryPool *memory_pool, CMDAccessor *md_accessor, const DXLDatumArray *pdrgpdatum);
 
 			// update table descriptor's key sets info from the MD cache object
 			static
@@ -93,7 +93,7 @@ namespace gpopt
 
 			// construct a dynamic array of col refs corresponding to the given col ids
 			static
-			DrgPcr *Pdrgpcr(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, const ULongPtrArray *col_ids);
+			ColRefArray *Pdrgpcr(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, const ULongPtrArray *col_ids);
 
 			// is the given expression is a scalar function that casts
 			static

@@ -57,7 +57,7 @@ CEnumeratorConfig::CEnumeratorConfig
 	m_fSampleValidPlans(true),
 	m_pfpc(NULL)
 {
-	m_pdrgpsp = GPOS_NEW(memory_pool) DrgPsp(memory_pool);
+	m_pdrgpsp = GPOS_NEW(memory_pool) SamplePlanArray(memory_pool);
 }
 
 

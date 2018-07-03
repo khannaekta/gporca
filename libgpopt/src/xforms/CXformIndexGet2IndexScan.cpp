@@ -74,7 +74,7 @@ CXformIndexGet2IndexScan::Transform
 	CTableDescriptor *ptabdesc = pop->Ptabdesc();
 	ptabdesc->AddRef();
 
-	DrgPcr *pdrgpcrOutput = pop->PdrgpcrOutput();
+	ColRefArray *pdrgpcrOutput = pop->PdrgpcrOutput();
 	GPOS_ASSERT(NULL != pdrgpcrOutput);
 	pdrgpcrOutput->AddRef();
 

@@ -32,16 +32,16 @@ namespace gpopt
 		protected:
 
 			// output column array
-			DrgPcr *m_pdrgpcrOutput;
+			ColRefArray *m_pdrgpcrOutput;
 			
 			// input column array
-			DrgDrgPcr *m_pdrgpdrgpcrInput;
+			ColRefArrays *m_pdrgpdrgpcrInput;
 
 			// set representation of output columns
 			CColRefSet *m_pcrsOutput;
 
 			// set representation of input columns
-			DrgPcrs *m_pdrgpcrsInput;
+			ColRefSetArray *m_pdrgpcrsInput;
 
 			// private copy ctor
 			CLogicalSetOp(const CLogicalSetOp &);
@@ -50,13 +50,13 @@ namespace gpopt
 			void BuildColumnSets(IMemoryPool *memory_pool);
 
 			// output equivalence classes
-			DrgPcrs *PdrgpcrsOutputEquivClasses(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, BOOL fIntersect) const;
+			ColRefSetArray *PdrgpcrsOutputEquivClasses(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, BOOL fIntersect) const;
 
 			// equivalence classes from one input child, mapped to output columns
-			DrgPcrs *PdrgpcrsInputMapped(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, ULONG ulChild) const;
+			ColRefSetArray *PdrgpcrsInputMapped(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, ULONG ulChild) const;
 
 			// constraints for a given output column from all children
-			DrgPcnstr *PdrgpcnstrColumn
+			ConstraintArray *PdrgpcnstrColumn
 						(
 						IMemoryPool *memory_pool,
 						CExpressionHandle &exprhdl,
@@ -93,16 +93,16 @@ namespace gpopt
 			CLogicalSetOp
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *pdrgOutput,
-				DrgPcr *pdrgpcrLeft,
-				DrgPcr *pdrgpcrRight
+				ColRefArray *pdrgOutput,
+				ColRefArray *pdrgpcrLeft,
+				ColRefArray *pdrgpcrRight
 				);
 
 			CLogicalSetOp
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *pdrgpcrOutput,
-				DrgDrgPcr *pdrgpdrgpcrInput
+				ColRefArray *pdrgpcrOutput,
+				ColRefArrays *pdrgpdrgpcrInput
 				);
 
 			// dtor
@@ -117,14 +117,14 @@ namespace gpopt
 			const CHAR *SzId() const = 0;
 
 			// accessor of output column array
-			DrgPcr *PdrgpcrOutput() const
+			ColRefArray *PdrgpcrOutput() const
 			{
 				GPOS_ASSERT(NULL != m_pdrgpcrOutput);
 				return m_pdrgpcrOutput;
 			}
 			
 			// accessor of input column array
-			DrgDrgPcr *PdrgpdrgpcrInput() const
+			ColRefArrays *PdrgpdrgpcrInput() const
 			{
 				GPOS_ASSERT(NULL != m_pdrgpdrgpcrInput);
 				return m_pdrgpdrgpcrInput;

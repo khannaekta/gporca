@@ -84,16 +84,16 @@ CXformIntersectAll2LeftSemiJoin::Transform
 	CExpression *pexprRightChild = (*pexpr)[1];
 
 	CLogicalIntersectAll *popIntersectAll = CLogicalIntersectAll::PopConvert(pexpr->Pop());
-	DrgDrgPcr *pdrgpdrgpcrInput = popIntersectAll->PdrgpdrgpcrInput();
+	ColRefArrays *pdrgpdrgpcrInput = popIntersectAll->PdrgpdrgpcrInput();
 
 	CExpression *pexprLeftWindow = CXformUtils::PexprWindowWithRowNumber(memory_pool, pexprLeftChild, (*pdrgpdrgpcrInput)[0]);
 	CExpression *pexprRightWindow = CXformUtils::PexprWindowWithRowNumber(memory_pool, pexprRightChild, (*pdrgpdrgpcrInput)[1]);
 
-	DrgDrgPcr *pdrgpdrgpcrInputNew = GPOS_NEW(memory_pool) DrgDrgPcr(memory_pool);
-	DrgPcr *pdrgpcrLeftNew = CUtils::PdrgpcrExactCopy(memory_pool, (*pdrgpdrgpcrInput)[0]);
+	ColRefArrays *pdrgpdrgpcrInputNew = GPOS_NEW(memory_pool) ColRefArrays(memory_pool);
+	ColRefArray *pdrgpcrLeftNew = CUtils::PdrgpcrExactCopy(memory_pool, (*pdrgpdrgpcrInput)[0]);
 	pdrgpcrLeftNew->Append(CXformUtils::PcrProjectElement(pexprLeftWindow, 0 /* row_number window function*/));
 
-	DrgPcr *pdrgpcrRightNew = CUtils::PdrgpcrExactCopy(memory_pool, (*pdrgpdrgpcrInput)[1]);
+	ColRefArray *pdrgpcrRightNew = CUtils::PdrgpcrExactCopy(memory_pool, (*pdrgpdrgpcrInput)[1]);
 	pdrgpcrRightNew->Append(CXformUtils::PcrProjectElement(pexprRightWindow, 0 /* row_number window function*/));
 
 	pdrgpdrgpcrInputNew->Append(pdrgpcrLeftNew);

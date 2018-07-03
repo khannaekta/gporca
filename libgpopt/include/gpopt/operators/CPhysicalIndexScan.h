@@ -59,7 +59,7 @@ namespace gpopt
 				CTableDescriptor *ptabdesc,
 				ULONG ulOriginOpId,
 				const CName *pnameAlias,
-				DrgPcr *colref_array,
+				ColRefArray *colref_array,
 				COrderSpec *pos
 				);
 

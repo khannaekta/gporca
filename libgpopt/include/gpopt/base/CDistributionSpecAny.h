@@ -97,7 +97,7 @@ namespace gpopt
 				IMemoryPool * , // memory_pool 
 				CExpressionHandle &, // exprhdl: gives access to child properties
 				CReqdPropPlan *, // prpp
-				DrgPexpr *, // pdrgpexpr 
+				ExpressionArray *, // pdrgpexpr 
 				CExpression * // pexpr				
 				)
 			{

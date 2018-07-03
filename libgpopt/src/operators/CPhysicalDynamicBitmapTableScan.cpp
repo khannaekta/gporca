@@ -46,8 +46,8 @@ CPhysicalDynamicBitmapTableScan::CPhysicalDynamicBitmapTableScan
 		ULONG ulOriginOpId,
 		const CName *pnameAlias,
 		ULONG scan_id,
-		DrgPcr *pdrgpcrOutput,
-		DrgDrgPcr *pdrgpdrgpcrParts,
+		ColRefArray *pdrgpcrOutput,
+		ColRefArrays *pdrgpdrgpcrParts,
 		ULONG ulSecondaryScanId,
 		CPartConstraint *ppartcnstr,
 		CPartConstraint *ppartcnstrRel

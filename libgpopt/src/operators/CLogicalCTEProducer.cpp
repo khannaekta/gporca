@@ -49,7 +49,7 @@ CLogicalCTEProducer::CLogicalCTEProducer
 	(
 	IMemoryPool *memory_pool,
 	ULONG id,
-	DrgPcr *colref_array
+	ColRefArray *colref_array
 	)
 	:
 	CLogical(memory_pool),
@@ -217,7 +217,7 @@ CLogicalCTEProducer::PopCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcr *colref_array = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcr, colref_mapping, must_exist);
+	ColRefArray *colref_array = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcr, colref_mapping, must_exist);
 
 	return GPOS_NEW(memory_pool) CLogicalCTEProducer(memory_pool, m_id, colref_array);
 }

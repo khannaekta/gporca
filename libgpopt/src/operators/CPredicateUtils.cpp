@@ -194,7 +194,7 @@ CPredicateUtils::FConjunctionOfEqComparisons
 		return true;
 	}
 	
-	DrgPexpr *pdrgpexpr = PdrgpexprConjuncts(memory_pool, pexpr);
+	ExpressionArray *pdrgpexpr = PdrgpexprConjuncts(memory_pool, pexpr);
 	const ULONG ulConjuncts = pdrgpexpr->Size();
 	
 	for (ULONG ul = 0; ul < ulConjuncts; ul++)
@@ -236,8 +236,8 @@ void
 CPredicateUtils::CollectChildren
 	(
 	CExpression *pexpr,
-	DrgPexpr *pdrgpexprLogical,
-	DrgPexpr *pdrgpexprScalar
+	ExpressionArray *pdrgpexprLogical,
+	ExpressionArray *pdrgpexprScalar
 	)
 {
 	GPOS_ASSERT(pexpr->Pop()->FLogical());
@@ -265,7 +265,7 @@ void
 CPredicateUtils::CollectConjuncts
 	(
 	CExpression *pexpr,
-	DrgPexpr *pdrgpexpr
+	ExpressionArray *pdrgpexpr
 	)
 {
 	GPOS_CHECK_STACK_SIZE;
@@ -290,7 +290,7 @@ void
 CPredicateUtils::CollectDisjuncts
 	(
 	CExpression *pexpr,
-	DrgPexpr *pdrgpexpr
+	ExpressionArray *pdrgpexpr
 	)
 {
 	GPOS_CHECK_STACK_SIZE;
@@ -311,28 +311,28 @@ CPredicateUtils::CollectDisjuncts
 }
 
 // extract conjuncts from a predicate
-DrgPexpr *
+ExpressionArray *
 CPredicateUtils::PdrgpexprConjuncts
 	(
 	IMemoryPool *memory_pool,
 	CExpression *pexpr
 	)
 {
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	CollectConjuncts(pexpr, pdrgpexpr);
 
 	return pdrgpexpr;
 }
 
 // extract disjuncts from a predicate
-DrgPexpr *
+ExpressionArray *
 CPredicateUtils::PdrgpexprDisjuncts
 	(
 	IMemoryPool *memory_pool,
 	CExpression *pexpr
 	)
 {
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	CollectDisjuncts(pexpr, pdrgpexpr);
 
 	return pdrgpexpr;
@@ -341,16 +341,16 @@ CPredicateUtils::PdrgpexprDisjuncts
 // This function expects an array of disjuncts (children of OR operator),
 // the function expands disjuncts in the given array by converting
 // ArrayComparison to AND/OR tree and deduplicating resulting disjuncts
-DrgPexpr *
+ExpressionArray *
 CPredicateUtils::PdrgpexprExpandDisjuncts
 	(
 	IMemoryPool *memory_pool,
-	DrgPexpr *pdrgpexprDisjuncts
+	ExpressionArray *pdrgpexprDisjuncts
 	)
 {
 	GPOS_ASSERT(NULL != pdrgpexprDisjuncts);
 
-	DrgPexpr *pdrgpexprExpanded = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprExpanded = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	const ULONG size = pdrgpexprDisjuncts->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
@@ -360,7 +360,7 @@ CPredicateUtils::PdrgpexprExpandDisjuncts
 			CExpression *pexprExpanded = CScalarArrayCmp::PexprExpand(memory_pool, pexpr);
 			if (FOr(pexprExpanded))
 			{
-				DrgPexpr *pdrgpexprArrayCmpDisjuncts = PdrgpexprDisjuncts(memory_pool, pexprExpanded);
+				ExpressionArray *pdrgpexprArrayCmpDisjuncts = PdrgpexprDisjuncts(memory_pool, pexprExpanded);
 				CUtils::AddRefAppend<CExpression, CleanupRelease>(pdrgpexprExpanded, pdrgpexprArrayCmpDisjuncts);
 				pdrgpexprArrayCmpDisjuncts->Release();
 				pexprExpanded->Release();
@@ -375,8 +375,8 @@ CPredicateUtils::PdrgpexprExpandDisjuncts
 
 		if (FAnd(pexpr))
 		{
-			DrgPexpr *pdrgpexprConjuncts = PdrgpexprConjuncts(memory_pool, pexpr);
-			DrgPexpr *pdrgpexprExpandedConjuncts = PdrgpexprExpandConjuncts(memory_pool, pdrgpexprConjuncts);
+			ExpressionArray *pdrgpexprConjuncts = PdrgpexprConjuncts(memory_pool, pexpr);
+			ExpressionArray *pdrgpexprExpandedConjuncts = PdrgpexprExpandConjuncts(memory_pool, pdrgpexprConjuncts);
 			pdrgpexprConjuncts->Release();
 			pdrgpexprExpanded->Append(PexprConjunction(memory_pool, pdrgpexprExpandedConjuncts));
 
@@ -387,7 +387,7 @@ CPredicateUtils::PdrgpexprExpandDisjuncts
 		pdrgpexprExpanded->Append(pexpr);
 	}
 
-	DrgPexpr *pdrgpexprResult = CUtils::PdrgpexprDedup(memory_pool, pdrgpexprExpanded);
+	ExpressionArray *pdrgpexprResult = CUtils::PdrgpexprDedup(memory_pool, pdrgpexprExpanded);
 	pdrgpexprExpanded->Release();
 
 	return pdrgpexprResult;
@@ -396,16 +396,16 @@ CPredicateUtils::PdrgpexprExpandDisjuncts
 // This function expects an array of conjuncts (children of AND operator),
 // the function expands conjuncts in the given array by converting
 // ArrayComparison to AND/OR tree and deduplicating resulting conjuncts
-DrgPexpr *
+ExpressionArray *
 CPredicateUtils::PdrgpexprExpandConjuncts
 	(
 	IMemoryPool *memory_pool,
-	DrgPexpr *pdrgpexprConjuncts
+	ExpressionArray *pdrgpexprConjuncts
 	)
 {
 	GPOS_ASSERT(NULL != pdrgpexprConjuncts);
 
-	DrgPexpr *pdrgpexprExpanded = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprExpanded = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	const ULONG size = pdrgpexprConjuncts->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
@@ -415,7 +415,7 @@ CPredicateUtils::PdrgpexprExpandConjuncts
 			CExpression *pexprExpanded = CScalarArrayCmp::PexprExpand(memory_pool, pexpr);
 			if (FAnd(pexprExpanded))
 			{
-				DrgPexpr *pdrgpexprArrayCmpConjuncts = PdrgpexprConjuncts(memory_pool, pexprExpanded);
+				ExpressionArray *pdrgpexprArrayCmpConjuncts = PdrgpexprConjuncts(memory_pool, pexprExpanded);
 				CUtils::AddRefAppend<CExpression, CleanupRelease>(pdrgpexprExpanded, pdrgpexprArrayCmpConjuncts);
 				pdrgpexprArrayCmpConjuncts->Release();
 				pexprExpanded->Release();
@@ -430,8 +430,8 @@ CPredicateUtils::PdrgpexprExpandConjuncts
 
 		if (FOr(pexpr))
 		{
-			DrgPexpr *pdrgpexprDisjuncts = PdrgpexprDisjuncts(memory_pool, pexpr);
-			DrgPexpr *pdrgpexprExpandedDisjuncts = PdrgpexprExpandDisjuncts(memory_pool, pdrgpexprDisjuncts);
+			ExpressionArray *pdrgpexprDisjuncts = PdrgpexprDisjuncts(memory_pool, pexpr);
+			ExpressionArray *pdrgpexprExpandedDisjuncts = PdrgpexprExpandDisjuncts(memory_pool, pdrgpexprDisjuncts);
 			pdrgpexprDisjuncts->Release();
 			pdrgpexprExpanded->Append(PexprDisjunction(memory_pool, pdrgpexprExpandedDisjuncts));
 
@@ -442,7 +442,7 @@ CPredicateUtils::PdrgpexprExpandConjuncts
 		pdrgpexprExpanded->Append(pexpr);
 	}
 
-	DrgPexpr *pdrgpexprResult = CUtils::PdrgpexprDedup(memory_pool, pdrgpexprExpanded);
+	ExpressionArray *pdrgpexprResult = CUtils::PdrgpexprDedup(memory_pool, pdrgpexprExpanded);
 	pdrgpexprExpanded->Release();
 
 	return pdrgpexprResult;
@@ -685,7 +685,7 @@ CExpression *
 CPredicateUtils::PexprConjDisj
 	(
 	IMemoryPool *memory_pool,
-	DrgPexpr *pdrgpexpr,
+	ExpressionArray *pdrgpexpr,
 	BOOL fConjunction
 	)
 {
@@ -695,9 +695,9 @@ CPredicateUtils::PexprConjDisj
 		eboolop = CScalarBoolOp::EboolopOr;
 	}
 
-	DrgPexpr *pdrgpexprFinal = pdrgpexpr;
+	ExpressionArray *pdrgpexprFinal = pdrgpexpr;
 
-	pdrgpexprFinal = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	pdrgpexprFinal = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	ULONG size = 0;
 	if (NULL != pdrgpexpr)
 	{
@@ -756,7 +756,7 @@ CExpression *
 CPredicateUtils::PexprConjunction
 	(
 	IMemoryPool *memory_pool,
-	DrgPexpr *pdrgpexpr
+	ExpressionArray *pdrgpexpr
 	)
 {
 	return PexprConjDisj(memory_pool, pdrgpexpr, true /*fConjunction*/);
@@ -767,7 +767,7 @@ CExpression *
 CPredicateUtils::PexprDisjunction
 	(
 	IMemoryPool *memory_pool,
-	DrgPexpr *pdrgpexpr
+	ExpressionArray *pdrgpexpr
 	)
 {
 	return PexprConjDisj(memory_pool, pdrgpexpr, false /*fConjunction*/);
@@ -792,8 +792,8 @@ CPredicateUtils::PexprConjDisj
 		return pexprOne;
 	}
 
-	DrgPexpr *pdrgpexprOne = NULL;
-	DrgPexpr *pdrgpexprTwo = NULL;
+	ExpressionArray *pdrgpexprOne = NULL;
+	ExpressionArray *pdrgpexprTwo = NULL;
 
 	if (fConjunction)
 	{
@@ -806,7 +806,7 @@ CPredicateUtils::PexprConjDisj
 		pdrgpexprTwo = PdrgpexprDisjuncts(memory_pool, pexprTwo);
 	}
 
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	CUtils::AddRefAppend<CExpression, CleanupRelease>(pdrgpexpr, pdrgpexprOne);
 	CUtils::AddRefAppend<CExpression, CleanupRelease>(pdrgpexpr, pdrgpexprTwo);
 
@@ -841,14 +841,14 @@ CPredicateUtils::PexprDisjunction
 }
 
 // extract equality predicates over scalar identifiers
-DrgPexpr *
+ExpressionArray *
 CPredicateUtils::PdrgpexprPlainEqualities
 	(
 	IMemoryPool *memory_pool,
-	DrgPexpr *pdrgpexpr
+	ExpressionArray *pdrgpexpr
 	)
 {
-	DrgPexpr *pdrgpexprEqualities = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprEqualities = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	const ULONG arity = pdrgpexpr->Size();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
@@ -1047,8 +1047,8 @@ CExpression *
 CPredicateUtils::PexprINDFConjunction
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *pdrgpcrFirst,
-	DrgPcr *pdrgpcrSecond
+	ColRefArray *pdrgpcrFirst,
+	ColRefArray *pdrgpcrSecond
 	)
 {
 	GPOS_ASSERT(NULL != pdrgpcrFirst);
@@ -1057,7 +1057,7 @@ CPredicateUtils::PexprINDFConjunction
 	GPOS_ASSERT(0 < pdrgpcrFirst->Size());
 
 	const ULONG num_cols = pdrgpcrFirst->Size();
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
 		pdrgpexpr->Append(CUtils::PexprINDF(memory_pool, (*pdrgpcrFirst)[ul], (*pdrgpcrSecond)[ul]));
@@ -1300,7 +1300,7 @@ CExpression *
 CPredicateUtils::PexprPartPruningPredicate
 	(
 	IMemoryPool *memory_pool,
-	const DrgPexpr *pdrgpexpr,
+	const ExpressionArray *pdrgpexpr,
 	CColRef *pcrPartKey,
 	CExpression *pexprCol,	// const selection predicate on the given column obtained from query
 	CColRefSet *pcrsAllowedRefs
@@ -1308,7 +1308,7 @@ CPredicateUtils::PexprPartPruningPredicate
 {
 	const ULONG size = pdrgpexpr->Size();
 
-	DrgPexpr *pdrgpexprResult = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprResult = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	
 	for (ULONG ul = 0; ul < size; ul++)
 	{
@@ -1353,7 +1353,7 @@ CPredicateUtils::PexprPartPruningPredicate
 		pcrsUsed->Release();
 	}
 
-	DrgPexpr *pdrgpexprResultNew = PdrgpexprAppendConjunctsDedup(memory_pool, pdrgpexprResult, pexprCol);
+	ExpressionArray *pdrgpexprResultNew = PdrgpexprAppendConjunctsDedup(memory_pool, pdrgpexprResult, pexprCol);
 	pdrgpexprResult->Release();
 	pdrgpexprResult = pdrgpexprResultNew;
 
@@ -1368,11 +1368,11 @@ CPredicateUtils::PexprPartPruningPredicate
 
 // append the conjuncts from the given expression to the given array, removing
 // any duplicates, and return the resulting array
-DrgPexpr *
+ExpressionArray *
 CPredicateUtils::PdrgpexprAppendConjunctsDedup
 	(
 	IMemoryPool *memory_pool,
-	DrgPexpr *pdrgpexpr,
+	ExpressionArray *pdrgpexpr,
 	CExpression *pexpr
 	)
 {
@@ -1384,10 +1384,10 @@ CPredicateUtils::PdrgpexprAppendConjunctsDedup
 		return pdrgpexpr;
 	}
 
-	DrgPexpr *pdrgpexprConjuncts = PdrgpexprConjuncts(memory_pool, pexpr);
+	ExpressionArray *pdrgpexprConjuncts = PdrgpexprConjuncts(memory_pool, pexpr);
 	CUtils::AddRefAppend(pdrgpexprConjuncts, pdrgpexpr);
 
-	DrgPexpr *pdrgpexprNew = CUtils::PdrgpexprDedup(memory_pool, pdrgpexprConjuncts);
+	ExpressionArray *pdrgpexprNew = CUtils::PdrgpexprDedup(memory_pool, pdrgpexprConjuncts);
 	pdrgpexprConjuncts->Release();
 	return pdrgpexprNew;
 }
@@ -1515,7 +1515,7 @@ CPredicateUtils::FDisjunctionOnColumn
 		return false;
 	}
 
-	DrgPexpr *pdrgpexprDisjuncts = PdrgpexprDisjuncts(memory_pool, pexpr);
+	ExpressionArray *pdrgpexprDisjuncts = PdrgpexprDisjuncts(memory_pool, pexpr);
 	const ULONG ulDisjuncts = pdrgpexprDisjuncts->Size();
 	for (ULONG ulDisj = 0; ulDisj < ulDisjuncts; ulDisj++)
 	{
@@ -1552,7 +1552,7 @@ CPredicateUtils::PexprExtractPredicatesOnPartKeys
 	(
 	IMemoryPool *memory_pool,
 	CExpression *pexprScalar,
-	DrgDrgPcr *pdrgpdrgpcrPartKeys,
+	ColRefArrays *pdrgpdrgpcrPartKeys,
 	CColRefSet *pcrsAllowedRefs,
 	BOOL fUseConstraints
 	)
@@ -1563,18 +1563,18 @@ CPredicateUtils::PexprExtractPredicatesOnPartKeys
 		return NULL;
 	}
 
-	DrgPexpr *pdrgpexprConjuncts = PdrgpexprConjuncts(memory_pool, pexprScalar);
-	DrgPcrs *pdrgpcrsChild = NULL;
+	ExpressionArray *pdrgpexprConjuncts = PdrgpexprConjuncts(memory_pool, pexprScalar);
+	ColRefSetArray *pdrgpcrsChild = NULL;
 	CConstraint *pcnstr = NULL;
 	(void) pexprScalar->PdpDerive();
-	CDrvdPropScalar *pdpScalar = CDrvdPropScalar::GetDrvdScalarProps(pexprScalar->Pdp(CDrvdProp::EptScalar));
+	CDrvdPropScalar *pdpScalar = CDrvdPropScalar::GetDrvdScalarProps(pexprScalar->Pdp(DrvdPropArray::EptScalar));
 	if (pdpScalar->FHasScalarArrayCmp() &&
 	    !GPOS_FTRACE(EopttraceArrayConstraints))
 	{
 		// if we have any Array Comparisons, we expand them into conjunctions/disjunctions
 		// of comparison predicates and then reconstruct scalar expression. This is because the
 		// DXL translator for partitions would not previously handle array statements
-		DrgPexpr *pdrgpexprExpandedConjuncts = PdrgpexprExpandConjuncts(memory_pool, pdrgpexprConjuncts);
+		ExpressionArray *pdrgpexprExpandedConjuncts = PdrgpexprExpandConjuncts(memory_pool, pdrgpexprConjuncts);
 		pdrgpexprConjuncts->Release();
 		CExpression *pexprExpandedScalar = PexprConjunction(memory_pool, pdrgpexprExpandedConjuncts);
 
@@ -1608,7 +1608,7 @@ CPredicateUtils::PexprExtractPredicatesOnPartKeys
 	}
 
 	const ULONG ulLevels = pdrgpdrgpcrPartKeys->Size();
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	for (ULONG ul = 0; ul < ulLevels; ul++)
 	{
 		CColRef *colref = CUtils::PcrExtractPartKey(pdrgpdrgpcrPartKeys, ul);
@@ -1715,7 +1715,7 @@ CPredicateUtils::FConstColumn
 	GPOS_ASSERT(pcnstr->FConstraint(colref));
 	
 	CConstraintInterval *pcnstrInterval = dynamic_cast<CConstraintInterval *>(pcnstr);
-	DrgPrng *pdrgprng = pcnstrInterval->Pdrgprng();
+	RangeArray *pdrgprng = pcnstrInterval->Pdrgprng();
 	if (1 < pdrgprng->Size())
 	{
 		return false;
@@ -1773,7 +1773,7 @@ CPredicateUtils::FColumnDisjunctionOfConst
 {
 	GPOS_ASSERT(pcnstrInterval->FConstraint(colref));
 
-	DrgPrng *pdrgprng = pcnstrInterval->Pdrgprng();
+	RangeArray *pdrgprng = pcnstrInterval->Pdrgprng();
 	
 	if (0 == pdrgprng->Size())
 	{
@@ -1804,7 +1804,7 @@ CPredicateUtils::PexprIndexLookupKeyOnLeft
 	CMDAccessor *md_accessor,
 	CExpression *pexprScalar,
 	const IMDIndex *pmdindex,
-	DrgPcr *pdrgpcrIndex,
+	ColRefArray *pdrgpcrIndex,
 	CColRefSet *outer_refs
 	)
 {
@@ -1860,7 +1860,7 @@ CPredicateUtils::PexprIndexLookupKeyOnRight
 	CMDAccessor *md_accessor,
 	CExpression *pexprScalar,
 	const IMDIndex *pmdindex,
-	DrgPcr *pdrgpcrIndex,
+	ColRefArray *pdrgpcrIndex,
 	CColRefSet *outer_refs
 	)
 {
@@ -1905,7 +1905,7 @@ CPredicateUtils::PexprIndexLookup
 	CMDAccessor *md_accessor,
 	CExpression *pexprScalar,
 	const IMDIndex *pmdindex,
-	DrgPcr *pdrgpcrIndex,
+	ColRefArray *pdrgpcrIndex,
 	CColRefSet *outer_refs
 	)
 {
@@ -1951,11 +1951,11 @@ CPredicateUtils::ExtractIndexPredicates
 	(
 	IMemoryPool *memory_pool,
 	CMDAccessor *md_accessor,
-	DrgPexpr *pdrgpexprPredicate,
+	ExpressionArray *pdrgpexprPredicate,
 	const IMDIndex *pmdindex,
-	DrgPcr *pdrgpcrIndex,
-	DrgPexpr *pdrgpexprIndex,
-	DrgPexpr *pdrgpexprResidual,
+	ColRefArray *pdrgpcrIndex,
+	ExpressionArray *pdrgpexprIndex,
+	ExpressionArray *pdrgpexprResidual,
 	CColRefSet *pcrsAcceptedOuterRefs // outer refs that are acceptable in an index predicate
 	)
 {
@@ -1985,7 +1985,7 @@ CPredicateUtils::ExtractIndexPredicates
 			continue;
 		}
 		
-		DrgPexpr *pdrgpexprTarget = pdrgpexprIndex;
+		ExpressionArray *pdrgpexprTarget = pdrgpexprIndex;
 
 		if (CUtils::FScalarIdentBoolType(pexprCond))
 		{
@@ -2049,9 +2049,9 @@ CPredicateUtils::SeparateOuterRefs
 		return;
 	}
 
-	DrgPexpr *pdrgpexpr = PdrgpexprConjuncts(memory_pool, pexprScalar);
-	DrgPexpr *pdrgpexprLocal = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
-	DrgPexpr *pdrgpexprOuterRefs = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = PdrgpexprConjuncts(memory_pool, pexprScalar);
+	ExpressionArray *pdrgpexprLocal = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexprOuterRefs = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 
 	const ULONG size = pdrgpexpr->Size();
 	for (ULONG ul = 0; ul < size; ul++)
@@ -2161,7 +2161,7 @@ CPredicateUtils::PexprPruneSuperfluosEquality
 	}
 
 	// process children
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	const ULONG ulChildren = pexpr->Arity();
 	for (ULONG ul = 0; ul < ulChildren; ul++)
 	{
@@ -2194,7 +2194,7 @@ BOOL
 CPredicateUtils::FImpliedPredicate
 	(
 	CExpression *pexprPred,
-	DrgPcrs *pdrgpcrsEquivClasses
+	ColRefSetArray *pdrgpcrsEquivClasses
 	)
 {
 	GPOS_ASSERT(pexprPred->Pop()->FScalar());
@@ -2231,12 +2231,12 @@ CPredicateUtils::PexprRemoveImpliedConjuncts
 	)
 {
 	// extract equivalence classes from logical children
-	DrgPcrs *pdrgpcrs = CUtils::PdrgpcrsCopyChildEquivClasses(memory_pool, exprhdl);
+	ColRefSetArray *pdrgpcrs = CUtils::PdrgpcrsCopyChildEquivClasses(memory_pool, exprhdl);
 
 	// extract all the conjuncts
-	DrgPexpr *pdrgpexprConjuncts = PdrgpexprConjuncts(memory_pool, pexprScalar);
+	ExpressionArray *pdrgpexprConjuncts = PdrgpexprConjuncts(memory_pool, pexprScalar);
 	const ULONG size = pdrgpexprConjuncts->Size();
-	DrgPexpr *pdrgpexprNewConjuncts = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprNewConjuncts = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	for (ULONG ul = 0; ul < size; ul++)
 	{
 		CExpression *pexprConj = (*pdrgpexprConjuncts)[ul];
@@ -2247,12 +2247,12 @@ CPredicateUtils::PexprRemoveImpliedConjuncts
 		}
 
 		// add predicate to current equivalence classes
-		DrgPcrs *pdrgpcrsConj = NULL;
+		ColRefSetArray *pdrgpcrsConj = NULL;
 		CConstraint *pcnstr = CConstraint::PcnstrFromScalarExpr(memory_pool, pexprConj, &pdrgpcrsConj);
 		CRefCount::SafeRelease(pcnstr);
 		if (NULL != pdrgpcrsConj)
 		{
-			DrgPcrs *pdrgpcrsMerged = CUtils::PdrgpcrsMergeEquivClasses(memory_pool, pdrgpcrs, pdrgpcrsConj);
+			ColRefSetArray *pdrgpcrsMerged = CUtils::PdrgpcrsMergeEquivClasses(memory_pool, pdrgpcrs, pdrgpcrsConj);
 			pdrgpcrs->Release();
 			pdrgpcrsConj->Release();
 			pdrgpcrs = pdrgpcrsMerged;
@@ -2278,7 +2278,7 @@ CPredicateUtils::FValidSemiJoinCorrelations
 	IMemoryPool *memory_pool,
 	CExpression *pexprOuter,
 	CExpression *pexprInner,
-	DrgPexpr *pdrgpexprCorrelations
+	ExpressionArray *pdrgpexprCorrelations
 	)
 {
 	GPOS_ASSERT(NULL != pexprOuter);
@@ -2324,7 +2324,7 @@ CPredicateUtils::FSimpleEqualityUsingCols
 	GPOS_ASSERT(0 < pcrs->Size());
 
 	// break expression into conjuncts
-	DrgPexpr *pdrgpexpr = PdrgpexprConjuncts(memory_pool, pexprScalar);
+	ExpressionArray *pdrgpexpr = PdrgpexprConjuncts(memory_pool, pexprScalar);
 	const ULONG size = pdrgpexpr->Size();
 	BOOL fSuccess = true;
 	for (ULONG ul = 0; fSuccess && ul < size; ul++)
@@ -2372,7 +2372,7 @@ CPredicateUtils::PexprReplaceColsWithNulls
 	}
 
 	// process children recursively
-	DrgPexpr *pdrgpexpr = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	const ULONG ulChildren = pexprScalar->Arity();
 	for (ULONG ul = 0; ul < ulChildren; ul++)
 	{
@@ -2438,9 +2438,9 @@ CPredicateUtils::FNotIdent
 BOOL
 CPredicateUtils::FCompatiblePredicates
 	(
-	DrgPexpr *pdrgpexprPred,
+	ExpressionArray *pdrgpexprPred,
 	const IMDIndex *pmdindex,
-	DrgPcr *pdrgpcrIndex,
+	ColRefArray *pdrgpcrIndex,
 	CMDAccessor *md_accessor
 	)
 {
@@ -2465,7 +2465,7 @@ CPredicateUtils::FCompatibleIndexPredicate
 	(
 	CExpression *pexprPred,
 	const IMDIndex *pmdindex,
-	DrgPcr *pdrgpcrIndex,
+	ColRefArray *pdrgpcrIndex,
 	CMDAccessor *md_accessor
 	)
 {
@@ -2503,7 +2503,7 @@ CPredicateUtils::FCompatibleIndexPredicate
 BOOL
 CPredicateUtils::FContainsVolatileFunction
 	(
-	DrgPexpr *pdrgpexprPred
+	ExpressionArray *pdrgpexprPred
 	)
 {
 	GPOS_ASSERT(NULL != pdrgpexprPred);
@@ -2620,8 +2620,8 @@ CPredicateUtils::CollectGrandChildrenUnionUnionAll
 	IMemoryPool *memory_pool,
 	CExpression *pexpr,
 	ULONG child_index,
-	DrgPexpr *pdrgpexprResult,
-	DrgDrgPcr *pdrgdrgpcrResult
+	ExpressionArray *pdrgpexprResult,
+	ColRefArrays *pdrgdrgpcrResult
 	)
 {
 	GPOS_ASSERT(NULL != pexpr);
@@ -2640,12 +2640,12 @@ CPredicateUtils::CollectGrandChildrenUnionUnionAll
 	// the parent setop's expected input columns and the child setop's output columns
 	// may have different size or order or both. We need to ensure that the new
 	// n-ary setop has the right order of the input columns from its grand children
-	DrgDrgPcr *pdrgpdrgpcrInput = pop->PdrgpdrgpcrInput();
-	DrgPcr *pdrgpcrInputExpected = (*pdrgpdrgpcrInput)[child_index];
+	ColRefArrays *pdrgpdrgpcrInput = pop->PdrgpdrgpcrInput();
+	ColRefArray *pdrgpcrInputExpected = (*pdrgpdrgpcrInput)[child_index];
 
 	const ULONG num_cols = pdrgpcrInputExpected->Size();
 
-	DrgPcr *pdrgpcrOuputChild = popChild->PdrgpcrOutput();
+	ColRefArray *pdrgpcrOuputChild = popChild->PdrgpcrOutput();
 	GPOS_ASSERT(num_cols <= pdrgpcrOuputChild->Size());
 
 	ULongPtrArray *pdrgpul = GPOS_NEW(memory_pool) ULongPtrArray (memory_pool);
@@ -2657,7 +2657,7 @@ CPredicateUtils::CollectGrandChildrenUnionUnionAll
 		pdrgpul->Append(GPOS_NEW(memory_pool) ULONG(ulPos));
 	}
 
-	DrgDrgPcr *pdrgdrgpcrChild = popChild->PdrgpdrgpcrInput();
+	ColRefArrays *pdrgdrgpcrChild = popChild->PdrgpdrgpcrInput();
 	const ULONG ulArityChild = pexprChild->Arity();
 	GPOS_ASSERT(pdrgdrgpcrChild->Size() == ulArityChild);
 
@@ -2671,8 +2671,8 @@ CPredicateUtils::CollectGrandChildrenUnionUnionAll
 		pdrgpexprResult->Append(pexprGrandchild);
 
 		// collect the correct input columns
-		DrgPcr *pdrgpcrOld = (*pdrgdrgpcrChild)[ul];
-		DrgPcr *pdrgpcrNew = GPOS_NEW(memory_pool) DrgPcr (memory_pool);
+		ColRefArray *pdrgpcrOld = (*pdrgdrgpcrChild)[ul];
+		ColRefArray *pdrgpcrNew = GPOS_NEW(memory_pool) ColRefArray (memory_pool);
 		for (ULONG ulColIdx = 0; ulColIdx < num_cols; ulColIdx++)
 		{
 			ULONG ulPos = *(*pdrgpul)[ulColIdx];

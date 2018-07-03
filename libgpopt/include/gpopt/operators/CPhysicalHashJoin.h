@@ -37,11 +37,11 @@ namespace gpopt
 
 			// the array of expressions from the outer relation
 			// that are extracted from the hashing condition
-			DrgPexpr *m_pdrgpexprOuterKeys;
+			ExpressionArray *m_pdrgpexprOuterKeys;
 
 			// the array of expressions from the inner relation
 			// that are extracted from the hashing condition
-			DrgPexpr *m_pdrgpexprInnerKeys;
+			ExpressionArray *m_pdrgpexprInnerKeys;
 
 			// array redistribute request sent to the first hash join child
 			DrgPds *m_pdrgpdsRedistributeRequests;
@@ -123,8 +123,8 @@ namespace gpopt
 			CPhysicalHashJoin
 				(
 				IMemoryPool *memory_pool,
-				DrgPexpr *pdrgpexprOuterKeys,
-				DrgPexpr *pdrgpexprInnerKeys
+				ExpressionArray *pdrgpexprOuterKeys,
+				ExpressionArray *pdrgpexprInnerKeys
 				);
 
 			// dtor
@@ -132,13 +132,13 @@ namespace gpopt
 			~CPhysicalHashJoin();
 
 			// inner keys
-			const DrgPexpr *PdrgpexprInnerKeys() const
+			const ExpressionArray *PdrgpexprInnerKeys() const
 			{
 				return m_pdrgpexprInnerKeys;
 			}
 
 			// outer keys
-			const DrgPexpr *PdrgpexprOuterKeys() const
+			const ExpressionArray *PdrgpexprOuterKeys() const
 			{
 				return m_pdrgpexprOuterKeys;
 			}

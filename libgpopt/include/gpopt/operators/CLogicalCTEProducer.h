@@ -34,7 +34,7 @@ namespace gpopt
 			ULONG m_id;
 
 			// cte columns
-			DrgPcr *m_pdrgpcr;
+			ColRefArray *m_pdrgpcr;
 
 			// output columns, same as cte columns but in CColRefSet
 			CColRefSet *m_pcrsOutput;
@@ -49,7 +49,7 @@ namespace gpopt
 			CLogicalCTEProducer(IMemoryPool *memory_pool);
 
 			// ctor
-			CLogicalCTEProducer(IMemoryPool *memory_pool, ULONG id, DrgPcr *colref_array);
+			CLogicalCTEProducer(IMemoryPool *memory_pool, ULONG id, ColRefArray *colref_array);
 
 			// dtor
 			virtual
@@ -75,7 +75,7 @@ namespace gpopt
 			}
 
 			// cte columns
-			DrgPcr *Pdrgpcr() const
+			ColRefArray *Pdrgpcr() const
 			{
 				return m_pdrgpcr;
 			}

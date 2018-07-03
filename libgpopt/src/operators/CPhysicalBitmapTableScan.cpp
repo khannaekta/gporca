@@ -38,7 +38,7 @@ CPhysicalBitmapTableScan::CPhysicalBitmapTableScan
 	CTableDescriptor *ptabdesc,
 	ULONG ulOriginOpId,
 	const CName *pnameTableAlias,
-	DrgPcr *pdrgpcrOutput
+	ColRefArray *pdrgpcrOutput
 	)
 	:
 	CPhysicalScan(memory_pool, pnameTableAlias, ptabdesc, pdrgpcrOutput),

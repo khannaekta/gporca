@@ -434,7 +434,7 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQuery()
 
 
 		// the output column references from the logical get
-		DrgPcr *colref_array = popGet->PdrgpcrOutput();
+		ColRefArray *colref_array = popGet->PdrgpcrOutput();
 
 		GPOS_ASSERT(NULL != colref_array && 2 == colref_array->Size());
 
@@ -490,7 +490,7 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQueryWithConst()
 		CLogicalGet *popGet = CLogicalGet::PopConvert(pexprLgGet->Pop());
 
 		// the output column references from the logical get
-		DrgPcr *colref_array = popGet->PdrgpcrOutput();
+		ColRefArray *colref_array = popGet->PdrgpcrOutput();
 		GPOS_ASSERT(NULL != colref_array && 2 == colref_array->Size());
 
 		CColRef *pcrLeft =  (*colref_array)[0];
@@ -538,7 +538,7 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQueryWithConstInList()
 		CLogicalGet *popGet = CLogicalGet::PopConvert(pexprLgGet->Pop());
 
 		// the output column references from the logical get
-		DrgPcr *colref_array = popGet->PdrgpcrOutput();
+		ColRefArray *colref_array = popGet->PdrgpcrOutput();
 		GPOS_ASSERT(NULL != colref_array && 2 == colref_array->Size());
 
 		CColRef *colref =  (*colref_array)[0];
@@ -548,7 +548,7 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQueryWithConstInList()
 		CExpression *pexprScConst2 = CUtils::PexprScalarConstInt4(memory_pool, ulVal2);
 		ULONG ulVal3 = 7;
 		CExpression *pexprScConst3 = CUtils::PexprScalarConstInt4(memory_pool, ulVal3);
-		DrgPexpr *pexprScalarChildren = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+		ExpressionArray *pexprScalarChildren = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 		pexprScalarChildren->Append(pexprScConst1);
 		pexprScalarChildren->Append(pexprScConst2);
 		pexprScalarChildren->Append(pexprScConst3);
@@ -605,7 +605,7 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQueryWithBoolExpr()
 		CLogicalGet *popGet = CLogicalGet::PopConvert(pexprLgGet->Pop());
 
 		// the output column references from the logical get
-		DrgPcr *colref_array = popGet->PdrgpcrOutput();
+		ColRefArray *colref_array = popGet->PdrgpcrOutput();
 
 		GPOS_ASSERT(NULL != colref_array && 2 == colref_array->Size());
 
@@ -619,7 +619,7 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQueryWithBoolExpr()
 
 		// create a scalar compare for a = b
 		CColRef *pcrRight = (*colref_array)[1];
-		DrgPexpr *pdrgpexprInput = GPOS_NEW(memory_pool) DrgPexpr(memory_pool, 2);
+		ExpressionArray *pdrgpexprInput = GPOS_NEW(memory_pool) ExpressionArray(memory_pool, 2);
 		pdrgpexprInput->Append(pexprScCmp);
 		pexprScCmp = CUtils::PexprScalarEqCmp(memory_pool, pcrLeft, pcrRight);
 
@@ -674,7 +674,7 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQueryWithScalarOp()
 		CLogicalGet *popGet = CLogicalGet::PopConvert(pexprLgGet->Pop());
 
 		// the output column references from the logical get
-		DrgPcr *colref_array = popGet->PdrgpcrOutput();
+		ColRefArray *colref_array = popGet->PdrgpcrOutput();
 
 		GPOS_ASSERT(NULL != colref_array && 2 == colref_array->Size());
 
@@ -859,7 +859,7 @@ GPOS_RESULT CTranslatorDXLToExprTest::EresUnittest_MetadataColumnMapping()
 	CAutoRef<CExpression> apExpr(CTranslatorDXLToExprTest::Pexpr(memory_pool, szQueryDroppedColumn));
 
 	CLogicalGet *pActualGet = (CLogicalGet *) apExpr->Pop();
-	DrgPcoldesc *pDrgColDesc = pActualGet->Ptabdesc()->Pdrgpcoldesc();
+	ColumnDescrArray *pDrgColDesc = pActualGet->Ptabdesc()->Pdrgpcoldesc();
 	CColumnDescriptor *pColDesc = (*pDrgColDesc)[0];
 	bool actualNullable = pColDesc->IsNullable();
 	GPOS_RTL_ASSERT(actualNullable == false);

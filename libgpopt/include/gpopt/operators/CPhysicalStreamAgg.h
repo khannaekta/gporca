@@ -41,7 +41,7 @@ namespace gpopt
 			CColRefSet *m_pcrsMinimalGrpCols;
 
 			// construct order spec on grouping column so that it covers required order spec
-			COrderSpec *PosCovering(IMemoryPool *memory_pool, COrderSpec *posRequired, DrgPcr *pdrgpcrGrp) const;
+			COrderSpec *PosCovering(IMemoryPool *memory_pool, COrderSpec *posRequired, ColRefArray *pdrgpcrGrp) const;
 
 		protected:
 
@@ -52,12 +52,12 @@ namespace gpopt
 				CExpressionHandle &exprhdl,
 				COrderSpec *posRequired,
 				ULONG child_index,
-				DrgPcr *pdrgpcrGrp
+				ColRefArray *pdrgpcrGrp
 				)
 				const;
 
 			// initialize the order spec using the given array of columns
-			void InitOrderSpec(IMemoryPool *memory_pool, DrgPcr *pdrgpcrOrder);
+			void InitOrderSpec(IMemoryPool *memory_pool, ColRefArray *pdrgpcrOrder);
 
 		public:
 
@@ -65,11 +65,11 @@ namespace gpopt
 			CPhysicalStreamAgg
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *colref_array,
-				DrgPcr *pdrgpcrMinimal, // minimal grouping columns based on FD's
+				ColRefArray *colref_array,
+				ColRefArray *pdrgpcrMinimal, // minimal grouping columns based on FD's
 				COperator::EGbAggType egbaggtype,
 				BOOL fGeneratesDuplicates,
-				DrgPcr *pdrgpcrArgDQA,
+				ColRefArray *pdrgpcrArgDQA,
 				BOOL fMultiStage
 				);
 

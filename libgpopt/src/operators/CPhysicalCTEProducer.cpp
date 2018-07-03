@@ -33,7 +33,7 @@ CPhysicalCTEProducer::CPhysicalCTEProducer
 	(
 	IMemoryPool *memory_pool,
 	ULONG id,
-	DrgPcr *colref_array
+	ColRefArray *colref_array
 	)
 	:
 	CPhysical(memory_pool),

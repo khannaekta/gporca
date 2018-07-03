@@ -53,7 +53,7 @@ CLogicalInsert::CLogicalInsert
 	(
 	IMemoryPool *memory_pool,
 	CTableDescriptor *ptabdesc,
-	DrgPcr *pdrgpcrSource
+	ColRefArray *pdrgpcrSource
 	)
 	:
 	CLogical(memory_pool),
@@ -140,7 +140,7 @@ CLogicalInsert::PopCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcr *colref_array = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrSource, colref_mapping, must_exist);
+	ColRefArray *colref_array = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrSource, colref_mapping, must_exist);
 	m_ptabdesc->AddRef();
 
 	return GPOS_NEW(memory_pool) CLogicalInsert(memory_pool, m_ptabdesc, colref_array);

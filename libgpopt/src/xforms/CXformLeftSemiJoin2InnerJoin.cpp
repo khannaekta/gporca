@@ -132,7 +132,7 @@ CXformLeftSemiJoin2InnerJoin::Transform
 	{
 		// grouping columns do not cover a key on the inner side,
 		// we need to create a group by on inner side
-		DrgPcr *colref_array = pcrsGb->Pdrgpcr(memory_pool);
+		ColRefArray *colref_array = pcrsGb->Pdrgpcr(memory_pool);
 		CExpression *pexprGb =
 			GPOS_NEW(memory_pool) CExpression
 				(

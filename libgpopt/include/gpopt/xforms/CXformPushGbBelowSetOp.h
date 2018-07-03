@@ -104,12 +104,12 @@ namespace gpopt
                 CLogicalGbAgg *popGbAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
                 CLogicalSetOp *popSetOp = CLogicalSetOp::PopConvert(pexprSetOp->Pop());
 
-                DrgPcr *pdrgpcrGb = popGbAgg->Pdrgpcr();
-                DrgPcr *pdrgpcrOutput = popSetOp->PdrgpcrOutput();
+                ColRefArray *pdrgpcrGb = popGbAgg->Pdrgpcr();
+                ColRefArray *pdrgpcrOutput = popSetOp->PdrgpcrOutput();
                 CColRefSet *pcrsOutput = GPOS_NEW(memory_pool) CColRefSet(memory_pool, pdrgpcrOutput);
-                DrgDrgPcr *pdrgpdrgpcrInput = popSetOp->PdrgpdrgpcrInput();
-                DrgPexpr *pdrgpexprNewChildren = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
-                DrgDrgPcr *pdrgpdrgpcrNewInput = GPOS_NEW(memory_pool) DrgDrgPcr(memory_pool);
+                ColRefArrays *pdrgpdrgpcrInput = popSetOp->PdrgpdrgpcrInput();
+                ExpressionArray *pdrgpexprNewChildren = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+                ColRefArrays *pdrgpdrgpcrNewInput = GPOS_NEW(memory_pool) ColRefArrays(memory_pool);
                 const ULONG arity = pexprSetOp->Arity();
 
                 BOOL fNewChild = false;
@@ -117,10 +117,10 @@ namespace gpopt
                 for (ULONG ulChild = 0; ulChild < arity; ulChild++)
                 {
                     CExpression *pexprChild = (*pexprSetOp)[ulChild];
-                    DrgPcr *pdrgpcrChild = (*pdrgpdrgpcrInput)[ulChild];
+                    ColRefArray *pdrgpcrChild = (*pdrgpdrgpcrInput)[ulChild];
                     CColRefSet *pcrsChild =  GPOS_NEW(memory_pool) CColRefSet(memory_pool, pdrgpcrChild);
 
-                    DrgPcr *pdrgpcrChildGb = NULL;
+                    ColRefArray *pdrgpcrChildGb = NULL;
                     if (!pcrsChild->Equals(pcrsOutput))
                     {
                         // use column mapping in SetOp to set child grouping colums

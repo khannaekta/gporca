@@ -57,8 +57,8 @@ CLogicalUpdate::CLogicalUpdate
 	(
 	IMemoryPool *memory_pool,
 	CTableDescriptor *ptabdesc,
-	DrgPcr *pdrgpcrDelete,
-	DrgPcr *pdrgpcrInsert,
+	ColRefArray *pdrgpcrDelete,
+	ColRefArray *pdrgpcrInsert,
 	CColRef *pcrCtid,
 	CColRef *pcrSegmentId, 
 	CColRef *pcrTupleOid
@@ -172,8 +172,8 @@ CLogicalUpdate::PopCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcrDelete = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrDelete, colref_mapping, must_exist);
-	DrgPcr *pdrgpcrInsert = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrInsert, colref_mapping, must_exist);
+	ColRefArray *pdrgpcrDelete = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrDelete, colref_mapping, must_exist);
+	ColRefArray *pdrgpcrInsert = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrInsert, colref_mapping, must_exist);
 	CColRef *pcrCtid = CUtils::PcrRemap(m_pcrCtid, colref_mapping, must_exist);
 	CColRef *pcrSegmentId = CUtils::PcrRemap(m_pcrSegmentId, colref_mapping, must_exist);
 	m_ptabdesc->AddRef();

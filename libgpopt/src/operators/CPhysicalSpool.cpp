@@ -391,7 +391,7 @@ CPhysicalSpool::FValidContext
 	(
 	IMemoryPool *,
 	COptimizationContext *,
-	DrgPoc *pdrgpocChild
+	OptimizationContextArray *pdrgpocChild
 	)
 	const
 {

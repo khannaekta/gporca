@@ -147,15 +147,15 @@ CXformSplitGbAgg::Transform
 
 	GPOS_ASSERT(NULL != pexprProjectListLocal && NULL != pexprProjectListLocal);
 
-	DrgPcr *colref_array = popAgg->Pdrgpcr();
+	ColRefArray *colref_array = popAgg->Pdrgpcr();
 
 	colref_array->AddRef();
-	DrgPcr *pdrgpcrLocal = colref_array;
+	ColRefArray *pdrgpcrLocal = colref_array;
 
 	colref_array->AddRef();
-	DrgPcr *pdrgpcrGlobal = colref_array;
+	ColRefArray *pdrgpcrGlobal = colref_array;
 
-	DrgPcr *pdrgpcrMinimal = popAgg->PdrgpcrMinimal();
+	ColRefArray *pdrgpcrMinimal = popAgg->PdrgpcrMinimal();
 	if (NULL != pdrgpcrMinimal)
 	{
 		// addref minimal grouping columns twice to be used in local and global aggregate
@@ -215,8 +215,8 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	// list of project elements for the new local and global aggregates
-	DrgPexpr *pdrgpexprProjElemLocal = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
-	DrgPexpr *pdrgpexprProjElemGlobal = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+	ExpressionArray *pdrgpexprProjElemLocal = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexprProjElemGlobal = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 	const ULONG arity = pexprProjList->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
@@ -259,10 +259,10 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList
 
 		// create a new local aggregate function
 		// create array of arguments for the aggregate function
-		DrgPexpr *pdrgpexprAgg = pexprAggFunc->PdrgPexpr();
+		ExpressionArray *pdrgpexprAgg = pexprAggFunc->PdrgPexpr();
 
 		pdrgpexprAgg->AddRef();
-		DrgPexpr *pdrgpexprLocal = pdrgpexprAgg;
+		ExpressionArray *pdrgpexprLocal = pdrgpexprAgg;
 
 		CExpression *pexprAggFuncLocal = GPOS_NEW(memory_pool) CExpression
 													(
@@ -273,7 +273,7 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList
 
 		// create a new global aggregate function adding the column reference of the
 		// intermediate result to the arguments of the global aggregate function
-		DrgPexpr *pdrgpexprGlobal = GPOS_NEW(memory_pool) DrgPexpr(memory_pool);
+		ExpressionArray *pdrgpexprGlobal = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
 		CExpression *pexprArg = CUtils::PexprScalarIdent(memory_pool, pcrLocal);
 		pdrgpexprGlobal->Append(pexprArg);
 

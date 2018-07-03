@@ -64,8 +64,8 @@ namespace gpopt
 				ULONG ulOriginOpId,
 				const CName *pnameAlias,
 				ULONG ulPartIndex,
-				DrgPcr *pdrgpcrOutput,
-				DrgDrgPcr *pdrgpdrgpcrPart,
+				ColRefArray *pdrgpcrOutput,
+				ColRefArrays *pdrgpdrgpcrPart,
 				ULONG ulSecondaryPartIndexId,
 				CPartConstraint *ppartcnstr,
 				CPartConstraint *ppartcnstrRel

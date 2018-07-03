@@ -153,7 +153,7 @@ namespace gpopt
 				CExpression *pexprInner,
 				BOOL fExistential,
 				BOOL fOuterRefsUnderInner,
-				DrgPcr **ppdrgpcr, // output: constructed grouping columns
+				ColRefArray **ppdrgpcr, // output: constructed grouping columns
 				BOOL *pfGbOnInner // output: is Gb created on inner expression
 				);
 

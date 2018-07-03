@@ -26,7 +26,7 @@ namespace gpnaucrates
 {
 	// type definitions
 	// array of doubles
-	typedef CDynamicPtrArray<CDouble, CleanupDelete> DrgPdouble;
+	typedef CDynamicPtrArray<CDouble, CleanupDelete> CDoubleArray;
 
 	//---------------------------------------------------------------------------
 	//	@class:
@@ -168,7 +168,7 @@ namespace gpnaucrates
 							   BucketArray *src_buckets,
 							   BucketArray *dest_buckets,
 							   CDouble rows,
-							   DrgPdouble *dest_bucket_freqs,
+							   CDoubleArray *dest_bucket_freqs,
 							   ULONG begin,
 							   ULONG end);
 
@@ -299,7 +299,7 @@ namespace gpnaucrates
 		// create a new histogram with updated bucket frequency
 		CHistogram *MakeHistogramUpdateFreq(IMemoryPool *memory_pool,
 											BucketArray *histogram_buckets,
-											DrgPdouble *dest_bucket_freqs,
+											CDoubleArray *dest_bucket_freqs,
 											CDouble *num_output_rows,
 											CDouble num_null_rows,
 											CDouble num_NDV_remain,
@@ -321,7 +321,7 @@ namespace gpnaucrates
 									 CDouble rows,
 									 BOOL bucket_is_residual,
 									 ULONG index,
-									 DrgPdouble *dest_bucket_freqs) const;
+									 CDoubleArray *dest_bucket_freqs) const;
 
 		// number of buckets
 		ULONG

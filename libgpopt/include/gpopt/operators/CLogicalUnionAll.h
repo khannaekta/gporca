@@ -46,8 +46,8 @@ namespace gpopt
 			CLogicalUnionAll
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *pdrgpcrOutput,
-				DrgDrgPcr *pdrgpdrgpcrInput,
+				ColRefArray *pdrgpcrOutput,
+				ColRefArrays *pdrgpdrgpcrInput,
 				ULONG ulScanIdPartialIndex = gpos::ulong_max
 				);
 

@@ -35,10 +35,10 @@ namespace gpopt
 		private:
 
 			// deletion columns
-			DrgPcr *m_pdrgpcrDelete;
+			ColRefArray *m_pdrgpcrDelete;
 
 			// insertion columns
-			DrgPcr *m_pdrgpcrInsert;
+			ColRefArray *m_pdrgpcrInsert;
 
 			// ctid column
 			CColRef *m_pcrCtid;
@@ -65,8 +65,8 @@ namespace gpopt
 			CLogicalSplit
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *pdrgpcrDelete,
-				DrgPcr *pdrgpcrInsert,
+				ColRefArray *pdrgpcrDelete,
+				ColRefArray *pdrgpcrInsert,
 				CColRef *pcrCtid,
 				CColRef *pcrSegmentId,
 				CColRef *pcrAction,
@@ -92,13 +92,13 @@ namespace gpopt
 			}
 
 			// deletion columns
-			DrgPcr *PdrgpcrDelete() const
+			ColRefArray *PdrgpcrDelete() const
 			{
 				return m_pdrgpcrDelete;
 			}
 
 			// insertion columns
-			DrgPcr *PdrgpcrInsert() const
+			ColRefArray *PdrgpcrInsert() const
 			{
 				return m_pdrgpcrInsert;
 			}

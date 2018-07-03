@@ -68,7 +68,7 @@ CLogicalDML::CLogicalDML
 	IMemoryPool *memory_pool,
 	EDMLOperator edmlop,
 	CTableDescriptor *ptabdesc,
-	DrgPcr *pdrgpcrSource,
+	ColRefArray *pdrgpcrSource,
 	CBitSet *pbsModified,
 	CColRef *pcrAction,
 	CColRef *pcrTableOid,
@@ -207,7 +207,7 @@ CLogicalDML::PopCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcr *colref_array = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrSource, colref_mapping, must_exist);
+	ColRefArray *colref_array = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrSource, colref_mapping, must_exist);
 	CColRef *pcrAction = CUtils::PcrRemap(m_pcrAction, colref_mapping, must_exist);
 	CColRef *pcrTableOid = CUtils::PcrRemap(m_pcrTableOid, colref_mapping, must_exist);
 	

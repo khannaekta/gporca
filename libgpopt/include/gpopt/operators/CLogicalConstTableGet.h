@@ -17,7 +17,7 @@
 namespace gpopt
 {
 	// dynamic array of datum arrays -- array owns elements
-	typedef CDynamicPtrArray<DrgPdatum, CleanupRelease> DrgPdrgPdatum;
+	typedef CDynamicPtrArray<IDatumArray, CleanupRelease> IDatumArrays;
 
 	//---------------------------------------------------------------------------
 	//	@class:
@@ -32,19 +32,19 @@ namespace gpopt
 
 		private:
 			// array of column descriptors: the schema of the const table
-			DrgPcoldesc *m_pdrgpcoldesc;
+			ColumnDescrArray *m_pdrgpcoldesc;
 		
 			// array of datum arrays
-			DrgPdrgPdatum *m_pdrgpdrgpdatum;
+			IDatumArrays *m_pdrgpdrgpdatum;
 			
 			// output columns
-			DrgPcr *m_pdrgpcrOutput;
+			ColRefArray *m_pdrgpcrOutput;
 			
 			// private copy ctor
 			CLogicalConstTableGet(const CLogicalConstTableGet &);
 			
 			// construct column descriptors from column references
-			DrgPcoldesc *PdrgpcoldescMapping(IMemoryPool *memory_pool, DrgPcr *colref_array)	const;
+			ColumnDescrArray *PdrgpcoldescMapping(IMemoryPool *memory_pool, ColRefArray *colref_array)	const;
 
 		public:
 		
@@ -55,15 +55,15 @@ namespace gpopt
 			CLogicalConstTableGet
 				(
 				IMemoryPool *memory_pool,
-				DrgPcoldesc *pdrgpcoldesc,
-				DrgPdrgPdatum *pdrgpdrgpdatum
+				ColumnDescrArray *pdrgpcoldesc,
+				IDatumArrays *pdrgpdrgpdatum
 				);
 
 			CLogicalConstTableGet
 				(
 				IMemoryPool *memory_pool,
-				DrgPcr *pdrgpcrOutput,
-				DrgPdrgPdatum *pdrgpdrgpdatum
+				ColRefArray *pdrgpcrOutput,
+				IDatumArrays *pdrgpdrgpdatum
 				);
 
 			// dtor
@@ -85,19 +85,19 @@ namespace gpopt
 			}
 			
 			// col descr accessor
-			DrgPcoldesc *Pdrgpcoldesc() const
+			ColumnDescrArray *Pdrgpcoldesc() const
 			{
 				return m_pdrgpcoldesc;
 			}
 			
 			// const table values accessor
-			DrgPdrgPdatum *Pdrgpdrgpdatum () const
+			IDatumArrays *Pdrgpdrgpdatum () const
 			{
 				return m_pdrgpdrgpdatum;
 			}
 			
 			// accessors
-			DrgPcr *PdrgpcrOutput() const
+			ColRefArray *PdrgpcrOutput() const
 			{
 				return m_pdrgpcrOutput;
 			}
@@ -152,7 +152,7 @@ namespace gpopt
 			{
 				// TODO:  - Jan 11, 2013; compute constraints based on the
 				// datum values in this CTG
-				return GPOS_NEW(memory_pool) CPropConstraint(memory_pool, GPOS_NEW(memory_pool) DrgPcrs(memory_pool), NULL /*pcnstr*/);
+				return GPOS_NEW(memory_pool) CPropConstraint(memory_pool, GPOS_NEW(memory_pool) ColRefSetArray(memory_pool), NULL /*pcnstr*/);
 			}
 
 			//-------------------------------------------------------------------------------------

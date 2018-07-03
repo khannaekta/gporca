@@ -269,7 +269,7 @@ CParseHandlerDXL::GetStatsDerivedRelDXLArray() const
 //		Returns search strategy
 //
 //---------------------------------------------------------------------------
-DrgPss *
+SearchStageArray *
 CParseHandlerDXL::GetSearchStageArray() const
 {
 	return m_search_stage_array;
@@ -674,7 +674,7 @@ CParseHandlerDXL::ExtractSearchStrategy(CParseHandlerBase *parse_handler_base)
 	GPOS_ASSERT(NULL != parse_handler_search_strategy &&
 				NULL != parse_handler_search_strategy->GetSearchStageArray());
 
-	DrgPss *search_stage_array = parse_handler_search_strategy->GetSearchStageArray();
+	SearchStageArray *search_stage_array = parse_handler_search_strategy->GetSearchStageArray();
 
 	search_stage_array->AddRef();
 	m_search_stage_array = search_stage_array;

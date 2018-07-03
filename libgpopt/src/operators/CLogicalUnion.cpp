@@ -50,15 +50,15 @@ CLogicalUnion::CLogicalUnion
 CLogicalUnion::CLogicalUnion
 	(
 	IMemoryPool *memory_pool,
-	DrgPcr *pdrgpcrOutput,
-	DrgDrgPcr *pdrgpdrgpcrInput
+	ColRefArray *pdrgpcrOutput,
+	ColRefArrays *pdrgpdrgpcrInput
 	)
 	:
 	CLogicalSetOp(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput)
 {
 
 #ifdef GPOS_DEBUG
-	DrgPcr *pdrgpcrInput = (*pdrgpdrgpcrInput)[0];
+	ColRefArray *pdrgpcrInput = (*pdrgpdrgpcrInput)[0];
 	const ULONG num_cols = pdrgpcrOutput->Size();
 	GPOS_ASSERT(num_cols == pdrgpcrInput->Size());
 
@@ -100,8 +100,8 @@ CLogicalUnion::PopCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcrOutput = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrOutput, colref_mapping, must_exist);
-	DrgDrgPcr *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(memory_pool, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
+	ColRefArray *pdrgpcrOutput = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrOutput, colref_mapping, must_exist);
+	ColRefArrays *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(memory_pool, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
 
 	return GPOS_NEW(memory_pool) CLogicalUnion(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput);
 }

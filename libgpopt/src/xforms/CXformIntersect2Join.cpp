@@ -82,7 +82,7 @@ CXformIntersect2Join::Transform
 	CExpression *pexprRightChild = (*pexpr)[1];
 
 	CLogicalIntersect *popIntersect = CLogicalIntersect::PopConvert(pexpr->Pop());
-	DrgDrgPcr *pdrgpdrgpcrInput = popIntersect->PdrgpdrgpcrInput();
+	ColRefArrays *pdrgpdrgpcrInput = popIntersect->PdrgpdrgpcrInput();
 
 	// construct group by over the left and right expressions
 
@@ -90,7 +90,7 @@ CXformIntersect2Join::Transform
 											(
 											memory_pool,
 											GPOS_NEW(memory_pool) CScalarProjectList(memory_pool),
-											GPOS_NEW(memory_pool) DrgPexpr(memory_pool)
+											GPOS_NEW(memory_pool) ExpressionArray(memory_pool)
 											);
 	pexprProjList->AddRef();
 	pexprLeftChild->AddRef();

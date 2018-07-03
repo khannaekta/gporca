@@ -62,7 +62,7 @@ namespace gpopt
 
 			// check if optimization contexts is valid
 			virtual
-			BOOL FValidContext(IMemoryPool *memory_pool, COptimizationContext *poc, DrgPoc *pdrgpocChild) const;
+			BOOL FValidContext(IMemoryPool *memory_pool, COptimizationContext *poc, OptimizationContextArray *pdrgpocChild) const;
 
 			//-------------------------------------------------------------------------------------
 			// Required Plan Properties

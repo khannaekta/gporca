@@ -31,7 +31,7 @@ namespace gpopt
 
 		// fwd declaration
 		class CNode;
-		typedef CDynamicPtrArray<CNode, CleanupRelease<CNode> > DrgPnd;
+		typedef CDynamicPtrArray<CNode, CleanupRelease<CNode> > NodeArray;
 
 		// struct for resulting trees
 		class CNode : public CRefCount
@@ -42,7 +42,7 @@ namespace gpopt
 				ULONG m_ulData;
 				
 				// children
-				DrgPnd *m_pdrgpnd;
+				NodeArray *m_pdrgpnd;
 
 				// private copy ctor
 				CNode(const CNode &);
@@ -50,7 +50,7 @@ namespace gpopt
 			public:
 				
 				// ctor
-				CNode(IMemoryPool *memory_pool, ULONG *pulData, DrgPnd *pdrgpnd);
+				CNode(IMemoryPool *memory_pool, ULONG *pulData, NodeArray *pdrgpnd);
 				
 				// dtor
 				~CNode();
@@ -68,7 +68,7 @@ namespace gpopt
 
 			// factory function for result object
 			static
-			CNode *Pnd(IMemoryPool *memory_pool, ULONG *pul, DrgPnd *pdrgpnd, BOOL *fTestTrue);
+			CNode *Pnd(IMemoryPool *memory_pool, ULONG *pul, NodeArray *pdrgpnd, BOOL *fTestTrue);
 		
 			// shorthand for tests
 			typedef CTreeMap<ULONG, CNode, BOOL, HashValue<ULONG>, Equals<ULONG> > TestMap;

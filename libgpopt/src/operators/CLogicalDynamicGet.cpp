@@ -58,8 +58,8 @@ CLogicalDynamicGet::CLogicalDynamicGet
 	const CName *pnameAlias,
 	CTableDescriptor *ptabdesc,
 	ULONG ulPartIndex,
-	DrgPcr *pdrgpcrOutput,
-	DrgDrgPcr *pdrgpdrgpcrPart,
+	ColRefArray *pdrgpcrOutput,
+	ColRefArrays *pdrgpdrgpcrPart,
 	ULONG ulSecondaryPartIndexId,
 	BOOL is_partial,
 	CPartConstraint *ppartcnstr, 
@@ -156,7 +156,7 @@ CLogicalDynamicGet::PopCopyWithRemappedColumns
 	BOOL must_exist
 	)
 {
-	DrgPcr *pdrgpcrOutput = NULL;
+	ColRefArray *pdrgpcrOutput = NULL;
 	if (must_exist)
 	{
 		pdrgpcrOutput = CUtils::PdrgpcrRemapAndCreate(memory_pool, m_pdrgpcrOutput, colref_mapping);
@@ -165,7 +165,7 @@ CLogicalDynamicGet::PopCopyWithRemappedColumns
 	{
 		pdrgpcrOutput = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrOutput, colref_mapping, must_exist);
 	}
-	DrgDrgPcr *pdrgpdrgpcrPart = PdrgpdrgpcrCreatePartCols(memory_pool, pdrgpcrOutput, m_ptabdesc->PdrgpulPart());
+	ColRefArrays *pdrgpdrgpcrPart = PdrgpdrgpcrCreatePartCols(memory_pool, pdrgpcrOutput, m_ptabdesc->PdrgpulPart());
 	CName *pnameAlias = GPOS_NEW(memory_pool) CName(memory_pool, *m_pnameAlias);
 	m_ptabdesc->AddRef();
 

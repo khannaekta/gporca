@@ -61,7 +61,7 @@ namespace gpopt
 
             // add explicit casting to equality operations between compatible types
             static
-            DrgPexpr *PdrgpexprCastEquality(IMemoryPool *memory_pool, CExpression *pexpr);
+            ExpressionArray *PdrgpexprCastEquality(IMemoryPool *memory_pool, CExpression *pexpr);
 
             // helper to add explicit casting to left child of given equality predicate
             static
