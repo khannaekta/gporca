@@ -39,7 +39,7 @@ CDXLColStats::CDXLColStats(IMemoryPool *mp,
 						   CDouble null_freq,
 						   CDouble distinct_remaining,
 						   CDouble freq_remaining,
-						   DXLBucketPtrArray *stats_bucket_dxl_array,
+						   DXLBucketPtrArray *dxl_stats_bucket_array,
 						   BOOL is_col_stats_missing)
 	: m_mp(mp),
 	  m_mdid_col_stats(mdid_col_stats),
@@ -48,11 +48,11 @@ CDXLColStats::CDXLColStats(IMemoryPool *mp,
 	  m_null_freq(null_freq),
 	  m_distinct_remaining(distinct_remaining),
 	  m_freq_remaining(freq_remaining),
-	  m_stats_bucket_dxl_array(stats_bucket_dxl_array),
+	  m_dxl_stats_bucket_array(dxl_stats_bucket_array),
 	  m_is_col_stats_missing(is_col_stats_missing)
 {
 	GPOS_ASSERT(mdid_col_stats->IsValid());
-	GPOS_ASSERT(NULL != stats_bucket_dxl_array);
+	GPOS_ASSERT(NULL != dxl_stats_bucket_array);
 	m_dxl_str = CDXLUtils::SerializeMDObj(
 		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
@@ -70,7 +70,7 @@ CDXLColStats::~CDXLColStats()
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
 	m_mdid_col_stats->Release();
-	m_stats_bucket_dxl_array->Release();
+	m_dxl_stats_bucket_array->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -126,7 +126,7 @@ CDXLColStats::GetStrRepr() const
 ULONG
 CDXLColStats::Buckets() const
 {
-	return m_stats_bucket_dxl_array->Size();
+	return m_dxl_stats_bucket_array->Size();
 }
 
 //---------------------------------------------------------------------------
@@ -140,7 +140,7 @@ CDXLColStats::Buckets() const
 const CDXLBucket *
 CDXLColStats::GetDXLBucketAt(ULONG pos) const
 {
-	return (*m_stats_bucket_dxl_array)[pos];
+	return (*m_dxl_stats_bucket_array)[pos];
 }
 
 

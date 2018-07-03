@@ -169,7 +169,7 @@ CParseHandlerStatsDerivedColumn::EndElement(const XMLCh *const,  // element_uri,
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
-	DXLBucketPtrArray *stats_bucket_dxl_array =
+	DXLBucketPtrArray *dxl_stats_bucket_array =
 		GPOS_NEW(m_mp) DXLBucketPtrArray(m_mp);
 
 	const ULONG num_of_buckets = this->Length();
@@ -180,7 +180,7 @@ CParseHandlerStatsDerivedColumn::EndElement(const XMLCh *const,  // element_uri,
 			dynamic_cast<CParseHandlerColStatsBucket *>((*this)[idx]);
 		CDXLBucket *dxl_bucket = col_stats_bucket_parse_handler->GetDXLBucketAt();
 		dxl_bucket->AddRef();
-		stats_bucket_dxl_array->Append(dxl_bucket);
+		dxl_stats_bucket_array->Append(dxl_bucket);
 	}
 
 	m_dxl_stats_derived_col =
@@ -189,7 +189,7 @@ CParseHandlerStatsDerivedColumn::EndElement(const XMLCh *const,  // element_uri,
 													   m_null_freq,
 													   m_distinct_remaining,
 													   m_freq_remaining,
-													   stats_bucket_dxl_array);
+													   dxl_stats_bucket_array);
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

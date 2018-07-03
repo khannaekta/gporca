@@ -180,7 +180,7 @@ CParseHandlerColStats::EndElement(const XMLCh *const,  // element_uri,
 
 	// get histogram buckets from child parse handlers
 
-	DXLBucketPtrArray *stats_bucket_dxl_array =
+	DXLBucketPtrArray *dxl_stats_bucket_array =
 		GPOS_NEW(m_mp) DXLBucketPtrArray(m_mp);
 
 	for (ULONG ul = 0; ul < this->Length(); ul++)
@@ -191,7 +191,7 @@ CParseHandlerColStats::EndElement(const XMLCh *const,  // element_uri,
 		CDXLBucket *bucket_dxl = parse_handler_col_stats_bucket->GetDXLBucketAt();
 		bucket_dxl->AddRef();
 
-		stats_bucket_dxl_array->Append(bucket_dxl);
+		dxl_stats_bucket_array->Append(bucket_dxl);
 	}
 
 	m_imd_obj = GPOS_NEW(m_mp) CDXLColStats(m_mp,
@@ -201,7 +201,7 @@ CParseHandlerColStats::EndElement(const XMLCh *const,  // element_uri,
 													 m_null_freq,
 													 m_distinct_remaining,
 													 m_freq_remaining,
-													 stats_bucket_dxl_array,
+													 dxl_stats_bucket_array,
 													 m_is_column_stats_missing);
 
 	// deactivate handler

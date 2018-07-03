@@ -53,7 +53,7 @@ namespace gpmd
 		// frequency of remaining tuples
 		CDouble m_freq_remaining;
 
-		DXLBucketPtrArray *m_stats_bucket_dxl_array;
+		DXLBucketPtrArray *m_dxl_stats_bucket_array;
 
 		// private copy ctor
 		CDXLStatsDerivedColumn(const CDXLStatsDerivedColumn &);
@@ -65,7 +65,7 @@ namespace gpmd
 							   CDouble null_freq,
 							   CDouble distinct_remaining,
 							   CDouble freq_remaining,
-							   DXLBucketPtrArray *stats_bucket_dxl_array);
+							   DXLBucketPtrArray *dxl_stats_bucket_array);
 
 		// dtor
 		virtual ~CDXLStatsDerivedColumn();

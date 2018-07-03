@@ -1755,7 +1755,7 @@ CHistogram::TranslateToDXLDerivedColumnStats(IMemoryPool *mp,
 											 ULONG col_id,
 											 CDouble width) const
 {
-	DXLBucketPtrArray *stats_bucket_dxl_array =
+	DXLBucketPtrArray *dxl_stats_bucket_array =
 		GPOS_NEW(mp) DXLBucketPtrArray(mp);
 
 	const ULONG num_of_buckets = m_histogram_buckets->Size();
@@ -1776,11 +1776,11 @@ CHistogram::TranslateToDXLDerivedColumnStats(IMemoryPool *mp,
 																  freq,
 																  distinct);
 
-		stats_bucket_dxl_array->Append(dxl_bucket);
+		dxl_stats_bucket_array->Append(dxl_bucket);
 	}
 
 	return GPOS_NEW(mp) CDXLStatsDerivedColumn(
-		col_id, width, m_null_freq, m_distinct_remaining, m_freq_remaining, stats_bucket_dxl_array);
+		col_id, width, m_null_freq, m_distinct_remaining, m_freq_remaining, dxl_stats_bucket_array);
 }
 
 // randomly pick a bucket index based on bucket frequency values

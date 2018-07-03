@@ -64,7 +64,7 @@ namespace gpmd
 		CDouble m_freq_remaining;
 
 		// histogram buckets
-		DXLBucketPtrArray *m_stats_bucket_dxl_array;
+		DXLBucketPtrArray *m_dxl_stats_bucket_array;
 
 		// is column statistics missing in the database
 		BOOL m_is_col_stats_missing;
@@ -84,7 +84,7 @@ namespace gpmd
 					 CDouble null_freq,
 					 CDouble distinct_remaining,
 					 CDouble freq_remaining,
-					 DXLBucketPtrArray *stats_bucket_dxl_array,
+					 DXLBucketPtrArray *dxl_stats_bucket_array,
 					 BOOL is_col_stats_missing);
 
 		// dtor
