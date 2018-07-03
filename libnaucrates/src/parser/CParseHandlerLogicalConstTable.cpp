@@ -37,7 +37,7 @@ CParseHandlerLogicalConstTable::CParseHandlerLogicalConstTable(
 	CParseHandlerBase *parse_handler_root)
 	: CParseHandlerLogicalOp(mp, parse_handler_mgr, parse_handler_root),
 	  m_const_tuples_datum_array(NULL),
-	  m_datum_dxl_array(NULL)
+	  m_dxl_datum_array(NULL)
 {
 }
 
@@ -78,22 +78,22 @@ CParseHandlerLogicalConstTable::StartElement(const XMLCh *const,  // element_uri
 	{
 		GPOS_ASSERT(NULL !=
 					m_const_tuples_datum_array);  // we must have already seen a logical const table
-		GPOS_ASSERT(NULL == m_datum_dxl_array);
+		GPOS_ASSERT(NULL == m_dxl_datum_array);
 
 		// initialize the array of datums (const tuple)
-		m_datum_dxl_array = GPOS_NEW(m_mp) DXLDatumArray(m_mp);
+		m_dxl_datum_array = GPOS_NEW(m_mp) DXLDatumArray(m_mp);
 	}
 	else if (0 ==
 			 XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDatum), element_local_name))
 	{
 		// we must have already seen a logical const table and a const tuple
 		GPOS_ASSERT(NULL != m_const_tuples_datum_array);
-		GPOS_ASSERT(NULL != m_datum_dxl_array);
+		GPOS_ASSERT(NULL != m_dxl_datum_array);
 
 		// translate the datum and add it to the datum array
 		CDXLDatum *datum_dxl = CDXLOperatorFactory::GetDatumVal(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenScalarConstValue);
-		m_datum_dxl_array->Append(datum_dxl);
+		m_dxl_datum_array->Append(datum_dxl);
 	}
 	else
 	{
@@ -144,10 +144,10 @@ CParseHandlerLogicalConstTable::EndElement(const XMLCh *const,  // element_uri,
 	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenConstTuple),
 										   element_local_name))
 	{
-		GPOS_ASSERT(NULL != m_datum_dxl_array);
-		m_const_tuples_datum_array->Append(m_datum_dxl_array);
+		GPOS_ASSERT(NULL != m_dxl_datum_array);
+		m_const_tuples_datum_array->Append(m_dxl_datum_array);
 
-		m_datum_dxl_array = NULL;  // intialize for the parsing the next const tuple (if needed)
+		m_dxl_datum_array = NULL;  // intialize for the parsing the next const tuple (if needed)
 	}
 	else if (0 !=
 			 XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDatum), element_local_name))
