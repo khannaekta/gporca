@@ -24,8 +24,8 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalJoin::CDXLPhysicalJoin(IMemoryPool *memory_pool, EdxlJoinType join_type)
-	: CDXLPhysical(memory_pool), m_join_type(join_type)
+CDXLPhysicalJoin::CDXLPhysicalJoin(IMemoryPool *mp, EdxlJoinType join_type)
+	: CDXLPhysical(mp), m_join_type(join_type)
 {
 }
 

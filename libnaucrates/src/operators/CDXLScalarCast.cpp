@@ -28,8 +28,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarCast::CDXLScalarCast(IMemoryPool *memory_pool, IMDId *mdid_type, IMDId *func_mdid)
-	: CDXLScalar(memory_pool), m_mdid_type(mdid_type), m_func_mdid(func_mdid)
+CDXLScalarCast::CDXLScalarCast(IMemoryPool *mp, IMDId *mdid_type, IMDId *func_mdid)
+	: CDXLScalar(mp), m_mdid_type(mdid_type), m_func_mdid(func_mdid)
 {
 	GPOS_ASSERT(NULL != m_func_mdid);
 	GPOS_ASSERT(m_mdid_type->IsValid());

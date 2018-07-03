@@ -42,7 +42,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CDXLScalarHashExpr(IMemoryPool *memory_pool, IMDId *mdid_type);
+		CDXLScalarHashExpr(IMemoryPool *mp, IMDId *mdid_type);
 
 		virtual ~CDXLScalarHashExpr();
 

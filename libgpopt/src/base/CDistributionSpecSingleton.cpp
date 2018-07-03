@@ -100,14 +100,14 @@ CDistributionSpecSingleton::FSatisfies
 void
 CDistributionSpecSingleton::AppendEnforcers
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &, // exprhdl
 	CReqdPropPlan *prpp,
 	ExpressionArray *pdrgpexpr,
 	CExpression *pexpr
 	)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != prpp);
 	GPOS_ASSERT(NULL != pdrgpexpr);
 	GPOS_ASSERT(NULL != pexpr);
@@ -123,10 +123,10 @@ CDistributionSpecSingleton::AppendEnforcers
 	}
 
 	pexpr->AddRef();
-	CExpression *pexprMotion = GPOS_NEW(memory_pool) CExpression
+	CExpression *pexprMotion = GPOS_NEW(mp) CExpression
 										(
-										memory_pool,
-										GPOS_NEW(memory_pool) CPhysicalMotionGather(memory_pool, m_est),
+										mp,
+										GPOS_NEW(mp) CPhysicalMotionGather(mp, m_est),
 										pexpr
 										);
 	pdrgpexpr->Append(pexprMotion);
@@ -138,10 +138,10 @@ CDistributionSpecSingleton::AppendEnforcers
 		pos->AddRef();
 		pexpr->AddRef();
 		
-		CExpression *pexprGatherMerge = GPOS_NEW(memory_pool) CExpression
+		CExpression *pexprGatherMerge = GPOS_NEW(mp) CExpression
 													(
-													memory_pool,
-													GPOS_NEW(memory_pool) CPhysicalMotionGather(memory_pool, m_est, pos),
+													mp,
+													GPOS_NEW(mp) CPhysicalMotionGather(mp, m_est, pos),
 													pexpr
 													);
 		pdrgpexpr->Append(pexprGatherMerge);

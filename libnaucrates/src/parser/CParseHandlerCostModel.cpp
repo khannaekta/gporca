@@ -38,10 +38,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerCostModel::CParseHandlerCostModel(IMemoryPool *memory_pool,
+CParseHandlerCostModel::CParseHandlerCostModel(IMemoryPool *mp,
 											   CParseHandlerManager *parse_handler_mgr,
 											   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
 	  m_num_of_segments(0),
 	  m_cost_model(NULL),
 	  m_parse_handler_cost_params(NULL)
@@ -96,7 +96,7 @@ CParseHandlerCostModel::StartElement(const XMLCh *const element_uri,
 										   element_local_name))
 	{
 		CParseHandlerBase *pphCostParams = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenCostParams), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenCostParams), m_parse_handler_mgr, this);
 		m_parse_handler_cost_params = static_cast<CParseHandlerCostParams *>(pphCostParams);
 		m_parse_handler_mgr->ActivateParseHandler(pphCostParams);
 
@@ -136,7 +136,7 @@ CParseHandlerCostModel::EndElement(const XMLCh *const,  // element_uri,
 	{
 		case ICostModel::EcmtGPDBLegacy:
 			m_cost_model =
-				GPOS_NEW(m_memory_pool) CCostModelGPDBLegacy(m_memory_pool, m_num_of_segments);
+				GPOS_NEW(m_mp) CCostModelGPDBLegacy(m_mp, m_num_of_segments);
 			break;
 		case ICostModel::EcmtGPDBCalibrated:
 			CCostModelParamsGPDB *pcp;
@@ -154,7 +154,7 @@ CParseHandlerCostModel::EndElement(const XMLCh *const,  // element_uri,
 				pcp->AddRef();
 			}
 			m_cost_model =
-				GPOS_NEW(m_memory_pool) CCostModelGPDB(m_memory_pool, m_num_of_segments, pcp);
+				GPOS_NEW(m_mp) CCostModelGPDB(m_mp, m_num_of_segments, pcp);
 			break;
 		case ICostModel::EcmtSentinel:
 			GPOS_ASSERT(false && "Unexpected cost model type");

@@ -54,7 +54,7 @@ namespace gpos
 			BOOL fPropagateException;
 
 			// IMemoryPool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 		};
 
 		// unittests

@@ -28,7 +28,7 @@ namespace gpopt {
 	void
 	CDrvdPropCtxt::DbgPrint() const
 	{
-		CAutoTrace at(m_memory_pool);
+		CAutoTrace at(m_mp);
 		(void) this->OsPrint(at.Os());
 	}
 #endif // GPOS_DEBUG

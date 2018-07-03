@@ -168,9 +168,9 @@ CDatumBoolGPDB::HashValue() const
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CDatumBoolGPDB::GetStrRepr(IMemoryPool *memory_pool) const
+CDatumBoolGPDB::GetStrRepr(IMemoryPool *mp) const
 {
-	CWStringDynamic str(memory_pool);
+	CWStringDynamic str(mp);
 	if (!IsNull())
 	{
 		str.AppendFormat(GPOS_WSZ_LIT("%d"), m_value);
@@ -180,7 +180,7 @@ CDatumBoolGPDB::GetStrRepr(IMemoryPool *memory_pool) const
 		str.AppendFormat(GPOS_WSZ_LIT("null"));
 	}
 
-	return GPOS_NEW(memory_pool) CWStringConst(memory_pool, str.GetBuffer());
+	return GPOS_NEW(mp) CWStringConst(mp, str.GetBuffer());
 }
 
 //---------------------------------------------------------------------------
@@ -223,10 +223,10 @@ CDatumBoolGPDB::Matches(const IDatum *other) const
 //
 //---------------------------------------------------------------------------
 IDatum *
-CDatumBoolGPDB::MakeCopy(IMemoryPool *memory_pool) const
+CDatumBoolGPDB::MakeCopy(IMemoryPool *mp) const
 {
 	m_mdid->AddRef();
-	return GPOS_NEW(memory_pool) CDatumBoolGPDB(m_mdid, m_value, m_is_null);
+	return GPOS_NEW(mp) CDatumBoolGPDB(m_mdid, m_value, m_is_null);
 }
 
 //---------------------------------------------------------------------------

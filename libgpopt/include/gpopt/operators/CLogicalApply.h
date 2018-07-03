@@ -45,10 +45,10 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CLogicalApply(IMemoryPool *memory_pool);
+			CLogicalApply(IMemoryPool *mp);
 
 			// ctor
-			CLogicalApply(IMemoryPool *memory_pool, ColRefArray *pdrgpcrInner, EOperatorId eopidOriginSubq);
+			CLogicalApply(IMemoryPool *mp, ColRefArray *pdrgpcrInner, EOperatorId eopidOriginSubq);
 
 			// dtor
 			virtual
@@ -77,7 +77,7 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //memory_pool,
+						IMemoryPool *, //mp,
 						UlongColRefHashMap *, //colref_mapping,
 						BOOL //must_exist
 						)
@@ -89,35 +89,35 @@ namespace gpopt
 			virtual
 			CPartInfo *PpartinfoDerive
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				) 
 				const
 			{
-				return PpartinfoDeriveCombine(memory_pool, exprhdl);
+				return PpartinfoDeriveCombine(mp, exprhdl);
 			}
 
 			// derive keys
 			CKeyCollection *PkcDeriveKeys
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PkcCombineKeys(memory_pool, exprhdl);
+				return PkcCombineKeys(mp, exprhdl);
 			}
 
 			// derive function properties
 			virtual
 			CFunctionProp *PfpDerive
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PfpDeriveFromScalar(memory_pool, exprhdl, 2 /*ulScalarIndex*/);
+				return PfpDeriveFromScalar(mp, exprhdl, 2 /*ulScalarIndex*/);
 			}
 
 			//-------------------------------------------------------------------------------------
@@ -128,14 +128,14 @@ namespace gpopt
 			virtual
 			IStatistics *PstatsDerive
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				StatsArray *// stats_ctxt
 				)
 				const
 			{
 				// we should use stats from the corresponding Join tree if decorrelation succeeds
-				return PstatsDeriveDummy(memory_pool, exprhdl, CStatistics::DefaultRelationRows);
+				return PstatsDeriveDummy(mp, exprhdl, CStatistics::DefaultRelationRows);
 			}
 
 			// promise level for stat derivation
@@ -156,7 +156,7 @@ namespace gpopt
 
 			// compute required stat columns of the n-th child
 			virtual
-			CColRefSet *PcrsStat(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CColRefSet *pcrsInput, ULONG child_index) const;
+			CColRefSet *PcrsStat(IMemoryPool *mp, CExpressionHandle &exprhdl, CColRefSet *pcrsInput, ULONG child_index) const;
 
 			// return true if operator is a correlated apply
 			virtual

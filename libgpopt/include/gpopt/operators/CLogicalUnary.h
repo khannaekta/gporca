@@ -45,7 +45,7 @@ namespace gpopt
 			// derive statistics for projection operators
 			IStatistics *PstatsDeriveProject
 							(
-							IMemoryPool *memory_pool,
+							IMemoryPool *mp,
 							CExpressionHandle &exprhdl,
 							HMUlDatum *phmuldatum = NULL
 							)
@@ -57,10 +57,10 @@ namespace gpopt
 			explicit
 			CLogicalUnary
 				(
-				IMemoryPool *memory_pool
+				IMemoryPool *mp
 				)
 				:
-				CLogical(memory_pool)
+				CLogical(mp)
 			{}
 
 			// dtor
@@ -83,7 +83,7 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //memory_pool,
+						IMemoryPool *, //mp,
 						UlongColRefHashMap *, //colref_mapping,
 						BOOL //must_exist
 						)
@@ -99,7 +99,7 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsDeriveNotNull
 				(
-				IMemoryPool *,// memory_pool
+				IMemoryPool *,// mp
 				CExpressionHandle &exprhdl
 				)
 				const
@@ -112,24 +112,24 @@ namespace gpopt
 			virtual
 			CPartInfo *PpartinfoDerive
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PpartinfoDeriveCombine(memory_pool, exprhdl);
+				return PpartinfoDeriveCombine(mp, exprhdl);
 			}
 			
 			// derive function properties
 			virtual
 			CFunctionProp *PfpDerive
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PfpDeriveFromScalar(memory_pool, exprhdl, 1 /*ulScalarIndex*/);
+				return PfpDeriveFromScalar(mp, exprhdl, 1 /*ulScalarIndex*/);
 			}
 
 			//-------------------------------------------------------------------------------------
@@ -148,14 +148,14 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsStat
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsInput,
 				ULONG child_index
 				)
 				const
 			{
-				return PcrsReqdChildStats(memory_pool, exprhdl, pcrsInput, exprhdl.GetDrvdScalarProps(1)->PcrsUsed(), child_index);
+				return PcrsReqdChildStats(mp, exprhdl, pcrsInput, exprhdl.GetDrvdScalarProps(1)->PcrsUsed(), child_index);
 			}
 
 	}; // class CLogicalUnary

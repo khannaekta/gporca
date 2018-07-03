@@ -26,12 +26,12 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalLeftOuterApply::CLogicalLeftOuterApply
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogicalApply(memory_pool)
+	CLogicalApply(mp)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 
 	m_fPattern = true;
 }
@@ -47,12 +47,12 @@ CLogicalLeftOuterApply::CLogicalLeftOuterApply
 //---------------------------------------------------------------------------
 CLogicalLeftOuterApply::CLogicalLeftOuterApply
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ColRefArray *pdrgpcrInner,
 	EOperatorId eopidOriginSubq
 	)
 	:
-	CLogicalApply(memory_pool, pdrgpcrInner, eopidOriginSubq)
+	CLogicalApply(mp, pdrgpcrInner, eopidOriginSubq)
 {
 	GPOS_ASSERT(0 < pdrgpcrInner->Size());
 }
@@ -80,7 +80,7 @@ CLogicalLeftOuterApply::~CLogicalLeftOuterApply()
 CMaxCard
 CLogicalLeftOuterApply::Maxcard
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -99,11 +99,11 @@ CLogicalLeftOuterApply::Maxcard
 CXformSet *
 CLogicalLeftOuterApply::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfLeftOuterApply2LeftOuterJoin);
 	(void) xform_set->ExchangeSet(CXform::ExfLeftOuterApply2LeftOuterJoinNoCorrelations);
@@ -123,14 +123,14 @@ CLogicalLeftOuterApply::PxfsCandidates
 COperator *
 CLogicalLeftOuterApply::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	BOOL must_exist
 	)
 {
-	ColRefArray *pdrgpcrInner = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrInner, colref_mapping, must_exist);
+	ColRefArray *pdrgpcrInner = CUtils::PdrgpcrRemap(mp, m_pdrgpcrInner, colref_mapping, must_exist);
 
-	return GPOS_NEW(memory_pool) CLogicalLeftOuterApply(memory_pool, pdrgpcrInner, m_eopidOriginSubq);
+	return GPOS_NEW(mp) CLogicalLeftOuterApply(mp, pdrgpcrInner, m_eopidOriginSubq);
 }
 
 // EOF

@@ -51,7 +51,7 @@ namespace gpopt
 			// ctors
 			CPhysicalDynamicIndexScan
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				BOOL is_partial,
 				CIndexDescriptor *pindexdesc,
 				CTableDescriptor *ptabdesc,
@@ -107,7 +107,7 @@ namespace gpopt
 			virtual
 			COrderSpec *PosDerive
 							(
-							IMemoryPool *,//memory_pool
+							IMemoryPool *,//mp
 							CExpressionHandle &//exprhdl
 							)
 							const
@@ -145,7 +145,7 @@ namespace gpopt
 			virtual
 			IStatistics *PstatsDerive
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CReqdPropPlan *prpplan,
 				StatsArray *stats_ctxt

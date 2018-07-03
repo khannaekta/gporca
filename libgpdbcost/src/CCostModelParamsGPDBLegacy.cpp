@@ -78,12 +78,12 @@ const CHAR rgszCostParamNames[CCostModelParamsGPDBLegacy::EcpSentinel][GPOPT_COS
 //---------------------------------------------------------------------------
 CCostModelParamsGPDBLegacy::CCostModelParamsGPDBLegacy
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	m_memory_pool(memory_pool)
+	m_mp(mp)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 
 	for (ULONG ul = 0; ul < EcpSentinel; ul++)
 	{
@@ -91,17 +91,17 @@ CCostModelParamsGPDBLegacy::CCostModelParamsGPDBLegacy
 	}
 
 	// populate param array with default param values
-	m_rgpcp[EcpSeqIOBandwidth] = GPOS_NEW(memory_pool) SCostParam(EcpSeqIOBandwidth, DSeqIOBandwidthVal, DSeqIOBandwidthVal - 128.0, DSeqIOBandwidthVal + 128.0);
-	m_rgpcp[EcpRandomIOBandwidth] = GPOS_NEW(memory_pool) SCostParam(EcpRandomIOBandwidth, DRandomIOBandwidthVal, DRandomIOBandwidthVal - 8.0, DRandomIOBandwidthVal + 8.0);
-	m_rgpcp[EcpTupProcBandwidth] = GPOS_NEW(memory_pool) SCostParam(EcpTupProcBandwidth, DTupProcBandwidthVal, DTupProcBandwidthVal - 32.0, DTupProcBandwidthVal + 32.0);
-	m_rgpcp[EcpTupUpdateBandwith] = GPOS_NEW(memory_pool) SCostParam(EcpTupUpdateBandwith, DTupUpdateBandwidthVal, DTupUpdateBandwidthVal - 32.0, DTupUpdateBandwidthVal + 32.0);
-	m_rgpcp[EcpNetBandwidth] = GPOS_NEW(memory_pool) SCostParam(EcpNetBandwidth, DNetBandwidthVal, DNetBandwidthVal - 128.0, DNetBandwidthVal + 128.0);
-	m_rgpcp[EcpSegments] = GPOS_NEW(memory_pool) SCostParam(EcpSegments, DSegmentsVal, DSegmentsVal - 2.0, DSegmentsVal + 2.0);
-	m_rgpcp[EcpNLJOuterFactor] = GPOS_NEW(memory_pool) SCostParam(EcpNLJOuterFactor, DNLJOuterFactorVal, DNLJOuterFactorVal - 128.0, DNLJOuterFactorVal + 128.0);
-	m_rgpcp[EcpNLJFactor] = GPOS_NEW(memory_pool) SCostParam(EcpNLJFactor, DNLJFactorVal, DNLJFactorVal - 0.5, DNLJFactorVal + 0.5);
-	m_rgpcp[EcpHJFactor] = GPOS_NEW(memory_pool) SCostParam(EcpHJFactor, DHJFactorVal, DHJFactorVal - 1.0, DHJFactorVal + 1.0);
-	m_rgpcp[EcpHashFactor] = GPOS_NEW(memory_pool) SCostParam(EcpHashFactor, DHashFactorVal, DHashFactorVal - 1.0, DHashFactorVal + 1.0);
-	m_rgpcp[EcpDefaultCost] = GPOS_NEW(memory_pool) SCostParam(EcpDefaultCost, DDefaultCostVal, DDefaultCostVal - 32.0, DDefaultCostVal + 32.0);
+	m_rgpcp[EcpSeqIOBandwidth] = GPOS_NEW(mp) SCostParam(EcpSeqIOBandwidth, DSeqIOBandwidthVal, DSeqIOBandwidthVal - 128.0, DSeqIOBandwidthVal + 128.0);
+	m_rgpcp[EcpRandomIOBandwidth] = GPOS_NEW(mp) SCostParam(EcpRandomIOBandwidth, DRandomIOBandwidthVal, DRandomIOBandwidthVal - 8.0, DRandomIOBandwidthVal + 8.0);
+	m_rgpcp[EcpTupProcBandwidth] = GPOS_NEW(mp) SCostParam(EcpTupProcBandwidth, DTupProcBandwidthVal, DTupProcBandwidthVal - 32.0, DTupProcBandwidthVal + 32.0);
+	m_rgpcp[EcpTupUpdateBandwith] = GPOS_NEW(mp) SCostParam(EcpTupUpdateBandwith, DTupUpdateBandwidthVal, DTupUpdateBandwidthVal - 32.0, DTupUpdateBandwidthVal + 32.0);
+	m_rgpcp[EcpNetBandwidth] = GPOS_NEW(mp) SCostParam(EcpNetBandwidth, DNetBandwidthVal, DNetBandwidthVal - 128.0, DNetBandwidthVal + 128.0);
+	m_rgpcp[EcpSegments] = GPOS_NEW(mp) SCostParam(EcpSegments, DSegmentsVal, DSegmentsVal - 2.0, DSegmentsVal + 2.0);
+	m_rgpcp[EcpNLJOuterFactor] = GPOS_NEW(mp) SCostParam(EcpNLJOuterFactor, DNLJOuterFactorVal, DNLJOuterFactorVal - 128.0, DNLJOuterFactorVal + 128.0);
+	m_rgpcp[EcpNLJFactor] = GPOS_NEW(mp) SCostParam(EcpNLJFactor, DNLJFactorVal, DNLJFactorVal - 0.5, DNLJFactorVal + 0.5);
+	m_rgpcp[EcpHJFactor] = GPOS_NEW(mp) SCostParam(EcpHJFactor, DHJFactorVal, DHJFactorVal - 1.0, DHJFactorVal + 1.0);
+	m_rgpcp[EcpHashFactor] = GPOS_NEW(mp) SCostParam(EcpHashFactor, DHashFactorVal, DHashFactorVal - 1.0, DHashFactorVal + 1.0);
+	m_rgpcp[EcpDefaultCost] = GPOS_NEW(mp) SCostParam(EcpDefaultCost, DDefaultCostVal, DDefaultCostVal - 32.0, DDefaultCostVal + 32.0);
 }
 
 
@@ -198,7 +198,7 @@ CCostModelParamsGPDBLegacy::SetParam
 
 	GPOS_DELETE(m_rgpcp[ecp]);
 	m_rgpcp[ecp] = NULL;
-	m_rgpcp[ecp] =  GPOS_NEW(m_memory_pool) SCostParam(ecp, dVal, dLowerBound, dUpperBound);
+	m_rgpcp[ecp] =  GPOS_NEW(m_mp) SCostParam(ecp, dVal, dLowerBound, dUpperBound);
 }
 
 
@@ -227,7 +227,7 @@ CCostModelParamsGPDBLegacy::SetParam
 		{
 			GPOS_DELETE(m_rgpcp[ul]);
 			m_rgpcp[ul] = NULL;
-			m_rgpcp[ul] = GPOS_NEW(m_memory_pool) SCostParam(ul, dVal, dLowerBound, dUpperBound);
+			m_rgpcp[ul] = GPOS_NEW(m_mp) SCostParam(ul, dVal, dLowerBound, dUpperBound);
 
 			return;
 		}

@@ -55,18 +55,18 @@ namespace gpnaucrates
 
 			// create filter on int4 types
 			static
-			void StatsFilterInt4(IMemoryPool *memory_pool, ULONG col_id, INT iLower, INT iUpper, StatsPredPtrArry *pgrgpstatspred);
+			void StatsFilterInt4(IMemoryPool *mp, ULONG col_id, INT iLower, INT iUpper, StatsPredPtrArry *pgrgpstatspred);
 
 			// create filter on boolean types
 			static
-			void StatsFilterBool(IMemoryPool *memory_pool, ULONG col_id, BOOL fValue, StatsPredPtrArry *pgrgpstatspred);
+			void StatsFilterBool(IMemoryPool *mp, ULONG col_id, BOOL fValue, StatsPredPtrArry *pgrgpstatspred);
 
 			// create filter on numeric types
 			static
 			void
 			StatsFilterNumeric
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ULONG col_id,
 				CWStringDynamic *pstrLowerEncoded,
 				CWStringDynamic *pstrUpperEncoded,
@@ -79,7 +79,7 @@ namespace gpnaucrates
 			static
 			void StatsFilterGeneric
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ULONG col_id,
 				OID oid,
 				CWStringDynamic *pstrLowerEncoded,
@@ -90,22 +90,22 @@ namespace gpnaucrates
 				);
 
 			static
-			CHistogram* PhistExampleInt4Dim(IMemoryPool *memory_pool);
+			CHistogram* PhistExampleInt4Dim(IMemoryPool *mp);
 
 			// helper function that generates an array of ULONG pointers
 			static
 			ULongPtrArray *
-					Pdrgpul(IMemoryPool *memory_pool,
+					Pdrgpul(IMemoryPool *mp,
 					ULONG ul1,
 					ULONG ul2 = gpos::ulong_max
 					)
 			{
-				ULongPtrArray *pdrgpul = GPOS_NEW(memory_pool) ULongPtrArray(memory_pool);
-				pdrgpul->Append(GPOS_NEW(memory_pool) ULONG (ul1));
+				ULongPtrArray *pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
+				pdrgpul->Append(GPOS_NEW(mp) ULONG (ul1));
 
 				if (gpos::ulong_max != ul2)
 				{
-					pdrgpul->Append(GPOS_NEW(memory_pool) ULONG (ul2));
+					pdrgpul->Append(GPOS_NEW(mp) ULONG (ul2));
 				}
 
 				return pdrgpul;
@@ -115,7 +115,7 @@ namespace gpnaucrates
 			static
 			CTableDescriptor *PtabdescTwoColumnSource
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				const CName &nameTable,
 				const IMDTypeInt4 *pmdtype,
 				const CWStringConst &strColA,
@@ -126,10 +126,10 @@ namespace gpnaucrates
 
 			// example filter
 			static
-			StatsPredPtrArry *Pdrgpstatspred1(IMemoryPool *memory_pool);
+			StatsPredPtrArry *Pdrgpstatspred1(IMemoryPool *mp);
 
 			static
-			StatsPredPtrArry *Pdrgpstatspred2(IMemoryPool *memory_pool);
+			StatsPredPtrArry *Pdrgpstatspred2(IMemoryPool *mp);
 
 			// unittests
 			static

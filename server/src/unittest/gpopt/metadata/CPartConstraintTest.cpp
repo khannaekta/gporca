@@ -75,16 +75,16 @@ CPartConstraintTest::EresUnittest()
 		GPOS_UNITTEST_FUNC(CPartConstraintTest::EresUnittest_DateIntervals),
 		};
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(memory_pool, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
-	CConstExprEvaluatorForDates *pceeval = GPOS_NEW(memory_pool) CConstExprEvaluatorForDates(memory_pool);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CConstExprEvaluatorForDates *pceeval = GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	// install opt context in TLS
-	CAutoOptCtxt aoc(memory_pool, &mda, pceeval, CTestUtils::GetCostModel(memory_pool));
+	CAutoOptCtxt aoc(mp, &mda, pceeval, CTestUtils::GetCostModel(mp));
 
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
@@ -102,34 +102,34 @@ GPOS_RESULT
 CPartConstraintTest::EresUnittest_Basic()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 	
 	// setup an MD accessor
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(memory_pool, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 	CColRef *colref = col_factory->PcrCreate(pmdtypeint4, default_type_modifier);
 	
 	// create a constraint col \in [1,3)
-	CConstraint *pcnstr13 = PcnstrInterval(memory_pool, colref, 1 /*ulLeft*/, 3 /*ulRight*/);
+	CConstraint *pcnstr13 = PcnstrInterval(mp, colref, 1 /*ulLeft*/, 3 /*ulRight*/);
 	
 	// create a constraint col \in [1,5)
-	CConstraint *pcnstr15 = PcnstrInterval(memory_pool, colref, 1 /*ulLeft*/, 5 /*ulRight*/);
+	CConstraint *pcnstr15 = PcnstrInterval(mp, colref, 1 /*ulLeft*/, 5 /*ulRight*/);
 		
-	CPartConstraint *ppartcnstr13Default = GPOS_NEW(memory_pool) CPartConstraint(memory_pool, pcnstr13, true /*fDefaultPartition*/, false /*is_unbounded*/);
-	CPartConstraint *ppartcnstr15Default = GPOS_NEW(memory_pool) CPartConstraint(memory_pool, pcnstr15, true /*fDefaultPartition*/, false /*is_unbounded*/);
+	CPartConstraint *ppartcnstr13Default = GPOS_NEW(mp) CPartConstraint(mp, pcnstr13, true /*fDefaultPartition*/, false /*is_unbounded*/);
+	CPartConstraint *ppartcnstr15Default = GPOS_NEW(mp) CPartConstraint(mp, pcnstr15, true /*fDefaultPartition*/, false /*is_unbounded*/);
 
 	pcnstr13->AddRef();
-	CPartConstraint *ppartcnstr13NoDefault = GPOS_NEW(memory_pool) CPartConstraint(memory_pool, pcnstr13, false /*fDefaultPartition*/, false /*is_unbounded*/);
+	CPartConstraint *ppartcnstr13NoDefault = GPOS_NEW(mp) CPartConstraint(mp, pcnstr13, false /*fDefaultPartition*/, false /*is_unbounded*/);
 
 	pcnstr13->AddRef();
-	CPartConstraint *ppartcnstr13DefaultUnbounded = GPOS_NEW(memory_pool) CPartConstraint(memory_pool, pcnstr13, true /*fDefaultPartition*/, true /*is_unbounded*/);
+	CPartConstraint *ppartcnstr13DefaultUnbounded = GPOS_NEW(mp) CPartConstraint(mp, pcnstr13, true /*fDefaultPartition*/, true /*is_unbounded*/);
 
 	pcnstr15->AddRef();
-	CPartConstraint *ppartcnstr15DefaultUnbounded = GPOS_NEW(memory_pool) CPartConstraint(memory_pool, pcnstr15, true /*fDefaultPartition*/, true /*is_unbounded*/);
+	CPartConstraint *ppartcnstr15DefaultUnbounded = GPOS_NEW(mp) CPartConstraint(mp, pcnstr15, true /*fDefaultPartition*/, true /*is_unbounded*/);
 
 	// tests
 	
@@ -150,8 +150,8 @@ CPartConstraintTest::EresUnittest_Basic()
 	GPOS_ASSERT(ppartcnstr13DefaultUnbounded->FSubsume(ppartcnstr15Default));
 	GPOS_ASSERT(ppartcnstr15Default->FSubsume(ppartcnstr13Default));
 	GPOS_ASSERT(!ppartcnstr13Default->FSubsume(ppartcnstr15Default));
-	GPOS_ASSERT(ppartcnstr13Default->FOverlap(memory_pool, ppartcnstr15Default));
-	GPOS_ASSERT(ppartcnstr13NoDefault->FOverlap(memory_pool, ppartcnstr13Default));
+	GPOS_ASSERT(ppartcnstr13Default->FOverlap(mp, ppartcnstr15Default));
+	GPOS_ASSERT(ppartcnstr13NoDefault->FOverlap(mp, ppartcnstr13Default));
 
 	// cleanup
 	ppartcnstr13Default->Release();
@@ -174,22 +174,22 @@ CPartConstraintTest::EresUnittest_Basic()
 CConstraint *
 CPartConstraintTest::PcnstrInterval
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CColRef *colref,
 	ULONG ulLeft,
 	ULONG ulRight
 	)
 {
-	CExpression *pexprConstLeft = CUtils::PexprScalarConstInt4(memory_pool, ulLeft);
-	CExpression *pexprConstRight = CUtils::PexprScalarConstInt4(memory_pool, ulRight);
+	CExpression *pexprConstLeft = CUtils::PexprScalarConstInt4(mp, ulLeft);
+	CExpression *pexprConstRight = CUtils::PexprScalarConstInt4(mp, ulRight);
 
 	// AND
-	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
-	pdrgpexpr->Append(CUtils::PexprScalarCmp(memory_pool, colref, pexprConstLeft, IMDType::EcmptGEq));
-	pdrgpexpr->Append(CUtils::PexprScalarCmp(memory_pool, colref, pexprConstRight, IMDType::EcmptL));
+	ExpressionArray *pdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
+	pdrgpexpr->Append(CUtils::PexprScalarCmp(mp, colref, pexprConstLeft, IMDType::EcmptGEq));
+	pdrgpexpr->Append(CUtils::PexprScalarCmp(mp, colref, pexprConstRight, IMDType::EcmptL));
 
-	CExpression *pexpr = CUtils::PexprScalarBoolOp(memory_pool, CScalarBoolOp::EboolopAnd, pdrgpexpr);
-	CConstraint *pcnstr = CConstraintInterval::PciIntervalFromScalarExpr(memory_pool, pexpr, colref);
+	CExpression *pexpr = CUtils::PexprScalarBoolOp(mp, CScalarBoolOp::EboolopAnd, pdrgpexpr);
+	CConstraint *pcnstr = CConstraintInterval::PciIntervalFromScalarExpr(mp, pexpr, colref);
 	
 	pexpr->Release();
 	
@@ -211,25 +211,25 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 	CAutoTraceFlag atf(EopttraceEnableConstantExpressionEvaluation, true /*m_bytearray_value*/);
 
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// setup an MD accessor
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(memory_pool, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	const IMDType *pmdtype = mda.RetrieveType(&CMDIdGPDB::m_mdid_date);
 	CWStringConst str(GPOS_WSZ_LIT("date_col"));
-	CName name(memory_pool, &str);
+	CName name(mp, &str);
 	CAutoP<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(pmdtype, default_type_modifier, name));
 
 	// create a date interval: ['01-01-2012', '01-21-2012')
-	CWStringDynamic pstrLowerDate1(memory_pool, wszInternalRepresentationFor2012_01_01);
-	CWStringDynamic pstrUpperDate1(memory_pool, wszInternalRepresentationFor2012_01_21);
+	CWStringDynamic pstrLowerDate1(mp, wszInternalRepresentationFor2012_01_01);
+	CWStringDynamic pstrUpperDate1(mp, wszInternalRepresentationFor2012_01_21);
 	CConstraintInterval *pciFirst =
 			CTestUtils::PciGenericInterval
 				(
-				memory_pool,
+				mp,
 				&mda,
 				CMDIdGPDB::m_mdid_date,
 				colref.Value(),
@@ -242,12 +242,12 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 				);
 
 	// create a date interval: ['01-01-2012', '01-22-2012')
-	CWStringDynamic pstrLowerDate2(memory_pool, wszInternalRepresentationFor2012_01_01);
-	CWStringDynamic pstrUpperDate2(memory_pool, wszInternalRepresentationFor2012_01_22);
+	CWStringDynamic pstrLowerDate2(mp, wszInternalRepresentationFor2012_01_01);
+	CWStringDynamic pstrUpperDate2(mp, wszInternalRepresentationFor2012_01_22);
 	CConstraintInterval *pciSecond =
 			CTestUtils::PciGenericInterval
 				(
-				memory_pool,
+				mp,
 				&mda,
 				CMDIdGPDB::m_mdid_date,
 				colref.Value(),
@@ -259,17 +259,17 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 				CRange::EriExcluded
 				);
 
-	CPartConstraint *ppartcnstr1Default = GPOS_NEW(memory_pool) CPartConstraint(memory_pool, pciFirst, true /*fDefaultPartition*/, false /*is_unbounded*/);
-	CPartConstraint *ppartcnstr2Default = GPOS_NEW(memory_pool) CPartConstraint(memory_pool, pciSecond, true /*fDefaultPartition*/, false /*is_unbounded*/);
+	CPartConstraint *ppartcnstr1Default = GPOS_NEW(mp) CPartConstraint(mp, pciFirst, true /*fDefaultPartition*/, false /*is_unbounded*/);
+	CPartConstraint *ppartcnstr2Default = GPOS_NEW(mp) CPartConstraint(mp, pciSecond, true /*fDefaultPartition*/, false /*is_unbounded*/);
 
 	pciFirst->AddRef();
-	CPartConstraint *ppartcnstr1NoDefault = GPOS_NEW(memory_pool) CPartConstraint(memory_pool, pciFirst, false /*fDefaultPartition*/, false /*is_unbounded*/);
+	CPartConstraint *ppartcnstr1NoDefault = GPOS_NEW(mp) CPartConstraint(mp, pciFirst, false /*fDefaultPartition*/, false /*is_unbounded*/);
 
 	pciFirst->AddRef();
-	CPartConstraint *ppartcnstr1DefaultUnbounded = GPOS_NEW(memory_pool) CPartConstraint(memory_pool, pciFirst, true /*fDefaultPartition*/, true /*is_unbounded*/);
+	CPartConstraint *ppartcnstr1DefaultUnbounded = GPOS_NEW(mp) CPartConstraint(mp, pciFirst, true /*fDefaultPartition*/, true /*is_unbounded*/);
 
 	pciSecond->AddRef();
-	CPartConstraint *ppartcnstr2DefaultUnbounded = GPOS_NEW(memory_pool) CPartConstraint(memory_pool, pciSecond, true /*fDefaultPartition*/, true /*is_unbounded*/);
+	CPartConstraint *ppartcnstr2DefaultUnbounded = GPOS_NEW(mp) CPartConstraint(mp, pciSecond, true /*fDefaultPartition*/, true /*is_unbounded*/);
 
 	// tests
 
@@ -288,11 +288,11 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 	// subsumption & overlap
 	GPOS_ASSERT(ppartcnstr1DefaultUnbounded->FSubsume(ppartcnstr1Default));
 	GPOS_ASSERT(ppartcnstr1DefaultUnbounded->FSubsume(ppartcnstr2Default));
-	GPOS_ASSERT(pciSecond->FContainsInterval(memory_pool, pciFirst));
+	GPOS_ASSERT(pciSecond->FContainsInterval(mp, pciFirst));
 	GPOS_ASSERT(ppartcnstr2Default->FSubsume(ppartcnstr1Default));
 	GPOS_ASSERT(!ppartcnstr1Default->FSubsume(ppartcnstr2Default));
-	GPOS_ASSERT(ppartcnstr1Default->FOverlap(memory_pool, ppartcnstr2Default));
-	GPOS_ASSERT(ppartcnstr1NoDefault->FOverlap(memory_pool, ppartcnstr1Default));
+	GPOS_ASSERT(ppartcnstr1Default->FOverlap(mp, ppartcnstr2Default));
+	GPOS_ASSERT(ppartcnstr1NoDefault->FOverlap(mp, ppartcnstr1Default));
 
 	// cleanup
 	ppartcnstr1Default->Release();

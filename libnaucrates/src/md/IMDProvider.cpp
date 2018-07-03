@@ -23,7 +23,7 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 IMDId *
-IMDProvider::GetGPDBTypeMdid(IMemoryPool *memory_pool,
+IMDProvider::GetGPDBTypeMdid(IMemoryPool *mp,
 							 CSystemId
 #ifdef GPOS_DEBUG
 								 sysid
@@ -37,19 +37,19 @@ IMDProvider::GetGPDBTypeMdid(IMemoryPool *memory_pool,
 	switch (type_info)
 	{
 		case IMDType::EtiInt2:
-			return GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT2);
+			return GPOS_NEW(mp) CMDIdGPDB(GPDB_INT2);
 
 		case IMDType::EtiInt4:
-			return GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT4);
+			return GPOS_NEW(mp) CMDIdGPDB(GPDB_INT4);
 
 		case IMDType::EtiInt8:
-			return GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT8);
+			return GPOS_NEW(mp) CMDIdGPDB(GPDB_INT8);
 
 		case IMDType::EtiBool:
-			return GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_BOOL);
+			return GPOS_NEW(mp) CMDIdGPDB(GPDB_BOOL);
 
 		case IMDType::EtiOid:
-			return GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_OID);
+			return GPOS_NEW(mp) CMDIdGPDB(GPDB_OID);
 
 		default:
 			return NULL;

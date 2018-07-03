@@ -42,20 +42,20 @@ CJoinCardinalityTest::EresUnittest()
 	GPOS_RESULT eres = GPOS_FAILED;
 
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(memory_pool, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 					(
-					memory_pool,
+					mp,
 					&mda,
 					NULL /* pceeval */,
-					CTestUtils::GetCostModel(memory_pool)
+					CTestUtils::GetCostModel(mp)
 					);
 
 	eres = CUnittest::EresExecute(rgutSharedOptCtxt, GPOS_ARRAY_SIZE(rgutSharedOptCtxt));
@@ -69,7 +69,7 @@ CJoinCardinalityTest::EresUnittest_JoinNDVRemain()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	SHistogramTestCase rghisttc[] =
 	{
@@ -79,7 +79,7 @@ CJoinCardinalityTest::EresUnittest_JoinNDVRemain()
 		{5, 100, false, 500} // distinct values spread in both buckets and NDVRemain
 	};
 
-	UlongHistogramHashMap *col_histogram_mapping = GPOS_NEW(memory_pool) UlongHistogramHashMap(memory_pool);
+	UlongHistogramHashMap *col_histogram_mapping = GPOS_NEW(mp) UlongHistogramHashMap(mp);
 
 	const ULONG ulHist = GPOS_ARRAY_SIZE(rghisttc);
 	for (ULONG ul1 = 0; ul1 < ulHist; ul1++)
@@ -91,11 +91,11 @@ CJoinCardinalityTest::EresUnittest_JoinNDVRemain()
 		BOOL fNullFreq = elem.m_fNullFreq;
 		CDouble num_NDV_remain = elem.m_dNDVRemain;
 
-		CHistogram *histogram = CCardinalityTestUtils::PhistInt4Remain(memory_pool, num_of_buckets, dNDVPerBucket, fNullFreq, num_NDV_remain);
+		CHistogram *histogram = CCardinalityTestUtils::PhistInt4Remain(mp, num_of_buckets, dNDVPerBucket, fNullFreq, num_NDV_remain);
 #ifdef GPOS_DEBUG
 			BOOL result =
 #endif // GPOS_DEBUG
-		col_histogram_mapping->Insert(GPOS_NEW(memory_pool) ULONG(ul1), histogram);
+		col_histogram_mapping->Insert(GPOS_NEW(mp) ULONG(ul1), histogram);
 		GPOS_ASSERT(result);
 	}
 
@@ -138,10 +138,10 @@ CJoinCardinalityTest::EresUnittest_JoinNDVRemain()
 		CHistogram *histogram1 = col_histogram_mapping->Find(&col_id1);
 		CHistogram *histogram2 = col_histogram_mapping->Find(&col_id2);
 
-		CHistogram *join_histogram = histogram1->MakeJoinHistogram(memory_pool, CStatsPred::EstatscmptEq, histogram2);
+		CHistogram *join_histogram = histogram1->MakeJoinHistogram(mp, CStatsPred::EstatscmptEq, histogram2);
 
 		{
-			CAutoTrace at(memory_pool);
+			CAutoTrace at(mp);
 			at.Os() <<  std::endl << "Input Histogram 1" <<  std::endl;
 			histogram1->OsPrint(at.Os());
 			at.Os() << "Input Histogram 2" <<  std::endl;
@@ -184,7 +184,7 @@ CJoinCardinalityTest::EresUnittest_Join()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	SStatsJoinSTestCase rgstatsjointc[] =
@@ -204,15 +204,15 @@ CJoinCardinalityTest::EresUnittest_Join()
 		SStatsJoinSTestCase elem = rgstatsjointc[ul];
 
 		// read input/output DXL file
-		CHAR *szDXLInput = CDXLUtils::Read(memory_pool, elem.m_szInputFile);
-		CHAR *szDXLOutput = CDXLUtils::Read(memory_pool, elem.m_szOutputFile);
+		CHAR *szDXLInput = CDXLUtils::Read(mp, elem.m_szInputFile);
+		CHAR *szDXLOutput = CDXLUtils::Read(mp, elem.m_szOutputFile);
 		BOOL left_outer_join = elem.m_fLeftOuterJoin;
 
 		GPOS_CHECK_ABORT;
 
 		// parse the input statistics objects
-		DXLStatsDerivedRelArray *dxl_derived_rel_stats_array = CDXLUtils::ParseDXLToStatsDerivedRelArray(memory_pool, szDXLInput, NULL);
-		CStatisticsArray *pdrgpstatBefore = CDXLUtils::ParseDXLToOptimizerStatisticObjArray(memory_pool, md_accessor, dxl_derived_rel_stats_array);
+		DXLStatsDerivedRelArray *dxl_derived_rel_stats_array = CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInput, NULL);
+		CStatisticsArray *pdrgpstatBefore = CDXLUtils::ParseDXLToOptimizerStatisticObjArray(mp, md_accessor, dxl_derived_rel_stats_array);
 		dxl_derived_rel_stats_array->Release();
 
 		GPOS_ASSERT(NULL != pdrgpstatBefore);
@@ -225,37 +225,37 @@ CJoinCardinalityTest::EresUnittest_Join()
 		// generate the join conditions
 		FnPdrgpstatjoin *pf = elem.m_pf;
 		GPOS_ASSERT(NULL != pf);
-		StatsPredJoinArray *join_preds_stats = pf(memory_pool);
+		StatsPredJoinArray *join_preds_stats = pf(mp);
 
 		// calculate the output stats
 		CStatistics *pstatsOutput = NULL;
 		if (left_outer_join)
 		{
-			pstatsOutput = pstats1->CalcLOJoinStats(memory_pool, pstats2, join_preds_stats);
+			pstatsOutput = pstats1->CalcLOJoinStats(mp, pstats2, join_preds_stats);
 		}
 		else
 		{
-			pstatsOutput = pstats1->CalcInnerJoinStats(memory_pool, pstats2, join_preds_stats);
+			pstatsOutput = pstats1->CalcInnerJoinStats(mp, pstats2, join_preds_stats);
 		}
 		GPOS_ASSERT(NULL != pstatsOutput);
 
-		CStatisticsArray *pdrgpstatOutput = GPOS_NEW(memory_pool) CStatisticsArray(memory_pool);
+		CStatisticsArray *pdrgpstatOutput = GPOS_NEW(mp) CStatisticsArray(mp);
 		pdrgpstatOutput->Append(pstatsOutput);
 
 		// serialize and compare against expected stats
 		CWStringDynamic *pstrOutput = CDXLUtils::SerializeStatistics
 													(
-													memory_pool,
+													mp,
 													md_accessor,
 													pdrgpstatOutput,
 													true /*serialize_header_footer*/,
 													true /*indentation*/
 													);
-		CWStringDynamic dstrExpected(memory_pool);
+		CWStringDynamic dstrExpected(mp);
 		dstrExpected.AppendFormat(GPOS_WSZ_LIT("%s"), szDXLOutput);
 
 		GPOS_RESULT eres = GPOS_OK;
-		CWStringDynamic str(memory_pool);
+		CWStringDynamic str(mp);
 		COstreamString oss(&str);
 
 		// compare the two dxls
@@ -293,11 +293,11 @@ CJoinCardinalityTest::EresUnittest_Join()
 StatsPredJoinArray *
 CJoinCardinalityTest::PdrgpstatspredjoinSingleJoinPredicate
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 {
-	StatsPredJoinArray *join_preds_stats = GPOS_NEW(memory_pool) StatsPredJoinArray(memory_pool);
-	join_preds_stats->Append(GPOS_NEW(memory_pool) CStatsPredJoin(0, CStatsPred::EstatscmptEq, 8));
+	StatsPredJoinArray *join_preds_stats = GPOS_NEW(mp) StatsPredJoinArray(mp);
+	join_preds_stats->Append(GPOS_NEW(mp) CStatsPredJoin(0, CStatsPred::EstatscmptEq, 8));
 
 	return join_preds_stats;
 }
@@ -306,14 +306,14 @@ CJoinCardinalityTest::PdrgpstatspredjoinSingleJoinPredicate
 StatsPredJoinArray *
 CJoinCardinalityTest::PdrgpstatspredjoinMultiplePredicates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 {
-	StatsPredJoinArray *join_preds_stats = GPOS_NEW(memory_pool) StatsPredJoinArray(memory_pool);
-	join_preds_stats->Append(GPOS_NEW(memory_pool) CStatsPredJoin(16, CStatsPred::EstatscmptEq, 32));
-	join_preds_stats->Append(GPOS_NEW(memory_pool) CStatsPredJoin(0, CStatsPred::EstatscmptEq, 31));
-	join_preds_stats->Append(GPOS_NEW(memory_pool) CStatsPredJoin(54, CStatsPred::EstatscmptEq, 32));
-	join_preds_stats->Append(GPOS_NEW(memory_pool) CStatsPredJoin(53, CStatsPred::EstatscmptEq, 31));
+	StatsPredJoinArray *join_preds_stats = GPOS_NEW(mp) StatsPredJoinArray(mp);
+	join_preds_stats->Append(GPOS_NEW(mp) CStatsPredJoin(16, CStatsPred::EstatscmptEq, 32));
+	join_preds_stats->Append(GPOS_NEW(mp) CStatsPredJoin(0, CStatsPred::EstatscmptEq, 31));
+	join_preds_stats->Append(GPOS_NEW(mp) CStatsPredJoin(54, CStatsPred::EstatscmptEq, 32));
+	join_preds_stats->Append(GPOS_NEW(mp) CStatsPredJoin(53, CStatsPred::EstatscmptEq, 31));
 
 	return join_preds_stats;
 }
@@ -322,11 +322,11 @@ CJoinCardinalityTest::PdrgpstatspredjoinMultiplePredicates
 StatsPredJoinArray *
 CJoinCardinalityTest::PdrgpstatspredjoinNullableCols
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 {
-	StatsPredJoinArray *join_preds_stats = GPOS_NEW(memory_pool) StatsPredJoinArray(memory_pool);
-	join_preds_stats->Append(GPOS_NEW(memory_pool) CStatsPredJoin(1, CStatsPred::EstatscmptEq, 2));
+	StatsPredJoinArray *join_preds_stats = GPOS_NEW(mp) StatsPredJoinArray(mp);
+	join_preds_stats->Append(GPOS_NEW(mp) CStatsPredJoin(1, CStatsPred::EstatscmptEq, 2));
 
 	return join_preds_stats;
 }

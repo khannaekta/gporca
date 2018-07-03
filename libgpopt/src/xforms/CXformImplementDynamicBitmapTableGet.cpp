@@ -33,18 +33,18 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 CXformImplementDynamicBitmapTableGet::CXformImplementDynamicBitmapTableGet
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	// pattern
 	CXformImplementation
 		(
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalDynamicBitmapTableGet(memory_pool),
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // predicate tree
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))  // bitmap index expression
+				mp,
+				GPOS_NEW(mp) CLogicalDynamicBitmapTableGet(mp),
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // predicate tree
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp))  // bitmap index expression
 				)
 		)
 {}
@@ -70,13 +70,13 @@ CXformImplementDynamicBitmapTableGet::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 	CLogicalDynamicBitmapTableGet *popLogical = CLogicalDynamicBitmapTableGet::PopConvert(pexpr->Pop());
 
 	CTableDescriptor *ptabdesc = popLogical->Ptabdesc();
 	ptabdesc->AddRef();
 
-	CName *pname = GPOS_NEW(memory_pool) CName(memory_pool, popLogical->Name());
+	CName *pname = GPOS_NEW(mp) CName(mp, popLogical->Name());
 
 	ColRefArray *pdrgpcrOutput = popLogical->PdrgpcrOutput();
 
@@ -93,9 +93,9 @@ CXformImplementDynamicBitmapTableGet::Transform
 	ppartcnstrRel->AddRef();
 
 	CPhysicalDynamicBitmapTableScan *popPhysical =
-			GPOS_NEW(memory_pool) CPhysicalDynamicBitmapTableScan
+			GPOS_NEW(mp) CPhysicalDynamicBitmapTableScan
 					(
-					memory_pool,
+					mp,
 					popLogical->IsPartial(),
 					ptabdesc,
 					pexpr->Pop()->UlOpId(),
@@ -114,7 +114,7 @@ CXformImplementDynamicBitmapTableGet::Transform
 	pexprIndexPath->AddRef();
 
 	CExpression *pexprPhysical =
-			GPOS_NEW(memory_pool) CExpression(memory_pool, popPhysical, pexprCondition, pexprIndexPath);
+			GPOS_NEW(mp) CExpression(mp, popPhysical, pexprCondition, pexprIndexPath);
 	pxfres->Add(pexprPhysical);
 }
 

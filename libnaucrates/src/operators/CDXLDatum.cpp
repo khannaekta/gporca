@@ -30,8 +30,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLDatum::CDXLDatum(
-	IMemoryPool *memory_pool, IMDId *mdid_type, INT type_modifier, BOOL is_null, ULONG length)
-	: m_memory_pool(memory_pool),
+	IMemoryPool *mp, IMDId *mdid_type, INT type_modifier, BOOL is_null, ULONG length)
+	: m_mp(mp),
 	  m_mdid_type(mdid_type),
 	  m_type_modifier(type_modifier),
 	  m_is_null(is_null),

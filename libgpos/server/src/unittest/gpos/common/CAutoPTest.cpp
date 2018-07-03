@@ -50,16 +50,16 @@ CAutoPTest::EresUnittest_Basics()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// assignment
 	CAutoP<CHAR> asz;
-	CHAR *sz = GPOS_NEW(memory_pool) CHAR;
+	CHAR *sz = GPOS_NEW(mp) CHAR;
 	asz = sz;
 
 	CAutoP<CHAR> asz2;
 	CAutoP<CHAR> asz3;
-	CHAR *sz2 = GPOS_NEW(memory_pool) CHAR;
+	CHAR *sz2 = GPOS_NEW(mp) CHAR;
 
 	*sz2 = '\0';
 	asz2 = sz2;
@@ -82,7 +82,7 @@ CAutoPTest::EresUnittest_Basics()
 	// unhooking of object
 	GPOS_DELETE(asz3.Reset());
 
-	CElem *pelem = GPOS_NEW(memory_pool) CElem;
+	CElem *pelem = GPOS_NEW(mp) CElem;
 	pelem->m_ul = 3;
 
 	CAutoP<CElem> aelem;
@@ -92,7 +92,7 @@ CAutoPTest::EresUnittest_Basics()
 	GPOS_ASSERT(pelem->m_ul == aelem->m_ul);
 
 	// c'tor
-	CAutoP<CHAR> asz4(GPOS_NEW(memory_pool) CHAR);
+	CAutoP<CHAR> asz4(GPOS_NEW(mp) CHAR);
 	*(asz4.Value()) = 'a';
 
 	return GPOS_OK;

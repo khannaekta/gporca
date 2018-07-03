@@ -113,7 +113,7 @@ CRewindabilitySpec::HashValue() const
 void
 CRewindabilitySpec::AppendEnforcers
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &, // exprhdl
 	CReqdPropPlan *
 #ifdef GPOS_DEBUG
@@ -125,17 +125,17 @@ CRewindabilitySpec::AppendEnforcers
 	)
 {
 	GPOS_ASSERT(NULL != prpp);
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != pdrgpexpr);
 	GPOS_ASSERT(NULL != pexpr);
 	GPOS_ASSERT(this == prpp->Per()->PrsRequired() &&
 				"required plan properties don't match enforced rewindability spec");
 
 	pexpr->AddRef();
-	CExpression *pexprSpool = GPOS_NEW(memory_pool) CExpression
+	CExpression *pexprSpool = GPOS_NEW(mp) CExpression
 									(
-									memory_pool, 
-									GPOS_NEW(memory_pool) CPhysicalSpool(memory_pool),
+									mp, 
+									GPOS_NEW(mp) CPhysicalSpool(mp),
 									pexpr
 									);
 	pdrgpexpr->Append(pexprSpool);

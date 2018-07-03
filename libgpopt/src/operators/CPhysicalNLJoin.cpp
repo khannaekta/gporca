@@ -33,10 +33,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalNLJoin::CPhysicalNLJoin
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CPhysicalJoin(memory_pool)
+	CPhysicalJoin(mp)
 {
 	// NLJ creates two partition propagation requests for children:
 	// (0) push possible Dynamic Partition Elimination (DPE) predicates from join's predicate to
@@ -73,7 +73,7 @@ CPhysicalNLJoin::~CPhysicalNLJoin()
 COrderSpec *
 CPhysicalNLJoin::PosRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	COrderSpec *posInput,
 	ULONG child_index,
@@ -87,10 +87,10 @@ CPhysicalNLJoin::PosRequired
 
 	if (0 == child_index)
 	{
-		return PosPropagateToOuter(memory_pool, exprhdl, posInput);
+		return PosPropagateToOuter(mp, exprhdl, posInput);
 	}
 
-	return GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+	return GPOS_NEW(mp) COrderSpec(mp);
 }
 
 
@@ -105,7 +105,7 @@ CPhysicalNLJoin::PosRequired
 CRewindabilitySpec *
 CPhysicalNLJoin::PrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CRewindabilitySpec *prsRequired,
 	ULONG child_index,
@@ -120,17 +120,17 @@ CPhysicalNLJoin::PrsRequired
 	// if there are outer references, then we need a materialize on both children
 	if (exprhdl.HasOuterRefs())
 	{
-		return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral);
+		return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral);
 	}
 
 	if (1 == child_index)
 	{
 		// inner child has to be rewindable
-		return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral /*ert*/);
+		return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral /*ert*/);
 	}
 
 	// pass through requirements to outer child
-	return PrsPassThru(memory_pool, exprhdl, prsRequired, 0 /*child_index*/);
+	return PrsPassThru(mp, exprhdl, prsRequired, 0 /*child_index*/);
 }
 
 //---------------------------------------------------------------------------
@@ -144,7 +144,7 @@ CPhysicalNLJoin::PrsRequired
 CColRefSet *
 CPhysicalNLJoin::PcrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CColRefSet *pcrsRequired,
 	ULONG child_index,
@@ -155,7 +155,7 @@ CPhysicalNLJoin::PcrsRequired
 	GPOS_ASSERT(child_index < 2 &&
 				"Required properties can only be computed on the relational child");
 
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(pcrsRequired);
 
 	// For subqueries in the projection list, the required columns from the outer child
@@ -173,7 +173,7 @@ CPhysicalNLJoin::PcrsRequired
 		pcrs->Include(PdrgPcrInner());
 	}
 
-	CColRefSet *pcrsReqd = PcrsChildReqd(memory_pool, exprhdl, pcrs, child_index, 2 /*ulScalarIndex*/);
+	CColRefSet *pcrsReqd = PcrsChildReqd(mp, exprhdl, pcrs, child_index, 2 /*ulScalarIndex*/);
 	pcrs->Release();
 
 	return pcrsReqd;
@@ -199,7 +199,7 @@ CPhysicalNLJoin::EpetOrder
 	GPOS_ASSERT(NULL != peo);
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());
 
-	if (FSortColsInOuterChild(m_memory_pool, exprhdl, peo->PosRequired()))
+	if (FSortColsInOuterChild(m_mp, exprhdl, peo->PosRequired()))
 	{
 		return CEnfdProp::EpetOptional;
 	}
@@ -219,7 +219,7 @@ CPhysicalNLJoin::EpetOrder
 CPartitionPropagationSpec *
 CPhysicalNLJoin::PppsRequiredNLJoinChild
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CPartitionPropagationSpec *pppsRequired,
 	ULONG child_index,
@@ -234,11 +234,11 @@ CPhysicalNLJoin::PppsRequiredNLJoinChild
 		// request (1): push partition propagation requests to join's children,
 		// do not consider possible dynamic partition elimination using join predicate here,
 		// this is handled by optimization request (0) below
-		return CPhysical::PppsRequiredPushThruNAry(memory_pool, exprhdl, pppsRequired, child_index);
+		return CPhysical::PppsRequiredPushThruNAry(mp, exprhdl, pppsRequired, child_index);
 	}
 	GPOS_ASSERT(0 == ulOptReq);
 
-	return PppsRequiredJoinChild(memory_pool, exprhdl, pppsRequired, child_index, pdrgpdpCtxt, true);
+	return PppsRequiredJoinChild(mp, exprhdl, pppsRequired, child_index, pdrgpdpCtxt, true);
 }
 
 

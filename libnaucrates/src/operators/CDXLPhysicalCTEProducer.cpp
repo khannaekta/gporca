@@ -28,10 +28,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalCTEProducer::CDXLPhysicalCTEProducer(IMemoryPool *memory_pool,
+CDXLPhysicalCTEProducer::CDXLPhysicalCTEProducer(IMemoryPool *mp,
 												 ULONG id,
 												 ULongPtrArray *output_colids_array)
-	: CDXLPhysical(memory_pool), m_id(id), m_output_colids_array(output_colids_array)
+	: CDXLPhysical(mp), m_id(id), m_output_colids_array(output_colids_array)
 {
 	GPOS_ASSERT(NULL != output_colids_array);
 }
@@ -94,7 +94,7 @@ CDXLPhysicalCTEProducer::SerializeToDXL(CXMLSerializer *xml_serializer,
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenCTEId), Id());
 
-	CWStringDynamic *pstrColIds = CDXLUtils::Serialize(m_memory_pool, m_output_colids_array);
+	CWStringDynamic *pstrColIds = CDXLUtils::Serialize(m_mp, m_output_colids_array);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenColumns), pstrColIds);
 	GPOS_DELETE(pstrColIds);
 

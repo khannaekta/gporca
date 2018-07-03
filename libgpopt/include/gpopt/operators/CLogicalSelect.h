@@ -43,7 +43,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CLogicalSelect(IMemoryPool *memory_pool);
+			CLogicalSelect(IMemoryPool *mp);
 
 			// dtor
 			virtual
@@ -72,29 +72,29 @@ namespace gpopt
 			
 			// dervive keys
 			virtual 
-			CKeyCollection *PkcDeriveKeys(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;		
+			CKeyCollection *PkcDeriveKeys(IMemoryPool *mp, CExpressionHandle &exprhdl) const;		
 					
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive constraint property
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PpcDeriveConstraintFromPredicates(memory_pool, exprhdl);
+				return PpcDeriveConstraintFromPredicates(mp, exprhdl);
 			}
 
 			// compute partition predicate to pass down to n-th child
 			virtual
 			CExpression *PexprPartPred
 							(
-							IMemoryPool *memory_pool,
+							IMemoryPool *mp,
 							CExpressionHandle &exprhdl,
 							CExpression *pexprInput,
 							ULONG child_index
@@ -137,7 +137,7 @@ namespace gpopt
 			virtual
 			IStatistics *PstatsDerive
 						(
-						IMemoryPool *memory_pool,
+						IMemoryPool *mp,
 						CExpressionHandle &exprhdl,
 						StatsArray *stats_ctxt
 						)

@@ -38,14 +38,14 @@ namespace gpdxl
 	{
 	private:
 		// memory pool
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// private copy ctor
 		CDXLMemoryManager(const CDXLMemoryManager &);
 
 	public:
 		// ctor
-		CDXLMemoryManager(IMemoryPool *memory_pool);
+		CDXLMemoryManager(IMemoryPool *mp);
 
 		// MemoryManager interface functions
 
@@ -60,7 +60,7 @@ namespace gpdxl
 		IMemoryPool *
 		Pmp()
 		{
-			return m_memory_pool;
+			return m_mp;
 		}
 
 		// returns the memory manager responsible for memory allocation

@@ -47,7 +47,7 @@ namespace gpmd
 	{
 	private:
 		// memory pool
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// included default partitions
 		ULongPtrArray *m_level_with_default_part_array;
@@ -56,11 +56,11 @@ namespace gpmd
 		BOOL m_is_unbounded;
 
 		// the DXL representation of the part constraint
-		CDXLNode *m_dxl_node;
+		CDXLNode *m_dxlnode;
 
 	public:
 		// ctor
-		CMDPartConstraintGPDB(IMemoryPool *memory_pool,
+		CMDPartConstraintGPDB(IMemoryPool *mp,
 							  ULongPtrArray *level_with_default_part_array,
 							  BOOL is_unbounded,
 							  CDXLNode *dxlnode);
@@ -72,7 +72,7 @@ namespace gpmd
 		virtual void Serialize(CXMLSerializer *xml_serializer) const;
 
 		// the scalar expression of the part constraint
-		virtual CExpression *GetPartConstraintExpr(IMemoryPool *memory_pool,
+		virtual CExpression *GetPartConstraintExpr(IMemoryPool *mp,
 												   CMDAccessor *md_accessor,
 												   ColRefArray *colref_array) const;
 

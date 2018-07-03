@@ -25,10 +25,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerLogicalOp::CParseHandlerLogicalOp(IMemoryPool *memory_pool,
+CParseHandlerLogicalOp::CParseHandlerLogicalOp(IMemoryPool *mp,
 											   CParseHandlerManager *parse_handler_mgr,
 											   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -50,7 +50,7 @@ CParseHandlerLogicalOp::StartElement(const XMLCh *const element_uri,
 {
 	// instantiate the parse handler
 	CParseHandlerBase *logical_op_parse_handler = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, element_local_name, m_parse_handler_mgr, this);
+		m_mp, element_local_name, m_parse_handler_mgr, this);
 
 	GPOS_ASSERT(NULL != logical_op_parse_handler);
 

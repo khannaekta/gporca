@@ -13,18 +13,18 @@ namespace gpopt
 {
 	CPhysicalParallelUnionAll::CPhysicalParallelUnionAll
 		(
-			IMemoryPool *memory_pool,
+			IMemoryPool *mp,
 			ColRefArray *pdrgpcrOutput,
 			ColRefArrays *pdrgpdrgpcrInput,
 			ULONG ulScanIdPartialIndex
 		) : CPhysicalUnionAll
 		(
-			memory_pool,
+			mp,
 			pdrgpcrOutput,
 			pdrgpdrgpcrInput,
 			ulScanIdPartialIndex
 		),
-			m_pdrgpds(GPOS_NEW(memory_pool) CStrictHashedDistributions(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput))
+			m_pdrgpds(GPOS_NEW(mp) CStrictHashedDistributions(mp, pdrgpcrOutput, pdrgpdrgpcrInput))
 	{
 		// ParallelUnionAll creates two distribution requests to enforce distribution of its children:
 		// (1) (StrictHashed, StrictHashed, ...): used to force redistribute motions that mirror the
@@ -48,7 +48,7 @@ namespace gpopt
 	CDistributionSpec *
 	CPhysicalParallelUnionAll::PdsRequired
 		(
-			IMemoryPool *memory_pool,
+			IMemoryPool *mp,
 			CExpressionHandle &,
 			CDistributionSpec *,
 			ULONG child_index,
@@ -66,13 +66,13 @@ namespace gpopt
 		else
 		{
 			ColRefArray *pdrgpcrChildInputColumns = (*PdrgpdrgpcrInput())[child_index];
-			ExpressionArray *pdrgpexprFakeRequestedColumns = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+			ExpressionArray *pdrgpexprFakeRequestedColumns = GPOS_NEW(mp) ExpressionArray(mp);
 
 			CColRef *pcrFirstColumn = (*pdrgpcrChildInputColumns)[0];
-			CExpression *pexprScalarIdent = CUtils::PexprScalarIdent(memory_pool, pcrFirstColumn);
+			CExpression *pexprScalarIdent = CUtils::PexprScalarIdent(mp, pcrFirstColumn);
 			pdrgpexprFakeRequestedColumns->Append(pexprScalarIdent);
 
-			return GPOS_NEW(memory_pool) CDistributionSpecHashedNoOp(pdrgpexprFakeRequestedColumns);
+			return GPOS_NEW(mp) CDistributionSpecHashedNoOp(pdrgpexprFakeRequestedColumns);
 		}
 	}
 

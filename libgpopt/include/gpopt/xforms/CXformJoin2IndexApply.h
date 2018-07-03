@@ -30,7 +30,7 @@ namespace gpopt
 			// for homogeneous b-tree indexes
 			void CreateHomogeneousBtreeIndexApplyAlternatives
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ULONG ulOriginOpId,
 				CExpression *pexprOuter,
 				CExpression *pexprInner,
@@ -48,7 +48,7 @@ namespace gpopt
 			// for homogeneous b-tree indexes
 			void CreateAlternativesForBtreeIndex
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ULONG ulOriginOpId,
 				CExpression *pexprOuter,
 				CExpression *pexprInner,
@@ -67,7 +67,7 @@ namespace gpopt
 			// for homogeneous bitmap indexes
 			void CreateHomogeneousBitmapIndexApplyAlternatives
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ULONG ulOriginOpId,
 				CExpression *pexprOuter,
 				CExpression *pexprInner,
@@ -82,7 +82,7 @@ namespace gpopt
 			// columns, outer references and required columns
 			void ComputeColumnSets
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprInner,
 				CExpression *pexprScalar,
 				CColRefSet **ppcrsScalarExpr,
@@ -93,7 +93,7 @@ namespace gpopt
 			// create an index apply plan when applicable
 			void CreatePartialIndexApplyPlan
 					(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					ULONG ulOriginOpId,
 					CExpression *pexprOuter,
 					CExpression *pexprScalar,
@@ -108,7 +108,7 @@ namespace gpopt
 			// partition constraint
 			CExpression *PexprJoinOverCTEConsumer
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ULONG ulOriginOpId,
 				CLogicalDynamicGet *popDynamicGet,
 				ULONG ulCTEId,
@@ -123,7 +123,7 @@ namespace gpopt
 			// and a dynamic get on the inner one
 			CExpression *PexprIndexApplyOverCTEConsumer
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ULONG ulOriginOpId,
 				CLogicalDynamicGet *popDynamicGet,
 				ExpressionArray *pdrgpexprIndex,
@@ -144,7 +144,7 @@ namespace gpopt
 			// create a union-all with the given children
 			CExpression *PexprConstructUnionAll
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *pdrgpcrLeftSchema,
 				ColRefArray *pdrgpcrRightSchema,
 				CExpression *pexprLeftChild,
@@ -156,7 +156,7 @@ namespace gpopt
 			//	Xform result
 			void AddUnionPlanForPartialIndexes
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CLogicalDynamicGet *popDynamicGet,
 				ULONG ulCTEId,
 				CExpression *pexprUnion,
@@ -182,7 +182,7 @@ namespace gpopt
 			virtual
 			void CreateHomogeneousIndexApplyAlternatives
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ULONG ulOriginOpId,
 				CExpression *pexprOuter,
 				CExpression *pexprInner,
@@ -198,7 +198,7 @@ namespace gpopt
 			virtual
 			void CreatePartialIndexApplyAlternatives
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ULONG ulOriginOpId,
 				CExpression *pexprOuter,
 				CExpression *pexprInner,
@@ -213,7 +213,7 @@ namespace gpopt
 			// takes the ownership and responsibility to release
 			// the instance.
 			virtual
-			CLogicalJoin *PopLogicalJoin(IMemoryPool *memory_pool) const = 0;
+			CLogicalJoin *PopLogicalJoin(IMemoryPool *mp) const = 0;
 
 			// return the new instance of logical apply operator
 			// that it is trying to transform to in the current
@@ -222,7 +222,7 @@ namespace gpopt
 			virtual
 			CLogicalApply *PopLogicalApply
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *pdrgpcrOuterRefs
 				) const = 0;
 

@@ -32,18 +32,18 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformSimplifyGbAgg::CXformSimplifyGbAgg
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformExploration
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 					(
-					memory_pool,
-					GPOS_NEW(memory_pool) CLogicalGbAgg(memory_pool),
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // relational child
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))  // scalar project list
+					mp,
+					GPOS_NEW(mp) CLogicalGbAgg(mp),
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // relational child
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))  // scalar project list
 					)
 		)
 {}
@@ -90,7 +90,7 @@ CXformSimplifyGbAgg::Exfp
 BOOL
 CXformSimplifyGbAgg::FDropGbAgg
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr,
 	CXformResult *pxfres
 	)
@@ -116,11 +116,11 @@ CXformSimplifyGbAgg::FDropGbAgg
 	BOOL fDrop = false;
 	for (ULONG ul = 0; !fDrop && ul < ulKeys; ul++)
 	{
-		ColRefArray *pdrgpcrKey = pkc->PdrgpcrKey(memory_pool, ul);
-		CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool, pdrgpcrKey);
+		ColRefArray *pdrgpcrKey = pkc->PdrgpcrKey(mp, ul);
+		CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrKey);
 		pdrgpcrKey->Release();
 
-		CColRefSet *pcrsGrpCols = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+		CColRefSet *pcrsGrpCols = GPOS_NEW(mp) CColRefSet(mp);
 		pcrsGrpCols->Include(popAgg->Pdrgpcr());
 		BOOL fGrpColsHasKey = pcrsGrpCols->ContainsAll(pcrs);
 
@@ -131,7 +131,7 @@ CXformSimplifyGbAgg::FDropGbAgg
 			// Gb operator can be dropped
 			pexprRelational->AddRef();
 			CExpression *pexprResult =
-				CUtils::PexprLogicalSelect(memory_pool, pexprRelational, CPredicateUtils::PexprConjunction(memory_pool, NULL));
+				CUtils::PexprLogicalSelect(mp, pexprRelational, CPredicateUtils::PexprConjunction(mp, NULL));
 			pxfres->Add(pexprResult);
 			fDrop = true;
 		}
@@ -163,9 +163,9 @@ CXformSimplifyGbAgg::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
-	if (FDropGbAgg(memory_pool, pexpr,pxfres))
+	if (FDropGbAgg(mp, pexpr,pxfres))
 	{
 		 // grouping columns could be dropped, GbAgg is transformed to a Select
 		return;
@@ -177,11 +177,11 @@ CXformSimplifyGbAgg::Transform
 	CExpression *pexprProjectList = (*pexpr)[1];
 
 	ColRefArray *colref_array = popAgg->Pdrgpcr();
-	CColRefSet *pcrsGrpCols = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrsGrpCols = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsGrpCols->Include(colref_array);
 
-	CColRefSet *pcrsCovered = GPOS_NEW(memory_pool) CColRefSet(memory_pool);	// set of grouping columns covered by FD's
-	CColRefSet *pcrsMinimal = GPOS_NEW(memory_pool) CColRefSet(memory_pool); // a set of minimal grouping columns based on FD's
+	CColRefSet *pcrsCovered = GPOS_NEW(mp) CColRefSet(mp);	// set of grouping columns covered by FD's
+	CColRefSet *pcrsMinimal = GPOS_NEW(mp) CColRefSet(mp); // a set of minimal grouping columns based on FD's
 	FunctionalDependencyArray *pdrgpfd = CDrvdPropRelational::GetRelationalProperties(pexpr->PdpDerive())->Pdrgpfd();
 
 	// collect grouping columns FD's
@@ -210,13 +210,13 @@ CXformSimplifyGbAgg::Transform
 	// create a new Agg with minimal grouping columns
 	colref_array->AddRef();
 
-	CLogicalGbAgg *popAggNew = GPOS_NEW(memory_pool) CLogicalGbAgg(memory_pool, colref_array, pcrsMinimal->Pdrgpcr(memory_pool), popAgg->Egbaggtype());
+	CLogicalGbAgg *popAggNew = GPOS_NEW(mp) CLogicalGbAgg(mp, colref_array, pcrsMinimal->Pdrgpcr(mp), popAgg->Egbaggtype());
 	pcrsMinimal->Release();
 	GPOS_ASSERT(!popAgg->Matches(popAggNew) && "Simplified aggregate matches original aggregate");
 
 	pexprRelational->AddRef();
 	pexprProjectList->AddRef();
-	CExpression *pexprResult = GPOS_NEW(memory_pool) CExpression(memory_pool, popAggNew, pexprRelational, pexprProjectList);
+	CExpression *pexprResult = GPOS_NEW(mp) CExpression(mp, popAggNew, pexprRelational, pexprProjectList);
 	pxfres->Add(pexprResult);
 }
 

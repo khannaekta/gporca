@@ -22,12 +22,12 @@ static
 ColRefToConstraintArrayMap *
 PhmcolconstrSingleColConstr
 	(
-		IMemoryPool *memory_pool,
+		IMemoryPool *mp,
 		ConstraintArray *drgPcnstr
 	)
 {
 	CAutoRef<ConstraintArray> arpdrgpcnstr(drgPcnstr);
-	ColRefToConstraintArrayMap *phmcolconstr = GPOS_NEW(memory_pool) ColRefToConstraintArrayMap(memory_pool);
+	ColRefToConstraintArrayMap *phmcolconstr = GPOS_NEW(mp) ColRefToConstraintArrayMap(mp);
 
 	const ULONG length = arpdrgpcnstr->Size();
 
@@ -42,7 +42,7 @@ PhmcolconstrSingleColConstr
 			ConstraintArray *pcnstrMapped = phmcolconstr->Find(colref);
 			if (NULL == pcnstrMapped)
 			{
-				pcnstrMapped = GPOS_NEW(memory_pool) ConstraintArray(memory_pool);
+				pcnstrMapped = GPOS_NEW(mp) ConstraintArray(mp);
 				phmcolconstr->Insert(colref, pcnstrMapped);
 			}
 			pcnstrChild->AddRef();
@@ -55,10 +55,10 @@ PhmcolconstrSingleColConstr
 
 CColConstraintsHashMapper::CColConstraintsHashMapper
 	(
-		IMemoryPool *memory_pool,
+		IMemoryPool *mp,
 		ConstraintArray *pdrgpcnstr
 	) :
-	m_phmColConstr(PhmcolconstrSingleColConstr(memory_pool, pdrgpcnstr))
+	m_phmColConstr(PhmcolconstrSingleColConstr(mp, pdrgpcnstr))
 {
 }
 

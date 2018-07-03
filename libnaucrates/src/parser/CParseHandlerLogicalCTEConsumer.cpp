@@ -28,10 +28,10 @@ XERCES_CPP_NAMESPACE_USE
 //
 //---------------------------------------------------------------------------
 CParseHandlerLogicalCTEConsumer::CParseHandlerLogicalCTEConsumer(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerLogicalOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerLogicalOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -70,9 +70,9 @@ CParseHandlerLogicalCTEConsumer::StartElement(const XMLCh *const,  // element_ur
 														 EdxltokenColumns,
 														 EdxltokenLogicalCTEConsumer);
 
-	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(
-		m_memory_pool,
-		GPOS_NEW(m_memory_pool) CDXLLogicalCTEConsumer(m_memory_pool, id, output_colids_array));
+	m_dxlnode = GPOS_NEW(m_mp) CDXLNode(
+		m_mp,
+		GPOS_NEW(m_mp) CDXLLogicalCTEConsumer(m_mp, id, output_colids_array));
 }
 
 //---------------------------------------------------------------------------
@@ -97,9 +97,9 @@ CParseHandlerLogicalCTEConsumer::EndElement(const XMLCh *const,  // element_uri,
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
-	GPOS_ASSERT(NULL != m_dxl_node);
+	GPOS_ASSERT(NULL != m_dxlnode);
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node, false /* validate_children */);
+	m_dxlnode->GetOperator()->AssertValid(m_dxlnode, false /* validate_children */);
 #endif  // GPOS_DEBUG
 
 	m_parse_handler_mgr->DeactivateHandler();

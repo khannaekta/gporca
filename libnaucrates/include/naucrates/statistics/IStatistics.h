@@ -149,7 +149,7 @@ namespace gpnaucrates
 		virtual CDouble Width(ULongPtrArray *col_ids) const = 0;
 
 		// what is the width in bytes of set of column references
-		virtual CDouble Width(IMemoryPool *memory_pool, CColRefSet *colrefs) const = 0;
+		virtual CDouble Width(IMemoryPool *mp, CColRefSet *colrefs) const = 0;
 
 		// the risk of errors in cardinality estimation
 		virtual ULONG StatsEstimationRisk() const = 0;
@@ -163,55 +163,55 @@ namespace gpnaucrates
 		virtual ULONG GetNumberOfPredicates() const = 0;
 
 		// inner join with another stats structure
-		virtual IStatistics *CalcInnerJoinStats(IMemoryPool *memory_pool,
+		virtual IStatistics *CalcInnerJoinStats(IMemoryPool *mp,
 												const IStatistics *other_stats,
 												StatsPredJoinArray *join_preds_stats) const = 0;
 
 		// LOJ with another stats structure
-		virtual IStatistics *CalcLOJoinStats(IMemoryPool *memory_pool,
+		virtual IStatistics *CalcLOJoinStats(IMemoryPool *mp,
 											 const IStatistics *other_stats,
 											 StatsPredJoinArray *join_preds_stats) const = 0;
 
 		// semi join stats computation
-		virtual IStatistics *CalcLSJoinStats(IMemoryPool *memory_pool,
+		virtual IStatistics *CalcLSJoinStats(IMemoryPool *mp,
 											 const IStatistics *inner_side_stats,
 											 StatsPredJoinArray *join_preds_stats) const = 0;
 
 		// anti semi join
-		virtual IStatistics *CalcLASJoinStats(IMemoryPool *memory_pool,
+		virtual IStatistics *CalcLASJoinStats(IMemoryPool *mp,
 											  const IStatistics *other_stats,
 											  StatsPredJoinArray *join_preds_stats,
 											  BOOL DoIgnoreLASJHistComputation) const = 0;
 
 		// return required props associated with stats object
-		virtual CReqdPropRelational *GetReqdRelationalProps(IMemoryPool *memory_pool) const = 0;
+		virtual CReqdPropRelational *GetReqdRelationalProps(IMemoryPool *mp) const = 0;
 
 		// append given stats to current object
-		virtual void AppendStats(IMemoryPool *memory_pool, IStatistics *stats) = 0;
+		virtual void AppendStats(IMemoryPool *mp, IStatistics *stats) = 0;
 
 		// set number of rebinds
 		virtual void SetRebinds(CDouble num_rebinds) = 0;
 
 		// copy stats
-		virtual IStatistics *CopyStats(IMemoryPool *memory_pool) const = 0;
+		virtual IStatistics *CopyStats(IMemoryPool *mp) const = 0;
 
 		// return a copy of this stats object scaled by a given factor
-		virtual IStatistics *ScaleStats(IMemoryPool *memory_pool, CDouble factor) const = 0;
+		virtual IStatistics *ScaleStats(IMemoryPool *mp, CDouble factor) const = 0;
 
 		// copy stats with remapped column ids
-		virtual IStatistics *CopyStatsWithRemap(IMemoryPool *memory_pool,
+		virtual IStatistics *CopyStatsWithRemap(IMemoryPool *mp,
 												UlongColRefHashMap *colref_mapping,
 												BOOL must_exist = true) const = 0;
 
 		// return a set of column references we have stats for
-		virtual CColRefSet *GetColRefSet(IMemoryPool *memory_pool) const = 0;
+		virtual CColRefSet *GetColRefSet(IMemoryPool *mp) const = 0;
 
 		// print function
 		virtual IOstream &OsPrint(IOstream &os) const = 0;
 
 		// generate the DXL representation of the statistics object
 		virtual CDXLStatsDerivedRelation *GetDxlStatsDrvdRelation(
-			IMemoryPool *memory_pool, CMDAccessor *md_accessor) const = 0;
+			IMemoryPool *mp, CMDAccessor *md_accessor) const = 0;
 
 		// is the join type either a left semi join or left anti-semi join
 		static BOOL

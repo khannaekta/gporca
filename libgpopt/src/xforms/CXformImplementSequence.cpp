@@ -28,17 +28,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformImplementSequence::CXformImplementSequence
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformImplementation
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalSequence(memory_pool),
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternMultiLeaf(memory_pool))
+				mp,
+				GPOS_NEW(mp) CLogicalSequence(mp),
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternMultiLeaf(mp))
 				)
 		)
 {}
@@ -65,17 +65,17 @@ CXformImplementSequence::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	ExpressionArray *pdrgpexpr = pexpr->PdrgPexpr();
 	pdrgpexpr->AddRef();
 	
 	// create alternative expression
 	CExpression *pexprAlt = 
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
-			GPOS_NEW(memory_pool) CPhysicalSequence(memory_pool),
+			mp,
+			GPOS_NEW(mp) CPhysicalSequence(mp),
 			pdrgpexpr
 			);
 	// add alternative to transformation result

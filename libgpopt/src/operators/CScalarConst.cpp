@@ -31,11 +31,11 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CScalarConst::CScalarConst
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IDatum *datum
 	)
 	:
-	CScalar(memory_pool),
+	CScalar(mp),
 	m_pdatum(datum)
 {
 	GPOS_ASSERT(NULL != datum);

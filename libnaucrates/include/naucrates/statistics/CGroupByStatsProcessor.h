@@ -24,7 +24,7 @@ namespace gpnaucrates
 	{
 	public:
 		// group by
-		static CStatistics *CalcGroupByStats(IMemoryPool *memory_pool,
+		static CStatistics *CalcGroupByStats(IMemoryPool *mp,
 											 const CStatistics *input_stats,
 											 ULongPtrArray *GCs,
 											 ULongPtrArray *aggs,

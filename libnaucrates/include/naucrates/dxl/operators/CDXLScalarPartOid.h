@@ -37,7 +37,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLScalarPartOid(IMemoryPool *memory_pool, ULONG partitioning_level);
+		CDXLScalarPartOid(IMemoryPool *mp, ULONG partitioning_level);
 
 		// operator type
 		virtual Edxlopid GetDXLOperator() const;

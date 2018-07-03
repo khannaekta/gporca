@@ -41,10 +41,10 @@ namespace gpopt
 			// ctor
 			CScalarSubqueryNotExists
 				(
-				IMemoryPool *memory_pool
+				IMemoryPool *mp
 				)
 				:
-				CScalarSubqueryExistential(memory_pool)
+				CScalarSubqueryExistential(mp)
 			{}
 
 			// dtor

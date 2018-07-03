@@ -94,15 +94,15 @@ namespace gpopt
 
 			// helper for getting applicable FDs from child
 			static
-			FunctionalDependencyArray *PdrgpfdChild(IMemoryPool *memory_pool, ULONG child_index, CExpressionHandle &exprhdl);
+			FunctionalDependencyArray *PdrgpfdChild(IMemoryPool *mp, ULONG child_index, CExpressionHandle &exprhdl);
 
 			// helper for creating local FDs
 			static
-			FunctionalDependencyArray *PdrgpfdLocal(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			FunctionalDependencyArray *PdrgpfdLocal(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 			// helper for deriving FD's
 			static
-			FunctionalDependencyArray *Pdrgpfd(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			FunctionalDependencyArray *Pdrgpfd(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 		public:
 
@@ -121,7 +121,7 @@ namespace gpopt
 			}
 
 			// derivation function
-			void Derive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CDrvdPropCtxt *pdpctxt);
+			void Derive(IMemoryPool *mp, CExpressionHandle &exprhdl, CDrvdPropCtxt *pdpctxt);
 
 			// output columns
 			CColRefSet *PcrsOutput() const

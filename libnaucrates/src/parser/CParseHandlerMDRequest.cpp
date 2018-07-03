@@ -26,10 +26,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerMDRequest::CParseHandlerMDRequest(IMemoryPool *memory_pool,
+CParseHandlerMDRequest::CParseHandlerMDRequest(IMemoryPool *mp,
 											   CParseHandlerManager *parse_handler_mgr,
 											   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root), m_mdid_array(NULL)
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root), m_mdid_array(NULL)
 {
 }
 
@@ -67,9 +67,9 @@ CParseHandlerMDRequest::StartElement(const XMLCh *const,  // element_uri,
 	{
 		// start of MD request section
 		GPOS_ASSERT(NULL == m_mdid_array);
-		m_mdid_array = GPOS_NEW(m_memory_pool) MdidPtrArray(m_memory_pool);
+		m_mdid_array = GPOS_NEW(m_mp) MdidPtrArray(m_mp);
 		m_mdtype_request_array =
-			GPOS_NEW(m_memory_pool) CMDRequest::MDTypeRequestPtrArray(m_memory_pool);
+			GPOS_NEW(m_mp) CMDRequest::MDTypeRequestPtrArray(m_mp);
 
 		return;
 	}
@@ -103,7 +103,7 @@ CParseHandlerMDRequest::StartElement(const XMLCh *const,  // element_uri,
 				attrs,
 				EdxltokenTypeInfo,
 				EdxltokenMDTypeRequest);
-		m_mdtype_request_array->Append(GPOS_NEW(m_memory_pool)
+		m_mdtype_request_array->Append(GPOS_NEW(m_mp)
 										   CMDRequest::SMDTypeRequest(sysid, type_info));
 	}
 }

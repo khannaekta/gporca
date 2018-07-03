@@ -28,11 +28,11 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarSubqueryQuantified::CDXLScalarSubqueryQuantified(IMemoryPool *memory_pool,
+CDXLScalarSubqueryQuantified::CDXLScalarSubqueryQuantified(IMemoryPool *mp,
 														   IMDId *scalar_op_mdid,
 														   CMDName *scalar_op_mdname,
 														   ULONG col_id)
-	: CDXLScalar(memory_pool),
+	: CDXLScalar(mp),
 	  m_scalar_op_mdid(scalar_op_mdid),
 	  m_scalar_op_mdname(scalar_op_mdname),
 	  m_colid(col_id)

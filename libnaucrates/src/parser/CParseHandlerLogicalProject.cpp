@@ -31,10 +31,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerLogicalProject::CParseHandlerLogicalProject(IMemoryPool *memory_pool,
+CParseHandlerLogicalProject::CParseHandlerLogicalProject(IMemoryPool *mp,
 														 CParseHandlerManager *parse_handler_mgr,
 														 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerLogicalOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerLogicalOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -68,19 +68,19 @@ CParseHandlerLogicalProject::StartElement(const XMLCh *const,  // element_uri,
 	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenLogicalProject),
 									  element_local_name))
 	{
-		m_dxl_node = GPOS_NEW(m_memory_pool)
-			CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLLogicalProject(m_memory_pool));
+		m_dxlnode = GPOS_NEW(m_mp)
+			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLLogicalProject(m_mp));
 
 		// create child node parsers
 
 		// parse handler for logical operator
 		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenLogical), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenLogical), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
 		// parse handler for the proj list
 		CParseHandlerBase *proj_list_parse_handler =
-			CParseHandlerFactory::GetParseHandler(m_memory_pool,
+			CParseHandlerFactory::GetParseHandler(m_mp,
 												  CDXLTokens::XmlstrToken(EdxltokenScalarProjList),
 												  m_parse_handler_mgr,
 												  this);
@@ -121,7 +121,7 @@ CParseHandlerLogicalProject::EndElement(const XMLCh *const,  // element_uri,
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
-	GPOS_ASSERT(NULL != m_dxl_node);
+	GPOS_ASSERT(NULL != m_dxlnode);
 
 	CParseHandlerProjList *proj_list_parse_handler =
 		dynamic_cast<CParseHandlerProjList *>((*this)[0]);
@@ -135,7 +135,7 @@ CParseHandlerLogicalProject::EndElement(const XMLCh *const,  // element_uri,
 	AddChildFromParseHandler(child_parse_handler);
 
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node, false /* validate_children */);
+	m_dxlnode->GetOperator()->AssertValid(m_dxlnode, false /* validate_children */);
 #endif  // GPOS_DEBUG
 
 	// deactivate handler

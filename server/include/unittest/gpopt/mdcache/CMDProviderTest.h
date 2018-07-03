@@ -35,7 +35,7 @@ namespace gpdxl
 		private:
 			// test lookup of MD objects with given MD provider
 			static
-			void TestMDLookup(IMemoryPool *memory_pool,	IMDProvider *pmdp);
+			void TestMDLookup(IMemoryPool *mp,	IMDProvider *pmdp);
 		
 		public:
 			

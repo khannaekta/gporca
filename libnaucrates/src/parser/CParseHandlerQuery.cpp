@@ -37,11 +37,11 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerQuery::CParseHandlerQuery(IMemoryPool *memory_pool,
+CParseHandlerQuery::CParseHandlerQuery(IMemoryPool *mp,
 									   CParseHandlerManager *parse_handler_mgr,
 									   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
-	  m_dxl_node(NULL),
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
+	  m_dxlnode(NULL),
 	  m_output_colums_dxl_array(NULL),
 	  m_cte_producers(NULL)
 {
@@ -57,7 +57,7 @@ CParseHandlerQuery::CParseHandlerQuery(IMemoryPool *memory_pool,
 //---------------------------------------------------------------------------
 CParseHandlerQuery::~CParseHandlerQuery()
 {
-	CRefCount::SafeRelease(m_dxl_node);
+	CRefCount::SafeRelease(m_dxlnode);
 	CRefCount::SafeRelease(m_output_colums_dxl_array);
 	CRefCount::SafeRelease(m_cte_producers);
 }
@@ -73,7 +73,7 @@ CParseHandlerQuery::~CParseHandlerQuery()
 CDXLNode *
 CParseHandlerQuery::CreateDXLNode() const
 {
-	return m_dxl_node;
+	return m_dxlnode;
 }
 
 //---------------------------------------------------------------------------
@@ -139,19 +139,19 @@ CParseHandlerQuery::StartElement(const XMLCh *const,  // element_uri,
 			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
-	GPOS_ASSERT(NULL != m_memory_pool);
+	GPOS_ASSERT(NULL != m_mp);
 
 	// create parse handler for the query output node
 	CParseHandlerBase *parse_handler_query_output = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenQueryOutput), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenQueryOutput), m_parse_handler_mgr, this);
 
 	// create parse handler for the CTE list
 	CParseHandlerBase *parse_handler_cte = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenCTEList), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenCTEList), m_parse_handler_mgr, this);
 
 	// create a parse handler for logical nodes
 	CParseHandlerBase *parse_handler_root = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenLogical), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenLogical), m_parse_handler_mgr, this);
 
 	m_parse_handler_mgr->ActivateParseHandler(parse_handler_root);
 	m_parse_handler_mgr->ActivateParseHandler(parse_handler_cte);
@@ -205,8 +205,8 @@ CParseHandlerQuery::EndElement(const XMLCh *const,  // element_uri,
 				NULL != parse_handler_logical_op->CreateDXLNode());
 
 	// store constructed node
-	m_dxl_node = parse_handler_logical_op->CreateDXLNode();
-	m_dxl_node->AddRef();
+	m_dxlnode = parse_handler_logical_op->CreateDXLNode();
+	m_dxlnode->AddRef();
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

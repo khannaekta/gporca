@@ -28,10 +28,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalLeftAntiSemiNLJoin::CPhysicalLeftAntiSemiNLJoin
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CPhysicalNLJoin(memory_pool)
+	CPhysicalNLJoin(mp)
 {}
 
 
@@ -79,7 +79,7 @@ CPhysicalLeftAntiSemiNLJoin::FProvidesReqdCols
 CPartitionPropagationSpec *
 CPhysicalLeftAntiSemiNLJoin::PppsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CPartitionPropagationSpec *pppsRequired,
 	ULONG child_index,
@@ -88,7 +88,7 @@ CPhysicalLeftAntiSemiNLJoin::PppsRequired
 	)
 {
 	// no partition elimination for LASJ: push request to the respective child
-	return CPhysical::PppsRequiredPushThruNAry(memory_pool, exprhdl, pppsRequired, child_index);
+	return CPhysical::PppsRequiredPushThruNAry(mp, exprhdl, pppsRequired, child_index);
 }
 
 // EOF

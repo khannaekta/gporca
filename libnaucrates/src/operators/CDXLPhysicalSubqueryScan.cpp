@@ -26,8 +26,8 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalSubqueryScan::CDXLPhysicalSubqueryScan(IMemoryPool *memory_pool, CMDName *mdname)
-	: CDXLPhysical(memory_pool), m_mdname_alias(mdname)
+CDXLPhysicalSubqueryScan::CDXLPhysicalSubqueryScan(IMemoryPool *mp, CMDName *mdname)
+	: CDXLPhysical(mp), m_mdname_alias(mdname)
 {
 }
 

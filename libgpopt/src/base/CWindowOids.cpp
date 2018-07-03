@@ -18,6 +18,6 @@ OID CWindowOids::OidRank() const {
     return m_oidRank;
 }
 
-CWindowOids *CWindowOids::GetWindowOids(IMemoryPool *memory_pool) {
-    return GPOS_NEW(memory_pool) CWindowOids(DUMMY_ROW_NUMBER_OID, DUMMY_WIN_RANK);
+CWindowOids *CWindowOids::GetWindowOids(IMemoryPool *mp) {
+    return GPOS_NEW(mp) CWindowOids(DUMMY_ROW_NUMBER_OID, DUMMY_WIN_RANK);
 }

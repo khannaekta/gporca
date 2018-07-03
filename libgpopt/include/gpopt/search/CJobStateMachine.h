@@ -212,13 +212,13 @@ namespace gpopt
 			// dump state machine diagram in graphviz format
 			IOstream &OsDiagramToGraphviz
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				IOstream &os,
 				const WCHAR *wszTitle
 				)
 				const
 			{
-				(void) m_sm.OsDiagramToGraphviz(memory_pool, os, wszTitle);
+				(void) m_sm.OsDiagramToGraphviz(mp, os, wszTitle);
 
 				return os;
 			}
@@ -226,13 +226,13 @@ namespace gpopt
 			// compute unreachable states
 			void Unreachable
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				TEnumState **ppestate,
 				ULONG *pulSize
 				)
 				const
 			{
-				m_sm.Unreachable(memory_pool, ppestate, pulSize);
+				m_sm.Unreachable(mp, ppestate, pulSize);
 			}
 
 #endif // GPOS_DEBUG

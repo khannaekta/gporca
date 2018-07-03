@@ -39,7 +39,7 @@ namespace gpopt
 			// ctor
 			CPhysicalHashAgg
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *colref_array,
 				ColRefArray *pdrgpcrMinimal,
 				COperator::EGbAggType egbaggtype,
@@ -75,7 +75,7 @@ namespace gpopt
 			virtual
 			COrderSpec *PosRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				COrderSpec *posRequired,
 				ULONG child_index,
@@ -90,7 +90,7 @@ namespace gpopt
 
 			// derive sort order
 			virtual
-			COrderSpec *PosDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			COrderSpec *PosDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			//-------------------------------------------------------------------------------------
 			// Enforced Properties

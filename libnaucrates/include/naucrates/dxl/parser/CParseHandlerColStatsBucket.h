@@ -83,7 +83,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerColStatsBucket(IMemoryPool *memory_pool,
+		CParseHandlerColStatsBucket(IMemoryPool *mp,
 									CParseHandlerManager *parse_handler_mgr,
 									CParseHandlerBase *parse_handler_base);
 

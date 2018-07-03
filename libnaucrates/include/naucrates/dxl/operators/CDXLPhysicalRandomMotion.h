@@ -48,7 +48,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLPhysicalRandomMotion(IMemoryPool *memory_pool, BOOL is_duplicate_sensitive);
+		CDXLPhysicalRandomMotion(IMemoryPool *mp, BOOL is_duplicate_sensitive);
 
 		// accessors
 		Edxlopid GetDXLOperator() const;

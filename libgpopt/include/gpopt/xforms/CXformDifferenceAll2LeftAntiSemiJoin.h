@@ -43,7 +43,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformDifferenceAll2LeftAntiSemiJoin(IMemoryPool *memory_pool);
+			CXformDifferenceAll2LeftAntiSemiJoin(IMemoryPool *mp);
 
 			// dtor
 			virtual

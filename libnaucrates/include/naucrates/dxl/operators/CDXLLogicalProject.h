@@ -44,7 +44,7 @@ namespace gpdxl
 		const CMDName *MdName() const;
 
 		// serialize operator in DXL format
-		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxl_node) const;
+		virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const;
 
 		// set alias name
 		void SetAliasName(CMDName *);

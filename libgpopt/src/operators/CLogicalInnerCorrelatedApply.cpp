@@ -25,10 +25,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalInnerCorrelatedApply::CLogicalInnerCorrelatedApply
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogicalInnerApply(memory_pool)
+	CLogicalInnerApply(mp)
 {}
 
 //---------------------------------------------------------------------------
@@ -41,12 +41,12 @@ CLogicalInnerCorrelatedApply::CLogicalInnerCorrelatedApply
 //---------------------------------------------------------------------------
 CLogicalInnerCorrelatedApply::CLogicalInnerCorrelatedApply
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ColRefArray *pdrgpcrInner,
 	EOperatorId eopidOriginSubq
 	)
 	:
-	CLogicalInnerApply(memory_pool, pdrgpcrInner, eopidOriginSubq)
+	CLogicalInnerApply(mp, pdrgpcrInner, eopidOriginSubq)
 {}
 
 //---------------------------------------------------------------------------
@@ -60,11 +60,11 @@ CLogicalInnerCorrelatedApply::CLogicalInnerCorrelatedApply
 CXformSet *
 CLogicalInnerCorrelatedApply::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementInnerCorrelatedApply);
 
 	return xform_set;
@@ -104,14 +104,14 @@ CLogicalInnerCorrelatedApply::Matches
 COperator *
 CLogicalInnerCorrelatedApply::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	BOOL must_exist
 	)
 {
-	ColRefArray *pdrgpcrInner = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrInner, colref_mapping, must_exist);
+	ColRefArray *pdrgpcrInner = CUtils::PdrgpcrRemap(mp, m_pdrgpcrInner, colref_mapping, must_exist);
 
-	return GPOS_NEW(memory_pool) CLogicalInnerCorrelatedApply(memory_pool, pdrgpcrInner, m_eopidOriginSubq);
+	return GPOS_NEW(mp) CLogicalInnerCorrelatedApply(mp, pdrgpcrInner, m_eopidOriginSubq);
 }
 
 // EOF

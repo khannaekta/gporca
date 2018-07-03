@@ -36,7 +36,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CMiniDumperDXL(IMemoryPool *memory_pool);
+			CMiniDumperDXL(IMemoryPool *mp);
 
 			// dtor
 			virtual

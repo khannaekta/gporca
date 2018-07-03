@@ -55,7 +55,7 @@ namespace gpopt
 		private:
 
 			// memory pool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 
 			// number of jobs in each pool
 			const ULONG m_ulJobs;
@@ -93,7 +93,7 @@ namespace gpopt
 			{
 				if (NULL == pspt)
 				{
-					pspt = GPOS_NEW(m_memory_pool) CSyncPool<T>(m_memory_pool, m_ulJobs);
+					pspt = GPOS_NEW(m_mp) CSyncPool<T>(m_mp, m_ulJobs);
 					pspt->Init(GPOS_OFFSET(T, m_id));
 				}
 
@@ -133,7 +133,7 @@ namespace gpopt
 			// ctor
 			CJobFactory
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ULONG ulJobs
 				);
 

@@ -165,7 +165,7 @@ namespace gpopt
 					};
 
 					// memory pool
-					IMemoryPool *m_memory_pool;
+					IMemoryPool *m_mp;
 					
 					// id of node
 					ULONG m_ul;
@@ -204,7 +204,7 @@ namespace gpopt
                     }
 					
 					// rehydrate tree
-					R* PrUnrank(IMemoryPool *memory_pool, PrFn prfn, U *pU,
+					R* PrUnrank(IMemoryPool *mp, PrFn prfn, U *pU,
 								ULONG ulChild, ULLONG ullRank)
                     {
                         GPOS_CHECK_STACK_SIZE;
@@ -230,15 +230,15 @@ namespace gpopt
                         }
 
                         GPOS_ASSERT(NULL != ptn);
-                        return ptn->PrUnrank(memory_pool, prfn, pU, ullRank);
+                        return ptn->PrUnrank(mp, prfn, pU, ullRank);
                     }
 					
 				public:
 				
 					// ctor
-					CTreeNode(IMemoryPool *memory_pool, ULONG ul, const T *value)
+					CTreeNode(IMemoryPool *mp, ULONG ul, const T *value)
                         :
-                        m_memory_pool(memory_pool),
+                        m_mp(mp),
                         m_ul(ul),
                         m_value(value),
                         m_pdrgdrgptn(NULL),
@@ -246,7 +246,7 @@ namespace gpopt
                         m_ulIncoming(0),
                         m_ens(EnsUncounted)
                     {
-                        m_pdrgdrgptn = GPOS_NEW(memory_pool) DrgDrgPtn(memory_pool);
+                        m_pdrgdrgptn = GPOS_NEW(mp) DrgDrgPtn(mp);
                     }
 					
 					// dtor
@@ -265,7 +265,7 @@ namespace gpopt
                         ULONG length = m_pdrgdrgptn->Size();
                         for (ULONG ul = length; ul <= ulPos; ul++)
                         {
-                            DrgPtn *pdrg = GPOS_NEW(m_memory_pool) DrgPtn(m_memory_pool);
+                            DrgPtn *pdrg = GPOS_NEW(m_mp) DrgPtn(m_mp);
                             m_pdrgdrgptn->Append(pdrg);
                         }
 
@@ -336,7 +336,7 @@ namespace gpopt
 					// unrank tree of a given rank with a given rehydrate function
 					R* PrUnrank
 						(
-						IMemoryPool *memory_pool, 
+						IMemoryPool *mp, 
 						PrFn prfn,
 						U *pU,
 						ULLONG ullRank
@@ -349,11 +349,11 @@ namespace gpopt
                         if (0 == this->m_ul)
                         {
                             // global root, just unrank 0-th child
-                            pr = PrUnrank(memory_pool, prfn, pU, 0 /* ulChild */, ullRank);
+                            pr = PrUnrank(mp, prfn, pU, 0 /* ulChild */, ullRank);
                         }
                         else
                         {
-                            DrgPr *pdrg = GPOS_NEW(memory_pool) DrgPr(memory_pool);
+                            DrgPr *pdrg = GPOS_NEW(mp) DrgPr(mp);
 
                             ULLONG ullRankRem = ullRank;
 
@@ -364,12 +364,12 @@ namespace gpopt
                                 GPOS_ASSERT(0 < ullLocalCount);
                                 ULLONG ullLocalRank = ullRankRem % ullLocalCount;
 
-                                pdrg->Append(PrUnrank(memory_pool, prfn, pU, ulChild, ullLocalRank));
+                                pdrg->Append(PrUnrank(mp, prfn, pU, ulChild, ullLocalRank));
 
                                 ullRankRem /= ullLocalCount;
                             }
 
-                            pr = prfn(memory_pool, const_cast<T*>(this->Value()), pdrg, pU);
+                            pr = prfn(mp, const_cast<T*>(this->Value()), pdrg, pU);
                         }
 
                         return pr;
@@ -410,7 +410,7 @@ namespace gpopt
 			};
 			
 			// memory pool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 			
 			// counter for nodes
 			ULONG m_ulCountNodes;
@@ -450,7 +450,7 @@ namespace gpopt
 
                 if (NULL == ptn)
                 {
-                    ptn = GPOS_NEW(m_memory_pool) CTreeNode(m_memory_pool, ++m_ulCountNodes, value);
+                    ptn = GPOS_NEW(m_mp) CTreeNode(m_mp, ++m_ulCountNodes, value);
                     (void) m_ptmap->Insert(const_cast<T*>(value), ptn);
                 }
 
@@ -463,9 +463,9 @@ namespace gpopt
 		public:
 		
 			// ctor
-			CTreeMap(IMemoryPool *memory_pool, PrFn prfn)
+			CTreeMap(IMemoryPool *mp, PrFn prfn)
                 :
-                m_memory_pool(memory_pool),
+                m_mp(mp),
                 m_ulCountNodes(0),
                 m_ulCountLinks(0),
                 m_prfn(prfn),
@@ -473,14 +473,14 @@ namespace gpopt
                 m_ptmap(NULL),
                 m_plinkmap(NULL)
             {
-                GPOS_ASSERT(NULL != memory_pool);
+                GPOS_ASSERT(NULL != mp);
                 GPOS_ASSERT(NULL != prfn);
 
-                m_ptmap = GPOS_NEW(memory_pool) TMap(memory_pool);
-                m_plinkmap = GPOS_NEW(memory_pool) LinkMap(memory_pool);
+                m_ptmap = GPOS_NEW(mp) TMap(mp);
+                m_plinkmap = GPOS_NEW(mp) LinkMap(mp);
 
                 // insert dummy node as global root -- the only node with NULL payload
-                m_ptnRoot = GPOS_NEW(memory_pool) CTreeNode(memory_pool, 0 /* ulCounter */, NULL /* m_bytearray_value */);
+                m_ptnRoot = GPOS_NEW(mp) CTreeNode(mp, 0 /* ulCounter */, NULL /* m_bytearray_value */);
             }
 			
 			// dtor
@@ -498,7 +498,7 @@ namespace gpopt
                 GPOS_ASSERT(ptParent != ptChild);
 
                 // exit function if link already exists
-                STreeLink *ptlink = GPOS_NEW(m_memory_pool) STreeLink(ptParent, ulPos, ptChild);
+                STreeLink *ptlink = GPOS_NEW(m_mp) STreeLink(ptParent, ulPos, ptChild);
                 if (NULL != m_plinkmap->Find(ptlink))
                 {
                     GPOS_DELETE(ptlink);
@@ -515,7 +515,7 @@ namespace gpopt
 #ifdef GPOS_DEBUG
                 BOOL fInserted =
 #endif // GPOS_DEBUG
-                m_plinkmap->Insert(ptlink, GPOS_NEW(m_memory_pool) BOOL(true));
+                m_plinkmap->Insert(ptlink, GPOS_NEW(m_mp) BOOL(true));
                 GPOS_ASSERT(fInserted);		
             }
 
@@ -556,9 +556,9 @@ namespace gpopt
             }
 
 			// unrank a specific tree
-			R *PrUnrank(IMemoryPool *memory_pool, U *pU, ULLONG ullRank) const
+			R *PrUnrank(IMemoryPool *mp, U *pU, ULLONG ullRank) const
             {
-                return m_ptnRoot->PrUnrank(memory_pool, m_prfn, pU, ullRank);
+                return m_ptnRoot->PrUnrank(mp, m_prfn, pU, ullRank);
             }
 
 			// return number of nodes

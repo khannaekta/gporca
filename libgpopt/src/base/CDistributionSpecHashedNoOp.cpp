@@ -29,7 +29,7 @@ BOOL CDistributionSpecHashedNoOp::Matches(const CDistributionSpec *pds) const
 void
 CDistributionSpecHashedNoOp::AppendEnforcers
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CReqdPropPlan *,
 	ExpressionArray *pdrgpexpr,
@@ -47,12 +47,12 @@ CDistributionSpecHashedNoOp::AppendEnforcers
 
 	ExpressionArray *pdrgpexprNoOpRedistributionColumns = pdsChildHashed->Pdrgpexpr();
 	pdrgpexprNoOpRedistributionColumns->AddRef();
-	CDistributionSpecHashedNoOp* pdsNoOp = GPOS_NEW(memory_pool) CDistributionSpecHashedNoOp(pdrgpexprNoOpRedistributionColumns);
+	CDistributionSpecHashedNoOp* pdsNoOp = GPOS_NEW(mp) CDistributionSpecHashedNoOp(pdrgpexprNoOpRedistributionColumns);
 	pexpr->AddRef();
-	CExpression *pexprMotion = GPOS_NEW(memory_pool) CExpression
+	CExpression *pexprMotion = GPOS_NEW(mp) CExpression
 			(
-					memory_pool,
-					GPOS_NEW(memory_pool) CPhysicalMotionHashDistribute(memory_pool, pdsNoOp),
+					mp,
+					GPOS_NEW(mp) CPhysicalMotionHashDistribute(mp, pdsNoOp),
 					pexpr
 			);
 	pdrgpexpr->Append(pexprMotion);

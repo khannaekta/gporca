@@ -39,7 +39,7 @@ namespace gpopt
 		private:
 
 			// shared memory pool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 
 			// damping factor for filter
 			CDouble m_damping_factor_filter;
@@ -61,7 +61,7 @@ namespace gpopt
 			// ctor
 			CStatisticsConfig
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CDouble damping_factor_filter,
 				CDouble damping_factor_join,
 				CDouble damping_factor_groupby
@@ -96,11 +96,11 @@ namespace gpopt
 
 			// generate default optimizer configurations
 			static
-			CStatisticsConfig *PstatsconfDefault(IMemoryPool *memory_pool)
+			CStatisticsConfig *PstatsconfDefault(IMemoryPool *mp)
 			{
-				return GPOS_NEW(memory_pool) CStatisticsConfig
+				return GPOS_NEW(mp) CStatisticsConfig
 									(
-									memory_pool,
+									mp,
 									0.75 /* damping_factor_filter */,
 									0.01 /* damping_factor_join */,
 									0.75 /* damping_factor_groupby */

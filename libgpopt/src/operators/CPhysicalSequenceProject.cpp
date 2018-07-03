@@ -35,13 +35,13 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalSequenceProject::CPhysicalSequenceProject
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CDistributionSpec *pds,
 	OrderSpecArray *pdrgpos,
 	WindowFrameArray *pdrgpwf
 	)
 	:
-	CPhysical(memory_pool),
+	CPhysical(mp),
 	m_pds(pds),
 	m_pdrgpos(pdrgpos),
 	m_pdrgpwf(pdrgpwf),
@@ -53,8 +53,8 @@ CPhysicalSequenceProject::CPhysicalSequenceProject
 	GPOS_ASSERT(NULL != pdrgpwf);
 	GPOS_ASSERT(CDistributionSpec::EdtHashed == pds->Edt() ||
 			CDistributionSpec::EdtSingleton == pds->Edt());
-	CreateOrderSpec(memory_pool);
-	ComputeRequiredLocalColumns(memory_pool);
+	CreateOrderSpec(mp);
+	ComputeRequiredLocalColumns(mp);
 }
 
 
@@ -69,14 +69,14 @@ CPhysicalSequenceProject::CPhysicalSequenceProject
 void
 CPhysicalSequenceProject::CreateOrderSpec
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 {
 	GPOS_ASSERT(NULL == m_pos);
 	GPOS_ASSERT(NULL != m_pds);
 	GPOS_ASSERT(NULL != m_pdrgpos);
 
-	m_pos = GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+	m_pos = GPOS_NEW(mp) COrderSpec(mp);
 
 	// add partition by keys to order spec
 	if (CDistributionSpec::EdtHashed == m_pds->Edt())
@@ -141,7 +141,7 @@ CPhysicalSequenceProject::CreateOrderSpec
 void
 CPhysicalSequenceProject::ComputeRequiredLocalColumns
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 {
 	GPOS_ASSERT(NULL != m_pos);
@@ -150,10 +150,10 @@ CPhysicalSequenceProject::ComputeRequiredLocalColumns
 	GPOS_ASSERT(NULL != m_pdrgpwf);
 	GPOS_ASSERT(NULL == m_pcrsRequiredLocal);
 
-	m_pcrsRequiredLocal = m_pos->PcrsUsed(memory_pool);
+	m_pcrsRequiredLocal = m_pos->PcrsUsed(mp);
 	if (CDistributionSpec::EdtHashed == m_pds->Edt())
 	{
-		CColRefSet *pcrsHashed = CDistributionSpecHashed::PdsConvert(m_pds)->PcrsUsed(memory_pool);
+		CColRefSet *pcrsHashed = CDistributionSpecHashed::PdsConvert(m_pds)->PcrsUsed(mp);
 		m_pcrsRequiredLocal->Include(pcrsHashed);
 		pcrsHashed->Release();
 	}
@@ -252,7 +252,7 @@ CPhysicalSequenceProject::HashValue() const
 CColRefSet *
 CPhysicalSequenceProject::PcrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CColRefSet *pcrsRequired,
 	ULONG child_index,
@@ -263,10 +263,10 @@ CPhysicalSequenceProject::PcrsRequired
 	GPOS_ASSERT(0 == child_index &&
 				"Required properties can only be computed on the relational child");
 
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool, *m_pcrsRequiredLocal);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrsRequiredLocal);
 	pcrs->Union(pcrsRequired);
 
-	CColRefSet *pcrsOutput = PcrsChildReqd(memory_pool, exprhdl, pcrs, child_index, 1 /*ulScalarIndex*/);
+	CColRefSet *pcrsOutput = PcrsChildReqd(mp, exprhdl, pcrs, child_index, 1 /*ulScalarIndex*/);
 	pcrs->Release();
 
 	return pcrsOutput;
@@ -284,7 +284,7 @@ CPhysicalSequenceProject::PcrsRequired
 COrderSpec *
 CPhysicalSequenceProject::PosRequired
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &, // exprhdl
 	COrderSpec *, // posRequired
 	ULONG
@@ -315,7 +315,7 @@ CPhysicalSequenceProject::PosRequired
 CDistributionSpec *
 CPhysicalSequenceProject::PdsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CDistributionSpec *pdsRequired,
 	ULONG child_index,
@@ -329,7 +329,7 @@ CPhysicalSequenceProject::PdsRequired
 	// if expression has to execute on master then we need a gather
 	if (exprhdl.FMasterOnly())
 	{
-		return PdsEnforceMaster(memory_pool, exprhdl, pdsRequired, child_index);
+		return PdsEnforceMaster(mp, exprhdl, pdsRequired, child_index);
 	}
 
 	// if there are outer references, then we need a broadcast (or a gather)
@@ -338,10 +338,10 @@ CPhysicalSequenceProject::PdsRequired
 		if (CDistributionSpec::EdtSingleton == pdsRequired->Edt() ||
 			CDistributionSpec::EdtReplicated == pdsRequired->Edt())
 		{
-			return PdsPassThru(memory_pool, exprhdl, pdsRequired, child_index);
+			return PdsPassThru(mp, exprhdl, pdsRequired, child_index);
 		}
 
-		return GPOS_NEW(memory_pool) CDistributionSpecReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated();
 	}
 
 	// if the window operator has a partition by clause, then always
@@ -352,7 +352,7 @@ CPhysicalSequenceProject::PdsRequired
 		return m_pds;
 	}
 
-	return GPOS_NEW(memory_pool) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
+	return GPOS_NEW(mp) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
 }
 
 
@@ -367,7 +367,7 @@ CPhysicalSequenceProject::PdsRequired
 CRewindabilitySpec *
 CPhysicalSequenceProject::PrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CRewindabilitySpec *prsRequired,
 	ULONG child_index,
@@ -381,10 +381,10 @@ CPhysicalSequenceProject::PrsRequired
 	// if there are outer references, then we need a materialize
 	if (exprhdl.HasOuterRefs())
 	{
-		return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral);
+		return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral);
 	}
 
-	return PrsPassThru(memory_pool, exprhdl, prsRequired, child_index);
+	return PrsPassThru(mp, exprhdl, prsRequired, child_index);
 }
 
 //---------------------------------------------------------------------------
@@ -398,7 +398,7 @@ CPhysicalSequenceProject::PrsRequired
 CPartitionPropagationSpec *
 CPhysicalSequenceProject::PppsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CPartitionPropagationSpec *pppsRequired,
 	ULONG 
@@ -413,7 +413,7 @@ CPhysicalSequenceProject::PppsRequired
 	GPOS_ASSERT(0 == child_index);
 	GPOS_ASSERT(NULL != pppsRequired);
 
-	return CPhysical::PppsRequiredPushThruUnresolvedUnary(memory_pool, exprhdl, pppsRequired, CPhysical::EppcAllowed);
+	return CPhysical::PppsRequiredPushThruUnresolvedUnary(mp, exprhdl, pppsRequired, CPhysical::EppcAllowed);
 }
 
 //---------------------------------------------------------------------------
@@ -427,7 +427,7 @@ CPhysicalSequenceProject::PppsRequired
 CCTEReq *
 CPhysicalSequenceProject::PcteRequired
 	(
-	IMemoryPool *, //memory_pool,
+	IMemoryPool *, //mp,
 	CExpressionHandle &, //exprhdl,
 	CCTEReq *pcter,
 	ULONG
@@ -464,7 +464,7 @@ CPhysicalSequenceProject::FProvidesReqdCols
 	GPOS_ASSERT(NULL != pcrsRequired);
 	GPOS_ASSERT(2 == exprhdl.Arity());
 
-	CColRefSet *pcrs = GPOS_NEW(m_memory_pool) CColRefSet(m_memory_pool);
+	CColRefSet *pcrs = GPOS_NEW(m_mp) CColRefSet(m_mp);
 	// include defined columns by scalar project list
 	pcrs->Union(exprhdl.GetDrvdScalarProps(1 /*child_index*/)->PcrsDefined());
 
@@ -489,7 +489,7 @@ CPhysicalSequenceProject::FProvidesReqdCols
 COrderSpec *
 CPhysicalSequenceProject::PosDerive
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -509,7 +509,7 @@ CPhysicalSequenceProject::PosDerive
 CDistributionSpec *
 CPhysicalSequenceProject::PdsDerive
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -529,7 +529,7 @@ CPhysicalSequenceProject::PdsDerive
 CRewindabilitySpec *
 CPhysicalSequenceProject::PrsDerive
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const

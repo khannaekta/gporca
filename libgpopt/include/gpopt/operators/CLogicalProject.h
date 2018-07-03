@@ -38,13 +38,13 @@ namespace gpopt
 
 			// return equivalence class from scalar ident project element
 			static
-			ColRefSetArray *PdrgpcrsEquivClassFromScIdent(IMemoryPool *memory_pool, CExpression *pexprPrEl);
+			ColRefSetArray *PdrgpcrsEquivClassFromScIdent(IMemoryPool *mp, CExpression *pexprPrEl);
 
 			// extract constraint from scalar constant project element
 			static
 			void ExtractConstraintFromScConst
 					(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					CExpression *pexprPrEl,
 					ConstraintArray *pdrgpcnstr,
 					ColRefSetArray *pdrgpcrs
@@ -54,7 +54,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CLogicalProject(IMemoryPool *memory_pool);
+			CLogicalProject(IMemoryPool *mp);
 
 			// dtor
 			virtual
@@ -80,19 +80,19 @@ namespace gpopt
 
 			// derive output columns
 			virtual
-			CColRefSet *PcrsDeriveOutput(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsDeriveOutput(IMemoryPool *mp, CExpressionHandle &exprhdl);
 			
 			// dervive keys
 			virtual 
-			CKeyCollection *PkcDeriveKeys(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CKeyCollection *PkcDeriveKeys(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 					
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive constraint property
 			virtual
-			CPropConstraint *PpcDeriveConstraint(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CPropConstraint *PpcDeriveConstraint(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			//-------------------------------------------------------------------------------------
 			// Transformations
@@ -100,13 +100,13 @@ namespace gpopt
 
 			// candidate set of xforms
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
+			CXformSet *PxfsCandidates(IMemoryPool *mp) const;
 
 			// derive statistics
 			virtual
 			IStatistics *PstatsDerive
 						(
-						IMemoryPool *memory_pool,
+						IMemoryPool *mp,
 						CExpressionHandle &exprhdl,
 						StatsArray *stats_ctxt
 						)

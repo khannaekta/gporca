@@ -26,14 +26,14 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CScalarArrayRef::CScalarArrayRef
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IMDId *elem_type_mdid,
 	INT type_modifier,
 	IMDId *array_type_mdid,
 	IMDId *return_type_mdid
 	)
 	:
-	CScalar(memory_pool),
+	CScalar(mp),
 	m_pmdidElem(elem_type_mdid),
 	m_type_modifier(type_modifier),
 	m_pmdidArray(array_type_mdid),

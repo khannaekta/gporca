@@ -33,7 +33,7 @@ namespace gpopt
 
 			// test cost model parameters
 			static
-			void TestParams(IMemoryPool *memory_pool, BOOL fCalibrated);
+			void TestParams(IMemoryPool *mp, BOOL fCalibrated);
 
 		public:
 

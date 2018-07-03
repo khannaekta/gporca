@@ -41,21 +41,21 @@ namespace gpopt
 			explicit
 			CLogicalLeftAntiSemiApply
 				(
-				IMemoryPool *memory_pool
+				IMemoryPool *mp
 				)
 				:
-				CLogicalApply(memory_pool)
+				CLogicalApply(mp)
 			{}
 
 			// ctor
 			CLogicalLeftAntiSemiApply
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *pdrgpcrInner,
 				EOperatorId eopidOriginSubq
 				)
 				:
-				CLogicalApply(memory_pool, pdrgpcrInner, eopidOriginSubq)
+				CLogicalApply(mp, pdrgpcrInner, eopidOriginSubq)
 			{}
 
 			// dtor
@@ -95,7 +95,7 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsDeriveOutput
 				(
-				IMemoryPool *, // memory_pool
+				IMemoryPool *, // mp
 				CExpressionHandle &exprhdl
 				)
 			{
@@ -108,7 +108,7 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsDeriveNotNull
 				(
-				IMemoryPool *,// memory_pool
+				IMemoryPool *,// mp
 				CExpressionHandle &exprhdl
 				)
 				const
@@ -118,17 +118,17 @@ namespace gpopt
 
 			// dervive keys
 			virtual 
-			CKeyCollection *PkcDeriveKeys(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CKeyCollection *PkcDeriveKeys(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 						
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive constraint property
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *, //memory_pool,
+				IMemoryPool *, //mp,
 				CExpressionHandle &exprhdl
 				)
 				const
@@ -142,7 +142,7 @@ namespace gpopt
 
 			// candidate set of xforms
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
+			CXformSet *PxfsCandidates(IMemoryPool *mp) const;
 
 			//-------------------------------------------------------------------------------------
 			//-------------------------------------------------------------------------------------
@@ -157,7 +157,7 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// conversion function
 			static

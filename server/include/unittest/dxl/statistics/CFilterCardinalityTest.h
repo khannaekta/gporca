@@ -36,7 +36,7 @@ namespace gpnaucrates
 	class CFilterCardinalityTest
 	{
 		// shorthand for functions for generating the disjunctive filter predicates
-		typedef CStatsPred *(FnPstatspredDisj)(IMemoryPool *memory_pool);
+		typedef CStatsPred *(FnPstatspredDisj)(IMemoryPool *mp);
 
 		private:
 
@@ -67,88 +67,88 @@ namespace gpnaucrates
 
 			// disjunction filters
 			static
-			CStatsPred *PstatspredDisj1(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredDisj1(IMemoryPool *mp);
 
 			// disjunction filters
 			static
-			CStatsPred *PstatspredDisj2(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredDisj2(IMemoryPool *mp);
 
 			// disjunction filters
 			static
-			CStatsPred *PstatspredDisj3(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredDisj3(IMemoryPool *mp);
 
 			// disjunction filters
 			static
-			CStatsPred *PstatspredDisj4(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredDisj4(IMemoryPool *mp);
 
 			// disjunction filters
 			static
-			CStatsPred *PstatspredDisj5(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredDisj5(IMemoryPool *mp);
 
 			// disjunction filters
 			static
-			CStatsPred *PstatspredDisj6(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredDisj6(IMemoryPool *mp);
 
 			// disjunction filters
 			static
-			CStatsPred *PstatspredDisj7(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredDisj7(IMemoryPool *mp);
 
 			// disjunction filters
 			static
-			CStatsPred *PstatspredDisj8(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredDisj8(IMemoryPool *mp);
 
 			// nested AND and OR predicates
 			static
-			CStatsPred *PstatspredNestedPredDiffCol1(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredNestedPredDiffCol1(IMemoryPool *mp);
 
 			// nested AND and OR predicates
 			static
-			CStatsPred *PstatspredNestedPredDiffCol2(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredNestedPredDiffCol2(IMemoryPool *mp);
 
 			// nested AND and OR predicates
 			static
-			CStatsPred *PstatspredNestedPredCommonCol1(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredNestedPredCommonCol1(IMemoryPool *mp);
 
 			// nested AND and OR predicates
 			static
-			CStatsPred *PstatspredNestedPredCommonCol2(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredNestedPredCommonCol2(IMemoryPool *mp);
 
 			// nested AND and OR predicates
 			static
-			CStatsPred *PstatspredNestedSharedCol(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredNestedSharedCol(IMemoryPool *mp);
 
 			// nested AND and OR predicates
 			static
-			CStatsPred *PstatspredDisjOverConjSameCol1(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredDisjOverConjSameCol1(IMemoryPool *mp);
 
 			// nested AND and OR predicates
 			static
-			CStatsPred *PstatspredDisjOverConjSameCol2(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredDisjOverConjSameCol2(IMemoryPool *mp);
 
 			// nested AND and OR predicates
 			static
-			CStatsPred *PstatspredDisjOverConjSameCol3(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredDisjOverConjSameCol3(IMemoryPool *mp);
 
 			// nested AND and OR predicates
 			static
-			CStatsPred *PstatspredDisjOverConjSameCol4(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredDisjOverConjSameCol4(IMemoryPool *mp);
 
 			// nested AND and OR predicates
 			static
-			CStatsPred *PstatspredDisjOverConjDifferentCol1(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredDisjOverConjDifferentCol1(IMemoryPool *mp);
 
 			static
-			CStatsPred *PstatspredDisjOverConjMultipleIdenticalCols(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredDisjOverConjMultipleIdenticalCols(IMemoryPool *mp);
 
 			// conjunctive predicates
 			static
-			CStatsPred *PstatspredConj(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredConj(IMemoryPool *mp);
 
 			// generate an array of filter given a column identifier, comparison type, and array of integer point
 			static
 			StatsPredPtrArry *PdrgpstatspredInteger
 			(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					ULONG col_id,
 					CStatsPred::EStatsCmpType stats_cmp_type,
 					INT *piVals,
@@ -157,25 +157,25 @@ namespace gpnaucrates
 
 			// create a numeric predicate on a particular column
 			static
-			StatsPredPtrArry *PdrgppredfilterNumeric(IMemoryPool *memory_pool, ULONG col_id, SStatsCmpValElem statsCmpValElem);
+			StatsPredPtrArry *PdrgppredfilterNumeric(IMemoryPool *mp, ULONG col_id, SStatsCmpValElem statsCmpValElem);
 
 			// create a filter on a column with null values
 			static
-			CStatsPred *PstatspredNullableCols(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredNullableCols(IMemoryPool *mp);
 
 			// create a point filter where the constant is null
 			static
-			CStatsPred *PstatspredWithNullConstant(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredWithNullConstant(IMemoryPool *mp);
 
 			// create a 'is not null' point filter
 			static
-			CStatsPred *PstatspredNotNull(IMemoryPool *memory_pool);
+			CStatsPred *PstatspredNotNull(IMemoryPool *mp);
 
 			// compare the derived statistics with the statistics in the outputfile
 			static
 			GPOS_RESULT EresUnittest_CStatisticsCompare
 			(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					CMDAccessor *md_accessor,
 					CStatisticsArray *pdrgpstatBefore,
 					CStatsPred *pred_stats,

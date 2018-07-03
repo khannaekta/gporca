@@ -45,7 +45,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CDXLScalarProjElem(IMemoryPool *memory_pool, ULONG id, const CMDName *mdname);
+		CDXLScalarProjElem(IMemoryPool *mp, ULONG id, const CMDName *mdname);
 
 		virtual ~CDXLScalarProjElem();
 

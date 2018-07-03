@@ -37,21 +37,21 @@ namespace gpopt
 			CXformGbAggWithMDQA2Join(const CXformGbAggWithMDQA2Join &);
 
 			static
-			CExpression *PexprMDQAs2Join(IMemoryPool *memory_pool, CExpression *pexpr);
+			CExpression *PexprMDQAs2Join(IMemoryPool *mp, CExpression *pexpr);
 
 			// expand GbAgg with multiple distinct aggregates into a join of single distinct aggregates
 			static
-			CExpression *PexprExpandMDQAs(IMemoryPool *memory_pool, CExpression *pexpr);
+			CExpression *PexprExpandMDQAs(IMemoryPool *mp, CExpression *pexpr);
 
 			// main transformation function driver
 			static
-			CExpression *PexprTransform(IMemoryPool *memory_pool, CExpression *pexpr);
+			CExpression *PexprTransform(IMemoryPool *mp, CExpression *pexpr);
 
 		public:
 
 			// ctor
 			explicit
-			CXformGbAggWithMDQA2Join(IMemoryPool *memory_pool);
+			CXformGbAggWithMDQA2Join(IMemoryPool *mp);
 
 			// dtor
 			virtual

@@ -60,7 +60,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerPhysicalTVF(IMemoryPool *memory_pool,
+		CParseHandlerPhysicalTVF(IMemoryPool *mp,
 								 CParseHandlerManager *parse_handler_mgr,
 								 CParseHandlerBase *parse_handler_root);
 	};

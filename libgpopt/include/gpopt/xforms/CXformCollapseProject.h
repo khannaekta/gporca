@@ -38,7 +38,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformCollapseProject(IMemoryPool *memory_pool);
+			CXformCollapseProject(IMemoryPool *mp);
 
 			// dtor
 			virtual

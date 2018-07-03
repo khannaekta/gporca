@@ -43,10 +43,10 @@ namespace gpopt
 			explicit
 			CXformLeftOuterApply2LeftOuterJoinNoCorrelations
 				(
-				IMemoryPool *memory_pool
+				IMemoryPool *mp
 				)
 				:
-				CXformApply2Join<CLogicalLeftOuterApply, CLogicalLeftOuterJoin>(memory_pool)
+				CXformApply2Join<CLogicalLeftOuterApply, CLogicalLeftOuterJoin>(mp)
 			{}
 
 			// dtor

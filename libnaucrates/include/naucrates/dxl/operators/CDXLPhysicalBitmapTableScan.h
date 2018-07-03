@@ -40,8 +40,8 @@ namespace gpdxl
 
 	public:
 		// ctors
-		CDXLPhysicalBitmapTableScan(IMemoryPool *memory_pool, CDXLTableDescr *table_descr)
-			: CDXLPhysicalAbstractBitmapScan(memory_pool, table_descr)
+		CDXLPhysicalBitmapTableScan(IMemoryPool *mp, CDXLTableDescr *table_descr)
+			: CDXLPhysicalAbstractBitmapScan(mp, table_descr)
 		{
 		}
 

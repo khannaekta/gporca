@@ -35,10 +35,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalComputeScalar::CPhysicalComputeScalar
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CPhysical(memory_pool)
+	CPhysical(mp)
 {
 	// when ComputeScalar includes no outer references, we create two optimization requests
 	// to enforce distribution of its child:
@@ -100,7 +100,7 @@ CPhysicalComputeScalar::Matches
 CColRefSet *
 CPhysicalComputeScalar::PcrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CColRefSet *pcrsRequired,
 	ULONG child_index,
@@ -111,8 +111,8 @@ CPhysicalComputeScalar::PcrsRequired
 	GPOS_ASSERT(0 == child_index &&
 				"Required properties can only be computed on the relational child");
 	
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool, *pcrsRequired);
-	CColRefSet *pcrsChildReqd = PcrsChildReqd(memory_pool, exprhdl, pcrs, child_index, 1 /*ulScalarIndex*/);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *pcrsRequired);
+	CColRefSet *pcrsChildReqd = PcrsChildReqd(mp, exprhdl, pcrs, child_index, 1 /*ulScalarIndex*/);
 	pcrs->Release();
 	
 	return pcrsChildReqd;
@@ -130,7 +130,7 @@ CPhysicalComputeScalar::PcrsRequired
 COrderSpec *
 CPhysicalComputeScalar::PosRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	COrderSpec *posRequired,
 	ULONG child_index,
@@ -141,7 +141,7 @@ CPhysicalComputeScalar::PosRequired
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrsSort = posRequired->PcrsUsed(m_memory_pool);
+	CColRefSet *pcrsSort = posRequired->PcrsUsed(m_mp);
 	BOOL fUsesDefinedCols = FUnaryUsesDefinedColumns(pcrsSort, exprhdl);
 	pcrsSort->Release();
 
@@ -151,11 +151,11 @@ CPhysicalComputeScalar::PosRequired
 		// request it from child, and we pass an empty order spec;
 		// order enforcer function takes care of enforcing this order on top of
 		// ComputeScalar operator
-		return GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+		return GPOS_NEW(mp) COrderSpec(mp);
 	}
 
 	// otherwise, we pass through required order
-	return PosPassThru(memory_pool, exprhdl, posRequired, child_index);
+	return PosPassThru(mp, exprhdl, posRequired, child_index);
 }
 
 
@@ -170,7 +170,7 @@ CPhysicalComputeScalar::PosRequired
 CDistributionSpec *
 CPhysicalComputeScalar::PdsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CDistributionSpec *pdsRequired,
 	ULONG child_index,
@@ -183,7 +183,7 @@ CPhysicalComputeScalar::PdsRequired
 	GPOS_ASSERT(2 > ulOptReq);
 
 	// check if master-only/replicated distribution needs to be requested
-	CDistributionSpec *pds = PdsMasterOnlyOrReplicated(memory_pool, exprhdl, pdsRequired, child_index, ulOptReq);
+	CDistributionSpec *pds = PdsMasterOnlyOrReplicated(mp, exprhdl, pdsRequired, child_index, ulOptReq);
 	if (NULL != pds)
 	{
 		return pds;
@@ -198,7 +198,7 @@ CPhysicalComputeScalar::PdsRequired
 	// distribution, the result of the set function is spread uniformly over all nodes
 	if (pdpscalar->FHasNonScalarFunction())
 	{
-		return GPOS_NEW(memory_pool) CDistributionSpecAny(this->Eopid());
+		return GPOS_NEW(mp) CDistributionSpecAny(this->Eopid());
 	}
 
 	// if required distribution uses any defined column, it has to be enforced on top of ComputeScalar,
@@ -207,36 +207,36 @@ CPhysicalComputeScalar::PdsRequired
 	if (CDistributionSpec::EdtHashed == edtRequired)
 	{
 		CDistributionSpecHashed *pdshashed = CDistributionSpecHashed::PdsConvert(pdsRequired);
-		CColRefSet *pcrs = pdshashed->PcrsUsed(m_memory_pool);
+		CColRefSet *pcrs = pdshashed->PcrsUsed(m_mp);
 		BOOL fUsesDefinedCols = FUnaryUsesDefinedColumns(pcrs, exprhdl);
 		pcrs->Release();
 		if (fUsesDefinedCols)
 		{
-			return GPOS_NEW(memory_pool) CDistributionSpecAny(this->Eopid());
+			return GPOS_NEW(mp) CDistributionSpecAny(this->Eopid());
 		}
 	}
 
 	if (CDistributionSpec::EdtRouted == edtRequired)
 	{
 		CDistributionSpecRouted *pdsrouted = CDistributionSpecRouted::PdsConvert(pdsRequired);
-		CColRefSet *pcrs = GPOS_NEW(m_memory_pool) CColRefSet(m_memory_pool);
+		CColRefSet *pcrs = GPOS_NEW(m_mp) CColRefSet(m_mp);
 		pcrs->Include(pdsrouted->Pcr());
 		BOOL fUsesDefinedCols = FUnaryUsesDefinedColumns(pcrs, exprhdl);
 		pcrs->Release();
 		if (fUsesDefinedCols)
 		{
-			return GPOS_NEW(memory_pool) CDistributionSpecAny(this->Eopid());
+			return GPOS_NEW(mp) CDistributionSpecAny(this->Eopid());
 		}
 	}
 
 	if (0 == ulOptReq)
 	{
 		// Req0: required distribution will be enforced on top of ComputeScalar
-		return GPOS_NEW(memory_pool) CDistributionSpecAny(this->Eopid());
+		return GPOS_NEW(mp) CDistributionSpecAny(this->Eopid());
 	}
 
 	// Req1: required distribution will be enforced on top of ComputeScalar's child
-	return PdsPassThru(memory_pool, exprhdl, pdsRequired, child_index);
+	return PdsPassThru(mp, exprhdl, pdsRequired, child_index);
 }
 
 
@@ -251,7 +251,7 @@ CPhysicalComputeScalar::PdsRequired
 CRewindabilitySpec *
 CPhysicalComputeScalar::PrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CRewindabilitySpec *prsRequired,
 	ULONG child_index,
@@ -265,10 +265,10 @@ CPhysicalComputeScalar::PrsRequired
 	// if there are outer references, then we need a materialize
 	if (exprhdl.HasOuterRefs())
 	{
-		return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral);
+		return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral);
 	}
 
-	return PrsPassThru(memory_pool, exprhdl, prsRequired, child_index);
+	return PrsPassThru(mp, exprhdl, prsRequired, child_index);
 }
 
 //---------------------------------------------------------------------------
@@ -282,7 +282,7 @@ CPhysicalComputeScalar::PrsRequired
 CPartitionPropagationSpec *
 CPhysicalComputeScalar::PppsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CPartitionPropagationSpec *pppsRequired,
 	ULONG child_index,
@@ -293,7 +293,7 @@ CPhysicalComputeScalar::PppsRequired
 	GPOS_ASSERT(0 == child_index);
 	GPOS_ASSERT(NULL != pppsRequired);
 	
-	return CPhysical::PppsRequiredPushThru(memory_pool, exprhdl, pppsRequired, child_index);
+	return CPhysical::PppsRequiredPushThru(mp, exprhdl, pppsRequired, child_index);
 }
 
 //---------------------------------------------------------------------------
@@ -307,7 +307,7 @@ CPhysicalComputeScalar::PppsRequired
 CCTEReq *
 CPhysicalComputeScalar::PcteRequired
 	(
-	IMemoryPool *, //memory_pool,
+	IMemoryPool *, //mp,
 	CExpressionHandle &, //exprhdl,
 	CCTEReq *pcter,
 	ULONG
@@ -344,7 +344,7 @@ CPhysicalComputeScalar::FProvidesReqdCols
 	GPOS_ASSERT(NULL != pcrsRequired);
 	GPOS_ASSERT(2 == exprhdl.Arity());
 
-	CColRefSet *pcrs = GPOS_NEW(m_memory_pool) CColRefSet(m_memory_pool);
+	CColRefSet *pcrs = GPOS_NEW(m_mp) CColRefSet(m_mp);
 	// include defined columns by scalar project list
 	pcrs->Union(exprhdl.GetDrvdScalarProps(1 /*child_index*/)->PcrsDefined());
 
@@ -369,7 +369,7 @@ CPhysicalComputeScalar::FProvidesReqdCols
 COrderSpec *
 CPhysicalComputeScalar::PosDerive
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -389,7 +389,7 @@ CPhysicalComputeScalar::PosDerive
 CDistributionSpec *
 CPhysicalComputeScalar::PdsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -399,7 +399,7 @@ CPhysicalComputeScalar::PdsDerive
 	if (CDistributionSpec::EdtUniversal == pds->Edt() && 
 		IMDFunction::EfsVolatile == exprhdl.GetDrvdScalarProps(1 /*child_index*/)->Pfp()->Efs())
 	{
-		return GPOS_NEW(memory_pool) CDistributionSpecStrictSingleton(CDistributionSpecSingleton::EstMaster);
+		return GPOS_NEW(mp) CDistributionSpecStrictSingleton(CDistributionSpecSingleton::EstMaster);
 	}
 	
 	pds->AddRef();
@@ -420,7 +420,7 @@ CPhysicalComputeScalar::PdsDerive
 CRewindabilitySpec *
 CPhysicalComputeScalar::PrsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -429,7 +429,7 @@ CPhysicalComputeScalar::PrsDerive
 	if (pdpscalar->FHasNonScalarFunction() || IMDFunction::EfsVolatile == pdpscalar->Pfp()->Efs())
 	{
 		// ComputeScalar is not rewindable if it has non-scalar/volatile functions in project list
-		return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
+		return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
 	}
 
 	return PrsDerivePassThruOuter(exprhdl);
@@ -463,7 +463,7 @@ CPhysicalComputeScalar::EpetOrder
 
 	// Sort has to go above ComputeScalar if sort columns use any column
 	// defined by ComputeScalar, otherwise, Sort can either go above or below ComputeScalar
-	CColRefSet *pcrsSort = peo->PosRequired()->PcrsUsed(m_memory_pool);
+	CColRefSet *pcrsSort = peo->PosRequired()->PcrsUsed(m_mp);
 	BOOL fUsesDefinedCols = FUnaryUsesDefinedColumns(pcrsSort, exprhdl);
 	pcrsSort->Release();
 	if (fUsesDefinedCols)

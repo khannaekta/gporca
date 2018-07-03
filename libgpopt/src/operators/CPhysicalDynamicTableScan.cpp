@@ -36,7 +36,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalDynamicTableScan::CPhysicalDynamicTableScan
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	BOOL is_partial,
 	const CName *pnameAlias,
 	CTableDescriptor *ptabdesc,
@@ -49,7 +49,7 @@ CPhysicalDynamicTableScan::CPhysicalDynamicTableScan
 	CPartConstraint *ppartcnstrRel
 	)
 	:
-	CPhysicalDynamicScan(memory_pool, is_partial, ptabdesc, ulOriginOpId, pnameAlias, scan_id, pdrgpcrOutput, pdrgpdrgpcrParts, ulSecondaryScanId, ppartcnstr, ppartcnstrRel)
+	CPhysicalDynamicScan(mp, is_partial, ptabdesc, ulOriginOpId, pnameAlias, scan_id, pdrgpcrOutput, pdrgpdrgpcrParts, ulSecondaryScanId, ppartcnstr, ppartcnstrRel)
 {}
 
 //---------------------------------------------------------------------------
@@ -81,7 +81,7 @@ CPhysicalDynamicTableScan::Matches
 IStatistics *
 CPhysicalDynamicTableScan::PstatsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CReqdPropPlan *prpplan,
 	StatsArray * // stats_ctxt
@@ -90,7 +90,7 @@ CPhysicalDynamicTableScan::PstatsDerive
 {
 	GPOS_ASSERT(NULL != prpplan);
 
-	return CStatisticsUtils::DeriveStatsForDynamicScan(memory_pool, exprhdl, ScanId(), prpplan->Pepp()->PpfmDerived());
+	return CStatisticsUtils::DeriveStatsForDynamicScan(mp, exprhdl, ScanId(), prpplan->Pepp()->PpfmDerived());
 }
 
 // EOF

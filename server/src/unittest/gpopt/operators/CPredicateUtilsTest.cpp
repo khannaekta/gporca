@@ -58,58 +58,58 @@ GPOS_RESULT
 CPredicateUtilsTest::EresUnittest_Conjunctions()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(memory_pool, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 					(
-					memory_pool,
+					mp,
 					&mda,
 					NULL,  /* pceeval */
-					CTestUtils::GetCostModel(memory_pool)
+					CTestUtils::GetCostModel(mp)
 					);
 
 	// build conjunction
-	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
 	const ULONG ulConjs = 3;
 	for (ULONG ul = 0; ul < ulConjs; ul++)
 	{
-		pdrgpexpr->Append(CUtils::PexprScalarConstBool(memory_pool, true /*fValue*/));
+		pdrgpexpr->Append(CUtils::PexprScalarConstBool(mp, true /*fValue*/));
 	}
-	CExpression *pexprConjunction = CUtils::PexprScalarBoolOp(memory_pool, CScalarBoolOp::EboolopAnd, pdrgpexpr);
+	CExpression *pexprConjunction = CUtils::PexprScalarBoolOp(mp, CScalarBoolOp::EboolopAnd, pdrgpexpr);
 	
 	// break into conjuncts
-	ExpressionArray *pdrgpexprExtract = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pexprConjunction);
+	ExpressionArray *pdrgpexprExtract = CPredicateUtils::PdrgpexprConjuncts(mp, pexprConjunction);
 	GPOS_ASSERT(pdrgpexprExtract->Size() == ulConjs);
 	
 	// collapse into single conjunct
-	CExpression *pexpr = CPredicateUtils::PexprConjunction(memory_pool, pdrgpexprExtract);
+	CExpression *pexpr = CPredicateUtils::PexprConjunction(mp, pdrgpexprExtract);
 	GPOS_ASSERT(NULL != pexpr);
 	GPOS_ASSERT(CUtils::FScalarConstTrue(pexpr));
 	pexpr->Release();
 	
 	// collapse empty input array to conjunct
-	CExpression *pexprSingleton = CPredicateUtils::PexprConjunction(memory_pool, NULL /*pdrgpexpr*/);
+	CExpression *pexprSingleton = CPredicateUtils::PexprConjunction(mp, NULL /*pdrgpexpr*/);
 	GPOS_ASSERT(NULL != pexprSingleton);
 	pexprSingleton->Release();
 
 	pexprConjunction->Release();
 
 	// conjunction on scalar comparisons
-	CExpression *pexprGet = CTestUtils::PexprLogicalGet(memory_pool);
+	CExpression *pexprGet = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs = CDrvdPropRelational::GetRelationalProperties(pexprGet->PdpDerive())->PcrsOutput();
 	CColRef *pcr1 = pcrs->PcrAny();
 	CColRef *pcr2 = pcrs->PcrFirst();
-	CExpression *pexprCmp1 = CUtils::PexprScalarCmp(memory_pool, pcr1, pcr2, IMDType::EcmptEq);
-	CExpression *pexprCmp2 = CUtils::PexprScalarCmp(memory_pool, pcr1, CUtils::PexprScalarConstInt4(memory_pool, 1 /*val*/), IMDType::EcmptEq);
+	CExpression *pexprCmp1 = CUtils::PexprScalarCmp(mp, pcr1, pcr2, IMDType::EcmptEq);
+	CExpression *pexprCmp2 = CUtils::PexprScalarCmp(mp, pcr1, CUtils::PexprScalarConstInt4(mp, 1 /*val*/), IMDType::EcmptEq);
 
-	CExpression *pexprConj = CPredicateUtils::PexprConjunction(memory_pool, pexprCmp1, pexprCmp2);
-	pdrgpexprExtract = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pexprConj);
+	CExpression *pexprConj = CPredicateUtils::PexprConjunction(mp, pexprCmp1, pexprCmp2);
+	pdrgpexprExtract = CPredicateUtils::PdrgpexprConjuncts(mp, pexprConj);
 	GPOS_ASSERT(2 == pdrgpexprExtract->Size());
 	pdrgpexprExtract->Release();
 
@@ -134,50 +134,50 @@ GPOS_RESULT
 CPredicateUtilsTest::EresUnittest_Disjunctions()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(memory_pool, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 					(
-					memory_pool,
+					mp,
 					&mda,
 					NULL,  /* pceeval */
-					CTestUtils::GetCostModel(memory_pool)
+					CTestUtils::GetCostModel(mp)
 					);
 
 	// build disjunction
-	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
 	const ULONG ulDisjs = 3;
 	for (ULONG ul = 0; ul < ulDisjs; ul++)
 	{
-		pdrgpexpr->Append(CUtils::PexprScalarConstBool(memory_pool, false /*fValue*/));
+		pdrgpexpr->Append(CUtils::PexprScalarConstBool(mp, false /*fValue*/));
 	}
-	CExpression *pexprDisjunction = CUtils::PexprScalarBoolOp(memory_pool, CScalarBoolOp::EboolopOr, pdrgpexpr);
+	CExpression *pexprDisjunction = CUtils::PexprScalarBoolOp(mp, CScalarBoolOp::EboolopOr, pdrgpexpr);
 
 	// break into disjuncts
-	ExpressionArray *pdrgpexprExtract = CPredicateUtils::PdrgpexprDisjuncts(memory_pool, pexprDisjunction);
+	ExpressionArray *pdrgpexprExtract = CPredicateUtils::PdrgpexprDisjuncts(mp, pexprDisjunction);
 	GPOS_ASSERT(pdrgpexprExtract->Size() == ulDisjs);
 
 	// collapse into single disjunct
-	CExpression *pexpr = CPredicateUtils::PexprDisjunction(memory_pool, pdrgpexprExtract);
+	CExpression *pexpr = CPredicateUtils::PexprDisjunction(mp, pdrgpexprExtract);
 	GPOS_ASSERT(NULL != pexpr);
 	GPOS_ASSERT(CUtils::FScalarConstFalse(pexpr));
 	pexpr->Release();
 
 	// collapse empty input array to disjunct
-	CExpression *pexprSingleton = CPredicateUtils::PexprDisjunction(memory_pool, NULL /*pdrgpexpr*/);
+	CExpression *pexprSingleton = CPredicateUtils::PexprDisjunction(mp, NULL /*pdrgpexpr*/);
 	GPOS_ASSERT(NULL != pexprSingleton);
 	pexprSingleton->Release();
 
 	pexprDisjunction->Release();
 
 	// disjunction on scalar comparisons
-	CExpression *pexprGet = CTestUtils::PexprLogicalGet(memory_pool);
+	CExpression *pexprGet = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs = CDrvdPropRelational::GetRelationalProperties(pexprGet->PdpDerive())->PcrsOutput();
 	CColRefSetIter crsi(*pcrs);
 
@@ -202,12 +202,12 @@ CPredicateUtilsTest::EresUnittest_Disjunctions()
 	GPOS_ASSERT(fAdvance);
 	CColRef *pcr3 = crsi.Pcr();
 
-	CExpression *pexprCmp1 = CUtils::PexprScalarCmp(memory_pool, pcr1, pcr2, IMDType::EcmptEq);
-	CExpression *pexprCmp2 = CUtils::PexprScalarCmp(memory_pool, pcr1, CUtils::PexprScalarConstInt4(memory_pool, 1 /*val*/), IMDType::EcmptEq);
+	CExpression *pexprCmp1 = CUtils::PexprScalarCmp(mp, pcr1, pcr2, IMDType::EcmptEq);
+	CExpression *pexprCmp2 = CUtils::PexprScalarCmp(mp, pcr1, CUtils::PexprScalarConstInt4(mp, 1 /*val*/), IMDType::EcmptEq);
 
 	{
-		CExpression *pexprDisj = CPredicateUtils::PexprDisjunction(memory_pool, pexprCmp1, pexprCmp2);
-		pdrgpexprExtract = CPredicateUtils::PdrgpexprDisjuncts(memory_pool, pexprDisj);
+		CExpression *pexprDisj = CPredicateUtils::PexprDisjunction(mp, pexprCmp1, pexprCmp2);
+		pdrgpexprExtract = CPredicateUtils::PdrgpexprDisjuncts(mp, pexprDisj);
 		GPOS_ASSERT(2 == pdrgpexprExtract->Size());
 		pdrgpexprExtract->Release();
 		pexprDisj->Release();
@@ -215,9 +215,9 @@ CPredicateUtilsTest::EresUnittest_Disjunctions()
 
 
 	{
-		ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
-		CExpression *pexprCmp3 = CUtils::PexprScalarCmp(memory_pool, pcr2, pcr1, IMDType::EcmptG);
-		CExpression *pexprCmp4 = CUtils::PexprScalarCmp(memory_pool, CUtils::PexprScalarConstInt4(memory_pool, 200 /*val*/), pcr3, IMDType::EcmptL);
+		ExpressionArray *pdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
+		CExpression *pexprCmp3 = CUtils::PexprScalarCmp(mp, pcr2, pcr1, IMDType::EcmptG);
+		CExpression *pexprCmp4 = CUtils::PexprScalarCmp(mp, CUtils::PexprScalarConstInt4(mp, 200 /*val*/), pcr3, IMDType::EcmptL);
 		pexprCmp1->AddRef();
 		pexprCmp2->AddRef();
 
@@ -226,8 +226,8 @@ CPredicateUtilsTest::EresUnittest_Disjunctions()
 		pdrgpexpr->Append(pexprCmp1);
 		pdrgpexpr->Append(pexprCmp2);
 
-		CExpression *pexprDisj = CPredicateUtils::PexprDisjunction(memory_pool, pdrgpexpr);
-		pdrgpexprExtract = CPredicateUtils::PdrgpexprDisjuncts(memory_pool, pexprDisj);
+		CExpression *pexprDisj = CPredicateUtils::PexprDisjunction(mp, pdrgpexpr);
+		pdrgpexprExtract = CPredicateUtils::PdrgpexprDisjuncts(mp, pexprDisj);
 		GPOS_ASSERT(4 == pdrgpexprExtract->Size());
 		pdrgpexprExtract->Release();
 		pexprDisj->Release();
@@ -253,26 +253,26 @@ GPOS_RESULT
 CPredicateUtilsTest::EresUnittest_PlainEqualities()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(memory_pool, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 					(
-					memory_pool,
+					mp,
 					&mda,
 					NULL,  /* pceeval */
-					CTestUtils::GetCostModel(memory_pool)
+					CTestUtils::GetCostModel(mp)
 					);
 
-	CExpression *pexprLeft = CTestUtils::PexprLogicalGet(memory_pool);
-	CExpression *pexprRight = CTestUtils::PexprLogicalGet(memory_pool);
+	CExpression *pexprLeft = CTestUtils::PexprLogicalGet(mp);
+	CExpression *pexprRight = CTestUtils::PexprLogicalGet(mp);
 
-	ExpressionArray *pdrgpexprOriginal = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexprOriginal = GPOS_NEW(mp) ExpressionArray(mp);
 
 	CColRefSet *pcrsLeft = CDrvdPropRelational::GetRelationalProperties(pexprLeft->PdpDerive())->PcrsOutput();
 	CColRefSet *pcrsRight = CDrvdPropRelational::GetRelationalProperties(pexprRight->PdpDerive())->PcrsOutput();
@@ -282,27 +282,27 @@ CPredicateUtilsTest::EresUnittest_PlainEqualities()
 
 	// generate an equality predicate between two column reference
 	CExpression *pexprScIdentEquality =
-		CUtils::PexprScalarEqCmp(memory_pool, pcrLeft, pcrRight);
+		CUtils::PexprScalarEqCmp(mp, pcrLeft, pcrRight);
 
 	pexprScIdentEquality->AddRef();
 	pdrgpexprOriginal->Append(pexprScIdentEquality);
 
 	// generate a non-equality predicate between two column reference
 	CExpression *pexprScIdentInequality =
-		CUtils::PexprScalarCmp(memory_pool, pcrLeft, pcrRight, CWStringConst(GPOS_WSZ_LIT("<")), GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT4_LT_OP));
+		CUtils::PexprScalarCmp(mp, pcrLeft, pcrRight, CWStringConst(GPOS_WSZ_LIT("<")), GPOS_NEW(mp) CMDIdGPDB(GPDB_INT4_LT_OP));
 
 	pexprScIdentInequality->AddRef();
 	pdrgpexprOriginal->Append(pexprScIdentInequality);
 
 	// generate an equality predicate between a column reference and a constant m_bytearray_value
-	CExpression *pexprScalarConstInt4 = CUtils::PexprScalarConstInt4(memory_pool, 10 /*fValue*/);
-	CExpression *pexprScIdentConstEquality = CUtils::PexprScalarEqCmp(memory_pool, pexprScalarConstInt4, pcrRight);
+	CExpression *pexprScalarConstInt4 = CUtils::PexprScalarConstInt4(mp, 10 /*fValue*/);
+	CExpression *pexprScIdentConstEquality = CUtils::PexprScalarEqCmp(mp, pexprScalarConstInt4, pcrRight);
 
 	pdrgpexprOriginal->Append(pexprScIdentConstEquality);
 
 	GPOS_ASSERT(3 == pdrgpexprOriginal->Size());
 
-	ExpressionArray *pdrgpexprResult = CPredicateUtils::PdrgpexprPlainEqualities(memory_pool, pdrgpexprOriginal);
+	ExpressionArray *pdrgpexprResult = CPredicateUtils::PdrgpexprPlainEqualities(mp, pdrgpexprOriginal);
 
 	GPOS_ASSERT(1 == pdrgpexprResult->Size());
 
@@ -329,69 +329,69 @@ GPOS_RESULT
 CPredicateUtilsTest::EresUnittest_Implication()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(memory_pool, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 					(
-					memory_pool,
+					mp,
 					&mda,
 					NULL,  /* pceeval */
-					CTestUtils::GetCostModel(memory_pool)
+					CTestUtils::GetCostModel(mp)
 					);
 
 	// generate a two cascaded joins
 	CWStringConst strName1(GPOS_WSZ_LIT("Rel1"));
-	CMDIdGPDB *pmdid1 = GPOS_NEW(memory_pool) CMDIdGPDB(GPOPT_TEST_REL_OID1, 1, 1);
-	CTableDescriptor *ptabdesc1 = CTestUtils::PtabdescCreate(memory_pool, 3, pmdid1, CName(&strName1));
+	CMDIdGPDB *pmdid1 = GPOS_NEW(mp) CMDIdGPDB(GPOPT_TEST_REL_OID1, 1, 1);
+	CTableDescriptor *ptabdesc1 = CTestUtils::PtabdescCreate(mp, 3, pmdid1, CName(&strName1));
 	CWStringConst strAlias1(GPOS_WSZ_LIT("Rel1"));
-	CExpression *pexprRel1 = CTestUtils::PexprLogicalGet(memory_pool, ptabdesc1, &strAlias1);
+	CExpression *pexprRel1 = CTestUtils::PexprLogicalGet(mp, ptabdesc1, &strAlias1);
 
 	CWStringConst strName2(GPOS_WSZ_LIT("Rel2"));
-	CMDIdGPDB *pmdid2 = GPOS_NEW(memory_pool) CMDIdGPDB(GPOPT_TEST_REL_OID2, 1, 1);
-	CTableDescriptor *ptabdesc2 = CTestUtils::PtabdescCreate(memory_pool, 3, pmdid2, CName(&strName2));
+	CMDIdGPDB *pmdid2 = GPOS_NEW(mp) CMDIdGPDB(GPOPT_TEST_REL_OID2, 1, 1);
+	CTableDescriptor *ptabdesc2 = CTestUtils::PtabdescCreate(mp, 3, pmdid2, CName(&strName2));
 	CWStringConst strAlias2(GPOS_WSZ_LIT("Rel2"));
-	CExpression *pexprRel2 = CTestUtils::PexprLogicalGet(memory_pool, ptabdesc2, &strAlias2);
+	CExpression *pexprRel2 = CTestUtils::PexprLogicalGet(mp, ptabdesc2, &strAlias2);
 
 	CWStringConst strName3(GPOS_WSZ_LIT("Rel3"));
-	CMDIdGPDB *pmdid3 = GPOS_NEW(memory_pool) CMDIdGPDB(GPOPT_TEST_REL_OID3, 1, 1);
-	CTableDescriptor *ptabdesc3 = CTestUtils::PtabdescCreate(memory_pool, 3, pmdid3, CName(&strName3));
+	CMDIdGPDB *pmdid3 = GPOS_NEW(mp) CMDIdGPDB(GPOPT_TEST_REL_OID3, 1, 1);
+	CTableDescriptor *ptabdesc3 = CTestUtils::PtabdescCreate(mp, 3, pmdid3, CName(&strName3));
 	CWStringConst strAlias3(GPOS_WSZ_LIT("Rel3"));
-	CExpression *pexprRel3 = CTestUtils::PexprLogicalGet(memory_pool, ptabdesc3, &strAlias3);
+	CExpression *pexprRel3 = CTestUtils::PexprLogicalGet(mp, ptabdesc3, &strAlias3);
 
-	CExpression *pexprJoin1 = CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(memory_pool, pexprRel1, pexprRel2);
-	CExpression *pexprJoin2 = CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(memory_pool, pexprJoin1, pexprRel3);
+	CExpression *pexprJoin1 = CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, pexprRel1, pexprRel2);
+	CExpression *pexprJoin2 = CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, pexprJoin1, pexprRel3);
 
 	{
-		CAutoTrace at(memory_pool);
+		CAutoTrace at(mp);
 		at.Os() << "Original expression:" << std::endl << *pexprJoin2 <<std::endl;
 	}
 
 	// imply new predicates by deriving constraints
-	CExpression *pexprConstraints = CExpressionPreprocessor::PexprAddPredicatesFromConstraints(memory_pool, pexprJoin2);
+	CExpression *pexprConstraints = CExpressionPreprocessor::PexprAddPredicatesFromConstraints(mp, pexprJoin2);
 
 	{
-		CAutoTrace at(memory_pool);
+		CAutoTrace at(mp);
 		at.Os() << "Expression with implied predicates:" << std::endl << *pexprConstraints <<std::endl;;
 	}
 
 	// minimize join predicates by removing implied conjuncts
-	CExpressionHandle exprhdl(memory_pool);
+	CExpressionHandle exprhdl(mp);
 	exprhdl.Attach(pexprConstraints);
-	CExpression *pexprMinimizedPred = CPredicateUtils::PexprRemoveImpliedConjuncts(memory_pool, (*pexprConstraints)[2], exprhdl);
+	CExpression *pexprMinimizedPred = CPredicateUtils::PexprRemoveImpliedConjuncts(mp, (*pexprConstraints)[2], exprhdl);
 
 	{
-		CAutoTrace at(memory_pool);
+		CAutoTrace at(mp);
 		at.Os() << "Minimized join predicate:" << std::endl << *pexprMinimizedPred <<std::endl;
 	}
 
-	ExpressionArray *pdrgpexprOriginalConjuncts = CPredicateUtils::PdrgpexprConjuncts(memory_pool,  (*pexprConstraints)[2]);
-	ExpressionArray *pdrgpexprNewConjuncts = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pexprMinimizedPred);
+	ExpressionArray *pdrgpexprOriginalConjuncts = CPredicateUtils::PdrgpexprConjuncts(mp,  (*pexprConstraints)[2]);
+	ExpressionArray *pdrgpexprNewConjuncts = CPredicateUtils::PdrgpexprConjuncts(mp, pexprMinimizedPred);
 
 	GPOS_ASSERT(pdrgpexprNewConjuncts->Size() < pdrgpexprOriginalConjuncts->Size());
 

@@ -8,25 +8,25 @@ using namespace gpopt;
 
 CStrictHashedDistributions::CStrictHashedDistributions
 (
-IMemoryPool *memory_pool,
+IMemoryPool *mp,
 ColRefArray *pdrgpcrOutput,
 ColRefArrays *pdrgpdrgpcrInput
 )
 :
-DrgPds(memory_pool)
+DrgPds(mp)
 {
 	const ULONG num_cols = pdrgpcrOutput->Size();
 	const ULONG arity = pdrgpdrgpcrInput->Size();
 	for (ULONG ulChild = 0; ulChild < arity; ulChild++)
 	{
 		ColRefArray *colref_array = (*pdrgpdrgpcrInput)[ulChild];
-		ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+		ExpressionArray *pdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
 		for (ULONG ulCol = 0; ulCol < num_cols; ulCol++)
 		{
 			CColRef *colref = (*colref_array)[ulCol];
 			if (colref->RetrieveType()->IsRedistributable())
 			{
-				CExpression *pexpr = CUtils::PexprScalarIdent(memory_pool, colref);
+				CExpression *pexpr = CUtils::PexprScalarIdent(mp, colref);
 				pdrgpexpr->Append(pexpr);
 			}
 		}
@@ -37,7 +37,7 @@ DrgPds(memory_pool)
 		{
 			// create a hashed distribution on input columns of the current child
 			BOOL fNullsColocated = true;
-			pdshashed = GPOS_NEW(memory_pool) CDistributionSpecStrictHashed(pdrgpexpr, fNullsColocated);
+			pdshashed = GPOS_NEW(mp) CDistributionSpecStrictHashed(pdrgpexpr, fNullsColocated);
 		}
 		else
 		{
@@ -48,7 +48,7 @@ DrgPds(memory_pool)
 			// Some databases actually execute it as if it's a random redistribution.
 			// We should not generate such a plan, for clarity and our own sanity
 
-			pdshashed = GPOS_NEW(memory_pool) CDistributionSpecStrictRandom();
+			pdshashed = GPOS_NEW(mp) CDistributionSpecStrictRandom();
 			pdrgpexpr->Release();
 		}
 		Append(pdshashed);

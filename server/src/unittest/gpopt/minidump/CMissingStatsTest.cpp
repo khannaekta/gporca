@@ -74,29 +74,29 @@ CMissingStatsTest::EresUnittest_RunTests()
 		};
 
 	CAutoMemoryPool amp(CAutoMemoryPool::ElcNone);
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	GPOS_RESULT eres = GPOS_OK;
 	const ULONG ulTests = GPOS_ARRAY_SIZE(rgtc);
 	for (ULONG ul = m_ulMissingStatsTestCounter; ((ul < ulTests) && (GPOS_OK == eres)); ul++)
 	{
-		ICostModel *pcm = CTestUtils::GetCostModel(memory_pool);
+		ICostModel *pcm = CTestUtils::GetCostModel(mp);
 		CAutoTraceFlag atf1(EopttracePrintColsWithMissingStats, true /*m_bytearray_value*/);
 
-		COptimizerConfig *optimizer_config = GPOS_NEW(memory_pool) COptimizerConfig
+		COptimizerConfig *optimizer_config = GPOS_NEW(mp) COptimizerConfig
 												(
-												CEnumeratorConfig::GetEnumeratorCfg(memory_pool, 0 /*plan_id*/),
-												CStatisticsConfig::PstatsconfDefault(memory_pool),
-												CCTEConfig::PcteconfDefault(memory_pool),
+												CEnumeratorConfig::GetEnumeratorCfg(mp, 0 /*plan_id*/),
+												CStatisticsConfig::PstatsconfDefault(mp),
+												CCTEConfig::PcteconfDefault(mp),
 												pcm,
-												CHint::PhintDefault(memory_pool),
-												CWindowOids::GetWindowOids(memory_pool)
+												CHint::PhintDefault(mp),
+												CWindowOids::GetWindowOids(mp)
 												);
 		SMissingStatsTestCase testCase = rgtc[ul];
 
 		CDXLNode *pdxlnPlan = CMinidumperUtils::PdxlnExecuteMinidump
 												(
-												memory_pool,
+												mp,
 												testCase.m_szInputFile,
 												GPOPT_TEST_SEGMENTS /*ulSegments*/,
 												1 /*ulSessionId*/,
@@ -107,14 +107,14 @@ CMissingStatsTest::EresUnittest_RunTests()
 
 		CStatisticsConfig *stats_config = optimizer_config->GetStatsConf();
 
-		MdidPtrArray *pdrgmdidCol = GPOS_NEW(memory_pool) MdidPtrArray(memory_pool);
+		MdidPtrArray *pdrgmdidCol = GPOS_NEW(mp) MdidPtrArray(mp);
 		stats_config->CollectMissingStatsColumns(pdrgmdidCol);
 		ULONG ulMissingStats = pdrgmdidCol->Size();
 
 		if (ulMissingStats != testCase.m_ulExpectedMissingStats)
 		{
 			// for debug traces
-			CWStringDynamic str(memory_pool);
+			CWStringDynamic str(mp);
 			COstreamString oss(&str);
 
 			// print objects

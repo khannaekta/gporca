@@ -35,7 +35,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CLogicalFullOuterJoin(IMemoryPool *memory_pool);
+			CLogicalFullOuterJoin(IMemoryPool *mp);
 
 			// dtor
 			virtual
@@ -74,29 +74,29 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsDeriveNotNull
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle & //exprhdl
 				)
 				const
 			{
 				// all output columns are nullable
-				return GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+				return GPOS_NEW(mp) CColRefSet(mp);
 			}
 
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive constraint property
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle & //exprhdl
 				)
 				const
 			{
-				return GPOS_NEW(memory_pool) CPropConstraint(memory_pool, GPOS_NEW(memory_pool) ColRefSetArray(memory_pool), NULL /*pcnstr*/);
+				return GPOS_NEW(mp) CPropConstraint(mp, GPOS_NEW(mp) ColRefSetArray(mp), NULL /*pcnstr*/);
 			}
 
 			// promise level for stat derivation
@@ -116,7 +116,7 @@ namespace gpopt
 			//-------------------------------------------------------------------------------------
 
 			// candidate set of xforms
-			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
+			CXformSet *PxfsCandidates(IMemoryPool *mp) const;
 
 			//-------------------------------------------------------------------------------------
 			//-------------------------------------------------------------------------------------

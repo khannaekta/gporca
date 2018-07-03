@@ -16,7 +16,7 @@ namespace gpopt
 		public:
 			CColConstraintsHashMapper
 				(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					ConstraintArray *pdrgPcnstr
 				);
 

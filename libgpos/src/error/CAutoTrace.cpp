@@ -21,7 +21,7 @@ using namespace gpos;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CAutoTrace::CAutoTrace(IMemoryPool *memory_pool) : m_wstr(memory_pool), m_os(&m_wstr)
+CAutoTrace::CAutoTrace(IMemoryPool *mp) : m_wstr(mp), m_os(&m_wstr)
 {
 }
 

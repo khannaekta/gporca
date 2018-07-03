@@ -26,8 +26,8 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalAppend::CDXLPhysicalAppend(IMemoryPool *memory_pool, BOOL fIsTarget, BOOL fIsZapped)
-	: CDXLPhysical(memory_pool), m_used_in_upd_del(fIsTarget), m_is_zapped(fIsZapped)
+CDXLPhysicalAppend::CDXLPhysicalAppend(IMemoryPool *mp, BOOL fIsTarget, BOOL fIsZapped)
+	: CDXLPhysical(mp), m_used_in_upd_del(fIsTarget), m_is_zapped(fIsZapped)
 {
 }
 

@@ -45,7 +45,7 @@ namespace gpopt
 			static
 			void CollectSubqueries
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexpr,
 				ColRefSetArray *pdrgpcrs,
 				ExpressionArrays *pdrgpdrgpexprSubqs
@@ -53,17 +53,17 @@ namespace gpopt
 
 			// replace subqueries with scalar identifier based on given map
 			static
-			CExpression *PexprReplaceSubqueries(IMemoryPool *memory_pool, CExpression *pexprScalar, HMExprCr *phmexprcr);
+			CExpression *PexprReplaceSubqueries(IMemoryPool *mp, CExpression *pexprScalar, HMExprCr *phmexprcr);
 
 			// push down subquery below join
 			static
-			CExpression *PexprSubqueryPushDown(IMemoryPool *memory_pool, CExpression *pexpr, BOOL fEnforceCorrelatedApply);
+			CExpression *PexprSubqueryPushDown(IMemoryPool *mp, CExpression *pexpr, BOOL fEnforceCorrelatedApply);
 
 		public:
 
 			// ctor
 			explicit
-			CXformSubqJoin2Apply(IMemoryPool *memory_pool);
+			CXformSubqJoin2Apply(IMemoryPool *mp);
 
 			// ctor
 			explicit

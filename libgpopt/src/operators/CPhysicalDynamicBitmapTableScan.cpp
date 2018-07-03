@@ -40,7 +40,7 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 CPhysicalDynamicBitmapTableScan::CPhysicalDynamicBitmapTableScan
 	(
-		IMemoryPool *memory_pool,
+		IMemoryPool *mp,
 		BOOL is_partial,
 		CTableDescriptor *ptabdesc,
 		ULONG ulOriginOpId,
@@ -53,7 +53,7 @@ CPhysicalDynamicBitmapTableScan::CPhysicalDynamicBitmapTableScan
 		CPartConstraint *ppartcnstrRel
 	)
 	:
-	CPhysicalDynamicScan(memory_pool, is_partial, ptabdesc, ulOriginOpId, pnameAlias, scan_id, pdrgpcrOutput, pdrgpdrgpcrParts, ulSecondaryScanId, ppartcnstr, ppartcnstrRel)
+	CPhysicalDynamicScan(mp, is_partial, ptabdesc, ulOriginOpId, pnameAlias, scan_id, pdrgpcrOutput, pdrgpdrgpcrParts, ulSecondaryScanId, ppartcnstr, ppartcnstrRel)
 {}
 
 //---------------------------------------------------------------------------
@@ -85,7 +85,7 @@ CPhysicalDynamicBitmapTableScan::Matches
 IStatistics *
 CPhysicalDynamicBitmapTableScan::PstatsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CReqdPropPlan *prpplan,
 	StatsArray *stats_ctxt
@@ -96,7 +96,7 @@ CPhysicalDynamicBitmapTableScan::PstatsDerive
 
 	IStatistics *pstatsBaseTable = CStatisticsUtils::DeriveStatsForDynamicScan
 									(
-									memory_pool,
+									mp,
 									exprhdl,
 									ScanId(),
 									prpplan->Pepp()->PpfmDerived()
@@ -109,11 +109,11 @@ CPhysicalDynamicBitmapTableScan::PstatsDerive
 	// get outer references from expression handle
 	CColRefSet *outer_refs = exprhdl.GetRelationalProperties()->PcrsOuter();
 
-	CPredicateUtils::SeparateOuterRefs(memory_pool, pexprCondChild, outer_refs, &local_expr, &expr_with_outer_refs);
+	CPredicateUtils::SeparateOuterRefs(mp, pexprCondChild, outer_refs, &local_expr, &expr_with_outer_refs);
 
 	IStatistics *stats = CFilterStatsProcessor::MakeStatsFilterForScalarExpr
 							(
-							memory_pool,
+							mp,
 							exprhdl,
 							pstatsBaseTable,
 							local_expr,

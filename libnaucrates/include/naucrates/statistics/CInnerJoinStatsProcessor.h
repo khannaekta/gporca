@@ -20,7 +20,7 @@ namespace gpnaucrates
 	{
 	public:
 		// inner join with another stats structure
-		static CStatistics *CalcInnerJoinStatsStatic(IMemoryPool *memory_pool,
+		static CStatistics *CalcInnerJoinStatsStatic(IMemoryPool *mp,
 													 const IStatistics *outer_stats_input,
 													 const IStatistics *inner_stats_input,
 													 StatsPredJoinArray *join_preds_stats);

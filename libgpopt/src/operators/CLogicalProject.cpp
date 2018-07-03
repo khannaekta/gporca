@@ -38,10 +38,10 @@ using namespace gpnaucrates;
 //---------------------------------------------------------------------------
 CLogicalProject::CLogicalProject
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogicalUnary(memory_pool)
+	CLogicalUnary(mp)
 {}
 
 	
@@ -56,13 +56,13 @@ CLogicalProject::CLogicalProject
 CColRefSet *
 CLogicalProject::PcrsDeriveOutput
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 {
 	GPOS_ASSERT(2 == exprhdl.Arity());
 	
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	
 	// the scalar child defines additional columns
 	pcrs->Union(exprhdl.GetRelationalProperties(0)->PcrsOutput());
@@ -83,7 +83,7 @@ CLogicalProject::PcrsDeriveOutput
 CKeyCollection *
 CLogicalProject::PkcDeriveKeys
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -103,7 +103,7 @@ CLogicalProject::PkcDeriveKeys
 ColRefSetArray *
 CLogicalProject::PdrgpcrsEquivClassFromScIdent
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexprPrEl
 	)
 {
@@ -136,9 +136,9 @@ CLogicalProject::PdrgpcrsEquivClassFromScIdent
 			!CColRefTable::PcrConvert(const_cast<CColRef*>(pcrScIdent))->IsNullable())
 	{
 		// equivalence class
-		ColRefSetArray *pdrgpcrs = GPOS_NEW(memory_pool) ColRefSetArray(memory_pool);
+		ColRefSetArray *pdrgpcrs = GPOS_NEW(mp) ColRefSetArray(mp);
 
-		CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+		CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
 		pcrs->Include(pcrPrEl);
 		pcrs->Include(pcrScIdent);
 		pdrgpcrs->Append(pcrs);
@@ -161,7 +161,7 @@ CLogicalProject::PdrgpcrsEquivClassFromScIdent
 void
 CLogicalProject::ExtractConstraintFromScConst
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexprPrEl,
 	ConstraintArray *pdrgpcnstr, // array of range constraints
 	ColRefSetArray *pdrgpcrs // array of equivalence class
@@ -186,12 +186,12 @@ CLogicalProject::ExtractConstraintFromScConst
 	CScalarConst *popConst = CScalarConst::PopConvert(pexprScalar->Pop());
 	IDatum *datum = popConst->GetDatum();
 
-	RangeArray *pdrgprng = GPOS_NEW(memory_pool) RangeArray(memory_pool);
+	RangeArray *pdrgprng = GPOS_NEW(mp) RangeArray(mp);
 	BOOL is_null = datum->IsNull();
 	if (!is_null)
 	{
 		datum->AddRef();
-		pdrgprng->Append(GPOS_NEW(memory_pool) CRange
+		pdrgprng->Append(GPOS_NEW(mp) CRange
 									(
 									COptCtxt::PoctxtFromTLS()->Pcomp(),
 									IMDType::EcmptEq,
@@ -199,9 +199,9 @@ CLogicalProject::ExtractConstraintFromScConst
 									));
 	}
 
-	pdrgpcnstr->Append(GPOS_NEW(memory_pool) CConstraintInterval(memory_pool, colref, pdrgprng, is_null));
+	pdrgpcnstr->Append(GPOS_NEW(mp) CConstraintInterval(mp, colref, pdrgprng, is_null));
 
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(colref);
 	pdrgpcrs->Append(pcrs);
 }
@@ -218,7 +218,7 @@ CLogicalProject::ExtractConstraintFromScConst
 CPropConstraint *
 CLogicalProject::PpcDeriveConstraint
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -231,8 +231,8 @@ CLogicalProject::PpcDeriveConstraint
 	CExpression *pexprPrL = exprhdl.PexprScalarChild(1);
 	GPOS_ASSERT(NULL != pexprPrL);
 
-	ConstraintArray *pdrgpcnstr = GPOS_NEW(memory_pool) ConstraintArray(memory_pool);
-	ColRefSetArray *pdrgpcrs = GPOS_NEW(memory_pool) ColRefSetArray(memory_pool);
+	ConstraintArray *pdrgpcnstr = GPOS_NEW(mp) ConstraintArray(mp);
+	ColRefSetArray *pdrgpcrs = GPOS_NEW(mp) ColRefSetArray(mp);
 
 	const ULONG ulProjElems = pexprPrL->Arity();
 	for (ULONG ul = 0; ul < ulProjElems; ul++)
@@ -242,16 +242,16 @@ CLogicalProject::PpcDeriveConstraint
 
 		if (EopScalarConst == pexprProjected->Pop()->Eopid())
 		{
-			ExtractConstraintFromScConst(memory_pool, pexprPrEl, pdrgpcnstr, pdrgpcrs);
+			ExtractConstraintFromScConst(mp, pexprPrEl, pdrgpcnstr, pdrgpcrs);
 		}
 		else
 		{
-			ColRefSetArray *pdrgpcrsChild = PdrgpcrsEquivClassFromScIdent(memory_pool, pexprPrEl);
+			ColRefSetArray *pdrgpcrsChild = PdrgpcrsEquivClassFromScIdent(mp, pexprPrEl);
 
 			if (NULL != pdrgpcrsChild)
 			{
 				// merge with the equivalence classes we have so far
-				ColRefSetArray *pdrgpcrsMerged = CUtils::PdrgpcrsMergeEquivClasses(memory_pool, pdrgpcrs, pdrgpcrsChild);
+				ColRefSetArray *pdrgpcrsMerged = CUtils::PdrgpcrsMergeEquivClasses(mp, pdrgpcrs, pdrgpcrsChild);
 
 				// clean up
 				pdrgpcrs->Release();
@@ -277,7 +277,7 @@ CLogicalProject::PpcDeriveConstraint
 	if (NULL != pdrgpcrsChild)
 	{
 		// merge with the equivalence classes we have so far
-		ColRefSetArray *pdrgpcrsMerged = CUtils::PdrgpcrsMergeEquivClasses(memory_pool, pdrgpcrs, pdrgpcrsChild);
+		ColRefSetArray *pdrgpcrsMerged = CUtils::PdrgpcrsMergeEquivClasses(mp, pdrgpcrs, pdrgpcrsChild);
 
 		// clean up
 		pdrgpcrs->Release();
@@ -292,9 +292,9 @@ CLogicalProject::PpcDeriveConstraint
 		pdrgpcnstr->Append(pcnstr);
 	}
 
-	CConstraint *pcnstrNew = CConstraint::PcnstrConjunction(memory_pool, pdrgpcnstr);
+	CConstraint *pcnstrNew = CConstraint::PcnstrConjunction(mp, pdrgpcnstr);
 
-	return GPOS_NEW(memory_pool) CPropConstraint(memory_pool, pdrgpcrs, pcnstrNew);
+	return GPOS_NEW(mp) CPropConstraint(mp, pdrgpcrs, pcnstrNew);
 }
 
 
@@ -309,7 +309,7 @@ CLogicalProject::PpcDeriveConstraint
 CMaxCard
 CLogicalProject::Maxcard
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -335,11 +335,11 @@ CLogicalProject::Maxcard
 CXformSet *
 CLogicalProject::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	) 
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfSimplifyProjectWithSubquery);
 	(void) xform_set->ExchangeSet(CXform::ExfProject2Apply);
@@ -360,13 +360,13 @@ CLogicalProject::PxfsCandidates
 IStatistics *
 CLogicalProject::PstatsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	StatsArray * // stats_ctxt
 	)
 	const
 {
-	HMUlDatum *phmuldatum = GPOS_NEW(memory_pool) HMUlDatum(memory_pool);
+	HMUlDatum *phmuldatum = GPOS_NEW(mp) HMUlDatum(mp);
 
 	// extract scalar constant expression that can be used for 
 	// statistics calculation
@@ -389,13 +389,13 @@ CLogicalProject::PstatsDerive
 #ifdef GPOS_DEBUG
 				BOOL fInserted =
 #endif
-						phmuldatum->Insert(GPOS_NEW(memory_pool) ULONG(colref->Id()), datum);
+						phmuldatum->Insert(GPOS_NEW(mp) ULONG(colref->Id()), datum);
 				GPOS_ASSERT(fInserted);
 			}
 		}
 	}
 
-	IStatistics *stats = PstatsDeriveProject(memory_pool, exprhdl, phmuldatum);
+	IStatistics *stats = PstatsDeriveProject(mp, exprhdl, phmuldatum);
 
 	// clean up
 	phmuldatum->Release();

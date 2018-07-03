@@ -27,11 +27,11 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalMotionRandom::CPhysicalMotionRandom
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CDistributionSpecRandom *pdsRandom
 	)
 	:
-	CPhysicalMotion(memory_pool),
+	CPhysicalMotion(mp),
 	m_pdsRandom(pdsRandom)
 {
 	GPOS_ASSERT(NULL != pdsRandom);
@@ -80,7 +80,7 @@ CPhysicalMotionRandom::Matches
 CColRefSet *
 CPhysicalMotionRandom::PcrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CColRefSet *pcrsRequired,
 	ULONG child_index,
@@ -90,7 +90,7 @@ CPhysicalMotionRandom::PcrsRequired
 {
 	GPOS_ASSERT(0 == child_index);
 
-	return PcrsChildReqd(memory_pool, exprhdl, pcrsRequired, child_index,
+	return PcrsChildReqd(mp, exprhdl, pcrsRequired, child_index,
 						 gpos::ulong_max);
 }
 
@@ -151,7 +151,7 @@ CPhysicalMotionRandom::EpetOrder
 COrderSpec *
 CPhysicalMotionRandom::PosRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &, //exprhdl,
 	COrderSpec *,//posInput,
 	ULONG
@@ -166,7 +166,7 @@ CPhysicalMotionRandom::PosRequired
 {
 	GPOS_ASSERT(0 == child_index);
 
-	return GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+	return GPOS_NEW(mp) COrderSpec(mp);
 }
 
 //---------------------------------------------------------------------------
@@ -180,12 +180,12 @@ CPhysicalMotionRandom::PosRequired
 COrderSpec *
 CPhysicalMotionRandom::PosDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle & // exprhdl
 	)
 	const
 {
-	return GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+	return GPOS_NEW(mp) COrderSpec(mp);
 }
 
 

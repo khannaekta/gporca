@@ -29,19 +29,19 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformLeftSemiJoin2HashJoin::CXformLeftSemiJoin2HashJoin
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	// pattern
 	CXformImplementation
 		(
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 					(
-					memory_pool,
-					GPOS_NEW(memory_pool) CLogicalLeftSemiJoin(memory_pool),
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // left child
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // right child
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))  // predicate
+					mp,
+					GPOS_NEW(mp) CLogicalLeftSemiJoin(mp),
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // left child
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // right child
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))  // predicate
 					)
 		)
 {}

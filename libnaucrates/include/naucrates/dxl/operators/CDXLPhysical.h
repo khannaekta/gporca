@@ -39,7 +39,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		explicit CDXLPhysical(IMemoryPool *memory_pool);
+		explicit CDXLPhysical(IMemoryPool *mp);
 
 		virtual ~CDXLPhysical();
 

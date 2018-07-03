@@ -63,7 +63,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLLogicalSetOp(IMemoryPool *memory_pool,
+		CDXLLogicalSetOp(IMemoryPool *mp,
 						 EdxlSetOpType edxlsetoptype,
 						 DXLColumnDescrArray *pdrgdxlcd,
 						 ULongPtrArray2D *array_2D,

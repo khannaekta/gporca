@@ -16,7 +16,7 @@ using namespace gpmd;
 
 // return statistics object after performing inner join
 CStatistics *
-CInnerJoinStatsProcessor::CalcInnerJoinStatsStatic(IMemoryPool *memory_pool,
+CInnerJoinStatsProcessor::CalcInnerJoinStatsStatic(IMemoryPool *mp,
 												   const IStatistics *outer_stats_input,
 												   const IStatistics *inner_stats_input,
 												   StatsPredJoinArray *join_preds_stats)
@@ -26,7 +26,7 @@ CInnerJoinStatsProcessor::CalcInnerJoinStatsStatic(IMemoryPool *memory_pool,
 	GPOS_ASSERT(NULL != join_preds_stats);
 	const CStatistics *outer_stats = dynamic_cast<const CStatistics *>(outer_stats_input);
 
-	return CJoinStatsProcessor::SetResultingJoinStats(memory_pool,
+	return CJoinStatsProcessor::SetResultingJoinStats(mp,
 													  outer_stats->GetStatsConfig(),
 													  outer_stats_input,
 													  inner_stats_input,

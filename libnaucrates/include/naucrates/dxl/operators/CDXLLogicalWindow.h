@@ -38,7 +38,7 @@ namespace gpdxl
 
 	public:
 		//ctor
-		CDXLLogicalWindow(IMemoryPool *memory_pool, DXLWindowSpecArray *pdrgpdxlwinspec);
+		CDXLLogicalWindow(IMemoryPool *mp, DXLWindowSpecArray *pdrgpdxlwinspec);
 
 		//dtor
 		virtual ~CDXLLogicalWindow();

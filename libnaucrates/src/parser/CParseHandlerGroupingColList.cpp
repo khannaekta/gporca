@@ -30,10 +30,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerGroupingColList::CParseHandlerGroupingColList(IMemoryPool *memory_pool,
+CParseHandlerGroupingColList::CParseHandlerGroupingColList(IMemoryPool *mp,
 														   CParseHandlerManager *parse_handler_mgr,
 														   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
 	  m_grouping_colids_array(NULL)
 {
 }
@@ -69,7 +69,7 @@ CParseHandlerGroupingColList::StartElement(const XMLCh *const,  //element_uri,
 									  element_local_name))
 	{
 		// start the grouping column list
-		m_grouping_colids_array = GPOS_NEW(m_memory_pool) ULongPtrArray(m_memory_pool);
+		m_grouping_colids_array = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 	}
 	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenGroupingCol),
 										   element_local_name))
@@ -78,7 +78,7 @@ CParseHandlerGroupingColList::StartElement(const XMLCh *const,  //element_uri,
 		GPOS_ASSERT(NULL != m_grouping_colids_array);
 
 		// parse grouping col id
-		ULONG *pulColId = GPOS_NEW(m_memory_pool) ULONG(CDXLOperatorFactory::ParseGroupingColId(
+		ULONG *pulColId = GPOS_NEW(m_mp) ULONG(CDXLOperatorFactory::ParseGroupingColId(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 		m_grouping_colids_array->Append(pulColId);

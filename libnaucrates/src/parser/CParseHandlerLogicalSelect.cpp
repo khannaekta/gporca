@@ -28,10 +28,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerLogicalSelect::CParseHandlerLogicalSelect(IMemoryPool *memory_pool,
+CParseHandlerLogicalSelect::CParseHandlerLogicalSelect(IMemoryPool *mp,
 													   CParseHandlerManager *parse_handler_mgr,
 													   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerLogicalOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerLogicalOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -65,19 +65,19 @@ CParseHandlerLogicalSelect::StartElement(const XMLCh *const,  // element_uri,
 	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenLogicalSelect),
 									  element_local_name))
 	{
-		m_dxl_node = GPOS_NEW(m_memory_pool)
-			CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLLogicalSelect(m_memory_pool));
+		m_dxlnode = GPOS_NEW(m_mp)
+			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLLogicalSelect(m_mp));
 
 		// create child node parsers
 
 		// parse handler for logical operator
 		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenLogical), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenLogical), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
 		// parse handler for the scalar condition
 		CParseHandlerBase *scalar_cond_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(scalar_cond_parse_handler);
 
 		// store child parse handler in array
@@ -114,7 +114,7 @@ CParseHandlerLogicalSelect::EndElement(const XMLCh *const,  // element_uri,
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
-	GPOS_ASSERT(NULL != m_dxl_node);
+	GPOS_ASSERT(NULL != m_dxlnode);
 
 	CParseHandlerScalarOp *scalar_cond_parse_handler =
 		dynamic_cast<CParseHandlerScalarOp *>((*this)[0]);
@@ -125,7 +125,7 @@ CParseHandlerLogicalSelect::EndElement(const XMLCh *const,  // element_uri,
 	AddChildFromParseHandler(child_parse_handler);
 
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node, false /* validate_children */);
+	m_dxlnode->GetOperator()->AssertValid(m_dxlnode, false /* validate_children */);
 #endif  // GPOS_DEBUG
 
 	// deactivate handler

@@ -43,18 +43,18 @@ namespace gpopt
 			explicit
 			CXformSimplifySelectWithSubquery
 				(
-				IMemoryPool *memory_pool
+				IMemoryPool *mp
 				)
 				:
 				// pattern
 				CXformSimplifySubquery
 				(
-				GPOS_NEW(memory_pool) CExpression
+				GPOS_NEW(mp) CExpression
 						(
-						memory_pool,
-						GPOS_NEW(memory_pool) CLogicalSelect(memory_pool),
-						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // relational child
-						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))	// predicate tree
+						mp,
+						GPOS_NEW(mp) CLogicalSelect(mp),
+						GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // relational child
+						GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))	// predicate tree
 						)
 				)
 			{}

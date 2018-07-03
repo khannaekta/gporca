@@ -34,10 +34,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerMDGPDBScalarOp::CParseHandlerMDGPDBScalarOp(IMemoryPool *memory_pool,
+CParseHandlerMDGPDBScalarOp::CParseHandlerMDGPDBScalarOp(IMemoryPool *mp,
 														 CParseHandlerManager *parse_handler_mgr,
 														 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerMetadataObject(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerMetadataObject(mp, parse_handler_mgr, parse_handler_root),
 	  m_mdid(NULL),
 	  m_mdname(NULL),
 	  m_mdid_type_left(NULL),
@@ -76,7 +76,7 @@ CParseHandlerMDGPDBScalarOp::StartElement(const XMLCh *const element_uri,
 			m_parse_handler_mgr->GetDXLMemoryManager(), xml_str_op_name);
 
 		// create a copy of the string in the CMDName constructor
-		m_mdname = GPOS_NEW(m_memory_pool) CMDName(m_memory_pool, str_opname);
+		m_mdname = GPOS_NEW(m_mp) CMDName(m_mp, str_opname);
 
 		GPOS_DELETE(str_opname);
 
@@ -184,7 +184,7 @@ CParseHandlerMDGPDBScalarOp::StartElement(const XMLCh *const element_uri,
 	{
 		// parse handler for operator class list
 		CParseHandlerBase *op_class_list_parse_handler =
-			CParseHandlerFactory::GetParseHandler(m_memory_pool,
+			CParseHandlerFactory::GetParseHandler(m_mp,
 												  CDXLTokens::XmlstrToken(EdxltokenMetadataIdList),
 												  m_parse_handler_mgr,
 												  this);
@@ -234,9 +234,9 @@ CParseHandlerMDGPDBScalarOp::EndElement(const XMLCh *const,  // element_uri,
 		}
 		else
 		{
-			mdid_op_classes_array = GPOS_NEW(m_memory_pool) MdidPtrArray(m_memory_pool);
+			mdid_op_classes_array = GPOS_NEW(m_mp) MdidPtrArray(m_mp);
 		}
-		m_imd_obj = GPOS_NEW(m_memory_pool) CMDScalarOpGPDB(m_memory_pool,
+		m_imd_obj = GPOS_NEW(m_mp) CMDScalarOpGPDB(m_mp,
 															m_mdid,
 															m_mdname,
 															m_mdid_type_left,

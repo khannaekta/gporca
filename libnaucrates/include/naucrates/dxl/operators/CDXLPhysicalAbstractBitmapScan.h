@@ -55,8 +55,8 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLPhysicalAbstractBitmapScan(IMemoryPool *memory_pool, CDXLTableDescr *table_descr)
-			: CDXLPhysical(memory_pool), m_table_descr_dxl(table_descr)
+		CDXLPhysicalAbstractBitmapScan(IMemoryPool *mp, CDXLTableDescr *table_descr)
+			: CDXLPhysical(mp), m_table_descr_dxl(table_descr)
 		{
 			GPOS_ASSERT(NULL != table_descr);
 		}

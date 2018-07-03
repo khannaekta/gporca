@@ -15,14 +15,14 @@ using namespace gpopt;
 
 //	compute the statistics of a limit operation
 CStatistics *
-CLimitStatsProcessor::CalcLimitStats(IMemoryPool *memory_pool,
+CLimitStatsProcessor::CalcLimitStats(IMemoryPool *mp,
 									 const CStatistics *input_stats,
 									 CDouble input_limit_rows)
 {
 	GPOS_ASSERT(NULL != input_stats);
 
 	// copy the hash map from colid -> histogram for resultant structure
-	UlongHistogramHashMap *colid_histogram = input_stats->CopyHistograms(memory_pool);
+	UlongHistogramHashMap *colid_histogram = input_stats->CopyHistograms(mp);
 	;
 
 	CDouble limit_rows = CStatistics::MinRows;
@@ -32,9 +32,9 @@ CLimitStatsProcessor::CalcLimitStats(IMemoryPool *memory_pool,
 	}
 	// create an output stats object
 	CStatistics *pstatsLimit =
-		GPOS_NEW(memory_pool) CStatistics(memory_pool,
+		GPOS_NEW(mp) CStatistics(mp,
 										  colid_histogram,
-										  input_stats->CopyWidths(memory_pool),
+										  input_stats->CopyWidths(mp),
 										  limit_rows,
 										  input_stats->IsEmpty(),
 										  input_stats->GetNumberOfPredicates());
@@ -46,7 +46,7 @@ CLimitStatsProcessor::CalcLimitStats(IMemoryPool *memory_pool,
 	// and estimated limit cardinality.
 
 	// modify source id to upper bound card information
-	CStatisticsUtils::ComputeCardUpperBounds(memory_pool,
+	CStatisticsUtils::ComputeCardUpperBounds(mp,
 											 input_stats,
 											 pstatsLimit,
 											 limit_rows,

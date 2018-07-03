@@ -38,10 +38,10 @@ namespace gpopt
 
 			// ctor for patterns
 			explicit
-			CLogicalInnerApply(IMemoryPool *memory_pool);
+			CLogicalInnerApply(IMemoryPool *mp);
 
 			// ctor
-			CLogicalInnerApply(IMemoryPool *memory_pool, ColRefArray *pdrgpcrInner, EOperatorId eopidOriginSubq);
+			CLogicalInnerApply(IMemoryPool *mp, ColRefArray *pdrgpcrInner, EOperatorId eopidOriginSubq);
 
 			// dtor
 			virtual
@@ -63,7 +63,7 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			//-------------------------------------------------------------------------------------
 			// Derived Relational Properties
@@ -73,41 +73,41 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsDeriveOutput
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 			{
 				GPOS_ASSERT(3 == exprhdl.Arity());
 
-				return PcrsDeriveOutputCombineLogical(memory_pool, exprhdl);
+				return PcrsDeriveOutputCombineLogical(mp, exprhdl);
 			}
 
 			// derive not nullable columns
 			virtual
 			CColRefSet *PcrsDeriveNotNull
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PcrsDeriveNotNullCombineLogical(memory_pool, exprhdl);
+				return PcrsDeriveNotNullCombineLogical(mp, exprhdl);
 			}
 
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive constraint property
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PpcDeriveConstraintFromPredicates(memory_pool, exprhdl);
+				return PpcDeriveConstraintFromPredicates(mp, exprhdl);
 			}
 
 			//-------------------------------------------------------------------------------------

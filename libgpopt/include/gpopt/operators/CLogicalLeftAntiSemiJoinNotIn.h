@@ -43,7 +43,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CLogicalLeftAntiSemiJoinNotIn(IMemoryPool *memory_pool);
+			CLogicalLeftAntiSemiJoinNotIn(IMemoryPool *mp);
 
 			// dtor
 			virtual
@@ -69,7 +69,7 @@ namespace gpopt
 			//-------------------------------------------------------------------------------------
 
 			// candidate set of xforms
-			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
+			CXformSet *PxfsCandidates(IMemoryPool *mp) const;
 
 			//-------------------------------------------------------------------------------------
 			//-------------------------------------------------------------------------------------

@@ -29,10 +29,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarBitmapBoolOp::CDXLScalarBitmapBoolOp(IMemoryPool *memory_pool,
+CDXLScalarBitmapBoolOp::CDXLScalarBitmapBoolOp(IMemoryPool *mp,
 											   IMDId *mdid_type,
 											   EdxlBitmapBoolOp bitmap_op_type)
-	: CDXLScalar(memory_pool), m_mdid_type(mdid_type), m_bitmap_op_type(bitmap_op_type)
+	: CDXLScalar(mp), m_mdid_type(mdid_type), m_bitmap_op_type(bitmap_op_type)
 {
 	GPOS_ASSERT(EdxlbitmapSentinel > bitmap_op_type);
 	GPOS_ASSERT(IMDId::IsValid(mdid_type));

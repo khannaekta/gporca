@@ -406,7 +406,7 @@ GPOS_RESULT
 CEnumeratorTest::EresUnittest_RunUnsatisfiedRequiredPropertiesTests()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	const ULONG ulTests = GPOS_ARRAY_SIZE(rgszUnsatisfiedRequiredPropertiesPlans);
 
@@ -425,7 +425,7 @@ CEnumeratorTest::EresUnittest_RunUnsatisfiedRequiredPropertiesTests()
 						1// ulCmdId
 						);
 			{
-				CAutoTrace at(memory_pool);
+				CAutoTrace at(mp);
 				at.Os() << std::endl << "Minidump " << rgszUnsatisfiedRequiredPropertiesPlans[ul];
 				at.Os() << " did not raise UnsatisfiedRequiredProperties, as expected" << std::endl;
 			}
@@ -461,12 +461,12 @@ GPOS_RESULT
 CEnumeratorTest::EresUnittest_RunCompatibleDistributions()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 	const ULONG ulTests = GPOS_ARRAY_SIZE(rgszCompatibleDistributions);
 
 	return CTestUtils::EresRunMinidumps
 						(
-						memory_pool,
+						mp,
 						rgszCompatibleDistributions,
 						ulTests,
 						&m_ulCompatibleDistributionsTestCounter,

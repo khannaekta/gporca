@@ -28,10 +28,10 @@ XERCES_CPP_NAMESPACE_USE
 //
 //---------------------------------------------------------------------------
 CParseHandlerLogicalCTEAnchor::CParseHandlerLogicalCTEAnchor(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerLogicalOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerLogicalOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -64,12 +64,12 @@ CParseHandlerLogicalCTEAnchor::StartElement(const XMLCh *const,  // element_uri,
 		EdxltokenCTEId,
 		EdxltokenLogicalCTEAnchor);
 
-	m_dxl_node = GPOS_NEW(m_memory_pool)
-		CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLLogicalCTEAnchor(m_memory_pool, id));
+	m_dxlnode = GPOS_NEW(m_mp)
+		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLLogicalCTEAnchor(m_mp, id));
 
 	// create and activate the parse handler for the child expression node
 	CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenLogical), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenLogical), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
 	// store parse handler
@@ -98,14 +98,14 @@ CParseHandlerLogicalCTEAnchor::EndElement(const XMLCh *const,  // element_uri,
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
-	GPOS_ASSERT(NULL != m_dxl_node);
+	GPOS_ASSERT(NULL != m_dxlnode);
 
 	CParseHandlerLogicalOp *child_parse_handler =
 		dynamic_cast<CParseHandlerLogicalOp *>((*this)[0]);
 	AddChildFromParseHandler(child_parse_handler);
 
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node, false /* validate_children */);
+	m_dxlnode->GetOperator()->AssertValid(m_dxlnode, false /* validate_children */);
 #endif  // GPOS_DEBUG
 
 	m_parse_handler_mgr->DeactivateHandler();

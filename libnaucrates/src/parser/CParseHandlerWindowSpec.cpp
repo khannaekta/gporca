@@ -28,10 +28,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerWindowSpec::CParseHandlerWindowSpec(IMemoryPool *memory_pool,
+CParseHandlerWindowSpec::CParseHandlerWindowSpec(IMemoryPool *mp,
 												 CParseHandlerManager *parse_handler_mgr,
 												 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
 	  m_part_by_col_identifier_array(NULL),
 	  m_dxl_window_spec_gen(NULL),
 	  m_mdname(NULL),
@@ -66,7 +66,7 @@ CParseHandlerWindowSpec::StartElement(const XMLCh *const element_uri,
 		{
 			CWStringDynamic *str_alias = CDXLUtils::CreateDynamicStringFromXMLChArray(
 				m_parse_handler_mgr->GetDXLMemoryManager(), xml_alias);
-			m_mdname = GPOS_NEW(m_memory_pool) CMDName(m_memory_pool, str_alias);
+			m_mdname = GPOS_NEW(m_mp) CMDName(m_mp, str_alias);
 			GPOS_DELETE(str_alias);
 		}
 
@@ -84,7 +84,7 @@ CParseHandlerWindowSpec::StartElement(const XMLCh *const element_uri,
 	{
 		// parse handler for the sorting column list
 		CParseHandlerBase *sort_col_list_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool,
+			m_mp,
 			CDXLTokens::XmlstrToken(EdxltokenScalarSortColList),
 			m_parse_handler_mgr,
 			this);
@@ -102,7 +102,7 @@ CParseHandlerWindowSpec::StartElement(const XMLCh *const element_uri,
 
 		// parse handler for the leading and trailing scalar values
 		CParseHandlerBase *window_frame_parse_handler =
-			CParseHandlerFactory::GetParseHandler(m_memory_pool,
+			CParseHandlerFactory::GetParseHandler(m_mp,
 												  CDXLTokens::XmlstrToken(EdxltokenWindowFrame),
 												  m_parse_handler_mgr,
 												  this);
@@ -179,8 +179,8 @@ CParseHandlerWindowSpec::EndElement(const XMLCh *const,  // element_uri,
 			dynamic_cast<CParseHandlerWindowFrame *>((*this)[1]);
 		window_frame = window_frame_parse_handler->GetWindowFrame();
 	}
-	m_dxl_window_spec_gen = GPOS_NEW(m_memory_pool) CDXLWindowSpec(
-		m_memory_pool, m_part_by_col_identifier_array, m_mdname, sort_col_list_dxl, window_frame);
+	m_dxl_window_spec_gen = GPOS_NEW(m_mp) CDXLWindowSpec(
+		m_mp, m_part_by_col_identifier_array, m_mdname, sort_col_list_dxl, window_frame);
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

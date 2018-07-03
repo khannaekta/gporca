@@ -43,18 +43,18 @@ namespace gpopt
 			explicit
 			CXformSimplifyProjectWithSubquery
 				(
-				IMemoryPool *memory_pool
+				IMemoryPool *mp
 				)
 				:
 				// pattern
 				CXformSimplifySubquery
 				(
-				GPOS_NEW(memory_pool) CExpression
+				GPOS_NEW(mp) CExpression
 						(
-						memory_pool,
-						GPOS_NEW(memory_pool) CLogicalProject(memory_pool),
-						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),	// relational child
-						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))	// project list
+						mp,
+						GPOS_NEW(mp) CLogicalProject(mp),
+						GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)),	// relational child
+						GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))	// project list
 						)
 				)
 			{}

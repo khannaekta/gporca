@@ -59,7 +59,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLPhysicalSplit(IMemoryPool *memory_pool,
+		CDXLPhysicalSplit(IMemoryPool *mp,
 						  ULongPtrArray *delete_colid_array,
 						  ULongPtrArray *insert_colid_array,
 						  ULONG action_colid,

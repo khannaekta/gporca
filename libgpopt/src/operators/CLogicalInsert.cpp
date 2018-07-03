@@ -31,10 +31,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalInsert::CLogicalInsert
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogical(memory_pool),
+	CLogical(mp),
 	m_ptabdesc(NULL),
 	m_pdrgpcrSource(NULL)
 {
@@ -51,12 +51,12 @@ CLogicalInsert::CLogicalInsert
 //---------------------------------------------------------------------------
 CLogicalInsert::CLogicalInsert
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CTableDescriptor *ptabdesc,
 	ColRefArray *pdrgpcrSource
 	)
 	:
-	CLogical(memory_pool),
+	CLogical(mp),
 	m_ptabdesc(ptabdesc),
 	m_pdrgpcrSource(pdrgpcrSource)
 
@@ -135,15 +135,15 @@ CLogicalInsert::HashValue() const
 COperator *
 CLogicalInsert::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	BOOL must_exist
 	)
 {
-	ColRefArray *colref_array = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrSource, colref_mapping, must_exist);
+	ColRefArray *colref_array = CUtils::PdrgpcrRemap(mp, m_pdrgpcrSource, colref_mapping, must_exist);
 	m_ptabdesc->AddRef();
 
-	return GPOS_NEW(memory_pool) CLogicalInsert(memory_pool, m_ptabdesc, colref_array);
+	return GPOS_NEW(mp) CLogicalInsert(mp, m_ptabdesc, colref_array);
 }
 
 //---------------------------------------------------------------------------
@@ -157,11 +157,11 @@ CLogicalInsert::PopCopyWithRemappedColumns
 CColRefSet *
 CLogicalInsert::PcrsDeriveOutput
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle & //exprhdl
 	)
 {
-	CColRefSet *pcrsOutput = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsOutput->Include(m_pdrgpcrSource);
 	return pcrsOutput;
 }
@@ -177,7 +177,7 @@ CLogicalInsert::PcrsDeriveOutput
 CKeyCollection *
 CLogicalInsert::PkcDeriveKeys
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -196,7 +196,7 @@ CLogicalInsert::PkcDeriveKeys
 CMaxCard
 CLogicalInsert::Maxcard
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -216,11 +216,11 @@ CLogicalInsert::Maxcard
 CXformSet *
 CLogicalInsert::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfInsert2DML);
 	return xform_set;
 }
@@ -236,7 +236,7 @@ CLogicalInsert::PxfsCandidates
 IStatistics *
 CLogicalInsert::PstatsDerive
 	(
-	IMemoryPool *, // memory_pool,
+	IMemoryPool *, // mp,
 	CExpressionHandle &exprhdl,
 	StatsArray * // not used
 	)

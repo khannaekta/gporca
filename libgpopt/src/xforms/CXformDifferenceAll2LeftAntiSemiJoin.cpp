@@ -28,17 +28,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformDifferenceAll2LeftAntiSemiJoin::CXformDifferenceAll2LeftAntiSemiJoin
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	// pattern
 	CXformExploration
 		(
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 					(
-					memory_pool,
-					GPOS_NEW(memory_pool) CLogicalDifferenceAll(memory_pool),
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternMultiLeaf(memory_pool))
+					mp,
+					GPOS_NEW(mp) CLogicalDifferenceAll(mp),
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternMultiLeaf(mp))
 					)
 		)
 {}
@@ -64,7 +64,7 @@ CXformDifferenceAll2LeftAntiSemiJoin::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// TODO: , Jan 8th 2013, we currently only handle difference all
 	//  operators with two children
@@ -77,27 +77,27 @@ CXformDifferenceAll2LeftAntiSemiJoin::Transform
 	CLogicalDifferenceAll *popDifferenceAll = CLogicalDifferenceAll::PopConvert(pexpr->Pop());
 	ColRefArrays *pdrgpdrgpcrInput = popDifferenceAll->PdrgpdrgpcrInput();
 
-	CExpression *pexprLeftWindow = CXformUtils::PexprWindowWithRowNumber(memory_pool, pexprLeftChild, (*pdrgpdrgpcrInput)[0]);
-	CExpression *pexprRightWindow = CXformUtils::PexprWindowWithRowNumber(memory_pool, pexprRightChild, (*pdrgpdrgpcrInput)[1]);
+	CExpression *pexprLeftWindow = CXformUtils::PexprWindowWithRowNumber(mp, pexprLeftChild, (*pdrgpdrgpcrInput)[0]);
+	CExpression *pexprRightWindow = CXformUtils::PexprWindowWithRowNumber(mp, pexprRightChild, (*pdrgpdrgpcrInput)[1]);
 
-	ColRefArrays *pdrgpdrgpcrInputNew = GPOS_NEW(memory_pool) ColRefArrays(memory_pool);
-	ColRefArray *pdrgpcrLeftNew = CUtils::PdrgpcrExactCopy(memory_pool, (*pdrgpdrgpcrInput)[0]);
+	ColRefArrays *pdrgpdrgpcrInputNew = GPOS_NEW(mp) ColRefArrays(mp);
+	ColRefArray *pdrgpcrLeftNew = CUtils::PdrgpcrExactCopy(mp, (*pdrgpdrgpcrInput)[0]);
 	pdrgpcrLeftNew->Append(CXformUtils::PcrProjectElement(pexprLeftWindow, 0 /* row_number window function*/));
 
-	ColRefArray *pdrgpcrRightNew = CUtils::PdrgpcrExactCopy(memory_pool, (*pdrgpdrgpcrInput)[1]);
+	ColRefArray *pdrgpcrRightNew = CUtils::PdrgpcrExactCopy(mp, (*pdrgpdrgpcrInput)[1]);
 	pdrgpcrRightNew->Append(CXformUtils::PcrProjectElement(pexprRightWindow, 0 /* row_number window function*/));
 
 	pdrgpdrgpcrInputNew->Append(pdrgpcrLeftNew);
 	pdrgpdrgpcrInputNew->Append(pdrgpcrRightNew);
 
 	// generate the scalar condition for the left anti-semi join
-	CExpression *pexprScCond = CUtils::PexprConjINDFCond(memory_pool, pdrgpdrgpcrInputNew);
+	CExpression *pexprScCond = CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInputNew);
 
 	// assemble the new left anti-semi join logical operator
-	CExpression *pexprLASJ = GPOS_NEW(memory_pool) CExpression
+	CExpression *pexprLASJ = GPOS_NEW(mp) CExpression
 										(
-										memory_pool,
-										GPOS_NEW(memory_pool) CLogicalLeftAntiSemiJoin(memory_pool),
+										mp,
+										GPOS_NEW(mp) CLogicalLeftAntiSemiJoin(mp),
 										pexprLeftWindow,
 										pexprRightWindow,
 										pexprScCond

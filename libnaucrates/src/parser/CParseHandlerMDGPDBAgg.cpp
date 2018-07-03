@@ -29,10 +29,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerMDGPDBAgg::CParseHandlerMDGPDBAgg(IMemoryPool *memory_pool,
+CParseHandlerMDGPDBAgg::CParseHandlerMDGPDBAgg(IMemoryPool *mp,
 											   CParseHandlerManager *parse_handler_mgr,
 											   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerMetadataObject(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerMetadataObject(mp, parse_handler_mgr, parse_handler_root),
 	  m_mdid(NULL),
 	  m_mdname(NULL),
 	  m_mdid_type_result(NULL),
@@ -68,7 +68,7 @@ CParseHandlerMDGPDBAgg::StartElement(const XMLCh *const,  // element_uri,
 			m_parse_handler_mgr->GetDXLMemoryManager(), xml_str_agg_name);
 
 		// create a copy of the string in the CMDName constructor
-		m_mdname = GPOS_NEW(m_memory_pool) CMDName(m_memory_pool, str_agg_name);
+		m_mdname = GPOS_NEW(m_mp) CMDName(m_mp, str_agg_name);
 
 		GPOS_DELETE(str_agg_name);
 
@@ -165,7 +165,7 @@ CParseHandlerMDGPDBAgg::EndElement(const XMLCh *const,  // element_uri,
 		// construct the MD agg object from its part
 		GPOS_ASSERT(m_mdid->IsValid() && NULL != m_mdname);
 
-		m_imd_obj = GPOS_NEW(m_memory_pool) CMDAggregateGPDB(m_memory_pool,
+		m_imd_obj = GPOS_NEW(m_mp) CMDAggregateGPDB(m_mp,
 															 m_mdid,
 															 m_mdname,
 															 m_mdid_type_result,

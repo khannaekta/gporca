@@ -28,7 +28,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLLogicalUpdate::CDXLLogicalUpdate(IMemoryPool *memory_pool,
+CDXLLogicalUpdate::CDXLLogicalUpdate(IMemoryPool *mp,
 									 CDXLTableDescr *table_descr,
 									 ULONG ctid_colid,
 									 ULONG segid_colid,
@@ -36,7 +36,7 @@ CDXLLogicalUpdate::CDXLLogicalUpdate(IMemoryPool *memory_pool,
 									 ULongPtrArray *insert_colid_array,
 									 BOOL preserve_oids,
 									 ULONG tuple_oid)
-	: CDXLLogical(memory_pool),
+	: CDXLLogical(mp),
 	  m_table_descr_dxl(table_descr),
 	  m_ctid_colid(ctid_colid),
 	  m_segid_colid(segid_colid),
@@ -107,11 +107,11 @@ CDXLLogicalUpdate::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
-	CWStringDynamic *deletion_colids = CDXLUtils::Serialize(m_memory_pool, m_deletion_colid_array);
+	CWStringDynamic *deletion_colids = CDXLUtils::Serialize(m_mp, m_deletion_colid_array);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenDeleteCols), deletion_colids);
 	GPOS_DELETE(deletion_colids);
 
-	CWStringDynamic *insertion_colids = CDXLUtils::Serialize(m_memory_pool, m_insert_colid_array);
+	CWStringDynamic *insertion_colids = CDXLUtils::Serialize(m_mp, m_insert_colid_array);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenInsertCols), insertion_colids);
 	GPOS_DELETE(insertion_colids);
 

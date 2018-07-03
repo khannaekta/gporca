@@ -49,7 +49,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CDXLScalarCast(IMemoryPool *memory_pool, IMDId *mdid_type, IMDId *func_mdid);
+		CDXLScalarCast(IMemoryPool *mp, IMDId *mdid_type, IMDId *func_mdid);
 
 		virtual ~CDXLScalarCast();
 

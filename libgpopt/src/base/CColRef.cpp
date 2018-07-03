@@ -133,16 +133,16 @@ CColRef::OsPrint
 ULongPtrArray *
 CColRef::Pdrgpul
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ColRefArray *colref_array
 	)
 {
-	ULongPtrArray *pdrgpul = GPOS_NEW(memory_pool) ULongPtrArray(memory_pool);
+	ULongPtrArray *pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
 	const ULONG length = colref_array->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		CColRef *colref = (*colref_array)[ul];
-		pdrgpul->Append(GPOS_NEW(memory_pool) ULONG(colref->Id()));
+		pdrgpul->Append(GPOS_NEW(mp) ULONG(colref->Id()));
 	}
 
 	return pdrgpul;

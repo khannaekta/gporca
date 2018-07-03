@@ -40,22 +40,22 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformPushGbBelowSetOp(IMemoryPool *memory_pool)
+			CXformPushGbBelowSetOp(IMemoryPool *mp)
                 :
                 CXformExploration
                 (
                  // pattern
-                 GPOS_NEW(memory_pool) CExpression
+                 GPOS_NEW(mp) CExpression
                         (
-                         memory_pool,
-                         GPOS_NEW(memory_pool) CLogicalGbAgg(memory_pool),
-                         GPOS_NEW(memory_pool) CExpression  // left child is a set operation
+                         mp,
+                         GPOS_NEW(mp) CLogicalGbAgg(mp),
+                         GPOS_NEW(mp) CExpression  // left child is a set operation
                                 (
-                                 memory_pool,
-                                 GPOS_NEW(memory_pool) TSetOp(memory_pool),
-                                 GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternMultiLeaf(memory_pool))
+                                 mp,
+                                 GPOS_NEW(mp) TSetOp(mp),
+                                 GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternMultiLeaf(mp))
                                  ),
-                         GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool)) // project list of group-by
+                         GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp)) // project list of group-by
                          )
                 )
             {}
@@ -91,7 +91,7 @@ namespace gpopt
                 GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
                 GPOS_ASSERT(FCheckPattern(pexpr));
 
-                IMemoryPool *memory_pool = pxfctxt->Pmp();
+                IMemoryPool *mp = pxfctxt->Pmp();
 
                 CExpression *pexprSetOp = (*pexpr)[0];
                 CExpression *pexprPrjList = (*pexpr)[1];
@@ -106,10 +106,10 @@ namespace gpopt
 
                 ColRefArray *pdrgpcrGb = popGbAgg->Pdrgpcr();
                 ColRefArray *pdrgpcrOutput = popSetOp->PdrgpcrOutput();
-                CColRefSet *pcrsOutput = GPOS_NEW(memory_pool) CColRefSet(memory_pool, pdrgpcrOutput);
+                CColRefSet *pcrsOutput = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrOutput);
                 ColRefArrays *pdrgpdrgpcrInput = popSetOp->PdrgpdrgpcrInput();
-                ExpressionArray *pdrgpexprNewChildren = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
-                ColRefArrays *pdrgpdrgpcrNewInput = GPOS_NEW(memory_pool) ColRefArrays(memory_pool);
+                ExpressionArray *pdrgpexprNewChildren = GPOS_NEW(mp) ExpressionArray(mp);
+                ColRefArrays *pdrgpdrgpcrNewInput = GPOS_NEW(mp) ColRefArrays(mp);
                 const ULONG arity = pexprSetOp->Arity();
 
                 BOOL fNewChild = false;
@@ -118,14 +118,14 @@ namespace gpopt
                 {
                     CExpression *pexprChild = (*pexprSetOp)[ulChild];
                     ColRefArray *pdrgpcrChild = (*pdrgpdrgpcrInput)[ulChild];
-                    CColRefSet *pcrsChild =  GPOS_NEW(memory_pool) CColRefSet(memory_pool, pdrgpcrChild);
+                    CColRefSet *pcrsChild =  GPOS_NEW(mp) CColRefSet(mp, pdrgpcrChild);
 
                     ColRefArray *pdrgpcrChildGb = NULL;
                     if (!pcrsChild->Equals(pcrsOutput))
                     {
                         // use column mapping in SetOp to set child grouping colums
-                        UlongColRefHashMap *colref_mapping = CUtils::PhmulcrMapping(memory_pool, pdrgpcrOutput, pdrgpcrChild);
-                        pdrgpcrChildGb = CUtils::PdrgpcrRemap(memory_pool, pdrgpcrGb, colref_mapping, true /*must_exist*/);
+                        UlongColRefHashMap *colref_mapping = CUtils::PhmulcrMapping(mp, pdrgpcrOutput, pdrgpcrChild);
+                        pdrgpcrChildGb = CUtils::PdrgpcrRemap(mp, pdrgpcrGb, colref_mapping, true /*must_exist*/);
                         colref_mapping->Release();
                     }
                     else
@@ -155,7 +155,7 @@ namespace gpopt
 
                     fNewChild = true;
                     pexprPrjList->AddRef();
-                    CExpression *pexprChildGb = CUtils::PexprLogicalGbAggGlobal(memory_pool, pdrgpcrChildGb, pexprChild, pexprPrjList);
+                    CExpression *pexprChildGb = CUtils::PexprLogicalGbAggGlobal(mp, pdrgpcrChildGb, pexprChild, pexprPrjList);
                     pdrgpexprNewChildren->Append(pexprChildGb);
 
                     pdrgpcrChildGb->AddRef();
@@ -175,12 +175,12 @@ namespace gpopt
                 }
 
                 pdrgpcrGb->AddRef();
-                TSetOp *popSetOpNew = GPOS_NEW(memory_pool) TSetOp(memory_pool, pdrgpcrGb, pdrgpdrgpcrNewInput);
-                CExpression *pexprNewSetOp = GPOS_NEW(memory_pool) CExpression(memory_pool, popSetOpNew, pdrgpexprNewChildren);
+                TSetOp *popSetOpNew = GPOS_NEW(mp) TSetOp(mp, pdrgpcrGb, pdrgpdrgpcrNewInput);
+                CExpression *pexprNewSetOp = GPOS_NEW(mp) CExpression(mp, popSetOpNew, pdrgpexprNewChildren);
 
                 popGbAgg->AddRef();
                 pexprPrjList->AddRef();
-                CExpression *pexprResult = GPOS_NEW(memory_pool) CExpression(memory_pool, popGbAgg, pexprNewSetOp, pexprPrjList); 
+                CExpression *pexprResult = GPOS_NEW(mp) CExpression(mp, popGbAgg, pexprNewSetOp, pexprPrjList); 
 
                 pxfres->Add(pexprResult);
             }

@@ -46,11 +46,11 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLPhysicalDynamicBitmapTableScan(IMemoryPool *memory_pool,
+		CDXLPhysicalDynamicBitmapTableScan(IMemoryPool *mp,
 										   CDXLTableDescr *table_descr,
 										   ULONG part_idx_id,
 										   ULONG part_idx_id_printable)
-			: CDXLPhysicalAbstractBitmapScan(memory_pool, table_descr),
+			: CDXLPhysicalAbstractBitmapScan(mp, table_descr),
 			  m_part_index_id(part_idx_id),
 			  m_part_index_id_printable(part_idx_id_printable)
 		{

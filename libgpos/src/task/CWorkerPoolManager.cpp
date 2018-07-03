@@ -34,8 +34,8 @@ CWorkerPoolManager *CWorkerPoolManager::m_worker_pool_manager = NULL;
 //		Private ctor
 //
 //---------------------------------------------------------------------------
-CWorkerPoolManager::CWorkerPoolManager(IMemoryPool *memory_pool)
-	: m_memory_pool(memory_pool),
+CWorkerPoolManager::CWorkerPoolManager(IMemoryPool *mp)
+	: m_mp(mp),
 	  m_num_workers(0),
 	  m_min_workers(0),
 	  m_max_workers(0),
@@ -43,7 +43,7 @@ CWorkerPoolManager::CWorkerPoolManager(IMemoryPool *memory_pool)
 	  m_active(false)
 {
 	// initialize hash tables
-	m_shtWLS.Init(memory_pool,
+	m_shtWLS.Init(mp,
 				  GPOS_WORKERPOOL_HT_SIZE,
 				  GPOS_OFFSET(CWorker, m_link),
 				  GPOS_OFFSET(CWorker, m_wid),
@@ -51,7 +51,7 @@ CWorkerPoolManager::CWorkerPoolManager(IMemoryPool *memory_pool)
 				  CWorkerId::HashValue,
 				  CWorkerId::Equals);
 
-	m_shtTS.Init(memory_pool,
+	m_shtTS.Init(mp,
 				 GPOS_WORKERPOOL_HT_SIZE,
 				 GPOS_OFFSET(CTask, m_worker_pool_manager_link),
 				 GPOS_OFFSET(CTask, m_tid),
@@ -82,14 +82,14 @@ CWorkerPoolManager::Init(ULONG min_workers, ULONG max_workers)
 	GPOS_ASSERT(min_workers <= max_workers);
 	GPOS_ASSERT(max_workers <= GPOS_THREAD_MAX);
 
-	IMemoryPool *memory_pool = CMemoryPoolManager::GetMemoryPoolMgr()->Create(
+	IMemoryPool *mp = CMemoryPoolManager::GetMemoryPoolMgr()->Create(
 		CMemoryPoolManager::EatTracker, true /*fThreadSafe*/, GPOS_WORKERPOOL_MEM_POOL_SIZE);
 
 	GPOS_TRY
 	{
 		// create worker pool
 		CWorkerPoolManager::m_worker_pool_manager =
-			GPOS_NEW(memory_pool) CWorkerPoolManager(memory_pool);
+			GPOS_NEW(mp) CWorkerPoolManager(mp);
 
 		// set min and max number of workers
 		CWorkerPoolManager::m_worker_pool_manager->SetWorkersLimit(min_workers, max_workers);
@@ -97,7 +97,7 @@ CWorkerPoolManager::Init(ULONG min_workers, ULONG max_workers)
 	GPOS_CATCH_EX(ex)
 	{
 		// turn in memory pool in case of failure
-		CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(memory_pool);
+		CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(mp);
 
 		CWorkerPoolManager::m_worker_pool_manager = NULL;
 
@@ -148,14 +148,14 @@ CWorkerPoolManager::Shutdown()
 	worker_pool_manager->m_thread_manager.ShutDown();
 
 
-	IMemoryPool *memory_pool = worker_pool_manager->m_memory_pool;
+	IMemoryPool *mp = worker_pool_manager->m_mp;
 
 	// destroy worker pool
 	CWorkerPoolManager::m_worker_pool_manager = NULL;
 	GPOS_DELETE(worker_pool_manager);
 
 	// release allocated memory pool
-	CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(memory_pool);
+	CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(mp);
 }
 
 

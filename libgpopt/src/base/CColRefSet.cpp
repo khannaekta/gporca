@@ -30,11 +30,11 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CColRefSet::CColRefSet
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ULONG ulSizeBits
 	)
 	:
-	CBitSet(memory_pool, ulSizeBits)
+	CBitSet(mp, ulSizeBits)
 {}
 
 
@@ -48,11 +48,11 @@ CColRefSet::CColRefSet
 //---------------------------------------------------------------------------
 CColRefSet::CColRefSet
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CColRefSet &bs
 	)
 	:
-	CBitSet(memory_pool, bs)
+	CBitSet(mp, bs)
 {}
 
 
@@ -66,12 +66,12 @@ CColRefSet::CColRefSet
 //---------------------------------------------------------------------------
 CColRefSet::CColRefSet
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const ColRefArray *colref_array,
 	ULONG size
 	)
 	:
-	CBitSet(memory_pool, size)
+	CBitSet(mp, size)
 {
 	Include(colref_array);
 }
@@ -326,11 +326,11 @@ CColRefSet::Replace
 ColRefArray *
 CColRefSet::Pdrgpcr
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	ColRefArray *colref_array = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
+	ColRefArray *colref_array = GPOS_NEW(mp) ColRefArray(mp);
 	
 	CColRefSetIter crsi(*this);
 	while(crsi.Advance())
@@ -420,7 +420,7 @@ CColRefSet::OsPrint
 void
 CColRefSet::ExtractColIds
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ULongPtrArray *col_ids
 	)
 	const
@@ -430,7 +430,7 @@ CColRefSet::ExtractColIds
 	{
 		CColRef *colref = crsi.Pcr();
 		ULONG col_id = colref->Id();
-		col_ids->Append(GPOS_NEW(memory_pool) ULONG(col_id));
+		col_ids->Append(GPOS_NEW(mp) ULONG(col_id));
 	}
 }
 

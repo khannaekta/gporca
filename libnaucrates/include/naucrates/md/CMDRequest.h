@@ -70,7 +70,7 @@ namespace gpmd
 
 	private:
 		// memory pool
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// array of mdids
 		MdidPtrArray *m_mdid_array;
@@ -86,12 +86,12 @@ namespace gpmd
 
 	public:
 		// ctor
-		CMDRequest(IMemoryPool *memory_pool,
+		CMDRequest(IMemoryPool *mp,
 				   MdidPtrArray *mdid_array,
 				   MDTypeRequestPtrArray *mdtype_request_array);
 
 		// ctor: type request only
-		CMDRequest(IMemoryPool *memory_pool, SMDTypeRequest *md_type_request);
+		CMDRequest(IMemoryPool *mp, SMDTypeRequest *md_type_request);
 
 		// dtor
 		virtual ~CMDRequest();

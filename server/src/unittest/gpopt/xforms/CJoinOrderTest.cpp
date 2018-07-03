@@ -67,7 +67,7 @@ GPOS_RESULT
 CJoinOrderTest::EresUnittest_ExpandMinCard()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// array of relation names
 	CWStringConst rgscRel[] =
@@ -115,41 +115,41 @@ CJoinOrderTest::EresUnittest_ExpandMinCard()
 	// setup a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(memory_pool, CMDCache::Pcache());
+	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
 	{
 		// install opt context in TLS
 		CAutoOptCtxt aoc
 				(
-				memory_pool,
+				mp,
 				&mda,
 				NULL,  /* pceeval */
-				CTestUtils::GetCostModel(memory_pool)
+				CTestUtils::GetCostModel(mp)
 				);
 
 		CExpression *pexprNAryJoin =
-				CTestUtils::PexprLogicalNAryJoin(memory_pool, rgscRel, rgulRel, ulRels, false /*fCrossProduct*/);
+				CTestUtils::PexprLogicalNAryJoin(mp, rgscRel, rgulRel, ulRels, false /*fCrossProduct*/);
 
 		// derive stats on input expression
-		CExpressionHandle exprhdl(memory_pool);
+		CExpressionHandle exprhdl(mp);
 		exprhdl.Attach(pexprNAryJoin);
-		exprhdl.DeriveStats(memory_pool, memory_pool, NULL /*prprel*/, NULL /*stats_ctxt*/);
+		exprhdl.DeriveStats(mp, mp, NULL /*prprel*/, NULL /*stats_ctxt*/);
 
-		ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+		ExpressionArray *pdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
 		for (ULONG ul = 0; ul < ulRels; ul++)
 		{
 			CExpression *pexprChild = (*pexprNAryJoin)[ul];
 			pexprChild->AddRef();
 			pdrgpexpr->Append(pexprChild);
 		}
-		ExpressionArray *pdrgpexprPred = CPredicateUtils::PdrgpexprConjuncts(memory_pool, (*pexprNAryJoin)[ulRels]);
+		ExpressionArray *pdrgpexprPred = CPredicateUtils::PdrgpexprConjuncts(mp, (*pexprNAryJoin)[ulRels]);
 		pdrgpexpr->AddRef();
 		pdrgpexprPred->AddRef();
-		CJoinOrderMinCard jomc(memory_pool, pdrgpexpr, pdrgpexprPred);
+		CJoinOrderMinCard jomc(mp, pdrgpexpr, pdrgpexprPred);
 		CExpression *pexprResult = jomc.PexprExpand();
 		{
-			CAutoTrace at(memory_pool);
+			CAutoTrace at(mp);
 			at.Os() << std::endl << "INPUT:" << std::endl << *pexprNAryJoin << std::endl;
 			at.Os() << std::endl << "OUTPUT:" << std::endl << *pexprResult << std::endl;
 		}

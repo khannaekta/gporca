@@ -59,7 +59,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLLogicalUpdate(IMemoryPool *memory_pool,
+		CDXLLogicalUpdate(IMemoryPool *mp,
 						  CDXLTableDescr *table_descr,
 						  ULONG ctid_colid,
 						  ULONG segid_colid,

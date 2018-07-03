@@ -63,7 +63,7 @@ namespace gpdbcost
 			}; // struct SCostMapping
 
 			// memory pool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 
 			// number of segments
 			ULONG m_num_of_segments;
@@ -101,84 +101,84 @@ namespace gpdbcost
 
 			// cost of scan
 			static
-			CCost CostScan(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostScan(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of index scan
 			static
-			CCost CostIndexScan(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostIndexScan(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of bitmap table scan
 			static
-			CCost CostBitmapTableScan(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostBitmapTableScan(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of sequence project
 			static
-			CCost CostSequenceProject(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostSequenceProject(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of CTE producer
 			static
-			CCost CostCTEProducer(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostCTEProducer(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of CTE consumer
 			static
-			CCost CostCTEConsumer(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostCTEConsumer(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of const table get
 			static
-			CCost CostConstTableGet(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostConstTableGet(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of DML
 			static
-			CCost CostDML(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostDML(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of hash agg
 			static
-			CCost CostHashAgg(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostHashAgg(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of scalar agg
 			static
-			CCost CostScalarAgg(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostScalarAgg(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of stream agg
 			static
-			CCost CostStreamAgg(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostStreamAgg(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of sequence
 			static
-			CCost CostSequence(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostSequence(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of sort
 			static
-			CCost CostSort(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostSort(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of TVF
 			static
-			CCost CostTVF(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostTVF(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of UnionAll
 			static
-			CCost CostUnionAll(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostUnionAll(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of hash join
 			static
-			CCost CostHashJoin(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostHashJoin(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of nljoin
 			static
-			CCost CostNLJoin(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostNLJoin(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of inner or outer index-nljoin
 			static
-			CCost CostIndexNLJoin(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostIndexNLJoin(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of motion
 			static
-			CCost CostMotion(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
+			CCost CostMotion(IMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDBLegacy *pcmgpdb, const SCostingInfo *pci);
 
 		public:
 
 			// ctor
-			CCostModelGPDBLegacy(IMemoryPool *memory_pool, ULONG ulSegments, CostModelParamsArray *pdrgpcp = NULL);
+			CCostModelGPDBLegacy(IMemoryPool *mp, ULONG ulSegments, CostModelParamsArray *pdrgpcp = NULL);
 
 			// dtor
 			virtual

@@ -32,10 +32,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerSubqueryScan::CParseHandlerSubqueryScan(IMemoryPool *memory_pool,
+CParseHandlerSubqueryScan::CParseHandlerSubqueryScan(IMemoryPool *mp,
 													 CParseHandlerManager *parse_handler_mgr,
 													 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerPhysicalOp(memory_pool, parse_handler_mgr, parse_handler_root), m_dxl_op(NULL)
+	: CParseHandlerPhysicalOp(mp, parse_handler_mgr, parse_handler_root), m_dxl_op(NULL)
 {
 }
 
@@ -69,22 +69,22 @@ CParseHandlerSubqueryScan::StartElement(const XMLCh *const,  // element_uri,
 
 	// parse handler for child node
 	CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenPhysical), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenPhysical), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
 	// parse handler for the filter
 	CParseHandlerBase *filter_parse_handler = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalarFilter), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenScalarFilter), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(filter_parse_handler);
 
 	// parse handler for the proj list
 	CParseHandlerBase *proj_list_parse_handler = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalarProjList), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenScalarProjList), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(proj_list_parse_handler);
 
 	//parse handler for the properties of the operator
 	CParseHandlerBase *prop_parse_handler = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenProperties), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenProperties), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(prop_parse_handler);
 
 	// store child parse handlers in array
@@ -125,9 +125,9 @@ CParseHandlerSubqueryScan::EndElement(const XMLCh *const,  // element_uri,
 	CParseHandlerPhysicalOp *child_parse_handler =
 		dynamic_cast<CParseHandlerPhysicalOp *>((*this)[3]);
 
-	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, m_dxl_op);
+	m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, m_dxl_op);
 	// set statictics and physical properties
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxlnode, prop_parse_handler);
 
 	// add constructed children
 	AddChildFromParseHandler(proj_list_parse_handler);
@@ -135,7 +135,7 @@ CParseHandlerSubqueryScan::EndElement(const XMLCh *const,  // element_uri,
 	AddChildFromParseHandler(child_parse_handler);
 
 #ifdef GPOS_DEBUG
-	m_dxl_op->AssertValid(m_dxl_node, false /* validate_children */);
+	m_dxl_op->AssertValid(m_dxlnode, false /* validate_children */);
 #endif  // GPOS_DEBUG
 
 	// deactivate handler

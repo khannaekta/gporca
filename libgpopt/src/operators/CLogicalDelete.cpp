@@ -31,10 +31,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalDelete::CLogicalDelete
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogical(memory_pool),
+	CLogical(mp),
 	m_ptabdesc(NULL),
 	m_pdrgpcr(NULL),
 	m_pcrCtid(NULL),
@@ -53,14 +53,14 @@ CLogicalDelete::CLogicalDelete
 //---------------------------------------------------------------------------
 CLogicalDelete::CLogicalDelete
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CTableDescriptor *ptabdesc,
 	ColRefArray *colref_array,
 	CColRef *pcrCtid,
 	CColRef *pcrSegmentId
 	)
 	:
-	CLogical(memory_pool),
+	CLogical(mp),
 	m_ptabdesc(ptabdesc),
 	m_pdrgpcr(colref_array),
 	m_pcrCtid(pcrCtid),
@@ -149,17 +149,17 @@ CLogicalDelete::HashValue() const
 COperator *
 CLogicalDelete::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	BOOL must_exist
 	)
 {
-	ColRefArray *colref_array = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcr, colref_mapping, must_exist);
+	ColRefArray *colref_array = CUtils::PdrgpcrRemap(mp, m_pdrgpcr, colref_mapping, must_exist);
 	CColRef *pcrCtid = CUtils::PcrRemap(m_pcrCtid, colref_mapping, must_exist);
 	CColRef *pcrSegmentId = CUtils::PcrRemap(m_pcrSegmentId, colref_mapping, must_exist);
 	m_ptabdesc->AddRef();
 
-	return GPOS_NEW(memory_pool) CLogicalDelete(memory_pool, m_ptabdesc, colref_array, pcrCtid, pcrSegmentId);
+	return GPOS_NEW(mp) CLogicalDelete(mp, m_ptabdesc, colref_array, pcrCtid, pcrSegmentId);
 }
 
 //---------------------------------------------------------------------------
@@ -173,11 +173,11 @@ CLogicalDelete::PopCopyWithRemappedColumns
 CColRefSet *
 CLogicalDelete::PcrsDeriveOutput
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle & //exprhdl
 	)
 {
-	CColRefSet *pcrsOutput = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsOutput->Include(m_pdrgpcr);
 	return pcrsOutput;
 }
@@ -193,7 +193,7 @@ CLogicalDelete::PcrsDeriveOutput
 CKeyCollection *
 CLogicalDelete::PkcDeriveKeys
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -212,7 +212,7 @@ CLogicalDelete::PkcDeriveKeys
 CMaxCard
 CLogicalDelete::Maxcard
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -232,11 +232,11 @@ CLogicalDelete::Maxcard
 CXformSet *
 CLogicalDelete::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfDelete2DML);
 	return xform_set;
 }
@@ -252,7 +252,7 @@ CLogicalDelete::PxfsCandidates
 IStatistics *
 CLogicalDelete::PstatsDerive
 	(
-	IMemoryPool *, // memory_pool,
+	IMemoryPool *, // mp,
 	CExpressionHandle &exprhdl,
 	StatsArray * // not used
 	)

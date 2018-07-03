@@ -30,11 +30,11 @@ XERCES_CPP_NAMESPACE_USE
 //
 //---------------------------------------------------------------------------
 CParseHandlerScalarWindowFrameEdge::CParseHandlerScalarWindowFrameEdge(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root,
 	BOOL leading_edge)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root),
 	  m_leading_edge(leading_edge)
 {
 }
@@ -57,30 +57,30 @@ CParseHandlerScalarWindowFrameEdge::StartElement(const XMLCh *const element_uri,
 		XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarWindowFrameLeadingEdge),
 								 element_local_name))
 	{
-		GPOS_ASSERT(NULL == m_dxl_node);
+		GPOS_ASSERT(NULL == m_dxlnode);
 		EdxlFrameBoundary dxl_frame_bound =
 			CDXLOperatorFactory::ParseDXLFrameBoundary(attrs, EdxltokenWindowLeadingBoundary);
-		m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(
-			m_memory_pool,
-			GPOS_NEW(m_memory_pool)
-				CDXLScalarWindowFrameEdge(m_memory_pool, true /*fLeading*/, dxl_frame_bound));
+		m_dxlnode = GPOS_NEW(m_mp) CDXLNode(
+			m_mp,
+			GPOS_NEW(m_mp)
+				CDXLScalarWindowFrameEdge(m_mp, true /*fLeading*/, dxl_frame_bound));
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(EdxltokenScalarWindowFrameTrailingEdge),
 					  element_local_name))
 	{
-		GPOS_ASSERT(NULL == m_dxl_node);
+		GPOS_ASSERT(NULL == m_dxlnode);
 		EdxlFrameBoundary dxl_frame_bound =
 			CDXLOperatorFactory::ParseDXLFrameBoundary(attrs, EdxltokenWindowTrailingBoundary);
-		m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(
-			m_memory_pool,
-			GPOS_NEW(m_memory_pool)
-				CDXLScalarWindowFrameEdge(m_memory_pool, false /*fLeading*/, dxl_frame_bound));
+		m_dxlnode = GPOS_NEW(m_mp) CDXLNode(
+			m_mp,
+			GPOS_NEW(m_mp)
+				CDXLScalarWindowFrameEdge(m_mp, false /*fLeading*/, dxl_frame_bound));
 	}
 	else
 	{
 		// we must have seen a Window Frame Edge already and initialized its corresponding node
-		if (NULL == m_dxl_node)
+		if (NULL == m_dxlnode)
 		{
 			CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
 				m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
@@ -89,7 +89,7 @@ CParseHandlerScalarWindowFrameEdge::StartElement(const XMLCh *const element_uri,
 
 		// install a scalar element parser for parsing the frame edge m_bytearray_value
 		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
 		// store parse handler

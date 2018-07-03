@@ -32,7 +32,7 @@ namespace gpdxl
 	{
 	private:
 		// the root of the parsed DXL tree constructed by the parse handler
-		CDXLNode *m_dxl_node;
+		CDXLNode *m_dxlnode;
 
 		// private copy ctor
 		CParseHandlerScalarExpr(const CParseHandlerScalarExpr &);
@@ -58,7 +58,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerScalarExpr(IMemoryPool *memory_pool,
+		CParseHandlerScalarExpr(IMemoryPool *mp,
 								CParseHandlerManager *parse_handler_mgr,
 								CParseHandlerBase *parse_handler_root);
 

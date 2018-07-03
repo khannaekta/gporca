@@ -76,13 +76,13 @@ GPOS_RESULT
 CNameTest::EresUnittest_Ownership()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	CWStringConst strName(GPOS_WSZ_LIT("nametest"));
 	CName name1(&strName);
 
-	CName name2(memory_pool, name1);
-	CName name3(memory_pool, name2);
+	CName name2(mp, name1);
+	CName name3(mp, name2);
 
 	GPOS_ASSERT(name1.Equals(name2));
 	GPOS_ASSERT(name1.Equals(name3));

@@ -57,9 +57,9 @@ namespace gpopt
 
 			// create correlated apply expression
 			static
-			void CreateCorrelatedApply(IMemoryPool *memory_pool, CExpression *pexprApply, CXformResult *pxfres)
+			void CreateCorrelatedApply(IMemoryPool *mp, CExpression *pexprApply, CXformResult *pxfres)
             {
-                if (!FCanCreateCorrelatedApply(memory_pool, pexprApply))
+                if (!FCanCreateCorrelatedApply(mp, pexprApply))
                 {
                     return;
                 }
@@ -84,23 +84,23 @@ namespace gpopt
                 switch (op_id)
                 {
                     case COperator::EopLogicalInnerApply:
-                        pexprResult = CUtils::PexprLogicalApply<CLogicalInnerCorrelatedApply>(memory_pool, pexprOuter, pexprInner, colref_array, eopidSubq, pexprScalar);
+                        pexprResult = CUtils::PexprLogicalApply<CLogicalInnerCorrelatedApply>(mp, pexprOuter, pexprInner, colref_array, eopidSubq, pexprScalar);
                         break;
 
                     case COperator::EopLogicalLeftOuterApply:
-                        pexprResult = CUtils::PexprLogicalApply<CLogicalLeftOuterCorrelatedApply>(memory_pool, pexprOuter, pexprInner, colref_array, eopidSubq, pexprScalar);
+                        pexprResult = CUtils::PexprLogicalApply<CLogicalLeftOuterCorrelatedApply>(mp, pexprOuter, pexprInner, colref_array, eopidSubq, pexprScalar);
                         break;
 
                     case COperator::EopLogicalLeftSemiApply:
-                        pexprResult = CUtils::PexprLogicalApply<CLogicalLeftSemiCorrelatedApply>(memory_pool, pexprOuter, pexprInner, colref_array, eopidSubq, pexprScalar);
+                        pexprResult = CUtils::PexprLogicalApply<CLogicalLeftSemiCorrelatedApply>(mp, pexprOuter, pexprInner, colref_array, eopidSubq, pexprScalar);
                         break;
 
                     case COperator::EopLogicalLeftSemiApplyIn:
-                        pexprResult = CUtils::PexprLogicalCorrelatedQuantifiedApply<CLogicalLeftSemiCorrelatedApplyIn>(memory_pool, pexprOuter, pexprInner, colref_array, eopidSubq, pexprScalar);
+                        pexprResult = CUtils::PexprLogicalCorrelatedQuantifiedApply<CLogicalLeftSemiCorrelatedApplyIn>(mp, pexprOuter, pexprInner, colref_array, eopidSubq, pexprScalar);
                         break;
 
                     case COperator::EopLogicalLeftAntiSemiApply:
-                        pexprResult = CUtils::PexprLogicalApply<CLogicalLeftAntiSemiCorrelatedApply>(memory_pool, pexprOuter, pexprInner, colref_array, eopidSubq, pexprScalar);
+                        pexprResult = CUtils::PexprLogicalApply<CLogicalLeftAntiSemiCorrelatedApply>(mp, pexprOuter, pexprInner, colref_array, eopidSubq, pexprScalar);
                         break;
 
                     default:
@@ -118,13 +118,13 @@ namespace gpopt
 
 			// helper function to attempt decorrelating Apply's inner child
 			static
-			BOOL FDecorrelate(IMemoryPool *memory_pool, CExpression *pexprApply, CExpression **ppexprInner, ExpressionArray **ppdrgpexpr)
+			BOOL FDecorrelate(IMemoryPool *mp, CExpression *pexprApply, CExpression **ppexprInner, ExpressionArray **ppdrgpexpr)
             {
                 GPOS_ASSERT(NULL != pexprApply);
                 GPOS_ASSERT(NULL != ppexprInner);
                 GPOS_ASSERT(NULL != ppdrgpexpr);
 
-                *ppdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+                *ppdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
 
                 CExpression *pexprPredicateOrig = (*pexprApply)[2];
 
@@ -138,7 +138,7 @@ namespace gpopt
                 (*pexprApply)[1]->ResetDerivedProperties();
 
                 // decorrelate inner child
-                if (!CDecorrelator::FProcess(memory_pool, (*pexprApply)[1], false /*fEqualityOnly*/, ppexprInner, *ppdrgpexpr))
+                if (!CDecorrelator::FProcess(mp, (*pexprApply)[1], false /*fEqualityOnly*/, ppexprInner, *ppdrgpexpr))
                 {
                     // decorrelation filed
                     (*ppdrgpexpr)->Release();
@@ -148,7 +148,7 @@ namespace gpopt
                 // check for valid semi join correlations
                 if ((COperator::EopLogicalLeftSemiJoin == pexprApply->Pop()->Eopid() ||
                      COperator::EopLogicalLeftAntiSemiJoin == pexprApply->Pop()->Eopid()) &&
-                    !CPredicateUtils::FValidSemiJoinCorrelations(memory_pool, (*pexprApply)[0], (*ppexprInner), (*ppdrgpexpr))
+                    !CPredicateUtils::FValidSemiJoinCorrelations(mp, (*pexprApply)[0], (*ppexprInner), (*ppdrgpexpr))
                     )
                 {
                     (*ppdrgpexpr)->Release();
@@ -172,13 +172,13 @@ namespace gpopt
                     return;
                 }
 
-                IMemoryPool *memory_pool = pxfctxt->Pmp();
+                IMemoryPool *mp = pxfctxt->Pmp();
                 ExpressionArray *pdrgpexpr = NULL;
                 CExpression *pexprInner = NULL;
-                if (!FDecorrelate(memory_pool, pexprApply, &pexprInner, &pdrgpexpr))
+                if (!FDecorrelate(mp, pexprApply, &pexprInner, &pdrgpexpr))
                 {
                     // decorrelation failed, create correlated apply expression if possible
-                    CreateCorrelatedApply(memory_pool, pexprApply, pxfres);
+                    CreateCorrelatedApply(mp, pexprApply, pxfres);
 
                     return;
                 }
@@ -187,13 +187,13 @@ namespace gpopt
                 GPOS_ASSERT(NULL != pexprInner);
                 (*pexprApply)[0]->AddRef();
                 CExpression *pexprOuter = (*pexprApply)[0];
-                CExpression *pexprPredicate = CPredicateUtils::PexprConjunction(memory_pool, pdrgpexpr);
+                CExpression *pexprPredicate = CPredicateUtils::PexprConjunction(mp, pdrgpexpr);
 
                 CExpression *pexprResult =
-                GPOS_NEW(memory_pool) CExpression
+                GPOS_NEW(mp) CExpression
                 (
-                 memory_pool,
-                 GPOS_NEW(memory_pool) TJoin(memory_pool), // join operator
+                 mp,
+                 GPOS_NEW(mp) TJoin(mp), // join operator
                  pexprOuter,
                  pexprInner,
                  pexprPredicate
@@ -214,7 +214,7 @@ namespace gpopt
                                 && "Apply's inner child can only use external columns");
 #endif // GPOS_DEBUG
 
-                IMemoryPool *memory_pool = pxfctxt->Pmp();
+                IMemoryPool *mp = pxfctxt->Pmp();
                 CExpression *pexprOuter = (*pexprApply)[0];
                 CExpression *pexprInner = (*pexprApply)[1];
                 CExpression *pexprPred = (*pexprApply)[2];
@@ -222,10 +222,10 @@ namespace gpopt
                 pexprInner->AddRef();
                 pexprPred->AddRef();
                 CExpression *pexprResult =
-                GPOS_NEW(memory_pool) CExpression
+                GPOS_NEW(mp) CExpression
                 (
-                 memory_pool,
-                 GPOS_NEW(memory_pool) TJoin(memory_pool), // join operator
+                 mp,
+                 GPOS_NEW(mp) TJoin(mp), // join operator
                  pexprOuter,
                  pexprInner,
                  pexprPred
@@ -239,36 +239,36 @@ namespace gpopt
 
 			// ctor for deep pattern
 			explicit
-			CXformApply2Join<TApply, TJoin>(IMemoryPool *memory_pool, BOOL )
+			CXformApply2Join<TApply, TJoin>(IMemoryPool *mp, BOOL )
                 :
                 // pattern
                 CXformExploration
                 (
-                 GPOS_NEW(memory_pool) CExpression
+                 GPOS_NEW(mp) CExpression
                  (
-                  memory_pool,
-                  GPOS_NEW(memory_pool) TApply(memory_pool),
-                  GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // left child
-                  GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool)), // right child
-                  GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool)) // predicate
+                  mp,
+                  GPOS_NEW(mp) TApply(mp),
+                  GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // left child
+                  GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp)), // right child
+                  GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp)) // predicate
                   )
                  )
             {}
 
 			// ctor for shallow pattern
 			explicit
-			CXformApply2Join<TApply, TJoin>(IMemoryPool *memory_pool)
+			CXformApply2Join<TApply, TJoin>(IMemoryPool *mp)
                 :
                 // pattern
                 CXformExploration
                 (
-                 GPOS_NEW(memory_pool) CExpression
+                 GPOS_NEW(mp) CExpression
                  (
-                  memory_pool,
-                  GPOS_NEW(memory_pool) TApply(memory_pool),
-                  GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // left child
-                  GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // right child
-                  GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)) // predicate
+                  mp,
+                  GPOS_NEW(mp) TApply(mp),
+                  GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // left child
+                  GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // right child
+                  GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)) // predicate
                   )
                  )
             {}
@@ -276,7 +276,7 @@ namespace gpopt
 			// ctor for passed pattern
 			CXformApply2Join<TApply, TJoin>
 				(
-				IMemoryPool *, // memory_pool
+				IMemoryPool *, // mp
 				CExpression *pexprPattern
 				)
 				:

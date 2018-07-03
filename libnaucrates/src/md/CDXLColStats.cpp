@@ -32,7 +32,7 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLColStats::CDXLColStats(IMemoryPool *memory_pool,
+CDXLColStats::CDXLColStats(IMemoryPool *mp,
 						   CMDIdColStats *mdid_col_stats,
 						   CMDName *mdname,
 						   CDouble width,
@@ -41,7 +41,7 @@ CDXLColStats::CDXLColStats(IMemoryPool *memory_pool,
 						   CDouble freq_remaining,
 						   DXLBucketPtrArray *stats_bucket_dxl_array,
 						   BOOL is_col_stats_missing)
-	: m_memory_pool(memory_pool),
+	: m_mp(mp),
 	  m_mdid_col_stats(mdid_col_stats),
 	  m_mdname(mdname),
 	  m_width(width),
@@ -54,7 +54,7 @@ CDXLColStats::CDXLColStats(IMemoryPool *memory_pool,
 	GPOS_ASSERT(mdid_col_stats->IsValid());
 	GPOS_ASSERT(NULL != stats_bucket_dxl_array);
 	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_memory_pool, this, false /*fSerializeHeader*/, false /*indentation*/);
+		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 //---------------------------------------------------------------------------
@@ -222,7 +222,7 @@ CDXLColStats::DebugPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CDXLColStats *
-CDXLColStats::CreateDXLDummyColStats(IMemoryPool *memory_pool,
+CDXLColStats::CreateDXLDummyColStats(IMemoryPool *mp,
 									 IMDId *mdid,
 									 CMDName *mdname,
 									 CDouble width)
@@ -230,9 +230,9 @@ CDXLColStats::CreateDXLDummyColStats(IMemoryPool *memory_pool,
 	CMDIdColStats *mdid_col_stats = CMDIdColStats::CastMdid(mdid);
 
 	CAutoRef<DXLBucketPtrArray> dxl_bucket_array;
-	dxl_bucket_array = GPOS_NEW(memory_pool) DXLBucketPtrArray(memory_pool);
+	dxl_bucket_array = GPOS_NEW(mp) DXLBucketPtrArray(mp);
 	CAutoRef<CDXLColStats> dxl_col_stats;
-	dxl_col_stats = GPOS_NEW(memory_pool) CDXLColStats(memory_pool,
+	dxl_col_stats = GPOS_NEW(mp) CDXLColStats(mp,
 													   mdid_col_stats,
 													   mdname,
 													   width,

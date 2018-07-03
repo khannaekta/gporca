@@ -629,7 +629,7 @@ namespace gpdxl
 		// parses the input and output segment ids from Xerces attributes and
 		// stores them in the provided DXL Motion operator
 		// will raise an exception if lists are not well-formed
-		static void SetSegmentInfo(CDXLMemoryManager *memory_pool,
+		static void SetSegmentInfo(CDXLMemoryManager *mp,
 								   CDXLPhysicalMotion *motion,
 								   const Attributes &attrs,
 								   Edxltoken target_elem);
@@ -685,10 +685,10 @@ namespace gpdxl
 											Edxltoken target_elem)
 	{
 		// get the memory pool from the memory manager
-		IMemoryPool *memory_pool = memory_manager_dxl->Pmp();
+		IMemoryPool *mp = memory_manager_dxl->Pmp();
 
 		CDynamicPtrArray<T, CleanupFn> *pdrgpt =
-			GPOS_NEW(memory_pool) CDynamicPtrArray<T, CleanupFn>(memory_pool);
+			GPOS_NEW(mp) CDynamicPtrArray<T, CleanupFn>(mp);
 
 		XMLStringTokenizer mdid_components(mdid_list_xml, CDXLTokens::XmlstrToken(EdxltokenComma));
 		const ULONG num_tokens = mdid_components.countTokens();
@@ -699,7 +699,7 @@ namespace gpdxl
 
 			GPOS_ASSERT(NULL != xmlszNext);
 
-			T *pt = GPOS_NEW(memory_pool)
+			T *pt = GPOS_NEW(mp)
 				T(ValueFromXmlstr(memory_manager_dxl, xmlszNext, target_attr, target_elem));
 			pdrgpt->Append(pt);
 		}

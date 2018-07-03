@@ -45,8 +45,8 @@ namespace gpos
 		static void *AllocateSerial(void *pv);
 		static void *AllocateRepeated(void *pv);
 		static void *AllocateStress(void *pv);
-		static void Allocate(IMemoryPool *memory_pool, ULONG count);
-		static void AllocateRandom(IMemoryPool *memory_pool);
+		static void Allocate(IMemoryPool *mp, ULONG count);
+		static void AllocateRandom(IMemoryPool *mp);
 		static ULONG Size(ULONG offset);
 
 	public:

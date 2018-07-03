@@ -42,7 +42,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLScalarPartBoundOpen(IMemoryPool *memory_pool,
+		CDXLScalarPartBoundOpen(IMemoryPool *mp,
 								ULONG partitioning_level,
 								BOOL is_lower_bound);
 

@@ -30,10 +30,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalDifferenceAll::CLogicalDifferenceAll
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogicalSetOp(memory_pool)
+	CLogicalSetOp(mp)
 {
 	m_fPattern = true;
 }
@@ -48,12 +48,12 @@ CLogicalDifferenceAll::CLogicalDifferenceAll
 //---------------------------------------------------------------------------
 CLogicalDifferenceAll::CLogicalDifferenceAll
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ColRefArray *pdrgpcrOutput,
 	ColRefArrays *pdrgpdrgpcrInput
 	)
 	:
-	CLogicalSetOp(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput)
+	CLogicalSetOp(mp, pdrgpcrOutput, pdrgpdrgpcrInput)
 {
 }
 
@@ -80,7 +80,7 @@ CLogicalDifferenceAll::~CLogicalDifferenceAll()
 CMaxCard
 CLogicalDifferenceAll::Maxcard
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -105,15 +105,15 @@ CLogicalDifferenceAll::Maxcard
 COperator *
 CLogicalDifferenceAll::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	BOOL must_exist
 	)
 {
-	ColRefArray *pdrgpcrOutput = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrOutput, colref_mapping, must_exist);
-	ColRefArrays *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(memory_pool, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
+	ColRefArray *pdrgpcrOutput = CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput, colref_mapping, must_exist);
+	ColRefArrays *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(mp, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
 
-	return GPOS_NEW(memory_pool) CLogicalDifferenceAll(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput);
+	return GPOS_NEW(mp) CLogicalDifferenceAll(mp, pdrgpcrOutput, pdrgpdrgpcrInput);
 }
 
 //---------------------------------------------------------------------------
@@ -127,7 +127,7 @@ CLogicalDifferenceAll::PopCopyWithRemappedColumns
 CKeyCollection *
 CLogicalDifferenceAll::PkcDeriveKeys
 	(
-	IMemoryPool *, // memory_pool,
+	IMemoryPool *, // mp,
 	CExpressionHandle & //exprhdl
 	)
 	const
@@ -147,7 +147,7 @@ CLogicalDifferenceAll::PkcDeriveKeys
 IStatistics *
 CLogicalDifferenceAll::PstatsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	StatsArray * // not used
 	)
@@ -157,11 +157,11 @@ CLogicalDifferenceAll::PstatsDerive
 
 	// difference all is transformed into a LASJ,
 	// we follow the same route to compute statistics
-	ColRefSetArray *output_colrefsets = GPOS_NEW(memory_pool) ColRefSetArray(memory_pool);
+	ColRefSetArray *output_colrefsets = GPOS_NEW(mp) ColRefSetArray(mp);
 	const ULONG size = m_pdrgpdrgpcrInput->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool, (*m_pdrgpdrgpcrInput)[ul]);
+		CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, (*m_pdrgpdrgpcrInput)[ul]);
 		output_colrefsets->Append(pcrs);
 	}
 
@@ -169,13 +169,13 @@ CLogicalDifferenceAll::PstatsDerive
 	IStatistics *inner_side_stats = exprhdl.Pstats(1);
 
 	// construct the scalar condition for the LASJ
-	CExpression *pexprScCond = CUtils::PexprConjINDFCond(memory_pool, m_pdrgpdrgpcrInput);
+	CExpression *pexprScCond = CUtils::PexprConjINDFCond(mp, m_pdrgpdrgpcrInput);
 
 	// compute the statistics for LASJ
 	CColRefSet *outer_refs = exprhdl.GetRelationalProperties()->PcrsOuter();
 	StatsPredJoinArray *join_preds_stats = CStatsPredUtils::ExtractJoinStatsFromExpr
 														(
-														memory_pool, 
+														mp, 
 														exprhdl, 
 														pexprScCond, 
 														output_colrefsets, 
@@ -183,7 +183,7 @@ CLogicalDifferenceAll::PstatsDerive
 														);
 	IStatistics *LASJ_stats = outer_stats->CalcLASJoinStats
 											(
-											memory_pool,
+											mp,
 											inner_side_stats,
 											join_preds_stats,
 											true /* DoIgnoreLASJHistComputation*/
@@ -208,11 +208,11 @@ CLogicalDifferenceAll::PstatsDerive
 CXformSet *
 CLogicalDifferenceAll::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfDifferenceAll2LeftAntiSemiJoin);
 	return xform_set;
 }

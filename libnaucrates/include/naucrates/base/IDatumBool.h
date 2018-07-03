@@ -109,7 +109,7 @@ namespace gpnaucrates
 
 		// return the padded datum
 		virtual IDatum *
-		MakePaddedDatum(IMemoryPool *,  // memory_pool,
+		MakePaddedDatum(IMemoryPool *,  // mp,
 						ULONG			// col_len
 						) const
 		{

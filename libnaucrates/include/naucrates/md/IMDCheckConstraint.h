@@ -57,7 +57,7 @@ namespace gpmd
 		virtual IMDId *GetRelMdId() const = 0;
 
 		// the scalar expression of the check constraint
-		virtual CExpression *GetCheckConstraintExpr(IMemoryPool *memory_pool,
+		virtual CExpression *GetCheckConstraintExpr(IMemoryPool *mp,
 													CMDAccessor *md_accessor,
 													ColRefArray *colref_array) const = 0;
 	};

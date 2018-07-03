@@ -35,7 +35,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLPhysicalSequence(IMemoryPool *memory_pool);
+		CDXLPhysicalSequence(IMemoryPool *mp);
 
 		// dtor
 		virtual ~CDXLPhysicalSequence();

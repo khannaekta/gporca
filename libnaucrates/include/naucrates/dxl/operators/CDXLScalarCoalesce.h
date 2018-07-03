@@ -40,7 +40,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLScalarCoalesce(IMemoryPool *memory_pool, IMDId *mdid_type);
+		CDXLScalarCoalesce(IMemoryPool *mp, IMDId *mdid_type);
 
 		//dtor
 		virtual ~CDXLScalarCoalesce();

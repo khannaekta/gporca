@@ -24,8 +24,8 @@ using namespace gpdxl;
 //		Construct a DXL Logical group by node
 //
 //---------------------------------------------------------------------------
-CDXLLogicalGroupBy::CDXLLogicalGroupBy(IMemoryPool *memory_pool)
-	: CDXLLogical(memory_pool), m_grouping_colid_array(NULL)
+CDXLLogicalGroupBy::CDXLLogicalGroupBy(IMemoryPool *mp)
+	: CDXLLogical(mp), m_grouping_colid_array(NULL)
 {
 }
 
@@ -37,8 +37,8 @@ CDXLLogicalGroupBy::CDXLLogicalGroupBy(IMemoryPool *memory_pool)
 //		Construct a DXL Logical group by node
 //
 //---------------------------------------------------------------------------
-CDXLLogicalGroupBy::CDXLLogicalGroupBy(IMemoryPool *memory_pool, ULongPtrArray *pdrgpulGrpColIds)
-	: CDXLLogical(memory_pool), m_grouping_colid_array(pdrgpulGrpColIds)
+CDXLLogicalGroupBy::CDXLLogicalGroupBy(IMemoryPool *mp, ULongPtrArray *pdrgpulGrpColIds)
+	: CDXLLogical(mp), m_grouping_colid_array(pdrgpulGrpColIds)
 {
 	GPOS_ASSERT(NULL != pdrgpulGrpColIds);
 }

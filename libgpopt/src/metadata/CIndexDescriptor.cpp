@@ -28,7 +28,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CIndexDescriptor::CIndexDescriptor
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IMDId *pmdidIndex,
 	const CName &name,
 	ColumnDescrArray *pdrgcoldescKeyCols,
@@ -37,12 +37,12 @@ CIndexDescriptor::CIndexDescriptor
 	)
 	:
 	m_pmdidIndex(pmdidIndex),
-	m_name(memory_pool, name),
+	m_name(mp, name),
 	m_pdrgpcoldescKeyCols(pdrgcoldescKeyCols),
 	m_pdrgpcoldescIncludedCols(pdrgcoldescIncludedCols),
 	m_clustered(is_clustered)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(pmdidIndex->IsValid());
 	GPOS_ASSERT(NULL != pdrgcoldescKeyCols);
 	GPOS_ASSERT(NULL != pdrgcoldescIncludedCols);
@@ -107,19 +107,19 @@ CIndexDescriptor::UlIncludedColumns() const
 CIndexDescriptor *
 CIndexDescriptor::Pindexdesc
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CTableDescriptor *ptabdesc,
 	const IMDIndex *pmdindex
 	)
 {
-	CWStringConst strIndexName(memory_pool, pmdindex->Mdname().GetMDName()->GetBuffer());
+	CWStringConst strIndexName(mp, pmdindex->Mdname().GetMDName()->GetBuffer());
 
 	ColumnDescrArray *pdrgpcoldesc = ptabdesc->Pdrgpcoldesc();
 
 	pmdindex->MDId()->AddRef();
 
 	// array of index column descriptors
-	ColumnDescrArray *pdrgcoldescKey = GPOS_NEW(memory_pool) ColumnDescrArray(memory_pool);
+	ColumnDescrArray *pdrgcoldescKey = GPOS_NEW(mp) ColumnDescrArray(mp);
 
 	for (ULONG ul = 0; ul < pmdindex->Keys(); ul++)
 	{
@@ -129,7 +129,7 @@ CIndexDescriptor::Pindexdesc
 	}
 
 	// array of included column descriptors
-	ColumnDescrArray *pdrgcoldescIncluded = GPOS_NEW(memory_pool) ColumnDescrArray(memory_pool);
+	ColumnDescrArray *pdrgcoldescIncluded = GPOS_NEW(mp) ColumnDescrArray(mp);
 	for (ULONG ul = 0; ul < pmdindex->IncludedCols(); ul++)
 	{
 		CColumnDescriptor *pcoldesc = (*pdrgpcoldesc)[ul];
@@ -139,9 +139,9 @@ CIndexDescriptor::Pindexdesc
 
 
 	// create the index descriptors
-	CIndexDescriptor *pindexdesc = GPOS_NEW(memory_pool) CIndexDescriptor
+	CIndexDescriptor *pindexdesc = GPOS_NEW(mp) CIndexDescriptor
 											(
-											memory_pool,
+											mp,
 											pmdindex->MDId(),
 											CName(&strIndexName),
 											pdrgcoldescKey,

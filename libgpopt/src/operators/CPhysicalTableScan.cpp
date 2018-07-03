@@ -33,13 +33,13 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalTableScan::CPhysicalTableScan
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CName *pnameAlias,
 	CTableDescriptor *ptabdesc,
 	ColRefArray *pdrgpcrOutput
 	)
 	:
-	CPhysicalScan(memory_pool, pnameAlias, ptabdesc, pdrgpcrOutput)
+	CPhysicalScan(mp, pnameAlias, ptabdesc, pdrgpcrOutput)
 {
 }
 

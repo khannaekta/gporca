@@ -42,7 +42,7 @@ namespace gpdxl
 	{
 	private:
 		// memory pool
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// name
 		CMDName *m_md_name;

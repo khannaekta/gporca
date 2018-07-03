@@ -29,13 +29,13 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CScalarSubquery::CScalarSubquery
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CColRef *colref,
 	BOOL fGeneratedByExist,
 	BOOL fGeneratedByQuantified
 	)
 	: 
-	CScalar(memory_pool),
+	CScalar(mp),
 	m_pcr(colref),
 	m_fGeneratedByExist(fGeneratedByExist),
 	m_fGeneratedByQuantified(fGeneratedByQuantified)
@@ -126,14 +126,14 @@ CScalarSubquery::Matches
 COperator *
 CScalarSubquery::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	BOOL must_exist
 	)
 {
 	CColRef *colref = CUtils::PcrRemap(m_pcr, colref_mapping, must_exist);
 
-	return GPOS_NEW(memory_pool) CScalarSubquery(memory_pool, colref, m_fGeneratedByExist, m_fGeneratedByQuantified);
+	return GPOS_NEW(mp) CScalarSubquery(mp, colref, m_fGeneratedByExist, m_fGeneratedByQuantified);
 }
 
 
@@ -148,14 +148,14 @@ CScalarSubquery::PopCopyWithRemappedColumns
 CColRefSet *
 CScalarSubquery::PcrsUsed
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 {
 	GPOS_ASSERT(1 == exprhdl.Arity());
 
 	// used columns is an empty set unless subquery column is an outer reference
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	CColRefSet *pcrsChildOutput = exprhdl.GetRelationalProperties(0 /* child_index */)->PcrsOutput();
 	if (!pcrsChildOutput->FMember(m_pcr))
@@ -178,7 +178,7 @@ CScalarSubquery::PcrsUsed
 CPartInfo *
 CScalarSubquery::PpartinfoDerive
 	(
-	IMemoryPool *, // memory_pool, 
+	IMemoryPool *, // mp, 
 	CExpressionHandle &exprhdl
 	)
 	const

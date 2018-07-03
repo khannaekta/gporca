@@ -33,7 +33,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalTVF::CPhysicalTVF
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IMDId *mdid_func,
 	IMDId *mdid_return_type,
 	CWStringConst *str,
@@ -41,7 +41,7 @@ CPhysicalTVF::CPhysicalTVF
 	CColRefSet *pcrsOutput
 	)
 	:
-	CPhysical(memory_pool),
+	CPhysical(mp),
 	m_func_mdid(mdid_func),
 	m_return_type_mdid(mdid_return_type),
 	m_pstr(str),
@@ -130,7 +130,7 @@ CPhysicalTVF::FInputOrderSensitive() const
 CColRefSet *
 CPhysicalTVF::PcrsRequired
 	(
-	IMemoryPool *, // memory_pool,
+	IMemoryPool *, // mp,
 	CExpressionHandle &, // exprhdl,
 	CColRefSet *, // pcrsRequired,
 	ULONG , // child_index,
@@ -153,7 +153,7 @@ CPhysicalTVF::PcrsRequired
 COrderSpec *
 CPhysicalTVF::PosRequired
 	(
-	IMemoryPool *, // memory_pool,
+	IMemoryPool *, // mp,
 	CExpressionHandle &, // exprhdl,
 	COrderSpec *, // posRequired,
 	ULONG ,// child_index,
@@ -177,7 +177,7 @@ CPhysicalTVF::PosRequired
 CDistributionSpec *
 CPhysicalTVF::PdsRequired
 	(
-	IMemoryPool *, // memory_pool,
+	IMemoryPool *, // mp,
 	CExpressionHandle &, // exprhdl,
 	CDistributionSpec *, // pdsRequired,
 	ULONG , //child_index
@@ -201,7 +201,7 @@ CPhysicalTVF::PdsRequired
 CRewindabilitySpec *
 CPhysicalTVF::PrsRequired
 	(
-	IMemoryPool *, // memory_pool,
+	IMemoryPool *, // mp,
 	CExpressionHandle &, // exprhdl,
 	CRewindabilitySpec *, // prsRequired,
 	ULONG , // child_index,
@@ -225,7 +225,7 @@ CPhysicalTVF::PrsRequired
 CCTEReq *
 CPhysicalTVF::PcteRequired
 	(
-	IMemoryPool *, //memory_pool,
+	IMemoryPool *, //mp,
 	CExpressionHandle &, //exprhdl,
 	CCTEReq *, //pcter,
 	ULONG , //child_index,
@@ -271,12 +271,12 @@ CPhysicalTVF::FProvidesReqdCols
 COrderSpec *
 CPhysicalTVF::PosDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle & // exprhdl
 	)
 	const
 {
-	return GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+	return GPOS_NEW(mp) COrderSpec(mp);
 }
 
 //---------------------------------------------------------------------------
@@ -290,17 +290,17 @@ CPhysicalTVF::PosDerive
 CDistributionSpec *
 CPhysicalTVF::PdsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 	const
 {
 	if (exprhdl.FMasterOnly())
 	{
-		return GPOS_NEW(memory_pool) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
+		return GPOS_NEW(mp) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
 	}
 
-	return GPOS_NEW(memory_pool) CDistributionSpecUniversal();
+	return GPOS_NEW(mp) CDistributionSpecUniversal();
 }
 
 //---------------------------------------------------------------------------
@@ -314,17 +314,17 @@ CPhysicalTVF::PdsDerive
 CRewindabilitySpec *
 CPhysicalTVF::PrsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 	const
 {
 	if (IMDFunction::EfsVolatile == exprhdl.GetRelationalProperties()->Pfp()->Efs() || 0 < exprhdl.Arity())
 	{
-		return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
+		return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
 	}
 
-	return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral /*ert*/);
+	return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral /*ert*/);
 }
 
 //---------------------------------------------------------------------------
@@ -338,12 +338,12 @@ CPhysicalTVF::PrsDerive
 CCTEMap *
 CPhysicalTVF::PcmDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle & //exprhdl
 	)
 	const
 {
-	return GPOS_NEW(memory_pool) CCTEMap(memory_pool);
+	return GPOS_NEW(mp) CCTEMap(mp);
 }
 
 //---------------------------------------------------------------------------

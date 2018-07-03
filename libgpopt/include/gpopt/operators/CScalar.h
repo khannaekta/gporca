@@ -59,7 +59,7 @@ namespace gpopt
 			
 			// helper for combining partition consumer arrays of scalar children
 			static
-			CPartInfo *PpartinfoDeriveCombineScalar(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CPartInfo *PpartinfoDeriveCombineScalar(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 		protected:
 
@@ -85,10 +85,10 @@ namespace gpopt
 			explicit
 			CScalar
 				(
-				IMemoryPool *memory_pool
+				IMemoryPool *mp
 				)
 				: 
-				COperator(memory_pool)
+				COperator(mp)
 			{}
 
 			// dtor
@@ -105,72 +105,72 @@ namespace gpopt
 
 			// create derived properties container
 			virtual
-			DrvdPropArray *PdpCreate(IMemoryPool *memory_pool) const;
+			DrvdPropArray *PdpCreate(IMemoryPool *mp) const;
 
 			// create required properties container
 			virtual
-			CReqdProp *PrpCreate(IMemoryPool *memory_pool) const;
+			CReqdProp *PrpCreate(IMemoryPool *mp) const;
 
 			// return locally defined columns
 			virtual
 			CColRefSet *PcrsDefined
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle & // exprhdl
 				)
 			{
 				// return an empty set of column refs
-				return GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+				return GPOS_NEW(mp) CColRefSet(mp);
 			}
 
 			// return columns containing set-returning function
 			virtual
 			CColRefSet *PcrsSetReturningFunction
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle & // exprhdl
 				)
 			{
 				// return an empty set of column refs
-				return GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+				return GPOS_NEW(mp) CColRefSet(mp);
 			}
 
 			// return locally used columns
 			virtual
 			CColRefSet *PcrsUsed
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle & // exprhdl
 				)
 			{
 				// return an empty set of column refs
-				return GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+				return GPOS_NEW(mp) CColRefSet(mp);
 			}
 
 			// derive partition consumer info
 			virtual
 			CPartInfo *PpartinfoDerive
 				(
-				IMemoryPool *memory_pool, 
+				IMemoryPool *mp, 
 				CExpressionHandle &exprhdl
 				) 
 				const
 			{
-				return PpartinfoDeriveCombineScalar(memory_pool, exprhdl);
+				return PpartinfoDeriveCombineScalar(mp, exprhdl);
 			}
 
 			// derive function properties
 			virtual
 			CFunctionProp *PfpDerive
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
 				return PfpDeriveFromChildren
 							(
-							memory_pool,
+							mp,
 							exprhdl,
 							IMDFunction::EfsImmutable, // efsDefault
 							IMDFunction::EfdaNoSQL, // efdaDefault
@@ -204,7 +204,7 @@ namespace gpopt
 
 			// perform boolean evaluation of the given expression tree
 			static
-			EBoolEvalResult EberEvaluate(IMemoryPool *memory_pool, CExpression *pexprScalar);
+			EBoolEvalResult EberEvaluate(IMemoryPool *mp, CExpression *pexprScalar);
 
 			// conversion function
 			static

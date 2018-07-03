@@ -31,7 +31,7 @@ namespace gpdxl
 	{
 	private:
 		// memory pool;
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// window frame associated with the window key
 		CDXLWindowFrame *m_window_frame_dxl;
@@ -44,7 +44,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		explicit CDXLWindowKey(IMemoryPool *memory_pool);
+		explicit CDXLWindowKey(IMemoryPool *mp);
 
 		// dtor
 		virtual ~CDXLWindowKey();

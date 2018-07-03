@@ -37,10 +37,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerMDType::CParseHandlerMDType(IMemoryPool *memory_pool,
+CParseHandlerMDType::CParseHandlerMDType(IMemoryPool *mp,
 										 CParseHandlerManager *parse_handler_mgr,
 										 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerMetadataObject(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerMetadataObject(mp, parse_handler_mgr, parse_handler_root),
 	  m_mdid(NULL),
 	  m_mdname(NULL),
 	  m_mdid_eq_op(NULL),
@@ -61,11 +61,11 @@ CParseHandlerMDType::CParseHandlerMDType(IMemoryPool *memory_pool,
 	  m_mdid_array_type(NULL)
 {
 	// default: no aggregates for type
-	m_mdid_min_op = GPOS_NEW(memory_pool) CMDIdGPDB(0);
-	m_mdid_max_op = GPOS_NEW(memory_pool) CMDIdGPDB(0);
-	m_mdid_avg_op = GPOS_NEW(memory_pool) CMDIdGPDB(0);
-	m_mdid_sum_op = GPOS_NEW(memory_pool) CMDIdGPDB(0);
-	m_mdid_count_op = GPOS_NEW(memory_pool) CMDIdGPDB(0);
+	m_mdid_min_op = GPOS_NEW(mp) CMDIdGPDB(0);
+	m_mdid_max_op = GPOS_NEW(mp) CMDIdGPDB(0);
+	m_mdid_avg_op = GPOS_NEW(mp) CMDIdGPDB(0);
+	m_mdid_sum_op = GPOS_NEW(mp) CMDIdGPDB(0);
+	m_mdid_count_op = GPOS_NEW(mp) CMDIdGPDB(0);
 }
 
 
@@ -126,7 +126,7 @@ CParseHandlerMDType::StartElement(const XMLCh *const,  // element_uri,
 				m_parse_handler_mgr->GetDXLMemoryManager(), xmlszTypeName);
 
 			// create a copy of the string in the CMDName constructor
-			m_mdname = GPOS_NEW(m_memory_pool) CMDName(m_memory_pool, pstrTypeName);
+			m_mdname = GPOS_NEW(m_mp) CMDName(m_mp, pstrTypeName);
 			GPOS_DELETE(pstrTypeName);
 
 			// parse if type is redistributable
@@ -354,23 +354,23 @@ CParseHandlerMDType::EndElement(const XMLCh *const,  // element_uri,
 		switch (pmdidGPDB->OidObjectId())
 		{
 			case GPDB_INT2:
-				m_imd_obj = GPOS_NEW(m_memory_pool) CMDTypeInt2GPDB(m_memory_pool);
+				m_imd_obj = GPOS_NEW(m_mp) CMDTypeInt2GPDB(m_mp);
 				break;
 
 			case GPDB_INT4:
-				m_imd_obj = GPOS_NEW(m_memory_pool) CMDTypeInt4GPDB(m_memory_pool);
+				m_imd_obj = GPOS_NEW(m_mp) CMDTypeInt4GPDB(m_mp);
 				break;
 
 			case GPDB_INT8:
-				m_imd_obj = GPOS_NEW(m_memory_pool) CMDTypeInt8GPDB(m_memory_pool);
+				m_imd_obj = GPOS_NEW(m_mp) CMDTypeInt8GPDB(m_mp);
 				break;
 
 			case GPDB_BOOL:
-				m_imd_obj = GPOS_NEW(m_memory_pool) CMDTypeBoolGPDB(m_memory_pool);
+				m_imd_obj = GPOS_NEW(m_mp) CMDTypeBoolGPDB(m_mp);
 				break;
 
 			case GPDB_OID:
-				m_imd_obj = GPOS_NEW(m_memory_pool) CMDTypeOidGPDB(m_memory_pool);
+				m_imd_obj = GPOS_NEW(m_mp) CMDTypeOidGPDB(m_mp);
 				break;
 
 			default:
@@ -398,7 +398,7 @@ CParseHandlerMDType::EndElement(const XMLCh *const,  // element_uri,
 				{
 					length = (ULONG) m_type_length;
 				}
-				m_imd_obj = GPOS_NEW(m_memory_pool) CMDTypeGenericGPDB(m_memory_pool,
+				m_imd_obj = GPOS_NEW(m_mp) CMDTypeGenericGPDB(m_mp,
 																	   m_mdid,
 																	   m_mdname,
 																	   m_is_redistributable,

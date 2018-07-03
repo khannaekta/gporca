@@ -60,7 +60,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CParseHandlerStatsBound(IMemoryPool *memory_pool,
+		CParseHandlerStatsBound(IMemoryPool *mp,
 								CParseHandlerManager *parse_handler_mgr,
 								CParseHandlerBase *parse_handler_root);
 

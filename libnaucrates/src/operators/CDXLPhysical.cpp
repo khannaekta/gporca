@@ -23,7 +23,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysical::CDXLPhysical(IMemoryPool *memory_pool) : CDXLOperator(memory_pool)
+CDXLPhysical::CDXLPhysical(IMemoryPool *mp) : CDXLOperator(mp)
 {
 }
 

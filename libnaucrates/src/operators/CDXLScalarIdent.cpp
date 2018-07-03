@@ -29,8 +29,8 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarIdent::CDXLScalarIdent(IMemoryPool *memory_pool, CDXLColRef *dxl_colref)
-	: CDXLScalar(memory_pool), m_dxl_colref(dxl_colref)
+CDXLScalarIdent::CDXLScalarIdent(IMemoryPool *mp, CDXLColRef *dxl_colref)
+	: CDXLScalar(mp), m_dxl_colref(dxl_colref)
 {
 	GPOS_ASSERT(NULL != m_dxl_colref);
 }

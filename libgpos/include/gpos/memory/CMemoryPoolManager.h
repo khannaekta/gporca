@@ -55,15 +55,15 @@ namespace gpos
 
 		// memory pool used to get memory from the underlying system
 		// all created pools use this as their underlying allocator
-		IMemoryPool *m_base_memory_pool;
+		IMemoryPool *m_base_mp;
 
 		// memory pool in which all objects created by the manager itself
 		// are allocated - must be thread-safe
-		IMemoryPool *m_internal_memory_pool;
+		IMemoryPool *m_internal_mp;
 
 		// memory pool in which all objects created using global new operator
 		// are allocated
-		IMemoryPool *m_global_memory_pool;
+		IMemoryPool *m_global_mp;
 
 		// are allocations using global new operator allowed?
 		BOOL m_allow_global_new;
@@ -72,15 +72,15 @@ namespace gpos
 		CSyncHashtable<CMemoryPool, ULONG_PTR, CSpinlockOS> m_hash_table;
 
 		// global instance
-		static CMemoryPoolManager *m_memory_pool_mgr;
+		static CMemoryPoolManager *m_mp_mgr;
 
 		// down-cast IMemoryPool to CMemoryPool
 		CMemoryPool *
-		Convert(IMemoryPool *memory_pool)
+		Convert(IMemoryPool *mp)
 		{
-			GPOS_ASSERT(NULL != memory_pool);
+			GPOS_ASSERT(NULL != mp);
 
-			return dynamic_cast<CMemoryPool *>(memory_pool);
+			return dynamic_cast<CMemoryPool *>(mp);
 		}
 
 		// private ctor
@@ -88,10 +88,10 @@ namespace gpos
 
 		// create new pool of given type
 		IMemoryPool *New(AllocType alloc_type,
-						 IMemoryPool *underlying_memory_pool,
+						 IMemoryPool *underlying_mp,
 						 ULLONG capacity,
 						 BOOL thread_safe,
-						 BOOL owns_underlying_memory_pool);
+						 BOOL owns_underlying_mp);
 
 #ifdef GPOS_DEBUG
 		// surround new pool with tracker pools
@@ -105,7 +105,7 @@ namespace gpos
 		void Cleanup();
 
 		// destroy a memory pool at shutdown
-		static void DestroyMemoryPoolAtShutdown(CMemoryPool *memory_pool);
+		static void DestroyMemoryPoolAtShutdown(CMemoryPool *mp);
 
 	public:
 		// create new memory pool
@@ -134,7 +134,7 @@ namespace gpos
 		IMemoryPool *
 		GetGlobalMemoryPool()
 		{
-			return m_global_memory_pool;
+			return m_global_mp;
 		}
 
 		// are allocations using global new operator allowed?
@@ -168,7 +168,7 @@ namespace gpos
 		static CMemoryPoolManager *
 		GetMemoryPoolMgr()
 		{
-			return m_memory_pool_mgr;
+			return m_mp_mgr;
 		}
 
 	};  // class CMemoryPoolManager

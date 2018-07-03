@@ -28,8 +28,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarPartDefault::CDXLScalarPartDefault(IMemoryPool *memory_pool, ULONG partitioning_level)
-	: CDXLScalar(memory_pool), m_partitioning_level(partitioning_level)
+CDXLScalarPartDefault::CDXLScalarPartDefault(IMemoryPool *mp, ULONG partitioning_level)
+	: CDXLScalar(mp), m_partitioning_level(partitioning_level)
 {
 }
 

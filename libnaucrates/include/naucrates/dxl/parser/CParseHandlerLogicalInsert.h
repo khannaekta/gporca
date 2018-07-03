@@ -54,7 +54,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CParseHandlerLogicalInsert(IMemoryPool *memory_pool,
+		CParseHandlerLogicalInsert(IMemoryPool *mp,
 								   CParseHandlerManager *parse_handler_mgr,
 								   CParseHandlerBase *parse_handler_root);
 	};

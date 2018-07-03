@@ -29,19 +29,19 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformSimplifyLeftOuterJoin::CXformSimplifyLeftOuterJoin
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformExploration
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 					(
-					memory_pool,
-					GPOS_NEW(memory_pool) CLogicalLeftOuterJoin(memory_pool),
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // left child
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),  // right child
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))  // predicate tree
+					mp,
+					GPOS_NEW(mp) CLogicalLeftOuterJoin(mp),
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // left child
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)),  // right child
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))  // predicate tree
 					)
 		)
 {}
@@ -95,7 +95,7 @@ CXformSimplifyLeftOuterJoin::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
 	CExpression *pexprOuter = (*pexpr)[0];
@@ -110,17 +110,17 @@ CXformSimplifyLeftOuterJoin::Transform
 	GPOS_ASSERT(CUtils::FScalarConstFalse(pexprScalar));
 
 	// extract output columns of inner child
-	ColRefArray *colref_array = CDrvdPropRelational::GetRelationalProperties(pexprInner->PdpDerive())->PcrsOutput()->Pdrgpcr(memory_pool);
+	ColRefArray *colref_array = CDrvdPropRelational::GetRelationalProperties(pexprInner->PdpDerive())->PcrsOutput()->Pdrgpcr(mp);
 
 	// generate empty constant table with the same columns
-	COperator *popCTG = GPOS_NEW(memory_pool) CLogicalConstTableGet(memory_pool, colref_array, GPOS_NEW(memory_pool) IDatumArrays(memory_pool));
+	COperator *popCTG = GPOS_NEW(mp) CLogicalConstTableGet(mp, colref_array, GPOS_NEW(mp) IDatumArrays(mp));
 	pexprResult =
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
-			GPOS_NEW(memory_pool) CLogicalLeftOuterJoin(memory_pool),
+			mp,
+			GPOS_NEW(mp) CLogicalLeftOuterJoin(mp),
 			pexprOuter,
-			GPOS_NEW(memory_pool) CExpression(memory_pool, popCTG),
+			GPOS_NEW(mp) CExpression(mp, popCTG),
 			pexprScalar
 			);
 

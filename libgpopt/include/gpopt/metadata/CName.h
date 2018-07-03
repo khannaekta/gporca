@@ -45,7 +45,7 @@ namespace gpopt
 			BOOL m_fDeepCopy;
 			
 			// deep copy function
-			void DeepCopy(IMemoryPool *memory_pool, const CWStringConst *str);
+			void DeepCopy(IMemoryPool *mp, const CWStringConst *str);
 			
 		public:
 		
@@ -54,8 +54,8 @@ namespace gpopt
 			CName(const CWStringConst *, BOOL fOwnsMemory = false);
 			CName(const CName &);
 
-			CName(IMemoryPool *memory_pool, const CName &);
-			CName(IMemoryPool *memory_pool, const CName &, const CName &);
+			CName(IMemoryPool *mp, const CName &);
+			CName(IMemoryPool *mp, const CName &, const CName &);
 
 			// dtor
 			~CName();

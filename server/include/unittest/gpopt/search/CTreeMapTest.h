@@ -50,7 +50,7 @@ namespace gpopt
 			public:
 				
 				// ctor
-				CNode(IMemoryPool *memory_pool, ULONG *pulData, NodeArray *pdrgpnd);
+				CNode(IMemoryPool *mp, ULONG *pulData, NodeArray *pdrgpnd);
 				
 				// dtor
 				~CNode();
@@ -68,14 +68,14 @@ namespace gpopt
 
 			// factory function for result object
 			static
-			CNode *Pnd(IMemoryPool *memory_pool, ULONG *pul, NodeArray *pdrgpnd, BOOL *fTestTrue);
+			CNode *Pnd(IMemoryPool *mp, ULONG *pul, NodeArray *pdrgpnd, BOOL *fTestTrue);
 		
 			// shorthand for tests
 			typedef CTreeMap<ULONG, CNode, BOOL, HashValue<ULONG>, Equals<ULONG> > TestMap;
 
 			// helper to generate loaded the tree map
 			static 
-			TestMap *PtmapLoad(IMemoryPool *memory_pool);
+			TestMap *PtmapLoad(IMemoryPool *mp);
 
 		public:
 

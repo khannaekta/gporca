@@ -38,7 +38,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformImplementRowTrigger(IMemoryPool *memory_pool);
+			CXformImplementRowTrigger(IMemoryPool *mp);
 
 			// dtor
 			virtual

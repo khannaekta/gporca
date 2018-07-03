@@ -84,7 +84,7 @@ CScalarProjectElement::FInputOrderSensitive() const
 COperator *
 CScalarProjectElement::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	BOOL must_exist
 	)
@@ -104,7 +104,7 @@ CScalarProjectElement::PopCopyWithRemappedColumns
 #ifdef GPOS_DEBUG
 			BOOL result =
 #endif // GPOS_DEBUG
-			colref_mapping->Insert(GPOS_NEW(memory_pool) ULONG(id), colref);
+			colref_mapping->Insert(GPOS_NEW(mp) ULONG(id), colref);
 			GPOS_ASSERT(result);
 		}
 		else
@@ -113,7 +113,7 @@ CScalarProjectElement::PopCopyWithRemappedColumns
 		}
 	}
 
-	return GPOS_NEW(memory_pool) CScalarProjectElement(memory_pool, colref);
+	return GPOS_NEW(mp) CScalarProjectElement(mp, colref);
 }
 
 //---------------------------------------------------------------------------

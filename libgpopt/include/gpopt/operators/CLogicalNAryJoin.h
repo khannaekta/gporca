@@ -35,7 +35,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CLogicalNAryJoin(IMemoryPool *memory_pool);
+			CLogicalNAryJoin(IMemoryPool *mp);
 
 			// dtor
 			virtual
@@ -64,40 +64,40 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsDeriveNotNull
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PcrsDeriveNotNullCombineLogical(memory_pool, exprhdl);
+				return PcrsDeriveNotNullCombineLogical(mp, exprhdl);
 			}
 
 			// derive partition consumer info
 			virtual
 			CPartInfo *PpartinfoDerive
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				) 
 				const
 			{
-				return PpartinfoDeriveCombine(memory_pool, exprhdl);
+				return PpartinfoDeriveCombine(mp, exprhdl);
 			}
 
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive constraint property
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PpcDeriveConstraintFromPredicates(memory_pool, exprhdl);
+				return PpcDeriveConstraintFromPredicates(mp, exprhdl);
 			}
 
 			//-------------------------------------------------------------------------------------
@@ -122,7 +122,7 @@ namespace gpopt
 
 			// candidate set of xforms
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
+			CXformSet *PxfsCandidates(IMemoryPool *mp) const;
 
 			//-------------------------------------------------------------------------------------
 			//-------------------------------------------------------------------------------------

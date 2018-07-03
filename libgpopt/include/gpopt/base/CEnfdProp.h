@@ -95,7 +95,7 @@ namespace gpopt
 			// append enforcers to dynamic array for the given plan properties
 			void AppendEnforcers
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CReqdPropPlan *prpp,
 				ExpressionArray *pdrgpexpr,			// array of enforcer expressions
 				CExpression *pexprChild,	// leaf in the target group where enforcers will be added
@@ -105,7 +105,7 @@ namespace gpopt
 			{
 				if (FEnforce(epet))
 				{
-					Pps()->AppendEnforcers(memory_pool, exprhdl, prpp, pdrgpexpr, pexprChild);
+					Pps()->AppendEnforcers(mp, exprhdl, prpp, pdrgpexpr, pexprChild);
 				}
 			}
 

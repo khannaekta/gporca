@@ -47,7 +47,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLDatumInt4(IMemoryPool *memory_pool, IMDId *mdid_type, BOOL is_null, INT val);
+		CDXLDatumInt4(IMemoryPool *mp, IMDId *mdid_type, BOOL is_null, INT val);
 
 		// dtor
 		virtual ~CDXLDatumInt4(){};

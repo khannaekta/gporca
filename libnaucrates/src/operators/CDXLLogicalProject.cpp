@@ -25,8 +25,8 @@ using namespace gpdxl;
 //		Construct a DXL Logical project node
 //
 //---------------------------------------------------------------------------
-CDXLLogicalProject::CDXLLogicalProject(IMemoryPool *memory_pool)
-	: CDXLLogical(memory_pool), m_mdname_alias(NULL)
+CDXLLogicalProject::CDXLLogicalProject(IMemoryPool *mp)
+	: CDXLLogical(mp), m_mdname_alias(NULL)
 {
 }
 

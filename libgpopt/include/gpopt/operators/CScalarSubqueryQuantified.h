@@ -61,7 +61,7 @@ namespace gpopt
 			// ctor
 			CScalarSubqueryQuantified
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				IMDId *scalar_op_mdid,
 				const CWStringConst *pstrScalarOp,
 				const CColRef *colref
@@ -103,13 +103,13 @@ namespace gpopt
 
 			// return locally used columns
 			virtual
-			CColRefSet *PcrsUsed(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsUsed(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 			// derive partition consumer info
 			virtual
 			CPartInfo *PpartinfoDerive
 				(
-				IMemoryPool *memory_pool, 
+				IMemoryPool *mp, 
 				CExpressionHandle &exprhdl
 				) 
 				const;

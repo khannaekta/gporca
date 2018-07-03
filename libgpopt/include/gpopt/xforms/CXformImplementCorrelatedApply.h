@@ -41,18 +41,18 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformImplementCorrelatedApply(IMemoryPool *memory_pool)
+			CXformImplementCorrelatedApply(IMemoryPool *mp)
                 :
                 // pattern
                 CXformImplementation
                 (
-                 GPOS_NEW(memory_pool) CExpression
+                 GPOS_NEW(mp) CExpression
                  (
-                  memory_pool,
-                  GPOS_NEW(memory_pool) TLogicalApply(memory_pool),
-                  GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // left child
-                  GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // right child
-                  GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)) // predicate
+                  mp,
+                  GPOS_NEW(mp) TLogicalApply(mp),
+                  GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // left child
+                  GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // right child
+                  GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)) // predicate
                   )
                  )
             {}
@@ -76,7 +76,7 @@ namespace gpopt
                 GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
                 GPOS_ASSERT(FCheckPattern(pexpr));
 
-                IMemoryPool *memory_pool = pxfctxt->Pmp();
+                IMemoryPool *mp = pxfctxt->Pmp();
 
                 // extract components
                 CExpression *pexprLeft = (*pexpr)[0];
@@ -94,10 +94,10 @@ namespace gpopt
 
                 // assemble physical operator
                 CExpression *pexprPhysicalApply =
-                GPOS_NEW(memory_pool) CExpression
+                GPOS_NEW(mp) CExpression
                 (
-                 memory_pool,
-                 GPOS_NEW(memory_pool) TPhysicalJoin(memory_pool, colref_array, popApply->EopidOriginSubq()),
+                 mp,
+                 GPOS_NEW(mp) TPhysicalJoin(mp, colref_array, popApply->EopidOriginSubq()),
                  pexprLeft,
                  pexprRight,
                  pexprScalar

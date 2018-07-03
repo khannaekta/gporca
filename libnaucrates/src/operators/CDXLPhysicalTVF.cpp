@@ -26,11 +26,11 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalTVF::CDXLPhysicalTVF(IMemoryPool *memory_pool,
+CDXLPhysicalTVF::CDXLPhysicalTVF(IMemoryPool *mp,
 								 IMDId *mdid_func,
 								 IMDId *mdid_return_type,
 								 CWStringConst *str)
-	: CDXLPhysical(memory_pool),
+	: CDXLPhysical(mp),
 	  m_func_mdid(mdid_func),
 	  m_return_type_mdid(mdid_return_type),
 	  func_name(str)

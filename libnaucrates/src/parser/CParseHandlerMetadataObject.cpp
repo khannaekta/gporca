@@ -27,10 +27,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerMetadataObject::CParseHandlerMetadataObject(IMemoryPool *memory_pool,
+CParseHandlerMetadataObject::CParseHandlerMetadataObject(IMemoryPool *mp,
 														 CParseHandlerManager *parse_handler_mgr,
 														 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root), m_imd_obj(NULL)
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root), m_imd_obj(NULL)
 {
 }
 

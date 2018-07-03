@@ -60,7 +60,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CParseHandlerTraceFlags(IMemoryPool *memory_pool,
+		CParseHandlerTraceFlags(IMemoryPool *mp,
 								CParseHandlerManager *parse_handler_mgr,
 								CParseHandlerBase *parse_handler_root);
 

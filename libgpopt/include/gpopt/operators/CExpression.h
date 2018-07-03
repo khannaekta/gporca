@@ -57,7 +57,7 @@ namespace gpopt
 		private:
 		
 			// memory pool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 			
 			// operator class
 			COperator *m_pop;
@@ -115,7 +115,7 @@ namespace gpopt
 			void CopyGroupPropsAndStats(IStatistics *input_stats);
 
 			// decorate expression tree with required plan properties
-			CReqdPropPlan* PrppDecorate(IMemoryPool *memory_pool, CReqdPropPlan *prppInput);
+			CReqdPropPlan* PrppDecorate(IMemoryPool *mp, CReqdPropPlan *prppInput);
 
 			// private copy ctor
 			CExpression(const CExpression &);
@@ -127,7 +127,7 @@ namespace gpopt
 			// ctor for leaf nodes
 			CExpression
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				COperator *pop,
 				CGroupExpression *pgexpr = NULL
 				);
@@ -135,7 +135,7 @@ namespace gpopt
 			// ctor for unary expressions
 			CExpression
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				COperator *pop,
 				CExpression *pexpr
 				);
@@ -143,7 +143,7 @@ namespace gpopt
 			// ctor for binary expressions
 			CExpression
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				COperator *pop,
 				CExpression *pexprChildFirst,
 				CExpression *pexprChildSecond
@@ -152,7 +152,7 @@ namespace gpopt
 			// ctor for ternary expressions
 			CExpression
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				COperator *pop,
 				CExpression *pexprChildFirst,
 				CExpression *pexprChildSecond,
@@ -162,7 +162,7 @@ namespace gpopt
 			// ctor n-ary expressions
 			CExpression
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				COperator *pop,
 				ExpressionArray *pdrgpexpr
 				);
@@ -170,7 +170,7 @@ namespace gpopt
 			// ctor for n-ary expression with origin group expression
 			CExpression
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				COperator *pop,
 				CGroupExpression *pgexpr,
 				ExpressionArray *pdrgpexpr,
@@ -181,7 +181,7 @@ namespace gpopt
 			// ctor for expression with derived properties
 			CExpression
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				DrvdPropArray *pdprop
 				);
 			
@@ -264,7 +264,7 @@ namespace gpopt
 			void ResetStats();
 
 			// compute required plan properties of all expression nodes
-			CReqdPropPlan* PrppCompute(IMemoryPool *memory_pool, CReqdPropPlan *prppInput);
+			CReqdPropPlan* PrppCompute(IMemoryPool *mp, CReqdPropPlan *prppInput);
 
 			// check for outer references
 			BOOL HasOuterRefs();
@@ -282,7 +282,7 @@ namespace gpopt
 			BOOL FMatchPattern(CGroupExpression *pgexpr) const;
 			
 			// return a copy of the expression with remapped columns
-			CExpression *PexprCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist) const;
+			CExpression *PexprCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist) const;
 
 			// compare entire expression rooted here
 			BOOL Matches(CExpression *pexpr) const;
@@ -318,7 +318,7 @@ namespace gpopt
 
 			// rehydrate expression from a given cost context and child expressions
 			static
-			CExpression *PexprRehydrate(IMemoryPool *memory_pool, CCostContext *pcc, ExpressionArray *pdrgpexpr, CDrvdPropCtxtPlan *pdpctxtplan);
+			CExpression *PexprRehydrate(IMemoryPool *mp, CCostContext *pcc, ExpressionArray *pdrgpexpr, CDrvdPropCtxtPlan *pdpctxtplan);
 
 
 	}; // class CExpression

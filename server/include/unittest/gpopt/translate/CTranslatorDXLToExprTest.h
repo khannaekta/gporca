@@ -45,7 +45,7 @@ namespace gpopt
 			// translate a dxl document and check against the expected Expr tree's string representation
 			static GPOS_RESULT EresTranslateAndCheck
 						(
-						IMemoryPool *memory_pool,
+						IMemoryPool *mp,
 						const CHAR *dxl_filename, // DXL document representing the DXL logical tree
 						const CWStringDynamic *pstrExpQuery // string representation of the expected query
 						);
@@ -53,19 +53,19 @@ namespace gpopt
 			// translate a dxl document into Expr Tree
 			static CExpression* Pexpr
 						(
-						IMemoryPool *memory_pool, // memory pool
+						IMemoryPool *mp, // memory pool
 						const CHAR *dxl_filename // DXL document representing the DXL logical tree
 						);
 
 			// generate a string representation of a given Expr tree
 			static CWStringDynamic *Pstr
 					(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					CExpression *pexpr
 					);
 
 			// create a get expression for a table (r) with two integer columns
-			static CExpression *PexprGet(IMemoryPool *memory_pool);
+			static CExpression *PexprGet(IMemoryPool *mp);
 
 		public:
 

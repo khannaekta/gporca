@@ -40,7 +40,7 @@ namespace gpmd
 	{
 	protected:
 		// return the mdid for the requested type
-		static IMDId *GetGPDBTypeMdid(IMemoryPool *memory_pool,
+		static IMDId *GetGPDBTypeMdid(IMemoryPool *mp,
 									  CSystemId sysid,
 									  IMDType::ETypeInfo type_info);
 
@@ -50,12 +50,12 @@ namespace gpmd
 		}
 
 		// returns the DXL string of the requested metadata object
-		virtual CWStringBase *GetMDObjDXLStr(IMemoryPool *memory_pool,
+		virtual CWStringBase *GetMDObjDXLStr(IMemoryPool *mp,
 											 CMDAccessor *md_accessor,
 											 IMDId *mdid) const = 0;
 
 		// return the mdid for the specified system id and type
-		virtual IMDId *MDId(IMemoryPool *memory_pool,
+		virtual IMDId *MDId(IMemoryPool *mp,
 							CSystemId sysid,
 							IMDType::ETypeInfo type_info) const = 0;
 	};

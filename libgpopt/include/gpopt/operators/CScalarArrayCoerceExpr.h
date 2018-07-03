@@ -52,7 +52,7 @@ namespace gpopt
 			// ctor
 			CScalarArrayCoerceExpr
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				IMDId *element_func,
 				IMDId *result_type_mdid,
 				INT type_modifier,

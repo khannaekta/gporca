@@ -43,7 +43,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 void CExpressionUtils::UnnestChild
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr, // parent node
 	ULONG child_index, // child index
 	BOOL fAnd, // is expression an AND node?
@@ -52,7 +52,7 @@ void CExpressionUtils::UnnestChild
 	ExpressionArray *pdrgpexpr // array to append results to
 	)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != pexpr);
 	GPOS_ASSERT(child_index < pexpr->Arity());
 	GPOS_ASSERT(NULL != pdrgpexpr);
@@ -64,7 +64,7 @@ void CExpressionUtils::UnnestChild
 	{
 		// two cascaded AND nodes or two cascaded OR nodes, recursively
 		// pull-up children
-		AppendChildren(memory_pool, pexprChild, pdrgpexpr);
+		AppendChildren(mp, pexprChild, pdrgpexpr);
 
 		return;
 	}
@@ -77,7 +77,7 @@ void CExpressionUtils::UnnestChild
 		CExpression *pexprNot = (*pexprChild)[0];
 		pexprChild = (*pexprNot)[0];
 	}
-	CExpression *pexprUnnestedChild = PexprUnnest(memory_pool, pexprChild);
+	CExpression *pexprUnnestedChild = PexprUnnest(mp, pexprChild);
 	pdrgpexpr->Append(pexprUnnestedChild);
 }
 
@@ -91,16 +91,16 @@ void CExpressionUtils::UnnestChild
 //---------------------------------------------------------------------------
 void CExpressionUtils::AppendChildren
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr,
 	ExpressionArray *pdrgpexpr
 	)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != pexpr);
 	GPOS_ASSERT(NULL != pdrgpexpr);
 
-	ExpressionArray *pdrgpexprChildren = PdrgpexprUnnestChildren(memory_pool, pexpr);
+	ExpressionArray *pdrgpexprChildren = PdrgpexprUnnestChildren(mp, pexpr);
 	CUtils::AddRefAppend<CExpression, CleanupRelease>(pdrgpexpr, pdrgpexprChildren);
 	pdrgpexprChildren->Release();
 }
@@ -117,13 +117,13 @@ void CExpressionUtils::AppendChildren
 ExpressionArray *
 CExpressionUtils::PdrgpexprUnnestChildren
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr
 	)
 {
 	// protect against stack overflow during recursion
 	GPOS_CHECK_STACK_SIZE;
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != pexpr);
 
 	// compute flags for cases where we may have nested predicates
@@ -131,11 +131,11 @@ CExpressionUtils::PdrgpexprUnnestChildren
 	BOOL fOr = CPredicateUtils::FOr(pexpr);
 	BOOL fHasNegatedChild = CPredicateUtils::FHasNegatedChild(pexpr);
 
-	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
 	const ULONG arity = pexpr->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		UnnestChild(memory_pool, pexpr, ul, fAnd, fOr, fHasNegatedChild, pdrgpexpr);
+		UnnestChild(mp, pexpr, ul, fAnd, fOr, fHasNegatedChild, pdrgpexpr);
 	}
 
 	return pdrgpexpr;
@@ -152,35 +152,35 @@ CExpressionUtils::PdrgpexprUnnestChildren
 CExpression *
 CExpressionUtils::PexprUnnest
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr
 	)
 {
 	// protect against stack overflow during recursion
 	GPOS_CHECK_STACK_SIZE;
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != pexpr);
 
 	if (CPredicateUtils::FNot(pexpr))
 	{
 		CExpression *pexprChild = (*pexpr)[0];
-		CExpression *pexprPushedNot = PexprPushNotOneLevel(memory_pool, pexprChild);
+		CExpression *pexprPushedNot = PexprPushNotOneLevel(mp, pexprChild);
 
 		COperator *pop = pexprPushedNot->Pop();
-		ExpressionArray *pdrgpexpr = PdrgpexprUnnestChildren(memory_pool, pexprPushedNot);
+		ExpressionArray *pdrgpexpr = PdrgpexprUnnestChildren(mp, pexprPushedNot);
 		pop->AddRef();
 
 		// clean up
 		pexprPushedNot->Release();
 
-		return GPOS_NEW(memory_pool) CExpression(memory_pool, pop, pdrgpexpr);
+		return GPOS_NEW(mp) CExpression(mp, pop, pdrgpexpr);
 	}
 
 	COperator *pop = pexpr->Pop();
-	ExpressionArray *pdrgpexpr = PdrgpexprUnnestChildren(memory_pool, pexpr);
+	ExpressionArray *pdrgpexpr = PdrgpexprUnnestChildren(mp, pexpr);
 	pop->AddRef();
 
-	return GPOS_NEW(memory_pool) CExpression(memory_pool, pop, pdrgpexpr);
+	return GPOS_NEW(mp) CExpression(mp, pop, pdrgpexpr);
 }
 
 
@@ -198,7 +198,7 @@ CExpressionUtils::PexprUnnest
 CExpression *
 CExpressionUtils::PexprPushNotOneLevel
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr
 	)
 {
@@ -213,33 +213,33 @@ CExpressionUtils::PexprPushNotOneLevel
 
 		if (fOr)
 		{
-			popNew = GPOS_NEW(memory_pool) CScalarBoolOp(memory_pool, CScalarBoolOp::EboolopAnd);
+			popNew = GPOS_NEW(mp) CScalarBoolOp(mp, CScalarBoolOp::EboolopAnd);
 		}
 		else
 		{
-			popNew = GPOS_NEW(memory_pool) CScalarBoolOp(memory_pool, CScalarBoolOp::EboolopOr);
+			popNew = GPOS_NEW(mp) CScalarBoolOp(mp, CScalarBoolOp::EboolopOr);
 		}
 
-		ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+		ExpressionArray *pdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
 		const ULONG arity = pexpr->Arity();
 		for (ULONG ul = 0; ul < arity; ul++)
 		{
 			CExpression *pexprChild = (*pexpr)[ul];
 			pexprChild->AddRef();
-			pdrgpexpr->Append(CUtils::PexprNegate(memory_pool, pexprChild));
+			pdrgpexpr->Append(CUtils::PexprNegate(mp, pexprChild));
 		}
 
-		return GPOS_NEW(memory_pool) CExpression(memory_pool, popNew, pdrgpexpr);
+		return GPOS_NEW(mp) CExpression(mp, popNew, pdrgpexpr);
 	}
 
 	const COperator *pop = pexpr->Pop();
 	if (COperator::EopScalarSubqueryExists == pop->Eopid())
 	{
 		pexpr->PdrgPexpr()->AddRef();
-		return GPOS_NEW(memory_pool) CExpression
+		return GPOS_NEW(mp) CExpression
 							(
-							memory_pool,
-							GPOS_NEW(memory_pool) CScalarSubqueryNotExists(memory_pool),
+							mp,
+							GPOS_NEW(mp) CScalarSubqueryNotExists(mp),
 							pexpr->PdrgPexpr()
 							);
 	}
@@ -247,20 +247,20 @@ CExpressionUtils::PexprPushNotOneLevel
 	if (COperator::EopScalarSubqueryNotExists == pop->Eopid())
 	{
 		pexpr->PdrgPexpr()->AddRef();
-		return GPOS_NEW(memory_pool) CExpression
+		return GPOS_NEW(mp) CExpression
 							(
-							memory_pool,
-							GPOS_NEW(memory_pool) CScalarSubqueryExists(memory_pool),
+							mp,
+							GPOS_NEW(mp) CScalarSubqueryExists(mp),
 							pexpr->PdrgPexpr()
 							);
 	}
 
 	// TODO: , Feb 4 2015, we currently only handling EXISTS/NOT EXISTS/AND/OR
 	pexpr->AddRef();
-	return GPOS_NEW(memory_pool) CExpression
+	return GPOS_NEW(mp) CExpression
 					(
-					memory_pool,
-					GPOS_NEW(memory_pool) CScalarBoolOp(memory_pool, CScalarBoolOp::EboolopNot),
+					mp,
+					GPOS_NEW(mp) CScalarBoolOp(mp, CScalarBoolOp::EboolopNot),
 					pexpr
 					);
 }
@@ -277,27 +277,27 @@ CExpressionUtils::PexprPushNotOneLevel
 CExpression *
 CExpressionUtils::PexprDedupChildren
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr
 	)
 {
 	// protect against stack overflow during recursion
 	GPOS_CHECK_STACK_SIZE;
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != pexpr);
 
 	// recursively process children
 	const ULONG arity = pexpr->Arity();
-	ExpressionArray *pdrgpexprChildren = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexprChildren = GPOS_NEW(mp) ExpressionArray(mp);
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprChild = PexprDedupChildren(memory_pool, (*pexpr)[ul]);
+		CExpression *pexprChild = PexprDedupChildren(mp, (*pexpr)[ul]);
 		pdrgpexprChildren->Append(pexprChild);
 	}
 
 	if (CPredicateUtils::FAnd(pexpr) || CPredicateUtils::FOr(pexpr))
 	{
-		ExpressionArray *pdrgpexprNewChildren = CUtils::PdrgpexprDedup(memory_pool, pdrgpexprChildren);
+		ExpressionArray *pdrgpexprNewChildren = CUtils::PdrgpexprDedup(mp, pdrgpexprChildren);
 
 		pdrgpexprChildren->Release();
 		pdrgpexprChildren = pdrgpexprNewChildren;
@@ -316,7 +316,7 @@ CExpressionUtils::PexprDedupChildren
 
 	COperator *pop = pexpr->Pop();
 	pop->AddRef();
-	return GPOS_NEW(memory_pool) CExpression(memory_pool, pop, pdrgpexprChildren);
+	return GPOS_NEW(mp) CExpression(mp, pop, pdrgpexprChildren);
 }
 
 // EOF

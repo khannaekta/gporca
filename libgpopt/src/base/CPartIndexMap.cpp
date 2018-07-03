@@ -94,7 +94,7 @@ CPartIndexMap::CPartTableInfo::~CPartTableInfo()
 void
 CPartIndexMap::CPartTableInfo::AddPartConstraint
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ULONG scan_id,
 	CPartConstraint *ppartcnstr
 	)
@@ -103,7 +103,7 @@ CPartIndexMap::CPartTableInfo::AddPartConstraint
 #ifdef GPOS_DEBUG
 	BOOL result =
 #endif // GPOS_DEBUG
-	m_ppartcnstrmap->Insert(GPOS_NEW(memory_pool) ULONG(scan_id), ppartcnstr);
+	m_ppartcnstrmap->Insert(GPOS_NEW(mp) ULONG(scan_id), ppartcnstr);
 
 	GPOS_ASSERT(result && "Part constraint already exists in map");
 }
@@ -119,7 +119,7 @@ CPartIndexMap::CPartTableInfo::AddPartConstraint
 void
 CPartIndexMap::CPartTableInfo::AddPartConstraints
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	PartCnstrMap *ppartcnstrmap
 	)
 {
@@ -132,7 +132,7 @@ CPartIndexMap::CPartTableInfo::AddPartConstraints
 		CPartConstraint *ppartcnstr = const_cast<CPartConstraint*>(partcnstriter.Value());
 
 		ppartcnstr->AddRef();
-		AddPartConstraint(memory_pool, scan_id, ppartcnstr);
+		AddPartConstraint(mp, scan_id, ppartcnstr);
 	}
 
 	m_fPartialScans = m_fPartialScans || FDefinesPartialScans(ppartcnstrmap, m_ppartcnstrRel);
@@ -216,8 +216,8 @@ void
 CPartIndexMap::CPartTableInfo::DbgPrint() const
 {
 
-	IMemoryPool *memory_pool = COptCtxt::PoctxtFromTLS()->Pmp();
-	CAutoTrace at(memory_pool);
+	IMemoryPool *mp = COptCtxt::PoctxtFromTLS()->Pmp();
+	CAutoTrace at(mp);
 	(void) this->OsPrint(at.Os());
 }
 #endif
@@ -232,17 +232,17 @@ CPartIndexMap::CPartTableInfo::DbgPrint() const
 //---------------------------------------------------------------------------
 CPartIndexMap::CPartIndexMap
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	m_memory_pool(memory_pool),
+	m_mp(mp),
 	m_pim(NULL),
 	m_ulUnresolved(0),
 	m_ulUnresolvedZeroPropagators(0)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 
-	m_pim = GPOS_NEW(m_memory_pool) PartIndexMap(m_memory_pool);
+	m_pim = GPOS_NEW(m_mp) PartIndexMap(m_mp);
 }
 
 
@@ -285,11 +285,11 @@ CPartIndexMap::Insert
 	if (NULL == ppti)
 	{
 		// no entry is found, create a new entry
-		ppti = GPOS_NEW(m_memory_pool) CPartTableInfo(scan_id, ppartcnstrmap, epim, mdid, pdrgppartkeys, ppartcnstrRel, ulExpectedPropagators);
+		ppti = GPOS_NEW(m_mp) CPartTableInfo(scan_id, ppartcnstrmap, epim, mdid, pdrgppartkeys, ppartcnstrRel, ulExpectedPropagators);
 #ifdef GPOS_DEBUG
 		BOOL fSuccess =
 #endif // GPOS_DEBUG
-		m_pim->Insert(GPOS_NEW(m_memory_pool) ULONG(scan_id), ppti);
+		m_pim->Insert(GPOS_NEW(m_mp) ULONG(scan_id), ppti);
 		GPOS_ASSERT(fSuccess && "failed to insert partition index map entry");
 		
 		// increase number of unresolved consumers
@@ -309,7 +309,7 @@ CPartIndexMap::Insert
 		if (!is_empty)
 		{
 			// add part constraints to part info
-			ppti->AddPartConstraints(m_memory_pool, ppartcnstrmap);
+			ppti->AddPartConstraints(m_mp, ppartcnstrmap);
 		}
 		
 		mdid->Release();
@@ -531,7 +531,7 @@ BOOL CPartIndexMap::FPartialScans
 void
 CPartIndexMap::AddUnresolved
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CPartIndexMap &pimFst,
 	const CPartIndexMap &pimSnd,
 	CPartIndexMap* ppimResult
@@ -573,7 +573,7 @@ CPartIndexMap::AddUnresolved
 		PartKeysArray *pdrgppartkeys = pptiFst->Pdrgppartkeys();
 		CPartConstraint *ppartcnstrRel = pptiFst->PpartcnstrRel();
 		
-		PartCnstrMap *ppartcnstrmap = CPartConstraint::PpartcnstrmapCombine(memory_pool, pptiFst->Ppartcnstrmap(), ppartcnstrmapSnd);
+		PartCnstrMap *ppartcnstrmap = CPartConstraint::PpartcnstrmapCombine(mp, pptiFst->Ppartcnstrmap(), ppartcnstrmapSnd);
 
 		mdid->AddRef();
 		pdrgppartkeys->AddRef();
@@ -645,18 +645,18 @@ CPartIndexMap::ResolvePropagator
 CPartIndexMap *
 CPartIndexMap::PpimCombine
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CPartIndexMap &pimFst,
 	const CPartIndexMap &pimSnd
 	)
 {
-	CPartIndexMap *ppim = GPOS_NEW(memory_pool) CPartIndexMap(memory_pool);
+	CPartIndexMap *ppim = GPOS_NEW(mp) CPartIndexMap(mp);
 
 	// add entries from first map that are not resolvable based on second map
-	AddUnresolved(memory_pool, pimFst, pimSnd, ppim);
+	AddUnresolved(mp, pimFst, pimSnd, ppim);
 
 	// add entries from second map that are not resolvable based on first map
-	AddUnresolved(memory_pool, pimSnd, pimFst, ppim);
+	AddUnresolved(mp, pimSnd, pimFst, ppim);
 
 	return ppim;
 }
@@ -700,12 +700,12 @@ CPartIndexMap::FContainsUnresolvedZeroPropagators() const
 ULongPtrArray *
 CPartIndexMap::PdrgpulScanIds
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	BOOL fConsumersOnly
 	)
 	const
 {
-	ULongPtrArray *pdrgpul = GPOS_NEW(memory_pool) ULongPtrArray(memory_pool);
+	ULongPtrArray *pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
 	PartIndexMapIter pimi(m_pim);
 	while (pimi.Advance())
 	{
@@ -715,7 +715,7 @@ CPartIndexMap::PdrgpulScanIds
 			continue;
 		}
 
-		pdrgpul->Append(GPOS_NEW(memory_pool) ULONG(ppti->ScanId()));
+		pdrgpul->Append(GPOS_NEW(mp) ULONG(ppti->ScanId()));
 	}
 
 	return pdrgpul;
@@ -959,13 +959,13 @@ CPartIndexMap::AddRequiredPartPropagation
 CPartIndexMap *
 CPartIndexMap::PpimPartitionSelector
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ULONG scan_id,
 	ULONG ulExpectedFromReq
 	)
 	const
 {
-	CPartIndexMap *ppimResult = GPOS_NEW(memory_pool) CPartIndexMap(memory_pool);
+	CPartIndexMap *ppimResult = GPOS_NEW(mp) CPartIndexMap(mp);
 
 	PartIndexMapIter pimi(m_pim);
 	while (pimi.Advance())
@@ -1086,7 +1086,7 @@ CPartIndexMap::OsPrintPartCnstrMap
 void
 CPartIndexMap::DbgPrint() const
 {
-	CAutoTrace at(m_memory_pool);
+	CAutoTrace at(m_mp);
 	(void) this->OsPrint(at.Os());
 }
 #endif // GPOS_DEBUG

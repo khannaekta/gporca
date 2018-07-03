@@ -43,19 +43,19 @@ namespace gpopt
 			explicit
 			CXformLeftAntiSemiJoinNotIn2CrossProduct
 				(
-				IMemoryPool *memory_pool
+				IMemoryPool *mp
 				)
 				:
 				// pattern
 				CXformLeftAntiSemiJoin2CrossProduct
 					(
-					GPOS_NEW(memory_pool) CExpression
+					GPOS_NEW(mp) CExpression
 								(
-								memory_pool,
-								GPOS_NEW(memory_pool) CLogicalLeftAntiSemiJoinNotIn(memory_pool),
-								GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool)), // left child is a tree since we may need to push predicates down
-								GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // right child
-								GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))  // predicate is a tree since we may need to do clean-up of scalar expression
+								mp,
+								GPOS_NEW(mp) CLogicalLeftAntiSemiJoinNotIn(mp),
+								GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp)), // left child is a tree since we may need to push predicates down
+								GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // right child
+								GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))  // predicate is a tree since we may need to do clean-up of scalar expression
 								)
 					)
 			{}

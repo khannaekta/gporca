@@ -37,12 +37,12 @@ namespace gpos
 												 void *funcSingle(void *),
 												 void *funcRepeated(void *));
 
-		static void Unittest_TestSingleTaskPerformance(IMemoryPool *memory_pool,
+		static void Unittest_TestSingleTaskPerformance(IMemoryPool *mp,
 													   ULONG culWrkrCnt,
 													   ULONG culIterCnt,
 													   void *funcRepeated(void *));
 
-		static void Unittest_TestMultiTaskPerformance(IMemoryPool *memory_pool,
+		static void Unittest_TestMultiTaskPerformance(IMemoryPool *mp,
 													  ULONG culWrkrCnt,
 													  ULONG culIterCnt,
 													  void *funcSingle(void *));

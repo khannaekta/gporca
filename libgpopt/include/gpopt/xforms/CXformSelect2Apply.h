@@ -39,7 +39,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformSelect2Apply(IMemoryPool *memory_pool);
+			CXformSelect2Apply(IMemoryPool *mp);
 
 			// dtor
 			virtual

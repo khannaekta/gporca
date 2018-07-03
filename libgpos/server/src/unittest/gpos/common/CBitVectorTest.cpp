@@ -62,11 +62,11 @@ CBitVectorTest::EresUnittest_Basics()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	ULONG cSize = 129;
 
-	CBitVector bv(memory_pool, cSize);
+	CBitVector bv(mp, cSize);
 	GPOS_ASSERT(bv.IsEmpty());
 
 	for (ULONG i = 0; i < cSize; i++)
@@ -78,7 +78,7 @@ CBitVectorTest::EresUnittest_Basics()
 		}
 		GPOS_ASSERT(bv.Get(i));
 
-		CBitVector bvCopy(memory_pool, bv);
+		CBitVector bvCopy(mp, bv);
 		for (ULONG j = 0; j <= i; j++)
 		{
 			BOOL fSetAlt = bvCopy.Get(j);
@@ -118,19 +118,19 @@ CBitVectorTest::EresUnittest_SetOps()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	ULONG cSize = 129;
-	CBitVector bvEmpty(memory_pool, cSize);
+	CBitVector bvEmpty(mp, cSize);
 
-	CBitVector bvEven(memory_pool, cSize);
+	CBitVector bvEven(mp, cSize);
 	for (ULONG i = 0; i < cSize; i += 2)
 	{
 		bvEven.ExchangeSet(i);
 	}
 	GPOS_ASSERT(bvEven.ContainsAll(&bvEmpty));
 
-	CBitVector bvOdd(memory_pool, cSize);
+	CBitVector bvOdd(mp, cSize);
 	for (ULONG i = 1; i < cSize; i += 2)
 	{
 		bvOdd.ExchangeSet(i);
@@ -141,7 +141,7 @@ CBitVectorTest::EresUnittest_SetOps()
 	GPOS_ASSERT(!bvEven.ContainsAll(&bvOdd));
 	GPOS_ASSERT(!bvOdd.ContainsAll(&bvEven));
 
-	CBitVector bv(memory_pool, bvOdd);
+	CBitVector bv(mp, bvOdd);
 
 	bv.Or(&bvEven);
 	bv.And(&bvOdd);
@@ -168,9 +168,9 @@ CBitVectorTest::EresUnittest_Cursor()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
-	CBitVector bv(memory_pool, 129);
+	CBitVector bv(mp, 129);
 	for (ULONG i = 1; i < 20; i++)
 	{
 		bv.ExchangeSet(i * 3);
@@ -200,11 +200,11 @@ CBitVectorTest::EresUnittest_Random()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// set up control vector
 	ULONG cTotal = 10000;
-	CHAR *rg = GPOS_NEW_ARRAY(memory_pool, CHAR, cTotal);
+	CHAR *rg = GPOS_NEW_ARRAY(mp, CHAR, cTotal);
 
 	CRandom rand;
 
@@ -219,7 +219,7 @@ CBitVectorTest::EresUnittest_Random()
 	}
 
 	ULONG cElements = 0;
-	CBitVector bv(memory_pool, cTotal);
+	CBitVector bv(mp, cTotal);
 	for (ULONG i = 0; i < cTotal; i++)
 	{
 		if (1 == rg[i])
@@ -260,9 +260,9 @@ CBitVectorTest::EresUnittest_OutOfBounds()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
-	CBitVector bv(memory_pool, 129);
+	CBitVector bv(mp, 129);
 
 	// this must assert
 	bv.ExchangeSet(130);

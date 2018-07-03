@@ -54,7 +54,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerScalarNullTest(IMemoryPool *memory_pool,
+		CParseHandlerScalarNullTest(IMemoryPool *mp,
 									CParseHandlerManager *parse_handler_mgr,
 									CParseHandlerBase *parse_handler_root);
 	};

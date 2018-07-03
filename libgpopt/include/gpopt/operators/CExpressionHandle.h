@@ -54,7 +54,7 @@ namespace gpopt
 		private:
 					
 			// memory pool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 			
 			// attached expression
 			CExpression *m_pexpr;
@@ -121,7 +121,7 @@ namespace gpopt
 		
 			// ctor
 			explicit
-			CExpressionHandle(IMemoryPool *memory_pool);
+			CExpressionHandle(IMemoryPool *mp);
 
 			// dtor
 			~CExpressionHandle();
@@ -294,7 +294,7 @@ namespace gpopt
 
 			// return the columns used by a logical operator internally as well
 			// as columns used by all its scalar children
-			CColRefSet *PcrsUsedColumns(IMemoryPool *memory_pool);
+			CColRefSet *PcrsUsedColumns(IMemoryPool *mp);
 
 	}; // class CExpressionHandle
 	

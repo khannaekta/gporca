@@ -32,10 +32,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerRelStats::CParseHandlerRelStats(IMemoryPool *memory_pool,
+CParseHandlerRelStats::CParseHandlerRelStats(IMemoryPool *mp,
 											 CParseHandlerManager *parse_handler_mgr,
 											 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerMetadataObject(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerMetadataObject(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -69,7 +69,7 @@ CParseHandlerRelStats::StartElement(const XMLCh *const,  // element_uri,
 		m_parse_handler_mgr->GetDXLMemoryManager(), xml_str_table_name);
 
 	// create a copy of the string in the CMDName constructor
-	CMDName *mdname = GPOS_NEW(m_memory_pool) CMDName(m_memory_pool, str_table_name);
+	CMDName *mdname = GPOS_NEW(m_mp) CMDName(m_mp, str_table_name);
 
 	GPOS_DELETE(str_table_name);
 
@@ -94,8 +94,8 @@ CParseHandlerRelStats::StartElement(const XMLCh *const,  // element_uri,
 														EdxltokenStatsDerivedRelation);
 	}
 
-	m_imd_obj = GPOS_NEW(m_memory_pool)
-		CDXLRelStats(m_memory_pool, CMDIdRelStats::CastMdid(mdid), mdname, rows, is_empty);
+	m_imd_obj = GPOS_NEW(m_mp)
+		CDXLRelStats(m_mp, CMDIdRelStats::CastMdid(mdid), mdname, rows, is_empty);
 }
 
 //---------------------------------------------------------------------------

@@ -72,7 +72,7 @@ namespace gpopt
 			// output column generation given a list of column descriptors
 			ColRefArray *PdrgpcrCreateMapping
 					(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					const ColumnDescrArray *pdrgpcoldesc,
 					ULONG ulOpSourceId
 					)
@@ -80,10 +80,10 @@ namespace gpopt
 
 			// initialize the array of partition columns
 			ColRefArrays *
-			PdrgpdrgpcrCreatePartCols(IMemoryPool *memory_pool, ColRefArray *colref_array, const ULongPtrArray *pdrgpulPart);
+			PdrgpdrgpcrCreatePartCols(IMemoryPool *mp, ColRefArray *colref_array, const ULongPtrArray *pdrgpulPart);
 
 			// derive dummy statistics
-			IStatistics *PstatsDeriveDummy(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CDouble rows) const;
+			IStatistics *PstatsDeriveDummy(IMemoryPool *mp, CExpressionHandle &exprhdl, CDouble rows) const;
 
 			// helper for common case of output derivation from outer child
 			static
@@ -95,17 +95,17 @@ namespace gpopt
 
 			// helper for common case of output derivation from all logical children
 			static
-			CColRefSet *PcrsDeriveOutputCombineLogical(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsDeriveOutputCombineLogical(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 			// helper for common case of combining not nullable columns from all logical children
 			static
-			CColRefSet *PcrsDeriveNotNullCombineLogical(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsDeriveNotNullCombineLogical(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 			// helper for common case of stat columns computation
 			static
 			CColRefSet *PcrsReqdChildStats
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsInput,
 				CColRefSet *pcrsUsed,
@@ -126,11 +126,11 @@ namespace gpopt
 
 			// shorthand to combine keys from first n - 1 children
 			static
-			CKeyCollection *PkcCombineKeys(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CKeyCollection *PkcCombineKeys(IMemoryPool *mp, CExpressionHandle &exprhdl);
 				
 			// helper function for computing the keys in a base relation
 			static
-			CKeyCollection *PkcKeysBaseTable(IMemoryPool *memory_pool, const BitSetArray *pdrgpbsKeys, const ColRefArray *pdrgpcrOutput);
+			CKeyCollection *PkcKeysBaseTable(IMemoryPool *mp, const BitSetArray *pdrgpbsKeys, const ColRefArray *pdrgpcrOutput);
 			
 			// helper for the common case of passing through partition consumer info
 			static
@@ -138,17 +138,17 @@ namespace gpopt
 			
 			// helper for common case of combining partition consumer info from logical children
 			static
-			CPartInfo *PpartinfoDeriveCombine(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CPartInfo *PpartinfoDeriveCombine(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 			// derive constraint property from a table/index get
 			static
-			CPropConstraint *PpcDeriveConstraintFromTable(IMemoryPool *memory_pool, const CTableDescriptor *ptabdesc, const ColRefArray *pdrgpcrOutput);
+			CPropConstraint *PpcDeriveConstraintFromTable(IMemoryPool *mp, const CTableDescriptor *ptabdesc, const ColRefArray *pdrgpcrOutput);
 
 			// derive constraint property from a table/index get with predicates
 			static
 			CPropConstraint *PpcDeriveConstraintFromTableWithPredicates
 							(
-							IMemoryPool *memory_pool,
+							IMemoryPool *mp,
 							CExpressionHandle &exprhdl,
 							const CTableDescriptor *ptabdesc,
 							const ColRefArray *pdrgpcrOutput
@@ -160,7 +160,7 @@ namespace gpopt
 
 			// derive constraint property only on the given columns
 			static
-			CPropConstraint *PpcDeriveConstraintRestrict(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CColRefSet *pcrsOutput);
+			CPropConstraint *PpcDeriveConstraintRestrict(IMemoryPool *mp, CExpressionHandle &exprhdl, CColRefSet *pcrsOutput);
 
 			// default max card for join and apply operators
 			static
@@ -174,7 +174,7 @@ namespace gpopt
 			static
 			COrderSpec *PosFromIndex
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				const IMDIndex *pmdindex,
 				ColRefArray *colref_array,
 				const CTableDescriptor *ptabdesc
@@ -182,17 +182,17 @@ namespace gpopt
 
 			// derive function properties using data access property of scalar child
 			static
-			CFunctionProp *PfpDeriveFromScalar(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, ULONG ulScalarIndex);
+			CFunctionProp *PfpDeriveFromScalar(IMemoryPool *mp, CExpressionHandle &exprhdl, ULONG ulScalarIndex);
 
 			// derive outer references
 			static
-			CColRefSet *PcrsDeriveOuter(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CColRefSet *pcrsUsedAdditional);
+			CColRefSet *PcrsDeriveOuter(IMemoryPool *mp, CExpressionHandle &exprhdl, CColRefSet *pcrsUsedAdditional);
 
 		public:
 		
 			// ctor
 			explicit
-			CLogical(IMemoryPool *memory_pool);
+			CLogical(IMemoryPool *mp);
 			
 			// dtor
 			virtual 
@@ -218,67 +218,67 @@ namespace gpopt
 
 			// create derived properties container
 			virtual
-			DrvdPropArray *PdpCreate(IMemoryPool *memory_pool) const;
+			DrvdPropArray *PdpCreate(IMemoryPool *mp) const;
 
 			// derive output columns
 			virtual
-			CColRefSet *PcrsDeriveOutput(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) = 0;
+			CColRefSet *PcrsDeriveOutput(IMemoryPool *mp, CExpressionHandle &exprhdl) = 0;
 
 			// derive outer references
 			virtual
 			CColRefSet *PcrsDeriveOuter
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 			{
-				return PcrsDeriveOuter(memory_pool, exprhdl, NULL /*pcrsUsedAdditional*/);
+				return PcrsDeriveOuter(mp, exprhdl, NULL /*pcrsUsedAdditional*/);
 			}
 			
 			// derive outer references for index get and dynamic index get operators
 			virtual
-			CColRefSet *PcrsDeriveOuterIndexGet(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsDeriveOuterIndexGet(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 			// derive not nullable output columns
 			virtual
 			CColRefSet *PcrsDeriveNotNull
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle & // exprhdl
 				)
 				const
 			{
 				// by default, return an empty set
-				return GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+				return GPOS_NEW(mp) CColRefSet(mp);
 			}
 
 			// derive columns from the inner child of a correlated-apply expression that can be used above the apply expression
 			virtual
-			CColRefSet *PcrsDeriveCorrelatedApply(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CColRefSet *PcrsDeriveCorrelatedApply(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive key collections
 			virtual
-			CKeyCollection *PkcDeriveKeys(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CKeyCollection *PkcDeriveKeys(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive join depth
 			virtual
-			ULONG JoinDepth(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			ULONG JoinDepth(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive partition information
 			virtual
-			CPartInfo *PpartinfoDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const = 0;
+			CPartInfo *PpartinfoDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const = 0;
 
 			// derive constraint property
 			virtual
-			CPropConstraint *PpcDeriveConstraint(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const = 0;
+			CPropConstraint *PpcDeriveConstraint(IMemoryPool *mp, CExpressionHandle &exprhdl) const = 0;
 			
 			// derive function properties
 			virtual
-			CFunctionProp *PfpDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CFunctionProp *PfpDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			//-------------------------------------------------------------------------------------
 			// Derived Stats
@@ -286,7 +286,7 @@ namespace gpopt
 
 			// derive statistics
 			virtual
-			IStatistics *PstatsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, StatsArray *stats_ctxt) const = 0;
+			IStatistics *PstatsDerive(IMemoryPool *mp, CExpressionHandle &exprhdl, StatsArray *stats_ctxt) const = 0;
 
 			// promise level for stat derivation
 			virtual
@@ -298,15 +298,15 @@ namespace gpopt
 
 			// create required properties container
 			virtual
-			CReqdProp *PrpCreate(IMemoryPool *memory_pool) const;
+			CReqdProp *PrpCreate(IMemoryPool *mp) const;
 
 			// compute required stat columns of the n-th child
 			virtual
-			CColRefSet *PcrsStat(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CColRefSet *pcrsInput, ULONG child_index) const = 0;
+			CColRefSet *PcrsStat(IMemoryPool *mp, CExpressionHandle &exprhdl, CColRefSet *pcrsInput, ULONG child_index) const = 0;
 
 			// compute partition predicate to pass down to n-th child
 			virtual
-			CExpression *PexprPartPred(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CExpression *pexprInput, ULONG child_index) const;
+			CExpression *PexprPartPred(IMemoryPool *mp, CExpressionHandle &exprhdl, CExpression *pexprInput, ULONG child_index) const;
 
 			//-------------------------------------------------------------------------------------
 			// Transformations
@@ -314,7 +314,7 @@ namespace gpopt
 
 			// candidate set of xforms
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const = 0;
+			CXformSet *PxfsCandidates(IMemoryPool *mp) const = 0;
 			
 			//-------------------------------------------------------------------------------------
 			//-------------------------------------------------------------------------------------
@@ -342,7 +342,7 @@ namespace gpopt
 			static
 			IStatistics *PstatsBaseTable
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CTableDescriptor *ptabdesc,
 				CColRefSet *pcrsStatExtra = NULL
@@ -375,11 +375,11 @@ namespace gpopt
 
 			// return the set of distribution columns
 			static
-			CColRefSet *PcrsDist(IMemoryPool *memory_pool, const CTableDescriptor *ptabdesc, const ColRefArray *colref_array);
+			CColRefSet *PcrsDist(IMemoryPool *mp, const CTableDescriptor *ptabdesc, const ColRefArray *colref_array);
 
 			// derive constraint property when expression has relational children and predicates
 			static
-			CPropConstraint *PpcDeriveConstraintFromPredicates(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CPropConstraint *PpcDeriveConstraintFromPredicates(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 
 	}; // class CLogical

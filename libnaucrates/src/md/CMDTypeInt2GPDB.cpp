@@ -38,30 +38,30 @@ CMDName CMDTypeInt2GPDB::m_mdname(&m_str);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDTypeInt2GPDB::CMDTypeInt2GPDB(IMemoryPool *memory_pool) : m_memory_pool(memory_pool)
+CMDTypeInt2GPDB::CMDTypeInt2GPDB(IMemoryPool *mp) : m_mp(mp)
 {
-	m_mdid = GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT2_OID);
-	m_mdid_op_eq = GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT2_EQ_OP);
-	m_mdid_op_neq = GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT2_NEQ_OP);
-	m_mdid_op_lt = GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT2_LT_OP);
-	m_mdid_op_leq = GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT2_LEQ_OP);
-	m_mdid_op_gt = GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT2_GT_OP);
-	m_mdid_op_geq = GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT2_GEQ_OP);
-	m_mdid_op_cmp = GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT2_COMP_OP);
-	m_mdid_type_array = GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT2_ARRAY_TYPE);
-	m_mdid_min = GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT2_AGG_MIN);
-	m_mdid_max = GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT2_AGG_MAX);
-	m_mdid_avg = GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT2_AGG_AVG);
-	m_mdid_sum = GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT2_AGG_SUM);
-	m_mdid_count = GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT2_AGG_COUNT);
+	m_mdid = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT2_OID);
+	m_mdid_op_eq = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT2_EQ_OP);
+	m_mdid_op_neq = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT2_NEQ_OP);
+	m_mdid_op_lt = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT2_LT_OP);
+	m_mdid_op_leq = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT2_LEQ_OP);
+	m_mdid_op_gt = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT2_GT_OP);
+	m_mdid_op_geq = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT2_GEQ_OP);
+	m_mdid_op_cmp = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT2_COMP_OP);
+	m_mdid_type_array = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT2_ARRAY_TYPE);
+	m_mdid_min = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT2_AGG_MIN);
+	m_mdid_max = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT2_AGG_MAX);
+	m_mdid_avg = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT2_AGG_AVG);
+	m_mdid_sum = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT2_AGG_SUM);
+	m_mdid_count = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT2_AGG_COUNT);
 
 	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_memory_pool, this, false /*fSerializeHeader*/, false /*indentation*/);
+		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 
 	GPOS_ASSERT(GPDB_INT2_OID == CMDIdGPDB::CastMdid(m_mdid)->OidObjectId());
 	m_mdid->AddRef();
 	m_datum_null =
-		GPOS_NEW(memory_pool) CDatumInt2GPDB(m_mdid, 1 /* m_bytearray_value */, true /* is_null */);
+		GPOS_NEW(mp) CDatumInt2GPDB(m_mdid, 1 /* m_bytearray_value */, true /* is_null */);
 }
 
 //---------------------------------------------------------------------------
@@ -102,9 +102,9 @@ CMDTypeInt2GPDB::~CMDTypeInt2GPDB()
 //
 //---------------------------------------------------------------------------
 IDatumInt2 *
-CMDTypeInt2GPDB::CreateInt2Datum(IMemoryPool *memory_pool, SINT value, BOOL is_null) const
+CMDTypeInt2GPDB::CreateInt2Datum(IMemoryPool *mp, SINT value, BOOL is_null) const
 {
-	return GPOS_NEW(memory_pool) CDatumInt2GPDB(m_mdid->Sysid(), value, is_null);
+	return GPOS_NEW(mp) CDatumInt2GPDB(m_mdid->Sysid(), value, is_null);
 }
 
 
@@ -224,7 +224,7 @@ CMDTypeInt2GPDB::GetDatumForDXLConstVal(const CDXLScalarConstValue *dxl_op) cons
 	CDXLDatumInt2 *datum_dxl = CDXLDatumInt2::Cast(const_cast<CDXLDatum *>(dxl_op->GetDatumVal()));
 	GPOS_ASSERT(datum_dxl->IsPassedByValue());
 
-	return GPOS_NEW(m_memory_pool)
+	return GPOS_NEW(m_mp)
 		CDatumInt2GPDB(m_mdid->Sysid(), datum_dxl->Value(), datum_dxl->IsNull());
 }
 
@@ -237,14 +237,14 @@ CMDTypeInt2GPDB::GetDatumForDXLConstVal(const CDXLScalarConstValue *dxl_op) cons
 //
 //---------------------------------------------------------------------------
 IDatum *
-CMDTypeInt2GPDB::GetDatumForDXLDatum(IMemoryPool *memory_pool, const CDXLDatum *datum_dxl) const
+CMDTypeInt2GPDB::GetDatumForDXLDatum(IMemoryPool *mp, const CDXLDatum *datum_dxl) const
 {
 	CDXLDatumInt2 *int2_dxl_datum = CDXLDatumInt2::Cast(const_cast<CDXLDatum *>(datum_dxl));
 	GPOS_ASSERT(int2_dxl_datum->IsPassedByValue());
 	SINT val = int2_dxl_datum->Value();
 	BOOL is_null = int2_dxl_datum->IsNull();
 
-	return GPOS_NEW(memory_pool) CDatumInt2GPDB(m_mdid->Sysid(), val, is_null);
+	return GPOS_NEW(mp) CDatumInt2GPDB(m_mdid->Sysid(), val, is_null);
 }
 
 //---------------------------------------------------------------------------
@@ -256,13 +256,13 @@ CMDTypeInt2GPDB::GetDatumForDXLDatum(IMemoryPool *memory_pool, const CDXLDatum *
 //
 //---------------------------------------------------------------------------
 CDXLDatum *
-CMDTypeInt2GPDB::GetDatumVal(IMemoryPool *memory_pool, IDatum *datum) const
+CMDTypeInt2GPDB::GetDatumVal(IMemoryPool *mp, IDatum *datum) const
 {
 	m_mdid->AddRef();
 	CDatumInt2GPDB *int2_datum = dynamic_cast<CDatumInt2GPDB *>(datum);
 
-	return GPOS_NEW(memory_pool)
-		CDXLDatumInt2(memory_pool, m_mdid, int2_datum->IsNull(), int2_datum->Value());
+	return GPOS_NEW(mp)
+		CDXLDatumInt2(mp, m_mdid, int2_datum->IsNull(), int2_datum->Value());
 }
 
 //---------------------------------------------------------------------------
@@ -274,15 +274,15 @@ CMDTypeInt2GPDB::GetDatumVal(IMemoryPool *memory_pool, IDatum *datum) const
 //
 //---------------------------------------------------------------------------
 CDXLScalarConstValue *
-CMDTypeInt2GPDB::GetDXLOpScConst(IMemoryPool *memory_pool, IDatum *datum) const
+CMDTypeInt2GPDB::GetDXLOpScConst(IMemoryPool *mp, IDatum *datum) const
 {
 	CDatumInt2GPDB *int2gpdb_datum = dynamic_cast<CDatumInt2GPDB *>(datum);
 
 	m_mdid->AddRef();
-	CDXLDatumInt2 *datum_dxl = GPOS_NEW(memory_pool)
-		CDXLDatumInt2(memory_pool, m_mdid, int2gpdb_datum->IsNull(), int2gpdb_datum->Value());
+	CDXLDatumInt2 *datum_dxl = GPOS_NEW(mp)
+		CDXLDatumInt2(mp, m_mdid, int2gpdb_datum->IsNull(), int2gpdb_datum->Value());
 
-	return GPOS_NEW(memory_pool) CDXLScalarConstValue(memory_pool, datum_dxl);
+	return GPOS_NEW(mp) CDXLScalarConstValue(mp, datum_dxl);
 }
 
 //---------------------------------------------------------------------------
@@ -294,12 +294,12 @@ CMDTypeInt2GPDB::GetDXLOpScConst(IMemoryPool *memory_pool, IDatum *datum) const
 //
 //---------------------------------------------------------------------------
 CDXLDatum *
-CMDTypeInt2GPDB::GetDXLDatumNull(IMemoryPool *memory_pool) const
+CMDTypeInt2GPDB::GetDXLDatumNull(IMemoryPool *mp) const
 {
 	m_mdid->AddRef();
 
-	return GPOS_NEW(memory_pool)
-		CDXLDatumInt2(memory_pool, m_mdid, true /*is_null*/, 1 /* a dummy m_bytearray_value */);
+	return GPOS_NEW(mp)
+		CDXLDatumInt2(mp, m_mdid, true /*is_null*/, 1 /* a dummy m_bytearray_value */);
 }
 
 #ifdef GPOS_DEBUG

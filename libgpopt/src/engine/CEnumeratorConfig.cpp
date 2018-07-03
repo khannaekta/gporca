@@ -36,13 +36,13 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CEnumeratorConfig::CEnumeratorConfig
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ULLONG plan_id,
 	ULLONG ullSamples,
 	CDouble cost_threshold
 	)
 	:
-	m_memory_pool(memory_pool),
+	m_mp(mp),
 	m_plan_id(plan_id),
 	m_ullSpaceSize(0),
 	m_ullInputSamples(ullSamples),
@@ -57,7 +57,7 @@ CEnumeratorConfig::CEnumeratorConfig
 	m_fSampleValidPlans(true),
 	m_pfpc(NULL)
 {
-	m_pdrgpsp = GPOS_NEW(memory_pool) SamplePlanArray(memory_pool);
+	m_pdrgpsp = GPOS_NEW(mp) SamplePlanArray(mp);
 }
 
 
@@ -159,7 +159,7 @@ CEnumeratorConfig::FAddSample
 					(cost <= m_costBest * m_dCostThreshold);
 	if (fAccept)
 	{
-		m_pdrgpsp->Append(GPOS_NEW(m_memory_pool) SSamplePlan(plan_id, cost));
+		m_pdrgpsp->Append(GPOS_NEW(m_mp) SSamplePlan(plan_id, cost));
 
 		if (GPOPT_INVALID_COST == m_costMax || cost > m_costMax)
 		{
@@ -296,10 +296,10 @@ CEnumeratorConfig::FitCostDistribution()
 	GPOS_DELETE_ARRAY(m_pdY);
 	InitCostDistrSize();
 	ULONG ulCreatedSamples = UlCreatedSamples();
-	m_pdX = GPOS_NEW_ARRAY(m_memory_pool, DOUBLE, m_ulDistrSize);
-	m_pdY = GPOS_NEW_ARRAY(m_memory_pool, DOUBLE, m_ulDistrSize);
-	DOUBLE *pdObervationX = GPOS_NEW_ARRAY(m_memory_pool, DOUBLE, ulCreatedSamples);
-	DOUBLE *pdObervationY = GPOS_NEW_ARRAY(m_memory_pool, DOUBLE, ulCreatedSamples);
+	m_pdX = GPOS_NEW_ARRAY(m_mp, DOUBLE, m_ulDistrSize);
+	m_pdY = GPOS_NEW_ARRAY(m_mp, DOUBLE, m_ulDistrSize);
+	DOUBLE *pdObervationX = GPOS_NEW_ARRAY(m_mp, DOUBLE, ulCreatedSamples);
+	DOUBLE *pdObervationY = GPOS_NEW_ARRAY(m_mp, DOUBLE, ulCreatedSamples);
 
 	for (ULONG ul = 0; ul < ulCreatedSamples; ul++)
 	{
@@ -345,7 +345,7 @@ CEnumeratorConfig::DumpSamples
 	// dump samples to output file
 	CHAR file_name[GPOS_FILE_NAME_BUF_SIZE];
 	CUtils::GenerateFileName(file_name, "SamplePlans", "xml", GPOS_FILE_NAME_BUF_SIZE, ulSessionId, ulCommandId);
-	CHAR *sz = CUtils::CreateMultiByteCharStringFromWCString(m_memory_pool, const_cast<WCHAR *>(str->GetBuffer()));
+	CHAR *sz = CUtils::CreateMultiByteCharStringFromWCString(m_mp, const_cast<WCHAR *>(str->GetBuffer()));
 	CIOUtils::Dump(file_name, sz);
 	GPOS_DELETE_ARRAY(sz);
 
@@ -379,7 +379,7 @@ CEnumeratorConfig::DumpCostDistr
 	// dump cost distribution to output file
 	CHAR file_name[GPOS_FILE_NAME_BUF_SIZE];
 	CUtils::GenerateFileName(file_name, "CostDistr", "xml", GPOS_FILE_NAME_BUF_SIZE, ulSessionId, ulCommandId);
-	CHAR *sz = CUtils::CreateMultiByteCharStringFromWCString(m_memory_pool, const_cast<WCHAR *>(str->GetBuffer()));
+	CHAR *sz = CUtils::CreateMultiByteCharStringFromWCString(m_mp, const_cast<WCHAR *>(str->GetBuffer()));
 	CIOUtils::Dump(file_name, sz);
 	GPOS_DELETE_ARRAY(sz);
 
@@ -401,7 +401,7 @@ CEnumeratorConfig::DumpCostDistr
 void
 CEnumeratorConfig::PrintPlanSample() const
 {
-	CAutoTrace at(m_memory_pool);
+	CAutoTrace at(m_mp);
 
 	const ULONG ulSamples = UlCreatedSamples();
 	at.Os() << "[OPT]: Generated "<< ulSamples <<" plan samples: ";

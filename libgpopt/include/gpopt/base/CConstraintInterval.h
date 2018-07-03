@@ -63,7 +63,7 @@ namespace gpopt
 			// at the range with the given index
 			void AddRemainingRanges
 					(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					RangeArray *pdrgprngSrc,
 					ULONG ulStart,
 					RangeArray *pdrgprngDest
@@ -72,7 +72,7 @@ namespace gpopt
 			// append the given range to the array or extend the last element
 			void AppendOrExtend
 					(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					RangeArray *pdrgprng,
 					CRange *prange
 					);
@@ -81,7 +81,7 @@ namespace gpopt
 			// any difference on the right side is reported as residual range
 			CRange *PrangeDiffWithRightResidual
 					(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					CRange *prangeFirst,
 					CRange *prangeSecond,
 					CRange **pprangeResidual,
@@ -93,16 +93,16 @@ namespace gpopt
 
 			// construct scalar expression
 			virtual
-			CExpression *PexprConstructScalar(IMemoryPool *memory_pool) const;
+			CExpression *PexprConstructScalar(IMemoryPool *mp) const;
 
 			virtual
-			CExpression *PexprConstructArrayScalar(IMemoryPool *memory_pool) const;
+			CExpression *PexprConstructArrayScalar(IMemoryPool *mp) const;
 
 			// create interval from scalar comparison expression
 			static
 			CConstraintInterval *PciIntervalFromScalarCmp
 									(
-									IMemoryPool *memory_pool,
+									IMemoryPool *mp,
 									CExpression *pexpr,
 									CColRef *colref
 									);
@@ -110,7 +110,7 @@ namespace gpopt
 			static
 			CConstraintInterval *PciIntervalFromScalarIDF
 									(
-									IMemoryPool *memory_pool,
+									IMemoryPool *mp,
 									CExpression *pexpr,
 									CColRef *colref
 									);
@@ -119,7 +119,7 @@ namespace gpopt
 			static
 			CConstraintInterval *PciIntervalFromScalarBoolOp
 									(
-									IMemoryPool *memory_pool,
+									IMemoryPool *mp,
 									CExpression *pexpr,
 									CColRef *colref
 									);
@@ -128,7 +128,7 @@ namespace gpopt
 			static
 			CConstraintInterval *PciIntervalFromScalarBoolAnd
 									(
-									IMemoryPool *memory_pool,
+									IMemoryPool *mp,
 									CExpression *pexpr,
 									CColRef *colref
 									);
@@ -137,7 +137,7 @@ namespace gpopt
 			static
 			CConstraintInterval *PciIntervalFromScalarBoolOr
 									(
-									IMemoryPool *memory_pool,
+									IMemoryPool *mp,
 									CExpression *pexpr,
 									CColRef *colref
 									);
@@ -146,24 +146,24 @@ namespace gpopt
 			static
 			CConstraintInterval *PciIntervalFromScalarNullTest
 									(
-									IMemoryPool *memory_pool,
+									IMemoryPool *mp,
 									CExpression *pexpr,
 									CColRef *colref
 									);
 
 			// creates a range like [x,x] where x is a constant
 			static
-			RangeArray *PciRangeFromColConstCmp(IMemoryPool *memory_pool,
+			RangeArray *PciRangeFromColConstCmp(IMemoryPool *mp,
 											 IMDType::ECmpType cmp_type,
 											 const CScalarConst *popScConst);
 
 			// create an array IN or NOT IN expression
 			CExpression *
-			PexprConstructArrayScalar(IMemoryPool *memory_pool, bool isIn) const;
+			PexprConstructArrayScalar(IMemoryPool *mp, bool isIn) const;
 		public:
 
 			// ctor
-			CConstraintInterval(IMemoryPool *memory_pool, const CColRef *colref, RangeArray *pdrgprng, BOOL is_null);
+			CConstraintInterval(IMemoryPool *mp, const CColRef *colref, RangeArray *pdrgprng, BOOL is_null);
 
 			// dtor
 			virtual
@@ -215,41 +215,41 @@ namespace gpopt
 
 			// return a copy of the constraint with remapped columns
 			virtual
-			CConstraint *PcnstrCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			CConstraint *PcnstrCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// interval intersection
-			CConstraintInterval *PciIntersect(IMemoryPool *memory_pool, CConstraintInterval *pci);
+			CConstraintInterval *PciIntersect(IMemoryPool *mp, CConstraintInterval *pci);
 
 			// interval union
-			CConstraintInterval *PciUnion(IMemoryPool *memory_pool, CConstraintInterval *pci);
+			CConstraintInterval *PciUnion(IMemoryPool *mp, CConstraintInterval *pci);
 
 			// interval difference
-			CConstraintInterval *PciDifference(IMemoryPool *memory_pool, CConstraintInterval *pci);
+			CConstraintInterval *PciDifference(IMemoryPool *mp, CConstraintInterval *pci);
 
 			// interval complement
-			CConstraintInterval *PciComplement(IMemoryPool *memory_pool);
+			CConstraintInterval *PciComplement(IMemoryPool *mp);
 
 			// does the current interval contain the given interval?
-			BOOL FContainsInterval(IMemoryPool *memory_pool, CConstraintInterval *pci);
+			BOOL FContainsInterval(IMemoryPool *mp, CConstraintInterval *pci);
 
 			// scalar expression
 			virtual
-			CExpression *PexprScalar(IMemoryPool *memory_pool);
+			CExpression *PexprScalar(IMemoryPool *mp);
 
 			// scalar expression  which will be a disjunction
-			CExpression *PexprConstructDisjunctionScalar(IMemoryPool *memory_pool) const;
+			CExpression *PexprConstructDisjunctionScalar(IMemoryPool *mp) const;
 
 			// return constraint on a given column
 			virtual
-			CConstraint *Pcnstr(IMemoryPool *memory_pool, const CColRef *colref);
+			CConstraint *Pcnstr(IMemoryPool *mp, const CColRef *colref);
 
 			// return constraint on a given column set
 			virtual
-			CConstraint *Pcnstr(IMemoryPool *memory_pool, CColRefSet *pcrs);
+			CConstraint *Pcnstr(IMemoryPool *mp, CColRefSet *pcrs);
 
 			// return a clone of the constraint for a different column
 			virtual
-			CConstraint *PcnstrRemapForColumn(IMemoryPool *memory_pool, CColRef *colref) const;
+			CConstraint *PcnstrRemapForColumn(IMemoryPool *mp, CColRef *colref) const;
 
 			// converts to an array in expression
 			bool FConvertsToNotIn() const;
@@ -263,17 +263,17 @@ namespace gpopt
 
 			// create unbounded interval
 			static
-			CConstraintInterval *PciUnbounded(IMemoryPool *memory_pool, const CColRef *colref, BOOL fIncludesNull);
+			CConstraintInterval *PciUnbounded(IMemoryPool *mp, const CColRef *colref, BOOL fIncludesNull);
 
 			// create an unbounded interval on any column from the given set
 			static
-			CConstraintInterval *PciUnbounded(IMemoryPool *memory_pool,	const CColRefSet *pcrs,	BOOL fIncludesNull);
+			CConstraintInterval *PciUnbounded(IMemoryPool *mp,	const CColRefSet *pcrs,	BOOL fIncludesNull);
 
 			// helper for create interval from comparison between a column and a constant
 			static
 			CConstraintInterval *PciIntervalFromColConstCmp
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CColRef *colref,
 				IMDType::ECmpType cmp_type,
 				CScalarConst *popScConst
@@ -283,7 +283,7 @@ namespace gpopt
 			static
 			CConstraintInterval *PciIntervalFromScalarExpr
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexpr,
 				CColRef *colref
 				);
@@ -293,7 +293,7 @@ namespace gpopt
 			static
 			CConstraintInterval *PciIntervalFromConstraint
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CConstraint *pcnstr,
 				CColRef *colref = NULL
 				);
@@ -302,7 +302,7 @@ namespace gpopt
 			static
 			CConstraintInterval *PcnstrIntervalFromScalarArrayCmp
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexpr,
 				CColRef *colref
 				);

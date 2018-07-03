@@ -30,10 +30,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerMDGPDBFunc::CParseHandlerMDGPDBFunc(IMemoryPool *memory_pool,
+CParseHandlerMDGPDBFunc::CParseHandlerMDGPDBFunc(IMemoryPool *mp,
 												 CParseHandlerManager *parse_handler_mgr,
 												 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerMetadataObject(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerMetadataObject(mp, parse_handler_mgr, parse_handler_root),
 	  m_mdid(NULL),
 	  m_mdname(NULL),
 	  m_mdid_type_result(NULL),
@@ -67,7 +67,7 @@ CParseHandlerMDGPDBFunc::StartElement(const XMLCh *const,  // element_uri,
 			m_parse_handler_mgr->GetDXLMemoryManager(), xml_str_func_name);
 
 		// create a copy of the string in the CMDName constructor
-		m_mdname = GPOS_NEW(m_memory_pool) CMDName(m_memory_pool, str_func_name);
+		m_mdname = GPOS_NEW(m_mp) CMDName(m_mp, str_func_name);
 
 		GPOS_DELETE(str_func_name);
 
@@ -150,7 +150,7 @@ CParseHandlerMDGPDBFunc::EndElement(const XMLCh *const,  // element_uri,
 		// construct the MD func object from its part
 		GPOS_ASSERT(m_mdid->IsValid() && NULL != m_mdname);
 
-		m_imd_obj = GPOS_NEW(m_memory_pool) CMDFunctionGPDB(m_memory_pool,
+		m_imd_obj = GPOS_NEW(m_mp) CMDFunctionGPDB(m_mp,
 															m_mdid,
 															m_mdname,
 															m_mdid_type_result,

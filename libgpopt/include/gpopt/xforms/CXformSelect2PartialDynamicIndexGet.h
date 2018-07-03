@@ -37,7 +37,7 @@ namespace gpopt
 			// return the column reference set of included / key columns
 			CColRefSet *GetColRefSet
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CLogicalGet *popGet,
 				const IMDIndex *pmdindex,
 				BOOL fIncludedColumns
@@ -47,7 +47,7 @@ namespace gpopt
 			// create an index get plan when applicable
 			void CreatePartialIndexGetPlan
 					(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					CExpression *pexpr,
 					PartDynamicIndexGetInfoArray *pdrgppartdig,
 					const IMDRelation *pmdrel,
@@ -62,7 +62,7 @@ namespace gpopt
 			static
 			CExpression *PexprSelectOverDynamicGet
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CLogicalDynamicGet *popGet,
 				CExpression *pexprScalar,
 				ColRefArray *pdrgpcrDGet,
@@ -73,7 +73,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformSelect2PartialDynamicIndexGet(IMemoryPool *memory_pool);
+			CXformSelect2PartialDynamicIndexGet(IMemoryPool *mp);
 
 			// dtor
 			virtual

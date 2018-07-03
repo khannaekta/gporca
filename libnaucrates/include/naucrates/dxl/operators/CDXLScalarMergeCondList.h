@@ -33,7 +33,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		explicit CDXLScalarMergeCondList(IMemoryPool *memory_pool);
+		explicit CDXLScalarMergeCondList(IMemoryPool *mp);
 
 		// ident accessors
 		Edxlopid GetDXLOperator() const;

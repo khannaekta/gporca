@@ -32,7 +32,7 @@ namespace gpnaucrates
 	{
 	private:
 		// memory pool
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// size in bytes
 		ULONG m_size;
@@ -59,7 +59,7 @@ namespace gpnaucrates
 
 	public:
 		// ctor
-		CDatumGenericGPDB(IMemoryPool *memory_pool,
+		CDatumGenericGPDB(IMemoryPool *mp,
 						  IMDId *mdid,
 						  INT type_modifier,
 						  const void *src,
@@ -83,7 +83,7 @@ namespace gpnaucrates
 		virtual BOOL IsNull() const;
 
 		// return string representation
-		virtual const CWStringConst *GetStrRepr(IMemoryPool *memory_pool) const;
+		virtual const CWStringConst *GetStrRepr(IMemoryPool *mp) const;
 
 		// hash function
 		virtual ULONG HashValue() const;
@@ -92,13 +92,13 @@ namespace gpnaucrates
 		virtual BOOL Matches(const IDatum *datum) const;
 
 		// copy datum
-		virtual IDatum *MakeCopy(IMemoryPool *memory_pool) const;
+		virtual IDatum *MakeCopy(IMemoryPool *mp) const;
 
 		// print function
 		virtual IOstream &OsPrint(IOstream &os) const;
 
 		// accessor to bytearray, creates a copy
-		virtual BYTE *MakeCopyOfValue(IMemoryPool *memory_pool, ULONG *pulLength) const;
+		virtual BYTE *MakeCopyOfValue(IMemoryPool *mp, ULONG *pulLength) const;
 
 		// statistics related APIs
 
@@ -139,7 +139,7 @@ namespace gpnaucrates
 		virtual BOOL NeedsPadding() const;
 
 		// return the padded datum
-		virtual IDatum *MakePaddedDatum(IMemoryPool *memory_pool, ULONG col_len) const;
+		virtual IDatum *MakePaddedDatum(IMemoryPool *mp, ULONG col_len) const;
 
 		// statistics equality based on byte array representation of datums
 		virtual BOOL StatsEqualBinary(const IDatum *datum) const;

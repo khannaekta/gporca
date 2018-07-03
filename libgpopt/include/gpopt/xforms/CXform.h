@@ -307,7 +307,7 @@ namespace gpopt
 
 			// verify xform promise on the given expression
 			static
-			BOOL FPromising(IMemoryPool *memory_pool, const CXform *pxform, CExpression *pexpr);
+			BOOL FPromising(IMemoryPool *mp, const CXform *pxform, CExpression *pexpr);
 
 #endif // GPOS_DEBUG
 
@@ -319,32 +319,32 @@ namespace gpopt
 			// returns a set containing all xforms related to index join
 			// caller takes ownership of the returned set
 			static
-			CBitSet *PbsIndexJoinXforms(IMemoryPool *memory_pool);
+			CBitSet *PbsIndexJoinXforms(IMemoryPool *mp);
 
 			// returns a set containing all xforms related to bitmap indexes
 			// caller takes ownership of the returned set
 			static
-			CBitSet *PbsBitmapIndexXforms(IMemoryPool *memory_pool);
+			CBitSet *PbsBitmapIndexXforms(IMemoryPool *mp);
 
 			// returns a set containing all xforms related to heterogeneous indexes
 			// caller takes ownership of the returned set
 			static
-			CBitSet *PbsHeterogeneousIndexXforms(IMemoryPool *memory_pool);
+			CBitSet *PbsHeterogeneousIndexXforms(IMemoryPool *mp);
 
 			// returns a set containing all xforms that generate a plan with a hash join
 			// caller takes ownership of the returned set
 			static
-			CBitSet *PbsHashJoinXforms(IMemoryPool *memory_pool);
+			CBitSet *PbsHashJoinXforms(IMemoryPool *mp);
 
 			// returns a set containing xforms to use only the join order as available
 			// in the query
 			static
-			CBitSet *PbsJoinOrderInQueryXforms(IMemoryPool *memory_pool);
+			CBitSet *PbsJoinOrderInQueryXforms(IMemoryPool *mp);
 
 			// returns a set containing xforms to use combination of greedy xforms
 			// for join order
 			static
-			CBitSet *PbsJoinOrderOnGreedyXforms(IMemoryPool *memory_pool);
+			CBitSet *PbsJoinOrderOnGreedyXforms(IMemoryPool *mp);
 
 			// return true if xform should be applied only once.
 			// for expression of type CPatternTree, in deep trees, the number

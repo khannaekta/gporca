@@ -26,8 +26,8 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalSort::CDXLPhysicalSort(IMemoryPool *memory_pool, BOOL discard_duplicates)
-	: CDXLPhysical(memory_pool), m_discard_duplicates(discard_duplicates)
+CDXLPhysicalSort::CDXLPhysicalSort(IMemoryPool *mp, BOOL discard_duplicates)
+	: CDXLPhysical(mp), m_discard_duplicates(discard_duplicates)
 {
 }
 

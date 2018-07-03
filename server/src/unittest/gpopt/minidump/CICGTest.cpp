@@ -166,26 +166,26 @@ CICGTest::EresUnittest_RunUnsupportedMinidumpTests()
 	CAutoTraceFlag atf2(EopttraceDisableXformBase + CXform::ExfDynamicGet2DynamicTableScan, true);
 	
 	CAutoMemoryPool amp(CAutoMemoryPool::ElcNone);
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 	
 	GPOS_RESULT eres = GPOS_OK;
 	const ULONG ulTests = GPOS_ARRAY_SIZE(unSupportedTestCases);
 	for (ULONG ul = m_ulUnsupportedTestCounter; ul < ulTests; ul++)
 	{
 		const CHAR *filename = unSupportedTestCases[ul].filename;
-		CDXLMinidump *pdxlmd = CMinidumperUtils::PdxlmdLoad(memory_pool, filename);
+		CDXLMinidump *pdxlmd = CMinidumperUtils::PdxlmdLoad(mp, filename);
 		bool unmatchedException = false;
 		ULONG unmatchedExceptionMajor = 0;
 		ULONG unmatchedExceptionMinor = 0;
 
 		GPOS_TRY
 		{
-			ICostModel *pcm = CTestUtils::GetCostModel(memory_pool);
+			ICostModel *pcm = CTestUtils::GetCostModel(mp);
 
 			COptimizerConfig *optimizer_config = pdxlmd->GetOptimizerConfig();
 			CDXLNode *pdxlnPlan = CMinidumperUtils::PdxlnExecuteMinidump
 									(
-									memory_pool,
+									mp,
 									filename,
 									optimizer_config->GetCostModel()->UlHosts() /*ulSegments*/,
 									1 /*ulSessionId*/, 
@@ -228,7 +228,7 @@ CICGTest::EresUnittest_RunUnsupportedMinidumpTests()
 
 		if (GPOS_FAILED == eres && unmatchedException)
 		{
-			CAutoTrace at(memory_pool);
+			CAutoTrace at(mp);
 			at.Os() << "Test failed due to unmatched exceptions." << std::endl;
 			at.Os() << " Expected result: " << unSupportedTestCases[ul].major << "." << unSupportedTestCases[ul].minor << std::endl;
 			at.Os() << " Actual result: " << unmatchedExceptionMajor << "." << unmatchedExceptionMinor << std::endl;
@@ -265,7 +265,7 @@ CICGTest::EresUnittest_NegativeIndexApplyTests()
 	CAutoTraceFlag atfNLJ(EopttraceDisableXformBase + CXform::ExfInnerJoin2NLJoin, true);
 
 	CAutoMemoryPool amp(CAutoMemoryPool::ElcNone);
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	GPOS_RESULT eres = GPOS_OK;
 	const ULONG ulTests = GPOS_ARRAY_SIZE(rgszNegativeIndexApplyFileNames);
@@ -273,20 +273,20 @@ CICGTest::EresUnittest_NegativeIndexApplyTests()
 	{
 		GPOS_TRY
 		{
-			ICostModel *pcm = CTestUtils::GetCostModel(memory_pool);
+			ICostModel *pcm = CTestUtils::GetCostModel(mp);
 
-			COptimizerConfig *optimizer_config = GPOS_NEW(memory_pool) COptimizerConfig
+			COptimizerConfig *optimizer_config = GPOS_NEW(mp) COptimizerConfig
 						(
-						CEnumeratorConfig::GetEnumeratorCfg(memory_pool, 0 /*plan_id*/),
-						CStatisticsConfig::PstatsconfDefault(memory_pool),
-						CCTEConfig::PcteconfDefault(memory_pool),
+						CEnumeratorConfig::GetEnumeratorCfg(mp, 0 /*plan_id*/),
+						CStatisticsConfig::PstatsconfDefault(mp),
+						CCTEConfig::PcteconfDefault(mp),
 						pcm,
-						CHint::PhintDefault(memory_pool),
-						CWindowOids::GetWindowOids(memory_pool)
+						CHint::PhintDefault(mp),
+						CWindowOids::GetWindowOids(mp)
 						);
 			CDXLNode *pdxlnPlan = CMinidumperUtils::PdxlnExecuteMinidump
 									(
-									memory_pool,
+									mp,
 									rgszNegativeIndexApplyFileNames[ul],
 									GPOPT_TEST_SEGMENTS /*ulSegments*/,
 									1 /*ulSessionId*/,
@@ -416,15 +416,15 @@ GPOS_RESULT
 CICGTest::EresUnittest_PreferHashJoinVersusIndexJoinWhenRiskIsHigh()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// enable (Redistribute, Broadcast) hash join plans
 	CAutoTraceFlag atf(EopttraceEnableRedistributeBroadcastHashJoin, true /*m_bytearray_value*/);
 
 	// When the risk threshold is infinite, we should pick index join
-	CostModelParamsArray *pdrgpcpUnlimited = GPOS_NEW(memory_pool) CostModelParamsArray(memory_pool);
+	CostModelParamsArray *pdrgpcpUnlimited = GPOS_NEW(mp) CostModelParamsArray(mp);
 	ICostModelParams::SCostParam *pcpUnlimited =
-		GPOS_NEW(memory_pool) ICostModelParams::SCostParam(
+		GPOS_NEW(mp) ICostModelParams::SCostParam(
 			CCostModelParamsGPDB::EcpIndexJoinAllowedRiskThreshold,
 			gpos::ulong_max,  // dVal
 			0,				  // dLowerBound
@@ -449,8 +449,8 @@ CICGTest::EresUnittest_PreferHashJoinVersusIndexJoinWhenRiskIsHigh()
 	}
 
 	// When the risk threshold is zero, we should not pick index join
-	CostModelParamsArray *pdrgpcpNoIndexJoin = GPOS_NEW(memory_pool) CostModelParamsArray(memory_pool);
-	ICostModelParams::SCostParam *pcpNoIndexJoin = GPOS_NEW(memory_pool) ICostModelParams::SCostParam
+	CostModelParamsArray *pdrgpcpNoIndexJoin = GPOS_NEW(mp) CostModelParamsArray(mp);
+	ICostModelParams::SCostParam *pcpNoIndexJoin = GPOS_NEW(mp) ICostModelParams::SCostParam
 								(
 								CCostModelParamsGPDB::EcpIndexJoinAllowedRiskThreshold,
 								0,  // dVal

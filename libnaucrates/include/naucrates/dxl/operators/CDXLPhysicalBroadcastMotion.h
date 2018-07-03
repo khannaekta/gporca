@@ -45,7 +45,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		explicit CDXLPhysicalBroadcastMotion(IMemoryPool *memory_pool);
+		explicit CDXLPhysicalBroadcastMotion(IMemoryPool *mp);
 
 		// accessors
 		Edxlopid GetDXLOperator() const;

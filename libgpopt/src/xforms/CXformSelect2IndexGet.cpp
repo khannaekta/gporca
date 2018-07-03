@@ -31,18 +31,18 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CXformSelect2IndexGet::CXformSelect2IndexGet
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	// pattern
 	CXformExploration
 		(
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalSelect(memory_pool),
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CLogicalGet(memory_pool)), // relational child
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))	// predicate tree
+				mp,
+				GPOS_NEW(mp) CLogicalSelect(mp),
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalGet(mp)), // relational child
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))	// predicate tree
 				)
 		)
 {}
@@ -92,7 +92,7 @@ CXformSelect2IndexGet::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
 	CExpression *pexprRelational = (*pexpr)[0];
@@ -107,14 +107,14 @@ CXformSelect2IndexGet::Transform
 	}
 	
 	// array of expressions in the scalar expression
-	ExpressionArray *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pexprScalar);
+	ExpressionArray *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 	GPOS_ASSERT(pdrgpexpr->Size() > 0);
 
 	// derive the scalar and relational properties to build set of required columns
 	CColRefSet *pcrsOutput = CDrvdPropRelational::GetRelationalProperties(pexpr->PdpDerive())->PcrsOutput();
 	CColRefSet *pcrsScalarExpr = CDrvdPropScalar::GetDrvdScalarProps(pexprScalar->PdpDerive())->PcrsUsed();
 
-	CColRefSet *pcrsReqd = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrsReqd = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsReqd->Include(pcrsOutput);
 	pcrsReqd->Include(pcrsScalarExpr);
 
@@ -128,7 +128,7 @@ CXformSelect2IndexGet::Transform
 		const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pmdidIndex);
 		CExpression *pexprIndexGet = CXformUtils::PexprLogicalIndexGet
 						(
-						 memory_pool,
+						 mp,
 						 md_accessor,
 						 pexprRelational,
 						 pexpr->Pop()->UlOpId(),

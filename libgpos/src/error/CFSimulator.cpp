@@ -50,7 +50,7 @@ CFSimulator::AddTracker(CStackTracker::SStackKey key)
 
 	// allocate new tracker before getting the spinlock
 	CStackTracker *new_stack_tracker =
-		GPOS_NEW(m_memory_pool) CStackTracker(m_memory_pool, m_resolution, key);
+		GPOS_NEW(m_mp) CStackTracker(m_mp, m_resolution, key);
 
 	// assume somebody overtook
 	BOOL overtaken = true;
@@ -133,9 +133,9 @@ GPOS_RESULT
 CFSimulator::Init()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
-	CFSimulator::m_fsim = GPOS_NEW(memory_pool) CFSimulator(memory_pool, GPOS_FSIM_RESOLUTION);
+	CFSimulator::m_fsim = GPOS_NEW(mp) CFSimulator(mp, GPOS_FSIM_RESOLUTION);
 
 	// detach safety
 	(void) amp.Detach();
@@ -156,11 +156,11 @@ CFSimulator::Init()
 void
 CFSimulator::Shutdown()
 {
-	IMemoryPool *memory_pool = m_memory_pool;
+	IMemoryPool *mp = m_mp;
 	GPOS_DELETE(CFSimulator::m_fsim);
 	CFSimulator::m_fsim = NULL;
 
-	CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(memory_pool);
+	CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(mp);
 }
 #endif  // GPOS_DEBUG
 
@@ -173,11 +173,11 @@ CFSimulator::Shutdown()
 //		ctor
 //
 //---------------------------------------------------------------------------
-CFSimulator::CStackTracker::CStackTracker(IMemoryPool *memory_pool, ULONG resolution, SStackKey key)
+CFSimulator::CStackTracker::CStackTracker(IMemoryPool *mp, ULONG resolution, SStackKey key)
 	: m_key(key), m_bit_vector(NULL)
 {
 	// allocate bit vector
-	m_bit_vector = GPOS_NEW(memory_pool) CBitVector(memory_pool, resolution);
+	m_bit_vector = GPOS_NEW(mp) CBitVector(mp, resolution);
 }
 
 
@@ -204,11 +204,11 @@ CFSimulator::CStackTracker::ExchangeSet(ULONG bit)
 //		ctor
 //
 //---------------------------------------------------------------------------
-CFSimulator::CFSimulator(IMemoryPool *memory_pool, ULONG resolution)
-	: m_memory_pool(memory_pool), m_resolution(resolution)
+CFSimulator::CFSimulator(IMemoryPool *mp, ULONG resolution)
+	: m_mp(mp), m_resolution(resolution)
 {
 	// setup init table
-	m_stack.Init(m_memory_pool,
+	m_stack.Init(m_mp,
 				 1024,
 				 GPOS_OFFSET(CStackTracker, m_link),
 				 GPOS_OFFSET(CStackTracker, m_key),

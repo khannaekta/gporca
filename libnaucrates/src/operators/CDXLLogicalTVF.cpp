@@ -26,12 +26,12 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLLogicalTVF::CDXLLogicalTVF(IMemoryPool *memory_pool,
+CDXLLogicalTVF::CDXLLogicalTVF(IMemoryPool *mp,
 							   IMDId *mdid_func,
 							   IMDId *mdid_return_type,
 							   CMDName *mdname,
 							   DXLColumnDescrArray *pdrgdxlcd)
-	: CDXLLogical(memory_pool),
+	: CDXLLogical(mp),
 	  m_func_mdid(mdid_func),
 	  m_return_type_mdid(mdid_return_type),
 	  m_mdname(mdname),

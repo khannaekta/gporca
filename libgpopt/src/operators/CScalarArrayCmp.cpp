@@ -42,13 +42,13 @@ const CHAR CScalarArrayCmp::m_rgszCmpType[EarrcmpSentinel][10] =
 //---------------------------------------------------------------------------
 CScalarArrayCmp::CScalarArrayCmp
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IMDId *mdid_op,
 	const CWStringConst *pstrOp,
 	EArrCmpType earrcmpt
 	)
 	:
-	CScalar(memory_pool),
+	CScalar(mp),
 	m_mdid_op(mdid_op),
 	m_pscOp(pstrOp),
 	m_earrccmpt(earrcmpt),
@@ -210,7 +210,7 @@ CScalarArrayCmp::OsPrint
 CExpression *
 CScalarArrayCmp::PexprExpand
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexprArrayCmp
 	)
 {
@@ -236,10 +236,10 @@ CScalarArrayCmp::PexprExpand
 		return pexprArrayCmp;
 	}
 
-	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
 	for (ULONG ul = 0; ul < ulArrayElems; ul++)
 	{
-		CExpression *pexprArrayElem = CUtils::PScalarArrayExprChildAt(memory_pool, pexprArray, ul);
+		CExpression *pexprArrayElem = CUtils::PScalarArrayExprChildAt(mp, pexprArray, ul);
 		pexprIdent->AddRef();
 		const CWStringConst *str_opname = popArrayCmp->Pstr();
 		IMDId *mdid_op = popArrayCmp->MdIdOp();
@@ -247,23 +247,23 @@ CScalarArrayCmp::PexprExpand
 
 		mdid_op->AddRef();
 
-		CExpression *pexprCmp = CUtils::PexprScalarCmp(memory_pool, pexprIdent, pexprArrayElem, *str_opname, mdid_op);
+		CExpression *pexprCmp = CUtils::PexprScalarCmp(mp, pexprIdent, pexprArrayElem, *str_opname, mdid_op);
 		pdrgpexpr->Append(pexprCmp);
 	}
 	GPOS_ASSERT(0 < pdrgpexpr->Size());
 
 	// deduplicate resulting array
-	ExpressionArray *pdrgpexprDeduped = CUtils::PdrgpexprDedup(memory_pool, pdrgpexpr);
+	ExpressionArray *pdrgpexprDeduped = CUtils::PdrgpexprDedup(mp, pdrgpexpr);
 	pdrgpexpr->Release();
 
 	EArrCmpType earrcmpt = popArrayCmp->Earrcmpt();
 	if (EarrcmpAny == earrcmpt)
 	{
-		return CPredicateUtils::PexprDisjunction(memory_pool, pdrgpexprDeduped);
+		return CPredicateUtils::PexprDisjunction(mp, pdrgpexprDeduped);
 	}
 	GPOS_ASSERT(EarrcmpAll == earrcmpt);
 
-	return CPredicateUtils::PexprConjunction(memory_pool, pdrgpexprDeduped);
+	return CPredicateUtils::PexprConjunction(mp, pdrgpexprDeduped);
 }
 
 

@@ -55,11 +55,11 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerPhysicalBitmapTableScan(IMemoryPool *memory_pool,
+		CParseHandlerPhysicalBitmapTableScan(IMemoryPool *mp,
 											 CParseHandlerManager *parse_handler_mgr,
 											 CParseHandlerBase *parse_handler_root)
 			: CParseHandlerPhysicalAbstractBitmapScan(
-				  memory_pool, parse_handler_mgr, parse_handler_root)
+				  mp, parse_handler_mgr, parse_handler_root)
 		{
 		}
 	};

@@ -32,16 +32,16 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CDrvdPropCtxtPlan::CDrvdPropCtxtPlan
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	BOOL fUpdateCTEMap
 	)
 	:
-	CDrvdPropCtxt(memory_pool),
+	CDrvdPropCtxt(mp),
 	m_phmulpdpCTEs(NULL),
 	m_ulExpectedPartitionSelectors(0),
 	m_fUpdateCTEMap(fUpdateCTEMap)
 {
-	m_phmulpdpCTEs = GPOS_NEW(m_memory_pool) HMUlPdp(m_memory_pool);
+	m_phmulpdpCTEs = GPOS_NEW(m_mp) HMUlPdp(m_mp);
 }
 
 
@@ -70,11 +70,11 @@ CDrvdPropCtxtPlan::~CDrvdPropCtxtPlan()
 CDrvdPropCtxt *
 CDrvdPropCtxtPlan::PdpctxtCopy
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	CDrvdPropCtxtPlan *pdpctxtplan = GPOS_NEW(memory_pool) CDrvdPropCtxtPlan(memory_pool);
+	CDrvdPropCtxtPlan *pdpctxtplan = GPOS_NEW(mp) CDrvdPropCtxtPlan(mp);
 	pdpctxtplan->m_ulExpectedPartitionSelectors = m_ulExpectedPartitionSelectors;
 
 	HMUlPdpIter hmulpdpiter(m_phmulpdpCTEs);
@@ -86,7 +86,7 @@ CDrvdPropCtxtPlan::PdpctxtCopy
 	#ifdef GPOS_DEBUG
 		BOOL fInserted =
 	#endif // GPOS_DEBUG
-			pdpctxtplan->m_phmulpdpCTEs->Insert(GPOS_NEW(m_memory_pool) ULONG(id), pdpplan);
+			pdpctxtplan->m_phmulpdpCTEs->Insert(GPOS_NEW(m_mp) ULONG(id), pdpplan);
 		GPOS_ASSERT(fInserted);
 	}
 
@@ -129,7 +129,7 @@ CDrvdPropCtxtPlan::AddProps
 #ifdef GPOS_DEBUG
 		BOOL fInserted =
 #endif // GPOS_DEBUG
-				m_phmulpdpCTEs->Insert(GPOS_NEW(m_memory_pool) ULONG(ulProducerId), pdpplanProducer);
+				m_phmulpdpCTEs->Insert(GPOS_NEW(m_mp) ULONG(ulProducerId), pdpplanProducer);
 		GPOS_ASSERT(fInserted);
 	}
 }
@@ -206,7 +206,7 @@ CDrvdPropCtxtPlan::CopyCTEProducerProps
 #ifdef GPOS_DEBUG
 	BOOL fInserted =
 #endif // GPOS_DEBUG
-		m_phmulpdpCTEs->Insert(GPOS_NEW(m_memory_pool) ULONG(ulCTEId), pdpplan);
+		m_phmulpdpCTEs->Insert(GPOS_NEW(m_mp) ULONG(ulCTEId), pdpplan);
 	GPOS_ASSERT(fInserted);
 }
 

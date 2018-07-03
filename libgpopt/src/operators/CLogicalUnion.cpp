@@ -31,10 +31,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalUnion::CLogicalUnion
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogicalSetOp(memory_pool)
+	CLogicalSetOp(mp)
 {
 	m_fPattern = true;
 }
@@ -49,12 +49,12 @@ CLogicalUnion::CLogicalUnion
 //---------------------------------------------------------------------------
 CLogicalUnion::CLogicalUnion
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ColRefArray *pdrgpcrOutput,
 	ColRefArrays *pdrgpdrgpcrInput
 	)
 	:
-	CLogicalSetOp(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput)
+	CLogicalSetOp(mp, pdrgpcrOutput, pdrgpdrgpcrInput)
 {
 
 #ifdef GPOS_DEBUG
@@ -95,15 +95,15 @@ CLogicalUnion::~CLogicalUnion()
 COperator *
 CLogicalUnion::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	BOOL must_exist
 	)
 {
-	ColRefArray *pdrgpcrOutput = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrOutput, colref_mapping, must_exist);
-	ColRefArrays *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(memory_pool, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
+	ColRefArray *pdrgpcrOutput = CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput, colref_mapping, must_exist);
+	ColRefArrays *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(mp, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
 
-	return GPOS_NEW(memory_pool) CLogicalUnion(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput);
+	return GPOS_NEW(mp) CLogicalUnion(mp, pdrgpcrOutput, pdrgpdrgpcrInput);
 }
 
 //---------------------------------------------------------------------------
@@ -117,7 +117,7 @@ CLogicalUnion::PopCopyWithRemappedColumns
 CMaxCard
 CLogicalUnion::Maxcard
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -144,11 +144,11 @@ CLogicalUnion::Maxcard
 CXformSet *
 CLogicalUnion::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	) 
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfUnion2UnionAll);
 	return xform_set;
 }
@@ -164,7 +164,7 @@ CLogicalUnion::PxfsCandidates
 IStatistics *
 CLogicalUnion::PstatsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	StatsArray * // not used
 	)
@@ -174,14 +174,14 @@ CLogicalUnion::PstatsDerive
 
 	// union is transformed into a group by over an union all
 	// we follow the same route to compute statistics
-	IStatistics *pstatsUnionAll = CLogicalUnionAll::PstatsDeriveUnionAll(memory_pool, exprhdl);
+	IStatistics *pstatsUnionAll = CLogicalUnionAll::PstatsDeriveUnionAll(mp, exprhdl);
 
 	// computed columns
-	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(memory_pool) ULongPtrArray(memory_pool);
+	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(mp) ULongPtrArray(mp);
 
 	IStatistics *stats = CLogicalGbAgg::PstatsDerive
 											(
-											memory_pool,
+											mp,
 											pstatsUnionAll,
 											m_pdrgpcrOutput, // we group by the output columns
 											pdrgpulComputedCols, // no computed columns for set ops

@@ -55,23 +55,23 @@ GPOS_RESULT
 CColRefSetTest::EresUnittest_Basics()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// Setup an MD cache with a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(memory_pool, CMDCache::Pcache());
+	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 				(
-				memory_pool,
+				mp,
 				&mda,
 				NULL, /* pceeval */
-				CTestUtils::GetCostModel(memory_pool)
+				CTestUtils::GetCostModel(mp)
 				);
 
 	// get column factory from optimizer context object
@@ -93,7 +93,7 @@ CColRefSetTest::EresUnittest_Basics()
 
 	GPOS_ASSERT(pcrs->Size() == num_cols);
 
-	CColRefSet *pcrsTwo = GPOS_NEW(memory_pool) CColRefSet(memory_pool, *pcrs);
+	CColRefSet *pcrsTwo = GPOS_NEW(mp) CColRefSet(mp, *pcrs);
 	GPOS_ASSERT(pcrsTwo->Size() == num_cols);
 
 	pcrsTwo->Release();

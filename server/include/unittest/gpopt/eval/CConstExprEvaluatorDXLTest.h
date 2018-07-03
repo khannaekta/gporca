@@ -50,7 +50,7 @@ namespace gpopt
 			{
 				private:
 					// memory pool
-					IMemoryPool *m_memory_pool;
+					IMemoryPool *m_mp;
 
 					// metadata accessor
 					CMDAccessor *m_pmda;
@@ -65,12 +65,12 @@ namespace gpopt
 					// ctor
 					CDummyConstDXLNodeEvaluator
 						(
-						IMemoryPool *memory_pool,
+						IMemoryPool *mp,
 						CMDAccessor *md_accessor,
 						INT val
 						)
 						:
-						m_memory_pool(memory_pool),
+						m_mp(mp),
 						m_pmda(md_accessor),
 						m_val(val)
 					{}

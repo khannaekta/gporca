@@ -16,14 +16,14 @@ using namespace gpopt;
 
 // return statistics object after union all operation with input statistics object
 CStatistics *
-CUnionAllStatsProcessor::CreateStatsForUnionAll(IMemoryPool *memory_pool,
+CUnionAllStatsProcessor::CreateStatsForUnionAll(IMemoryPool *mp,
 												const CStatistics *stats_first_child,
 												const CStatistics *stats_second_child,
 												ULongPtrArray *output_colids,
 												ULongPtrArray *first_child_colids,
 												ULongPtrArray *second_child_colids)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != stats_second_child);
 
 	// lengths must match
@@ -32,17 +32,17 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(IMemoryPool *memory_pool,
 
 	// create hash map from colid -> histogram for resultant structure
 	UlongHistogramHashMap *histograms_new =
-		GPOS_NEW(memory_pool) UlongHistogramHashMap(memory_pool);
+		GPOS_NEW(mp) UlongHistogramHashMap(mp);
 
 	// column ids on which widths are to be computed
-	UlongDoubleHashMap *column_to_width_map = GPOS_NEW(memory_pool) UlongDoubleHashMap(memory_pool);
+	UlongDoubleHashMap *column_to_width_map = GPOS_NEW(mp) UlongDoubleHashMap(mp);
 
 	BOOL is_empty_unionall = stats_first_child->IsEmpty() && stats_second_child->IsEmpty();
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 	CDouble unionall_rows = CStatistics::MinRows;
 	if (is_empty_unionall)
 	{
-		CHistogram::AddDummyHistogramAndWidthInfo(memory_pool,
+		CHistogram::AddDummyHistogramAndWidthInfo(mp,
 												  col_factory,
 												  histograms_new,
 												  column_to_width_map,
@@ -69,12 +69,12 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(IMemoryPool *memory_pool,
 			{
 				CHistogram *output_histogram =
 					first_child_histogram->MakeUnionAllHistogramNormalize(
-						memory_pool,
+						mp,
 						stats_first_child->Rows(),
 						second_child_histogram,
 						stats_second_child->Rows());
 				CStatisticsUtils::AddHistogram(
-					memory_pool, output_colid, output_histogram, histograms_new);
+					mp, output_colid, output_histogram, histograms_new);
 				GPOS_DELETE(output_histogram);
 			}
 			else
@@ -83,15 +83,15 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(IMemoryPool *memory_pool,
 				GPOS_ASSERT(NULL != column_ref);
 
 				CHistogram *dummy_histogram =
-					CHistogram::MakeDefaultHistogram(memory_pool, column_ref, false /* is_empty*/);
-				histograms_new->Insert(GPOS_NEW(memory_pool) ULONG(output_colid), dummy_histogram);
+					CHistogram::MakeDefaultHistogram(mp, column_ref, false /* is_empty*/);
+				histograms_new->Insert(GPOS_NEW(mp) ULONG(output_colid), dummy_histogram);
 			}
 
 			// look up width
 			const CDouble *col_width = stats_first_child->GetWidth(first_child_colid);
 			GPOS_ASSERT(NULL != col_width);
-			column_to_width_map->Insert(GPOS_NEW(memory_pool) ULONG(output_colid),
-										GPOS_NEW(memory_pool) CDouble(*col_width));
+			column_to_width_map->Insert(GPOS_NEW(mp) ULONG(output_colid),
+										GPOS_NEW(mp) CDouble(*col_width));
 		}
 
 		unionall_rows = stats_first_child->Rows() + stats_second_child->Rows();
@@ -103,7 +103,7 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(IMemoryPool *memory_pool,
 	second_child_colids->Release();
 
 	// create an output stats object
-	CStatistics *unionall_stats = GPOS_NEW(memory_pool) CStatistics(memory_pool,
+	CStatistics *unionall_stats = GPOS_NEW(mp) CStatistics(mp,
 																	histograms_new,
 																	column_to_width_map,
 																	unionall_rows,
@@ -116,7 +116,7 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(IMemoryPool *memory_pool,
 
 	// modify upper bound card information
 	CStatisticsUtils::ComputeCardUpperBounds(
-		memory_pool,
+		mp,
 		stats_first_child,
 		unionall_stats,
 		unionall_rows,

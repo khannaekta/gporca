@@ -28,12 +28,12 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalLeftOuterHashJoin::CPhysicalLeftOuterHashJoin
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ExpressionArray *pdrgpexprOuterKeys,
 	ExpressionArray *pdrgpexprInnerKeys
 	)
 	:
-	CPhysicalHashJoin(memory_pool, pdrgpexprOuterKeys, pdrgpexprInnerKeys)
+	CPhysicalHashJoin(mp, pdrgpexprOuterKeys, pdrgpexprInnerKeys)
 {
 }
 

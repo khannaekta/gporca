@@ -28,8 +28,8 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarIfStmt::CDXLScalarIfStmt(IMemoryPool *memory_pool, IMDId *result_type_mdid)
-	: CDXLScalar(memory_pool), m_result_type_mdid(result_type_mdid)
+CDXLScalarIfStmt::CDXLScalarIfStmt(IMemoryPool *mp, IMDId *result_type_mdid)
+	: CDXLScalar(mp), m_result_type_mdid(result_type_mdid)
 {
 	GPOS_ASSERT(m_result_type_mdid->IsValid());
 }

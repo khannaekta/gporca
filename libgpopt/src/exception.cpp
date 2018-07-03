@@ -27,7 +27,7 @@ using namespace gpos;
 GPOS_RESULT
 gpopt::EresExceptionInit
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 {
 	//---------------------------------------------------------------------------
@@ -106,7 +106,7 @@ gpopt::EresExceptionInit
 
 		for (ULONG i = 0; i < GPOS_ARRAY_SIZE(rgpmsg); i++)
 		{
-			rgpmsg[i] = GPOS_NEW(memory_pool) CMessage(rgmsg[i]);
+			rgpmsg[i] = GPOS_NEW(mp) CMessage(rgmsg[i]);
 			pmr->AddMessage(ElocEnUS_Utf8, rgpmsg[i]);
 		}
 

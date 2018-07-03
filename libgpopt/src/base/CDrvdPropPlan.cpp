@@ -94,7 +94,7 @@ CDrvdPropPlan::Pdpplan
 void
 CDrvdPropPlan::Derive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CDrvdPropCtxt *pdpctxt
 	)
@@ -102,22 +102,22 @@ CDrvdPropPlan::Derive
 	CPhysical *popPhysical = CPhysical::PopConvert(exprhdl.Pop());
 	if (NULL != pdpctxt && COperator::EopPhysicalCTEConsumer == popPhysical->Eopid())
 	{
-		CopyCTEProducerPlanProps(memory_pool, pdpctxt, popPhysical);
+		CopyCTEProducerPlanProps(mp, pdpctxt, popPhysical);
 	}
 	else
 	{
 		// call property derivation functions on the operator
-		m_pos = popPhysical->PosDerive(memory_pool, exprhdl);
-		m_pds = popPhysical->PdsDerive(memory_pool, exprhdl);
-		m_prs = popPhysical->PrsDerive(memory_pool, exprhdl);
-		m_ppim = popPhysical->PpimDerive(memory_pool, exprhdl, pdpctxt);
-		m_ppfm = popPhysical->PpfmDerive(memory_pool, exprhdl);
+		m_pos = popPhysical->PosDerive(mp, exprhdl);
+		m_pds = popPhysical->PdsDerive(mp, exprhdl);
+		m_prs = popPhysical->PrsDerive(mp, exprhdl);
+		m_ppim = popPhysical->PpimDerive(mp, exprhdl, pdpctxt);
+		m_ppfm = popPhysical->PpfmDerive(mp, exprhdl);
 
 		GPOS_ASSERT(NULL != m_ppim);
 		GPOS_ASSERT(CDistributionSpec::EdtAny != m_pds->Edt() && "CDistributionAny is a require-only, cannot be derived");
 	}
 
-	m_pcm = popPhysical->PcmDerive(memory_pool, exprhdl);
+	m_pcm = popPhysical->PcmDerive(mp, exprhdl);
 }
 
 
@@ -132,7 +132,7 @@ CDrvdPropPlan::Derive
 void
 CDrvdPropPlan::CopyCTEProducerPlanProps
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CDrvdPropCtxt *pdpctxt,
 	COperator *pop
 	)
@@ -145,8 +145,8 @@ CDrvdPropPlan::CopyCTEProducerPlanProps
 	if (NULL != pdpplan)
 	{
 		// copy producer plan properties after remapping columns
-		m_pos = pdpplan->Pos()->PosCopyWithRemappedColumns(memory_pool, colref_mapping, true /*must_exist*/);
-		m_pds = pdpplan->Pds()->PdsCopyWithRemappedColumns(memory_pool, colref_mapping, true /*must_exist*/);
+		m_pos = pdpplan->Pos()->PosCopyWithRemappedColumns(mp, colref_mapping, true /*must_exist*/);
+		m_pds = pdpplan->Pds()->PdsCopyWithRemappedColumns(mp, colref_mapping, true /*must_exist*/);
 
 		// rewindability and partition filter map do not need column remapping,
 		// we add-ref producer's properties directly
@@ -158,7 +158,7 @@ CDrvdPropPlan::CopyCTEProducerPlanProps
 
 		// no need to copy the part index map. return an empty one. This is to
 		// distinguish between a CTE consumer and the inlined expression
-		m_ppim = GPOS_NEW(memory_pool) CPartIndexMap(memory_pool);
+		m_ppim = GPOS_NEW(mp) CPartIndexMap(mp);
 
 		GPOS_ASSERT(CDistributionSpec::EdtAny != m_pds->Edt() && "CDistributionAny is a require-only, cannot be derived");
 	}

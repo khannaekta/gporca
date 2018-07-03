@@ -30,11 +30,11 @@ using namespace gpmd;
 //		Constructs a scalar OpExpr node
 //
 //---------------------------------------------------------------------------
-CDXLScalarOpExpr::CDXLScalarOpExpr(IMemoryPool *memory_pool,
+CDXLScalarOpExpr::CDXLScalarOpExpr(IMemoryPool *mp,
 								   IMDId *mdid_op,
 								   IMDId *return_type_mdid,
 								   const CWStringConst *str_opname)
-	: CDXLScalar(memory_pool),
+	: CDXLScalar(mp),
 	  m_mdid(mdid_op),
 	  m_return_type_mdid(return_type_mdid),
 	  m_str_opname(str_opname)

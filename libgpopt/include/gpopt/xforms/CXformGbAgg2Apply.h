@@ -40,7 +40,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformGbAgg2Apply(IMemoryPool *memory_pool);
+			CXformGbAgg2Apply(IMemoryPool *mp);
 
 			// dtor
 			virtual

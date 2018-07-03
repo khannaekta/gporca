@@ -25,13 +25,13 @@ using namespace gpos;
 //		ctor
 //
 //---------------------------------------------------------------------------
-CTaskContext::CTaskContext(IMemoryPool *memory_pool)
+CTaskContext::CTaskContext(IMemoryPool *mp)
 	: m_bitset(NULL),
 	  m_log_out(&CLoggerStream::m_stdout_stream_logger),
 	  m_log_err(&CLoggerStream::m_stderr_stream_logger),
 	  m_locale(ElocEnUS_Utf8)
 {
-	m_bitset = GPOS_NEW(memory_pool) CBitSet(memory_pool, EtraceSentinel);
+	m_bitset = GPOS_NEW(mp) CBitSet(mp, EtraceSentinel);
 }
 
 
@@ -43,7 +43,7 @@ CTaskContext::CTaskContext(IMemoryPool *memory_pool)
 //		used to inherit parent task's context
 //
 //---------------------------------------------------------------------------
-CTaskContext::CTaskContext(IMemoryPool *memory_pool, const CTaskContext &task_ctxt)
+CTaskContext::CTaskContext(IMemoryPool *mp, const CTaskContext &task_ctxt)
 	: m_bitset(NULL),
 	  m_log_out(task_ctxt.GetOutputLogger()),
 	  m_log_err(task_ctxt.GetErrorLogger()),
@@ -52,7 +52,7 @@ CTaskContext::CTaskContext(IMemoryPool *memory_pool, const CTaskContext &task_ct
 	// allocate bitset and union separately to guard against leaks under OOM
 	CAutoRef<CBitSet> bitset;
 
-	bitset = GPOS_NEW(memory_pool) CBitSet(memory_pool);
+	bitset = GPOS_NEW(mp) CBitSet(mp);
 	bitset->Union(task_ctxt.m_bitset);
 
 	m_bitset = bitset.Reset();

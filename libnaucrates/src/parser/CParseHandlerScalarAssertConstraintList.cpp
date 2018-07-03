@@ -30,10 +30,10 @@ XERCES_CPP_NAMESPACE_USE
 //
 //---------------------------------------------------------------------------
 CParseHandlerScalarAssertConstraintList::CParseHandlerScalarAssertConstraintList(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root),
 	  m_dxl_op(NULL),
 	  m_dxl_op_assert_constraint(NULL),
 	  m_dxlnode_assert_constraints_parsed_array(NULL)
@@ -62,9 +62,9 @@ CParseHandlerScalarAssertConstraintList::StartElement(const XMLCh *const,  // el
 		GPOS_ASSERT(NULL == m_dxl_op_assert_constraint);
 		GPOS_ASSERT(NULL == m_dxlnode_assert_constraints_parsed_array);
 
-		m_dxl_op = GPOS_NEW(m_memory_pool) CDXLScalarAssertConstraintList(m_memory_pool);
+		m_dxl_op = GPOS_NEW(m_mp) CDXLScalarAssertConstraintList(m_mp);
 		m_dxlnode_assert_constraints_parsed_array =
-			GPOS_NEW(m_memory_pool) DXLNodeArray(m_memory_pool);
+			GPOS_NEW(m_mp) DXLNodeArray(m_mp);
 	}
 	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarAssertConstraint),
 										   element_local_name))
@@ -79,10 +79,10 @@ CParseHandlerScalarAssertConstraintList::StartElement(const XMLCh *const,  // el
 			EdxltokenErrorMessage,
 			EdxltokenScalarAssertConstraint);
 		m_dxl_op_assert_constraint =
-			GPOS_NEW(m_memory_pool) CDXLScalarAssertConstraint(m_memory_pool, pstrErrorMsg);
+			GPOS_NEW(m_mp) CDXLScalarAssertConstraint(m_mp, pstrErrorMsg);
 
 		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
 		this->Append(child_parse_handler);
@@ -116,11 +116,11 @@ CParseHandlerScalarAssertConstraintList::EndElement(const XMLCh *const,  // elem
 		GPOS_ASSERT(NULL != m_dxlnode_assert_constraints_parsed_array);
 
 		// assemble final assert predicate node
-		m_dxl_node = GPOS_NEW(m_memory_pool)
-			CDXLNode(m_memory_pool, m_dxl_op, m_dxlnode_assert_constraints_parsed_array);
+		m_dxlnode = GPOS_NEW(m_mp)
+			CDXLNode(m_mp, m_dxl_op, m_dxlnode_assert_constraints_parsed_array);
 
 #ifdef GPOS_DEBUG
-		m_dxl_op->AssertValid(m_dxl_node, false /* validate_children */);
+		m_dxl_op->AssertValid(m_dxlnode, false /* validate_children */);
 #endif  // GPOS_DEBUG
 
 		// deactivate handler
@@ -137,8 +137,8 @@ CParseHandlerScalarAssertConstraintList::EndElement(const XMLCh *const,  // elem
 		GPOS_ASSERT(NULL != child_dxlnode);
 		child_dxlnode->AddRef();
 
-		CDXLNode *pdxlnAssertConstraint = GPOS_NEW(m_memory_pool)
-			CDXLNode(m_memory_pool, m_dxl_op_assert_constraint, child_dxlnode);
+		CDXLNode *pdxlnAssertConstraint = GPOS_NEW(m_mp)
+			CDXLNode(m_mp, m_dxl_op_assert_constraint, child_dxlnode);
 		m_dxlnode_assert_constraints_parsed_array->Append(pdxlnAssertConstraint);
 		m_dxl_op_assert_constraint = NULL;
 	}

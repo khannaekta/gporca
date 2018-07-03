@@ -56,24 +56,24 @@ GPOS_RESULT
 CKeyCollectionTest::EresUnittest_Basics()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// Setup an MD cache with a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 
-	CMDAccessor mda(memory_pool, CMDCache::Pcache());
+	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 				(
-				memory_pool,
+				mp,
 				&mda,
 				NULL, /* pceeval */
-				CTestUtils::GetCostModel(memory_pool)
+				CTestUtils::GetCostModel(mp)
 				);
 
 	// get column factory from optimizer context object
@@ -84,7 +84,7 @@ CKeyCollectionTest::EresUnittest_Basics()
 	CName name(&strName);
 	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
-	CKeyCollection *pkc = GPOS_NEW(memory_pool) CKeyCollection(memory_pool);
+	CKeyCollection *pkc = GPOS_NEW(mp) CKeyCollection(mp);
 
 	const ULONG num_cols = 10;
 	for(ULONG i = 0; i < num_cols; i++)
@@ -96,8 +96,8 @@ CKeyCollectionTest::EresUnittest_Basics()
 	pkc->Add(pcrs);	
 	GPOS_ASSERT(pkc->FKey(pcrs));
 	
-	ColRefArray *colref_array = pkc->PdrgpcrKey(memory_pool);
-	GPOS_ASSERT(pkc->FKey(memory_pool, colref_array));
+	ColRefArray *colref_array = pkc->PdrgpcrKey(mp);
+	GPOS_ASSERT(pkc->FKey(mp, colref_array));
 	
 	pcrs->Include(colref_array);
 	GPOS_ASSERT(pkc->FKey(pcrs));
@@ -121,22 +121,22 @@ GPOS_RESULT
 CKeyCollectionTest::EresUnittest_Subsumes()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// Setup an MD cache with a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 
-	CMDAccessor mda(memory_pool, CMDCache::Pcache());
+	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 					(
-					memory_pool,
+					mp,
 					&mda,
 					NULL, /* pceeval */
-					CTestUtils::GetCostModel(memory_pool)
+					CTestUtils::GetCostModel(mp)
 					);
 
 	// get column factory from optimizer context object
@@ -147,11 +147,11 @@ CKeyCollectionTest::EresUnittest_Subsumes()
 	CName name(&strName);
 	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
-	CKeyCollection *pkc = GPOS_NEW(memory_pool) CKeyCollection(memory_pool);
+	CKeyCollection *pkc = GPOS_NEW(mp) CKeyCollection(mp);
 
-	CColRefSet *pcrs0 = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
-	CColRefSet *pcrs1 = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
-	CColRefSet *pcrs2 = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrs0 = GPOS_NEW(mp) CColRefSet(mp);
+	CColRefSet *pcrs1 = GPOS_NEW(mp) CColRefSet(mp);
+	CColRefSet *pcrs2 = GPOS_NEW(mp) CColRefSet(mp);
 
 	const ULONG num_cols = 10;
 	const ULONG ulLen1 = 3;
@@ -178,15 +178,15 @@ CKeyCollectionTest::EresUnittest_Subsumes()
 	GPOS_ASSERT(pkc->FKey(pcrs2));
 
 	// get the second key
-	ColRefArray *colref_array = pkc->PdrgpcrKey(memory_pool, 1);
+	ColRefArray *colref_array = pkc->PdrgpcrKey(mp, 1);
 	GPOS_ASSERT(ulLen1 == colref_array->Size());
-	GPOS_ASSERT(pkc->FKey(memory_pool, colref_array));
+	GPOS_ASSERT(pkc->FKey(mp, colref_array));
 
 	// get the subsumed key
-	ColRefArray *pdrgpcrSubsumed = pkc->PdrgpcrTrim(memory_pool, colref_array);
+	ColRefArray *pdrgpcrSubsumed = pkc->PdrgpcrTrim(mp, colref_array);
 	GPOS_ASSERT(colref_array->Size() >= pdrgpcrSubsumed->Size());
 
-	CColRefSet *pcrsSubsumed = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrsSubsumed = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsSubsumed->Include(colref_array);
 
 #ifdef GPOS_DEBUG

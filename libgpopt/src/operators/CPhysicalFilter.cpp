@@ -32,10 +32,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalFilter::CPhysicalFilter
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CPhysical(memory_pool)
+	CPhysical(mp)
 {
 	// when Filter includes outer references, correlated execution has to be enforced,
 	// in this case, we create two child optimization requests to guarantee correct evaluation of parameters
@@ -69,7 +69,7 @@ CPhysicalFilter::~CPhysicalFilter()
 CColRefSet *
 CPhysicalFilter::PcrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CColRefSet *pcrsRequired,
 	ULONG child_index,
@@ -79,7 +79,7 @@ CPhysicalFilter::PcrsRequired
 {
 	GPOS_ASSERT(0 == child_index && "Required properties can only be computed on the relational child");
 
-	return PcrsChildReqd(memory_pool, exprhdl, pcrsRequired, child_index, 1 /*ulScalarIndex*/);
+	return PcrsChildReqd(mp, exprhdl, pcrsRequired, child_index, 1 /*ulScalarIndex*/);
 }
 
 
@@ -94,7 +94,7 @@ CPhysicalFilter::PcrsRequired
 COrderSpec *
 CPhysicalFilter::PosRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	COrderSpec *posRequired,
 	ULONG child_index,
@@ -105,7 +105,7 @@ CPhysicalFilter::PosRequired
 {
 	GPOS_ASSERT(0 == child_index);
 
-	return PosPassThru(memory_pool, exprhdl, posRequired, child_index);
+	return PosPassThru(mp, exprhdl, posRequired, child_index);
 }
 
 
@@ -120,7 +120,7 @@ CPhysicalFilter::PosRequired
 CDistributionSpec *
 CPhysicalFilter::PdsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CDistributionSpec *pdsRequired,
 	ULONG child_index,
@@ -140,7 +140,7 @@ CPhysicalFilter::PdsRequired
 		return pdsRequired;
 	}
 
-	return CPhysical::PdsUnary(memory_pool, exprhdl, pdsRequired, child_index, ulOptReq);
+	return CPhysical::PdsUnary(mp, exprhdl, pdsRequired, child_index, ulOptReq);
 }
 
 
@@ -155,7 +155,7 @@ CPhysicalFilter::PdsRequired
 CRewindabilitySpec *
 CPhysicalFilter::PrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CRewindabilitySpec *prsRequired,
 	ULONG child_index,
@@ -173,10 +173,10 @@ CPhysicalFilter::PrsRequired
 	// results.
 	if (exprhdl.HasOuterRefs() && !exprhdl.HasOuterRefs(0))
 	{
-		return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral);
+		return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral);
 	}
 
-	return PrsPassThru(memory_pool, exprhdl, prsRequired, child_index);
+	return PrsPassThru(mp, exprhdl, prsRequired, child_index);
 }
 
 
@@ -191,7 +191,7 @@ CPhysicalFilter::PrsRequired
 CPartitionPropagationSpec *
 CPhysicalFilter::PppsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CPartitionPropagationSpec *pppsRequired,
 	ULONG 
@@ -209,10 +209,10 @@ CPhysicalFilter::PppsRequired
 	CPartIndexMap *ppimReqd = pppsRequired->Ppim();
 	CPartFilterMap *ppfmReqd = pppsRequired->Ppfm();
 	
-	ULongPtrArray *pdrgpul = ppimReqd->PdrgpulScanIds(memory_pool);
+	ULongPtrArray *pdrgpul = ppimReqd->PdrgpulScanIds(mp);
 	
-	CPartIndexMap *ppimResult = GPOS_NEW(memory_pool) CPartIndexMap(memory_pool);
-	CPartFilterMap *ppfmResult = GPOS_NEW(memory_pool) CPartFilterMap(memory_pool);
+	CPartIndexMap *ppimResult = GPOS_NEW(mp) CPartIndexMap(mp);
+	CPartFilterMap *ppfmResult = GPOS_NEW(mp) CPartFilterMap(mp);
 	
 	/// get derived part consumers
 	CPartInfo *ppartinfo = exprhdl.GetRelationalProperties(0)->Ppartinfo();
@@ -247,7 +247,7 @@ CPhysicalFilter::PppsRequired
 			// try to generate a request with dynamic partition selection		
 			pexprCmp = CPredicateUtils::PexprExtractPredicatesOnPartKeys
 									(
-									memory_pool,
+									mp,
 									pexprScalar,
 									pdrgpdrgpcrPartKeys,
 									NULL, /*pcrsAllowedRefs*/
@@ -272,13 +272,13 @@ CPhysicalFilter::PppsRequired
 		if (NULL != pexprCmp)
 		{
 			// interesting filter found
-			ppfmResult->AddPartFilter(memory_pool, part_idx_id, pexprCmp, NULL /*stats */);
+			ppfmResult->AddPartFilter(mp, part_idx_id, pexprCmp, NULL /*stats */);
 		}
 	}
 	
 	pdrgpul->Release();
 
-	return GPOS_NEW(memory_pool) CPartitionPropagationSpec(ppimResult, ppfmResult);
+	return GPOS_NEW(mp) CPartitionPropagationSpec(ppimResult, ppfmResult);
 }
 
 //---------------------------------------------------------------------------
@@ -292,7 +292,7 @@ CPhysicalFilter::PppsRequired
 CCTEReq *
 CPhysicalFilter::PcteRequired
 	(
-	IMemoryPool *, //memory_pool,
+	IMemoryPool *, //mp,
 	CExpressionHandle &, //exprhdl,
 	CCTEReq *pcter,
 	ULONG
@@ -320,7 +320,7 @@ CPhysicalFilter::PcteRequired
 COrderSpec *
 CPhysicalFilter::PosDerive
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -340,7 +340,7 @@ CPhysicalFilter::PosDerive
 CDistributionSpec *
 CPhysicalFilter::PdsDerive
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -360,7 +360,7 @@ CPhysicalFilter::PdsDerive
 CRewindabilitySpec *
 CPhysicalFilter::PrsDerive
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const

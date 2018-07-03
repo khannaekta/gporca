@@ -36,7 +36,7 @@ namespace gpos
 	public:
 		// ctors
 		CWStringConst(const WCHAR *w_str_buffer);
-		CWStringConst(IMemoryPool *memory_pool, const WCHAR *w_str_buffer);
+		CWStringConst(IMemoryPool *mp, const WCHAR *w_str_buffer);
 
 		// shallow copy ctor
 		CWStringConst(const CWStringConst &);

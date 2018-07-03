@@ -28,11 +28,11 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarPartBound::CDXLScalarPartBound(IMemoryPool *memory_pool,
+CDXLScalarPartBound::CDXLScalarPartBound(IMemoryPool *mp,
 										 ULONG partitioning_level,
 										 IMDId *mdid_type,
 										 BOOL is_lower_bound)
-	: CDXLScalar(memory_pool),
+	: CDXLScalar(mp),
 	  m_partitioning_level(partitioning_level),
 	  m_mdid_type(mdid_type),
 	  m_is_lower_bound(is_lower_bound)

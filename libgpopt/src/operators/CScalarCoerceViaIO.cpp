@@ -32,14 +32,14 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CScalarCoerceViaIO::CScalarCoerceViaIO
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IMDId *mdid_type,
 	INT type_modifier,
 	ECoercionForm ecf,
 	INT location
 	)
 	:
-	CScalarCoerceBase(memory_pool, mdid_type, type_modifier, ecf, location)
+	CScalarCoerceBase(mp, mdid_type, type_modifier, ecf, location)
 {
 }
 

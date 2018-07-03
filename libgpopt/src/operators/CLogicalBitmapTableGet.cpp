@@ -37,14 +37,14 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 CLogicalBitmapTableGet::CLogicalBitmapTableGet
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CTableDescriptor *ptabdesc,
 	ULONG ulOriginOpId,
 	const CName *pnameTableAlias,
 	ColRefArray *pdrgpcrOutput
 	)
 	:
-	CLogical(memory_pool),
+	CLogical(mp),
 	m_ptabdesc(ptabdesc),
 	m_ulOriginOpId(ulOriginOpId),
 	m_pnameTableAlias(pnameTableAlias),
@@ -65,10 +65,10 @@ CLogicalBitmapTableGet::CLogicalBitmapTableGet
 //---------------------------------------------------------------------------
 CLogicalBitmapTableGet::CLogicalBitmapTableGet
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogical(memory_pool),
+	CLogical(mp),
 	m_ptabdesc(NULL),
 	m_ulOriginOpId(gpos::ulong_max),
 	m_pnameTableAlias(NULL),
@@ -139,7 +139,7 @@ CLogicalBitmapTableGet::Matches
 CColRefSet *
 CLogicalBitmapTableGet::PcrsDeriveOutput
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &
 #ifdef GPOS_DEBUG
 		exprhdl
@@ -148,7 +148,7 @@ CLogicalBitmapTableGet::PcrsDeriveOutput
 {
 	GPOS_ASSERT(exprhdl.Pop() == this);
 
-	return GPOS_NEW(memory_pool) CColRefSet(memory_pool, m_pdrgpcrOutput);
+	return GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput);
 }
 
 //---------------------------------------------------------------------------
@@ -162,11 +162,11 @@ CLogicalBitmapTableGet::PcrsDeriveOutput
 CColRefSet *
 CLogicalBitmapTableGet::PcrsDeriveOuter
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 {
-	return PcrsDeriveOuterIndexGet(memory_pool, exprhdl);
+	return PcrsDeriveOuterIndexGet(mp, exprhdl);
 }
 
 
@@ -181,12 +181,12 @@ CLogicalBitmapTableGet::PcrsDeriveOuter
 CPropConstraint *
 CLogicalBitmapTableGet::PpcDeriveConstraint
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 	const
 {
-	return PpcDeriveConstraintFromTableWithPredicates(memory_pool, exprhdl, m_ptabdesc, m_pdrgpcrOutput);
+	return PpcDeriveConstraintFromTableWithPredicates(mp, exprhdl, m_ptabdesc, m_pdrgpcrOutput);
 }
 
 //---------------------------------------------------------------------------
@@ -200,13 +200,13 @@ CLogicalBitmapTableGet::PpcDeriveConstraint
 IStatistics *
 CLogicalBitmapTableGet::PstatsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	StatsArray *stats_ctxt
 	)
 	const
 {
-	return CStatisticsUtils::DeriveStatsForBitmapTableGet(memory_pool, exprhdl, stats_ctxt);
+	return CStatisticsUtils::DeriveStatsForBitmapTableGet(mp, exprhdl, stats_ctxt);
 }
 
 //---------------------------------------------------------------------------
@@ -246,7 +246,7 @@ CLogicalBitmapTableGet::OsPrint
 COperator *
 CLogicalBitmapTableGet::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	BOOL must_exist
 	)
@@ -254,17 +254,17 @@ CLogicalBitmapTableGet::PopCopyWithRemappedColumns
 	ColRefArray *pdrgpcrOutput = NULL;
 	if (must_exist)
 	{
-		pdrgpcrOutput = CUtils::PdrgpcrRemapAndCreate(memory_pool, m_pdrgpcrOutput, colref_mapping);
+		pdrgpcrOutput = CUtils::PdrgpcrRemapAndCreate(mp, m_pdrgpcrOutput, colref_mapping);
 	}
 	else
 	{
-		pdrgpcrOutput = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrOutput, colref_mapping, must_exist);
+		pdrgpcrOutput = CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput, colref_mapping, must_exist);
 	}
-	CName *pnameAlias = GPOS_NEW(memory_pool) CName(memory_pool, *m_pnameTableAlias);
+	CName *pnameAlias = GPOS_NEW(mp) CName(mp, *m_pnameTableAlias);
 
 	m_ptabdesc->AddRef();
 
-	return GPOS_NEW(memory_pool) CLogicalBitmapTableGet(memory_pool, m_ptabdesc, m_ulOriginOpId, pnameAlias, pdrgpcrOutput);
+	return GPOS_NEW(mp) CLogicalBitmapTableGet(mp, m_ptabdesc, m_ulOriginOpId, pnameAlias, pdrgpcrOutput);
 }
 
 //---------------------------------------------------------------------------
@@ -278,11 +278,11 @@ CLogicalBitmapTableGet::PopCopyWithRemappedColumns
 CXformSet *
 CLogicalBitmapTableGet::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementBitmapTableGet);
 
 	return xform_set;

@@ -71,21 +71,21 @@ namespace gpopt
 			}
 
 			// copy part key into the given memory pool
-			CPartKeys *PpartkeysCopy(IMemoryPool *memory_pool);
+			CPartKeys *PpartkeysCopy(IMemoryPool *mp);
 
 			// check whether the key columns overlap the given column
 			BOOL FOverlap(CColRefSet *pcrs) const;
 
 			// create a new PartKeys object from the current one by remapping the
 			// keys using the given hashmap
-			CPartKeys *PpartkeysRemap(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping) const;
+			CPartKeys *PpartkeysRemap(IMemoryPool *mp, UlongColRefHashMap *colref_mapping) const;
 
 			// print
 			IOstream &OsPrint(IOstream &) const;
 
 			// copy array of part keys into given memory pool
 			static
-			PartKeysArray *PdrgppartkeysCopy(IMemoryPool *memory_pool, const PartKeysArray *pdrgppartkeys);
+			PartKeysArray *PdrgppartkeysCopy(IMemoryPool *mp, const PartKeysArray *pdrgppartkeys);
 
 #ifdef GPOS_DEBUG
 			// debug print for interactive debugging sessions only

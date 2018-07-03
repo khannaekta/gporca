@@ -79,12 +79,12 @@ namespace gpopt
 			CRange(const CRange&);
 
 			// construct an equality predicate if possible
-			CExpression *PexprEquality(IMemoryPool *memory_pool, const CColRef *colref);
+			CExpression *PexprEquality(IMemoryPool *mp, const CColRef *colref);
 
 			// construct a scalar comparison expression from one of the ends
 			CExpression *PexprScalarCompEnd
 							(
-							IMemoryPool *memory_pool,
+							IMemoryPool *mp,
 							IDatum *datum,
 							ERangeInclusion eri,
 							IMDType::ECmpType ecmptIncl,
@@ -189,20 +189,20 @@ namespace gpopt
 			BOOL FPoint() const;
 
 			// intersection with another range
-			CRange *PrngIntersect(IMemoryPool *memory_pool, CRange *prange);
+			CRange *PrngIntersect(IMemoryPool *mp, CRange *prange);
 
 			// difference between this range and a given range on the left side only
-			CRange *PrngDifferenceLeft(IMemoryPool *memory_pool, CRange *prange);
+			CRange *PrngDifferenceLeft(IMemoryPool *mp, CRange *prange);
 
 			// difference between this range and a given range on the right side only
-			CRange *PrngDifferenceRight(IMemoryPool *memory_pool, CRange *prange);
+			CRange *PrngDifferenceRight(IMemoryPool *mp, CRange *prange);
 
 			// return the extension of this range with the given range. The given
 			// range must start right after this range, otherwise NULL is returned
-			CRange *PrngExtend(IMemoryPool *memory_pool, CRange *prange);
+			CRange *PrngExtend(IMemoryPool *mp, CRange *prange);
 
 			// construct scalar expression
-			CExpression *PexprScalar(IMemoryPool *memory_pool, const CColRef *colref);
+			CExpression *PexprScalar(IMemoryPool *mp, const CColRef *colref);
 
 			// is this interval unbounded
 			BOOL IsConstraintUnbounded() const

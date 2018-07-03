@@ -33,10 +33,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerCTEConfig::CParseHandlerCTEConfig(IMemoryPool *memory_pool,
+CParseHandlerCTEConfig::CParseHandlerCTEConfig(IMemoryPool *mp,
 											   CParseHandlerManager *parse_handler_mgr,
 											   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root), m_cte_conf(NULL)
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root), m_cte_conf(NULL)
 {
 }
 
@@ -82,7 +82,7 @@ CParseHandlerCTEConfig::StartElement(const XMLCh *const,  //element_uri,
 		EdxltokenCTEInliningCutoff,
 		EdxltokenCTEConfig);
 
-	m_cte_conf = GPOS_NEW(m_memory_pool) CCTEConfig(cte_inlining_cut_off);
+	m_cte_conf = GPOS_NEW(m_mp) CCTEConfig(cte_inlining_cut_off);
 }
 
 //---------------------------------------------------------------------------

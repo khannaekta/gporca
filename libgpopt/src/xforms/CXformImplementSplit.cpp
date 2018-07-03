@@ -28,18 +28,18 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformImplementSplit::CXformImplementSplit
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformImplementation
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalSplit(memory_pool),
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))
+				mp,
+				GPOS_NEW(mp) CLogicalSplit(mp),
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)),
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp))
 				)
 		)
 {}
@@ -85,7 +85,7 @@ CXformImplementSplit::Transform
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CLogicalSplit *popSplit = CLogicalSplit::PopConvert(pexpr->Pop());
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
 	ColRefArray *pdrgpcrDelete = popSplit->PdrgpcrDelete();
@@ -107,10 +107,10 @@ CXformImplementSplit::Transform
 
 	// create physical Split
 	CExpression *pexprAlt =
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
-			GPOS_NEW(memory_pool) CPhysicalSplit(memory_pool, pdrgpcrDelete, pdrgpcrInsert, pcrCtid, pcrSegmentId, pcrAction, pcrTupleOid),
+			mp,
+			GPOS_NEW(mp) CPhysicalSplit(mp, pdrgpcrDelete, pdrgpcrInsert, pcrCtid, pcrSegmentId, pcrAction, pcrTupleOid),
 			pexprChild,
 			pexprProjList
 			);

@@ -58,7 +58,7 @@ namespace gpopt
 			// ctor
 			CLogicalBitmapTableGet
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CTableDescriptor *ptabdesc,
 				ULONG ulOriginOpId,
 				const CName *pnameTableAlias,
@@ -68,7 +68,7 @@ namespace gpopt
 			// ctor
 			// only for transformations
 			explicit
-			CLogicalBitmapTableGet(IMemoryPool *memory_pool);
+			CLogicalBitmapTableGet(IMemoryPool *mp);
 
 			// dtor
 			virtual
@@ -129,37 +129,37 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// derive output columns
 			virtual
-			CColRefSet *PcrsDeriveOutput(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsDeriveOutput(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 			// derive outer references
 			virtual
-			CColRefSet *PcrsDeriveOuter(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsDeriveOuter(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 			// derive partition consumer info
 			virtual
 			CPartInfo *PpartinfoDerive
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle & //exprhdl
 				)
 				const
 			{
-				return GPOS_NEW(memory_pool) CPartInfo(memory_pool);
+				return GPOS_NEW(mp) CPartInfo(mp);
 			}
 
 			// derive constraint property
 			virtual
-			CPropConstraint *PpcDeriveConstraint(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CPropConstraint *PpcDeriveConstraint(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive join depth
 			virtual
 			ULONG JoinDepth
 				(
-				IMemoryPool *, // memory_pool
+				IMemoryPool *, // mp
 				CExpressionHandle & // exprhdl
 				)
 				const
@@ -171,25 +171,25 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsStat
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &, // exprhdl
 				CColRefSet *, //pcrsInput
 				ULONG // child_index
 				)
 				const
 			{
-				return GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+				return GPOS_NEW(mp) CColRefSet(mp);
 			}
 
 			// candidate set of xforms
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
+			CXformSet *PxfsCandidates(IMemoryPool *mp) const;
 
 			// derive statistics
 			virtual
 			IStatistics *PstatsDerive
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				StatsArray *stats_ctxt
 				)

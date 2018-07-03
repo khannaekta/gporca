@@ -94,7 +94,7 @@ CDistributionSpecRouted::FSatisfies
 CDistributionSpec *
 CDistributionSpecRouted::PdsCopyWithRemappedColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	BOOL must_exist
 	)
@@ -112,7 +112,7 @@ CDistributionSpecRouted::PdsCopyWithRemappedColumns
 #ifdef GPOS_DEBUG
 			BOOL result =
 #endif // GPOS_DEBUG
-			colref_mapping->Insert(GPOS_NEW(memory_pool) ULONG(id), pcrSegmentId);
+			colref_mapping->Insert(GPOS_NEW(mp) ULONG(id), pcrSegmentId);
 			GPOS_ASSERT(result);
 		}
 		else
@@ -121,7 +121,7 @@ CDistributionSpecRouted::PdsCopyWithRemappedColumns
 		}
 	}
 
-	return GPOS_NEW(memory_pool) CDistributionSpecRouted(pcrSegmentId);
+	return GPOS_NEW(mp) CDistributionSpecRouted(pcrSegmentId);
 }
 
 //---------------------------------------------------------------------------
@@ -135,7 +135,7 @@ CDistributionSpecRouted::PdsCopyWithRemappedColumns
 void
 CDistributionSpecRouted::AppendEnforcers
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &, // exprhdl
 	CReqdPropPlan *
 #ifdef GPOS_DEBUG
@@ -146,7 +146,7 @@ CDistributionSpecRouted::AppendEnforcers
 	CExpression *pexpr
 	)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != prpp);
 	GPOS_ASSERT(NULL != pdrgpexpr);
 	GPOS_ASSERT(NULL != pexpr);
@@ -163,10 +163,10 @@ CDistributionSpecRouted::AppendEnforcers
 	// add a routed distribution enforcer
 	AddRef();
 	pexpr->AddRef();
-	CExpression *pexprMotion = GPOS_NEW(memory_pool) CExpression
+	CExpression *pexprMotion = GPOS_NEW(mp) CExpression
 										(
-										memory_pool,
-										GPOS_NEW(memory_pool) CPhysicalMotionRoutedDistribute(memory_pool, this),
+										mp,
+										GPOS_NEW(mp) CPhysicalMotionRoutedDistribute(mp, this),
 										pexpr
 										);
 	pdrgpexpr->Append(pexprMotion);
@@ -199,11 +199,11 @@ CDistributionSpecRouted::HashValue() const
 CColRefSet *
 CDistributionSpecRouted::PcrsUsed
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(m_pcrSegmentId);
 
 	return pcrs;

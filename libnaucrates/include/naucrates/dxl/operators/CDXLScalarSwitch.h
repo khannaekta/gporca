@@ -41,7 +41,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLScalarSwitch(IMemoryPool *memory_pool, IMDId *mdid_type);
+		CDXLScalarSwitch(IMemoryPool *mp, IMDId *mdid_type);
 
 		//dtor
 		virtual ~CDXLScalarSwitch();

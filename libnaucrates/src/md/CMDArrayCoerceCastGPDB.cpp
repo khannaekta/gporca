@@ -21,7 +21,7 @@ using namespace gpmd;
 using namespace gpdxl;
 
 // ctor
-CMDArrayCoerceCastGPDB::CMDArrayCoerceCastGPDB(IMemoryPool *memory_pool,
+CMDArrayCoerceCastGPDB::CMDArrayCoerceCastGPDB(IMemoryPool *mp,
 											   IMDId *mdid,
 											   CMDName *mdname,
 											   IMDId *mdid_src,
@@ -33,7 +33,7 @@ CMDArrayCoerceCastGPDB::CMDArrayCoerceCastGPDB(IMemoryPool *memory_pool,
 											   BOOL is_explicit,
 											   EdxlCoercionForm dxl_coerce_format,
 											   INT location)
-	: CMDCastGPDB(memory_pool,
+	: CMDCastGPDB(mp,
 				  mdid,
 				  mdname,
 				  mdid_src,
@@ -47,7 +47,7 @@ CMDArrayCoerceCastGPDB::CMDArrayCoerceCastGPDB(IMemoryPool *memory_pool,
 	  m_location(location)
 {
 	m_dxl_str = CDXLUtils::SerializeMDObj(
-		memory_pool, this, false /*fSerializeHeader*/, false /*indentation*/);
+		mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 // dtor

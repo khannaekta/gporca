@@ -53,7 +53,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerStatisticsConfig(IMemoryPool *memory_pool,
+		CParseHandlerStatisticsConfig(IMemoryPool *mp,
 									  CParseHandlerManager *parse_handler_mgr,
 									  CParseHandlerBase *parse_handler_root);
 

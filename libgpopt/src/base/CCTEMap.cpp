@@ -26,15 +26,15 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CCTEMap::CCTEMap
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	m_memory_pool(memory_pool),
+	m_mp(mp),
 	m_phmcm(NULL)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 
-	m_phmcm = GPOS_NEW(m_memory_pool) HMCteMap(m_memory_pool);
+	m_phmcm = GPOS_NEW(m_mp) HMCteMap(m_mp);
 }
 
 //---------------------------------------------------------------------------
@@ -73,11 +73,11 @@ CCTEMap::Insert
 		pdpplan->AddRef();
 	}
 
-	CCTEMapEntry *pcme = GPOS_NEW(m_memory_pool) CCTEMapEntry(ulCteId, ect, pdpplan);
+	CCTEMapEntry *pcme = GPOS_NEW(m_mp) CCTEMapEntry(ulCteId, ect, pdpplan);
 #ifdef GPOS_DEBUG
 	BOOL fSuccess =
 #endif // GPOS_DEBUG
-	m_phmcm->Insert(GPOS_NEW(m_memory_pool) ULONG(ulCteId), pcme);
+	m_phmcm->Insert(GPOS_NEW(m_mp) ULONG(ulCteId), pcme);
 	GPOS_ASSERT(fSuccess);
 }
 
@@ -296,12 +296,12 @@ CCTEMap::Ect
 CCTEMap *
 CCTEMap::PcmCombine
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CCTEMap &cmFirst,
 	const CCTEMap &cmSecond
 	)
 {
-	CCTEMap *pcmResult = GPOS_NEW(memory_pool) CCTEMap(memory_pool);
+	CCTEMap *pcmResult = GPOS_NEW(mp) CCTEMap(mp);
 
 	// add entries from first map that are not resolvable based on second map
 	AddUnresolved(cmFirst, cmSecond, pcmResult);
@@ -370,13 +370,13 @@ CCTEMap::FSatisfies
 ULongPtrArray *
 CCTEMap::PdrgpulAdditionalProducers
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CCTEReq *pcter
 	)
 	const
 {
 	GPOS_ASSERT(NULL != pcter);
-	ULongPtrArray *pdrgpul = GPOS_NEW(memory_pool) ULongPtrArray(memory_pool);
+	ULongPtrArray *pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
 
 	HMCteMapIter hmcmi(m_phmcm);
 	while (hmcmi.Advance())
@@ -387,7 +387,7 @@ CCTEMap::PdrgpulAdditionalProducers
 
 		if (CCTEMap::EctProducer == ect && !pcter->FContainsRequirement(id, ect))
 		{
-			pdrgpul->Append(GPOS_NEW(memory_pool) ULONG(id));
+			pdrgpul->Append(GPOS_NEW(mp) ULONG(id));
 		}
 	}
 

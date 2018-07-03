@@ -29,10 +29,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerIndexOnlyScan::CParseHandlerIndexOnlyScan(IMemoryPool *memory_pool,
+CParseHandlerIndexOnlyScan::CParseHandlerIndexOnlyScan(IMemoryPool *mp,
 													   CParseHandlerManager *parse_handler_mgr,
 													   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerIndexScan(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerIndexScan(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 

@@ -46,7 +46,7 @@ namespace gpmd
 
 	public:
 		// ctor
-		CMDArrayCoerceCastGPDB(IMemoryPool *memory_pool,
+		CMDArrayCoerceCastGPDB(IMemoryPool *mp,
 							   IMDId *mdid,
 							   CMDName *mdname,
 							   IMDId *mdid_src,

@@ -30,7 +30,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformRemoveSubqDistinct(IMemoryPool *memory_pool);
+			CXformRemoveSubqDistinct(IMemoryPool *mp);
 
 			// dtor
 			virtual

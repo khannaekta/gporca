@@ -60,7 +60,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerSearchStage(IMemoryPool *memory_pool,
+		CParseHandlerSearchStage(IMemoryPool *mp,
 								 CParseHandlerManager *parse_handler_mgr,
 								 CParseHandlerBase *parse_handler_root);
 

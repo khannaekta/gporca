@@ -28,10 +28,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalCTEAnchor::CLogicalCTEAnchor
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogical(memory_pool),
+	CLogical(mp),
 	m_id(0)
 {
 	m_fPattern = true;
@@ -47,11 +47,11 @@ CLogicalCTEAnchor::CLogicalCTEAnchor
 //---------------------------------------------------------------------------
 CLogicalCTEAnchor::CLogicalCTEAnchor
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ULONG id
 	)
 	:
-	CLogical(memory_pool),
+	CLogical(mp),
 	m_id(id)
 {}
 
@@ -66,7 +66,7 @@ CLogicalCTEAnchor::CLogicalCTEAnchor
 CColRefSet *
 CLogicalCTEAnchor::PcrsDeriveOutput
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 {
@@ -84,7 +84,7 @@ CLogicalCTEAnchor::PcrsDeriveOutput
 CKeyCollection *
 CLogicalCTEAnchor::PkcDeriveKeys
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -103,7 +103,7 @@ CLogicalCTEAnchor::PkcDeriveKeys
 CPartInfo *
 CLogicalCTEAnchor::PpartinfoDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -115,7 +115,7 @@ CLogicalCTEAnchor::PpartinfoDerive
 	GPOS_ASSERT(NULL != pexprProducer);
 	CPartInfo *ppartinfoCTEProducer = CDrvdPropRelational::GetRelationalProperties(pexprProducer->PdpDerive())->Ppartinfo();
 
-	return CPartInfo::PpartinfoCombine(memory_pool, ppartinfoChild, ppartinfoCTEProducer);
+	return CPartInfo::PpartinfoCombine(mp, ppartinfoChild, ppartinfoCTEProducer);
 }
 
 //---------------------------------------------------------------------------
@@ -129,7 +129,7 @@ CLogicalCTEAnchor::PpartinfoDerive
 CMaxCard
 CLogicalCTEAnchor::Maxcard
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -188,11 +188,11 @@ CLogicalCTEAnchor::HashValue() const
 CXformSet *
 CLogicalCTEAnchor::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfCTEAnchor2Sequence);
 	(void) xform_set->ExchangeSet(CXform::ExfCTEAnchor2TrivialSelect);
 	return xform_set;

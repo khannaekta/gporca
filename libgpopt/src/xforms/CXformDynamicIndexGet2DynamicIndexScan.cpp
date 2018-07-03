@@ -29,17 +29,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformDynamicIndexGet2DynamicIndexScan::CXformDynamicIndexGet2DynamicIndexScan
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformImplementation
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalDynamicIndexGet(memory_pool),
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))	// index lookup predicate
+				mp,
+				GPOS_NEW(mp) CLogicalDynamicIndexGet(mp),
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp))	// index lookup predicate
 				)
 		)
 {}
@@ -67,10 +67,10 @@ CXformDynamicIndexGet2DynamicIndexScan::Transform
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CLogicalDynamicIndexGet *popIndexGet = CLogicalDynamicIndexGet::PopConvert(pexpr->Pop());
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// create/extract components for alternative
-	CName *pname = GPOS_NEW(memory_pool) CName(memory_pool, popIndexGet->Name());
+	CName *pname = GPOS_NEW(mp) CName(mp, popIndexGet->Name());
 	
 	CTableDescriptor *ptabdesc = popIndexGet->Ptabdesc();
 	ptabdesc->AddRef();
@@ -100,12 +100,12 @@ CXformDynamicIndexGet2DynamicIndexScan::Transform
 	
 	// create alternative expression
 	CExpression *pexprAlt = 
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
-			GPOS_NEW(memory_pool) CPhysicalDynamicIndexScan
+			mp,
+			GPOS_NEW(mp) CPhysicalDynamicIndexScan
 						(
-						memory_pool,
+						mp,
 						popIndexGet->IsPartial(),
 						pindexdesc,
 						ptabdesc,

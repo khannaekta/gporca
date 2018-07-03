@@ -32,10 +32,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerMDScCmp::CParseHandlerMDScCmp(IMemoryPool *memory_pool,
+CParseHandlerMDScCmp::CParseHandlerMDScCmp(IMemoryPool *mp,
 										   CParseHandlerManager *parse_handler_mgr,
 										   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerMetadataObject(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerMetadataObject(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -94,8 +94,8 @@ CParseHandlerMDScCmp::StartElement(const XMLCh *const,  // element_uri,
 
 	IMDType::ECmpType comparision_type = CDXLOperatorFactory::ParseCmpType(xml_str_comp_type);
 
-	m_imd_obj = GPOS_NEW(m_memory_pool)
-		CMDScCmpGPDB(m_memory_pool, mdid, mdname, mdid_left, mdid_right, comparision_type, mdid_op);
+	m_imd_obj = GPOS_NEW(m_mp)
+		CMDScCmpGPDB(m_mp, mdid, mdname, mdid_left, mdid_right, comparision_type, mdid_op);
 }
 
 //---------------------------------------------------------------------------

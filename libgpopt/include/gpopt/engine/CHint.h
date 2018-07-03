@@ -124,9 +124,9 @@ namespace gpopt
 			// generate default hint configurations, which disables sort during insert on
 			// append only row-oriented partitioned tables by default
 			static
-			CHint *PhintDefault(IMemoryPool *memory_pool)
+			CHint *PhintDefault(IMemoryPool *mp)
 			{
-				return GPOS_NEW(memory_pool) CHint(
+				return GPOS_NEW(mp) CHint(
 					gpos::int_max, /* min_num_of_parts_to_require_sort_on_insert */
 					gpos::int_max, /* join_arity_for_associativity_commutativity */
 					gpos::int_max,			 /* array_expansion_threshold */

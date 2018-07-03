@@ -26,11 +26,11 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CScalarArrayRefIndexList::CScalarArrayRefIndexList
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	EIndexListType eilt
 	)
 	:
-	CScalar(memory_pool),
+	CScalar(mp),
 	m_eilt(eilt)
 {
 	GPOS_ASSERT(EiltSentinel > eilt);

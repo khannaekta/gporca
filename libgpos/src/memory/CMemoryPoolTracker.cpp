@@ -44,16 +44,16 @@ using namespace gpos;
 //		Ctor.
 //
 //---------------------------------------------------------------------------
-CMemoryPoolTracker::CMemoryPoolTracker(IMemoryPool *underlying_memory_pool,
+CMemoryPoolTracker::CMemoryPoolTracker(IMemoryPool *underlying_mp,
 									   ULLONG max_size,
 									   BOOL thread_safe,
-									   BOOL owns_underlying_memory_pool)
-	: CMemoryPool(underlying_memory_pool, owns_underlying_memory_pool, thread_safe),
+									   BOOL owns_underlying_mp)
+	: CMemoryPool(underlying_mp, owns_underlying_mp, thread_safe),
 	  m_alloc_sequence(0),
 	  m_capacity(max_size),
 	  m_reserved(0)
 {
-	GPOS_ASSERT(NULL != underlying_memory_pool);
+	GPOS_ASSERT(NULL != underlying_mp);
 
 	m_allocations_list.Init(GPOS_OFFSET(SAllocHeader, m_link));
 }
@@ -117,7 +117,7 @@ CMemoryPoolTracker::Allocate(const ULONG bytes, const CHAR *file, const ULONG li
 	{
 		SLock(as);
 
-		m_memory_pool_statistics.RecordAllocation(bytes, alloc);
+		m_mp_statistics.RecordAllocation(bytes, alloc);
 		m_allocations_list.Prepend(header);
 		header->m_serial = m_alloc_sequence;
 		++m_alloc_sequence;
@@ -194,7 +194,7 @@ CMemoryPoolTracker::Unreserve(CAutoSpinlock &as, ULONG alloc, BOOL mem_available
 		m_reserved -= alloc;
 	}
 
-	m_memory_pool_statistics.RecordFailedAllocation();
+	m_mp_statistics.RecordFailedAllocation();
 
 	SUnlock(as);
 }
@@ -228,7 +228,7 @@ CMemoryPoolTracker::Free(void *ptr)
 		SLock(as);
 
 		// update stats and allocation list
-		m_memory_pool_statistics.RecordFree(user_size, total_size);
+		m_mp_statistics.RecordFree(user_size, total_size);
 		m_allocations_list.Remove(header);
 
 		SUnlock(as);
@@ -321,12 +321,12 @@ CMemoryPoolTracker::WalkLiveObjects(gpos::IMemoryVisitor *visitor)
 //
 //---------------------------------------------------------------------------
 void
-CMemoryPoolTracker::UpdateStatistics(CMemoryPoolStatistics &memory_pool_statistics)
+CMemoryPoolTracker::UpdateStatistics(CMemoryPoolStatistics &mp_statistics)
 {
 	CAutoSpinlock as(m_lock);
 	SLock(as);
 
-	memory_pool_statistics = m_memory_pool_statistics;
+	mp_statistics = m_mp_statistics;
 }
 
 

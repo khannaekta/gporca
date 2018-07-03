@@ -31,11 +31,11 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 CJobFactory::CJobFactory
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ULONG ulJobs
 	)
 	:
-	m_memory_pool(memory_pool),
+	m_mp(mp),
 	m_ulJobs(ulJobs),
 	m_pspjTest(NULL),
 	m_pspjGroupOptimization(NULL),

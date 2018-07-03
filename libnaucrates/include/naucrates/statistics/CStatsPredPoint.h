@@ -51,7 +51,7 @@ namespace gpnaucrates
 		CPoint *m_pred_point;
 
 		// add padding to datums when needed
-		static IDatum *PreprocessDatum(IMemoryPool *memory_pool,
+		static IDatum *PreprocessDatum(IMemoryPool *mp,
 									   const CColRef *colref,
 									   IDatum *datum);
 
@@ -60,7 +60,7 @@ namespace gpnaucrates
 		CStatsPredPoint(ULONG col_id, CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point);
 
 		// ctor
-		CStatsPredPoint(IMemoryPool *memory_pool,
+		CStatsPredPoint(IMemoryPool *mp,
 						const CColRef *colref,
 						CStatsPred::EStatsCmpType stats_cmp_type,
 						IDatum *datum);

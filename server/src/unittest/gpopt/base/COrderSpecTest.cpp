@@ -53,20 +53,20 @@ GPOS_RESULT
 COrderSpecTest::EresUnittest_Basics()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 		
 	// Setup an MD cache with a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(memory_pool, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 	
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 					(
-					memory_pool,
+					mp,
 					&mda,
 					NULL, /* pceeval */
-					CTestUtils::GetCostModel(memory_pool)
+					CTestUtils::GetCostModel(mp)
 					);
 	
 	// get column factory from optimizer context object
@@ -82,7 +82,7 @@ COrderSpecTest::EresUnittest_Basics()
 	CColRef *pcr3 = col_factory->PcrCreate(pmdtypeint4, default_type_modifier, name);
 	
 	
-	COrderSpec *pos1 = GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+	COrderSpec *pos1 = GPOS_NEW(mp) COrderSpec(mp);
 	
 	IMDId *pmdidInt4LT = pmdtypeint4->GetMdidForCmpType(IMDType::EcmptL);
 	pmdidInt4LT->AddRef();
@@ -94,7 +94,7 @@ COrderSpecTest::EresUnittest_Basics()
 	GPOS_ASSERT(pos1->Matches(pos1));
 	GPOS_ASSERT(pos1->FSatisfies(pos1));
 	
-	COrderSpec *pos2 = GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+	COrderSpec *pos2 = GPOS_NEW(mp) COrderSpec(mp);
 	pmdidInt4LT->AddRef();
 	pmdidInt4LT->AddRef();
 	pmdidInt4LT->AddRef();

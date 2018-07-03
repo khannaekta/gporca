@@ -34,7 +34,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		explicit CDXLScalarJoinFilter(IMemoryPool *memory_pool);
+		explicit CDXLScalarJoinFilter(IMemoryPool *mp);
 
 		// accessors
 		Edxlopid GetDXLOperator() const;

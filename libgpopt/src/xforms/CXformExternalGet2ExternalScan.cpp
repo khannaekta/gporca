@@ -28,16 +28,16 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformExternalGet2ExternalScan::CXformExternalGet2ExternalScan
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformImplementation
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalExternalGet(memory_pool)
+				mp,
+				GPOS_NEW(mp) CLogicalExternalGet(mp)
 				)
 		)
 {}
@@ -82,10 +82,10 @@ CXformExternalGet2ExternalScan::Transform
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CLogicalExternalGet *popGet = CLogicalExternalGet::PopConvert(pexpr->Pop());
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
-	CName *pname = GPOS_NEW(memory_pool) CName(memory_pool, popGet->Name());
+	CName *pname = GPOS_NEW(mp) CName(mp, popGet->Name());
 
 	CTableDescriptor *ptabdesc = popGet->Ptabdesc();
 	ptabdesc->AddRef();
@@ -97,10 +97,10 @@ CXformExternalGet2ExternalScan::Transform
 
 	// create alternative expression
 	CExpression *pexprAlt =
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
-			GPOS_NEW(memory_pool) CPhysicalExternalScan(memory_pool, pname, ptabdesc, pdrgpcrOutput)
+			mp,
+			GPOS_NEW(mp) CPhysicalExternalScan(mp, pname, ptabdesc, pdrgpcrOutput)
 			);
 
 	// add alternative to transformation result

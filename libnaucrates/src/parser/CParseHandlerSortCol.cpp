@@ -28,10 +28,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerSortCol::CParseHandlerSortCol(IMemoryPool *memory_pool,
+CParseHandlerSortCol::CParseHandlerSortCol(IMemoryPool *mp,
 										   CParseHandlerManager *parse_handler_mgr,
 										   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -61,7 +61,7 @@ CParseHandlerSortCol::StartElement(const XMLCh *const,  // element_uri,
 	// parse and create sort col operator
 	CDXLScalarSortCol *dxl_op = (CDXLScalarSortCol *) CDXLOperatorFactory::MakeDXLSortCol(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
-	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, dxl_op);
+	m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 }
 
 //---------------------------------------------------------------------------
@@ -86,10 +86,10 @@ CParseHandlerSortCol::EndElement(const XMLCh *const,  // element_uri,
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
-	GPOS_ASSERT(NULL != m_dxl_node);
+	GPOS_ASSERT(NULL != m_dxlnode);
 
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node, false /* validate_children */);
+	m_dxlnode->GetOperator()->AssertValid(m_dxlnode, false /* validate_children */);
 #endif  // GPOS_DEBUG
 
 	// deactivate handler

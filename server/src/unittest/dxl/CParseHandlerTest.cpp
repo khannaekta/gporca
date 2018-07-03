@@ -226,15 +226,15 @@ CParseHandlerTest::EresUnittest_ErrSAXParseException()
 {
 	// create own memory pool
 	CAutoMemoryPool amp(CAutoMemoryPool::ElcNone);
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// read DXL file
-	CHAR *dxl_string = CDXLUtils::Read(memory_pool, m_rgszXerceTestFileNames[0]);
+	CHAR *dxl_string = CDXLUtils::Read(mp, m_rgszXerceTestFileNames[0]);
 	
 	// function call should throw an exception
 	ULLONG plan_id = gpos::ullong_max;
 	ULLONG plan_space_size = gpos::ullong_max;
-	(void) CDXLUtils::GetPlanDXLNode(memory_pool, dxl_string, CTestUtils::m_szXSDPath, &plan_id, &plan_space_size);
+	(void) CDXLUtils::GetPlanDXLNode(mp, dxl_string, CTestUtils::m_szXSDPath, &plan_id, &plan_space_size);
 
 	return GPOS_FAILED;
 }
@@ -272,9 +272,9 @@ CParseHandlerTest::EresUnittest_MDRequest()
 {
 	// create own memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 	
-	return EresParseAndSerializeMDRequest(memory_pool, m_szMDRequestFile, false /* fvalidate */);
+	return EresParseAndSerializeMDRequest(mp, m_szMDRequestFile, false /* fvalidate */);
 }
 
 
@@ -378,12 +378,12 @@ CParseHandlerTest::EresUnittest_RunAllPositiveTests
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// loop over all test files
 	for (ULONG ul = 0; ul< ulFiles; ul++)
 	{
-		if (GPOS_FAILED == (*testFunc)(memory_pool, rgszFileNames[ul], fValidate))
+		if (GPOS_FAILED == (*testFunc)(mp, rgszFileNames[ul], fValidate))
 		{
 			return GPOS_FAILED;
 		}
@@ -403,7 +403,7 @@ GPOS_RESULT
 CParseHandlerTest::EresUnittest_RunAllNegativeTests()
 {
 	CAutoMemoryPool amp(CAutoMemoryPool::ElcNone);
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// loop over all test files
 	for (ULONG ulFileNum = 0;
@@ -414,7 +414,7 @@ CParseHandlerTest::EresUnittest_RunAllNegativeTests()
 		{
 			// try running the test for the current file
 			EresParseAndSerializePlan(
-							memory_pool,
+							mp,
 							m_rgszNegativeTestsFileNames[ulFileNum],
 							true /* fValidate */
 			);
@@ -445,16 +445,16 @@ CParseHandlerTest::EresUnittest_RunAllNegativeTests()
 GPOS_RESULT
 CParseHandlerTest::EresParseAndSerializePlan
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CHAR *dxl_filename,
 	BOOL fValidate
 	)
 {
-	CWStringDynamic str(memory_pool);
+	CWStringDynamic str(mp);
 	COstreamString oss(&str);
 	
 	// read DXL file
-	CHAR *dxl_string = CDXLUtils::Read(memory_pool, dxl_filename);
+	CHAR *dxl_string = CDXLUtils::Read(mp, dxl_filename);
 
 	GPOS_CHECK_ABORT;
 		
@@ -468,20 +468,20 @@ CParseHandlerTest::EresParseAndSerializePlan
 	// the root of the parsed DXL tree
 	ULLONG plan_id = gpos::ullong_max;
 	ULLONG plan_space_size = gpos::ullong_max;
-	CDXLNode *root_dxl_node = CDXLUtils::GetPlanDXLNode(memory_pool, dxl_string, szValidationPath, &plan_id, &plan_space_size);
+	CDXLNode *root_dxlnode = CDXLUtils::GetPlanDXLNode(mp, dxl_string, szValidationPath, &plan_id, &plan_space_size);
 	
 	GPOS_CHECK_ABORT;
 
 	oss << "Serializing parsed tree" << std::endl;
 
-	CWStringDynamic strPlan(memory_pool);
+	CWStringDynamic strPlan(mp);
 	COstreamString osPlan(&strPlan);
 
-	CDXLUtils::SerializePlan(memory_pool, osPlan, root_dxl_node, plan_id, plan_space_size, true /*serialize_header_footer*/, true /*indentation*/);
+	CDXLUtils::SerializePlan(mp, osPlan, root_dxlnode, plan_id, plan_space_size, true /*serialize_header_footer*/, true /*indentation*/);
 
 	GPOS_CHECK_ABORT;
 
-	CWStringDynamic dstrExpected(memory_pool);
+	CWStringDynamic dstrExpected(mp);
 	dstrExpected.AppendFormat(GPOS_WSZ_LIT("%s"), dxl_string);
 
 	if (!dstrExpected.Equals(&strPlan))
@@ -493,7 +493,7 @@ CParseHandlerTest::EresParseAndSerializePlan
 	}
 	
 	// cleanup
-	root_dxl_node->Release();
+	root_dxlnode->Release();
 	GPOS_DELETE_ARRAY(dxl_string);
 	
 	return GPOS_OK;
@@ -512,16 +512,16 @@ CParseHandlerTest::EresParseAndSerializePlan
 GPOS_RESULT
 CParseHandlerTest::EresParseAndSerializeQuery
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CHAR *dxl_filename,
 	BOOL fValidate
 	)
 {
-	CWStringDynamic str(memory_pool);
+	CWStringDynamic str(mp);
 	COstreamString oss(&str);
 
 	// read DXL file
-	CHAR *dxl_string = CDXLUtils::Read(memory_pool, dxl_filename);
+	CHAR *dxl_string = CDXLUtils::Read(mp, dxl_filename);
 
 	const CHAR *szValidationPath = NULL;
 	
@@ -531,21 +531,21 @@ CParseHandlerTest::EresParseAndSerializeQuery
 	}
 	
 	// the root of the parsed DXL tree
-	CQueryToDXLResult *pq2dxlresult = CDXLUtils::ParseQueryToQueryDXLTree(memory_pool, dxl_string, szValidationPath);
+	CQueryToDXLResult *pq2dxlresult = CDXLUtils::ParseQueryToQueryDXLTree(mp, dxl_string, szValidationPath);
 	GPOS_ASSERT(NULL != pq2dxlresult);
 
 	oss << "Serializing parsed tree" << std::endl;
 
-	CDXLNode *root_dxl_node = const_cast<CDXLNode *>(pq2dxlresult->CreateDXLNode());
+	CDXLNode *root_dxlnode = const_cast<CDXLNode *>(pq2dxlresult->CreateDXLNode());
 	DXLNodeArray* dxl_array = const_cast<DXLNodeArray* >(pq2dxlresult->GetOutputColumnsDXLArray());
 	DXLNodeArray* cte_producers = const_cast<DXLNodeArray* >(pq2dxlresult->GetCTEProducerDXLArray());
 
-	CWStringDynamic wstrQuery(memory_pool);
+	CWStringDynamic wstrQuery(mp);
 	COstreamString osQuery(&wstrQuery);
 
-	CDXLUtils::SerializeQuery(memory_pool, osQuery, root_dxl_node, dxl_array, cte_producers, true /*serialize_header_footer*/, true /*indentation*/);
+	CDXLUtils::SerializeQuery(mp, osQuery, root_dxlnode, dxl_array, cte_producers, true /*serialize_header_footer*/, true /*indentation*/);
 
-	CWStringDynamic dstrExpected(memory_pool);
+	CWStringDynamic dstrExpected(mp);
 	dstrExpected.AppendFormat(GPOS_WSZ_LIT("%s"), dxl_string);
 
 	if (!dstrExpected.Equals(&wstrQuery))
@@ -572,16 +572,16 @@ CParseHandlerTest::EresParseAndSerializeQuery
 GPOS_RESULT
 CParseHandlerTest::EresParseAndSerializeMetadata
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CHAR *dxl_filename,
 	BOOL fValidate
 	)
 {
-	CWStringDynamic str(memory_pool);
+	CWStringDynamic str(mp);
 	COstreamString oss(&str);
 
 	// read DXL file
-	CHAR *dxl_string = CDXLUtils::Read(memory_pool, dxl_filename);
+	CHAR *dxl_string = CDXLUtils::Read(mp, dxl_filename);
 
 	GPOS_CHECK_ABORT;
 	
@@ -593,18 +593,18 @@ CParseHandlerTest::EresParseAndSerializeMetadata
 	   szValidationPath = CTestUtils::m_szXSDPath;
 	}
 	
-	IMDCachePtrArray *mdcache_obj_array = CDXLUtils::ParseDXLToIMDObjectArray(memory_pool, dxl_string, szValidationPath);
+	IMDCachePtrArray *mdcache_obj_array = CDXLUtils::ParseDXLToIMDObjectArray(mp, dxl_string, szValidationPath);
 	
 	GPOS_ASSERT(NULL != mdcache_obj_array);
 	
 	GPOS_CHECK_ABORT;
 
 	oss << "Serializing metadata objects" << std::endl;
-	CWStringDynamic *metadata_str = CDXLUtils::SerializeMetadata(memory_pool, mdcache_obj_array, true /*serialize_header_footer*/, true /*indentation*/);
+	CWStringDynamic *metadata_str = CDXLUtils::SerializeMetadata(mp, mdcache_obj_array, true /*serialize_header_footer*/, true /*indentation*/);
 
 	GPOS_CHECK_ABORT;
 
-	CWStringDynamic dstrExpected(memory_pool);
+	CWStringDynamic dstrExpected(mp);
 	dstrExpected.AppendFormat(GPOS_WSZ_LIT("%s"), dxl_string);
 	
 	if (!dstrExpected.Equals(metadata_str))
@@ -631,16 +631,16 @@ CParseHandlerTest::EresParseAndSerializeMetadata
 GPOS_RESULT
 CParseHandlerTest::EresParseAndSerializeMDRequest
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CHAR *dxl_filename,
 	BOOL fValidate
 	)
 {
-	CWStringDynamic str(memory_pool);
+	CWStringDynamic str(mp);
 	COstreamString oss(&str);
 	
 	// read DXL file
-	CHAR *dxl_string = CDXLUtils::Read(memory_pool, dxl_filename);
+	CHAR *dxl_string = CDXLUtils::Read(mp, dxl_filename);
 
 	GPOS_CHECK_ABORT;
 	
@@ -652,17 +652,17 @@ CParseHandlerTest::EresParseAndSerializeMDRequest
 	   szValidationPath = CTestUtils::m_szXSDPath;
 	}
 	
-	CMDRequest *pmdr = CDXLUtils::ParseDXLToMDRequest(memory_pool, dxl_string, szValidationPath);
+	CMDRequest *pmdr = CDXLUtils::ParseDXLToMDRequest(mp, dxl_string, szValidationPath);
 	
 	GPOS_ASSERT(NULL != pmdr);
 	
 	GPOS_CHECK_ABORT;
 
-	CDXLUtils::SerializeMDRequest(memory_pool, pmdr, oss, true /*serialize_header_footer*/, true /*indentation*/);
+	CDXLUtils::SerializeMDRequest(mp, pmdr, oss, true /*serialize_header_footer*/, true /*indentation*/);
 
 	GPOS_CHECK_ABORT;
 
-	CWStringDynamic strExpected(memory_pool);
+	CWStringDynamic strExpected(mp);
 	strExpected.AppendFormat(GPOS_WSZ_LIT("%s"), dxl_string);
 	
 	GPOS_ASSERT(strExpected.Equals(&str));
@@ -686,7 +686,7 @@ CParseHandlerTest::EresParseAndSerializeMDRequest
 GPOS_RESULT
 CParseHandlerTest::EresParseAndSerializeStatistics
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CHAR *dxl_filename,
 	BOOL fValidate
 	)
@@ -694,22 +694,22 @@ CParseHandlerTest::EresParseAndSerializeStatistics
 	// setup a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(memory_pool, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 					(
-					memory_pool,
+					mp,
 					&mda,
 					NULL /* pceeval */,
-					CTestUtils::GetCostModel(memory_pool)
+					CTestUtils::GetCostModel(mp)
 					);
 
-	CWStringDynamic str(memory_pool);
+	CWStringDynamic str(mp);
 	COstreamString oss(&str);
 
 	// read DXL file
-	CHAR *dxl_string = CDXLUtils::Read(memory_pool, dxl_filename);
+	CHAR *dxl_string = CDXLUtils::Read(mp, dxl_filename);
 
 	GPOS_CHECK_ABORT;
 
@@ -721,10 +721,10 @@ CParseHandlerTest::EresParseAndSerializeStatistics
 	}
 
 	// parse the statistics objects
-	DXLStatsDerivedRelArray *dxl_derived_rel_stats_array = CDXLUtils::ParseDXLToStatsDerivedRelArray(memory_pool, dxl_string, szValidationPath);
+	DXLStatsDerivedRelArray *dxl_derived_rel_stats_array = CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, dxl_string, szValidationPath);
 	CStatisticsArray *statistics_array = CDXLUtils::ParseDXLToOptimizerStatisticObjArray
 								(
-								memory_pool,
+								mp,
 								&mda,
 								dxl_derived_rel_stats_array
 								);
@@ -739,21 +739,21 @@ CParseHandlerTest::EresParseAndSerializeStatistics
 
 	stats->Rows();
 	oss << "Statistics:" << std::endl;
-	CCardinalityTestUtils::PrintStats(memory_pool, stats);
+	CCardinalityTestUtils::PrintStats(mp, stats);
 
 	GPOS_CHECK_ABORT;
 
 	oss << "Serializing Statistics Objects" << std::endl;
 	CWStringDynamic *statistics_str = CDXLUtils::SerializeStatistics
 											(
-											memory_pool,
+											mp,
 											&mda,
 											statistics_array,
 											true /*serialize_header_footer*/,
 											true /*indentation*/
 											);
 
-	CWStringDynamic dstrExpected(memory_pool);
+	CWStringDynamic dstrExpected(mp);
 	dstrExpected.AppendFormat(GPOS_WSZ_LIT("%s"), dxl_string);
 
 	GPOS_ASSERT(dstrExpected.Equals(statistics_str));
@@ -778,13 +778,13 @@ CParseHandlerTest::EresParseAndSerializeStatistics
 GPOS_RESULT
 CParseHandlerTest::EresParseAndSerializeScalarExpr
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CHAR *dxl_filename,
 	BOOL fValidate
 	)
 {
 	// read DXL file
-	CHAR *dxl_string = CDXLUtils::Read(memory_pool, dxl_filename);
+	CHAR *dxl_string = CDXLUtils::Read(mp, dxl_filename);
 	GPOS_CHECK_ABORT;
 
 	const CHAR *szValidationPath = NULL;
@@ -794,16 +794,16 @@ CParseHandlerTest::EresParseAndSerializeScalarExpr
 	}
 
 	// the root of the parsed DXL tree
-	CDXLNode *root_dxl_node = CDXLUtils::ParseDXLToScalarExprDXLNode(memory_pool, dxl_string, szValidationPath);
+	CDXLNode *root_dxlnode = CDXLUtils::ParseDXLToScalarExprDXLNode(mp, dxl_string, szValidationPath);
 	GPOS_CHECK_ABORT;
 
-	CWStringDynamic str(memory_pool);
+	CWStringDynamic str(mp);
 	COstreamString oss(&str);
 	oss << "Serializing parsed tree" << std::endl;
-	CWStringDynamic *scalar_expr_str = CDXLUtils::SerializeScalarExpr(memory_pool, root_dxl_node, true /*serialize_header_footer*/, true /*indentation*/);
+	CWStringDynamic *scalar_expr_str = CDXLUtils::SerializeScalarExpr(mp, root_dxlnode, true /*serialize_header_footer*/, true /*indentation*/);
 	GPOS_CHECK_ABORT;
 
-	CWStringDynamic dstrExpected(memory_pool);
+	CWStringDynamic dstrExpected(mp);
 	dstrExpected.AppendFormat(GPOS_WSZ_LIT("%s"), dxl_string);
 
 	GPOS_RESULT eres = GPOS_OK;
@@ -817,7 +817,7 @@ CParseHandlerTest::EresParseAndSerializeScalarExpr
 	}
 
 	// cleanup
-	root_dxl_node->Release();
+	root_dxlnode->Release();
 	GPOS_DELETE(scalar_expr_str);
 	GPOS_DELETE_ARRAY(dxl_string);
 

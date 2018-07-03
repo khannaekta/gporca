@@ -57,7 +57,7 @@ namespace gpopt
 			// compute required stats columns for a GbAgg
 			CColRefSet *PcrsStatGbAgg
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsInput,
 				ULONG child_index,
@@ -69,12 +69,12 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CLogicalGbAgg(IMemoryPool *memory_pool);
+			CLogicalGbAgg(IMemoryPool *mp);
 
 			// ctor
 			CLogicalGbAgg
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *colref_array,
 				COperator::EGbAggType egbaggtype
 				);
@@ -82,7 +82,7 @@ namespace gpopt
 			// ctor
 			CLogicalGbAgg
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *colref_array,
 				COperator::EGbAggType egbaggtype,
 				BOOL fGeneratesDuplicates,
@@ -92,7 +92,7 @@ namespace gpopt
 			// ctor
 			CLogicalGbAgg
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *colref_array,
 				ColRefArray *pdrgpcrMinimal,
 				COperator::EGbAggType egbaggtype
@@ -101,7 +101,7 @@ namespace gpopt
 			// ctor
 			CLogicalGbAgg
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *colref_array,
 				ColRefArray *pdrgpcrMinimal,
 				COperator::EGbAggType egbaggtype,
@@ -174,7 +174,7 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			//-------------------------------------------------------------------------------------
 			// Derived Relational Properties
@@ -186,23 +186,23 @@ namespace gpopt
 			
 			// derive outer references
 			virtual
-			CColRefSet *PcrsDeriveOuter(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsDeriveOuter(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 			// derive not null columns
 			virtual
-			CColRefSet *PcrsDeriveNotNull(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CColRefSet *PcrsDeriveNotNull(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive key collections
 			virtual
-			CKeyCollection *PkcDeriveKeys(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CKeyCollection *PkcDeriveKeys(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive constraint property
 			virtual
-			CPropConstraint *PpcDeriveConstraint(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CPropConstraint *PpcDeriveConstraint(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// compute required stats columns of the n-th child
 			//-------------------------------------------------------------------------------------
@@ -213,7 +213,7 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsStat
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsInput,
 				ULONG child_index
@@ -225,13 +225,13 @@ namespace gpopt
 			//-------------------------------------------------------------------------------------
 
 			// candidate set of xforms
-			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
+			CXformSet *PxfsCandidates(IMemoryPool *mp) const;
 
 			// derive statistics
 			virtual
 			IStatistics *PstatsDerive
 						(
-						IMemoryPool *memory_pool,
+						IMemoryPool *mp,
 						CExpressionHandle &exprhdl,
 						StatsArray *stats_ctxt
 						)
@@ -271,7 +271,7 @@ namespace gpopt
 			static
 			IStatistics *PstatsDerive
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				IStatistics *child_stats,
 				ColRefArray *pdrgpcrGroupingCols,
 				ULongPtrArray *pdrgpulComputedCols,

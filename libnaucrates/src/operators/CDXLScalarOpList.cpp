@@ -26,8 +26,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarOpList::CDXLScalarOpList(IMemoryPool *memory_pool, EdxlOpListType dxl_op_list_type)
-	: CDXLScalar(memory_pool), m_dxl_op_list_type(dxl_op_list_type)
+CDXLScalarOpList::CDXLScalarOpList(IMemoryPool *mp, EdxlOpListType dxl_op_list_type)
+	: CDXLScalar(mp), m_dxl_op_list_type(dxl_op_list_type)
 {
 	GPOS_ASSERT(EdxloplistSentinel > dxl_op_list_type);
 }

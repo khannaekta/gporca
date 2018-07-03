@@ -56,7 +56,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerScalarSubPlanParamList(IMemoryPool *memory_pool,
+		CParseHandlerScalarSubPlanParamList(IMemoryPool *mp,
 											CParseHandlerManager *parse_handler_mgr,
 											CParseHandlerBase *parse_handler_root);
 

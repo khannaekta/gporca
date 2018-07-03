@@ -31,7 +31,7 @@ namespace gpos
 		static CMessageRepository *m_repository;
 
 		// memory pool
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// short hand for Table of Message Tables (TMT)
 		typedef CSyncHashtable<CMessageTable, ELocale, CSpinlockOS> TMT;
@@ -43,7 +43,7 @@ namespace gpos
 		TMT m_hash_table;
 
 		// init basic directory
-		void InitDirectory(IMemoryPool *memory_pool);
+		void InitDirectory(IMemoryPool *mp);
 
 		// install message table for a given locale
 		void AddMessageTable(ELocale locale);
@@ -53,7 +53,7 @@ namespace gpos
 
 	public:
 		// ctor
-		CMessageRepository(IMemoryPool *memory_pool);
+		CMessageRepository(IMemoryPool *mp);
 
 		// dtor
 		~CMessageRepository();

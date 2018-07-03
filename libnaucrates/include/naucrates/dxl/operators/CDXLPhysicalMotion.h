@@ -57,7 +57,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		explicit CDXLPhysicalMotion(IMemoryPool *memory_pool);
+		explicit CDXLPhysicalMotion(IMemoryPool *mp);
 
 		virtual ~CDXLPhysicalMotion();
 

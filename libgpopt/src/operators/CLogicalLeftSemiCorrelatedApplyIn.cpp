@@ -25,10 +25,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalLeftSemiCorrelatedApplyIn::CLogicalLeftSemiCorrelatedApplyIn
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogicalLeftSemiApplyIn(memory_pool)
+	CLogicalLeftSemiApplyIn(mp)
 {}
 
 //---------------------------------------------------------------------------
@@ -41,12 +41,12 @@ CLogicalLeftSemiCorrelatedApplyIn::CLogicalLeftSemiCorrelatedApplyIn
 //---------------------------------------------------------------------------
 CLogicalLeftSemiCorrelatedApplyIn::CLogicalLeftSemiCorrelatedApplyIn
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ColRefArray *pdrgpcrInner,
 	EOperatorId eopidOriginSubq
 	)
 	:
-	CLogicalLeftSemiApplyIn(memory_pool, pdrgpcrInner, eopidOriginSubq)
+	CLogicalLeftSemiApplyIn(mp, pdrgpcrInner, eopidOriginSubq)
 {}
 
 //---------------------------------------------------------------------------
@@ -60,11 +60,11 @@ CLogicalLeftSemiCorrelatedApplyIn::CLogicalLeftSemiCorrelatedApplyIn
 CXformSet *
 CLogicalLeftSemiCorrelatedApplyIn::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementLeftSemiCorrelatedApplyIn);
 
 	return xform_set;
@@ -81,14 +81,14 @@ CLogicalLeftSemiCorrelatedApplyIn::PxfsCandidates
 COperator *
 CLogicalLeftSemiCorrelatedApplyIn::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	BOOL must_exist
 	)
 {
-	ColRefArray *pdrgpcrInner = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrInner, colref_mapping, must_exist);
+	ColRefArray *pdrgpcrInner = CUtils::PdrgpcrRemap(mp, m_pdrgpcrInner, colref_mapping, must_exist);
 
-	return GPOS_NEW(memory_pool) CLogicalLeftSemiCorrelatedApplyIn(memory_pool, pdrgpcrInner, m_eopidOriginSubq);
+	return GPOS_NEW(mp) CLogicalLeftSemiCorrelatedApplyIn(mp, pdrgpcrInner, m_eopidOriginSubq);
 }
 
 

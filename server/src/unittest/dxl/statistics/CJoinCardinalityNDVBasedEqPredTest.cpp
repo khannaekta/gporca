@@ -107,10 +107,10 @@ namespace gpnaucrates
 		CDouble dRowsExpected(10000); // the minimum cardinality is min(NDV a, NDV b)
 
 		Fixture f(file_name);
-		IMemoryPool *memory_pool = f.Pmp();
+		IMemoryPool *mp = f.Pmp();
 		StatsArray *statistics_array = f.PdrgPstat();
 
-		CExpression *pexprLgGet = CTestUtils::PexprLogicalGet(memory_pool);
+		CExpression *pexprLgGet = CTestUtils::PexprLogicalGet(mp);
 		CLogicalGet *popGet = CLogicalGet::PopConvert(pexprLgGet->Pop());
 		ColRefArray *colref_array = popGet->PdrgpcrOutput();
 
@@ -120,15 +120,15 @@ namespace gpnaucrates
 
 		// create a scalar ident
 		// CScalarIdent "column_0000" (0)
-		CExpression *pexprScalarIdentRight = CUtils::PexprScalarIdent(memory_pool, pcrRight);
+		CExpression *pexprScalarIdentRight = CUtils::PexprScalarIdent(mp, pcrRight);
 
 		// create a scalar op expression column_0002 + 10
 		//  CScalarOp (+)
 		//	|--CScalarIdent "column_0002" (2)
 		//	+--CScalarConst (10)
-		CExpression *pexprScConst = CUtils::PexprScalarConstInt4(memory_pool, 10 /* val */);
-		CExpression *pexprScOp = CUtils::PexprScalarOp(memory_pool, pcrLeft, pexprScConst, CWStringConst(GPOS_WSZ_LIT("+")),
-													   GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT4_ADD_OP));
+		CExpression *pexprScConst = CUtils::PexprScalarConstInt4(mp, 10 /* val */);
+		CExpression *pexprScOp = CUtils::PexprScalarOp(mp, pcrLeft, pexprScConst, CWStringConst(GPOS_WSZ_LIT("+")),
+													   GPOS_NEW(mp) CMDIdGPDB(GPDB_INT4_ADD_OP));
 
 		// create a scalar comparision operator
 		//	+--CScalarCmp (=)
@@ -136,9 +136,9 @@ namespace gpnaucrates
 		//	|  |--CScalarIdent "column_0002" (2)
 		//	|  +--CScalarConst (10)
 		//	+--CScalarIdent "column_0000" (0)
-		CExpression *pScalarCmp = CUtils::PexprScalarEqCmp(memory_pool, pexprScOp, pexprScalarIdentRight);
+		CExpression *pScalarCmp = CUtils::PexprScalarEqCmp(mp, pexprScOp, pexprScalarIdentRight);
 
-		IStatistics *join_stats = CJoinStatsProcessor::CalcAllJoinStats(memory_pool, statistics_array, pScalarCmp,
+		IStatistics *join_stats = CJoinStatsProcessor::CalcAllJoinStats(mp, statistics_array, pScalarCmp,
 																	   IStatistics::EsjtInnerJoin);
 
 		GPOS_ASSERT(NULL != join_stats);
@@ -167,10 +167,10 @@ namespace gpnaucrates
 		CDouble dRowsExpected(76004000);
 
 		Fixture f(file_name);
-		IMemoryPool *memory_pool = f.Pmp();
+		IMemoryPool *mp = f.Pmp();
 		StatsArray *statistics_array = f.PdrgPstat();
 
-		CExpression *pexprLgGet = CTestUtils::PexprLogicalGet(memory_pool);
+		CExpression *pexprLgGet = CTestUtils::PexprLogicalGet(mp);
 		CLogicalGet *popGet = CLogicalGet::PopConvert(pexprLgGet->Pop());
 		ColRefArray *colref_array = popGet->PdrgpcrOutput();
 
@@ -181,16 +181,16 @@ namespace gpnaucrates
 
 		// create a scalar ident
 		// CScalarIdent "column_0000" (0)
-		CExpression *pexprScalarIdentRight = CUtils::PexprScalarIdent(memory_pool, pcrRight);
-		CExpression *pexprScalarIdentLeft2 = CUtils::PexprScalarIdent(memory_pool, pcrLeft2);
+		CExpression *pexprScalarIdentRight = CUtils::PexprScalarIdent(mp, pcrRight);
+		CExpression *pexprScalarIdentLeft2 = CUtils::PexprScalarIdent(mp, pcrLeft2);
 
 		// create a scalar op expression column_0002 + column_0001
 		//  CScalarOp (+)
 		//	|--CScalarIdent "column_0002" (2)
 		//	+--CScalarIdent "column_0001" (1)
-		CExpression *pexprScOp = CUtils::PexprScalarOp(memory_pool, pcrLeft1, pexprScalarIdentLeft2,
+		CExpression *pexprScOp = CUtils::PexprScalarOp(mp, pcrLeft1, pexprScalarIdentLeft2,
 													   CWStringConst(GPOS_WSZ_LIT("+")),
-													   GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT4_ADD_OP));
+													   GPOS_NEW(mp) CMDIdGPDB(GPDB_INT4_ADD_OP));
 
 		// create a scalar comparision operator
 		//	+--CScalarCmp (=)
@@ -198,8 +198,8 @@ namespace gpnaucrates
 		//	|  |--CScalarIdent "column_0002" (2)
 		//	|  +--CScalarIdent "column_0001" (1)
 		//	+--CScalarIdent "column_0000" (0)
-		CExpression *pScalarCmp = CUtils::PexprScalarEqCmp(memory_pool, pexprScOp, pexprScalarIdentRight);
-		IStatistics *join_stats = CJoinStatsProcessor::CalcAllJoinStats(memory_pool, statistics_array, pScalarCmp,
+		CExpression *pScalarCmp = CUtils::PexprScalarEqCmp(mp, pexprScOp, pexprScalarIdentRight);
+		IStatistics *join_stats = CJoinStatsProcessor::CalcAllJoinStats(mp, statistics_array, pScalarCmp,
 																	   IStatistics::EsjtInnerJoin);
 
 		GPOS_ASSERT(NULL != join_stats);
@@ -229,10 +229,10 @@ namespace gpnaucrates
 		CDouble dRowsExpected(76004000);
 
 		Fixture f(file_name);
-		IMemoryPool *memory_pool = f.Pmp();
+		IMemoryPool *mp = f.Pmp();
 		StatsArray *statistics_array = f.PdrgPstat();
 
-		CExpression *pexprLgGet = CTestUtils::PexprLogicalGet(memory_pool);
+		CExpression *pexprLgGet = CTestUtils::PexprLogicalGet(mp);
 		CLogicalGet *popGet = CLogicalGet::PopConvert(pexprLgGet->Pop());
 		ColRefArray *colref_array = popGet->PdrgpcrOutput();
 
@@ -242,15 +242,15 @@ namespace gpnaucrates
 
 		// create a scalar ident
 		// CScalarIdent "column_0000" (0)
-		CExpression *pexprScalarIdentRight = CUtils::PexprScalarIdent(memory_pool, pcrRight);
+		CExpression *pexprScalarIdentRight = CUtils::PexprScalarIdent(mp, pcrRight);
 
 		// create a scalar op expression column_0002 + 10
 		//  CScalarOp (+)
 		//	|--CScalarIdent "column_0002" (2)
 		//	+--CScalarConst (10)
-		CExpression *pexprScConst = CUtils::PexprScalarConstInt4(memory_pool, 10 /* val */);
-		CExpression *pexprScOp = CUtils::PexprScalarOp(memory_pool, pcrLeft, pexprScConst, CWStringConst(GPOS_WSZ_LIT("+")),
-													   GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_INT4_ADD_OP));
+		CExpression *pexprScConst = CUtils::PexprScalarConstInt4(mp, 10 /* val */);
+		CExpression *pexprScOp = CUtils::PexprScalarOp(mp, pcrLeft, pexprScConst, CWStringConst(GPOS_WSZ_LIT("+")),
+													   GPOS_NEW(mp) CMDIdGPDB(GPDB_INT4_ADD_OP));
 
 		// create a scalar comparision operator
 		//	+--CScalarCmp (<=)
@@ -258,13 +258,13 @@ namespace gpnaucrates
 		//	|  |--CScalarIdent "column_0002" (2)
 		//	|  +--CScalarConst (10)
 		//	+--CScalarIdent "column_0000" (0)
-		CExpression *pScalarCmp = CUtils::PexprScalarCmp(memory_pool,
+		CExpression *pScalarCmp = CUtils::PexprScalarCmp(mp,
 														 pexprScOp,
 														 pexprScalarIdentRight,
 														 IMDType::EcmptLEq
 		);
 
-		IStatistics *join_stats = CJoinStatsProcessor::CalcAllJoinStats(memory_pool, statistics_array, pScalarCmp,
+		IStatistics *join_stats = CJoinStatsProcessor::CalcAllJoinStats(mp, statistics_array, pScalarCmp,
 																	   IStatistics::EsjtInnerJoin);
 
 		GPOS_ASSERT(NULL != join_stats);

@@ -31,10 +31,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerScalarOpExpr::CParseHandlerScalarOpExpr(IMemoryPool *memory_pool,
+CParseHandlerScalarOpExpr::CParseHandlerScalarOpExpr(IMemoryPool *mp,
 													 CParseHandlerManager *parse_handler_mgr,
 													 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root),
 	  m_num_of_children(0)
 {
 }
@@ -56,21 +56,21 @@ CParseHandlerScalarOpExpr::StartElement(const XMLCh *const element_uri,
 {
 	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarOpExpr),
 									  element_local_name) &&
-		(NULL == m_dxl_node))
+		(NULL == m_dxlnode))
 	{
 		// parse and create scalar OpExpr
 		CDXLScalarOpExpr *dxl_op = (CDXLScalarOpExpr *) CDXLOperatorFactory::MakeDXLOpExpr(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 
 		// construct node from the created child nodes
-		m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, dxl_op);
+		m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 	}
-	else if (NULL != m_dxl_node)
+	else if (NULL != m_dxlnode)
 	{
 		if (2 > m_num_of_children)
 		{
 			CParseHandlerBase *op_parse_handler = CParseHandlerFactory::GetParseHandler(
-				m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+				m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 
 			m_parse_handler_mgr->ActivateParseHandler(op_parse_handler);
 

@@ -48,7 +48,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLDatumStatsLintMappable(IMemoryPool *memory_pool,
+		CDXLDatumStatsLintMappable(IMemoryPool *mp,
 								   IMDId *mdid_type,
 								   INT type_modifier,
 								   BOOL is_passed_by_value,

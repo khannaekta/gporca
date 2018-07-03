@@ -30,17 +30,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformGbAgg2HashAgg::CXformGbAgg2HashAgg
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformImplementation
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CLogicalGbAgg(memory_pool),
-							 GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),
+		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalGbAgg(mp),
+							 GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)),
 							 // we need to extract deep tree in the project list to check
 							 // for existence of distinct agg functions
-							 GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool)))
+							 GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp)))
 		)
 {}
 
@@ -121,7 +121,7 @@ CXformGbAgg2HashAgg::Transform
 		return;
 	}
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();	
+	IMemoryPool *mp = pxfctxt->Pmp();	
 	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
 	ColRefArray *colref_array = popAgg->Pdrgpcr();
 	colref_array->AddRef();
@@ -143,12 +143,12 @@ CXformGbAgg2HashAgg::Transform
 
 	// create alternative expression
 	CExpression *pexprAlt = 
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
-			GPOS_NEW(memory_pool) CPhysicalHashAgg
+			mp,
+			GPOS_NEW(mp) CPhysicalHashAgg
 						(
-						memory_pool,
+						mp,
 						colref_array,
 						popAgg->PdrgpcrMinimal(),
 						popAgg->Egbaggtype(),

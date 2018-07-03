@@ -29,10 +29,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerCondList::CParseHandlerCondList(IMemoryPool *memory_pool,
+CParseHandlerCondList::CParseHandlerCondList(IMemoryPool *mp,
 											 CParseHandlerManager *parse_handler_mgr,
 											 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -55,23 +55,23 @@ CParseHandlerCondList::StartElement(const XMLCh *const element_uri,
 									  element_local_name))
 	{
 		// start the hash cond list
-		m_dxl_node = GPOS_NEW(m_memory_pool)
-			CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarHashCondList(m_memory_pool));
+		m_dxlnode = GPOS_NEW(m_mp)
+			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarHashCondList(m_mp));
 	}
 	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarMergeCondList),
 										   element_local_name))
 	{
 		// start the merge cond list
-		m_dxl_node = GPOS_NEW(m_memory_pool)
-			CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarMergeCondList(m_memory_pool));
+		m_dxlnode = GPOS_NEW(m_mp)
+			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarMergeCondList(m_mp));
 	}
 	else
 	{
 		// we must have seen a cond list already and initialized the cond list node
-		GPOS_ASSERT(NULL != m_dxl_node);
+		GPOS_ASSERT(NULL != m_dxlnode);
 		// start new hash cond element
 		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
 		// store parse handler

@@ -126,18 +126,18 @@ CJoinOrderDP::SComponentPair::~SComponentPair()
 //---------------------------------------------------------------------------
 CJoinOrderDP::CJoinOrderDP
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ExpressionArray *pdrgpexprComponents,
 	ExpressionArray *pdrgpexprConjuncts
 	)
 	:
-	CJoinOrder(memory_pool, pdrgpexprComponents, pdrgpexprConjuncts)
+	CJoinOrder(mp, pdrgpexprComponents, pdrgpexprConjuncts)
 {
-	m_phmcomplink = GPOS_NEW(memory_pool) ComponentPairToExpressionMap(memory_pool);
-	m_phmbsexpr = GPOS_NEW(memory_pool) BitSetToExpressionMap(memory_pool);
-	m_phmexprcost = GPOS_NEW(memory_pool) ExpressionToCostMap(memory_pool);
-	m_pdrgpexprTopKOrders = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
-	m_pexprDummy = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool));
+	m_phmcomplink = GPOS_NEW(mp) ComponentPairToExpressionMap(mp);
+	m_phmbsexpr = GPOS_NEW(mp) BitSetToExpressionMap(mp);
+	m_phmexprcost = GPOS_NEW(mp) ExpressionToCostMap(mp);
+	m_pdrgpexprTopKOrders = GPOS_NEW(mp) ExpressionArray(mp);
+	m_pexprDummy = GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp));
 
 #ifdef GPOS_DEBUG
 	for (ULONG ul = 0; ul < m_ulComps; ul++)
@@ -296,7 +296,7 @@ CJoinOrderDP::PexprPred
 	{
 		pbsFst->AddRef();
 		pbsSnd->AddRef();
-		pcomppair = GPOS_NEW(m_memory_pool) SComponentPair(pbsFst, pbsSnd);
+		pcomppair = GPOS_NEW(m_mp) SComponentPair(pbsFst, pbsSnd);
 		pexprPred = m_phmcomplink->Find(pcomppair);
 		if (NULL != pexprPred)
 		{
@@ -371,7 +371,7 @@ CJoinOrderDP::PexprJoin
 	pexprSnd->AddRef();
 	pexprScalar->AddRef();
 
-	return CUtils::PexprLogicalJoin<CLogicalInnerJoin>(m_memory_pool, pexprFst, pexprSnd, pexprScalar);
+	return CUtils::PexprLogicalJoin<CLogicalInnerJoin>(m_mp, pexprFst, pexprSnd, pexprScalar);
 }
 
 
@@ -393,9 +393,9 @@ CJoinOrderDP::DeriveStats
 
 	if (m_pexprDummy != pexpr && NULL == pexpr->Pstats())
 	{
-		CExpressionHandle exprhdl(m_memory_pool);
+		CExpressionHandle exprhdl(m_mp);
 		exprhdl.Attach(pexpr);
-		exprhdl.DeriveStats(m_memory_pool, m_memory_pool, NULL /*prprel*/, NULL /*stats_ctxt*/);
+		exprhdl.DeriveStats(m_mp, m_mp, NULL /*prprel*/, NULL /*stats_ctxt*/);
 	}
 }
 
@@ -433,7 +433,7 @@ CJoinOrderDP::InsertExpressionCost
 #ifdef GPOS_DEBUG
 	BOOL fInserted =
 #endif // GPOS_DEBUG
-		m_phmexprcost->Insert(pexpr, GPOS_NEW(m_memory_pool) CDouble(dCost));
+		m_phmexprcost->Insert(pexpr, GPOS_NEW(m_mp) CDouble(dCost));
 	GPOS_ASSERT(fInserted);
 }
 
@@ -461,9 +461,9 @@ CJoinOrderDP::PexprJoin
 	ULONG ulCompSnd = bsi.Bit();
 	GPOS_ASSERT(!bsi.Advance());
 
-	CBitSet *pbsFst = GPOS_NEW(m_memory_pool) CBitSet(m_memory_pool);
+	CBitSet *pbsFst = GPOS_NEW(m_mp) CBitSet(m_mp);
 	(void) pbsFst->ExchangeSet(ulCompFst);
-	CBitSet *pbsSnd = GPOS_NEW(m_memory_pool) CBitSet(m_memory_pool);
+	CBitSet *pbsSnd = GPOS_NEW(m_mp) CBitSet(m_mp);
 	(void) pbsSnd->ExchangeSet(ulCompSnd);
 	CExpression *pexprScalar = PexprPred(pbsFst, pbsSnd);
 	pbsFst->Release();
@@ -480,7 +480,7 @@ CJoinOrderDP::PexprJoin
 	pexprRight->AddRef();
 	pexprScalar->AddRef();
 	CExpression *pexprJoin =
-		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(m_memory_pool, pexprLeft, pexprRight, pexprScalar);
+		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(m_mp, pexprLeft, pexprRight, pexprScalar);
 
 	DeriveStats(pexprJoin);
 	// store solution in DP table
@@ -521,12 +521,12 @@ CJoinOrderDP::PexprBestJoinOrderDP
 	CDouble dMinCost(0.0);
 	CExpression *pexprResult = NULL;
 
-	BitSetArray *pdrgpbsSubsets = PdrgpbsSubsets(m_memory_pool, pbs);
+	BitSetArray *pdrgpbsSubsets = PdrgpbsSubsets(m_mp, pbs);
 	const ULONG ulSubsets = pdrgpbsSubsets->Size();
 	for (ULONG ul = 0; ul < ulSubsets; ul++)
 	{
 		CBitSet *pbsCurrent = (*pdrgpbsSubsets)[ul];
-		CBitSet *pbsRemaining = GPOS_NEW(m_memory_pool) CBitSet(m_memory_pool, *pbs);
+		CBitSet *pbsRemaining = GPOS_NEW(m_mp) CBitSet(m_mp, *pbs);
 		pbsRemaining->Difference(pbsCurrent);
 
 		// check if subsets are connected with one or more edges
@@ -598,7 +598,7 @@ CJoinOrderDP::PexprBestJoinOrderDP
 void
 CJoinOrderDP::GenerateSubsets
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CBitSet *pbsCurrent,
 	ULONG *pulElems,
 	ULONG size,
@@ -620,15 +620,15 @@ CJoinOrderDP::GenerateSubsets
 		return;
 	}
 
-	CBitSet *pbsCopy = GPOS_NEW(memory_pool) CBitSet(memory_pool, *pbsCurrent);
+	CBitSet *pbsCopy = GPOS_NEW(mp) CBitSet(mp, *pbsCurrent);
 #ifdef GPOS_DEBUG
 	BOOL fSet =
 #endif // GPOS_DEBUG
 		pbsCopy->ExchangeSet(pulElems[ulIndex]);
 	GPOS_ASSERT(!fSet);
 
-	GenerateSubsets(memory_pool, pbsCopy, pulElems, size, ulIndex + 1, pdrgpbsSubsets);
-	GenerateSubsets(memory_pool, pbsCurrent, pulElems, size, ulIndex + 1, pdrgpbsSubsets);
+	GenerateSubsets(mp, pbsCopy, pulElems, size, ulIndex + 1, pdrgpbsSubsets);
+	GenerateSubsets(mp, pbsCurrent, pulElems, size, ulIndex + 1, pdrgpbsSubsets);
 }
 
 //---------------------------------------------------------------------------
@@ -642,12 +642,12 @@ CJoinOrderDP::GenerateSubsets
 BitSetArray *
 CJoinOrderDP::PdrgpbsSubsets
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CBitSet *pbs
 	)
 {
 	const ULONG size = pbs->Size();
-	ULONG *pulElems = GPOS_NEW_ARRAY(memory_pool, ULONG, size);
+	ULONG *pulElems = GPOS_NEW_ARRAY(mp, ULONG, size);
 	ULONG ul = 0;
 	CBitSetIter bsi(*pbs);
 	while (bsi.Advance())
@@ -655,9 +655,9 @@ CJoinOrderDP::PdrgpbsSubsets
 		pulElems[ul++] = bsi.Bit();
 	}
 
-	CBitSet *pbsCurrent = GPOS_NEW(memory_pool) CBitSet(memory_pool);
-	BitSetArray *pdrgpbsSubsets = GPOS_NEW(memory_pool) BitSetArray(memory_pool);
-	GenerateSubsets(memory_pool, pbsCurrent, pulElems, size, 0, pdrgpbsSubsets);
+	CBitSet *pbsCurrent = GPOS_NEW(mp) CBitSet(mp);
+	BitSetArray *pdrgpbsSubsets = GPOS_NEW(mp) BitSetArray(mp);
+	GenerateSubsets(mp, pbsCurrent, pulElems, size, 0, pdrgpbsSubsets);
 	GPOS_DELETE_ARRAY(pulElems);
 
 	return pdrgpbsSubsets;
@@ -734,7 +734,7 @@ CJoinOrderDP::PbsCovered
 	)
 {
 	GPOS_ASSERT(NULL != pbsInput);
-	CBitSet *pbs = GPOS_NEW(m_memory_pool) CBitSet(m_memory_pool);
+	CBitSet *pbs = GPOS_NEW(m_mp) CBitSet(m_mp);
 
 	for (ULONG ul = 0; ul < m_ulEdges; ul++)
 	{
@@ -781,7 +781,7 @@ CJoinOrderDP::PexprCross
 	{
 		pexprComp =  m_rgpcomp[bsi.Bit()]->m_pexpr;
 		pexprComp->AddRef();
-		pexprCross = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(m_memory_pool, pexprComp, pexprCross, CPredicateUtils::PexprConjunction(m_memory_pool, NULL /*pdrgpexpr*/));
+		pexprCross = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(m_mp, pexprComp, pexprCross, CPredicateUtils::PexprConjunction(m_mp, NULL /*pdrgpexpr*/));
 	}
 
 	pbs->AddRef();
@@ -831,7 +831,7 @@ CJoinOrderDP::PexprJoinCoveredSubsetWithUncoveredSubset
 	// join the results with a cross product
 	pexprJoin->AddRef();
 	pexprCross->AddRef();
-	CExpression *pexprResult = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(m_memory_pool, pexprJoin, pexprCross, CPredicateUtils::PexprConjunction(m_memory_pool, NULL));
+	CExpression *pexprResult = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(m_mp, pexprJoin, pexprCross, CPredicateUtils::PexprConjunction(m_mp, NULL));
 	pbs->AddRef();
 #ifdef GPOS_DEBUG
 	BOOL fInserted =
@@ -890,7 +890,7 @@ CJoinOrderDP::PexprBestJoinOrder
 	if (!pbsCovered->Equals(pbs))
 	{
 		// create a cross product for uncovered subset
-		CBitSet *pbsUncovered = GPOS_NEW(m_memory_pool) CBitSet(m_memory_pool, *pbs);
+		CBitSet *pbsUncovered = GPOS_NEW(m_mp) CBitSet(m_mp, *pbs);
 		pbsUncovered->Difference(pbsCovered);
 		CExpression *pexprResult =
 			PexprJoinCoveredSubsetWithUncoveredSubset(pbs, pbsCovered, pbsUncovered);
@@ -935,8 +935,8 @@ CJoinOrderDP::PexprBuildPred
 	)
 {
 	// collect edges connecting the given sets
-	CBitSet *pbsEdges = GPOS_NEW(m_memory_pool) CBitSet(m_memory_pool);
-	CBitSet *pbs = GPOS_NEW(m_memory_pool) CBitSet(m_memory_pool, *pbsFst);
+	CBitSet *pbsEdges = GPOS_NEW(m_mp) CBitSet(m_mp);
+	CBitSet *pbs = GPOS_NEW(m_mp) CBitSet(m_mp, *pbsFst);
 	pbs->Union(pbsSnd);
 
 	for (ULONG ul = 0; ul < m_ulEdges; ul++)
@@ -960,7 +960,7 @@ CJoinOrderDP::PexprBuildPred
 	CExpression *pexprPred = NULL;
 	if (0 < pbsEdges->Size())
 	{
-		ExpressionArray *pdrgpexpr = GPOS_NEW(m_memory_pool) ExpressionArray(m_memory_pool);
+		ExpressionArray *pdrgpexpr = GPOS_NEW(m_mp) ExpressionArray(m_mp);
 		CBitSetIter bsi(*pbsEdges);
 		while (bsi.Advance())
 		{
@@ -970,7 +970,7 @@ CJoinOrderDP::PexprBuildPred
 			pdrgpexpr->Append(pedge->m_pexpr);
 		}
 
-		pexprPred = CPredicateUtils::PexprConjunction(m_memory_pool, pdrgpexpr);
+		pexprPred = CPredicateUtils::PexprConjunction(m_mp, pdrgpexpr);
 	}
 
 	pbsEdges->Release();
@@ -989,7 +989,7 @@ CJoinOrderDP::PexprBuildPred
 CExpression *
 CJoinOrderDP::PexprExpand()
 {
-	CBitSet *pbs = GPOS_NEW(m_memory_pool) CBitSet(m_memory_pool);
+	CBitSet *pbs = GPOS_NEW(m_mp) CBitSet(m_mp);
 	for (ULONG ul = 0; ul < m_ulComps; ul++)
 	{
 		(void) pbs->ExchangeSet(ul);

@@ -82,17 +82,17 @@ namespace gpnaucrates
 		CStatisticsUtils(const CStatisticsUtils &);
 
 		// given MCVs and histogram buckets, merge them into buckets of a single histogram
-		static BucketArray *MergeMcvHistBucket(IMemoryPool *memory_pool,
+		static BucketArray *MergeMcvHistBucket(IMemoryPool *mp,
 											   const BucketArray *mcv_buckets,
 											   const BucketArray *histogram_buckets);
 
 		// split a histogram bucket given an MCV bucket
-		static BucketArray *SplitHistBucketGivenMcvBuckets(IMemoryPool *memory_pool,
+		static BucketArray *SplitHistBucketGivenMcvBuckets(IMemoryPool *mp,
 														   const CBucket *histogram_bucket,
 														   const BucketArray *mcv_buckets);
 
 		// given lower and upper bound information and their closedness, return a bucket if they can form a valid bucket
-		static CBucket *CreateValidBucket(IMemoryPool *memory_pool,
+		static CBucket *CreateValidBucket(IMemoryPool *mp,
 										  CPoint *bucket_lower_bound,
 										  CPoint *bucket_upper_bound,
 										  BOOL is_lower_closed,
@@ -105,7 +105,7 @@ namespace gpnaucrates
 								  BOOL is_upper_closed);
 
 		// find the MCVs that fall within the same histogram bucket and perform the split
-		static void SplitHistDriver(IMemoryPool *memory_pool,
+		static void SplitHistDriver(IMemoryPool *mp,
 									const CBucket *histogram_bucket,
 									const BucketArray *mcv_buckets,
 									BucketArray *merged_buckets,
@@ -118,14 +118,14 @@ namespace gpnaucrates
 											   BucketArray *buckets);
 
 		// add the NDVs for all of the grouping columns
-		static void AddNdvForAllGrpCols(IMemoryPool *memory_pool,
+		static void AddNdvForAllGrpCols(IMemoryPool *mp,
 										const CStatistics *input_stats,
 										const ULongPtrArray *grouping_columns,
 										CDoubleArray *output_ndvs  // output array of NDV
 		);
 
 		// compute max number of groups when grouping on columns from the given source
-		static CDouble MaxNumGroupsForGivenSrcGprCols(IMemoryPool *memory_pool,
+		static CDouble MaxNumGroupsForGivenSrcGprCols(IMemoryPool *mp,
 													  const CStatisticsConfig *stats_config,
 													  CStatistics *input_stats,
 													  const ULongPtrArray *src_grouping_cols);
@@ -139,17 +139,17 @@ namespace gpnaucrates
 
 	public:
 		// get the next data point for generating new bucket boundary
-		static CPoint *NextPoint(IMemoryPool *memory_pool, CMDAccessor *md_accessor, CPoint *point);
+		static CPoint *NextPoint(IMemoryPool *mp, CMDAccessor *md_accessor, CPoint *point);
 
 		// transform mcv information to optimizer's histogram structure
-		static CHistogram *TransformMCVToHist(IMemoryPool *memory_pool,
+		static CHistogram *TransformMCVToHist(IMemoryPool *mp,
 											  const IMDType *mdtype,
 											  IDatumArray *mcv_datums,
 											  CDoubleArray *freq_array,
 											  ULONG num_mcv_values);
 
 		// merge MCVs and histogram
-		static CHistogram *MergeMCVHist(IMemoryPool *memory_pool,
+		static CHistogram *MergeMCVHist(IMemoryPool *mp,
 										const CHistogram *mcv_histogram,
 										const CHistogram *histogram);
 
@@ -157,7 +157,7 @@ namespace gpnaucrates
 		static inline INT GetMcvPairCmpFunc(const void *val1, const void *val2);
 
 		// utility function to print column stats before/after applying filter
-		static void PrintColStats(IMemoryPool *memory_pool,
+		static void PrintColStats(IMemoryPool *mp,
 								  CStatsPred *pred_stats,
 								  ULONG cond_col_id,
 								  CHistogram *histogram,
@@ -165,14 +165,14 @@ namespace gpnaucrates
 								  BOOL is_filter_applied_before);
 
 		// extract all the column identifiers used in the statistics filter
-		static void ExtractUsedColIds(IMemoryPool *memory_pool,
+		static void ExtractUsedColIds(IMemoryPool *mp,
 									  CBitSet *col_ids_bitset,
 									  CStatsPred *pred_stats,
 									  ULongPtrArray *col_ids);
 
 		// given the previously generated histogram, update the intermediate
 		// result of the disjunction
-		static void UpdateDisjStatistics(IMemoryPool *memory_pool,
+		static void UpdateDisjStatistics(IMemoryPool *mp,
 										 CBitSet *non_updatable_cols,
 										 CDouble input_disjunct_rows,
 										 CDouble local_rows,
@@ -183,11 +183,11 @@ namespace gpnaucrates
 		// given a disjunction filter, generate a bit set of columns whose
 		// histogram buckets cannot be changed by applying the predicates in the
 		// disjunction
-		static CBitSet *GetColsNonUpdatableHistForDisj(IMemoryPool *memory_pool,
+		static CBitSet *GetColsNonUpdatableHistForDisj(IMemoryPool *mp,
 													   CStatsPredDisj *pred_stats);
 
 		// helper method to add a histogram to a map
-		static void AddHistogram(IMemoryPool *memory_pool,
+		static void AddHistogram(IMemoryPool *mp,
 								 ULONG col_id,
 								 const CHistogram *histogram,
 								 UlongHistogramHashMap *col_histogram_mapping,
@@ -196,7 +196,7 @@ namespace gpnaucrates
 		// create a new hash map of histograms after merging
 		// the histograms generated by the child of disjunctive predicate
 		static UlongHistogramHashMap *CreateHistHashMapAfterMergingDisjPreds(
-			IMemoryPool *memory_pool,
+			IMemoryPool *mp,
 			CBitSet *non_updatable_cols,
 			UlongHistogramHashMap *prev_histogram_map,
 			UlongHistogramHashMap *disj_preds_histogram_map,
@@ -204,7 +204,7 @@ namespace gpnaucrates
 			CDouble num_rows_disj_child);
 
 		// helper method to copy the hash map of histograms
-		static UlongHistogramHashMap *CopyHistHashMap(IMemoryPool *memory_pool,
+		static UlongHistogramHashMap *CopyHistHashMap(IMemoryPool *mp,
 													  UlongHistogramHashMap *col_histogram_mapping);
 
 		// return the column identifier of the filter if the predicate is
@@ -212,7 +212,7 @@ namespace gpnaucrates
 		static ULONG GetColId(const StatsPredPtrArry *stats_preds_array);
 
 		// add remaining buckets from one array of buckets to the other
-		static void AddRemainingBuckets(IMemoryPool *memory_pool,
+		static void AddRemainingBuckets(IMemoryPool *mp,
 										const BucketArray *src_buckets,
 										BucketArray *dest_buckets,
 										ULONG *start_val);
@@ -226,18 +226,18 @@ namespace gpnaucrates
 #endif  // GPOS_DEBUG
 
 		// derive statistics of dynamic scan based on part-selector stats in the given map
-		static IStatistics *DeriveStatsForDynamicScan(IMemoryPool *memory_pool,
+		static IStatistics *DeriveStatsForDynamicScan(IMemoryPool *mp,
 													  CExpressionHandle &expr_handle,
 													  ULONG part_idx_id,
 													  CPartFilterMap *part_filter_map);
 
 		// derive statistics of (dynamic) index-get
-		static IStatistics *DeriveStatsForIndexGet(IMemoryPool *memory_pool,
+		static IStatistics *DeriveStatsForIndexGet(IMemoryPool *mp,
 												   CExpressionHandle &exprhdl,
 												   StatsArray *stats_contexts);
 
 		// derive statistics of bitmap table-get
-		static IStatistics *DeriveStatsForBitmapTableGet(IMemoryPool *memory_pool,
+		static IStatistics *DeriveStatsForBitmapTableGet(IMemoryPool *mp,
 														 CExpressionHandle &exprhdl,
 														 StatsArray *stats_contexts);
 
@@ -249,13 +249,13 @@ namespace gpnaucrates
 		// return the mapping between the table column used for grouping to the logical operator id where it was defined.
 		// If the grouping column is not a table column then the logical op id is initialized to gpos::ulong_max
 		static UlongUlongArrayHashMap *GetGrpColIdToUpperBoundNDVIdxMap(
-			IMemoryPool *memory_pool,
+			IMemoryPool *mp,
 			CStatistics *stats,
 			const CColRefSet *grouping_cols_refset,
 			CBitSet *keys);
 
 		// extract NDVs for the given array of grouping columns
-		static CDoubleArray *ExtractNDVForGrpCols(IMemoryPool *memory_pool,
+		static CDoubleArray *ExtractNDVForGrpCols(IMemoryPool *mp,
 												const CStatisticsConfig *stats_config,
 												const IStatistics *stats,
 												CColRefSet *grp_cols_refset,  // grouping columns
@@ -263,7 +263,7 @@ namespace gpnaucrates
 		);
 
 		// compute the cumulative number of groups for the given set of grouping columns
-		static CDouble Groups(IMemoryPool *memory_pool,
+		static CDouble Groups(IMemoryPool *mp,
 							  IStatistics *stats,
 							  const CStatisticsConfig *stats_config,
 							  ULongPtrArray *grouping_cols,
@@ -277,7 +277,7 @@ namespace gpnaucrates
 		}
 
 		// add the statistics (histogram and width) of the grouping columns
-		static void AddGrpColStats(IMemoryPool *memory_pool,
+		static void AddGrpColStats(IMemoryPool *mp,
 								   const CStatistics *input_stats,
 								   CColRefSet *grp_cols_refset,
 								   UlongHistogramHashMap *output_histograms,
@@ -285,7 +285,7 @@ namespace gpnaucrates
 
 		// return the set of grouping columns for statistics computation;
 		static CColRefSet *MakeGroupByColsForStats(
-			IMemoryPool *memory_pool,
+			IMemoryPool *mp,
 			const ULongPtrArray *grouping_columns,
 			CColRefSet *
 				computed_groupby_cols  // output set of grouping columns that are computed attributes
@@ -306,7 +306,7 @@ namespace gpnaucrates
 		static CDouble DefaultColumnWidth(const IMDType *mdtype);
 
 		// helper method to add width information
-		static void AddWidthInfo(IMemoryPool *memory_pool,
+		static void AddWidthInfo(IMemoryPool *mp,
 								 UlongDoubleHashMap *src_width,
 								 UlongDoubleHashMap *dest_width);
 
@@ -314,7 +314,7 @@ namespace gpnaucrates
 		// for the output stats object, compute its upper bound cardinality mapping based on the bounding method
 		// estimated output cardinality and information maintained in the current stats object
 		static void ComputeCardUpperBounds(
-			IMemoryPool *memory_pool,  // memory pool
+			IMemoryPool *mp,  // memory pool
 			const CStatistics *input_stats,
 			CStatistics *output_stats,  // output statistics object that is to be updated
 			CDouble rows_output,		// estimated output cardinality of the operator

@@ -34,12 +34,12 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLLogicalSetOp::CDXLLogicalSetOp(IMemoryPool *memory_pool,
+CDXLLogicalSetOp::CDXLLogicalSetOp(IMemoryPool *mp,
 								   EdxlSetOpType edxlsetoptype,
 								   DXLColumnDescrArray *col_descr_array,
 								   ULongPtrArray2D *input_colids_arrays,
 								   BOOL fCastAcrossInputs)
-	: CDXLLogical(memory_pool),
+	: CDXLLogical(mp),
 	  m_set_operation_dxl_type(edxlsetoptype),
 	  m_col_descr_array(col_descr_array),
 	  m_input_colids_arrays(input_colids_arrays),
@@ -142,7 +142,7 @@ CDXLLogicalSetOp::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode 
 
 	// serialize the array of input colid arrays
 	CWStringDynamic *input_colids_array_str =
-		CDXLUtils::Serialize(m_memory_pool, m_input_colids_arrays);
+		CDXLUtils::Serialize(m_mp, m_input_colids_arrays);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenInputCols),
 								 input_colids_array_str);
 	GPOS_DELETE(input_colids_array_str);

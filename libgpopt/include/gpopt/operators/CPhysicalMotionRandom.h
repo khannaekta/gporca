@@ -44,7 +44,7 @@ namespace gpopt
 			// ctor
 			CPhysicalMotionRandom
 				(
-				IMemoryPool *memory_pool, 
+				IMemoryPool *mp, 
 				CDistributionSpecRandom *pdsRandom
 				);
 			
@@ -90,7 +90,7 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsInput,
 				ULONG child_index,
@@ -102,7 +102,7 @@ namespace gpopt
 			virtual
 			COrderSpec *PosRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				COrderSpec *posInput,
 				ULONG child_index,
@@ -121,7 +121,7 @@ namespace gpopt
 
 			// derive sort order
 			virtual
-			COrderSpec *PosDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			COrderSpec *PosDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 			
 			//-------------------------------------------------------------------------------------
 			// Enforced Properties

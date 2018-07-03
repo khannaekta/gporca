@@ -28,7 +28,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CAutoOptCtxt::CAutoOptCtxt
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CMDAccessor *md_accessor,
 	IConstExprEvaluator *pceeval,
 	COptimizerConfig *optimizer_config
@@ -37,15 +37,15 @@ CAutoOptCtxt::CAutoOptCtxt
 	if (NULL == optimizer_config)
 	{
 		// create default statistics configuration
-		optimizer_config = COptimizerConfig::PoconfDefault(memory_pool);
+		optimizer_config = COptimizerConfig::PoconfDefault(mp);
 	}
 	if (NULL == pceeval)
 	{
 		// use the default constant expression evaluator which cannot evaluate any expression
-		pceeval = GPOS_NEW(memory_pool) CConstExprEvaluatorDefault();
+		pceeval = GPOS_NEW(mp) CConstExprEvaluatorDefault();
 	}
 
-	COptCtxt *poctxt = COptCtxt::PoctxtCreate(memory_pool, md_accessor, pceeval, optimizer_config);
+	COptCtxt *poctxt = COptCtxt::PoctxtCreate(mp, md_accessor, pceeval, optimizer_config);
 	ITask::Self()->GetTls().Store(poctxt);
 }
 
@@ -60,7 +60,7 @@ CAutoOptCtxt::CAutoOptCtxt
 //---------------------------------------------------------------------------
 CAutoOptCtxt::CAutoOptCtxt
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CMDAccessor *md_accessor,
 	IConstExprEvaluator *pceeval,
 	ICostModel *pcm
@@ -69,15 +69,15 @@ CAutoOptCtxt::CAutoOptCtxt
 	GPOS_ASSERT(NULL != pcm);
 	
 	// create default statistics configuration
-	COptimizerConfig *optimizer_config = COptimizerConfig::PoconfDefault(memory_pool, pcm);
+	COptimizerConfig *optimizer_config = COptimizerConfig::PoconfDefault(mp, pcm);
 	
 	if (NULL == pceeval)
 	{
 		// use the default constant expression evaluator which cannot evaluate any expression
-		pceeval = GPOS_NEW(memory_pool) CConstExprEvaluatorDefault();
+		pceeval = GPOS_NEW(mp) CConstExprEvaluatorDefault();
 	}
 
-	COptCtxt *poctxt = COptCtxt::PoctxtCreate(memory_pool, md_accessor, pceeval, optimizer_config);
+	COptCtxt *poctxt = COptCtxt::PoctxtCreate(mp, md_accessor, pceeval, optimizer_config);
 	ITask::Self()->GetTls().Store(poctxt);
 }
 

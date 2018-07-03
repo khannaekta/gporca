@@ -56,7 +56,7 @@ namespace gpopt
 		public:
 
 			// ctor
-			CScalarAssertConstraintList(IMemoryPool *memory_pool);
+			CScalarAssertConstraintList(IMemoryPool *mp);
 
 			// ident accessors
 			virtual
@@ -87,7 +87,7 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //memory_pool,
+						IMemoryPool *, //mp,
 						UlongColRefHashMap *, //colref_mapping,
 						BOOL //must_exist
 						)

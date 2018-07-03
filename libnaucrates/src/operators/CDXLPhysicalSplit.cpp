@@ -26,7 +26,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalSplit::CDXLPhysicalSplit(IMemoryPool *memory_pool,
+CDXLPhysicalSplit::CDXLPhysicalSplit(IMemoryPool *mp,
 									 ULongPtrArray *delete_colid_array,
 									 ULongPtrArray *insert_colid_array,
 									 ULONG action_colid,
@@ -34,7 +34,7 @@ CDXLPhysicalSplit::CDXLPhysicalSplit(IMemoryPool *memory_pool,
 									 ULONG segid_colid,
 									 BOOL preserve_oids,
 									 ULONG tuple_oid)
-	: CDXLPhysical(memory_pool),
+	: CDXLPhysical(mp),
 	  m_deletion_colid_array(delete_colid_array),
 	  m_insert_colid_array(insert_colid_array),
 	  m_action_colid(action_colid),
@@ -103,11 +103,11 @@ CDXLPhysicalSplit::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
-	CWStringDynamic *delete_cols = CDXLUtils::Serialize(m_memory_pool, m_deletion_colid_array);
+	CWStringDynamic *delete_cols = CDXLUtils::Serialize(m_mp, m_deletion_colid_array);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenDeleteCols), delete_cols);
 	GPOS_DELETE(delete_cols);
 
-	CWStringDynamic *insert_cols = CDXLUtils::Serialize(m_memory_pool, m_insert_colid_array);
+	CWStringDynamic *insert_cols = CDXLUtils::Serialize(m_mp, m_insert_colid_array);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenInsertCols), insert_cols);
 	GPOS_DELETE(insert_cols);
 

@@ -35,7 +35,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CTableDescriptor::CTableDescriptor
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IMDId *mdid,
 	const CName &name,
 	BOOL convert_hash_to_random,
@@ -44,9 +44,9 @@ CTableDescriptor::CTableDescriptor
 	ULONG ulExecuteAsUser
 	)
 	:
-	m_memory_pool(memory_pool),
+	m_mp(mp),
 	m_mdid(mdid),
-	m_name(memory_pool, name),
+	m_name(mp, name),
 	m_pdrgpcoldesc(NULL),
 	m_rel_distr_policy(rel_distr_policy),
 	m_erelstoragetype(erelstoragetype),
@@ -58,13 +58,13 @@ CTableDescriptor::CTableDescriptor
 	m_execute_as_user_id(ulExecuteAsUser),
 	m_fHasPartialIndexes(FDescriptorWithPartialIndexes())
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(mdid->IsValid());
 	
-	m_pdrgpcoldesc = GPOS_NEW(m_memory_pool) ColumnDescrArray(m_memory_pool);
-	m_pdrgpcoldescDist = GPOS_NEW(m_memory_pool) ColumnDescrArray(m_memory_pool);
-	m_pdrgpulPart = GPOS_NEW(m_memory_pool) ULongPtrArray(m_memory_pool);
-	m_pdrgpbsKeys = GPOS_NEW(m_memory_pool) BitSetArray(m_memory_pool);
+	m_pdrgpcoldesc = GPOS_NEW(m_mp) ColumnDescrArray(m_mp);
+	m_pdrgpcoldescDist = GPOS_NEW(m_mp) ColumnDescrArray(m_mp);
+	m_pdrgpulPart = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
+	m_pdrgpbsKeys = GPOS_NEW(m_mp) BitSetArray(m_mp);
 }
 
 
@@ -222,7 +222,7 @@ CTableDescriptor::AddPartitionColumn
 	ULONG ulPos
 	)
 {
-	m_pdrgpulPart->Append(GPOS_NEW(m_memory_pool) ULONG(ulPos));
+	m_pdrgpulPart->Append(GPOS_NEW(m_mp) ULONG(ulPos));
 }
 
 //---------------------------------------------------------------------------

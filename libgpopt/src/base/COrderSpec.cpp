@@ -114,8 +114,8 @@ COrderSpec::COrderExpression::OsPrint
 void
 COrderSpec::COrderExpression::DbgPrint() const
 {
-	IMemoryPool *memory_pool = COptCtxt::PoctxtFromTLS()->Pmp();
-	CAutoTrace at(memory_pool);
+	IMemoryPool *mp = COptCtxt::PoctxtFromTLS()->Pmp();
+	CAutoTrace at(mp);
 	(void) this->OsPrint(at.Os());
 }
 #endif // GPOS_DEBUG
@@ -130,13 +130,13 @@ COrderSpec::COrderExpression::DbgPrint() const
 //---------------------------------------------------------------------------
 COrderSpec::COrderSpec
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	m_memory_pool(memory_pool),
+	m_mp(mp),
 	m_pdrgpoe(NULL)
 {
-	m_pdrgpoe = GPOS_NEW(memory_pool) OrderExpressionArray(memory_pool);
+	m_pdrgpoe = GPOS_NEW(mp) OrderExpressionArray(mp);
 }
 
 
@@ -170,7 +170,7 @@ COrderSpec::Append
 	ENullTreatment ent
 	)
 {
-	COrderExpression *poe = GPOS_NEW(m_memory_pool) COrderExpression(mdid, colref, ent);
+	COrderExpression *poe = GPOS_NEW(m_mp) COrderExpression(mdid, colref, ent);
 	m_pdrgpoe->Append(poe);
 }
 
@@ -238,7 +238,7 @@ COrderSpec::FSatisfies
 void
 COrderSpec::AppendEnforcers
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &, // exprhdl
 	CReqdPropPlan *
 #ifdef GPOS_DEBUG
@@ -250,7 +250,7 @@ COrderSpec::AppendEnforcers
 	)
 {
 	GPOS_ASSERT(NULL != prpp);
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != pdrgpexpr);
 	GPOS_ASSERT(NULL != pexpr);
 	GPOS_ASSERT(this == prpp->Peo()->PosRequired() &&
@@ -258,10 +258,10 @@ COrderSpec::AppendEnforcers
 
 	AddRef();
 	pexpr->AddRef();
-	CExpression *pexprSort = GPOS_NEW(memory_pool) CExpression
+	CExpression *pexprSort = GPOS_NEW(mp) CExpression
 										(
-										memory_pool, 
-										GPOS_NEW(memory_pool) CPhysicalSort(memory_pool, this),
+										mp, 
+										GPOS_NEW(mp) CPhysicalSort(mp, this),
 										pexpr
 										);
 	pdrgpexpr->Append(pexprSort);
@@ -303,12 +303,12 @@ COrderSpec::HashValue() const
 COrderSpec *
 COrderSpec::PosCopyWithRemappedColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	BOOL must_exist
 	)
 {
-	COrderSpec *pos = GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+	COrderSpec *pos = GPOS_NEW(mp) COrderSpec(mp);
 
 	const ULONG num_cols = m_pdrgpoe->Size();
 	for (ULONG ul = 0; ul < num_cols; ul++)
@@ -331,7 +331,7 @@ COrderSpec::PosCopyWithRemappedColumns
 #ifdef GPOS_DEBUG
 				BOOL result =
 #endif // GPOS_DEBUG
-				colref_mapping->Insert(GPOS_NEW(memory_pool) ULONG(id), pcrMapped);
+				colref_mapping->Insert(GPOS_NEW(mp) ULONG(id), pcrMapped);
 				GPOS_ASSERT(result);
 			}
 			else
@@ -358,13 +358,13 @@ COrderSpec::PosCopyWithRemappedColumns
 COrderSpec *
 COrderSpec::PosExcludeColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CColRefSet *pcrs
 	)
 {
 	GPOS_ASSERT(NULL != pcrs);
 
-	COrderSpec *pos = GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+	COrderSpec *pos = GPOS_NEW(mp) COrderSpec(mp);
 
 	const ULONG num_cols = m_pdrgpoe->Size();
 	for (ULONG ul = 0; ul < num_cols; ul++)
@@ -422,11 +422,11 @@ COrderSpec::ExtractCols
 CColRefSet *
 COrderSpec::PcrsUsed
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	ExtractCols(pcrs);
 	
 	return pcrs;
@@ -444,13 +444,13 @@ COrderSpec::PcrsUsed
 CColRefSet *
 COrderSpec::GetColRefSet
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	OrderSpecArray *pdrgpos
 	)
 {
 	GPOS_ASSERT(NULL != pdrgpos);
 
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	const ULONG ulOrderSpecs = pdrgpos->Size();
 	for (ULONG ulSpec = 0; ulSpec < ulOrderSpecs; ulSpec++)
 	{
@@ -473,7 +473,7 @@ COrderSpec::GetColRefSet
 OrderSpecArray *
 COrderSpec::PdrgposExclude
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	OrderSpecArray *pdrgpos,
 	CColRefSet *pcrsToExclude
 	)
@@ -488,12 +488,12 @@ COrderSpec::PdrgposExclude
 		return pdrgpos;
 	}
 
-	OrderSpecArray *pdrgposNew = GPOS_NEW(memory_pool) OrderSpecArray(memory_pool);
+	OrderSpecArray *pdrgposNew = GPOS_NEW(mp) OrderSpecArray(mp);
 	const ULONG ulOrderSpecs = pdrgpos->Size();
 	for (ULONG ulSpec = 0; ulSpec < ulOrderSpecs; ulSpec++)
 	{
 		COrderSpec *pos = (*pdrgpos)[ulSpec];
-		COrderSpec *posNew = pos->PosExcludeColumns(memory_pool, pcrsToExclude);
+		COrderSpec *posNew = pos->PosExcludeColumns(mp, pcrsToExclude);
 		pdrgposNew->Append(posNew);
 	}
 

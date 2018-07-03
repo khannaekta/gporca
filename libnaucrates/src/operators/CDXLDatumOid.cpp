@@ -29,8 +29,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLDatumOid::CDXLDatumOid(IMemoryPool *memory_pool, IMDId *mdid_type, BOOL is_null, OID oid_val)
-	: CDXLDatum(memory_pool, mdid_type, default_type_modifier, is_null, 4 /*length*/),
+CDXLDatumOid::CDXLDatumOid(IMemoryPool *mp, IMDId *mdid_type, BOOL is_null, OID oid_val)
+	: CDXLDatum(mp, mdid_type, default_type_modifier, is_null, 4 /*length*/),
 	  m_oid_val(oid_val)
 {
 }

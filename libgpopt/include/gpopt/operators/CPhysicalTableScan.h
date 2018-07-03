@@ -37,7 +37,7 @@ namespace gpopt
 		
 			// ctors
 			explicit
-			CPhysicalTableScan(IMemoryPool *memory_pool);
+			CPhysicalTableScan(IMemoryPool *mp);
 			CPhysicalTableScan(IMemoryPool *, const CName *, CTableDescriptor *, ColRefArray *);
 
 			// ident accessors
@@ -64,13 +64,13 @@ namespace gpopt
 			virtual
 			CPartIndexMap *PpimDerive
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &, // exprhdl
 				CDrvdPropCtxt * //pdpctxt
 				)
 				const
 			{
-				return GPOS_NEW(memory_pool) CPartIndexMap(memory_pool);
+				return GPOS_NEW(mp) CPartIndexMap(mp);
 			}
 
 			//-------------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ namespace gpopt
 			virtual
 			IStatistics *PstatsDerive
 				(
-				IMemoryPool *, // memory_pool
+				IMemoryPool *, // mp
 				CExpressionHandle &, // exprhdl
 				CReqdPropPlan *, // prpplan
 				StatsArray * //stats_ctxt

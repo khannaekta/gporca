@@ -27,7 +27,7 @@ namespace gpnaucrates
 	{
 	private:
 		// create a new histogram after applying the filter that is not an AND/OR predicate
-		static CHistogram *MakeHistSimpleFilter(IMemoryPool *memory_pool,
+		static CHistogram *MakeHistSimpleFilter(IMemoryPool *mp,
 												CStatsPred *pred_stats,
 												CBitSet *filter_col_ids,
 												CHistogram *hist_before,
@@ -35,7 +35,7 @@ namespace gpnaucrates
 												ULONG *target_last_col_id);
 
 		// create a new histogram after applying a point filter
-		static CHistogram *MakeHistPointFilter(IMemoryPool *memory_pool,
+		static CHistogram *MakeHistPointFilter(IMemoryPool *mp,
 											   CStatsPredPoint *pred_stats,
 											   CBitSet *filter_col_ids,
 											   CHistogram *hist_before,
@@ -43,7 +43,7 @@ namespace gpnaucrates
 											   ULONG *target_last_col_id);
 
 		// create a new histogram after applying a LIKE filter
-		static CHistogram *MakeHistLikeFilter(IMemoryPool *memory_pool,
+		static CHistogram *MakeHistLikeFilter(IMemoryPool *mp,
 											  CStatsPredLike *pred_stats,
 											  CBitSet *filter_col_ids,
 											  CHistogram *hist_before,
@@ -51,7 +51,7 @@ namespace gpnaucrates
 											  ULONG *target_last_col_id);
 
 		// create a new histogram for an unsupported predicate
-		static CHistogram *MakeHistUnsupportedPred(IMemoryPool *memory_pool,
+		static CHistogram *MakeHistUnsupportedPred(IMemoryPool *mp,
 												   CStatsPredUnsupported *pred_stats,
 												   CBitSet *filter_col_ids,
 												   CHistogram *hist_before,
@@ -60,7 +60,7 @@ namespace gpnaucrates
 
 		// create a new hash map of histograms after applying a conjunctive or disjunctive filter
 		static UlongHistogramHashMap *MakeHistHashMapConjOrDisjFilter(
-			IMemoryPool *memory_pool,
+			IMemoryPool *mp,
 			const CStatisticsConfig *stats_config,
 			UlongHistogramHashMap *input_histograms,
 			CDouble input_rows,
@@ -69,7 +69,7 @@ namespace gpnaucrates
 
 		// create new hash map of histograms after applying the conjunction predicate
 		static UlongHistogramHashMap *MakeHistHashMapConjFilter(
-			IMemoryPool *memory_pool,
+			IMemoryPool *mp,
 			const CStatisticsConfig *stats_config,
 			UlongHistogramHashMap *intermediate_histograms,
 			CDouble input_rows,
@@ -78,7 +78,7 @@ namespace gpnaucrates
 
 		// create new hash map of histograms after applying the disjunctive predicate
 		static UlongHistogramHashMap *MakeHistHashMapDisjFilter(
-			IMemoryPool *memory_pool,
+			IMemoryPool *mp,
 			const CStatisticsConfig *stats_config,
 			UlongHistogramHashMap *input_histograms,
 			CDouble input_rows,
@@ -90,14 +90,14 @@ namespace gpnaucrates
 
 	public:
 		// filter
-		static CStatistics *MakeStatsFilter(IMemoryPool *memory_pool,
+		static CStatistics *MakeStatsFilter(IMemoryPool *mp,
 											const CStatistics *input_stats,
 											CStatsPred *base_pred_stats,
 											BOOL do_cap_NDVs);
 
 		// derive statistics for filter operation based on given scalar expression
 		static IStatistics *MakeStatsFilterForScalarExpr(
-			IMemoryPool *memory_pool,
+			IMemoryPool *mp,
 			CExpressionHandle &exprhdl,
 			IStatistics *child_stats,
 			CExpression *local_scalar_expr,		  // filter expression on local columns only

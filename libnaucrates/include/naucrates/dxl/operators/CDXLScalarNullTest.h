@@ -45,7 +45,7 @@ namespace gpdxl
 
 	public:
 		// ctor/
-		CDXLScalarNullTest(IMemoryPool *memory_pool, BOOL is_null);
+		CDXLScalarNullTest(IMemoryPool *mp, BOOL is_null);
 
 		// ident accessors
 		Edxlopid GetDXLOperator() const;

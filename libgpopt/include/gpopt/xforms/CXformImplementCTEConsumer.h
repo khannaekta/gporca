@@ -38,7 +38,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformImplementCTEConsumer(IMemoryPool *memory_pool);
+			CXformImplementCTEConsumer(IMemoryPool *mp);
 
 			// dtor
 			virtual

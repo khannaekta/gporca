@@ -50,7 +50,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CParseHandlerStacktrace(IMemoryPool *memory_pool,
+		CParseHandlerStacktrace(IMemoryPool *mp,
 								CParseHandlerManager *parse_handler_mgr,
 								CParseHandlerBase *parse_handler_root);
 	};

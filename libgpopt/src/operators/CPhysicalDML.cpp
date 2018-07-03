@@ -34,7 +34,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalDML::CPhysicalDML
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CLogicalDML::EDMLOperator edmlop,
 	CTableDescriptor *ptabdesc,
 	ColRefArray *pdrgpcrSource,
@@ -46,7 +46,7 @@ CPhysicalDML::CPhysicalDML
 	CColRef *pcrTupleOid
 	)
 	:
-	CPhysical(memory_pool),
+	CPhysical(mp),
 	m_edmlop(edmlop),
 	m_ptabdesc(ptabdesc),
 	m_pdrgpcrSource(pdrgpcrSource),
@@ -69,9 +69,9 @@ CPhysicalDML::CPhysicalDML
 	GPOS_ASSERT_IMP(CLogicalDML::EdmlDelete == edmlop || CLogicalDML::EdmlUpdate == edmlop,
 					NULL != pcrCtid && NULL != pcrSegmentId);
 
-	m_pds = CPhysical::PdsCompute(m_memory_pool, m_ptabdesc, pdrgpcrSource);
-	m_pos = PosComputeRequired(memory_pool, ptabdesc);
-	ComputeRequiredLocalColumns(memory_pool);
+	m_pds = CPhysical::PdsCompute(m_mp, m_ptabdesc, pdrgpcrSource);
+	m_pos = PosComputeRequired(mp, ptabdesc);
+	ComputeRequiredLocalColumns(mp);
 }
 
 //---------------------------------------------------------------------------
@@ -103,7 +103,7 @@ CPhysicalDML::~CPhysicalDML()
 COrderSpec *
 CPhysicalDML::PosRequired
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &, // exprhdl
 	COrderSpec *, // posRequired
 	ULONG
@@ -132,13 +132,13 @@ CPhysicalDML::PosRequired
 COrderSpec *
 CPhysicalDML::PosDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle & // exprhdl
 	)
 	const
 {
 	// return empty sort order
-	return GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+	return GPOS_NEW(mp) COrderSpec(mp);
 }
 
 //---------------------------------------------------------------------------
@@ -183,7 +183,7 @@ CPhysicalDML::EpetOrder
 CColRefSet *
 CPhysicalDML::PcrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &, // exprhdl,
 	CColRefSet *pcrsRequired,
 	ULONG
@@ -198,7 +198,7 @@ CPhysicalDML::PcrsRequired
 	GPOS_ASSERT(0 == child_index &&
 				"Required properties can only be computed on the relational child");
 
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool, *m_pcrsRequiredLocal);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrsRequiredLocal);
 	pcrs->Union(pcrsRequired);
 
 	return pcrs;
@@ -215,7 +215,7 @@ CPhysicalDML::PcrsRequired
 CDistributionSpec *
 CPhysicalDML::PdsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &, // exprhdl,
 	CDistributionSpec *, // pdsInput,
 	ULONG
@@ -232,7 +232,7 @@ CPhysicalDML::PdsRequired
 	
 	if (CDistributionSpec::EdtRandom == m_pds->Edt() && CLogicalDML::EdmlInsert != m_edmlop)
 	{
-		return GPOS_NEW(memory_pool) CDistributionSpecRouted(m_pcrSegmentId);
+		return GPOS_NEW(mp) CDistributionSpecRouted(m_pcrSegmentId);
 	}
 	
 	m_pds->AddRef();
@@ -250,7 +250,7 @@ CPhysicalDML::PdsRequired
 CRewindabilitySpec *
 CPhysicalDML::PrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CRewindabilitySpec *prsRequired,
 	ULONG child_index,
@@ -261,7 +261,7 @@ CPhysicalDML::PrsRequired
 {
 	GPOS_ASSERT(0 == child_index);
 
-	return PrsPassThru(memory_pool, exprhdl, prsRequired, child_index);
+	return PrsPassThru(mp, exprhdl, prsRequired, child_index);
 }
 
 //---------------------------------------------------------------------------
@@ -275,7 +275,7 @@ CPhysicalDML::PrsRequired
 CPartitionPropagationSpec *
 CPhysicalDML::PppsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CPartitionPropagationSpec *pppsRequired,
 	ULONG child_index,
@@ -286,7 +286,7 @@ CPhysicalDML::PppsRequired
 	GPOS_ASSERT(0 == child_index);
 	GPOS_ASSERT(NULL != pppsRequired);
 	
-	return CPhysical::PppsRequiredPushThru(memory_pool, exprhdl, pppsRequired, child_index);
+	return CPhysical::PppsRequiredPushThru(mp, exprhdl, pppsRequired, child_index);
 }
 
 //---------------------------------------------------------------------------
@@ -300,7 +300,7 @@ CPhysicalDML::PppsRequired
 CCTEReq *
 CPhysicalDML::PcteRequired
 	(
-	IMemoryPool *, //memory_pool,
+	IMemoryPool *, //mp,
 	CExpressionHandle &, //exprhdl,
 	CCTEReq *pcter,
 	ULONG
@@ -348,7 +348,7 @@ CPhysicalDML::FProvidesReqdCols
 CDistributionSpec *
 CPhysicalDML::PdsDerive
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -367,7 +367,7 @@ CPhysicalDML::PdsDerive
 CRewindabilitySpec *
 CPhysicalDML::PrsDerive
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -481,11 +481,11 @@ CPhysicalDML::EpetRewindability
 COrderSpec *
 CPhysicalDML::PosComputeRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CTableDescriptor *ptabdesc
 	)
 {
-	COrderSpec *pos = GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+	COrderSpec *pos = GPOS_NEW(mp) COrderSpec(mp);
 
 	const BitSetArray *pdrgpbsKeys = ptabdesc->PdrgpbsKeys();
 	if (1 < pdrgpbsKeys->Size() && CLogicalDML::EdmlUpdate == m_edmlop)
@@ -579,12 +579,12 @@ CPhysicalDML::FInsertSortOnRows
 void
 CPhysicalDML::ComputeRequiredLocalColumns
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 {
 	GPOS_ASSERT(NULL == m_pcrsRequiredLocal);
 
-	m_pcrsRequiredLocal = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	m_pcrsRequiredLocal = GPOS_NEW(mp) CColRefSet(mp);
 
 	// include source columns
 	m_pcrsRequiredLocal->Include(m_pdrgpcrSource);

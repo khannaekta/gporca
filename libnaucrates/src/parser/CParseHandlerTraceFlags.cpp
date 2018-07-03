@@ -32,13 +32,13 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerTraceFlags::CParseHandlerTraceFlags(IMemoryPool *memory_pool,
+CParseHandlerTraceFlags::CParseHandlerTraceFlags(IMemoryPool *mp,
 												 CParseHandlerManager *parse_handler_mgr,
 												 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
 	  m_trace_flags_bitset(NULL)
 {
-	m_trace_flags_bitset = GPOS_NEW(memory_pool) CBitSet(memory_pool, EopttraceSentinel);
+	m_trace_flags_bitset = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
 }
 
 //---------------------------------------------------------------------------

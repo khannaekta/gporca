@@ -21,7 +21,7 @@ namespace gpnaucrates
 	class CUnionAllStatsProcessor
 	{
 	public:
-		static CStatistics *CreateStatsForUnionAll(IMemoryPool *memory_pool,
+		static CStatistics *CreateStatsForUnionAll(IMemoryPool *mp,
 												   const CStatistics *stats_first_child,
 												   const CStatistics *stats_second_child,
 												   ULongPtrArray *output_colids,

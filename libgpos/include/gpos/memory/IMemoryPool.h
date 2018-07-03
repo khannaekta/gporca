@@ -248,11 +248,11 @@ namespace gpos
 // specific type signature defined below.
 inline void *
 operator new(gpos::SIZE_T size,
-			 gpos::IMemoryPool *memory_pool,
+			 gpos::IMemoryPool *mp,
 			 const gpos::CHAR *filename,
 			 gpos::ULONG line)
 {
-	return memory_pool->NewImpl(size, filename, line, gpos::IMemoryPool::EatSingleton);
+	return mp->NewImpl(size, filename, line, gpos::IMemoryPool::EatSingleton);
 }
 
 // Corresponding placement variant of delete operator. Note that, for delete
@@ -271,18 +271,18 @@ operator delete(void *ptr, gpos::IMemoryPool *, const gpos::CHAR *, gpos::ULONG)
 // Placement new-style macro to do 'new' with a memory pool. Anything allocated
 // with this *must* be deleted by GPOS_DELETE, *not* the ordinary delete
 // operator.
-#define GPOS_NEW(memory_pool) new (memory_pool, __FILE__, __LINE__)
+#define GPOS_NEW(mp) new (mp, __FILE__, __LINE__)
 
 // Replacement for array-new. Conceptually equivalent to
-// 'new(memory_pool) datatype[count]'. Any arrays allocated with this *must* be deleted
+// 'new(mp) datatype[count]'. Any arrays allocated with this *must* be deleted
 // by GPOS_DELETE_ARRAY, *not* the ordinary delete[] operator.
 //
 // NOTE: Unlike singleton new, we do not overload the built-in new operator for
 // arrays, because when we do so the C++ compiler adds its own book-keeping
 // information to the allocation in a non-portable way such that we can not
 // recover GPOS' own book-keeping information reliably.
-#define GPOS_NEW_ARRAY(memory_pool, datatype, count) \
-	memory_pool->NewArrayImpl<datatype>(count, __FILE__, __LINE__)
+#define GPOS_NEW_ARRAY(mp, datatype, count) \
+	mp->NewArrayImpl<datatype>(count, __FILE__, __LINE__)
 
 // Delete a singleton object allocated by GPOS_NEW().
 template <typename T>

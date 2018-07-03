@@ -30,10 +30,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerMetadataIdList::CParseHandlerMetadataIdList(IMemoryPool *memory_pool,
+CParseHandlerMetadataIdList::CParseHandlerMetadataIdList(IMemoryPool *mp,
 														 CParseHandlerManager *parse_handler_mgr,
 														 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root), m_mdid_array(NULL)
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root), m_mdid_array(NULL)
 {
 }
 
@@ -71,7 +71,7 @@ CParseHandlerMetadataIdList::StartElement(const XMLCh *const,  // element_uri,
 		// start of an index or partition metadata id list
 		GPOS_ASSERT(NULL == m_mdid_array);
 
-		m_mdid_array = GPOS_NEW(m_memory_pool) MdidPtrArray(m_memory_pool);
+		m_mdid_array = GPOS_NEW(m_mp) MdidPtrArray(m_mp);
 	}
 	else if (0 ==
 			 XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenIndex), element_local_name))

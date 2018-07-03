@@ -36,20 +36,20 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CConstraintInterval::CConstraintInterval
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CColRef *colref,
 	RangeArray *pdrgprng,
 	BOOL fIncludesNull
 	)
 	:
-	CConstraint(memory_pool),
+	CConstraint(mp),
 	m_pcr(colref),
 	m_pdrgprng(pdrgprng),
 	m_fIncludesNull(fIncludesNull)
 {
 	GPOS_ASSERT(NULL != colref);
 	GPOS_ASSERT(NULL != pdrgprng);
-	m_pcrsUsed = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	m_pcrsUsed = GPOS_NEW(mp) CColRefSet(mp);
 	m_pcrsUsed->Include(colref);
 }
 
@@ -108,13 +108,13 @@ CConstraintInterval::IsConstraintUnbounded() const
 CConstraint *
 CConstraintInterval::PcnstrCopyWithRemappedColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	BOOL must_exist
 	)
 {
 	CColRef *colref = CUtils::PcrRemap(m_pcr, colref_mapping, must_exist);
-	return PcnstrRemapForColumn(memory_pool, colref);
+	return PcnstrRemapForColumn(mp, colref);
 }
 
 //---------------------------------------------------------------------------
@@ -128,7 +128,7 @@ CConstraintInterval::PcnstrCopyWithRemappedColumns
 CConstraintInterval *
 CConstraintInterval::PciIntervalFromScalarExpr
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr,
 	CColRef *colref
 	)
@@ -146,33 +146,33 @@ CConstraintInterval::PciIntervalFromScalarExpr
 	switch (pexpr->Pop()->Eopid())
 	{
 		case COperator::EopScalarNullTest:
-			pci = PciIntervalFromScalarNullTest(memory_pool, pexpr, colref);
+			pci = PciIntervalFromScalarNullTest(mp, pexpr, colref);
 			break;
 		case COperator::EopScalarBoolOp:
-			pci =  PciIntervalFromScalarBoolOp(memory_pool, pexpr, colref);
+			pci =  PciIntervalFromScalarBoolOp(mp, pexpr, colref);
 			break;
 		case COperator::EopScalarCmp:
-			pci =  PciIntervalFromScalarCmp(memory_pool, pexpr, colref);
+			pci =  PciIntervalFromScalarCmp(mp, pexpr, colref);
 			break;
 		case COperator::EopScalarIsDistinctFrom:
-			pci = PciIntervalFromScalarIDF(memory_pool, pexpr, colref);
+			pci = PciIntervalFromScalarIDF(mp, pexpr, colref);
 			break;
 		case COperator::EopScalarConst:
 			{
 				if (CUtils::FScalarConstTrue(pexpr))
 				{
-					pci =  CConstraintInterval::PciUnbounded(memory_pool, colref, true/*fIncludesNull*/);
+					pci =  CConstraintInterval::PciUnbounded(mp, colref, true/*fIncludesNull*/);
 				}
 				else
 				{
-					pci =  GPOS_NEW(memory_pool) CConstraintInterval(memory_pool, colref, GPOS_NEW(memory_pool) RangeArray(memory_pool), false /*fIncludesNull*/);
+					pci =  GPOS_NEW(mp) CConstraintInterval(mp, colref, GPOS_NEW(mp) RangeArray(mp), false /*fIncludesNull*/);
 				}
 			}
 			break;
 		case COperator::EopScalarArrayCmp:
 			if (GPOS_FTRACE(EopttraceArrayConstraints))
 			{
-				pci = CConstraintInterval::PcnstrIntervalFromScalarArrayCmp(memory_pool, pexpr, colref);
+				pci = CConstraintInterval::PcnstrIntervalFromScalarArrayCmp(mp, pexpr, colref);
 			}
 			break;
 		default:
@@ -195,7 +195,7 @@ CConstraintInterval::PciIntervalFromScalarExpr
 CConstraintInterval *
 CConstraintInterval::PcnstrIntervalFromScalarArrayCmp
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr,
 	CColRef *colref
 	)
@@ -225,9 +225,9 @@ CConstraintInterval::PcnstrIntervalFromScalarArrayCmp
 	}
 
 	const IComparator *pcomp = COptCtxt::PoctxtFromTLS()->Pcomp();
-	gpos::CAutoRef<CDatumSortedSet> apdatumsortedset(GPOS_NEW(memory_pool) CDatumSortedSet(memory_pool, pexprArray, pcomp));
+	gpos::CAutoRef<CDatumSortedSet> apdatumsortedset(GPOS_NEW(mp) CDatumSortedSet(mp, pexprArray, pcomp));
 	// construct ranges representing IN or NOT IN
-	RangeArray *prgrng = GPOS_NEW(memory_pool) RangeArray(memory_pool);
+	RangeArray *prgrng = GPOS_NEW(mp) RangeArray(mp);
 
 	switch(cmp_type)
 	{
@@ -237,7 +237,7 @@ CConstraintInterval::PcnstrIntervalFromScalarArrayCmp
 			for (ULONG ul = 0; ul < apdatumsortedset->Size(); ul++)
 			{
 				(*apdatumsortedset)[ul]->AddRef();
-				CRange *prng = GPOS_NEW(memory_pool) CRange(pcomp, IMDType::EcmptEq, (*apdatumsortedset)[ul]);
+				CRange *prng = GPOS_NEW(mp) CRange(pcomp, IMDType::EcmptEq, (*apdatumsortedset)[ul]);
 				prgrng->Append(prng);
 			}
 			break;
@@ -261,7 +261,7 @@ CConstraintInterval::PcnstrIntervalFromScalarArrayCmp
 				IMDId *mdid = datum->MDId();
 				mdid->AddRef();
 
-				CRange *prng = GPOS_NEW(memory_pool) CRange(mdid, pcomp, pprevdatum, CRange::EriExcluded, datum, CRange::EriExcluded);
+				CRange *prng = GPOS_NEW(mp) CRange(mdid, pcomp, pprevdatum, CRange::EriExcluded, datum, CRange::EriExcluded);
 				prgrng->Append(prng);
 
 				pprevdatum = datum;
@@ -271,7 +271,7 @@ CConstraintInterval::PcnstrIntervalFromScalarArrayCmp
 			IMDId *mdid = pprevdatum->MDId();
 			pprevdatum->AddRef();
 			mdid->AddRef();
-			CRange *prng = GPOS_NEW(memory_pool) CRange(mdid, pcomp, pprevdatum, CRange::EriExcluded, NULL, CRange::EriExcluded);
+			CRange *prng = GPOS_NEW(mp) CRange(mdid, pcomp, pprevdatum, CRange::EriExcluded, NULL, CRange::EriExcluded);
 			prgrng->Append(prng);
 			break;
 		}
@@ -285,7 +285,7 @@ CConstraintInterval::PcnstrIntervalFromScalarArrayCmp
 
 	BOOL fContainsNull = apdatumsortedset->FIncludesNull();
 
-	return GPOS_NEW(memory_pool) CConstraintInterval(memory_pool, colref, prgrng, fContainsNull);
+	return GPOS_NEW(mp) CConstraintInterval(mp, colref, prgrng, fContainsNull);
 }
 
 //---------------------------------------------------------------------------
@@ -299,7 +299,7 @@ CConstraintInterval::PcnstrIntervalFromScalarArrayCmp
 CConstraintInterval *
 CConstraintInterval::PciIntervalFromConstraint
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CConstraint *pcnstr,
 	CColRef *colref
 	)
@@ -307,7 +307,7 @@ CConstraintInterval::PciIntervalFromConstraint
 	if (NULL == pcnstr)
 	{
 		GPOS_ASSERT(NULL != colref && "Must provide valid column reference to construct unbounded interval");
-		return PciUnbounded(memory_pool, colref, true /*fIncludesNull*/);
+		return PciUnbounded(mp, colref, true /*fIncludesNull*/);
 	}
 
 	if (CConstraint::EctInterval == pcnstr->Ect())
@@ -322,9 +322,9 @@ CConstraintInterval::PciIntervalFromConstraint
 	CColRef *pcrFirst = pcrsUsed->PcrFirst();
 	GPOS_ASSERT_IMP(NULL != colref, pcrFirst == colref);
 
-	CExpression *pexprScalar = pcnstr->PexprScalar(memory_pool);
+	CExpression *pexprScalar = pcnstr->PexprScalar(mp);
 
-	return PciIntervalFromScalarExpr(memory_pool, pexprScalar, pcrFirst);
+	return PciIntervalFromScalarExpr(mp, pexprScalar, pcrFirst);
 }
 
 //---------------------------------------------------------------------------
@@ -338,7 +338,7 @@ CConstraintInterval::PciIntervalFromConstraint
 CConstraintInterval *
 CConstraintInterval::PciIntervalFromScalarNullTest
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr,
 	CColRef *colref
 	)
@@ -358,7 +358,7 @@ CConstraintInterval::PciIntervalFromScalarNullTest
 		CScalarIdent *popScId = CScalarIdent::PopConvert(pexprChild->Pop());
 		GPOS_ASSERT (colref == (CColRef *) popScId->Pcr());
 #endif // GPOS_DEBUG
-		return GPOS_NEW(memory_pool) CConstraintInterval(memory_pool, colref, GPOS_NEW(memory_pool) RangeArray(memory_pool), true /*fIncludesNull*/);
+		return GPOS_NEW(mp) CConstraintInterval(mp, colref, GPOS_NEW(mp) RangeArray(mp), true /*fIncludesNull*/);
 	}
 
 	return NULL;
@@ -377,17 +377,17 @@ CConstraintInterval::PciIntervalFromScalarNullTest
 CConstraintInterval *
 CConstraintInterval::PciIntervalFromColConstCmp
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CColRef *colref,
 	IMDType::ECmpType cmp_type,
 	CScalarConst *popScConst
 	)
 {
 	CConstraintInterval *pcri = NULL;
-	RangeArray *pdrngprng = PciRangeFromColConstCmp(memory_pool, cmp_type, popScConst);
+	RangeArray *pdrngprng = PciRangeFromColConstCmp(mp, cmp_type, popScConst);
 	if (NULL != pdrngprng)
 	{
-		pcri = GPOS_NEW(memory_pool) CConstraintInterval(memory_pool, colref, pdrngprng, false /*fIncludesNull*/);
+		pcri = GPOS_NEW(mp) CConstraintInterval(mp, colref, pdrngprng, false /*fIncludesNull*/);
 	}
 	return pcri;
 
@@ -405,7 +405,7 @@ CConstraintInterval::PciIntervalFromColConstCmp
 CConstraintInterval *
 CConstraintInterval::PciIntervalFromScalarCmp
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr,
 	CColRef *colref
 	)
@@ -427,7 +427,7 @@ CConstraintInterval::PciIntervalFromScalarCmp
 		CScalarConst *popScConst = CScalarConst::PopConvert((*pexpr)[1]->Pop());
 		CScalarCmp *popScCmp = CScalarCmp::PopConvert(pexpr->Pop());
 
-		return PciIntervalFromColConstCmp(memory_pool, colref, popScCmp->ParseCmpType(), popScConst);
+		return PciIntervalFromColConstCmp(mp, colref, popScCmp->ParseCmpType(), popScConst);
 	}
 
 	return NULL;
@@ -437,7 +437,7 @@ CConstraintInterval::PciIntervalFromScalarCmp
 CConstraintInterval *
 CConstraintInterval::PciIntervalFromScalarIDF
 (
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr,
 	CColRef *colref
 	)
@@ -467,18 +467,18 @@ CConstraintInterval::PciIntervalFromScalarIDF
 		if (datum->IsNull())
 		{
 			// col IS DISTINCT FROM NULL
-			CConstraintInterval *pcriChild = GPOS_NEW(memory_pool)
-							CConstraintInterval(memory_pool, colref, GPOS_NEW(memory_pool) RangeArray(memory_pool), true /*fIncludesNull*/);
-			pcri = pcriChild->PciComplement(memory_pool);
+			CConstraintInterval *pcriChild = GPOS_NEW(mp)
+							CConstraintInterval(mp, colref, GPOS_NEW(mp) RangeArray(mp), true /*fIncludesNull*/);
+			pcri = pcriChild->PciComplement(mp);
 			pcriChild->Release();
 		}
 		else
 		{
 			// col IS DISTINCT FROM const
-			RangeArray *pdrgprng = PciRangeFromColConstCmp(memory_pool, popScCmp->ParseCmpType(), popScConst);
+			RangeArray *pdrgprng = PciRangeFromColConstCmp(mp, popScCmp->ParseCmpType(), popScConst);
 			if (NULL != pdrgprng)
 			{
-				pcri = GPOS_NEW(memory_pool) CConstraintInterval(memory_pool, colref, pdrgprng, true /*fIncludesNull*/);
+				pcri = GPOS_NEW(mp) CConstraintInterval(mp, colref, pdrgprng, true /*fIncludesNull*/);
 			}
 		}
 
@@ -499,7 +499,7 @@ CConstraintInterval::PciIntervalFromScalarIDF
 CConstraintInterval *
 CConstraintInterval::PciIntervalFromScalarBoolOp
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr,
 	CColRef *colref
 	)
@@ -513,20 +513,20 @@ CConstraintInterval::PciIntervalFromScalarBoolOp
 	switch (eboolop)
 	{
 		case CScalarBoolOp::EboolopAnd:
-			return PciIntervalFromScalarBoolAnd(memory_pool, pexpr, colref);
+			return PciIntervalFromScalarBoolAnd(mp, pexpr, colref);
 
 		case CScalarBoolOp::EboolopOr:
-			return PciIntervalFromScalarBoolOr(memory_pool, pexpr, colref);
+			return PciIntervalFromScalarBoolOr(mp, pexpr, colref);
 
 		case CScalarBoolOp::EboolopNot:
 		{
-			CConstraintInterval *pciChild = PciIntervalFromScalarExpr(memory_pool, (*pexpr)[0], colref);
+			CConstraintInterval *pciChild = PciIntervalFromScalarExpr(mp, (*pexpr)[0], colref);
 			if (NULL == pciChild)
 			{
 				return NULL;
 			}
 
-			CConstraintInterval *pciNot = pciChild->PciComplement(memory_pool);
+			CConstraintInterval *pciNot = pciChild->PciComplement(mp);
 			pciChild->Release();
 			return pciNot;
 		}
@@ -546,7 +546,7 @@ CConstraintInterval::PciIntervalFromScalarBoolOp
 CConstraintInterval *
 CConstraintInterval::PciIntervalFromScalarBoolOr
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr,
 	CColRef *colref
 	)
@@ -558,7 +558,7 @@ CConstraintInterval::PciIntervalFromScalarBoolOr
 	const ULONG arity = pexpr->Arity();
 	GPOS_ASSERT(0 < arity);
 
-	CConstraintInterval *pci = PciIntervalFromScalarExpr(memory_pool, (*pexpr)[0], colref);
+	CConstraintInterval *pci = PciIntervalFromScalarExpr(mp, (*pexpr)[0], colref);
 	if (NULL == pci)
 	{
 		return NULL;
@@ -566,7 +566,7 @@ CConstraintInterval::PciIntervalFromScalarBoolOr
 
 	for (ULONG ul = 1; ul < arity; ul++)
 	{
-		CConstraintInterval *pciChild = PciIntervalFromScalarExpr(memory_pool, (*pexpr)[ul], colref);
+		CConstraintInterval *pciChild = PciIntervalFromScalarExpr(mp, (*pexpr)[ul], colref);
 
 		if (NULL == pciChild)
 		{
@@ -574,7 +574,7 @@ CConstraintInterval::PciIntervalFromScalarBoolOr
 			return NULL;
 		}
 
-		CConstraintInterval *pciOr = pci->PciUnion(memory_pool, pciChild);
+		CConstraintInterval *pciOr = pci->PciUnion(mp, pciChild);
 		pci->Release();
 		pciChild->Release();
 		pci = pciOr;
@@ -594,7 +594,7 @@ CConstraintInterval::PciIntervalFromScalarBoolOr
 CConstraintInterval *
 CConstraintInterval::PciIntervalFromScalarBoolAnd
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr,
 	CColRef *colref
 	)
@@ -606,15 +606,15 @@ CConstraintInterval::PciIntervalFromScalarBoolAnd
 	const ULONG arity = pexpr->Arity();
 	GPOS_ASSERT(0 < arity);
 
-	CConstraintInterval *pci = PciIntervalFromScalarExpr(memory_pool, (*pexpr)[0], colref);
+	CConstraintInterval *pci = PciIntervalFromScalarExpr(mp, (*pexpr)[0], colref);
 	for (ULONG ul = 1; ul < arity; ul++)
 	{
-		CConstraintInterval *pciChild = PciIntervalFromScalarExpr(memory_pool, (*pexpr)[ul], colref);
+		CConstraintInterval *pciChild = PciIntervalFromScalarExpr(mp, (*pexpr)[ul], colref);
 		// here is where we will return a NULL child from not being able to create a
 		// CConstraint interval from the ScalarExpr
 		if (NULL != pciChild && NULL != pci)
 		{
-			CConstraintInterval *pciAnd = pci->PciIntersect(memory_pool, pciChild);
+			CConstraintInterval *pciAnd = pci->PciIntersect(mp, pciChild);
 			pci->Release();
 			pciChild->Release();
 			pci = pciAnd;
@@ -639,12 +639,12 @@ CConstraintInterval::PciIntervalFromScalarBoolAnd
 CExpression *
 CConstraintInterval::PexprScalar
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 {
 	if (NULL == m_pexprScalar)
 	{
-		m_pexprScalar = PexprConstructScalar(memory_pool);
+		m_pexprScalar = PexprConstructScalar(mp);
 	}
 
 	return m_pexprScalar;
@@ -661,19 +661,19 @@ CConstraintInterval::PexprScalar
 CExpression *
 CConstraintInterval::PexprConstructScalar
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
 	if (FContradiction())
 	{
-		return CUtils::PexprScalarConstBool(memory_pool, false /*fval*/, false /*is_null*/);
+		return CUtils::PexprScalarConstBool(mp, false /*fval*/, false /*is_null*/);
 	}
 
 	if (GPOS_FTRACE(EopttraceArrayConstraints))
 	{
 		// try creating an array IN/NOT IN expression
-		CExpression *pexpr = PexprConstructArrayScalar(memory_pool);
+		CExpression *pexpr = PexprConstructArrayScalar(mp);
 		if (pexpr != NULL)
 		{
 			return pexpr;
@@ -681,7 +681,7 @@ CConstraintInterval::PexprConstructScalar
 	}
 
 	// otherwise, we generate a disjunction of ranges
-	return PexprConstructDisjunctionScalar(memory_pool);
+	return PexprConstructDisjunctionScalar(mp);
 }
 
 //---------------------------------------------------------------------------
@@ -704,17 +704,17 @@ CConstraintInterval::PexprConstructScalar
 CExpression *
 CConstraintInterval::PexprConstructDisjunctionScalar
 	(
-		IMemoryPool *memory_pool
+		IMemoryPool *mp
 	)
 	const
 {
-	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
 
 	const ULONG length = m_pdrgprng->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		CRange *prange = (*m_pdrgprng)[ul];
-		CExpression *pexprChild = prange->PexprScalar(memory_pool, m_pcr);
+		CExpression *pexprChild = prange->PexprScalar(mp, m_pcr);
 		pdrgpexpr->Append(pexprChild);
 	}
 
@@ -725,19 +725,19 @@ CConstraintInterval::PexprConstructDisjunctionScalar
 
 		if (m_fIncludesNull)
 		{
-			return CUtils::PexprScalarConstBool(memory_pool, true /*fval*/, false /*is_null*/);
+			return CUtils::PexprScalarConstBool(mp, true /*fval*/, false /*is_null*/);
 		}
 
-		return CUtils::PexprIsNotNull(memory_pool, CUtils::PexprScalarIdent(memory_pool, m_pcr));
+		return CUtils::PexprIsNotNull(mp, CUtils::PexprScalarIdent(mp, m_pcr));
 	}
 
 	if (m_fIncludesNull)
 	{
-		CExpression *pexprIsNull = CUtils::PexprIsNull(memory_pool, CUtils::PexprScalarIdent(memory_pool, m_pcr));
+		CExpression *pexprIsNull = CUtils::PexprIsNull(mp, CUtils::PexprScalarIdent(mp, m_pcr));
 		pdrgpexpr->Append(pexprIsNull);
 	}
 
-	return CPredicateUtils::PexprDisjunction(memory_pool, pdrgpexpr);
+	return CPredicateUtils::PexprDisjunction(mp, pdrgpexpr);
 }
 
 //---------------------------------------------------------------------------
@@ -821,7 +821,7 @@ bool CConstraintInterval::FConvertsToNotIn() const
 //
 //---------------------------------------------------------------------------
 CExpression *
-CConstraintInterval::PexprConstructArrayScalar(IMemoryPool *memory_pool, bool fIn) const
+CConstraintInterval::PexprConstructArrayScalar(IMemoryPool *mp, bool fIn) const
 {
 	GPOS_ASSERT(FConvertsToIn() || FConvertsToNotIn());
 
@@ -839,7 +839,7 @@ CConstraintInterval::PexprConstructArrayScalar(IMemoryPool *memory_pool, bool fI
 	}
 
 	// loop through all of the constants in the ranges, creating an array of CScalarConst Expressions
-	ExpressionArray *prngexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *prngexpr = GPOS_NEW(mp) ExpressionArray(mp);
 
 	// this method assumes IN or NOT IN which means that the ranges stored will look like either
 	// [x,x], ... ,[y,y] or the NOT IN case (-inf, x),(x,y), ... ,(z,inf).
@@ -847,8 +847,8 @@ CConstraintInterval::PexprConstructArrayScalar(IMemoryPool *memory_pool, bool fI
 	{
 		IDatum *datum = (*m_pdrgprng)[ul]->PdatumRight();
 		datum->AddRef();
-		CScalarConst *popScConst = GPOS_NEW(memory_pool) CScalarConst(memory_pool, datum);
-		CExpression *pexpr = GPOS_NEW(memory_pool) CExpression(memory_pool, popScConst);
+		CScalarConst *popScConst = GPOS_NEW(mp) CScalarConst(mp, datum);
+		CExpression *pexpr = GPOS_NEW(mp) CExpression(mp, popScConst);
 		prngexpr->Append(pexpr);
 	}
 
@@ -859,11 +859,11 @@ CConstraintInterval::PexprConstructArrayScalar(IMemoryPool *memory_pool, bool fI
 		GPOS_ASSERT(NULL != datum);
 		IDatum *pdatumNull = md_accessor->RetrieveType(datum->MDId())->DatumNull();
 		pdatumNull->AddRef();
-		CScalarConst *popScConst = GPOS_NEW(memory_pool) CScalarConst(memory_pool, pdatumNull);
-		prngexpr->Append(GPOS_NEW(memory_pool) CExpression(memory_pool, popScConst));
+		CScalarConst *popScConst = GPOS_NEW(mp) CScalarConst(mp, pdatumNull);
+		prngexpr->Append(GPOS_NEW(mp) CExpression(mp, popScConst));
 	}
 
-	return CUtils::PexprScalarArrayCmp(memory_pool, earraycmptype, ecmptype, prngexpr, m_pcr);
+	return CUtils::PexprScalarArrayCmp(mp, earraycmptype, ecmptype, prngexpr, m_pcr);
 }
 
 //---------------------------------------------------------------------------
@@ -877,7 +877,7 @@ CConstraintInterval::PexprConstructArrayScalar(IMemoryPool *memory_pool, bool fI
 //
 //---------------------------------------------------------------------------
 CExpression *
-CConstraintInterval::PexprConstructArrayScalar(IMemoryPool *memory_pool) const
+CConstraintInterval::PexprConstructArrayScalar(IMemoryPool *mp) const
 {
 	if (1 >= m_pdrgprng->Size())
 	{
@@ -886,11 +886,11 @@ CConstraintInterval::PexprConstructArrayScalar(IMemoryPool *memory_pool) const
 
 	if (FConvertsToIn())
 	{
-		return PexprConstructArrayScalar(memory_pool, true);
+		return PexprConstructArrayScalar(mp, true);
 	}
 	else if (FConvertsToNotIn())
 	{
-		return PexprConstructArrayScalar(memory_pool, false);
+		return PexprConstructArrayScalar(mp, false);
 	}
 	else
 	{
@@ -910,7 +910,7 @@ CConstraintInterval::PexprConstructArrayScalar(IMemoryPool *memory_pool) const
 CConstraint *
 CConstraintInterval::Pcnstr
 	(
-	IMemoryPool *, //memory_pool,
+	IMemoryPool *, //mp,
 	const CColRef *colref
 	)
 {
@@ -934,7 +934,7 @@ CConstraintInterval::Pcnstr
 CConstraint *
 CConstraintInterval::Pcnstr
 	(
-	IMemoryPool *, //memory_pool,
+	IMemoryPool *, //mp,
 	CColRefSet *pcrs
 	)
 {
@@ -958,14 +958,14 @@ CConstraintInterval::Pcnstr
 CConstraint *
 CConstraintInterval::PcnstrRemapForColumn
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CColRef *colref
 	)
 	const
 {
 	GPOS_ASSERT(NULL != colref);
 	m_pdrgprng->AddRef();
-	return GPOS_NEW(memory_pool) CConstraintInterval(memory_pool, colref, m_pdrgprng, m_fIncludesNull);
+	return GPOS_NEW(mp) CConstraintInterval(mp, colref, m_pdrgprng, m_fIncludesNull);
 }
 
 //---------------------------------------------------------------------------
@@ -979,7 +979,7 @@ CConstraintInterval::PcnstrRemapForColumn
 CConstraintInterval *
 CConstraintInterval::PciIntersect
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CConstraintInterval *pci
 	)
 {
@@ -988,7 +988,7 @@ CConstraintInterval::PciIntersect
 
 	RangeArray *pdrgprngOther = pci->Pdrgprng();
 
-	RangeArray *pdrgprngNew = GPOS_NEW(memory_pool) RangeArray(memory_pool);
+	RangeArray *pdrgprngNew = GPOS_NEW(mp) RangeArray(mp);
 
 	ULONG ulFst = 0;
 	ULONG ulSnd = 0;
@@ -1002,12 +1002,12 @@ CConstraintInterval::PciIntersect
 		CRange *prangeNew = NULL;
 		if (prangeOther->FEndsAfter(prangeThis))
 		{
-			prangeNew = prangeThis->PrngIntersect(memory_pool, prangeOther);
+			prangeNew = prangeThis->PrngIntersect(mp, prangeOther);
 			ulFst ++;
 		}
 		else
 		{
-			prangeNew = prangeOther->PrngIntersect(memory_pool, prangeThis);
+			prangeNew = prangeOther->PrngIntersect(mp, prangeThis);
 			ulSnd ++;
 		}
 
@@ -1017,9 +1017,9 @@ CConstraintInterval::PciIntersect
 		}
 	}
 
-	return GPOS_NEW(memory_pool) CConstraintInterval
+	return GPOS_NEW(mp) CConstraintInterval
 						(
-						memory_pool,
+						mp,
 						m_pcr,
 						pdrgprngNew,
 						m_fIncludesNull && pci->FIncludesNull()
@@ -1037,7 +1037,7 @@ CConstraintInterval::PciIntersect
 CConstraintInterval *
 CConstraintInterval::PciUnion
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CConstraintInterval *pci
 	)
 {
@@ -1046,7 +1046,7 @@ CConstraintInterval::PciUnion
 
 	RangeArray *pdrgprngOther = pci->Pdrgprng();
 
-	RangeArray *pdrgprngNew = GPOS_NEW(memory_pool) RangeArray(memory_pool);
+	RangeArray *pdrgprngNew = GPOS_NEW(mp) RangeArray(mp);
 
 	ULONG ulFst = 0;
 	ULONG ulSnd = 0;
@@ -1060,24 +1060,24 @@ CConstraintInterval::PciUnion
 		CRange *prangeNew = NULL;
 		if (prangeOther->FEndsAfter(prangeThis))
 		{
-			prangeNew = prangeThis->PrngDifferenceLeft(memory_pool, prangeOther);
+			prangeNew = prangeThis->PrngDifferenceLeft(mp, prangeOther);
 			ulFst ++;
 		}
 		else
 		{
-			prangeNew = prangeOther->PrngDifferenceLeft(memory_pool, prangeThis);
+			prangeNew = prangeOther->PrngDifferenceLeft(mp, prangeThis);
 			ulSnd ++;
 		}
 
-		AppendOrExtend(memory_pool, pdrgprngNew, prangeNew);
+		AppendOrExtend(mp, pdrgprngNew, prangeNew);
 	}
 
-	AddRemainingRanges(memory_pool, m_pdrgprng, ulFst, pdrgprngNew);
-	AddRemainingRanges(memory_pool, pdrgprngOther, ulSnd, pdrgprngNew);
+	AddRemainingRanges(mp, m_pdrgprng, ulFst, pdrgprngNew);
+	AddRemainingRanges(mp, pdrgprngOther, ulSnd, pdrgprngNew);
 
-	return GPOS_NEW(memory_pool) CConstraintInterval
+	return GPOS_NEW(mp) CConstraintInterval
 						(
-						memory_pool,
+						mp,
 						m_pcr,
 						pdrgprngNew,
 						m_fIncludesNull || pci->FIncludesNull()
@@ -1095,7 +1095,7 @@ CConstraintInterval::PciUnion
 CConstraintInterval *
 CConstraintInterval::PciDifference
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CConstraintInterval *pci
 	)
 {
@@ -1104,11 +1104,11 @@ CConstraintInterval::PciDifference
 
 	RangeArray *pdrgprngOther = pci->Pdrgprng();
 
-	RangeArray *pdrgprngNew = GPOS_NEW(memory_pool) RangeArray(memory_pool);
+	RangeArray *pdrgprngNew = GPOS_NEW(mp) RangeArray(mp);
 
 	ULONG ulFst = 0;
 	ULONG ulSnd = 0;
-	RangeArray *pdrgprngResidual = GPOS_NEW(memory_pool) RangeArray(memory_pool);
+	RangeArray *pdrgprngResidual = GPOS_NEW(mp) RangeArray(mp);
 	CRange *prangeResidual = NULL;
 	const ULONG ulNumRangesFst = m_pdrgprng->Size();
 	const ULONG ulNumRangesSnd = pdrgprngOther->Size();
@@ -1123,16 +1123,16 @@ CConstraintInterval::PciDifference
 
 		if (prangeOther->FEndsWithOrAfter(prangeThis))
 		{
-			prangeNew = prangeThis->PrngDifferenceLeft(memory_pool, prangeOther);
+			prangeNew = prangeThis->PrngDifferenceLeft(mp, prangeOther);
 			ulFst ++;
 		}
 		else
 		{
-			prangeNew = PrangeDiffWithRightResidual(memory_pool, prangeThis, prangeOther, &prangeResidual, pdrgprngResidual);
+			prangeNew = PrangeDiffWithRightResidual(mp, prangeThis, prangeOther, &prangeResidual, pdrgprngResidual);
 			ulSnd ++;
 		}
 
-		AppendOrExtend(memory_pool, pdrgprngNew, prangeNew);
+		AppendOrExtend(mp, pdrgprngNew, prangeNew);
 	}
 
 	if (NULL != prangeResidual)
@@ -1141,13 +1141,13 @@ CConstraintInterval::PciDifference
 		prangeResidual->AddRef();
 	}
 
-	AppendOrExtend(memory_pool, pdrgprngNew, prangeResidual);
+	AppendOrExtend(mp, pdrgprngNew, prangeResidual);
 	pdrgprngResidual->Release();
-	AddRemainingRanges(memory_pool, m_pdrgprng, ulFst, pdrgprngNew);
+	AddRemainingRanges(mp, m_pdrgprng, ulFst, pdrgprngNew);
 
-	return GPOS_NEW(memory_pool) CConstraintInterval
+	return GPOS_NEW(mp) CConstraintInterval
 						(
-						memory_pool,
+						mp,
 						m_pcr,
 						pdrgprngNew,
 						m_fIncludesNull && !pci->FIncludesNull()
@@ -1165,7 +1165,7 @@ CConstraintInterval::PciDifference
 BOOL
 CConstraintInterval::FContainsInterval
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CConstraintInterval *pci
 	)
 {
@@ -1184,7 +1184,7 @@ CConstraintInterval::FContainsInterval
 		return false;
 	}
 
-	CConstraintInterval *pciDiff = pci->PciDifference(memory_pool, this);
+	CConstraintInterval *pciDiff = pci->PciDifference(mp, this);
 
 	// if the difference is empty, then this interval contains the given one
 	BOOL fContains = pciDiff->FContradiction();
@@ -1204,7 +1204,7 @@ CConstraintInterval::FContainsInterval
 CConstraintInterval *
 CConstraintInterval::PciUnbounded
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CColRef *colref,
 	BOOL fIncludesNull
 	)
@@ -1216,7 +1216,7 @@ CConstraintInterval::PciUnbounded
 	}
 
 	mdid->AddRef();
-	CRange *prange = GPOS_NEW(memory_pool) CRange
+	CRange *prange = GPOS_NEW(mp) CRange
 								(
 								mdid,
 								COptCtxt::PoctxtFromTLS()->Pcomp(),
@@ -1226,10 +1226,10 @@ CConstraintInterval::PciUnbounded
 								CRange::EriExcluded
 								);
 
-	RangeArray *pdrgprng = GPOS_NEW(memory_pool) RangeArray(memory_pool);
+	RangeArray *pdrgprng = GPOS_NEW(mp) RangeArray(mp);
 	pdrgprng->Append(prange);
 
-	return GPOS_NEW(memory_pool) CConstraintInterval(memory_pool, colref, pdrgprng, fIncludesNull);
+	return GPOS_NEW(mp) CConstraintInterval(mp, colref, pdrgprng, fIncludesNull);
 }
 
 //---------------------------------------------------------------------------
@@ -1243,7 +1243,7 @@ CConstraintInterval::PciUnbounded
 CConstraintInterval *
 CConstraintInterval::PciUnbounded
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CColRefSet *pcrs,
 	BOOL fIncludesNull
 	)
@@ -1253,7 +1253,7 @@ CConstraintInterval::PciUnbounded
 	while (crsi.Advance())
 	{
 		CColRef *colref = crsi.Pcr();
-		CConstraintInterval *pci = PciUnbounded(memory_pool, colref, fIncludesNull);
+		CConstraintInterval *pci = PciUnbounded(mp, colref, fIncludesNull);
 		if (NULL != pci)
 		{
 			return pci;
@@ -1296,13 +1296,13 @@ CConstraintInterval::MDIdType()
 CConstraintInterval *
 CConstraintInterval::PciComplement
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 {
 	// create an unbounded interval
-	CConstraintInterval *pciUniversal = PciUnbounded(memory_pool, m_pcr, true /*fIncludesNull*/);
+	CConstraintInterval *pciUniversal = PciUnbounded(mp, m_pcr, true /*fIncludesNull*/);
 
-	CConstraintInterval *pciComp = pciUniversal->PciDifference(memory_pool, this);
+	CConstraintInterval *pciComp = pciUniversal->PciDifference(mp, this);
 	pciUniversal->Release();
 
 	return pciComp;
@@ -1324,7 +1324,7 @@ CConstraintInterval::PciComplement
 CRange *
 CConstraintInterval::PrangeDiffWithRightResidual
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CRange *prangeFirst,
 	CRange *prangeSecond,
 	CRange **pprangeResidual,
@@ -1340,11 +1340,11 @@ CConstraintInterval::PrangeDiffWithRightResidual
 
 	if (prangeFirst->Contains(prangeSecond))
 	{
-		prangeRet = prangeFirst->PrngDifferenceLeft(memory_pool, prangeSecond);
+		prangeRet = prangeFirst->PrngDifferenceLeft(mp, prangeSecond);
 	}
 
 	// the part of prangeFirst that goes beyond prangeSecond
-	*pprangeResidual = prangeFirst->PrngDifferenceRight(memory_pool, prangeSecond);
+	*pprangeResidual = prangeFirst->PrngDifferenceRight(mp, prangeSecond);
 	// add it to array so we can release it later on
 	if (NULL != *pprangeResidual)
 	{
@@ -1366,7 +1366,7 @@ CConstraintInterval::PrangeDiffWithRightResidual
 void
 CConstraintInterval::AddRemainingRanges
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	RangeArray *pdrgprngSrc,
 	ULONG ulStart,
 	RangeArray *pdrgprngDest
@@ -1377,7 +1377,7 @@ CConstraintInterval::AddRemainingRanges
 	{
 		CRange *prange = (*pdrgprngSrc)[ul];
 		prange->AddRef();
-		AppendOrExtend(memory_pool, pdrgprngDest, prange);
+		AppendOrExtend(mp, pdrgprngDest, prange);
 	}
 }
 
@@ -1393,7 +1393,7 @@ CConstraintInterval::AddRemainingRanges
 void
 CConstraintInterval::AppendOrExtend
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	RangeArray *pdrgprng,
 	CRange *prange
 	)
@@ -1413,7 +1413,7 @@ CConstraintInterval::AppendOrExtend
 	}
 
 	CRange *prangeLast = (*pdrgprng)[length - 1];
-	CRange *prangeNew = prangeLast->PrngExtend(memory_pool, prange);
+	CRange *prangeNew = prangeLast->PrngExtend(mp, prange);
 	if (NULL == prangeNew)
 	{
 		pdrgprng->Append(prange);
@@ -1472,7 +1472,7 @@ CConstraintInterval::OsPrint
 RangeArray*
 CConstraintInterval::PciRangeFromColConstCmp
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IMDType::ECmpType cmp_type,
 	const CScalarConst *popsccnst
 	)
@@ -1486,21 +1486,21 @@ CConstraintInterval::PciRangeFromColConstCmp
 	}
 
 	IDatum *datum = popsccnst->GetDatum();
-	RangeArray *pdrgprng = GPOS_NEW(memory_pool) RangeArray(memory_pool);
+	RangeArray *pdrgprng = GPOS_NEW(mp) RangeArray(mp);
 
 	const IComparator *pcomp = COptCtxt::PoctxtFromTLS()->Pcomp();
 	if (IMDType::EcmptNEq == cmp_type || IMDType::EcmptIDF == cmp_type)
 	{
 		// need an interval with 2 ranges
 		datum->AddRef();
-		pdrgprng->Append(GPOS_NEW(memory_pool) CRange(pcomp, IMDType::EcmptL, datum));
+		pdrgprng->Append(GPOS_NEW(mp) CRange(pcomp, IMDType::EcmptL, datum));
 		datum->AddRef();
-		pdrgprng->Append(GPOS_NEW(memory_pool) CRange(pcomp, IMDType::EcmptG, datum));
+		pdrgprng->Append(GPOS_NEW(mp) CRange(pcomp, IMDType::EcmptG, datum));
 	}
 	else
 	{
 		datum->AddRef();
-		pdrgprng->Append(GPOS_NEW(memory_pool) CRange(pcomp, cmp_type, datum));
+		pdrgprng->Append(GPOS_NEW(mp) CRange(pcomp, cmp_type, datum));
 	}
 
 	return pdrgprng;
@@ -1510,7 +1510,7 @@ CConstraintInterval::PciRangeFromColConstCmp
 void
 CConstraintInterval::DbgPrint() const
 {
-	CAutoTrace at(m_memory_pool);
+	CAutoTrace at(m_mp);
 	(void) this->OsPrint(at.Os());
 }
 #endif  // GPOS_DEBUG

@@ -28,10 +28,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalUnionAll::CLogicalUnionAll
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogicalUnion(memory_pool),
+	CLogicalUnion(mp),
 	m_ulScanIdPartialIndex(0)
 {
 	m_fPattern = true;
@@ -47,13 +47,13 @@ CLogicalUnionAll::CLogicalUnionAll
 //---------------------------------------------------------------------------
 CLogicalUnionAll::CLogicalUnionAll
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ColRefArray *pdrgpcrOutput,
 	ColRefArrays *pdrgpdrgpcrInput,
 	ULONG ulScanIdPartialIndex
 	)
 	:
-	CLogicalUnion(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput),
+	CLogicalUnion(mp, pdrgpcrOutput, pdrgpdrgpcrInput),
 	m_ulScanIdPartialIndex(ulScanIdPartialIndex)
 {
 }
@@ -81,7 +81,7 @@ CLogicalUnionAll::~CLogicalUnionAll()
 CMaxCard
 CLogicalUnionAll::Maxcard
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -108,15 +108,15 @@ CLogicalUnionAll::Maxcard
 COperator *
 CLogicalUnionAll::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	BOOL must_exist
 	)
 {
-	ColRefArray *pdrgpcrOutput = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrOutput, colref_mapping, must_exist);
-	ColRefArrays *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(memory_pool, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
+	ColRefArray *pdrgpcrOutput = CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput, colref_mapping, must_exist);
+	ColRefArrays *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(mp, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
 
-	return GPOS_NEW(memory_pool) CLogicalUnionAll(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput, m_ulScanIdPartialIndex);
+	return GPOS_NEW(mp) CLogicalUnionAll(mp, pdrgpcrOutput, pdrgpdrgpcrInput, m_ulScanIdPartialIndex);
 }
 
 //---------------------------------------------------------------------------
@@ -130,7 +130,7 @@ CLogicalUnionAll::PopCopyWithRemappedColumns
 CKeyCollection *
 CLogicalUnionAll::PkcDeriveKeys
 	(
-	IMemoryPool *, //memory_pool,
+	IMemoryPool *, //mp,
 	CExpressionHandle & // exprhdl
 	)
 	const
@@ -149,11 +149,11 @@ CLogicalUnionAll::PkcDeriveKeys
 CXformSet *
 CLogicalUnionAll::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementUnionAll);
 
 	return xform_set;
@@ -171,7 +171,7 @@ CLogicalUnionAll::PxfsCandidates
 IStatistics *
 CLogicalUnionAll::PstatsDeriveUnionAll
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 {
@@ -190,12 +190,12 @@ CLogicalUnionAll::PstatsDeriveUnionAll
 		IStatistics *child_stats = exprhdl.Pstats(ul);
 		CStatistics *stats = CUnionAllStatsProcessor::CreateStatsForUnionAll
 											(
-											memory_pool,
+											mp,
 											dynamic_cast<CStatistics *>(result_stats),
 											dynamic_cast<CStatistics *>(child_stats),
-											CColRef::Pdrgpul(memory_pool, pdrgpcrOutput),
-											CColRef::Pdrgpul(memory_pool, (*pdrgpdrgpcrInput)[0]),
-											CColRef::Pdrgpul(memory_pool, (*pdrgpdrgpcrInput)[ul])
+											CColRef::Pdrgpul(mp, pdrgpcrOutput),
+											CColRef::Pdrgpul(mp, (*pdrgpdrgpcrInput)[0]),
+											CColRef::Pdrgpul(mp, (*pdrgpdrgpcrInput)[ul])
 											);
 		result_stats->Release();
 		result_stats = stats;
@@ -215,7 +215,7 @@ CLogicalUnionAll::PstatsDeriveUnionAll
 IStatistics *
 CLogicalUnionAll::PstatsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	StatsArray * // not used
 	)
@@ -223,7 +223,7 @@ CLogicalUnionAll::PstatsDerive
 {
 	GPOS_ASSERT(EspNone < Esp(exprhdl));
 
-	return PstatsDeriveUnionAll(memory_pool, exprhdl);
+	return PstatsDeriveUnionAll(mp, exprhdl);
 }
 
 // EOF

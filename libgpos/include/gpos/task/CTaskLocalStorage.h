@@ -54,7 +54,7 @@ namespace gpos
 		~CTaskLocalStorage();
 
 		// reset
-		void Reset(IMemoryPool *memory_pool);
+		void Reset(IMemoryPool *mp);
 
 		// accessors
 		void Store(CTaskLocalStorageObject *);

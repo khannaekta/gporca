@@ -28,13 +28,13 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalMotionBroadcast::CPhysicalMotionBroadcast
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CPhysicalMotion(memory_pool),
+	CPhysicalMotion(mp),
 	m_pdsReplicated(NULL)
 {
-	m_pdsReplicated = GPOS_NEW(memory_pool) CDistributionSpecReplicated();
+	m_pdsReplicated = GPOS_NEW(mp) CDistributionSpecReplicated();
 }
 
 
@@ -81,7 +81,7 @@ CPhysicalMotionBroadcast::Matches
 CColRefSet *
 CPhysicalMotionBroadcast::PcrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CColRefSet *pcrsRequired,
 	ULONG child_index,
@@ -91,10 +91,10 @@ CPhysicalMotionBroadcast::PcrsRequired
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool, *pcrsRequired);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *pcrsRequired);
 
 	CColRefSet *pcrsChildReqd =
-		PcrsChildReqd(memory_pool, exprhdl, pcrs, child_index, gpos::ulong_max);
+		PcrsChildReqd(mp, exprhdl, pcrs, child_index, gpos::ulong_max);
 	pcrs->Release();
 
 	return pcrsChildReqd;
@@ -152,7 +152,7 @@ CPhysicalMotionBroadcast::EpetOrder
 COrderSpec *
 CPhysicalMotionBroadcast::PosRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &, // exprhdl
 	COrderSpec *,//posInput
 	ULONG 
@@ -168,7 +168,7 @@ CPhysicalMotionBroadcast::PosRequired
 	GPOS_ASSERT(0 == child_index);
 
 	// no order required from child expression
-	return GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+	return GPOS_NEW(mp) COrderSpec(mp);
 }
 
 //---------------------------------------------------------------------------
@@ -182,13 +182,13 @@ CPhysicalMotionBroadcast::PosRequired
 COrderSpec *
 CPhysicalMotionBroadcast::PosDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle & // exprhdl
 	)
 	const
 {
 	// broadcast motion is not order-preserving
-	return GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+	return GPOS_NEW(mp) COrderSpec(mp);
 }
 
 

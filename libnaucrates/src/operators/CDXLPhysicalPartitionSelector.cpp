@@ -25,11 +25,11 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalPartitionSelector::CDXLPhysicalPartitionSelector(IMemoryPool *memory_pool,
+CDXLPhysicalPartitionSelector::CDXLPhysicalPartitionSelector(IMemoryPool *mp,
 															 IMDId *mdid_rel,
 															 ULONG num_of_part_levels,
 															 ULONG scan_id)
-	: CDXLPhysical(memory_pool),
+	: CDXLPhysical(mp),
 	  m_rel_mdid(mdid_rel),
 	  m_num_of_part_levels(num_of_part_levels),
 	  m_scan_id(scan_id)

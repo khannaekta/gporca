@@ -31,12 +31,12 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalLeftSemiJoin::CLogicalLeftSemiJoin
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogicalJoin(memory_pool)
+	CLogicalJoin(mp)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 }
 
 
@@ -51,11 +51,11 @@ CLogicalLeftSemiJoin::CLogicalLeftSemiJoin
 CXformSet *
 CLogicalLeftSemiJoin::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfSemiJoinSemiJoinSwap);
 	(void) xform_set->ExchangeSet(CXform::ExfSemiJoinAntiSemiJoinSwap);
@@ -81,7 +81,7 @@ CLogicalLeftSemiJoin::PxfsCandidates
 CColRefSet *
 CLogicalLeftSemiJoin::PcrsDeriveOutput
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 {
@@ -102,7 +102,7 @@ CLogicalLeftSemiJoin::PcrsDeriveOutput
 CKeyCollection *
 CLogicalLeftSemiJoin::PkcDeriveKeys
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -122,7 +122,7 @@ CLogicalLeftSemiJoin::PkcDeriveKeys
 CMaxCard
 CLogicalLeftSemiJoin::Maxcard
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -141,13 +141,13 @@ CLogicalLeftSemiJoin::Maxcard
 IStatistics *
 CLogicalLeftSemiJoin::PstatsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	StatsPredJoinArray *join_preds_stats,
 	IStatistics *outer_stats,
 	IStatistics *inner_side_stats
 	)
 {
-	return outer_stats->CalcLSJoinStats(memory_pool, inner_side_stats, join_preds_stats);
+	return outer_stats->CalcLSJoinStats(mp, inner_side_stats, join_preds_stats);
 }
 
 
@@ -162,7 +162,7 @@ CLogicalLeftSemiJoin::PstatsDerive
 IStatistics *
 CLogicalLeftSemiJoin::PstatsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	StatsArray * // not used
 	)
@@ -171,8 +171,8 @@ CLogicalLeftSemiJoin::PstatsDerive
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 	IStatistics *outer_stats = exprhdl.Pstats(0);
 	IStatistics *inner_side_stats = exprhdl.Pstats(1);
-	StatsPredJoinArray *join_preds_stats = CStatsPredUtils::ExtractJoinStatsFromExprHandle(memory_pool, exprhdl);
-	IStatistics *pstatsSemiJoin = PstatsDerive(memory_pool, join_preds_stats, outer_stats, inner_side_stats);
+	StatsPredJoinArray *join_preds_stats = CStatsPredUtils::ExtractJoinStatsFromExprHandle(mp, exprhdl);
+	IStatistics *pstatsSemiJoin = PstatsDerive(mp, join_preds_stats, outer_stats, inner_side_stats);
 
 	join_preds_stats->Release();
 

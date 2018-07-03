@@ -38,10 +38,10 @@ XERCES_CPP_NAMESPACE_USE
 //
 //---------------------------------------------------------------------------
 CParseHandlerMDGPDBCheckConstraint::CParseHandlerMDGPDBCheckConstraint(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerMetadataObject(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerMetadataObject(mp, parse_handler_mgr, parse_handler_root),
 	  m_mdid(NULL),
 	  m_mdname(NULL),
 	  m_rel_mdid(NULL)
@@ -84,7 +84,7 @@ CParseHandlerMDGPDBCheckConstraint::StartElement(const XMLCh *const,  // element
 		m_parse_handler_mgr->GetDXLMemoryManager(), parsed_column_name);
 
 	// create a copy of the string in the CMDName constructor
-	m_mdname = GPOS_NEW(m_memory_pool) CMDName(m_memory_pool, column_name);
+	m_mdname = GPOS_NEW(m_mp) CMDName(m_mp, column_name);
 	GPOS_DELETE(column_name);
 
 	// parse mdid of relation
@@ -96,7 +96,7 @@ CParseHandlerMDGPDBCheckConstraint::StartElement(const XMLCh *const,  // element
 
 	// create and activate the parse handler for the child scalar expression node
 	CParseHandlerBase *scalar_expr_handler_base = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(scalar_expr_handler_base);
 
 	// store parse handler
@@ -132,8 +132,8 @@ CParseHandlerMDGPDBCheckConstraint::EndElement(const XMLCh *const,  // element_u
 	GPOS_ASSERT(NULL != dxlnode_scalar_expr);
 	dxlnode_scalar_expr->AddRef();
 
-	m_imd_obj = GPOS_NEW(m_memory_pool)
-		CMDCheckConstraintGPDB(m_memory_pool, m_mdid, m_mdname, m_rel_mdid, dxlnode_scalar_expr);
+	m_imd_obj = GPOS_NEW(m_mp)
+		CMDCheckConstraintGPDB(m_mp, m_mdid, m_mdname, m_rel_mdid, dxlnode_scalar_expr);
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

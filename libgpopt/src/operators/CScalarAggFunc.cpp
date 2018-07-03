@@ -35,7 +35,7 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CScalarAggFunc::CScalarAggFunc
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IMDId *pmdidAggFunc,
 	IMDId *resolved_rettype,
 	const CWStringConst *pstrAggFunc,
@@ -44,7 +44,7 @@ CScalarAggFunc::CScalarAggFunc
 	BOOL fSplit
 	)
 	:
-	CScalar(memory_pool),
+	CScalar(mp),
 	m_pmdidAggFunc(pmdidAggFunc),
 	m_pmdidResolvedRetType(resolved_rettype),
 	m_return_type_mdid(NULL),

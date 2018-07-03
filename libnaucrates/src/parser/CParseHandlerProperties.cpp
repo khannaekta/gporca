@@ -27,10 +27,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerProperties::CParseHandlerProperties(IMemoryPool *memory_pool,
+CParseHandlerProperties::CParseHandlerProperties(IMemoryPool *mp,
 												 CParseHandlerManager *parse_handler_mgr,
 												 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
 	  m_dxl_properties(NULL),
 	  m_dxl_stats_derived_relation(NULL)
 {
@@ -84,7 +84,7 @@ CParseHandlerProperties::StartElement(const XMLCh *const element_uri,
 	{
 		// create and install cost and output column parsers
 		CParseHandlerBase *parse_handler_root = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenCost), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenCost), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(parse_handler_root);
 
 		// store parse handler
@@ -97,7 +97,7 @@ CParseHandlerProperties::StartElement(const XMLCh *const element_uri,
 
 		// create and install derived relation statistics parsers
 		CParseHandlerBase *parse_handler_stats = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool,
+			m_mp,
 			CDXLTokens::XmlstrToken(EdxltokenStatsDerivedRelation),
 			m_parse_handler_mgr,
 			this);
@@ -157,7 +157,7 @@ CParseHandlerProperties::EndElement(const XMLCh *const,  // element_uri,
 		m_dxl_stats_derived_relation = dxl_stats_derived_relation;
 	}
 
-	m_dxl_properties = GPOS_NEW(m_memory_pool) CDXLPhysicalProperties(cost);
+	m_dxl_properties = GPOS_NEW(m_mp) CDXLPhysicalProperties(cost);
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

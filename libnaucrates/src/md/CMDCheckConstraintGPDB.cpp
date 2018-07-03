@@ -30,12 +30,12 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CMDCheckConstraintGPDB::CMDCheckConstraintGPDB(
-	IMemoryPool *memory_pool, IMDId *mdid, CMDName *mdname, IMDId *rel_mdid, CDXLNode *dxlnode)
-	: m_memory_pool(memory_pool),
+	IMemoryPool *mp, IMDId *mdid, CMDName *mdname, IMDId *rel_mdid, CDXLNode *dxlnode)
+	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
 	  m_rel_mdid(rel_mdid),
-	  m_dxl_node(dxlnode)
+	  m_dxlnode(dxlnode)
 {
 	GPOS_ASSERT(mdid->IsValid());
 	GPOS_ASSERT(rel_mdid->IsValid());
@@ -43,7 +43,7 @@ CMDCheckConstraintGPDB::CMDCheckConstraintGPDB(
 	GPOS_ASSERT(NULL != dxlnode);
 
 	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_memory_pool, this, false /*fSerializeHeader*/, false /*indentation*/);
+		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 //---------------------------------------------------------------------------
@@ -60,7 +60,7 @@ CMDCheckConstraintGPDB::~CMDCheckConstraintGPDB()
 	GPOS_DELETE(m_dxl_str);
 	m_mdid->Release();
 	m_rel_mdid->Release();
-	m_dxl_node->Release();
+	m_dxlnode->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -72,7 +72,7 @@ CMDCheckConstraintGPDB::~CMDCheckConstraintGPDB()
 //
 //---------------------------------------------------------------------------
 CExpression *
-CMDCheckConstraintGPDB::GetCheckConstraintExpr(IMemoryPool *memory_pool,
+CMDCheckConstraintGPDB::GetCheckConstraintExpr(IMemoryPool *mp,
 											   CMDAccessor *md_accessor,
 											   ColRefArray *colref_array) const
 {
@@ -88,8 +88,8 @@ CMDCheckConstraintGPDB::GetCheckConstraintExpr(IMemoryPool *memory_pool,
 #endif  // GPOS_DEBUG
 
 	// translate the DXL representation of the check constraint expression
-	CTranslatorDXLToExpr dxltr(memory_pool, md_accessor);
-	return dxltr.PexprTranslateScalar(m_dxl_node, colref_array, mdrel->NonDroppedColsArray());
+	CTranslatorDXLToExpr dxltr(mp, md_accessor);
+	return dxltr.PexprTranslateScalar(m_dxlnode, colref_array, mdrel->NonDroppedColsArray());
 }
 
 //---------------------------------------------------------------------------
@@ -111,7 +111,7 @@ CMDCheckConstraintGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	m_rel_mdid->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenRelationMdid));
 
 	// serialize the scalar expression
-	m_dxl_node->SerializeToDXL(xml_serializer);
+	m_dxlnode->SerializeToDXL(xml_serializer);
 
 	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
 								 CDXLTokens::GetDXLTokenStr(EdxltokenCheckConstraint));

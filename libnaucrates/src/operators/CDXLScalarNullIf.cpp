@@ -26,8 +26,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarNullIf::CDXLScalarNullIf(IMemoryPool *memory_pool, IMDId *mdid_op, IMDId *mdid_type)
-	: CDXLScalar(memory_pool), m_mdid_op(mdid_op), m_mdid_type(mdid_type)
+CDXLScalarNullIf::CDXLScalarNullIf(IMemoryPool *mp, IMDId *mdid_op, IMDId *mdid_type)
+	: CDXLScalar(mp), m_mdid_op(mdid_op), m_mdid_type(mdid_type)
 {
 	GPOS_ASSERT(mdid_op->IsValid());
 	GPOS_ASSERT(mdid_type->IsValid());

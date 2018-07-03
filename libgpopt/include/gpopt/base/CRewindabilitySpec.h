@@ -73,7 +73,7 @@ namespace gpopt
 
 			// append enforcers to dynamic array for the given plan properties
 			virtual
-			void AppendEnforcers(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CReqdPropPlan *prpp, ExpressionArray *pdrgpexpr, CExpression *pexpr);
+			void AppendEnforcers(IMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prpp, ExpressionArray *pdrgpexpr, CExpression *pexpr);
 
 			// hash function
 			virtual
@@ -83,12 +83,12 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsUsed
 				(
-				IMemoryPool *memory_pool
+				IMemoryPool *mp
 				)
 				const
 			{
 				// return an empty set
-				return GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+				return GPOS_NEW(mp) CColRefSet(mp);
 			}
 
 			// property type

@@ -31,7 +31,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalCTAS::CDXLPhysicalCTAS(IMemoryPool *memory_pool,
+CDXLPhysicalCTAS::CDXLPhysicalCTAS(IMemoryPool *mp,
 								   CMDName *mdname_schema,
 								   CMDName *mdname_rel,
 								   DXLColumnDescrArray *dxl_col_descr_array,
@@ -43,7 +43,7 @@ CDXLPhysicalCTAS::CDXLPhysicalCTAS(IMemoryPool *memory_pool,
 								   IMDRelation::Erelstoragetype rel_storage_type,
 								   ULongPtrArray *src_colids_array,
 								   IntPtrArray *vartypemod_array)
-	: CDXLPhysical(memory_pool),
+	: CDXLPhysical(mp),
 	  m_mdname_schema(mdname_schema),
 	  m_mdname_rel(mdname_rel),
 	  m_col_descr_array(dxl_col_descr_array),
@@ -151,7 +151,7 @@ CDXLPhysicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode 
 
 		// serialize distribution columns
 		CWStringDynamic *str_distribution_columns =
-			CDXLUtils::Serialize(m_memory_pool, m_distr_column_pos_array);
+			CDXLUtils::Serialize(m_mp, m_distr_column_pos_array);
 		GPOS_ASSERT(NULL != str_distribution_columns);
 
 		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenDistrColumns),
@@ -160,14 +160,14 @@ CDXLPhysicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode 
 	}
 
 	// serialize input columns
-	CWStringDynamic *str_input_cols = CDXLUtils::Serialize(m_memory_pool, m_src_colids_array);
+	CWStringDynamic *str_input_cols = CDXLUtils::Serialize(m_mp, m_src_colids_array);
 	GPOS_ASSERT(NULL != str_input_cols);
 
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenInsertCols), str_input_cols);
 	GPOS_DELETE(str_input_cols);
 
 	// serialize vartypmod list
-	CWStringDynamic *str_vartypmod_list = CDXLUtils::Serialize(m_memory_pool, m_vartypemod_array);
+	CWStringDynamic *str_vartypmod_list = CDXLUtils::Serialize(m_mp, m_vartypemod_array);
 	GPOS_ASSERT(NULL != str_vartypmod_list);
 
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenVarTypeModList),

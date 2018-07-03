@@ -197,10 +197,10 @@ CPoint::MaxPoint(CPoint *point1, CPoint *point2)
 //		Translate the point into its DXL representation
 //---------------------------------------------------------------------------
 CDXLDatum *
-CPoint::GetDatumVal(IMemoryPool *memory_pool, CMDAccessor *md_accessor) const
+CPoint::GetDatumVal(IMemoryPool *mp, CMDAccessor *md_accessor) const
 {
 	IMDId *mdid = m_datum->MDId();
-	return md_accessor->RetrieveType(mdid)->GetDatumVal(memory_pool, m_datum);
+	return md_accessor->RetrieveType(mdid)->GetDatumVal(mp, m_datum);
 }
 
 // EOF

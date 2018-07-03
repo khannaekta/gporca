@@ -30,10 +30,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalIntersect::CLogicalIntersect
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogicalSetOp(memory_pool)
+	CLogicalSetOp(mp)
 {
 	m_fPattern = true;
 }
@@ -48,12 +48,12 @@ CLogicalIntersect::CLogicalIntersect
 //---------------------------------------------------------------------------
 CLogicalIntersect::CLogicalIntersect
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ColRefArray *pdrgpcrOutput,
 	ColRefArrays *pdrgpdrgpcrInput
 	)
 	:
-	CLogicalSetOp(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput)
+	CLogicalSetOp(mp, pdrgpcrOutput, pdrgpdrgpcrInput)
 {
 }
 
@@ -80,7 +80,7 @@ CLogicalIntersect::~CLogicalIntersect()
 CMaxCard
 CLogicalIntersect::Maxcard
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -113,15 +113,15 @@ CLogicalIntersect::Maxcard
 COperator *
 CLogicalIntersect::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	BOOL must_exist
 	)
 {
-	ColRefArray *pdrgpcrOutput = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrOutput, colref_mapping, must_exist);
-	ColRefArrays *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(memory_pool, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
+	ColRefArray *pdrgpcrOutput = CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput, colref_mapping, must_exist);
+	ColRefArrays *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(mp, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
 
-	return GPOS_NEW(memory_pool) CLogicalIntersect(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput);
+	return GPOS_NEW(mp) CLogicalIntersect(mp, pdrgpcrOutput, pdrgpdrgpcrInput);
 }
 
 
@@ -136,11 +136,11 @@ CLogicalIntersect::PopCopyWithRemappedColumns
 CXformSet *
 CLogicalIntersect::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfIntersect2Join);
 	return xform_set;
 }
@@ -156,7 +156,7 @@ CLogicalIntersect::PxfsCandidates
 IStatistics *
 CLogicalIntersect::PstatsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	StatsArray * // not used
 	)
@@ -167,23 +167,23 @@ CLogicalIntersect::PstatsDerive
 	// intersect is transformed into a group by over an intersect all
 	// we follow the same route to compute statistics
 
-	ColRefSetArray *output_colrefsets = GPOS_NEW(memory_pool) ColRefSetArray(memory_pool);
+	ColRefSetArray *output_colrefsets = GPOS_NEW(mp) ColRefSetArray(mp);
 	const ULONG size = m_pdrgpdrgpcrInput->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool, (*m_pdrgpdrgpcrInput)[ul]);
+		CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, (*m_pdrgpdrgpcrInput)[ul]);
 		output_colrefsets->Append(pcrs);
 	}
 
 	IStatistics *pstatsIntersectAll =
-			CLogicalIntersectAll::PstatsDerive(memory_pool, exprhdl, m_pdrgpdrgpcrInput, output_colrefsets);
+			CLogicalIntersectAll::PstatsDerive(mp, exprhdl, m_pdrgpdrgpcrInput, output_colrefsets);
 
 	// computed columns
-	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(memory_pool) ULongPtrArray(memory_pool);
+	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(mp) ULongPtrArray(mp);
 
 	IStatistics *stats = CLogicalGbAgg::PstatsDerive
 											(
-											memory_pool,
+											mp,
 											pstatsIntersectAll,
 											(*m_pdrgpdrgpcrInput)[0], // we group by the columns of the first child
 											pdrgpulComputedCols, // no computed columns for set ops

@@ -59,7 +59,7 @@ namespace gpopt
 			// ctor
 			CScalarCmp
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				IMDId *mdid_op,
 				const CWStringConst *pstrOp,
 				IMDType::ECmpType cmp_type
@@ -108,7 +108,7 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //memory_pool,
+						IMemoryPool *, //mp,
 						UlongColRefHashMap *, //colref_mapping,
 						BOOL //must_exist
 						)
@@ -152,11 +152,11 @@ namespace gpopt
 		
 			// get commuted scalar comparision operator
 			virtual
-			CScalarCmp *PopCommutedOp(IMemoryPool *memory_pool, COperator *pop);
+			CScalarCmp *PopCommutedOp(IMemoryPool *mp, COperator *pop);
 		
 			// get the string representation of a metadata object
 			static
-			CWStringConst *Pstr(IMemoryPool *memory_pool, CMDAccessor *md_accessor, IMDId *mdid);
+			CWStringConst *Pstr(IMemoryPool *mp, CMDAccessor *md_accessor, IMDId *mdid);
 
 			// get metadata id of the commuted operator
 			static

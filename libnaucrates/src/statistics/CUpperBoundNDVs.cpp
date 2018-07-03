@@ -27,12 +27,12 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CUpperBoundNDVs *
-CUpperBoundNDVs::CopyUpperBoundNDVWithRemap(IMemoryPool *memory_pool,
+CUpperBoundNDVs::CopyUpperBoundNDVWithRemap(IMemoryPool *mp,
 											UlongColRefHashMap *colid_to_colref_map) const
 {
 	BOOL mapping_not_found = false;
 
-	CColRefSet *column_refset_copy = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *column_refset_copy = GPOS_NEW(mp) CColRefSet(mp);
 	CColRefSetIter column_refset_iter(*m_column_refset);
 	while (column_refset_iter.Advance() && !mapping_not_found)
 	{
@@ -50,7 +50,7 @@ CUpperBoundNDVs::CopyUpperBoundNDVWithRemap(IMemoryPool *memory_pool,
 
 	if (0 < column_refset_copy->Size() && !mapping_not_found)
 	{
-		return GPOS_NEW(memory_pool) CUpperBoundNDVs(column_refset_copy, UpperBoundNDVs());
+		return GPOS_NEW(mp) CUpperBoundNDVs(column_refset_copy, UpperBoundNDVs());
 	}
 
 	column_refset_copy->Release();
@@ -68,11 +68,11 @@ CUpperBoundNDVs::CopyUpperBoundNDVWithRemap(IMemoryPool *memory_pool,
 //
 //---------------------------------------------------------------------------
 CUpperBoundNDVs *
-CUpperBoundNDVs::CopyUpperBoundNDVs(IMemoryPool *memory_pool, CDouble upper_bound_ndv) const
+CUpperBoundNDVs::CopyUpperBoundNDVs(IMemoryPool *mp, CDouble upper_bound_ndv) const
 {
 	m_column_refset->AddRef();
 	CUpperBoundNDVs *ndv_copy =
-		GPOS_NEW(memory_pool) CUpperBoundNDVs(m_column_refset, upper_bound_ndv);
+		GPOS_NEW(mp) CUpperBoundNDVs(m_column_refset, upper_bound_ndv);
 
 	return ndv_copy;
 }
@@ -86,9 +86,9 @@ CUpperBoundNDVs::CopyUpperBoundNDVs(IMemoryPool *memory_pool, CDouble upper_boun
 //
 //---------------------------------------------------------------------------
 CUpperBoundNDVs *
-CUpperBoundNDVs::CopyUpperBoundNDVs(IMemoryPool *memory_pool) const
+CUpperBoundNDVs::CopyUpperBoundNDVs(IMemoryPool *mp) const
 {
-	return CopyUpperBoundNDVs(memory_pool, m_upper_bound_ndv);
+	return CopyUpperBoundNDVs(mp, m_upper_bound_ndv);
 }
 
 

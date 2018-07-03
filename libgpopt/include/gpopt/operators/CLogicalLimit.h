@@ -53,10 +53,10 @@ namespace gpopt
 
 			// ctors
 			explicit
-			CLogicalLimit(IMemoryPool *memory_pool);
+			CLogicalLimit(IMemoryPool *mp);
 			CLogicalLimit
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				COrderSpec *pos,
 				BOOL fGlobal,
 				BOOL fHasCount,
@@ -120,7 +120,7 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// print
 			virtual
@@ -132,25 +132,25 @@ namespace gpopt
 
 			// derive output columns
 			virtual
-			CColRefSet *PcrsDeriveOutput(IMemoryPool * memory_pool,CExpressionHandle &exprhdl);
+			CColRefSet *PcrsDeriveOutput(IMemoryPool * mp,CExpressionHandle &exprhdl);
 				
 			// derive outer references
 			virtual
-			CColRefSet *PcrsDeriveOuter(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsDeriveOuter(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 			// dervive keys
 			virtual 
-			CKeyCollection *PkcDeriveKeys(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;			
+			CKeyCollection *PkcDeriveKeys(IMemoryPool *mp, CExpressionHandle &exprhdl) const;			
 			
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive partition consumer info
 			virtual
 			CPartInfo *PpartinfoDerive
 				(
-				IMemoryPool *, // memory_pool
+				IMemoryPool *, // mp
 				CExpressionHandle &exprhdl
 				) 
 				const
@@ -162,7 +162,7 @@ namespace gpopt
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *, //memory_pool,
+				IMemoryPool *, //mp,
 				CExpressionHandle &exprhdl
 				)
 				const
@@ -176,7 +176,7 @@ namespace gpopt
 
 			// compute required stat columns of the n-th child
 			virtual
-			CColRefSet *PcrsStat(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CColRefSet *pcrsInput, ULONG child_index) const;
+			CColRefSet *PcrsStat(IMemoryPool *mp, CExpressionHandle &exprhdl, CColRefSet *pcrsInput, ULONG child_index) const;
 			
 			//-------------------------------------------------------------------------------------
 			// Transformations
@@ -197,7 +197,7 @@ namespace gpopt
 			virtual
 			IStatistics *PstatsDerive
 						(
-						IMemoryPool *memory_pool,
+						IMemoryPool *mp,
 						CExpressionHandle &exprhdl,
 						StatsArray *stats_ctxt
 						)

@@ -47,7 +47,7 @@ namespace gpdxl
 		CDXLScalarArrayCoerceExpr(const CDXLScalarArrayCoerceExpr &);
 
 	public:
-		CDXLScalarArrayCoerceExpr(IMemoryPool *memory_pool,
+		CDXLScalarArrayCoerceExpr(IMemoryPool *mp,
 								  IMDId *coerce_func_mdid,
 								  IMDId *result_type_mdid,
 								  INT type_modifier,

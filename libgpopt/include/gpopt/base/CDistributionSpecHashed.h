@@ -115,11 +115,11 @@ namespace gpopt
 
 			// columns used by distribution expressions
 			virtual
-			CColRefSet *PcrsUsed(IMemoryPool *memory_pool) const;
+			CColRefSet *PcrsUsed(IMemoryPool *mp) const;
 
 			// return a copy of the distribution spec after excluding the given columns
 			virtual
-			CDistributionSpecHashed *PdshashedExcludeColumns(IMemoryPool *memory_pool, CColRefSet *pcrs);
+			CDistributionSpecHashed *PdshashedExcludeColumns(IMemoryPool *mp, CColRefSet *pcrs);
 
 			// does this distribution match the given one
 			virtual 
@@ -138,11 +138,11 @@ namespace gpopt
 
 			// return a copy of the distribution spec with remapped columns
 			virtual
-			CDistributionSpec *PdsCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			CDistributionSpec *PdsCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// append enforcers to dynamic array for the given plan properties
 			virtual
-			void AppendEnforcers(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CReqdPropPlan *prpp, ExpressionArray *pdrgpexpr, CExpression *pexpr);
+			void AppendEnforcers(IMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prpp, ExpressionArray *pdrgpexpr, CExpression *pexpr);
 
 			// hash function for hashed distribution spec
 			virtual
@@ -163,7 +163,7 @@ namespace gpopt
 			static
 			CDistributionSpecHashed *PdshashedMaximal
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *colref_array,
 				BOOL fNullsColocated
 				);

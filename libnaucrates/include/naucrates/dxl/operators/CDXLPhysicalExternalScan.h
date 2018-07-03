@@ -34,9 +34,9 @@ namespace gpdxl
 
 	public:
 		// ctors
-		explicit CDXLPhysicalExternalScan(IMemoryPool *memory_pool);
+		explicit CDXLPhysicalExternalScan(IMemoryPool *mp);
 
-		CDXLPhysicalExternalScan(IMemoryPool *memory_pool, CDXLTableDescr *table_descr);
+		CDXLPhysicalExternalScan(IMemoryPool *mp, CDXLTableDescr *table_descr);
 
 		// operator type
 		virtual Edxlopid GetDXLOperator() const;

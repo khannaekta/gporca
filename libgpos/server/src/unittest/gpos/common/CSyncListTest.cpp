@@ -73,9 +73,9 @@ CSyncListTest::EresUnittest_Basics()
 	// scope for auto trace
 	{
 		CAutoMemoryPool amp;
-		IMemoryPool *memory_pool = amp.Pmp();
+		IMemoryPool *mp = amp.Pmp();
 
-		CAutoTrace trace(memory_pool);
+		CAutoTrace trace(mp);
 		IOstream &os(trace.Os());
 
 		os << GPOS_WSZ_LIT("Sync list contents:") << std::endl;
@@ -139,7 +139,7 @@ CSyncListTest::EresUnittest_Concurrency()
 
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	SElem rgelem[GPOS_SLIST_SIZE];
 	CSyncList<SElem> list;
@@ -154,15 +154,15 @@ CSyncListTest::EresUnittest_Concurrency()
 	}
 
 	// pool of elements to add to the list
-	CSyncPool<SElem> spe(memory_pool, GPOS_SLIST_STRESS_TASKS * GPOS_SLIST_STRESS_ITER);
+	CSyncPool<SElem> spe(mp, GPOS_SLIST_STRESS_TASKS * GPOS_SLIST_STRESS_ITER);
 	spe.Init(GPOS_OFFSET(SElem, m_id));
 
 	SArg arg(&list, &spe, GPOS_SLIST_STRESS_TASKS);
 
 	// run concurrent tests
-	ConcurrentPush(memory_pool, &arg);
-	ConcurrentPushPop(memory_pool, &arg);
-	ConcurrentPop(memory_pool, &arg);
+	ConcurrentPush(mp, &arg);
+	ConcurrentPushPop(mp, &arg);
+	ConcurrentPop(mp, &arg);
 
 	// pop element until empty
 	for (ULONG i = 0; i < GPOS_SLIST_SIZE; i++)
@@ -188,16 +188,16 @@ CSyncListTest::EresUnittest_Concurrency()
 //
 //---------------------------------------------------------------------------
 void
-CSyncListTest::ConcurrentPush(IMemoryPool *memory_pool, SArg *parg)
+CSyncListTest::ConcurrentPush(IMemoryPool *mp, SArg *parg)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != parg);
 
 	CWorkerPoolManager *pwpm = CWorkerPoolManager::WorkerPoolManager();
 
 	// scope for tasks
 	{
-		CAutoTaskProxy atp(memory_pool, pwpm);
+		CAutoTaskProxy atp(mp, pwpm);
 		CTask *rgptsk[GPOS_SLIST_STRESS_TASKS / 2];
 
 		for (ULONG i = 0; i < GPOS_ARRAY_SIZE(rgptsk); i++)
@@ -220,16 +220,16 @@ CSyncListTest::ConcurrentPush(IMemoryPool *memory_pool, SArg *parg)
 //
 //---------------------------------------------------------------------------
 void
-CSyncListTest::ConcurrentPushPop(IMemoryPool *memory_pool, SArg *parg)
+CSyncListTest::ConcurrentPushPop(IMemoryPool *mp, SArg *parg)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != parg);
 
 	CWorkerPoolManager *pwpm = CWorkerPoolManager::WorkerPoolManager();
 
 	// scope for tasks
 	{
-		CAutoTaskProxy atp(memory_pool, pwpm);
+		CAutoTaskProxy atp(mp, pwpm);
 		CTask *rgptsk[GPOS_SLIST_STRESS_TASKS];
 
 		for (ULONG i = 0; i < GPOS_ARRAY_SIZE(rgptsk) / 2; i++)
@@ -252,16 +252,16 @@ CSyncListTest::ConcurrentPushPop(IMemoryPool *memory_pool, SArg *parg)
 //
 //---------------------------------------------------------------------------
 void
-CSyncListTest::ConcurrentPop(IMemoryPool *memory_pool, SArg *parg)
+CSyncListTest::ConcurrentPop(IMemoryPool *mp, SArg *parg)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != parg);
 
 	CWorkerPoolManager *pwpm = CWorkerPoolManager::WorkerPoolManager();
 
 	// scope for tasks
 	{
-		CAutoTaskProxy atp(memory_pool, pwpm);
+		CAutoTaskProxy atp(mp, pwpm);
 		CTask *rgptsk[GPOS_SLIST_STRESS_TASKS / 2];
 
 		for (ULONG i = 0; i < GPOS_ARRAY_SIZE(rgptsk); i++)

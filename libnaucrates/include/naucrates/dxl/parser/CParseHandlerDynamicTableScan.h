@@ -61,7 +61,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerDynamicTableScan(IMemoryPool *memory_pool,
+		CParseHandlerDynamicTableScan(IMemoryPool *mp,
 									  CParseHandlerManager *parse_handler_mgr,
 									  CParseHandlerBase *pph);
 	};

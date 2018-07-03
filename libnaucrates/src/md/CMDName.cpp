@@ -25,10 +25,10 @@ using namespace gpmd;
 //		Creates a deep copy of the provided string
 //
 //---------------------------------------------------------------------------
-CMDName::CMDName(IMemoryPool *memory_pool, const CWStringBase *str)
+CMDName::CMDName(IMemoryPool *mp, const CWStringBase *str)
 	: m_name(NULL), m_deep_copy(true)
 {
-	m_name = GPOS_NEW(memory_pool) CWStringConst(memory_pool, str->GetBuffer());
+	m_name = GPOS_NEW(mp) CWStringConst(mp, str->GetBuffer());
 }
 
 //---------------------------------------------------------------------------

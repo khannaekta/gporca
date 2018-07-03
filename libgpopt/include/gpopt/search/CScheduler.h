@@ -203,7 +203,7 @@ namespace gpopt
 			// ctor
 			CScheduler
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ULONG ulJobs,
 				ULONG_PTR ulpTasks
 #ifdef GPOS_DEBUG

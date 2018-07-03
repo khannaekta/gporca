@@ -28,8 +28,8 @@ using namespace gpdxl;
 //		Construct a logical get operator node given its table descriptor rtable entry
 //
 //---------------------------------------------------------------------------
-CDXLLogicalGet::CDXLLogicalGet(IMemoryPool *memory_pool, CDXLTableDescr *table_descr)
-	: CDXLLogical(memory_pool), m_table_descr_dxl(table_descr)
+CDXLLogicalGet::CDXLLogicalGet(IMemoryPool *mp, CDXLTableDescr *table_descr)
+	: CDXLLogical(mp), m_table_descr_dxl(table_descr)
 {
 }
 

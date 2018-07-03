@@ -146,7 +146,7 @@ namespace gpopt
 
 			// extract array of colids from array of colrefs
 			static
-			ULongPtrArray *Pdrgpul(IMemoryPool *memory_pool, ColRefArray *colref_array);
+			ULongPtrArray *Pdrgpul(IMemoryPool *mp, ColRefArray *colref_array);
 
 			// check if the the array of column references are equal
 			static

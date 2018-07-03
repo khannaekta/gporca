@@ -24,7 +24,7 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarHashCondList::CDXLScalarHashCondList(IMemoryPool *memory_pool) : CDXLScalar(memory_pool)
+CDXLScalarHashCondList::CDXLScalarHashCondList(IMemoryPool *mp) : CDXLScalar(mp)
 {
 }
 

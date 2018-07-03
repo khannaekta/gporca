@@ -223,7 +223,7 @@ namespace gpdxl
 
 	protected:
 		// memory pool
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 	public:
 		// ctor/dtor

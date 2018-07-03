@@ -48,7 +48,7 @@ namespace gpos
 
 	private:
 		// task memory pool -- exclusively used by this task
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// task context
 		CTaskContext *m_task_ctxt;
@@ -96,7 +96,7 @@ namespace gpos
 		CTaskId m_tid;
 
 		// ctor
-		CTask(IMemoryPool *memory_pool,
+		CTask(IMemoryPool *mp,
 			  CTaskContext *task_ctxt,
 			  IErrorContext *err_ctxt,
 			  CEvent *event,
@@ -154,7 +154,7 @@ namespace gpos
 		IMemoryPool *
 		Pmp() const
 		{
-			return m_memory_pool;
+			return m_mp;
 		}
 
 		// TLS accessor

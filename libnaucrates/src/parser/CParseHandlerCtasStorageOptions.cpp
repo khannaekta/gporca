@@ -28,10 +28,10 @@ XERCES_CPP_NAMESPACE_USE
 //
 //---------------------------------------------------------------------------
 CParseHandlerCtasStorageOptions::CParseHandlerCtasStorageOptions(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
 	  m_mdname_tablespace(NULL),
 	  m_dxl_ctas_storage_option(NULL),
 	  m_ctas_storage_option_array(NULL)
@@ -100,10 +100,10 @@ CParseHandlerCtasStorageOptions::StartElement(const XMLCh *const,  // element_ur
 		if (NULL == m_ctas_storage_option_array)
 		{
 			m_ctas_storage_option_array =
-				GPOS_NEW(m_memory_pool) CDXLCtasStorageOptions::DXLCtasOptionArray(m_memory_pool);
+				GPOS_NEW(m_mp) CDXLCtasStorageOptions::DXLCtasOptionArray(m_mp);
 		}
 		m_ctas_storage_option_array->Append(
-			GPOS_NEW(m_memory_pool) CDXLCtasStorageOptions::CDXLCtasOption(
+			GPOS_NEW(m_mp) CDXLCtasStorageOptions::CDXLCtasOption(
 				ctas_option_type, ctas_option_name, ctas_option_val, is_null));
 	}
 	else
@@ -131,7 +131,7 @@ CParseHandlerCtasStorageOptions::EndElement(const XMLCh *const,  // element_uri,
 	if (0 ==
 		XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenCTASOptions), element_local_name))
 	{
-		m_dxl_ctas_storage_option = GPOS_NEW(m_memory_pool) CDXLCtasStorageOptions(
+		m_dxl_ctas_storage_option = GPOS_NEW(m_mp) CDXLCtasStorageOptions(
 			m_mdname_tablespace, m_ctas_on_commit_action, m_ctas_storage_option_array);
 		// deactivate handler
 		m_parse_handler_mgr->DeactivateHandler();

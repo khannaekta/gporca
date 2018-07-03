@@ -31,25 +31,25 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformPushDownLeftOuterJoin::CXformPushDownLeftOuterJoin
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformExploration
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 					(
-					memory_pool,
-					GPOS_NEW(memory_pool) CLogicalLeftOuterJoin(memory_pool),
-					GPOS_NEW(memory_pool) CExpression		// outer child is an NAry-Join
+					mp,
+					GPOS_NEW(mp) CLogicalLeftOuterJoin(mp),
+					GPOS_NEW(mp) CExpression		// outer child is an NAry-Join
 						(
-						memory_pool,
-						GPOS_NEW(memory_pool) CLogicalNAryJoin(memory_pool),
-						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternMultiLeaf(memory_pool)),
-						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))	// NAry-join predicate tree
+						mp,
+						GPOS_NEW(mp) CLogicalNAryJoin(mp),
+						GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternMultiLeaf(mp)),
+						GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))	// NAry-join predicate tree
 						),
-						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),	// inner child is a leaf
-						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))	// LOJ predicate tree
+						GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)),	// inner child is a leaf
+						GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))	// LOJ predicate tree
 					)
 		)
 {}
@@ -117,15 +117,15 @@ CXformPushDownLeftOuterJoin::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	CExpression *pexprNAryJoin = (*pexpr)[0];
 	CExpression *pexprLOJInnerChild = (*pexpr)[1];
 	CExpression *pexprLOJScalarChild = (*pexpr)[2];
 
 	CColRefSet *pcrsLOJUsed = CDrvdPropScalar::GetDrvdScalarProps(pexprLOJScalarChild->PdpDerive())->PcrsUsed();
-	ExpressionArray *pdrgpexprLOJChildren = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
-	ExpressionArray *pdrgpexprNAryJoinChildren = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexprLOJChildren = GPOS_NEW(mp) ExpressionArray(mp);
+	ExpressionArray *pdrgpexprNAryJoinChildren = GPOS_NEW(mp) ExpressionArray(mp);
 
 	const ULONG arity = pexprNAryJoin->Arity();
 	CExpression *pexprNAryJoinScalarChild = (*pexprNAryJoin)[arity - 1];
@@ -150,11 +150,11 @@ CXformPushDownLeftOuterJoin::Transform
 		// collect all relations needed by LOJ outer side into a cross product,
 		// normalization at the end of this function takes care of pushing NAry
 		// join predicates down
-		pdrgpexprLOJChildren->Append(CPredicateUtils::PexprConjunction(memory_pool, NULL /*pdrgpexpr*/));
-		pexprLOJOuterChild = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CLogicalNAryJoin(memory_pool), pdrgpexprLOJChildren);
+		pdrgpexprLOJChildren->Append(CPredicateUtils::PexprConjunction(mp, NULL /*pdrgpexpr*/));
+		pexprLOJOuterChild = GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalNAryJoin(mp), pdrgpexprLOJChildren);
 
 		// reconstruct LOJ children and add only the created child
-		pdrgpexprLOJChildren = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+		pdrgpexprLOJChildren = GPOS_NEW(mp) ExpressionArray(mp);
 		pdrgpexprLOJChildren->Append(pexprLOJOuterChild);
 	}
 
@@ -165,7 +165,7 @@ CXformPushDownLeftOuterJoin::Transform
 	pdrgpexprLOJChildren->Append(pexprLOJScalarChild);
 
 	// build new LOJ
-	CExpression *pexprLOJNew = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CLogicalLeftOuterJoin(memory_pool), pdrgpexprLOJChildren);
+	CExpression *pexprLOJNew = GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalLeftOuterJoin(mp), pdrgpexprLOJChildren);
 
 	// add new NAry join children
 	pdrgpexprNAryJoinChildren->Append(pexprLOJNew);
@@ -200,10 +200,10 @@ CXformPushDownLeftOuterJoin::Transform
 	}
 
 	// create new NAry join
-	CExpression *pexprNAryJoinNew = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CLogicalNAryJoin(memory_pool), pdrgpexprNAryJoinChildren);
+	CExpression *pexprNAryJoinNew = GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalNAryJoin(mp), pdrgpexprNAryJoinChildren);
 
 	// normalize resulting expression and add it to xform results
-	CExpression *pexprResult = CNormalizer::PexprNormalize(memory_pool, pexprNAryJoinNew);
+	CExpression *pexprResult = CNormalizer::PexprNormalize(mp, pexprNAryJoinNew);
 	pexprNAryJoinNew->Release();
 
 	pxfres->Add(pexprResult);

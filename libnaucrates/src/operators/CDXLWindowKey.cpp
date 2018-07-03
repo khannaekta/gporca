@@ -26,10 +26,10 @@ using namespace gpdxl;
 //		Constructs a scalar window key node
 //
 //---------------------------------------------------------------------------
-CDXLWindowKey::CDXLWindowKey(IMemoryPool *memory_pool)
-	: m_memory_pool(memory_pool), m_window_frame_dxl(NULL), m_sort_col_list_dxl(NULL)
+CDXLWindowKey::CDXLWindowKey(IMemoryPool *mp)
+	: m_mp(mp), m_window_frame_dxl(NULL), m_sort_col_list_dxl(NULL)
 {
-	GPOS_ASSERT(NULL != m_memory_pool);
+	GPOS_ASSERT(NULL != m_mp);
 }
 
 //---------------------------------------------------------------------------

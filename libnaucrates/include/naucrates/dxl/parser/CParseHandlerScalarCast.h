@@ -54,7 +54,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CParseHandlerScalarCast(IMemoryPool *memory_pool,
+		CParseHandlerScalarCast(IMemoryPool *mp,
 								CParseHandlerManager *parse_handler_mgr,
 								CParseHandlerBase *parse_handler_root);
 

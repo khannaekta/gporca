@@ -37,7 +37,7 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 CPhysicalDynamicScan::CPhysicalDynamicScan
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	BOOL is_partial,
 	CTableDescriptor *ptabdesc,
 	ULONG ulOriginOpId,
@@ -50,7 +50,7 @@ CPhysicalDynamicScan::CPhysicalDynamicScan
 	CPartConstraint *ppartcnstrRel
 	)
 	:
-	CPhysicalScan(memory_pool, pnameAlias, ptabdesc, pdrgpcrOutput),
+	CPhysicalScan(mp, pnameAlias, ptabdesc, pdrgpcrOutput),
 	m_ulOriginOpId(ulOriginOpId),
 	m_is_partial(is_partial),
 	m_scan_id(scan_id),
@@ -110,7 +110,7 @@ CPhysicalDynamicScan::HashValue() const
 CPartIndexMap *
 CPhysicalDynamicScan::PpimDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &, //exprhdl
 	CDrvdPropCtxt *pdpctxt
 	)
@@ -124,7 +124,7 @@ CPhysicalDynamicScan::PpimDerive
 	m_ppartcnstrRel->AddRef();
 	ULONG ulExpectedPartitionSelectors = CDrvdPropCtxtPlan::PdpctxtplanConvert(pdpctxt)->UlExpectedPartitionSelectors();
 
-	return PpimDeriveFromDynamicScan(memory_pool, m_scan_id, mdid, m_pdrgpdrgpcrPart, m_ulSecondaryScanId, m_part_constraint, m_ppartcnstrRel, ulExpectedPartitionSelectors);
+	return PpimDeriveFromDynamicScan(mp, m_scan_id, mdid, m_pdrgpdrgpcrPart, m_ulSecondaryScanId, m_part_constraint, m_ppartcnstrRel, ulExpectedPartitionSelectors);
 }
 
 //---------------------------------------------------------------------------

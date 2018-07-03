@@ -38,7 +38,7 @@ namespace gpopt
 			// ctors
 			CPhysicalDynamicTableScan
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				BOOL is_partial,
 				const CName *pname, 
 				CTableDescriptor *ptabdesc,
@@ -71,7 +71,7 @@ namespace gpopt
 
 			// statistics derivation during costing
 			virtual
-			IStatistics *PstatsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CReqdPropPlan *prpplan, StatsArray *stats_ctxt) const;
+			IStatistics *PstatsDerive(IMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prpplan, StatsArray *stats_ctxt) const;
 
 			// conversion function
 			static

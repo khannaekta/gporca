@@ -34,7 +34,7 @@ namespace gpdxl
 	{
 	private:
 		// the root of the parsed DXL tree constructed by the parse handler
-		CDXLNode *m_dxl_node;
+		CDXLNode *m_dxlnode;
 
 		// list of output columns (represented as scalar ident nodes)
 		DXLNodeArray *m_output_colums_dxl_array;
@@ -60,7 +60,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CParseHandlerQuery(IMemoryPool *memory_pool,
+		CParseHandlerQuery(IMemoryPool *mp,
 						   CParseHandlerManager *parse_handler_mgr,
 						   CParseHandlerBase *parse_handler_root);
 

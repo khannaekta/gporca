@@ -25,11 +25,11 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarArray::CDXLScalarArray(IMemoryPool *memory_pool,
+CDXLScalarArray::CDXLScalarArray(IMemoryPool *mp,
 								 IMDId *elem_type_mdid,
 								 IMDId *array_type_mdid,
 								 BOOL multi_dimensional_array)
-	: CDXLScalar(memory_pool),
+	: CDXLScalar(mp),
 	  m_elem_type_mdid(elem_type_mdid),
 	  m_array_type_mdid(array_type_mdid),
 	  m_multi_dimensional_array(multi_dimensional_array)

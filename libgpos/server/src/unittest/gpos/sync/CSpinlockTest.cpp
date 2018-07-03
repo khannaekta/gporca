@@ -87,13 +87,13 @@ CSpinlockTest::EresUnittest_Concurrency()
 	CSpinlockDummy slock;
 
 	CAutoMemoryPool amp(CAutoMemoryPool::ElcStrict);
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	CWorkerPoolManager *pwpm = CWorkerPoolManager::WorkerPoolManager();
 
 	// scope for tasks
 	{
-		CAutoTaskProxy atp(memory_pool, pwpm);
+		CAutoTaskProxy atp(mp, pwpm);
 		CTask *rgPtsk[GPOS_SLOCK_THREADS];
 
 		for (ULONG i = 0; i < GPOS_SLOCK_THREADS; i++)
@@ -217,14 +217,14 @@ CSpinlockTest::EresUnittest_Allocation()
 {
 	// create mem pool for 1KB
 	CAutoMemoryPool amp(CAutoMemoryPool::ElcStrict);
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	CSpinlockDummy slock;
 	{
 		CAutoSpinlock alock(slock);
 		alock.Lock();
 
-		GPOS_NEW_ARRAY(memory_pool, BYTE, 10);
+		GPOS_NEW_ARRAY(mp, BYTE, 10);
 	}
 
 	return GPOS_FAILED;

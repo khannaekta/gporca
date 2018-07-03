@@ -27,11 +27,11 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalDynamicTableScan::CDXLPhysicalDynamicTableScan(IMemoryPool *memory_pool,
+CDXLPhysicalDynamicTableScan::CDXLPhysicalDynamicTableScan(IMemoryPool *mp,
 														   CDXLTableDescr *table_descr,
 														   ULONG part_idx_id,
 														   ULONG part_idx_id_printable)
-	: CDXLPhysical(memory_pool),
+	: CDXLPhysical(mp),
 	  m_table_descr_dxl(table_descr),
 	  m_part_index_id(part_idx_id),
 	  m_part_index_id_printable(part_idx_id_printable)

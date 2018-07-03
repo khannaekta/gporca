@@ -30,10 +30,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerScalarSwitch::CParseHandlerScalarSwitch(IMemoryPool *memory_pool,
+CParseHandlerScalarSwitch::CParseHandlerScalarSwitch(IMemoryPool *mp,
 													 CParseHandlerManager *parse_handler_mgr,
 													 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root),
 	  m_mdid_type(NULL),
 	  m_arg_processed(false),
 	  m_default_val_processed(false)
@@ -67,18 +67,18 @@ CParseHandlerScalarSwitch::StartElement(const XMLCh *const element_uri,
 
 		// construct node
 		CDXLScalarSwitch *dxl_op =
-			GPOS_NEW(m_memory_pool) CDXLScalarSwitch(m_memory_pool, m_mdid_type);
-		m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, dxl_op);
+			GPOS_NEW(m_mp) CDXLScalarSwitch(m_mp, m_mdid_type);
+		m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 	}
 	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarSwitchCase),
 										   element_local_name))
 	{
 		// we must have already seen the arg child, but have not seen the DEFAULT child
-		GPOS_ASSERT(NULL != m_dxl_node && m_arg_processed && !m_default_val_processed);
+		GPOS_ASSERT(NULL != m_dxlnode && m_arg_processed && !m_default_val_processed);
 
 		// parse case
 		CParseHandlerBase *parse_handler_case = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool,
+			m_mp,
 			CDXLTokens::XmlstrToken(EdxltokenScalarSwitchCase),
 			m_parse_handler_mgr,
 			this);
@@ -91,11 +91,11 @@ CParseHandlerScalarSwitch::StartElement(const XMLCh *const element_uri,
 	}
 	else
 	{
-		GPOS_ASSERT(NULL != m_dxl_node && !m_default_val_processed);
+		GPOS_ASSERT(NULL != m_dxlnode && !m_default_val_processed);
 
 		// parse scalar child
 		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
 		// store parse handlers

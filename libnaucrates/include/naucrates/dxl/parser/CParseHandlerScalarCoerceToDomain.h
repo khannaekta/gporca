@@ -54,7 +54,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CParseHandlerScalarCoerceToDomain(IMemoryPool *memory_pool,
+		CParseHandlerScalarCoerceToDomain(IMemoryPool *mp,
 										  CParseHandlerManager *parse_handler_mgr,
 										  CParseHandlerBase *parse_handler_root);
 

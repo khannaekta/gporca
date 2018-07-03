@@ -44,7 +44,7 @@ namespace gpos
 	{
 	private:
 		// memory pool
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// array of preallocated objects
 		T *m_objects;
@@ -122,8 +122,8 @@ namespace gpos
 
 	public:
 		// ctor
-		CSyncPool(IMemoryPool *memory_pool, ULONG size)
-			: m_memory_pool(memory_pool),
+		CSyncPool(IMemoryPool *mp, ULONG size)
+			: m_mp(mp),
 			  m_objects(NULL),
 			  m_objs_reserved(NULL),
 			  m_objs_recycled(NULL),
@@ -172,9 +172,9 @@ namespace gpos
 		{
 			GPOS_ASSERT(ALIGNED_32(id_offset));
 
-			m_objects = GPOS_NEW_ARRAY(m_memory_pool, T, m_numobjs);
-			m_objs_reserved = GPOS_NEW_ARRAY(m_memory_pool, ULONG, m_bitmap_size);
-			m_objs_recycled = GPOS_NEW_ARRAY(m_memory_pool, ULONG, m_bitmap_size);
+			m_objects = GPOS_NEW_ARRAY(m_mp, T, m_numobjs);
+			m_objs_reserved = GPOS_NEW_ARRAY(m_mp, ULONG, m_bitmap_size);
+			m_objs_recycled = GPOS_NEW_ARRAY(m_mp, ULONG, m_bitmap_size);
 
 			m_id_offset = id_offset;
 
@@ -242,7 +242,7 @@ namespace gpos
 			}
 
 			// no object is currently available, create a new one
-			T *elem = GPOS_NEW(m_memory_pool) T();
+			T *elem = GPOS_NEW(m_mp) T();
 			*(ULONG *) (((BYTE *) elem) + m_id_offset) = gpos::ulong_max;
 
 			return elem;

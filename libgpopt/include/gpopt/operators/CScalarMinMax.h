@@ -61,7 +61,7 @@ namespace gpopt
 		public:
 
 			// ctor
-			CScalarMinMax(IMemoryPool *memory_pool, IMDId *mdid_type, EScalarMinMaxType esmmt);
+			CScalarMinMax(IMemoryPool *mp, IMDId *mdid_type, EScalarMinMaxType esmmt);
 
 			// dtor
 			virtual
@@ -113,7 +113,7 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //memory_pool,
+						IMemoryPool *, //mp,
 						UlongColRefHashMap *, //colref_mapping,
 						BOOL //must_exist
 						)

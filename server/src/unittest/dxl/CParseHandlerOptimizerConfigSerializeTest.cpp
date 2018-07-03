@@ -52,24 +52,24 @@ namespace
 static void
 SerializeOptimizerConfig
 		(
-		IMemoryPool *memory_pool,
+		IMemoryPool *mp,
 		COptimizerConfig *optimizer_config,
 		COstream &oos,
 		BOOL indentation
 		)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != optimizer_config);
 
-	CXMLSerializer xml_serializer(memory_pool, oos, indentation);
+	CXMLSerializer xml_serializer(mp, oos, indentation);
 
 	// Add XML version and encoding, DXL document header, and namespace
-	CDXLUtils::SerializeHeader(memory_pool, &xml_serializer);
+	CDXLUtils::SerializeHeader(mp, &xml_serializer);
 
 	// Make a dummy bitset
-	CBitSet *pbs = GPOS_NEW(memory_pool) CBitSet(memory_pool, 256);
+	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, 256);
 
-	optimizer_config->Serialize(memory_pool, &xml_serializer, pbs);
+	optimizer_config->Serialize(mp, &xml_serializer, pbs);
 
 	// Add DXL document footer
 	CDXLUtils::SerializeFooter(&xml_serializer);
@@ -89,7 +89,7 @@ namespace gpdxl
 	{
 		BOOL fValidate = false;
 		Fixture f;
-		IMemoryPool *memory_pool = f.Pmp();
+		IMemoryPool *mp = f.Pmp();
 		// Valid input for this test requires DXL in the form of:
 		// Please note that most editors will automatically add a newline at the end of the file
 		// This will cause the test to fail, as we do a byte-wise string comparison as opposed to a
@@ -97,10 +97,10 @@ namespace gpdxl
 		const CHAR *dxl_string = f.SzDxl(dxl_filename);
 		const CHAR *szValidationPath = f.SzValidationPath(fValidate);
 
-		CWStringDynamic str(memory_pool);
+		CWStringDynamic str(mp);
 		COstreamString oss(&str);
 
-		COptimizerConfig *poc = CDXLUtils::ParseDXLToOptimizerConfig(memory_pool, dxl_string, szValidationPath);
+		COptimizerConfig *poc = CDXLUtils::ParseDXLToOptimizerConfig(mp, dxl_string, szValidationPath);
 
 		GPOS_ASSERT(NULL != poc);
 
@@ -109,10 +109,10 @@ namespace gpdxl
 		// Though the serialization of an optimizer config will include a traceflags element
 		// This test tests only the serializing of the traceflags element itself and not the traceflag values
 		// The production code calls a method to get the traceflags from a global task context
-		SerializeOptimizerConfig(memory_pool, poc, oss, false);
+		SerializeOptimizerConfig(mp, poc, oss, false);
 		GPOS_CHECK_ABORT;
 
-		CWStringDynamic strExpected(memory_pool);
+		CWStringDynamic strExpected(mp);
 		strExpected.AppendFormat(GPOS_WSZ_LIT("%s"), dxl_string);
 
 		GPOS_ASSERT(strExpected.Equals(&str));

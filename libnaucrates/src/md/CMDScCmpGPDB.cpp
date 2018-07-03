@@ -28,14 +28,14 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDScCmpGPDB::CMDScCmpGPDB(IMemoryPool *memory_pool,
+CMDScCmpGPDB::CMDScCmpGPDB(IMemoryPool *mp,
 						   IMDId *mdid,
 						   CMDName *mdname,
 						   IMDId *left_mdid,
 						   IMDId *right_mdid,
 						   IMDType::ECmpType cmp_type,
 						   IMDId *mdid_op)
-	: m_memory_pool(memory_pool),
+	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
 	  m_mdid_left(left_mdid),
@@ -50,7 +50,7 @@ CMDScCmpGPDB::CMDScCmpGPDB(IMemoryPool *memory_pool,
 	GPOS_ASSERT(IMDType::EcmptOther != m_comparision_type);
 
 	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_memory_pool, this, false /*fSerializeHeader*/, false /*indentation*/);
+		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 //---------------------------------------------------------------------------

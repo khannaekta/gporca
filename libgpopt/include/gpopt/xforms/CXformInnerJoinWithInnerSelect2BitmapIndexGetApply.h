@@ -49,11 +49,11 @@ namespace gpopt
 		public:
 			// ctor
 			explicit
-			CXformInnerJoinWithInnerSelect2BitmapIndexGetApply(IMemoryPool *memory_pool)
+			CXformInnerJoinWithInnerSelect2BitmapIndexGetApply(IMemoryPool *mp)
 				: CXformJoin2IndexApplyBase
 				 <CLogicalInnerJoin, CLogicalIndexApply, CLogicalGet,
 				 true /*fWithSelect*/, false /*is_partial*/, IMDIndex::EmdindBitmap>
-				(memory_pool)
+				(mp)
 			{}
 
 			// dtor

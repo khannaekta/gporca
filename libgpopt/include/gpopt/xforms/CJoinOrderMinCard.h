@@ -45,7 +45,7 @@ namespace gpopt
 			// ctor
 			CJoinOrderMinCard
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ExpressionArray *pdrgpexprComponents,
 				ExpressionArray *pdrgpexprConjuncts
 				);

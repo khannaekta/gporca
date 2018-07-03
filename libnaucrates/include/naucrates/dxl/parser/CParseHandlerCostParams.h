@@ -53,7 +53,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CParseHandlerCostParams(IMemoryPool *memory_pool,
+		CParseHandlerCostParams(IMemoryPool *mp,
 								CParseHandlerManager *parse_handler_mgr,
 								CParseHandlerBase *parse_handler_root);
 

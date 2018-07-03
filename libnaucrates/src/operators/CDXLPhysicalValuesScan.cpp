@@ -18,7 +18,7 @@ using namespace gpos;
 using namespace gpdxl;
 
 // ctor
-CDXLPhysicalValuesScan::CDXLPhysicalValuesScan(IMemoryPool *memory_pool) : CDXLPhysical(memory_pool)
+CDXLPhysicalValuesScan::CDXLPhysicalValuesScan(IMemoryPool *mp) : CDXLPhysical(mp)
 {
 }
 

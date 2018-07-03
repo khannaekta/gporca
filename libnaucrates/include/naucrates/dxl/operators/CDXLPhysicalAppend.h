@@ -50,7 +50,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CDXLPhysicalAppend(IMemoryPool *memory_pool, BOOL fIsTarget, BOOL fIsZapped);
+		CDXLPhysicalAppend(IMemoryPool *mp, BOOL fIsTarget, BOOL fIsZapped);
 
 		// accessors
 		Edxlopid GetDXLOperator() const;

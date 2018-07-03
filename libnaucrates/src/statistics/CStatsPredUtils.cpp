@@ -117,12 +117,12 @@ CStatsPredUtils::StatsCmpType(IMDId *mdid)
 //		Create an unsupported statistics predicate
 //---------------------------------------------------------------------------
 CStatsPred *
-CStatsPredUtils::CreateStatsPredUnsupported(IMemoryPool *memory_pool,
+CStatsPredUtils::CreateStatsPredUnsupported(IMemoryPool *mp,
 											CExpression *,  // predicate_expr,
 											CColRefSet *	//outer_refs
 )
 {
-	return GPOS_NEW(memory_pool)
+	return GPOS_NEW(mp)
 		CStatsPredUnsupported(gpos::ulong_max, CStatsPred::EstatscmptOther);
 }
 
@@ -134,7 +134,7 @@ CStatsPredUtils::CreateStatsPredUnsupported(IMemoryPool *memory_pool,
 //		Extract statistics filtering information from a null test
 //---------------------------------------------------------------------------
 CStatsPred *
-CStatsPredUtils::GetStatsPredNullTest(IMemoryPool *memory_pool,
+CStatsPredUtils::GetStatsPredNullTest(IMemoryPool *mp,
 									  CExpression *predicate_expr,
 									  CColRefSet *  //outer_refs
 )
@@ -161,12 +161,12 @@ CStatsPredUtils::GetStatsPredNullTest(IMemoryPool *memory_pool,
 		// stats calculations on such datums unsupported
 		datum->Release();
 
-		return GPOS_NEW(memory_pool) CStatsPredUnsupported(col_ref->Id(), stats_cmp_type);
+		return GPOS_NEW(mp) CStatsPredUnsupported(col_ref->Id(), stats_cmp_type);
 	}
 
-	CPoint *point = GPOS_NEW(memory_pool) CPoint(datum);
+	CPoint *point = GPOS_NEW(mp) CPoint(datum);
 	CStatsPredPoint *pred_stats =
-		GPOS_NEW(memory_pool) CStatsPredPoint(col_ref->Id(), stats_cmp_type, point);
+		GPOS_NEW(mp) CStatsPredPoint(col_ref->Id(), stats_cmp_type, point);
 
 	return pred_stats;
 }
@@ -180,14 +180,14 @@ CStatsPredUtils::GetStatsPredNullTest(IMemoryPool *memory_pool,
 //		Extract statistics filtering information from a point comparison
 //---------------------------------------------------------------------------
 CStatsPred *
-CStatsPredUtils::GetStatsPredPoint(IMemoryPool *memory_pool,
+CStatsPredUtils::GetStatsPredPoint(IMemoryPool *mp,
 								   CExpression *predicate_expr,
 								   CColRefSet *  //outer_refs,
 )
 {
 	GPOS_ASSERT(NULL != predicate_expr);
 
-	CStatsPred *pred_stats = GetPredStats(memory_pool, predicate_expr);
+	CStatsPred *pred_stats = GetPredStats(mp, predicate_expr);
 	GPOS_ASSERT(NULL != pred_stats);
 
 	return pred_stats;
@@ -231,7 +231,7 @@ CStatsPredUtils::GetStatsCmpType(IMDId *mdid)
 //		for statistics computation only.
 //---------------------------------------------------------------------------
 CStatsPred *
-CStatsPredUtils::GetPredStats(IMemoryPool *memory_pool, CExpression *expr)
+CStatsPredUtils::GetPredStats(IMemoryPool *mp, CExpression *expr)
 {
 	GPOS_ASSERT(NULL != expr);
 
@@ -286,10 +286,10 @@ CStatsPredUtils::GetPredStats(IMemoryPool *memory_pool, CExpression *expr)
 		// example: SELECT 1 FROM pg_catalog.pg_class c WHERE c.relname ~ '^(t36)$';
 		// case 2: unsupported stats comparison between the column and datum
 
-		return GPOS_NEW(memory_pool) CStatsPredUnsupported(col_ref->Id(), stats_cmp_type);
+		return GPOS_NEW(mp) CStatsPredUnsupported(col_ref->Id(), stats_cmp_type);
 	}
 
-	return GPOS_NEW(memory_pool) CStatsPredPoint(memory_pool, col_ref, stats_cmp_type, datum);
+	return GPOS_NEW(mp) CStatsPredPoint(mp, col_ref, stats_cmp_type, datum);
 }
 
 
@@ -390,7 +390,7 @@ CStatsPredUtils::IsPredCmpColsOrIgnoreCast(CExpression *expr,
 //
 //---------------------------------------------------------------------------
 CStatsPred *
-CStatsPredUtils::ExtractPredStats(IMemoryPool *memory_pool,
+CStatsPredUtils::ExtractPredStats(IMemoryPool *mp,
 								  CExpression *scalar_expr,
 								  CColRefSet *outer_refs)
 {
@@ -398,7 +398,7 @@ CStatsPredUtils::ExtractPredStats(IMemoryPool *memory_pool,
 	if (CPredicateUtils::FOr(scalar_expr))
 	{
 		CStatsPred *disjunctive_pred_stats =
-			CreateStatsPredDisj(memory_pool, scalar_expr, outer_refs);
+			CreateStatsPredDisj(mp, scalar_expr, outer_refs);
 		if (NULL != disjunctive_pred_stats)
 		{
 			return disjunctive_pred_stats;
@@ -407,15 +407,15 @@ CStatsPredUtils::ExtractPredStats(IMemoryPool *memory_pool,
 	else
 	{
 		CStatsPred *conjunctive_pred_stats =
-			CreateStatsPredConj(memory_pool, scalar_expr, outer_refs);
+			CreateStatsPredConj(mp, scalar_expr, outer_refs);
 		if (NULL != conjunctive_pred_stats)
 		{
 			return conjunctive_pred_stats;
 		}
 	}
 
-	return GPOS_NEW(memory_pool)
-		CStatsPredConj(GPOS_NEW(memory_pool) StatsPredPtrArry(memory_pool));
+	return GPOS_NEW(mp)
+		CStatsPredConj(GPOS_NEW(mp) StatsPredPtrArry(mp));
 }
 
 
@@ -428,15 +428,15 @@ CStatsPredUtils::ExtractPredStats(IMemoryPool *memory_pool,
 //		components of the conjunction
 //---------------------------------------------------------------------------
 CStatsPred *
-CStatsPredUtils::CreateStatsPredConj(IMemoryPool *memory_pool,
+CStatsPredUtils::CreateStatsPredConj(IMemoryPool *mp,
 									 CExpression *scalar_expr,
 									 CColRefSet *outer_refs)
 {
 	GPOS_ASSERT(NULL != scalar_expr);
-	ExpressionArray *pred_expr_conjuncts = CPredicateUtils::PdrgpexprConjuncts(memory_pool, scalar_expr);
+	ExpressionArray *pred_expr_conjuncts = CPredicateUtils::PdrgpexprConjuncts(mp, scalar_expr);
 	const ULONG size = pred_expr_conjuncts->Size();
 
-	StatsPredPtrArry *pred_stats_array = GPOS_NEW(memory_pool) StatsPredPtrArry(memory_pool);
+	StatsPredPtrArry *pred_stats_array = GPOS_NEW(mp) StatsPredPtrArry(mp);
 	for (ULONG ul = 0; ul < size; ul++)
 	{
 		CExpression *predicate_expr = (*pred_expr_conjuncts)[ul];
@@ -451,7 +451,7 @@ CStatsPredUtils::CreateStatsPredConj(IMemoryPool *memory_pool,
 		if (CPredicateUtils::FOr(predicate_expr))
 		{
 			CStatsPred *disjunctive_pred_stats =
-				CreateStatsPredDisj(memory_pool, predicate_expr, outer_refs);
+				CreateStatsPredDisj(mp, predicate_expr, outer_refs);
 			if (NULL != disjunctive_pred_stats)
 			{
 				pred_stats_array->Append(disjunctive_pred_stats);
@@ -459,7 +459,7 @@ CStatsPredUtils::CreateStatsPredConj(IMemoryPool *memory_pool,
 		}
 		else
 		{
-			AddSupportedStatsFilters(memory_pool, pred_stats_array, predicate_expr, outer_refs);
+			AddSupportedStatsFilters(mp, pred_stats_array, predicate_expr, outer_refs);
 		}
 	}
 
@@ -467,7 +467,7 @@ CStatsPredUtils::CreateStatsPredConj(IMemoryPool *memory_pool,
 
 	if (0 < pred_stats_array->Size())
 	{
-		return GPOS_NEW(memory_pool) CStatsPredConj(pred_stats_array);
+		return GPOS_NEW(mp) CStatsPredConj(pred_stats_array);
 	}
 
 	pred_stats_array->Release();
@@ -485,20 +485,20 @@ CStatsPredUtils::CreateStatsPredConj(IMemoryPool *memory_pool,
 //		components of the disjunction
 //---------------------------------------------------------------------------
 CStatsPred *
-CStatsPredUtils::CreateStatsPredDisj(IMemoryPool *memory_pool,
+CStatsPredUtils::CreateStatsPredDisj(IMemoryPool *mp,
 									 CExpression *predicate_expr,
 									 CColRefSet *outer_refs)
 {
 	GPOS_ASSERT(NULL != predicate_expr);
 	GPOS_ASSERT(CPredicateUtils::FOr(predicate_expr));
 
-	StatsPredPtrArry *pred_stats_disj_child = GPOS_NEW(memory_pool) StatsPredPtrArry(memory_pool);
+	StatsPredPtrArry *pred_stats_disj_child = GPOS_NEW(mp) StatsPredPtrArry(mp);
 
 	// remove duplicate components of the OR tree
-	CExpression *expr_copy = CExpressionUtils::PexprDedupChildren(memory_pool, predicate_expr);
+	CExpression *expr_copy = CExpressionUtils::PexprDedupChildren(mp, predicate_expr);
 
 	// extract the components of the OR tree
-	ExpressionArray *disjunct_expr = CPredicateUtils::PdrgpexprDisjuncts(memory_pool, expr_copy);
+	ExpressionArray *disjunct_expr = CPredicateUtils::PdrgpexprDisjuncts(mp, expr_copy);
 	const ULONG size = disjunct_expr->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
@@ -511,7 +511,7 @@ CStatsPredUtils::CreateStatsPredDisj(IMemoryPool *memory_pool,
 			continue;
 		}
 
-		AddSupportedStatsFilters(memory_pool, pred_stats_disj_child, expr, outer_refs);
+		AddSupportedStatsFilters(mp, pred_stats_disj_child, expr, outer_refs);
 	}
 
 	// clean up
@@ -520,7 +520,7 @@ CStatsPredUtils::CreateStatsPredDisj(IMemoryPool *memory_pool,
 
 	if (0 < pred_stats_disj_child->Size())
 	{
-		return GPOS_NEW(memory_pool) CStatsPredDisj(pred_stats_disj_child);
+		return GPOS_NEW(mp) CStatsPredDisj(pred_stats_disj_child);
 	}
 
 	pred_stats_disj_child->Release();
@@ -536,7 +536,7 @@ CStatsPredUtils::CreateStatsPredDisj(IMemoryPool *memory_pool,
 //		Add supported filter for statistics computation
 //---------------------------------------------------------------------------
 void
-CStatsPredUtils::AddSupportedStatsFilters(IMemoryPool *memory_pool,
+CStatsPredUtils::AddSupportedStatsFilters(IMemoryPool *mp,
 										  StatsPredPtrArry *pred_stats_array,
 										  CExpression *predicate_expr,
 										  CColRefSet *outer_refs)
@@ -554,7 +554,7 @@ CStatsPredUtils::AddSupportedStatsFilters(IMemoryPool *memory_pool,
 
 	if (COperator::EopScalarConst == predicate_expr->Pop()->Eopid())
 	{
-		pred_stats_array->Append(GPOS_NEW(memory_pool) CStatsPredUnsupported(
+		pred_stats_array->Append(GPOS_NEW(mp) CStatsPredUnsupported(
 			gpos::ulong_max, CStatsPred::EstatscmptOther, CHistogram::NeutralScaleFactor));
 
 		return;
@@ -562,11 +562,11 @@ CStatsPredUtils::AddSupportedStatsFilters(IMemoryPool *memory_pool,
 
 	if (COperator::EopScalarArrayCmp == predicate_expr->Pop()->Eopid())
 	{
-		ProcessArrayCmp(memory_pool, predicate_expr, pred_stats_array);
+		ProcessArrayCmp(mp, predicate_expr, pred_stats_array);
 	}
 	else
 	{
-		CStatsPredUtils::EPredicateType ept = GetPredTypeForExpr(memory_pool, predicate_expr);
+		CStatsPredUtils::EPredicateType ept = GetPredTypeForExpr(mp, predicate_expr);
 		GPOS_ASSERT(CStatsPredUtils::EptSentinel != ept);
 
 		// array extract function mapping
@@ -591,7 +591,7 @@ CStatsPredUtils::AddSupportedStatsFilters(IMemoryPool *memory_pool,
 			}
 		}
 
-		CStatsPred *pred_stats = function_ptr(memory_pool, predicate_expr, outer_refs);
+		CStatsPred *pred_stats = function_ptr(mp, predicate_expr, outer_refs);
 		if (NULL != pred_stats)
 		{
 			pred_stats_array->Append(pred_stats);
@@ -608,7 +608,7 @@ CStatsPredUtils::AddSupportedStatsFilters(IMemoryPool *memory_pool,
 //		Return statistics filter type of the given expression
 //---------------------------------------------------------------------------
 CStatsPredUtils::EPredicateType
-CStatsPredUtils::GetPredTypeForExpr(IMemoryPool *memory_pool, CExpression *predicate_expr)
+CStatsPredUtils::GetPredTypeForExpr(IMemoryPool *mp, CExpression *predicate_expr)
 {
 	GPOS_ASSERT(NULL != predicate_expr);
 	if (CPredicateUtils::FOr(predicate_expr))
@@ -641,7 +641,7 @@ CStatsPredUtils::GetPredTypeForExpr(IMemoryPool *memory_pool, CExpression *predi
 		return CStatsPredUtils::EptPoint;
 	}
 
-	if (IsConjunction(memory_pool, predicate_expr))
+	if (IsConjunction(mp, predicate_expr))
 	{
 		return CStatsPredUtils::EptConj;
 	}
@@ -663,10 +663,10 @@ CStatsPredUtils::GetPredTypeForExpr(IMemoryPool *memory_pool, CExpression *predi
 //		Is the condition a conjunctive predicate
 //---------------------------------------------------------------------------
 BOOL
-CStatsPredUtils::IsConjunction(IMemoryPool *memory_pool, CExpression *predicate_expr)
+CStatsPredUtils::IsConjunction(IMemoryPool *mp, CExpression *predicate_expr)
 {
 	GPOS_ASSERT(NULL != predicate_expr);
-	ExpressionArray *expr_conjuncts = CPredicateUtils::PdrgpexprConjuncts(memory_pool, predicate_expr);
+	ExpressionArray *expr_conjuncts = CPredicateUtils::PdrgpexprConjuncts(mp, predicate_expr);
 	const ULONG size = expr_conjuncts->Size();
 	expr_conjuncts->Release();
 
@@ -794,7 +794,7 @@ CStatsPredUtils::IsPredScalarIdentIsNotNull(CExpression *predicate_expr)
 //		Create a LIKE statistics filter
 //---------------------------------------------------------------------------
 CStatsPred *
-CStatsPredUtils::GetStatsPredLike(IMemoryPool *memory_pool,
+CStatsPredUtils::GetStatsPredLike(IMemoryPool *mp,
 								  CExpression *predicate_expr,
 								  CColRefSet *  //outer_refs,
 )
@@ -823,7 +823,7 @@ CStatsPredUtils::GetStatsPredLike(IMemoryPool *memory_pool,
 
 	if (NULL == expr_scalar_ident || NULL == expr_scalar_const)
 	{
-		return GPOS_NEW(memory_pool)
+		return GPOS_NEW(mp)
 			CStatsPredUnsupported(gpos::ulong_max, CStatsPred::EstatscmptLike);
 	}
 
@@ -837,7 +837,7 @@ CStatsPredUtils::GetStatsPredLike(IMemoryPool *memory_pool,
 	if (!IMDType::StatsAreComparable(col_ref->RetrieveType(), datum_literal))
 	{
 		// unsupported stats comparison between the column and datum
-		return GPOS_NEW(memory_pool)
+		return GPOS_NEW(mp)
 			CStatsPredUnsupported(col_ref->Id(), CStatsPred::EstatscmptLike);
 	}
 
@@ -850,7 +850,7 @@ CStatsPredUtils::GetStatsPredLike(IMemoryPool *memory_pool,
 	expr_left->AddRef();
 	expr_right->AddRef();
 
-	return GPOS_NEW(memory_pool)
+	return GPOS_NEW(mp)
 		CStatsPredLike(col_id, expr_left, expr_right, default_scale_factor);
 }
 
@@ -863,7 +863,7 @@ CStatsPredUtils::GetStatsPredLike(IMemoryPool *memory_pool,
 //		Extract statistics filtering information from scalar array comparison
 //---------------------------------------------------------------------------
 void
-CStatsPredUtils::ProcessArrayCmp(IMemoryPool *memory_pool,
+CStatsPredUtils::ProcessArrayCmp(IMemoryPool *mp,
 								 CExpression *predicate_expr,
 								 StatsPredPtrArry *pred_stats_array)
 {
@@ -890,7 +890,7 @@ CStatsPredUtils::ProcessArrayCmp(IMemoryPool *memory_pool,
 	{
 		// unsupported predicate for stats calculations
 		pred_stats_array->Append(GPOS_NEW(
-			memory_pool) CStatsPredUnsupported(gpos::ulong_max, CStatsPred::EstatscmptOther));
+			mp) CStatsPredUnsupported(gpos::ulong_max, CStatsPred::EstatscmptOther));
 
 		return;
 	}
@@ -907,7 +907,7 @@ CStatsPredUtils::ProcessArrayCmp(IMemoryPool *memory_pool,
 	if (!CHistogram::SupportsFilter(stats_cmp_type))
 	{
 		// unsupported predicate for stats calculations
-		pred_stats_array->Append(GPOS_NEW(memory_pool)
+		pred_stats_array->Append(GPOS_NEW(mp)
 									 CStatsPredUnsupported(col_ref->Id(), stats_cmp_type));
 
 		return;
@@ -916,13 +916,13 @@ CStatsPredUtils::ProcessArrayCmp(IMemoryPool *memory_pool,
 	BOOL is_array_cmp_any = (CScalarArrayCmp::EarrcmpAny == scalar_array_cmp_op->Earrcmpt());
 	if (is_array_cmp_any)
 	{
-		pred_stats_child_array = GPOS_NEW(memory_pool) StatsPredPtrArry(memory_pool);
+		pred_stats_child_array = GPOS_NEW(mp) StatsPredPtrArry(mp);
 	}
 
 	for (ULONG ul = 0; ul < constants; ul++)
 	{
 		CExpression *expr_const =
-			CUtils::PScalarArrayExprChildAt(memory_pool, expr_scalar_array, ul);
+			CUtils::PScalarArrayExprChildAt(mp, expr_scalar_array, ul);
 		if (COperator::EopScalarConst == expr_const->Pop()->Eopid())
 		{
 			CScalarConst *scalar_const_op = CScalarConst::PopConvert(expr_const->Pop());
@@ -932,12 +932,12 @@ CStatsPredUtils::ProcessArrayCmp(IMemoryPool *memory_pool,
 			{
 				// stats calculations on such datums unsupported
 				child_pred_stats =
-					GPOS_NEW(memory_pool) CStatsPredUnsupported(col_ref->Id(), stats_cmp_type);
+					GPOS_NEW(mp) CStatsPredUnsupported(col_ref->Id(), stats_cmp_type);
 			}
 			else
 			{
-				child_pred_stats = GPOS_NEW(memory_pool)
-					CStatsPredPoint(memory_pool, col_ref, stats_cmp_type, datum_literal);
+				child_pred_stats = GPOS_NEW(mp)
+					CStatsPredPoint(mp, col_ref, stats_cmp_type, datum_literal);
 			}
 
 			pred_stats_child_array->Append(child_pred_stats);
@@ -947,7 +947,7 @@ CStatsPredUtils::ProcessArrayCmp(IMemoryPool *memory_pool,
 
 	if (is_array_cmp_any)
 	{
-		CStatsPredDisj *pstatspredOr = GPOS_NEW(memory_pool) CStatsPredDisj(pred_stats_child_array);
+		CStatsPredDisj *pstatspredOr = GPOS_NEW(mp) CStatsPredDisj(pred_stats_child_array);
 		pred_stats_array->Append(pstatspredOr);
 	}
 }
@@ -961,7 +961,7 @@ CStatsPredUtils::ProcessArrayCmp(IMemoryPool *memory_pool,
 //		in the form of scalar id or negated scalar id
 //---------------------------------------------------------------------------
 CStatsPred *
-CStatsPredUtils::GetStatsPredFromBoolExpr(IMemoryPool *memory_pool,
+CStatsPredUtils::GetStatsPredFromBoolExpr(IMemoryPool *mp,
 										  CExpression *predicate_expr,
 										  CColRefSet *  //outer_refs
 )
@@ -981,14 +981,14 @@ CStatsPredUtils::GetStatsPredFromBoolExpr(IMemoryPool *memory_pool,
 	{
 		CScalarIdent *scalar_ident_op = CScalarIdent::PopConvert(predicate_op);
 		datum = md_accessor->PtMDType<IMDTypeBool>()->CreateBoolDatum(
-			memory_pool, true /* fValue */, false /* is_null */);
+			mp, true /* fValue */, false /* is_null */);
 		col_id = scalar_ident_op->Pcr()->Id();
 	}
 	else
 	{
 		CExpression *child_expr = (*predicate_expr)[0];
 		datum = md_accessor->PtMDType<IMDTypeBool>()->CreateBoolDatum(
-			memory_pool, false /* fValue */, false /* is_null */);
+			mp, false /* fValue */, false /* is_null */);
 		col_id = CScalarIdent::PopConvert(child_expr->Pop())->Pcr()->Id();
 	}
 
@@ -997,14 +997,14 @@ CStatsPredUtils::GetStatsPredFromBoolExpr(IMemoryPool *memory_pool,
 		// stats calculations on such datums unsupported
 		datum->Release();
 
-		return GPOS_NEW(memory_pool) CStatsPredUnsupported(col_id, CStatsPred::EstatscmptEq);
+		return GPOS_NEW(mp) CStatsPredUnsupported(col_id, CStatsPred::EstatscmptEq);
 	}
 
 
 	GPOS_ASSERT(NULL != datum && gpos::ulong_max != col_id);
 
-	return GPOS_NEW(memory_pool)
-		CStatsPredPoint(col_id, CStatsPred::EstatscmptEq, GPOS_NEW(memory_pool) CPoint(datum));
+	return GPOS_NEW(mp)
+		CStatsPredPoint(col_id, CStatsPred::EstatscmptEq, GPOS_NEW(mp) CPoint(datum));
 }
 
 
@@ -1018,7 +1018,7 @@ CStatsPredUtils::GetStatsPredFromBoolExpr(IMemoryPool *memory_pool,
 //---------------------------------------------------------------------------
 CStatsPredJoin *
 CStatsPredUtils::ExtractJoinStatsFromJoinPred(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *join_pred_expr,
 	ColRefSetArray *output_col_refsets,  // array of output columns of join's relational inputs
 	CColRefSet *outer_refs,
@@ -1060,11 +1060,11 @@ CStatsPredUtils::ExtractJoinStatsFromJoinPred(
 		{
 			if (index_left < index_right)
 			{
-				return GPOS_NEW(memory_pool)
+				return GPOS_NEW(mp)
 					CStatsPredJoin(col_ref_left->Id(), stats_cmp_type, col_ref_right->Id());
 			}
 
-			return GPOS_NEW(memory_pool)
+			return GPOS_NEW(mp)
 				CStatsPredJoin(col_ref_right->Id(), stats_cmp_type, col_ref_left->Id());
 		}
 	}
@@ -1091,7 +1091,7 @@ CStatsPredUtils::ExtractJoinStatsFromJoinPred(
 //---------------------------------------------------------------------------
 StatsPredJoinArray *
 CStatsPredUtils::ExtractJoinStatsFromJoinPredArray(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *scalar_expr,
 	ColRefSetArray *output_col_refsets,  // array of output columns of join's relational inputs
 	CColRefSet *outer_refs,
@@ -1100,18 +1100,18 @@ CStatsPredUtils::ExtractJoinStatsFromJoinPredArray(
 	GPOS_ASSERT(NULL != scalar_expr);
 	GPOS_ASSERT(NULL != output_col_refsets);
 
-	StatsPredJoinArray *join_preds_stats = GPOS_NEW(memory_pool) StatsPredJoinArray(memory_pool);
+	StatsPredJoinArray *join_preds_stats = GPOS_NEW(mp) StatsPredJoinArray(mp);
 
-	ExpressionArray *unsupported_expr_array = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *unsupported_expr_array = GPOS_NEW(mp) ExpressionArray(mp);
 
 	// extract all the conjuncts
-	ExpressionArray *expr_conjuncts = CPredicateUtils::PdrgpexprConjuncts(memory_pool, scalar_expr);
+	ExpressionArray *expr_conjuncts = CPredicateUtils::PdrgpexprConjuncts(mp, scalar_expr);
 	const ULONG size = expr_conjuncts->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
 		CExpression *predicate_expr = (*expr_conjuncts)[ul];
 		CStatsPredJoin *join_stats = ExtractJoinStatsFromJoinPred(
-			memory_pool, predicate_expr, output_col_refsets, outer_refs, unsupported_expr_array);
+			mp, predicate_expr, output_col_refsets, outer_refs, unsupported_expr_array);
 		if (NULL != join_stats)
 		{
 			join_preds_stats->Append(join_stats);
@@ -1122,15 +1122,15 @@ CStatsPredUtils::ExtractJoinStatsFromJoinPredArray(
 	if (1 == unsupported_pred_count)
 	{
 		*unsupported_stats_pred_array = CStatsPredUtils::ExtractPredStats(
-			memory_pool, (*unsupported_expr_array)[0], outer_refs);
+			mp, (*unsupported_expr_array)[0], outer_refs);
 	}
 	else if (1 < unsupported_pred_count)
 	{
 		unsupported_expr_array->AddRef();
 		CExpression *expr_conjunct = CPredicateUtils::PexprConjDisj(
-			memory_pool, unsupported_expr_array, true /* fConjunction */);
+			mp, unsupported_expr_array, true /* fConjunction */);
 		*unsupported_stats_pred_array =
-			CStatsPredUtils::ExtractPredStats(memory_pool, expr_conjunct, outer_refs);
+			CStatsPredUtils::ExtractPredStats(mp, expr_conjunct, outer_refs);
 		expr_conjunct->Release();
 	}
 
@@ -1152,7 +1152,7 @@ CStatsPredUtils::ExtractJoinStatsFromJoinPredArray(
 //---------------------------------------------------------------------------
 StatsPredJoinArray *
 CStatsPredUtils::ExtractJoinStatsFromExpr(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &expr_handle,
 	CExpression *pexprScalarInput,
 	ColRefSetArray *output_col_refsets,  // array of output columns of join's relational inputs
@@ -1162,12 +1162,12 @@ CStatsPredUtils::ExtractJoinStatsFromExpr(
 
 	// remove implied predicates from join condition to avoid cardinality under-estimation
 	CExpression *scalar_expr =
-		CPredicateUtils::PexprRemoveImpliedConjuncts(memory_pool, pexprScalarInput, expr_handle);
+		CPredicateUtils::PexprRemoveImpliedConjuncts(mp, pexprScalarInput, expr_handle);
 
 	// extract all the conjuncts
 	CStatsPred *unsupported_pred_stats = NULL;
 	StatsPredJoinArray *join_pred_stats = ExtractJoinStatsFromJoinPredArray(
-		memory_pool, scalar_expr, output_col_refsets, outer_refs, &unsupported_pred_stats);
+		mp, scalar_expr, output_col_refsets, outer_refs, &unsupported_pred_stats);
 
 	// TODO:  May 15 2014, handle unsupported predicates for LASJ, LOJ and LS joins
 	// clean up
@@ -1187,16 +1187,16 @@ CStatsPredUtils::ExtractJoinStatsFromExpr(
 //
 //---------------------------------------------------------------------------
 StatsPredJoinArray *
-CStatsPredUtils::ExtractJoinStatsFromExprHandle(IMemoryPool *memory_pool,
+CStatsPredUtils::ExtractJoinStatsFromExprHandle(IMemoryPool *mp,
 												CExpressionHandle &expr_handle)
 {
 	// in case of subquery in join predicate, we return empty stats
 	if (expr_handle.GetDrvdScalarProps(expr_handle.Arity() - 1)->FHasSubquery())
 	{
-		return GPOS_NEW(memory_pool) StatsPredJoinArray(memory_pool);
+		return GPOS_NEW(mp) StatsPredJoinArray(mp);
 	}
 
-	ColRefSetArray *output_col_refsets = GPOS_NEW(memory_pool) ColRefSetArray(memory_pool);
+	ColRefSetArray *output_col_refsets = GPOS_NEW(mp) ColRefSetArray(mp);
 	const ULONG size = expr_handle.Arity();
 	for (ULONG ul = 0; ul < size - 1; ul++)
 	{
@@ -1210,7 +1210,7 @@ CStatsPredUtils::ExtractJoinStatsFromExprHandle(IMemoryPool *memory_pool,
 	CColRefSet *outer_refs = expr_handle.GetRelationalProperties()->PcrsOuter();
 
 	StatsPredJoinArray *join_pred_stats = ExtractJoinStatsFromExpr(
-		memory_pool, expr_handle, scalar_expr, output_col_refsets, outer_refs);
+		mp, expr_handle, scalar_expr, output_col_refsets, outer_refs);
 
 	// clean up
 	output_col_refsets->Release();

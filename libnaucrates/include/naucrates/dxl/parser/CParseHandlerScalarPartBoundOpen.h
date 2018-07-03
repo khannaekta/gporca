@@ -50,7 +50,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerScalarPartBoundOpen(IMemoryPool *memory_pool,
+		CParseHandlerScalarPartBoundOpen(IMemoryPool *mp,
 										 CParseHandlerManager *parse_handler_mgr,
 										 CParseHandlerBase *parse_handler_root);
 	};

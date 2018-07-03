@@ -54,7 +54,7 @@ namespace gpdxl
 
 	public:
 		//ctor
-		CDXLPhysicalIndexScan(IMemoryPool *memory_pool,
+		CDXLPhysicalIndexScan(IMemoryPool *mp,
 							  CDXLTableDescr *table_descr,
 							  CDXLIndexDescr *index_descr_dxl,
 							  EdxlIndexScanDirection idx_scan_direction);

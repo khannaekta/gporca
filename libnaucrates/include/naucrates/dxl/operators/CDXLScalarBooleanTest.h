@@ -53,7 +53,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CDXLScalarBooleanTest(IMemoryPool *memory_pool, const EdxlBooleanTestType dxl_bool_type);
+		CDXLScalarBooleanTest(IMemoryPool *mp, const EdxlBooleanTestType dxl_bool_type);
 
 		// ident accessors
 		Edxlopid GetDXLOperator() const;

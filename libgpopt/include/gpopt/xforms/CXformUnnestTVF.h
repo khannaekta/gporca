@@ -38,20 +38,20 @@ namespace gpopt
 			static
 			ColRefArray *PdrgpcrSubqueries
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprCTEProducer,
 				CExpression *pexprCTEConsumer
 				);
 
 			//	collect subquery arguments and return a Project expression
 			static
-			CExpression *PexprProjectSubqueries(IMemoryPool *memory_pool, CExpression *pexprTVF);
+			CExpression *PexprProjectSubqueries(IMemoryPool *mp, CExpression *pexprTVF);
 
 		public:
 
 			// ctor
 			explicit
-			CXformUnnestTVF(IMemoryPool *memory_pool);
+			CXformUnnestTVF(IMemoryPool *mp);
 
 			// dtor
 			virtual

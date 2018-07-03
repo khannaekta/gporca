@@ -42,7 +42,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLScalarSubqueryAll(IMemoryPool *memory_pool,
+		CDXLScalarSubqueryAll(IMemoryPool *mp,
 							  IMDId *scalar_op_mdid,
 							  CMDName *mdname,
 							  ULONG col_id);

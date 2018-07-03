@@ -42,7 +42,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLScalarNullIf(IMemoryPool *memory_pool, IMDId *mdid_op, IMDId *mdid_type);
+		CDXLScalarNullIf(IMemoryPool *mp, IMDId *mdid_op, IMDId *mdid_type);
 
 		// dtor
 		virtual ~CDXLScalarNullIf();

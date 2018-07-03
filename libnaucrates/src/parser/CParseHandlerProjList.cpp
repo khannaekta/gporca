@@ -32,10 +32,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerProjList::CParseHandlerProjList(IMemoryPool *memory_pool,
+CParseHandlerProjList::CParseHandlerProjList(IMemoryPool *mp,
 											 CParseHandlerManager *parse_handler_mgr,
 											 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -57,18 +57,18 @@ CParseHandlerProjList::StartElement(const XMLCh *const element_uri,
 									  element_local_name))
 	{
 		// start the proj list
-		m_dxl_node = GPOS_NEW(m_memory_pool)
-			CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarProjList(m_memory_pool));
+		m_dxlnode = GPOS_NEW(m_mp)
+			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjList(m_mp));
 	}
 	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarProjElem),
 										   element_local_name))
 	{
 		// we must have seen a proj list already and initialized the proj list node
-		GPOS_ASSERT(NULL != m_dxl_node);
+		GPOS_ASSERT(NULL != m_dxlnode);
 
 		// start new project element
 		CParseHandlerBase *parse_handler_proj_element =
-			CParseHandlerFactory::GetParseHandler(m_memory_pool,
+			CParseHandlerFactory::GetParseHandler(m_mp,
 												  CDXLTokens::XmlstrToken(EdxltokenScalarProjElem),
 												  m_parse_handler_mgr,
 												  this);

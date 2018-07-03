@@ -176,7 +176,7 @@ namespace gpopt
 					// ctor
 					SCostingInfo
 						(
-						IMemoryPool *memory_pool,
+						IMemoryPool *mp,
 						ULONG ulChildren,
 						CCostingStats *pcstats
 						)
@@ -194,10 +194,10 @@ namespace gpopt
 						GPOS_ASSERT(NULL != pcstats);
 						if (0 < ulChildren)
 						{
-							m_pdRowsChildren = GPOS_NEW_ARRAY(memory_pool, DOUBLE, ulChildren);
-							m_pdWidthChildren = GPOS_NEW_ARRAY(memory_pool, DOUBLE, ulChildren);
-							m_pdRebindsChildren = GPOS_NEW_ARRAY(memory_pool, DOUBLE, ulChildren);
-							m_pdCostChildren = GPOS_NEW_ARRAY(memory_pool, DOUBLE, ulChildren);
+							m_pdRowsChildren = GPOS_NEW_ARRAY(mp, DOUBLE, ulChildren);
+							m_pdWidthChildren = GPOS_NEW_ARRAY(mp, DOUBLE, ulChildren);
+							m_pdRebindsChildren = GPOS_NEW_ARRAY(mp, DOUBLE, ulChildren);
+							m_pdCostChildren = GPOS_NEW_ARRAY(mp, DOUBLE, ulChildren);
 						}
 					}
 
@@ -377,7 +377,7 @@ namespace gpopt
 
 			// create a default cost model instance
 			static
-			ICostModel *PcmDefault(IMemoryPool *memory_pool);
+			ICostModel *PcmDefault(IMemoryPool *mp);
 	};
 }
 

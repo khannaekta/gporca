@@ -42,7 +42,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLLogicalConstTable(IMemoryPool *memory_pool,
+		CDXLLogicalConstTable(IMemoryPool *mp,
 							  DXLColumnDescrArray *dxl_col_descr_array,
 							  DXLDatumArrays *pdrgpdrgpdxldatum);
 

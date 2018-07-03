@@ -34,18 +34,18 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformExpandNAryJoin::CXformExpandNAryJoin
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformExploration
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 					(
-					memory_pool,
-					GPOS_NEW(memory_pool) CLogicalNAryJoin(memory_pool),
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternMultiLeaf(memory_pool)),
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))
+					mp,
+					GPOS_NEW(mp) CLogicalNAryJoin(mp),
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternMultiLeaf(mp)),
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))
 					)
 		)
 {}
@@ -118,7 +118,7 @@ CXformExpandNAryJoin::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	const ULONG arity = pexpr->Arity();
 	GPOS_ASSERT(arity >= 3);
@@ -134,21 +134,21 @@ CXformExpandNAryJoin::Transform
 	//	   +--CScalarConst (1)
 	(*pexpr)[0]->AddRef();
 	(*pexpr)[1]->AddRef();
-	CExpression *pexprJoin = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(memory_pool, (*pexpr)[0], (*pexpr)[1], CPredicateUtils::PexprConjunction(memory_pool, NULL));
+	CExpression *pexprJoin = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, (*pexpr)[0], (*pexpr)[1], CPredicateUtils::PexprConjunction(mp, NULL));
 	for (ULONG ul = 2; ul < arity - 1; ul++)
 	{
 		(*pexpr)[ul]->AddRef();
-		pexprJoin = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(memory_pool, pexprJoin, (*pexpr)[ul], CPredicateUtils::PexprConjunction(memory_pool, NULL));
+		pexprJoin = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, pexprJoin, (*pexpr)[ul], CPredicateUtils::PexprConjunction(mp, NULL));
 	}
 
 	CExpression *pexprScalar = (*pexpr)[arity - 1];
 	pexprScalar->AddRef();
 
 	// create a logical select with the join expression and scalar condition child
-	CExpression *pexprSelect = CUtils::PexprLogicalSelect(memory_pool, pexprJoin, pexprScalar);
+	CExpression *pexprSelect = CUtils::PexprLogicalSelect(mp, pexprJoin, pexprScalar);
 
 	// normalize the tree and push down the predicates
-	CExpression *pexprNormalized = CNormalizer::PexprNormalize(memory_pool, pexprSelect);
+	CExpression *pexprNormalized = CNormalizer::PexprNormalize(mp, pexprSelect);
 	pexprSelect->Release();
 	pxfres->Add(pexprNormalized);
 }

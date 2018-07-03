@@ -70,7 +70,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerStatsDerivedColumn(IMemoryPool *memory_pool,
+		CParseHandlerStatsDerivedColumn(IMemoryPool *mp,
 										CParseHandlerManager *parse_handler_mgr,
 										CParseHandlerBase *parse_handler_root);
 

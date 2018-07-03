@@ -35,7 +35,7 @@ namespace gpopt
 
 			// helper to check if GbAgg can be transformed to a Select
 			static
-			BOOL FDropGbAgg(IMemoryPool *memory_pool, CExpression *pexpr, CXformResult *pxfres);
+			BOOL FDropGbAgg(IMemoryPool *mp, CExpression *pexpr, CXformResult *pxfres);
 
 			// private copy ctor
 			CXformSimplifyGbAgg(const CXformSimplifyGbAgg &);
@@ -44,7 +44,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformSimplifyGbAgg(IMemoryPool *memory_pool);
+			CXformSimplifyGbAgg(IMemoryPool *mp);
 
 			// dtor
 			virtual

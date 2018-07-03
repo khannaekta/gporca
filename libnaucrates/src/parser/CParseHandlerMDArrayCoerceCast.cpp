@@ -25,10 +25,10 @@ XERCES_CPP_NAMESPACE_USE
 
 // ctor
 CParseHandlerMDArrayCoerceCast::CParseHandlerMDArrayCoerceCast(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerMetadataObject(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerMetadataObject(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -121,7 +121,7 @@ CParseHandlerMDArrayCoerceCast::StartElement(const XMLCh *const,  // element_uri
 		EdxltokenLocation,
 		EdxltokenGPDBArrayCoerceCast);
 
-	m_imd_obj = GPOS_NEW(m_memory_pool) CMDArrayCoerceCastGPDB(m_memory_pool,
+	m_imd_obj = GPOS_NEW(m_mp) CMDArrayCoerceCastGPDB(m_mp,
 															   mdid,
 															   mdname,
 															   mdid_src,

@@ -33,10 +33,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalAssert::CLogicalAssert
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogicalUnary(memory_pool),
+	CLogicalUnary(mp),
 	m_pexc(NULL)
 {
 	m_fPattern = true;
@@ -52,11 +52,11 @@ CLogicalAssert::CLogicalAssert
 //---------------------------------------------------------------------------
 CLogicalAssert::CLogicalAssert
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CException *pexc
 	)
 	:
-	CLogicalUnary(memory_pool),
+	CLogicalUnary(mp),
 	m_pexc(pexc)
 {
 	GPOS_ASSERT(NULL != pexc);
@@ -97,7 +97,7 @@ CLogicalAssert::Matches
 CColRefSet *
 CLogicalAssert::PcrsDeriveOutput
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 {
@@ -116,7 +116,7 @@ CLogicalAssert::PcrsDeriveOutput
 CKeyCollection *
 CLogicalAssert::PkcDeriveKeys
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -136,11 +136,11 @@ CLogicalAssert::PkcDeriveKeys
 CXformSet *
 CLogicalAssert::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	) 
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementAssert);
 	return xform_set;
 }
@@ -156,7 +156,7 @@ CLogicalAssert::PxfsCandidates
 CMaxCard
 CLogicalAssert::Maxcard
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -195,18 +195,18 @@ CLogicalAssert::Maxcard
 IStatistics *
 CLogicalAssert::PstatsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	StatsArray * // not used
 	)
 	const
 {
-	CMaxCard maxcard = CLogicalAssert::PopConvert(exprhdl.Pop())->Maxcard(memory_pool, exprhdl);
+	CMaxCard maxcard = CLogicalAssert::PopConvert(exprhdl.Pop())->Maxcard(mp, exprhdl);
 	if (1 == maxcard.Ull())
 	{
 		// a max card of one requires re-scaling stats
 		IStatistics *stats = exprhdl.Pstats(0);
-		return  stats->ScaleStats(memory_pool, CDouble(1.0 / stats->Rows()));
+		return  stats->ScaleStats(mp, CDouble(1.0 / stats->Rows()));
 	}
 
 	return PstatsPassThruOuter(exprhdl);

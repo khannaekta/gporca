@@ -41,10 +41,10 @@ namespace gpopt
 			explicit
 			CLogicalMaxOneRow
 				(
-				IMemoryPool *memory_pool
+				IMemoryPool *mp
 				)
 				:
-				CLogical(memory_pool)
+				CLogical(mp)
 			{}
 
 
@@ -88,7 +88,7 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //memory_pool,
+						IMemoryPool *, //mp,
 						UlongColRefHashMap *, //colref_mapping,
 						BOOL //must_exist
 						)
@@ -114,7 +114,7 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsDeriveOutput
 				(
-				IMemoryPool *, // memory_pool
+				IMemoryPool *, // mp
 				CExpressionHandle &exprhdl
 				)
 			{
@@ -125,19 +125,19 @@ namespace gpopt
 			virtual
 			CPartInfo *PpartinfoDerive
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PpartinfoDeriveCombine(memory_pool, exprhdl);
+				return PpartinfoDeriveCombine(mp, exprhdl);
 			}
 
 			// dervive keys
 			virtual
 			CKeyCollection *PkcDeriveKeys
 				(
-				IMemoryPool *, // memory_pool
+				IMemoryPool *, // mp
 				CExpressionHandle &exprhdl
 				)
 				const
@@ -149,7 +149,7 @@ namespace gpopt
 			virtual
 			CMaxCard Maxcard
 				(
-				IMemoryPool *,  // memory_pool,
+				IMemoryPool *,  // mp,
 				CExpressionHandle & // exprhdl
 				)
 				const
@@ -161,12 +161,12 @@ namespace gpopt
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PpcDeriveConstraintFromPredicates(memory_pool, exprhdl);
+				return PpcDeriveConstraintFromPredicates(mp, exprhdl);
 			}
 
 			// promise level for stat derivation
@@ -181,7 +181,7 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsStat
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsInput,
 				ULONG child_index
@@ -196,7 +196,7 @@ namespace gpopt
 			virtual
 			CXformSet *PxfsCandidates
 				(
-				IMemoryPool *memory_pool
+				IMemoryPool *mp
 				)
 				const;
 
@@ -221,7 +221,7 @@ namespace gpopt
 			virtual
 			IStatistics *PstatsDerive
 						(
-						IMemoryPool *memory_pool,
+						IMemoryPool *mp,
 						CExpressionHandle &exprhdl,
 						StatsArray * // stats_ctxt
 						)

@@ -39,10 +39,10 @@ namespace gpopt
 
 			// ctor for patterns
 			explicit
-			CLogicalLeftOuterApply(IMemoryPool *memory_pool);
+			CLogicalLeftOuterApply(IMemoryPool *mp);
 
 			// ctor
-			CLogicalLeftOuterApply(IMemoryPool *memory_pool, ColRefArray *pdrgpcrInner, EOperatorId eopidOriginSubq);
+			CLogicalLeftOuterApply(IMemoryPool *mp, ColRefArray *pdrgpcrInner, EOperatorId eopidOriginSubq);
 
 			// dtor
 			virtual
@@ -74,7 +74,7 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			//-------------------------------------------------------------------------------------
 			// Derived Relational Properties
@@ -84,20 +84,20 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsDeriveOutput
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 			{
 				GPOS_ASSERT(3 == exprhdl.Arity());
 
-				return PcrsDeriveOutputCombineLogical(memory_pool, exprhdl);
+				return PcrsDeriveOutputCombineLogical(mp, exprhdl);
 			}
 
 			// derive not nullable output columns
 			virtual
 			CColRefSet *PcrsDeriveNotNull
 				(
-				IMemoryPool *,// memory_pool
+				IMemoryPool *,// mp
 				CExpressionHandle &exprhdl
 				)
 				const
@@ -108,13 +108,13 @@ namespace gpopt
 
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive constraint property
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *, //memory_pool,
+				IMemoryPool *, //mp,
 				CExpressionHandle &exprhdl
 				)
 				const

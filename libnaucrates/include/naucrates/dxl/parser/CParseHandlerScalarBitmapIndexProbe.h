@@ -53,7 +53,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerScalarBitmapIndexProbe(IMemoryPool *memory_pool,
+		CParseHandlerScalarBitmapIndexProbe(IMemoryPool *mp,
 											CParseHandlerManager *parse_handler_mgr,
 											CParseHandlerBase *parse_handler_root);
 	};  // class CParseHandlerScalarBitmapIndexProbe

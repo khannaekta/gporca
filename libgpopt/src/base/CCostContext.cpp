@@ -44,13 +44,13 @@ using namespace gpnaucrates;
 //---------------------------------------------------------------------------
 CCostContext::CCostContext
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	COptimizationContext *poc,
 	ULONG ulOptReq,
 	CGroupExpression *pgexpr
 	)
 	:
-	m_memory_pool(memory_pool),
+	m_mp(mp),
 	m_cost(GPOPT_INVALID_COST),
 	m_estate(estUncosted),
 	m_pgexpr(pgexpr),
@@ -73,7 +73,7 @@ CCostContext::CCostContext
 	if (!m_pgexpr->Pop()->FScalar() &&
 		!CPhysical::PopConvert(m_pgexpr->Pop())->FPassThruStats())
 	{
-		CGroupExpression *pgexprForStats = m_pgexpr->Pgroup()->PgexprBestPromise(m_memory_pool, m_pgexpr);
+		CGroupExpression *pgexprForStats = m_pgexpr->Pgroup()->PgexprBestPromise(m_mp, m_pgexpr);
 		if (NULL != pgexprForStats)
 		{
 			pgexprForStats->AddRef();
@@ -196,7 +196,7 @@ CCostContext::DeriveStats()
 		return;
 	}
 
-	CExpressionHandle exprhdl(m_memory_pool);
+	CExpressionHandle exprhdl(m_mp);
 	exprhdl.Attach(this);
 	exprhdl.DeriveCostContextStats();
 	if (NULL == exprhdl.Pstats())
@@ -225,7 +225,7 @@ CCostContext::DeriveStats()
 void
 CCostContext::DerivePlanProps
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 {
 	GPOS_ASSERT(NULL != m_pdrgpoc);
@@ -233,7 +233,7 @@ CCostContext::DerivePlanProps
 	if (NULL == m_pdpplan)
 	{
 		// derive properties of the plan carried by cost context
-		CExpressionHandle exprhdl(memory_pool);
+		CExpressionHandle exprhdl(mp);
 		exprhdl.Attach(this);
 		exprhdl.DerivePlanProps();
 		CDrvdPropPlan *pdpplan = CDrvdPropPlan::Pdpplan(exprhdl.Pdp());
@@ -277,7 +277,7 @@ CCostContext::operator ==
 BOOL
 CCostContext::IsValid
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 {
 	GPOS_ASSERT(NULL != m_poc);
@@ -288,7 +288,7 @@ CCostContext::IsValid
 	GPOS_ASSERT(NULL != pdprel);
 
 	// derive plan properties
-	DerivePlanProps(memory_pool);
+	DerivePlanProps(mp);
 
 	// checking for required properties satisfaction
 	BOOL fValid = Poc()->Prpp()->FSatisfied(pdprel, m_pdpplan);
@@ -296,7 +296,7 @@ CCostContext::IsValid
 #ifdef GPOS_DEBUG
 	if (COptCtxt::FAllEnforcersEnabled() && !fValid)
 	{
-		CAutoTrace at(memory_pool);
+		CAutoTrace at(mp);
 		IOstream &os = at.Os();
 
 		os << std::endl << "PROPERTY MISMATCH:" << std::endl;
@@ -491,7 +491,7 @@ CCostContext::FBetterThan
 CCost
 CCostContext::CostCompute
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CostArray *pdrgpcostChildren
 	)
 {
@@ -505,11 +505,11 @@ CCostContext::CostCompute
 	}
 
 	m_pstats->AddRef();
-	ICostModel::SCostingInfo ci(memory_pool, arity, GPOS_NEW(memory_pool) ICostModel::CCostingStats(m_pstats));
+	ICostModel::SCostingInfo ci(mp, arity, GPOS_NEW(mp) ICostModel::CCostingStats(m_pstats));
 
 	ICostModel *pcm = COptCtxt::PoctxtFromTLS()->GetCostModel();
 
-	CExpressionHandle exprhdl(memory_pool);
+	CExpressionHandle exprhdl(mp);
 	exprhdl.Attach(this);
 
 	// extract local costing info
@@ -521,7 +521,7 @@ CCostContext::CostCompute
 	}
 	ci.SetRows(rows);
 
-	DOUBLE width = m_pstats->Width(memory_pool, m_poc->Prpp()->PcrsRequired()).Get();
+	DOUBLE width = m_pstats->Width(mp, m_poc->Prpp()->PcrsRequired()).Get();
 	ci.SetWidth(width);
 
 	DOUBLE num_rebinds = m_pstats->NumRebinds().Get();
@@ -544,7 +544,7 @@ CCostContext::CostCompute
 		}
 		ci.SetChildRows(ul, dRowsChild);
 
-		DOUBLE dWidthChild = child_stats->Width(memory_pool, pocChild->Prpp()->PcrsRequired()).Get();
+		DOUBLE dWidthChild = child_stats->Width(mp, pocChild->Prpp()->PcrsRequired()).Get();
 		ci.SetChildWidth(ul, dWidthChild);
 
 		DOUBLE dRebindsChild = child_stats->NumRebinds().Get();
@@ -579,7 +579,7 @@ CCostContext::DRowsPerHost() const
 	{
 		CDistributionSpecHashed *pdshashed = CDistributionSpecHashed::PdsConvert(pds);
 		ExpressionArray *pdrgpexpr = pdshashed->Pdrgpexpr();
-		CColRefSet *pcrsUsed = CUtils::PcrsExtractColumns(m_memory_pool, pdrgpexpr);
+		CColRefSet *pcrsUsed = CUtils::PcrsExtractColumns(m_mp, pdrgpexpr);
 
 		const CColRefSet *pcrsReqdStats = this->Poc()->GetReqdRelationalProps()->PcrsStat();
 		if (!pcrsReqdStats->ContainsAll(pcrsUsed))
@@ -592,12 +592,12 @@ CCostContext::DRowsPerHost() const
 			return CDouble(rows / ulHosts);
 		}
 
-		ULongPtrArray *pdrgpul = GPOS_NEW(m_memory_pool) ULongPtrArray(m_memory_pool);
-		pcrsUsed->ExtractColIds(m_memory_pool, pdrgpul);
+		ULongPtrArray *pdrgpul = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
+		pcrsUsed->ExtractColIds(m_mp, pdrgpul);
 		pcrsUsed->Release();
 
 		CStatisticsConfig *stats_config = poptctxt->GetOptimizerConfig()->GetStatsConf();
-		CDouble dNDVs = CStatisticsUtils::Groups(m_memory_pool, Pstats(), stats_config, pdrgpul, NULL /*keys*/);
+		CDouble dNDVs = CStatisticsUtils::Groups(m_mp, Pstats(), stats_config, pdrgpul, NULL /*keys*/);
 		pdrgpul->Release();
 
 		if (dNDVs < ulHosts)
@@ -676,7 +676,7 @@ CCostContext::OsPrint
 void
 CCostContext::DbgPrint() const
 {
-	CAutoTrace at(m_memory_pool);
+	CAutoTrace at(m_mp);
 	(void) this->OsPrint(at.Os());
 }
 #endif // GPOS_DEBUG

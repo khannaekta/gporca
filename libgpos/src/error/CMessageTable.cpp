@@ -27,10 +27,10 @@ const ELocale CMessageTable::m_invalid_locale = ELocInvalid;
 //	@doc:
 //
 //---------------------------------------------------------------------------
-CMessageTable::CMessageTable(IMemoryPool *memory_pool, ULONG size, ELocale locale)
+CMessageTable::CMessageTable(IMemoryPool *mp, ULONG size, ELocale locale)
 	: m_locale(locale)
 {
-	m_hash_table.Init(memory_pool,
+	m_hash_table.Init(mp,
 					  size,
 					  GPOS_OFFSET(CMessage, m_link),
 					  GPOS_OFFSET(CMessage, m_exception),

@@ -26,8 +26,8 @@ using namespace gpdxl;
 //		Construct a table scan node with uninitialized table descriptor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalTableScan::CDXLPhysicalTableScan(IMemoryPool *memory_pool)
-	: CDXLPhysical(memory_pool), m_table_descr_dxl(NULL)
+CDXLPhysicalTableScan::CDXLPhysicalTableScan(IMemoryPool *mp)
+	: CDXLPhysical(mp), m_table_descr_dxl(NULL)
 {
 }
 
@@ -40,8 +40,8 @@ CDXLPhysicalTableScan::CDXLPhysicalTableScan(IMemoryPool *memory_pool)
 //		Construct a table scan node given its table descriptor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalTableScan::CDXLPhysicalTableScan(IMemoryPool *memory_pool, CDXLTableDescr *table_descr)
-	: CDXLPhysical(memory_pool), m_table_descr_dxl(table_descr)
+CDXLPhysicalTableScan::CDXLPhysicalTableScan(IMemoryPool *mp, CDXLTableDescr *table_descr)
+	: CDXLPhysical(mp), m_table_descr_dxl(table_descr)
 {
 }
 

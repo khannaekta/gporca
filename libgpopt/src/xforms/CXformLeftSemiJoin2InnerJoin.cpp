@@ -33,19 +33,19 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformLeftSemiJoin2InnerJoin::CXformLeftSemiJoin2InnerJoin
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	// pattern
 	CXformExploration
 		(
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 					(
-					memory_pool,
-					GPOS_NEW(memory_pool) CLogicalLeftSemiJoin(memory_pool),
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // left child
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // right child
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))  // predicate
+					mp,
+					GPOS_NEW(mp) CLogicalLeftSemiJoin(mp),
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // left child
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // right child
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp))  // predicate
 					)
 		)
 {}
@@ -106,7 +106,7 @@ CXformLeftSemiJoin2InnerJoin::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
 	CExpression *pexprOuter = (*pexpr)[0];
@@ -121,7 +121,7 @@ CXformLeftSemiJoin2InnerJoin::Transform
 	// that come from join's inner child
 	CColRefSet *pcrsOuterOutput = CDrvdPropRelational::GetRelationalProperties(pexprOuter->PdpDerive())->PcrsOutput();
 	CColRefSet *pcrsUsed = CDrvdPropScalar::GetDrvdScalarProps(pexprScalar->PdpDerive())->PcrsUsed();
-	CColRefSet *pcrsGb = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrsGb = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsGb->Include(pcrsUsed);
 	pcrsGb->Difference(pcrsOuterOutput);
 	GPOS_ASSERT(0 < pcrsGb->Size());
@@ -132,20 +132,20 @@ CXformLeftSemiJoin2InnerJoin::Transform
 	{
 		// grouping columns do not cover a key on the inner side,
 		// we need to create a group by on inner side
-		ColRefArray *colref_array = pcrsGb->Pdrgpcr(memory_pool);
+		ColRefArray *colref_array = pcrsGb->Pdrgpcr(mp);
 		CExpression *pexprGb =
-			GPOS_NEW(memory_pool) CExpression
+			GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalGbAgg(memory_pool, colref_array, COperator::EgbaggtypeGlobal /*egbaggtype*/),
+				mp,
+				GPOS_NEW(mp) CLogicalGbAgg(mp, colref_array, COperator::EgbaggtypeGlobal /*egbaggtype*/),
 				pexprInner,
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CScalarProjectList(memory_pool))
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp))
 				);
 		pexprInner = pexprGb;
 	}
 
 	CExpression *pexprInnerJoin =
-		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(memory_pool, pexprOuter, pexprInner, pexprScalar);
+		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, pexprOuter, pexprInner, pexprScalar);
 
 	pcrsGb->Release();
 	pxfres->Add(pexprInnerJoin);

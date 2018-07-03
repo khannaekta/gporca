@@ -110,7 +110,7 @@ namespace gpopt
 			virtual
 			void Compute
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CReqdProp *prpInput,
 				ULONG child_index,

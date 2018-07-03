@@ -55,7 +55,7 @@ namespace gpopt
 			COptCtxt(COptCtxt &);
 
 			// shared memory pool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 		
 			// column factory
 			CColumnFactory *m_pcf;
@@ -96,7 +96,7 @@ namespace gpopt
 			// ctor
 			COptCtxt
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CColumnFactory *col_factory,
 				CMDAccessor *md_accessor,
 				IConstExprEvaluator *pceeval,
@@ -110,7 +110,7 @@ namespace gpopt
 			// memory pool accessor
 			IMemoryPool *Pmp() const
 			{
-				return m_memory_pool;
+				return m_mp;
 			}
 			
 			// optimizer configurations
@@ -198,7 +198,7 @@ namespace gpopt
 			static
 			COptCtxt *PoctxtCreate
 						(
-						IMemoryPool *memory_pool,
+						IMemoryPool *mp,
 						CMDAccessor *md_accessor,
 						IConstExprEvaluator *pceeval,
 						COptimizerConfig *optimizer_config

@@ -129,7 +129,7 @@ namespace gpopt
 
 		
 			// memory pool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 		
 			// components of order spec
 			OrderExpressionArray *m_pdrgpoe;
@@ -144,7 +144,7 @@ namespace gpopt
 		
 			// ctor
 			explicit
-			COrderSpec(IMemoryPool *memory_pool);
+			COrderSpec(IMemoryPool *mp);
 			
 			// dtor
 			virtual
@@ -188,7 +188,7 @@ namespace gpopt
 			
 			// extract colref set of order columns
 			virtual
-			CColRefSet *PcrsUsed(IMemoryPool *memory_pool) const;
+			CColRefSet *PcrsUsed(IMemoryPool *mp) const;
 
 			// property type
 			virtual
@@ -205,7 +205,7 @@ namespace gpopt
 			
 			// append enforcers to dynamic array for the given plan properties
 			virtual
-			void AppendEnforcers(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CReqdPropPlan *prpp, ExpressionArray *pdrgpexpr, CExpression *pexpr);
+			void AppendEnforcers(IMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prpp, ExpressionArray *pdrgpexpr, CExpression *pexpr);
 
 			// hash function
 			virtual
@@ -213,11 +213,11 @@ namespace gpopt
 
 			// return a copy of the order spec with remapped columns
 			virtual
-			COrderSpec *PosCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			COrderSpec *PosCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// return a copy of the order spec after excluding the given columns
 			virtual
-			COrderSpec *PosExcludeColumns(IMemoryPool *memory_pool, CColRefSet *pcrs);
+			COrderSpec *PosExcludeColumns(IMemoryPool *mp, CColRefSet *pcrs);
 
 			// print
 			virtual
@@ -237,11 +237,11 @@ namespace gpopt
 
 			// extract colref set of order columns used by elements of order spec array
 			static
-			CColRefSet *GetColRefSet(IMemoryPool *memory_pool, OrderSpecArray *pdrgpos);
+			CColRefSet *GetColRefSet(IMemoryPool *mp, OrderSpecArray *pdrgpos);
 
 			// filter out array of order specs from order expressions using the passed columns
 			static
-			OrderSpecArray *PdrgposExclude(IMemoryPool *memory_pool, OrderSpecArray *pdrgpos, CColRefSet *pcrsToExclude);
+			OrderSpecArray *PdrgposExclude(IMemoryPool *mp, OrderSpecArray *pdrgpos, CColRefSet *pcrsToExclude);
 
 						
 	}; // class COrderSpec

@@ -32,10 +32,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerColStatsBucket::CParseHandlerColStatsBucket(IMemoryPool *memory_pool,
+CParseHandlerColStatsBucket::CParseHandlerColStatsBucket(IMemoryPool *mp,
 														 CParseHandlerManager *parse_handler_mgr,
 														 CParseHandlerBase *parse_handler_base)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_base),
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_base),
 	  m_frequency(0.0),
 	  m_distinct(0.0),
 	  m_lower_bound_datum_dxl(NULL),
@@ -153,7 +153,7 @@ CParseHandlerColStatsBucket::EndElement(const XMLCh *const,  // element_uri,
 	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenColumnStatsBucket),
 									  element_local_name))
 	{
-		m_bucket_dxl = GPOS_NEW(m_memory_pool) CDXLBucket(m_lower_bound_datum_dxl,
+		m_bucket_dxl = GPOS_NEW(m_mp) CDXLBucket(m_lower_bound_datum_dxl,
 														  m_upper_bound_datum_dxl,
 														  m_is_lower_closed,
 														  m_is_upper_closed,

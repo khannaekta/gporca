@@ -46,7 +46,7 @@ namespace gpopt
 		private:
 			
 			// memory pool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 			
 			// mdid of the table
 			IMDId *m_mdid;

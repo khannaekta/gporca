@@ -28,7 +28,7 @@ namespace gpos
 	{
 	private:
 		// memory pool
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// flag indicating if handler is initialized
 		BOOL m_initialized;
@@ -45,7 +45,7 @@ namespace gpos
 
 	public:
 		// ctor
-		CMiniDumper(IMemoryPool *memory_pool);
+		CMiniDumper(IMemoryPool *mp);
 
 		// dtor
 		virtual ~CMiniDumper();

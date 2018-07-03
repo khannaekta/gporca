@@ -28,17 +28,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformDifference2LeftAntiSemiJoin::CXformDifference2LeftAntiSemiJoin
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	// pattern
 	CXformExploration
 		(
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 					(
-					memory_pool,
-					GPOS_NEW(memory_pool) CLogicalDifference(memory_pool),
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternMultiLeaf(memory_pool))
+					mp,
+					GPOS_NEW(mp) CLogicalDifference(mp),
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternMultiLeaf(mp))
 					)
 		)
 {}
@@ -64,7 +64,7 @@ CXformDifference2LeftAntiSemiJoin::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// TODO: Oct 24th 2012, we currently only handle difference all
 	//  operators with two children
@@ -79,16 +79,16 @@ CXformDifference2LeftAntiSemiJoin::Transform
 	ColRefArrays *pdrgpdrgpcrInput = popDifference->PdrgpdrgpcrInput();
 
 	// generate the scalar condition for the left anti-semi join
-	CExpression *pexprScCond = CUtils::PexprConjINDFCond(memory_pool, pdrgpdrgpcrInput);
+	CExpression *pexprScCond = CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInput);
 
 	pexprLeftChild->AddRef();
 	pexprRightChild->AddRef();
 
 	// assemble the new left anti-semi join logical operator
-	CExpression *pexprLASJ = GPOS_NEW(memory_pool) CExpression
+	CExpression *pexprLASJ = GPOS_NEW(mp) CExpression
 										(
-										memory_pool,
-										GPOS_NEW(memory_pool) CLogicalLeftAntiSemiJoin(memory_pool),
+										mp,
+										GPOS_NEW(mp) CLogicalLeftAntiSemiJoin(mp),
 										pexprLeftChild,
 										pexprRightChild,
 										pexprScCond
@@ -97,14 +97,14 @@ CXformDifference2LeftAntiSemiJoin::Transform
 	// assemble the aggregate operator
 	pdrgpcrOutput->AddRef();
 
-	CExpression *pexprProjList = GPOS_NEW(memory_pool) CExpression
+	CExpression *pexprProjList = GPOS_NEW(mp) CExpression
 											(
-											memory_pool,
-											GPOS_NEW(memory_pool) CScalarProjectList(memory_pool),
-											GPOS_NEW(memory_pool) ExpressionArray(memory_pool)
+											mp,
+											GPOS_NEW(mp) CScalarProjectList(mp),
+											GPOS_NEW(mp) ExpressionArray(mp)
 											);
 
-	CExpression *pexprAgg = CUtils::PexprLogicalGbAggGlobal(memory_pool, pdrgpcrOutput, pexprLASJ, pexprProjList);
+	CExpression *pexprAgg = CUtils::PexprLogicalGbAggGlobal(mp, pdrgpcrOutput, pexprLASJ, pexprProjList);
 
 	// add alternative to results
 	pxfres->Add(pexprAgg);

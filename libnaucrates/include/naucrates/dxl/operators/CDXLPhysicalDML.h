@@ -80,7 +80,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLPhysicalDML(IMemoryPool *memory_pool,
+		CDXLPhysicalDML(IMemoryPool *mp,
 						const EdxlDmlType dml_type_dxl,
 						CDXLTableDescr *table_descr,
 						ULongPtrArray *src_colids_array,

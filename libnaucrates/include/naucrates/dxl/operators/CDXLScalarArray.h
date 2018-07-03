@@ -45,7 +45,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLScalarArray(IMemoryPool *memory_pool,
+		CDXLScalarArray(IMemoryPool *mp,
 						IMDId *elem_type_mdid,
 						IMDId *array_type_mdid,
 						BOOL multi_dimensional_array);

@@ -27,11 +27,11 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CScalarAssertConstraint::CScalarAssertConstraint
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CWStringBase *pstrErrorMsg
 	)
 	:
-	CScalar(memory_pool),
+	CScalar(mp),
 	m_pstrErrorMsg(pstrErrorMsg)
 {
 	GPOS_ASSERT(NULL != pstrErrorMsg);

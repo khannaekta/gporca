@@ -16,10 +16,10 @@ using namespace gpos;
 using namespace gpdxl;
 
 // Ctor
-CDXLScalarPartListNullTest::CDXLScalarPartListNullTest(IMemoryPool *memory_pool,
+CDXLScalarPartListNullTest::CDXLScalarPartListNullTest(IMemoryPool *mp,
 													   ULONG partitioning_level,
 													   BOOL is_null)
-	: CDXLScalar(memory_pool), m_partitioning_level(partitioning_level), m_is_null(is_null)
+	: CDXLScalar(mp), m_partitioning_level(partitioning_level), m_is_null(is_null)
 {
 }
 

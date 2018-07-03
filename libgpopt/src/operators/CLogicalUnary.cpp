@@ -76,7 +76,7 @@ CLogicalUnary::Esp
 IStatistics *
 CLogicalUnary::PstatsDeriveProject
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	HMUlDatum *phmuldatum
 	)
@@ -86,10 +86,10 @@ CLogicalUnary::PstatsDeriveProject
 	IStatistics *child_stats = exprhdl.Pstats(0);
 	CReqdPropRelational *prprel = CReqdPropRelational::GetReqdRelationalProps(exprhdl.Prp());
 	CColRefSet *pcrs = prprel->PcrsStat();
-	ULongPtrArray *col_ids = GPOS_NEW(memory_pool) ULongPtrArray(memory_pool);
-	pcrs->ExtractColIds(memory_pool, col_ids);
+	ULongPtrArray *col_ids = GPOS_NEW(mp) ULongPtrArray(mp);
+	pcrs->ExtractColIds(mp, col_ids);
 
-	IStatistics *stats = CProjectStatsProcessor::CalcProjStats(memory_pool, dynamic_cast<CStatistics *>(child_stats), col_ids, phmuldatum);
+	IStatistics *stats = CProjectStatsProcessor::CalcProjStats(mp, dynamic_cast<CStatistics *>(child_stats), col_ids, phmuldatum);
 
 	// clean up
 	col_ids->Release();

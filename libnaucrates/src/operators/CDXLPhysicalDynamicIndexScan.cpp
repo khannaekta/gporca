@@ -27,13 +27,13 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalDynamicIndexScan::CDXLPhysicalDynamicIndexScan(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CDXLTableDescr *table_descr,
 	ULONG part_idx_id,
 	ULONG part_idx_id_printable,
 	CDXLIndexDescr *index_descr_dxl,
 	EdxlIndexScanDirection idx_scan_direction)
-	: CDXLPhysical(memory_pool),
+	: CDXLPhysical(mp),
 	  m_table_descr_dxl(table_descr),
 	  m_part_index_id(part_idx_id),
 	  m_part_index_id_printable(part_idx_id_printable),

@@ -44,7 +44,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLPhysicalTVF(IMemoryPool *memory_pool,
+		CDXLPhysicalTVF(IMemoryPool *mp,
 						IMDId *mdid_func,
 						IMDId *mdid_return_type,
 						CWStringConst *str);

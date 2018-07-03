@@ -29,25 +29,25 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformInnerApplyWithOuterKey2InnerJoin::CXformInnerApplyWithOuterKey2InnerJoin
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformExploration
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalInnerApply(memory_pool),
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // left child
-				GPOS_NEW(memory_pool) CExpression
+				mp,
+				GPOS_NEW(mp) CLogicalInnerApply(mp),
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // left child
+				GPOS_NEW(mp) CExpression
 					(
-					memory_pool,
-					GPOS_NEW(memory_pool) CLogicalGbAgg(memory_pool),
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool)), // relational child of Gb
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)) // scalar project list of Gb
+					mp,
+					GPOS_NEW(mp) CLogicalGbAgg(mp),
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp)), // relational child of Gb
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)) // scalar project list of Gb
 					), // right child
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))  // Apply predicate
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp))  // Apply predicate
 				)
 		)
 {}
@@ -101,7 +101,7 @@ CXformInnerApplyWithOuterKey2InnerJoin::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
 	CExpression *pexprOuter = (*pexpr)[0];
@@ -123,23 +123,23 @@ CXformInnerApplyWithOuterKey2InnerJoin::Transform
 	// decorrelate Gb's relational child
 	(*pexprGb)[0]->ResetDerivedProperties();
 	CExpression *pexprInner = NULL;
-	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
-	if (!CDecorrelator::FProcess(memory_pool, (*pexprGb)[0], false /*fEqualityOnly*/, &pexprInner, pdrgpexpr))
+	ExpressionArray *pdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
+	if (!CDecorrelator::FProcess(mp, (*pexprGb)[0], false /*fEqualityOnly*/, &pexprInner, pdrgpexpr))
 	{
 		pdrgpexpr->Release();
 		return;
 	}
 
 	GPOS_ASSERT(NULL != pexprInner);
-	CExpression *pexprPredicate = CPredicateUtils::PexprConjunction(memory_pool, pdrgpexpr);
+	CExpression *pexprPredicate = CPredicateUtils::PexprConjunction(mp, pdrgpexpr);
 
 	// join outer child with Gb's decorrelated child
 	pexprOuter->AddRef();
 	CExpression *pexprInnerJoin =
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
-			GPOS_NEW(memory_pool) CLogicalInnerJoin(memory_pool),
+			mp,
+			GPOS_NEW(mp) CLogicalInnerJoin(mp),
 			pexprOuter,
 			pexprInner,
 			pexprPredicate
@@ -147,17 +147,17 @@ CXformInnerApplyWithOuterKey2InnerJoin::Transform
 
 	// create grouping columns from the output of outer child
 	ColRefArray *pdrgpcrKey = NULL;
-	ColRefArray *colref_array = CUtils::PdrgpcrGroupingKey(memory_pool, pexprOuter, &pdrgpcrKey);
+	ColRefArray *colref_array = CUtils::PdrgpcrGroupingKey(mp, pexprOuter, &pdrgpcrKey);
 	pdrgpcrKey->Release();  // key is not used here
 
-	CLogicalGbAgg *popGbAgg = GPOS_NEW(memory_pool) CLogicalGbAgg(memory_pool, colref_array, COperator::EgbaggtypeGlobal /*egbaggtype*/);
+	CLogicalGbAgg *popGbAgg = GPOS_NEW(mp) CLogicalGbAgg(mp, colref_array, COperator::EgbaggtypeGlobal /*egbaggtype*/);
 	CExpression *pexprPrjList = (*pexprGb)[1];
 	pexprPrjList->AddRef();
-	CExpression *pexprNewGb = GPOS_NEW(memory_pool) CExpression (memory_pool, popGbAgg, pexprInnerJoin, pexprPrjList);
+	CExpression *pexprNewGb = GPOS_NEW(mp) CExpression (mp, popGbAgg, pexprInnerJoin, pexprPrjList);
 
 	// add Apply predicate in a top Select node
 	pexprScalar->AddRef();
-	CExpression *pexprSelect = CUtils::PexprLogicalSelect(memory_pool, pexprNewGb, pexprScalar);
+	CExpression *pexprSelect = CUtils::PexprLogicalSelect(mp, pexprNewGb, pexprScalar);
 
 	pxfres->Add(pexprSelect);
 }

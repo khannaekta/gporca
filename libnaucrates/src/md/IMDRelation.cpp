@@ -80,9 +80,9 @@ IMDRelation::GetStorageTypeStr(IMDRelation::Erelstoragetype rel_storage_type)
 //
 //---------------------------------------------------------------------------
 CWStringDynamic *
-IMDRelation::ColumnsToStr(IMemoryPool *memory_pool, ULongPtrArray *col_id_array)
+IMDRelation::ColumnsToStr(IMemoryPool *mp, ULongPtrArray *col_id_array)
 {
-	CWStringDynamic *str = GPOS_NEW(memory_pool) CWStringDynamic(memory_pool);
+	CWStringDynamic *str = GPOS_NEW(mp) CWStringDynamic(mp);
 
 	ULONG length = col_id_array->Size();
 	for (ULONG ul = 0; ul < length; ul++)

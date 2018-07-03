@@ -42,7 +42,7 @@ namespace gpdxl
 
 	protected:
 		// memory pool
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// mdid of the datum's type
 		IMDId *m_mdid_type;
@@ -70,7 +70,7 @@ namespace gpdxl
 			EdxldatumSentinel
 		};
 		// ctor
-		CDXLDatum(IMemoryPool *memory_pool,
+		CDXLDatum(IMemoryPool *mp,
 				  IMDId *mdid_type,
 				  INT type_modifier,
 				  BOOL is_null,

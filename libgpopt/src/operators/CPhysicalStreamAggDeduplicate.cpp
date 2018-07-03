@@ -28,7 +28,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalStreamAggDeduplicate::CPhysicalStreamAggDeduplicate
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ColRefArray *colref_array,
 	ColRefArray *pdrgpcrMinimal,
 	COperator::EGbAggType egbaggtype,
@@ -37,11 +37,11 @@ CPhysicalStreamAggDeduplicate::CPhysicalStreamAggDeduplicate
 	BOOL fMultiStage
 	)
 	:
-	CPhysicalStreamAgg(memory_pool, colref_array, pdrgpcrMinimal, egbaggtype, fGeneratesDuplicates, NULL /*pdrgpcrGbMinusDistinct*/, fMultiStage),
+	CPhysicalStreamAgg(mp, colref_array, pdrgpcrMinimal, egbaggtype, fGeneratesDuplicates, NULL /*pdrgpcrGbMinusDistinct*/, fMultiStage),
 	m_pdrgpcrKeys(pdrgpcrKeys)
 {
 	GPOS_ASSERT(NULL != pdrgpcrKeys);
-	InitOrderSpec(memory_pool, m_pdrgpcrKeys);
+	InitOrderSpec(mp, m_pdrgpcrKeys);
 }
 
 //---------------------------------------------------------------------------

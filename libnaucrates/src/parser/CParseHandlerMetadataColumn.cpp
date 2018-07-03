@@ -32,10 +32,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerMetadataColumn::CParseHandlerMetadataColumn(IMemoryPool *memory_pool,
+CParseHandlerMetadataColumn::CParseHandlerMetadataColumn(IMemoryPool *mp,
 														 CParseHandlerManager *parse_handler_mgr,
 														 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
 	  m_mdcol(NULL),
 	  m_mdname(NULL),
 	  m_mdid_type(NULL),
@@ -86,7 +86,7 @@ CParseHandlerMetadataColumn::StartElement(const XMLCh *const,  // element_uri,
 		m_parse_handler_mgr->GetDXLMemoryManager(), column_name_xml);
 
 	// create a copy of the string in the CMDName constructor
-	m_mdname = GPOS_NEW(m_memory_pool) CMDName(m_memory_pool, col_name);
+	m_mdname = GPOS_NEW(m_mp) CMDName(m_mp, col_name);
 
 	GPOS_DELETE(col_name);
 
@@ -139,7 +139,7 @@ CParseHandlerMetadataColumn::StartElement(const XMLCh *const,  // element_uri,
 
 	// install a parse handler for the default m_bytearray_value
 	CParseHandlerBase *pph =
-		CParseHandlerFactory::GetParseHandler(m_memory_pool,
+		CParseHandlerFactory::GetParseHandler(m_mp,
 											  CDXLTokens::XmlstrToken(EdxltokenColumnDefaultValue),
 											  m_parse_handler_mgr,
 											  this);
@@ -182,7 +182,7 @@ CParseHandlerMetadataColumn::EndElement(const XMLCh *const,  // element_uri,
 		m_dxl_default_val->AddRef();
 	}
 
-	m_mdcol = GPOS_NEW(m_memory_pool) CMDColumn(m_mdname,
+	m_mdcol = GPOS_NEW(m_mp) CMDColumn(m_mdname,
 												m_attno,
 												m_mdid_type,
 												m_type_modifier,

@@ -50,7 +50,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerLogicalCTEAnchor(IMemoryPool *memory_pool,
+		CParseHandlerLogicalCTEAnchor(IMemoryPool *mp,
 									  CParseHandlerManager *parse_handler_mgr,
 									  CParseHandlerBase *parse_handler_root);
 	};

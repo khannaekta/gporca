@@ -84,20 +84,20 @@ GPOS_RESULT
 CCorrelatedExecutionTest::EresUnittest_RunAllPositiveTests()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(memory_pool, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 					(
-					memory_pool,
+					mp,
 					&mda,
 					NULL, /* pceeval */
-					CTestUtils::GetCostModel(memory_pool)
+					CTestUtils::GetCostModel(mp)
 					);
 
 	// loop over all test files
@@ -107,7 +107,7 @@ CCorrelatedExecutionTest::EresUnittest_RunAllPositiveTests()
 		GPOS_RESULT eres =
 				CTestUtils::EresTranslate
 									(
-									memory_pool,
+									mp,
 									rgszPositiveTests[ul],
 									NULL /* plan file */,
 									true /*fIgnoreMismatch*/

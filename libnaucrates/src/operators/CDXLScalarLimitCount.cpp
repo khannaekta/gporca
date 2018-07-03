@@ -27,7 +27,7 @@ using namespace gpdxl;
 //		Constructs a scalar Limit Count node
 //
 //---------------------------------------------------------------------------
-CDXLScalarLimitCount::CDXLScalarLimitCount(IMemoryPool *memory_pool) : CDXLScalar(memory_pool)
+CDXLScalarLimitCount::CDXLScalarLimitCount(IMemoryPool *mp) : CDXLScalar(mp)
 {
 }
 

@@ -38,7 +38,7 @@ namespace gpopt
 		
 			// ctor
 			explicit
-			CXformSelect2Filter(IMemoryPool *memory_pool);
+			CXformSelect2Filter(IMemoryPool *mp);
 
 			// dtor
 			virtual 

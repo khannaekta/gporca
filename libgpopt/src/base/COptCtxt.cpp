@@ -36,7 +36,7 @@ ULONG COptCtxt::m_ulFirstValidPartId = 1;
 //---------------------------------------------------------------------------
 COptCtxt::COptCtxt
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CColumnFactory *col_factory,
 	CMDAccessor *md_accessor,
 	IConstExprEvaluator *pceeval,
@@ -44,18 +44,18 @@ COptCtxt::COptCtxt
 	)
 	:
 	CTaskLocalStorageObject(CTaskLocalStorage::EtlsidxOptCtxt),
-	m_memory_pool(memory_pool),
+	m_mp(mp),
 	m_pcf(col_factory),
 	m_pmda(md_accessor),
 	m_pceeval(pceeval),
-	m_pcomp(GPOS_NEW(m_memory_pool) CDefaultComparator(pceeval)),
+	m_pcomp(GPOS_NEW(m_mp) CDefaultComparator(pceeval)),
 	m_auPartId(m_ulFirstValidPartId),
 	m_pcteinfo(NULL),
 	m_pdrgpcrSystemCols(NULL),
 	m_optimizer_config(optimizer_config),
 	m_fDMLQuery(false)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != col_factory);
 	GPOS_ASSERT(NULL != md_accessor);
 	GPOS_ASSERT(NULL != pceeval);
@@ -63,7 +63,7 @@ COptCtxt::COptCtxt
 	GPOS_ASSERT(NULL != optimizer_config);
 	GPOS_ASSERT(NULL != optimizer_config->GetCostModel());
 	
-	m_pcteinfo = GPOS_NEW(m_memory_pool) CCTEInfo(m_memory_pool);
+	m_pcteinfo = GPOS_NEW(m_mp) CCTEInfo(m_mp);
 	m_cost_model = optimizer_config->GetCostModel();
 }
 
@@ -99,7 +99,7 @@ COptCtxt::~COptCtxt()
 COptCtxt *
 COptCtxt::PoctxtCreate
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CMDAccessor *md_accessor,
 	IConstExprEvaluator *pceeval,
 	COptimizerConfig *optimizer_config
@@ -109,7 +109,7 @@ COptCtxt::PoctxtCreate
 
 	// CONSIDER:  - 1/5/09; allocate column factory out of given mem pool
 	// instead of having it create its own;
-	CColumnFactory *col_factory = GPOS_NEW(memory_pool) CColumnFactory;
+	CColumnFactory *col_factory = GPOS_NEW(mp) CColumnFactory;
 
 	COptCtxt *poctxt = NULL;
 	{
@@ -119,7 +119,7 @@ COptCtxt::PoctxtCreate
 		a_pcf = col_factory;
 		a_pcf.Value()->Initialize();
 
-		poctxt = GPOS_NEW(memory_pool) COptCtxt(memory_pool, col_factory, md_accessor, pceeval, optimizer_config);
+		poctxt = GPOS_NEW(mp) COptCtxt(mp, col_factory, md_accessor, pceeval, optimizer_config);
 
 		// detach safety
 		(void) a_pcf.Reset();

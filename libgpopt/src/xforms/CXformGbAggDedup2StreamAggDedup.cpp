@@ -29,15 +29,15 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformGbAggDedup2StreamAggDedup::CXformGbAggDedup2StreamAggDedup
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformGbAgg2StreamAgg
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CLogicalGbAggDeduplicate(memory_pool),
-							 GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),
-							 GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)))
+		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalGbAggDeduplicate(mp),
+							 GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)),
+							 GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)))
 		)
 {}
 
@@ -61,7 +61,7 @@ CXformGbAggDedup2StreamAggDedup::Transform
 	GPOS_ASSERT(NULL != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
 	CExpression *pexprRel = (*pexpr)[0];
@@ -81,12 +81,12 @@ CXformGbAggDedup2StreamAggDedup::Transform
 
 	// create alternative expression
 	CExpression *pexprAlt =
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
-			GPOS_NEW(memory_pool) CPhysicalStreamAggDeduplicate
+			mp,
+			GPOS_NEW(mp) CPhysicalStreamAggDeduplicate
 						(
-						memory_pool,
+						mp,
 						colref_array,
 						popAggDedup->PdrgpcrMinimal(),
 						popAggDedup->Egbaggtype(),

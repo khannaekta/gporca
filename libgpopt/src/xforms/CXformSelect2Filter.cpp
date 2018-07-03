@@ -27,18 +27,18 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformSelect2Filter::CXformSelect2Filter
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	// pattern
 	CXformImplementation
 		(
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 						(
-						memory_pool, 
-						GPOS_NEW(memory_pool) CLogicalSelect(memory_pool),
-						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // relational child
-						GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))	// predicate
+						mp, 
+						GPOS_NEW(mp) CLogicalSelect(mp),
+						GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // relational child
+						GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp))	// predicate
 						)
 		)
 {}
@@ -92,7 +92,7 @@ CXformSelect2Filter::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
 	CExpression *pexprRelational = (*pexpr)[0];
@@ -104,10 +104,10 @@ CXformSelect2Filter::Transform
 	
 	// assemble physical operator
 	CExpression *pexprFilter = 
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 					(
-					memory_pool, 
-					GPOS_NEW(memory_pool) CPhysicalFilter(memory_pool),
+					mp, 
+					GPOS_NEW(mp) CPhysicalFilter(mp),
 					pexprRelational,
 					pexprScalar
 					);

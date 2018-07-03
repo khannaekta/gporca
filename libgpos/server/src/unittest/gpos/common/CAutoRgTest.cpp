@@ -50,15 +50,15 @@ CAutoRgTest::EresUnittest_Basics()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	CAutoRg<CHAR> asz;
-	CHAR *sz = GPOS_NEW_ARRAY(memory_pool, CHAR, 1234);
+	CHAR *sz = GPOS_NEW_ARRAY(mp, CHAR, 1234);
 	asz = sz;
 
 	CAutoRg<CHAR> asz2;
 	CAutoRg<CHAR> asz3;
-	CHAR *sz2 = GPOS_NEW_ARRAY(memory_pool, CHAR, 1234);
+	CHAR *sz2 = GPOS_NEW_ARRAY(mp, CHAR, 1234);
 
 	asz2 = sz2;
 	asz3 = asz2;
@@ -72,7 +72,7 @@ CAutoRgTest::EresUnittest_Basics()
 	GPOS_DELETE_ARRAY(asz3.RgtReset());
 
 	// ctor
-	CAutoRg<CHAR> asz4(GPOS_NEW_ARRAY(memory_pool, CHAR, 1234));
+	CAutoRg<CHAR> asz4(GPOS_NEW_ARRAY(mp, CHAR, 1234));
 
 	return GPOS_OK;
 }

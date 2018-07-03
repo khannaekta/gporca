@@ -39,10 +39,10 @@ namespace gpos
 
 	public:
 		// c'tor
-		CStack<T>(IMemoryPool *memory_pool, ULONG min_size = 4) : m_size(0)
+		CStack<T>(IMemoryPool *mp, ULONG min_size = 4) : m_size(0)
 		{
 			m_dynamic_ptr_array =
-				GPOS_NEW(memory_pool) CDynamicPtrArray<T, CleanupNULL>(memory_pool, min_size, 10);
+				GPOS_NEW(mp) CDynamicPtrArray<T, CleanupNULL>(mp, min_size, 10);
 		}
 
 		// destructor

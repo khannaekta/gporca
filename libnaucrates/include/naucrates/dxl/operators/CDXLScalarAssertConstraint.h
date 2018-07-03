@@ -39,7 +39,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLScalarAssertConstraint(IMemoryPool *memory_pool, CWStringBase *error_msg);
+		CDXLScalarAssertConstraint(IMemoryPool *mp, CWStringBase *error_msg);
 
 		// dtor
 		virtual ~CDXLScalarAssertConstraint();

@@ -71,7 +71,7 @@ namespace gpos
 		}
 
 		// deep copy of the string
-		virtual CWStringConst *Copy(IMemoryPool *memory_pool) const;
+		virtual CWStringConst *Copy(IMemoryPool *mp) const;
 
 		// accessors
 		virtual ULONG Length() const;

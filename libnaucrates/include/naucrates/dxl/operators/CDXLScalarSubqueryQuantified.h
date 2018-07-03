@@ -58,7 +58,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLScalarSubqueryQuantified(IMemoryPool *memory_pool,
+		CDXLScalarSubqueryQuantified(IMemoryPool *mp,
 									 IMDId *scalar_op_mdid,
 									 CMDName *mdname,
 									 ULONG col_id);

@@ -36,7 +36,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		explicit CDXLScalarLimitOffset(IMemoryPool *memory_pool);
+		explicit CDXLScalarLimitOffset(IMemoryPool *mp);
 
 		// ident accessors
 		Edxlopid GetDXLOperator() const;

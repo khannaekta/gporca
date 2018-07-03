@@ -34,10 +34,10 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CParseHandlerDirectDispatchInfo::CParseHandlerDirectDispatchInfo(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
 	  m_dxl_datum_array(NULL),
 	  m_datum_array_combination(NULL),
 	  m_direct_dispatch_info(NULL)
@@ -77,13 +77,13 @@ CParseHandlerDirectDispatchInfo::StartElement(const XMLCh *const,  //element_uri
 	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchInfo),
 									  element_local_name))
 	{
-		m_datum_array_combination = GPOS_NEW(m_memory_pool) DXLDatumArrays(m_memory_pool);
+		m_datum_array_combination = GPOS_NEW(m_mp) DXLDatumArrays(m_mp);
 	}
 	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchKeyValue),
 										   element_local_name))
 	{
 		CRefCount::SafeRelease(m_dxl_datum_array);
-		m_dxl_datum_array = GPOS_NEW(m_memory_pool) DXLDatumArray(m_memory_pool);
+		m_dxl_datum_array = GPOS_NEW(m_mp) DXLDatumArray(m_mp);
 	}
 	else if (0 ==
 			 XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDatum), element_local_name))
@@ -120,7 +120,7 @@ CParseHandlerDirectDispatchInfo::EndElement(const XMLCh *const,  // element_uri,
 									  element_local_name))
 	{
 		m_direct_dispatch_info =
-			GPOS_NEW(m_memory_pool) CDXLDirectDispatchInfo(m_datum_array_combination);
+			GPOS_NEW(m_mp) CDXLDirectDispatchInfo(m_datum_array_combination);
 		m_parse_handler_mgr->DeactivateHandler();
 	}
 	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDirectDispatchKeyValue),

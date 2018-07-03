@@ -19,7 +19,7 @@ namespace gpnaucrates
 	{
 	private:
 		// create a new hash map of histograms from the results of the inner join and the histograms of the outer child
-		static UlongHistogramHashMap *MakeLOJHistogram(IMemoryPool *memory_pool,
+		static UlongHistogramHashMap *MakeLOJHistogram(IMemoryPool *mp,
 													   const CStatistics *outer_stats,
 													   const CStatistics *inner_side_stats,
 													   CStatistics *inner_join_stats,
@@ -27,7 +27,7 @@ namespace gpnaucrates
 													   CDouble num_rows_inner_join,
 													   CDouble *result_rows_LASJ);
 		// helper method to add histograms of the inner side of a LOJ
-		static void AddHistogramsLOJInner(IMemoryPool *memory_pool,
+		static void AddHistogramsLOJInner(IMemoryPool *mp,
 										  const CStatistics *inner_join_stats,
 										  ULongPtrArray *inner_colids_with_stats,
 										  CDouble num_rows_LASJ,
@@ -35,7 +35,7 @@ namespace gpnaucrates
 										  UlongHistogramHashMap *LOJ_histograms);
 
 	public:
-		static CStatistics *CalcLOJoinStatsStatic(IMemoryPool *memory_pool,
+		static CStatistics *CalcLOJoinStatsStatic(IMemoryPool *mp,
 												  const IStatistics *outer_stats,
 												  const IStatistics *inner_side_stats,
 												  StatsPredJoinArray *join_preds_stats);

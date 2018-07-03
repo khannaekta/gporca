@@ -75,7 +75,7 @@ namespace gpnaucrates
 		virtual BOOL IsNull() const = 0;
 
 		// return string representation
-		virtual const CWStringConst *GetStrRepr(IMemoryPool *memory_pool) const = 0;
+		virtual const CWStringConst *GetStrRepr(IMemoryPool *mp) const = 0;
 
 		// hash function
 		virtual ULONG HashValue() const = 0;
@@ -84,7 +84,7 @@ namespace gpnaucrates
 		virtual BOOL Matches(const IDatum *) const = 0;
 
 		// create a copy of the datum
-		virtual IDatum *MakeCopy(IMemoryPool *memory_pool) const = 0;
+		virtual IDatum *MakeCopy(IMemoryPool *mp) const = 0;
 
 		// print function
 		virtual IOstream &OsPrint(IOstream &os) const = 0;
@@ -123,7 +123,7 @@ namespace gpnaucrates
 		virtual BOOL NeedsPadding() const = 0;
 
 		// return the padded datum
-		virtual IDatum *MakePaddedDatum(IMemoryPool *memory_pool, ULONG col_len) const = 0;
+		virtual IDatum *MakePaddedDatum(IMemoryPool *mp, ULONG col_len) const = 0;
 
 		// does datum support like predicate
 		virtual BOOL SupportsLikePredicate() const = 0;

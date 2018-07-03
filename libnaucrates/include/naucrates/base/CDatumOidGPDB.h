@@ -61,7 +61,7 @@ namespace gpnaucrates
 		virtual BOOL IsNull() const;
 
 		// return string representation
-		virtual const CWStringConst *GetStrRepr(IMemoryPool *memory_pool) const;
+		virtual const CWStringConst *GetStrRepr(IMemoryPool *mp) const;
 
 		// hash function
 		virtual ULONG HashValue() const;
@@ -70,7 +70,7 @@ namespace gpnaucrates
 		virtual BOOL Matches(const IDatum *) const;
 
 		// copy datum
-		virtual IDatum *MakeCopy(IMemoryPool *memory_pool) const;
+		virtual IDatum *MakeCopy(IMemoryPool *mp) const;
 
 		// print function
 		virtual IOstream &OsPrint(IOstream &os) const;

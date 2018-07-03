@@ -48,7 +48,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLScalarOpList(IMemoryPool *memory_pool,
+		CDXLScalarOpList(IMemoryPool *mp,
 						 EdxlOpListType dxl_op_list_type = EdxloplistGeneral);
 
 		// operator type

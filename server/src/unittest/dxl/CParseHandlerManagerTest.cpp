@@ -63,10 +63,10 @@ CParseHandlerManagerTest::EresUnittest_Basic()
 {
 	// create memory pool
 	CAutoMemoryPool amp(CAutoMemoryPool::ElcNone);
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 		
 	// create XML reader and a parse handler manager for it
-	CDXLMemoryManager *memory_manager_dxl = GPOS_NEW(memory_pool) CDXLMemoryManager(memory_pool);
+	CDXLMemoryManager *memory_manager_dxl = GPOS_NEW(mp) CDXLMemoryManager(mp);
 
 	SAX2XMLReader* parser = NULL;
 	{
@@ -74,11 +74,11 @@ CParseHandlerManagerTest::EresUnittest_Basic()
 		parser = XMLReaderFactory::createXMLReader(memory_manager_dxl);
 	}
 
-	CParseHandlerManager *parse_handler_mgr = GPOS_NEW(memory_pool) CParseHandlerManager(memory_manager_dxl, parser);
+	CParseHandlerManager *parse_handler_mgr = GPOS_NEW(mp) CParseHandlerManager(memory_manager_dxl, parser);
 	
 	// create some parse handlers
-	CParseHandlerPlan *pphPlan = GPOS_NEW(memory_pool) CParseHandlerPlan(memory_pool, parse_handler_mgr, NULL);
-	CParseHandlerHashJoin *pphHJ = GPOS_NEW(memory_pool) CParseHandlerHashJoin(memory_pool, parse_handler_mgr, pphPlan);
+	CParseHandlerPlan *pphPlan = GPOS_NEW(mp) CParseHandlerPlan(mp, parse_handler_mgr, NULL);
+	CParseHandlerHashJoin *pphHJ = GPOS_NEW(mp) CParseHandlerHashJoin(mp, parse_handler_mgr, pphPlan);
 	
 	parse_handler_mgr->ActivateParseHandler(pphPlan);
 	GPOS_ASSERT(pphPlan == parse_handler_mgr->GetCurrentParseHandler());

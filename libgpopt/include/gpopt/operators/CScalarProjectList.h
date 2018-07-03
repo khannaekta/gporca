@@ -38,7 +38,7 @@ namespace gpopt
 		
 			// ctor
 			explicit
-			CScalarProjectList(IMemoryPool *memory_pool);
+			CScalarProjectList(IMemoryPool *mp);
 
 			// dtor
 			virtual 
@@ -68,7 +68,7 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //memory_pool,
+						IMemoryPool *, //mp,
 						UlongColRefHashMap *, //colref_mapping,
 						BOOL //must_exist
 						)

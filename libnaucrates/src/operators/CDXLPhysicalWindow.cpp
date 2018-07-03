@@ -25,10 +25,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalWindow::CDXLPhysicalWindow(IMemoryPool *memory_pool,
+CDXLPhysicalWindow::CDXLPhysicalWindow(IMemoryPool *mp,
 									   ULongPtrArray *part_by_col_identifier_array,
 									   CDXLWindowKeyArray *window_key_array)
-	: CDXLPhysical(memory_pool),
+	: CDXLPhysical(mp),
 	  m_part_by_col_identifier_array(part_by_col_identifier_array),
 	  m_dxl_window_key_array(window_key_array)
 {
@@ -138,7 +138,7 @@ CDXLPhysicalWindow::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNod
 
 	// serialize partition keys
 	CWStringDynamic *part_by_cols_str =
-		CDXLUtils::Serialize(m_memory_pool, m_part_by_col_identifier_array);
+		CDXLUtils::Serialize(m_mp, m_part_by_col_identifier_array);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenPartKeys), part_by_cols_str);
 	GPOS_DELETE(part_by_cols_str);
 

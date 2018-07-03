@@ -35,7 +35,7 @@ namespace gpmd
 	{
 	private:
 		// memory pool
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// DXL for object
 		const CWStringDynamic *m_dxl_str;
@@ -77,7 +77,7 @@ namespace gpmd
 
 	public:
 		// ctor/dtor
-		CMDScalarOpGPDB(IMemoryPool *memory_pool,
+		CMDScalarOpGPDB(IMemoryPool *mp,
 						IMDId *mdid,
 						CMDName *mdname,
 						IMDId *mdid_type_left,

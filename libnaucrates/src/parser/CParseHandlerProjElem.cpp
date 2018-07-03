@@ -29,10 +29,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerProjElem::CParseHandlerProjElem(IMemoryPool *memory_pool,
+CParseHandlerProjElem::CParseHandlerProjElem(IMemoryPool *mp,
 											 CParseHandlerManager *parse_handler_mgr,
 											 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -66,7 +66,7 @@ CParseHandlerProjElem::StartElement(const XMLCh *const,  // element_uri,
 	// create and activate the parse handler for the child scalar expression node
 
 	CParseHandlerBase *parse_handler_root = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(parse_handler_root);
 
 	// store parse handler
@@ -96,7 +96,7 @@ CParseHandlerProjElem::EndElement(const XMLCh *const,  // element_uri,
 	}
 
 	// construct node from the parsed expression node
-	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, m_dxl_op);
+	m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, m_dxl_op);
 
 	CParseHandlerScalarOp *operator_parse_handler =
 		dynamic_cast<CParseHandlerScalarOp *>((*this)[0]);

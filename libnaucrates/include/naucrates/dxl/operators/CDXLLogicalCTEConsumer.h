@@ -38,7 +38,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLLogicalCTEConsumer(IMemoryPool *memory_pool,
+		CDXLLogicalCTEConsumer(IMemoryPool *mp,
 							   ULONG id,
 							   ULongPtrArray *output_colids_array);
 

@@ -168,43 +168,43 @@ namespace gpnaucrates
 		virtual IOstream &OsPrint(IOstream &os) const;
 
 		// construct new bucket with lower bound greater than given point
-		CBucket *MakeBucketGreaterThan(IMemoryPool *memory_pool, CPoint *point) const;
+		CBucket *MakeBucketGreaterThan(IMemoryPool *mp, CPoint *point) const;
 
 		// scale down version of bucket adjusting upper boundary
-		CBucket *MakeBucketScaleUpper(IMemoryPool *memory_pool,
+		CBucket *MakeBucketScaleUpper(IMemoryPool *mp,
 									  CPoint *bucket_upper_bound,
 									  BOOL include_upper) const;
 
 		// scale down version of bucket adjusting lower boundary
-		CBucket *MakeBucketScaleLower(IMemoryPool *memory_pool,
+		CBucket *MakeBucketScaleLower(IMemoryPool *mp,
 									  CPoint *bucket_lower_bound,
 									  BOOL include_lower) const;
 
 		// extract singleton bucket at given point
-		CBucket *MakeBucketSingleton(IMemoryPool *memory_pool, CPoint *point_singleton) const;
+		CBucket *MakeBucketSingleton(IMemoryPool *mp, CPoint *point_singleton) const;
 
 		// create a new bucket by intersecting with another and return the percentage of each of the buckets that intersect
-		CBucket *MakeBucketIntersect(IMemoryPool *memory_pool,
+		CBucket *MakeBucketIntersect(IMemoryPool *mp,
 									 CBucket *bucket,
 									 CDouble *result_freq_intersect1,
 									 CDouble *result_freq_intersect2) const;
 
 		// Remove a bucket range. This produces lower and upper split
-		void Difference(IMemoryPool *memory_pool,
+		void Difference(IMemoryPool *mp,
 						CBucket *bucket_other,
 						CBucket **result_bucket_lower,
 						CBucket **result_bucket_upper);
 
 		// return copy of bucket
-		CBucket *MakeBucketCopy(IMemoryPool *memory_pool);
+		CBucket *MakeBucketCopy(IMemoryPool *mp);
 
 		// return a copy of the bucket with updated frequency based on the new total number of rows
-		CBucket *MakeBucketUpdateFrequency(IMemoryPool *memory_pool,
+		CBucket *MakeBucketUpdateFrequency(IMemoryPool *mp,
 										   CDouble rows_old,
 										   CDouble rows_new);
 
 		// Merge with another bucket and return leftovers
-		CBucket *MakeBucketMerged(IMemoryPool *memory_pool,
+		CBucket *MakeBucketMerged(IMemoryPool *mp,
 								  CBucket *bucket_other,
 								  CDouble rows,
 								  CDouble rows_other,
@@ -232,7 +232,7 @@ namespace gpnaucrates
 		static INT CompareLowerBoundToUpperBound(const CBucket *bucket1, const CBucket *bucket2);
 
 		// create a new singleton bucket with the given datum as it lower and upper bounds
-		static CBucket *MakeBucketSingleton(IMemoryPool *memory_pool, IDatum *datum);
+		static CBucket *MakeBucketSingleton(IMemoryPool *mp, IDatum *datum);
 	};
 }  // namespace gpnaucrates
 

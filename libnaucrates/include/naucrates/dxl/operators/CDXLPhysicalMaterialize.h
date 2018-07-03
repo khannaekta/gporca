@@ -60,9 +60,9 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CDXLPhysicalMaterialize(IMemoryPool *memory_pool, BOOL is_eager);
+		CDXLPhysicalMaterialize(IMemoryPool *mp, BOOL is_eager);
 
-		CDXLPhysicalMaterialize(IMemoryPool *memory_pool,
+		CDXLPhysicalMaterialize(IMemoryPool *mp,
 								BOOL is_eager,
 								ULONG spooling_op_id,
 								INT executor_slice,

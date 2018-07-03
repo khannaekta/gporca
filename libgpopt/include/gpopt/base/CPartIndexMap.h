@@ -108,7 +108,7 @@ namespace gpopt
 					const CHAR *m_szManipulator[EpimSentinel];
 
 					// add a part constraint
-					void AddPartConstraint(IMemoryPool *memory_pool, ULONG part_idx_id, CPartConstraint *ppartcnstr);
+					void AddPartConstraint(IMemoryPool *mp, ULONG part_idx_id, CPartConstraint *ppartcnstr);
 
 					// private copy ctor
 					CPartTableInfo(const CPartTableInfo &);
@@ -198,7 +198,7 @@ namespace gpopt
 					const CHAR *SzManipulatorType(EPartIndexManipulator epim);
 
 					// add part constraints
-					void AddPartConstraints(IMemoryPool *memory_pool, PartCnstrMap *ppartcnstrmap);
+					void AddPartConstraints(IMemoryPool *mp, PartCnstrMap *ppartcnstrmap);
 
 					IOstream &OsPrint(IOstream &os) const;
 
@@ -218,7 +218,7 @@ namespace gpopt
 				CleanupDelete<ULONG>, CleanupRelease<CPartTableInfo> > PartIndexMapIter;
 
 			// memory pool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 
 			// partition index map
 			PartIndexMap *m_pim;
@@ -253,7 +253,7 @@ namespace gpopt
 
 			// helper to add part-index id's found in first map and are unresolved based on second map
 			static
-			void AddUnresolved(IMemoryPool *memory_pool, const CPartIndexMap &pimFst, const CPartIndexMap &pimSnd, CPartIndexMap* ppimResult);
+			void AddUnresolved(IMemoryPool *mp, const CPartIndexMap &pimFst, const CPartIndexMap &pimSnd, CPartIndexMap* ppimResult);
 
 			// print part constraint map
 			static
@@ -263,7 +263,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CPartIndexMap(IMemoryPool *memory_pool);
+			CPartIndexMap(IMemoryPool *mp);
 
 			// dtor
 			virtual
@@ -288,7 +288,7 @@ namespace gpopt
 			BOOL FContainsUnresolvedZeroPropagators() const;
 
 			// extract scan ids in the given memory pool
-			ULongPtrArray *PdrgpulScanIds(IMemoryPool *memory_pool, BOOL fConsumersOnly = false) const;
+			ULongPtrArray *PdrgpulScanIds(IMemoryPool *mp, BOOL fConsumersOnly = false) const;
 
 			// check if two part index maps are equal
 			BOOL Equals
@@ -353,7 +353,7 @@ namespace gpopt
 
 			// return a new part index map for a partition selector with the given
 			// scan id, and the given number of expected selectors above it
-			CPartIndexMap *PpimPartitionSelector(IMemoryPool *memory_pool, ULONG scan_id, ULONG ulExpectedFromReq) const;
+			CPartIndexMap *PpimPartitionSelector(IMemoryPool *mp, ULONG scan_id, ULONG ulExpectedFromReq) const;
 
 			// print function
 			virtual
@@ -361,7 +361,7 @@ namespace gpopt
 
 			// combine the two given maps and return the resulting map
 			static
-			CPartIndexMap *PpimCombine(IMemoryPool *memory_pool, const CPartIndexMap &pimFst, const CPartIndexMap &pimSnd);
+			CPartIndexMap *PpimCombine(IMemoryPool *mp, const CPartIndexMap &pimFst, const CPartIndexMap &pimSnd);
 
 #ifdef GPOS_DEBUG
 			// debug print for interactive debugging sessions only

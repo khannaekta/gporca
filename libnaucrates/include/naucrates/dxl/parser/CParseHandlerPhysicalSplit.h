@@ -72,7 +72,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerPhysicalSplit(IMemoryPool *memory_pool,
+		CParseHandlerPhysicalSplit(IMemoryPool *mp,
 								   CParseHandlerManager *parse_handler_mgr,
 								   CParseHandlerBase *parse_handler_root);
 	};

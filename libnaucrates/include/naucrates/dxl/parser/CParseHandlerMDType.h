@@ -136,7 +136,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerMDType(IMemoryPool *memory_pool,
+		CParseHandlerMDType(IMemoryPool *mp,
 							CParseHandlerManager *parse_handler_mgr,
 							CParseHandlerBase *parse_handler_root);
 

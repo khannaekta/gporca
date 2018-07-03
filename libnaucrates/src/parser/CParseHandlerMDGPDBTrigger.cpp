@@ -36,10 +36,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerMDGPDBTrigger::CParseHandlerMDGPDBTrigger(IMemoryPool *memory_pool,
+CParseHandlerMDGPDBTrigger::CParseHandlerMDGPDBTrigger(IMemoryPool *mp,
 													   CParseHandlerManager *parse_handler_mgr,
 													   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerMetadataObject(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerMetadataObject(mp, parse_handler_mgr, parse_handler_root),
 	  m_mdid(NULL),
 	  m_mdname(NULL),
 	  m_rel_mdid(NULL),
@@ -78,7 +78,7 @@ CParseHandlerMDGPDBTrigger::StartElement(const XMLCh *const,  // element_uri,
 		CDXLOperatorFactory::ExtractAttrValue(attrs, EdxltokenName, EdxltokenGPDBTrigger);
 	CWStringDynamic *str_name = CDXLUtils::CreateDynamicStringFromXMLChArray(
 		m_parse_handler_mgr->GetDXLMemoryManager(), xml_str_name);
-	m_mdname = GPOS_NEW(m_memory_pool) CMDName(m_memory_pool, str_name);
+	m_mdname = GPOS_NEW(m_mp) CMDName(m_mp, str_name);
 	GPOS_DELETE(str_name);
 	GPOS_ASSERT(m_mdid->IsValid() && NULL != m_mdname);
 
@@ -161,8 +161,8 @@ CParseHandlerMDGPDBTrigger::EndElement(const XMLCh *const,  // element_uri,
 	}
 
 	// construct the MD trigger object
-	m_imd_obj = GPOS_NEW(m_memory_pool) CMDTriggerGPDB(
-		m_memory_pool, m_mdid, m_mdname, m_rel_mdid, m_func_mdid, m_type, m_is_enabled);
+	m_imd_obj = GPOS_NEW(m_mp) CMDTriggerGPDB(
+		m_mp, m_mdid, m_mdname, m_rel_mdid, m_func_mdid, m_type, m_is_enabled);
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

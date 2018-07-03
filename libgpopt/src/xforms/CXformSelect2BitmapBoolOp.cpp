@@ -32,17 +32,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformSelect2BitmapBoolOp::CXformSelect2BitmapBoolOp
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformExploration
 		(
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalSelect(memory_pool),
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CLogicalGet(memory_pool)),  // logical child
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))  // predicate tree
+				mp,
+				GPOS_NEW(mp) CLogicalSelect(mp),
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalGet(mp)),  // logical child
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))  // predicate tree
 				)
 		)
 {}

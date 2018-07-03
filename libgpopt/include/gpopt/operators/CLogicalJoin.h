@@ -38,7 +38,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CLogicalJoin(IMemoryPool *memory_pool);
+			CLogicalJoin(IMemoryPool *mp);
 		
 			// dtor
 			virtual 
@@ -62,7 +62,7 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //memory_pool,
+						IMemoryPool *, //mp,
 						UlongColRefHashMap *, //colref_mapping,
 						BOOL //must_exist
 						)
@@ -78,47 +78,47 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsDeriveOutput
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 			{
-				return PcrsDeriveOutputCombineLogical(memory_pool, exprhdl);
+				return PcrsDeriveOutputCombineLogical(mp, exprhdl);
 			}
 					
 			// derive partition consumer info
 			virtual
 			CPartInfo *PpartinfoDerive
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				) 
 				const
 			{
-				return PpartinfoDeriveCombine(memory_pool, exprhdl);
+				return PpartinfoDeriveCombine(mp, exprhdl);
 			}
 
 			
 			// derive keys
 			CKeyCollection *PkcDeriveKeys
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PkcCombineKeys(memory_pool, exprhdl);
+				return PkcCombineKeys(mp, exprhdl);
 			}
 
 			// derive function properties
 			virtual
 			CFunctionProp *PfpDerive
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PfpDeriveFromScalar(memory_pool, exprhdl, exprhdl.Arity() - 1);
+				return PfpDeriveFromScalar(mp, exprhdl, exprhdl.Arity() - 1);
 			}
 
 			//-------------------------------------------------------------------------------------
@@ -152,7 +152,7 @@ namespace gpopt
 			virtual
 			IStatistics *PstatsDerive
 						(
-						IMemoryPool *memory_pool,
+						IMemoryPool *mp,
 						CExpressionHandle &exprhdl,
 						StatsArray *stats_ctxt
 						)
@@ -166,7 +166,7 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsStat
 					(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					CExpressionHandle &exprhdl,
 					CColRefSet *pcrsInput,
 					ULONG child_index
@@ -175,7 +175,7 @@ namespace gpopt
 			{
 				const ULONG arity = exprhdl.Arity();
 
-				return PcrsReqdChildStats(memory_pool, exprhdl, pcrsInput, exprhdl.GetDrvdScalarProps(arity - 1)->PcrsUsed(), child_index);
+				return PcrsReqdChildStats(mp, exprhdl, pcrsInput, exprhdl.GetDrvdScalarProps(arity - 1)->PcrsUsed(), child_index);
 			}
 
 			// return true if operator can select a subset of input tuples based on some predicate

@@ -23,7 +23,7 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLLogical::CDXLLogical(IMemoryPool *memory_pool) : CDXLOperator(memory_pool)
+CDXLLogical::CDXLLogical(IMemoryPool *mp) : CDXLOperator(mp)
 {
 }
 

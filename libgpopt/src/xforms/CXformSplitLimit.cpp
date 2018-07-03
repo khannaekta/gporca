@@ -29,19 +29,19 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformSplitLimit::CXformSplitLimit
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformExploration
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 					(
-					memory_pool,
-					GPOS_NEW(memory_pool) CLogicalLimit(memory_pool),
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // relational child
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),  // scalar child for offset
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))  // scalar child for number of rows
+					mp,
+					GPOS_NEW(mp) CLogicalLimit(mp),
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // relational child
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)),  // scalar child for offset
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp))  // scalar child for number of rows
 					)
 		)
 {}
@@ -98,7 +98,7 @@ CXformSplitLimit::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 	// extract components
 	CLogicalLimit *popLimit = CLogicalLimit::PopConvert(pexpr->Pop());
 	CExpression *pexprRelational = (*pexpr)[0];
@@ -122,7 +122,7 @@ CXformSplitLimit::Transform
 	// assemble local limit operator
 	CExpression *pexprLimitLocal = PexprLimit
 			(
-			memory_pool,
+			mp,
 			pexprRelational,
 			pexprScalarStart,
 			pexprScalarRows,
@@ -135,7 +135,7 @@ CXformSplitLimit::Transform
 	// assemble global limit operator
 	CExpression *pexprLimitGlobal = PexprLimit
 			(
-			memory_pool,
+			mp,
 			pexprLimitLocal,
 			pexprScalarStart,
 			pexprScalarRows,
@@ -160,7 +160,7 @@ CXformSplitLimit::Transform
 CExpression *
 CXformSplitLimit::PexprLimit
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexprRelational,
 	CExpression *pexprScalarStart,
 	CExpression *pexprScalarRows,
@@ -176,10 +176,10 @@ CXformSplitLimit::PexprLimit
 	pos->AddRef();
 
 	// assemble global limit operator
-	CExpression *pexprLimit = GPOS_NEW(memory_pool) CExpression
+	CExpression *pexprLimit = GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
-			GPOS_NEW(memory_pool) CLogicalLimit(memory_pool, pos, fGlobal, fHasCount, fTopLimitUnderDML),
+			mp,
+			GPOS_NEW(mp) CLogicalLimit(mp, pos, fGlobal, fHasCount, fTopLimitUnderDML),
 			pexprRelational,
 			pexprScalarStart,
 			pexprScalarRows

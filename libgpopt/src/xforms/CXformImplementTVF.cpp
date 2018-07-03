@@ -27,17 +27,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformImplementTVF::CXformImplementTVF
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformImplementation
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalTVF(memory_pool),
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternMultiLeaf(memory_pool))
+				mp,
+				GPOS_NEW(mp) CLogicalTVF(mp),
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternMultiLeaf(mp))
 				)
 		)
 {}
@@ -110,7 +110,7 @@ CXformImplementTVF::Transform
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CLogicalTVF *popTVF = CLogicalTVF::PopConvert(pexpr->Pop());
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// create/extract components for alternative
 	IMDId *mdid_func = popTVF->FuncMdId();
@@ -119,29 +119,29 @@ CXformImplementTVF::Transform
 	IMDId *mdid_return_type = popTVF->ReturnTypeMdId();
 	mdid_return_type->AddRef();
 
-	CWStringConst *str = GPOS_NEW(memory_pool) CWStringConst(popTVF->Pstr()->GetBuffer());
+	CWStringConst *str = GPOS_NEW(mp) CWStringConst(popTVF->Pstr()->GetBuffer());
 
 	ColumnDescrArray *pdrgpcoldesc = popTVF->Pdrgpcoldesc();
 	pdrgpcoldesc->AddRef();
 
 	ColRefArray *pdrgpcrOutput = popTVF->PdrgpcrOutput();
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(pdrgpcrOutput);
 
 	ExpressionArray *pdrgpexpr = pexpr->PdrgPexpr();
 
-	CPhysicalTVF *pphTVF = GPOS_NEW(memory_pool) CPhysicalTVF(memory_pool, mdid_func, mdid_return_type, str, pdrgpcoldesc, pcrs);
+	CPhysicalTVF *pphTVF = GPOS_NEW(mp) CPhysicalTVF(mp, mdid_func, mdid_return_type, str, pdrgpcoldesc, pcrs);
 
 	CExpression *pexprAlt = NULL;
 	// create alternative expression
 	if(NULL == pdrgpexpr || 0 == pdrgpexpr->Size())
 	{
-		pexprAlt = GPOS_NEW(memory_pool) CExpression(memory_pool, pphTVF);
+		pexprAlt = GPOS_NEW(mp) CExpression(mp, pphTVF);
 	}
 	else
 	{
 		pdrgpexpr->AddRef();
-		pexprAlt = GPOS_NEW(memory_pool) CExpression(memory_pool, pphTVF, pdrgpexpr);
+		pexprAlt = GPOS_NEW(mp) CExpression(mp, pphTVF, pdrgpexpr);
 	}
 
 	// add alternative to transformation result

@@ -72,10 +72,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CEngine::CEngine
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	m_memory_pool(memory_pool),
+	m_mp(mp),
 	m_pqc(NULL),
 	m_search_stage_array(NULL),
 	m_ulCurrSearchStage(0),
@@ -85,11 +85,11 @@ CEngine::CEngine
 	m_pdrgpulpXformCalls(NULL),
 	m_pdrgpulpXformTimes(NULL)
 {
-	m_pmemo = GPOS_NEW(memory_pool) CMemo(memory_pool);
-	m_pexprEnforcerPattern = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool));
-	m_xforms = GPOS_NEW(memory_pool) CXformSet(memory_pool);
-	m_pdrgpulpXformCalls = GPOS_NEW(memory_pool) ULONGPtrArray(memory_pool);
-	m_pdrgpulpXformTimes = GPOS_NEW(memory_pool) ULONGPtrArray(memory_pool);
+	m_pmemo = GPOS_NEW(mp) CMemo(mp);
+	m_pexprEnforcerPattern = GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp));
+	m_xforms = GPOS_NEW(mp) CXformSet(mp);
+	m_pdrgpulpXformCalls = GPOS_NEW(mp) ULONGPtrArray(mp);
+	m_pdrgpulpXformTimes = GPOS_NEW(mp) ULONGPtrArray(mp);
 }
 
 
@@ -166,7 +166,7 @@ CEngine::Init
 	m_search_stage_array = search_stage_array;
 	if (NULL == search_stage_array)
 	{
-		m_search_stage_array = CSearchStage::PdrgpssDefault(m_memory_pool);
+		m_search_stage_array = CSearchStage::PdrgpssDefault(m_mp);
 	}
 	GPOS_ASSERT(0 < m_search_stage_array->Size());
 
@@ -176,8 +176,8 @@ CEngine::Init
 		const ULONG ulStages = m_search_stage_array->Size();
 		for (ULONG ul = 0; ul < ulStages; ul++)
 		{
-			ULONG_PTR *pulpXformCalls = GPOS_NEW_ARRAY(m_memory_pool, ULONG_PTR, CXform::ExfSentinel);
-			ULONG_PTR *pulpXformTimes = GPOS_NEW_ARRAY(m_memory_pool, ULONG_PTR, CXform::ExfSentinel);
+			ULONG_PTR *pulpXformCalls = GPOS_NEW_ARRAY(m_mp, ULONG_PTR, CXform::ExfSentinel);
+			ULONG_PTR *pulpXformTimes = GPOS_NEW_ARRAY(m_mp, ULONG_PTR, CXform::ExfSentinel);
 			for (ULONG ulXform = 0; ulXform < CXform::ExfSentinel; ulXform++)
 			{
 				pulpXformCalls[ulXform] = 0;
@@ -315,15 +315,15 @@ CEngine::PgroupInsert
 	GPOS_ASSERT_IMP(NULL != pgroupOrigin, NULL == pgroupTarget);
 
 	// insert expression's children to memo by recursive call
-	GroupArray *pdrgpgroupChildren = GPOS_NEW(m_memory_pool) GroupArray(m_memory_pool, pexpr->Arity());
+	GroupArray *pdrgpgroupChildren = GPOS_NEW(m_mp) GroupArray(m_mp, pexpr->Arity());
 	InsertExpressionChildren(pexpr, pdrgpgroupChildren, exfidOrigin, pgexprOrigin);
 
 	COperator *pop = pexpr->Pop();
 	pop->AddRef();
 	CGroupExpression *pgexpr =
-		GPOS_NEW(m_memory_pool) CGroupExpression
+		GPOS_NEW(m_mp) CGroupExpression
 					(
-					m_memory_pool,
+					m_mp,
 					pop,
 					pdrgpgroupChildren,
 					exfidOrigin,
@@ -433,15 +433,15 @@ CEngine::DeriveStats
 	IMemoryPool *pmpLocal
 	)
 {
-	CWStringDynamic str(m_memory_pool);
+	CWStringDynamic str(m_mp);
 	COstreamString oss (&str);
 	oss << "\n[OPT]: Statistics Derivation Time (stage " << m_ulCurrSearchStage <<") ";
-	CHAR *sz = CUtils::CreateMultiByteCharStringFromWCString(m_memory_pool, const_cast<WCHAR *>(str.GetBuffer()));
+	CHAR *sz = CUtils::CreateMultiByteCharStringFromWCString(m_mp, const_cast<WCHAR *>(str.GetBuffer()));
 
 	{
 		CAutoTimer at(sz, GPOS_FTRACE(EopttracePrintOptimizationStatistics));
 		// derive stats on root group
-		CEngine::DeriveStats(pmpLocal, m_memory_pool, PgroupRoot(), NULL /*prprel*/);
+		CEngine::DeriveStats(pmpLocal, m_mp, PgroupRoot(), NULL /*prprel*/);
 	}
 
 	GPOS_DELETE_ARRAY(sz);
@@ -570,7 +570,7 @@ CEngine::FOptimizeChild
 	}
 
 
-	return COptimizationContext::FOptimize(m_memory_pool, pgexprParent, pgexprChild, pocChild, UlSearchStages());
+	return COptimizationContext::FOptimize(m_mp, pgexprParent, pgexprChild, pocChild, UlSearchStages());
 }
 
 //---------------------------------------------------------------------------
@@ -610,7 +610,7 @@ CEngine::FSafeToPruneWithDPEStats
 	}
 
 	// first child has been optimized
-	CExpressionHandle exprhdl(m_memory_pool);
+	CExpressionHandle exprhdl(m_mp);
 	exprhdl.Attach(pgexpr);
 	ULONG ulNextChild = exprhdl.UlNextOptimizedChildIndex(child_index);
 	CDrvdPropRelational *pdprelChild = CDrvdPropRelational::GetRelationalProperties((*pgexpr)[ulNextChild]->Pdp());
@@ -662,11 +662,11 @@ CEngine::FSafeToPrune
 
 	// check if container group has a plan for given properties
 	CGroup *pgroup = pgexpr->Pgroup();
-	COptimizationContext *pocGroup = pgroup->PocLookupBest(m_memory_pool, UlSearchStages(), prpp);
+	COptimizationContext *pocGroup = pgroup->PocLookupBest(m_mp, UlSearchStages(), prpp);
 	if (NULL != pocGroup && NULL != pocGroup->PccBest())
 	{
 		// compute a cost lower bound for the equivalent plan rooted by given group expression
-		CCost costLowerBound = pgexpr->CostLowerBound(m_memory_pool, prpp, pccChild, child_index);
+		CCost costLowerBound = pgexpr->CostLowerBound(m_mp, prpp, pccChild, child_index);
 		*pcostLowerBound = costLowerBound;
 		if (costLowerBound > pocGroup->PccBest()->Cost())
 		{
@@ -695,13 +695,13 @@ CEngine::Pmemotmap()
 	if (NULL == m_pmemo->Pmemotmap())
 	{
 		m_pqc->Prpp()->AddRef();
-		COptimizationContext *poc = GPOS_NEW(m_memory_pool) COptimizationContext
+		COptimizationContext *poc = GPOS_NEW(m_mp) COptimizationContext
 						(
-						m_memory_pool,
+						m_mp,
 						PgroupRoot(),
 						m_pqc->Prpp(),
-						GPOS_NEW(m_memory_pool) CReqdPropRelational(GPOS_NEW(m_memory_pool) CColRefSet(m_memory_pool)), // pass empty required relational properties initially
-						GPOS_NEW(m_memory_pool) StatsArray(m_memory_pool), // pass empty stats context initially
+						GPOS_NEW(m_mp) CReqdPropRelational(GPOS_NEW(m_mp) CColRefSet(m_mp)), // pass empty required relational properties initially
+						GPOS_NEW(m_mp) StatsArray(m_mp), // pass empty stats context initially
 						0 // ulSearchStageIndex
 						);
 
@@ -742,9 +742,9 @@ CEngine::ApplyTransformations
 		CXform *pxform = CXformFactory::Pxff()->Pxf(xsi.TBit());
 
 		// transform group expression, and insert results to memo
-		CXformResult *pxfres = GPOS_NEW(m_memory_pool) CXformResult(m_memory_pool);
+		CXformResult *pxfres = GPOS_NEW(m_mp) CXformResult(m_mp);
 		ULONG ulElapsedTime = 0;
-		pgexpr->Transform(m_memory_pool, pmpLocal, pxform, pxfres, &ulElapsedTime);
+		pgexpr->Transform(m_mp, pmpLocal, pxform, pxfres, &ulElapsedTime);
 		InsertXformResult(pgexpr->Pgroup(), pxfres, pxform->Exfid(), pgexpr, ulElapsedTime);
 		pxfres->Release();
 
@@ -808,7 +808,7 @@ CEngine::TransitionGroupExpression
 
 	// get all applicable xforms
 	COperator *pop = pgexpr->Pop();
-	CXformSet *pxfsCandidates = CLogical::PopConvert(pop)->PxfsCandidates(m_memory_pool);
+	CXformSet *pxfsCandidates = CLogical::PopConvert(pop)->PxfsCandidates(m_mp);
 
 	// intersect them with the required set of xforms, then apply transformations
 	pxfsCandidates->Intersection(xform_set);
@@ -947,7 +947,7 @@ CEngine::PocChild
 	exprhdlPlan.Prpp(child_index)->AddRef();
 
 	// use current stats for optimizing current child
-	StatsArray *stats_ctxt = GPOS_NEW(m_memory_pool) StatsArray(m_memory_pool);
+	StatsArray *stats_ctxt = GPOS_NEW(m_mp) StatsArray(m_mp);
 	CUtils::AddRefAppend<IStatistics, CleanupStats>(stats_ctxt, pdrgpstatCurrentCtxt);
 
 	// compute required relational properties
@@ -966,9 +966,9 @@ CEngine::PocChild
 	prprel->AddRef();
 
 	COptimizationContext *pocChild =
-			GPOS_NEW(m_memory_pool) COptimizationContext
+			GPOS_NEW(m_mp) COptimizationContext
 				(
-				m_memory_pool,
+				m_mp,
 				pgroupChild,
 				exprhdlPlan.Prpp(child_index),
 				prprel,
@@ -1024,7 +1024,7 @@ CEngine::PccOptimizeChild
 	}
 
 	// derive plan properties of child group optimal implementation
-	COptimizationContext *pocFound = pgroupChild->PocLookupBest(m_memory_pool, m_search_stage_array->Size(), exprhdl.Prpp(child_index));
+	COptimizationContext *pocFound = pgroupChild->PocLookupBest(m_mp, m_search_stage_array->Size(), exprhdl.Prpp(child_index));
 	GPOS_ASSERT(NULL != pocFound);
 
 	CCostContext *pccChildBest = pocFound->PccBest();
@@ -1036,7 +1036,7 @@ CEngine::PccOptimizeChild
 		FSafeToPrune(pgexpr, pocOrigin->Prpp(), pccChildBest, child_index, &costLowerBound))
 	{
 		// failed to optimize child due to cost bounding
-		(void) pgexpr->PccComputeCost(m_memory_pool, pocOrigin, ulOptReq, NULL /*pdrgpoc*/, true /*fPruned*/, costLowerBound);
+		(void) pgexpr->PccComputeCost(m_mp, pocOrigin, ulOptReq, NULL /*pdrgpoc*/, true /*fPruned*/, costLowerBound);
 		return NULL;
 	}
 
@@ -1067,19 +1067,19 @@ CEngine::PdrgpocOptimizeChildren
 	if (0 == arity)
 	{
 		// return empty array if no children
-		return GPOS_NEW(m_memory_pool) OptimizationContextArray(m_memory_pool);
+		return GPOS_NEW(m_mp) OptimizationContextArray(m_mp);
 	}
 
 	// create array of child derived properties
-	DrgPdp *pdrgpdp = GPOS_NEW(m_memory_pool) DrgPdp(m_memory_pool);
+	DrgPdp *pdrgpdp = GPOS_NEW(m_mp) DrgPdp(m_mp);
 
 	// initialize current stats context with input stats context
-	StatsArray *pdrgpstatCurrentCtxt = GPOS_NEW(m_memory_pool) StatsArray(m_memory_pool);
+	StatsArray *pdrgpstatCurrentCtxt = GPOS_NEW(m_mp) StatsArray(m_mp);
 	CUtils::AddRefAppend<IStatistics, CleanupStats>(pdrgpstatCurrentCtxt, pocOrigin->Pdrgpstat());
 
 	// initialize required relational properties computation
-	CExpressionHandle exprhdlRel(m_memory_pool);
-	CGroupExpression *pgexprForStats = pgexpr->Pgroup()->PgexprBestPromise(m_memory_pool, pgexpr);
+	CExpressionHandle exprhdlRel(m_mp);
+	CGroupExpression *pgexprForStats = pgexpr->Pgroup()->PgexprBestPromise(m_mp, pgexpr);
 	if (NULL != pgexprForStats)
 	{
 		exprhdlRel.Attach(pgexprForStats);
@@ -1106,7 +1106,7 @@ CEngine::PdrgpocOptimizeChildren
 			break;
 		}
 
-		CExpressionHandle exprhdlChild(m_memory_pool);
+		CExpressionHandle exprhdlChild(m_mp);
 		exprhdlChild.Attach(pccChildBest);
 		exprhdlChild.DerivePlanProps();
 		exprhdlChild.Pdp()->AddRef();
@@ -1129,7 +1129,7 @@ CEngine::PdrgpocOptimizeChildren
 	}
 
 	// return child optimization contexts array
-	return PdrgpocChildren(m_memory_pool, exprhdl);
+	return PdrgpocChildren(m_mp, exprhdl);
 }
 
 
@@ -1152,7 +1152,7 @@ CEngine::OptimizeGroupExpression
 	const ULONG ulOptRequests = CPhysical::PopConvert(pgexpr->Pop())->UlOptRequests();
 	for (ULONG ul = 0; ul < ulOptRequests; ul++)
 	{
-		CExpressionHandle exprhdl(m_memory_pool);
+		CExpressionHandle exprhdl(m_mp);
 		exprhdl.Attach(pgexpr);
 		exprhdl.DeriveProps(NULL /*pdpctxt*/);
 
@@ -1161,7 +1161,7 @@ CEngine::OptimizeGroupExpression
 		if (FSafeToPrune(pgexpr, poc->Prpp(), NULL /*pccChild*/,
 						 gpos::ulong_max /*child_index*/, &costLowerBound))
 		{
-			(void) pgexpr->PccComputeCost(m_memory_pool, poc, ul, NULL /*pdrgpoc*/, true /*fPruned*/, costLowerBound);
+			(void) pgexpr->PccComputeCost(m_mp, poc, ul, NULL /*pdrgpoc*/, true /*fPruned*/, costLowerBound);
 			continue;
 		}
 
@@ -1173,10 +1173,10 @@ CEngine::OptimizeGroupExpression
 			// optimize child groups
 			OptimizationContextArray *pdrgpoc = PdrgpocOptimizeChildren(exprhdl, poc, ul);
 
-			if (NULL != pdrgpoc && FCheckEnfdProps(m_memory_pool, pgexpr, poc, ul, pdrgpoc))
+			if (NULL != pdrgpoc && FCheckEnfdProps(m_mp, pgexpr, poc, ul, pdrgpoc))
 			{
 				// compute group expression cost under the current optimization context
-				CCostContext *pccComputed = pgexpr->PccComputeCost(m_memory_pool, poc, ul, pdrgpoc, false /*fPruned*/, CCost(0.0));
+				CCostContext *pccComputed = pgexpr->PccComputeCost(m_mp, poc, ul, pdrgpoc, false /*fPruned*/, CCost(0.0));
 
 				if (NULL != pccComputed)
 				{
@@ -1280,7 +1280,7 @@ CEngine::Explore()
 	// explore root group
 	GPOS_ASSERT(!PgroupRoot()->FExplored());
 
-	TransitionGroup(m_memory_pool, PgroupRoot(), CGroup::estExplored /*estTarget*/);
+	TransitionGroup(m_mp, PgroupRoot(), CGroup::estExplored /*estTarget*/);
 	GPOS_ASSERT_IMP
 		(
 		!PssCurrent()->FTimedOut(),
@@ -1306,7 +1306,7 @@ CEngine::Implement()
 	// implement root group
 	GPOS_ASSERT(!PgroupRoot()->FImplemented());
 
-	TransitionGroup(m_memory_pool, PgroupRoot(), CGroup::estImplemented /*estTarget*/);
+	TransitionGroup(m_mp, PgroupRoot(), CGroup::estImplemented /*estTarget*/);
 	GPOS_ASSERT_IMP
 		(
 		!PssCurrent()->FTimedOut(),
@@ -1350,13 +1350,13 @@ CEngine::RecursiveOptimize()
 		// optimize root group
 		m_pqc->Prpp()->AddRef();
 		COptimizationContext *poc =
-			GPOS_NEW(m_memory_pool) COptimizationContext
+			GPOS_NEW(m_mp) COptimizationContext
 				(
-				m_memory_pool,
+				m_mp,
 				PgroupRoot(),
 				m_pqc->Prpp(),
-				GPOS_NEW(m_memory_pool) CReqdPropRelational(GPOS_NEW(m_memory_pool) CColRefSet(m_memory_pool)), // pass empty required relational properties initially
-				GPOS_NEW(m_memory_pool) StatsArray(m_memory_pool), // pass an empty stats context initially
+				GPOS_NEW(m_mp) CReqdPropRelational(GPOS_NEW(m_mp) CColRefSet(m_mp)), // pass empty required relational properties initially
+				GPOS_NEW(m_mp) StatsArray(m_mp), // pass an empty stats context initially
 				m_ulCurrSearchStage
 				);
 		(void) PgexprOptimize(PgroupRoot(), poc, NULL /*pgexprOrigin*/);
@@ -1366,7 +1366,7 @@ CEngine::RecursiveOptimize()
 		CExpression *pexprPlan =
 			m_pmemo->PexprExtractPlan
 								(
-								m_memory_pool,
+								m_mp,
 								m_pmemo->PgroupRoot(),
 								m_pqc->Prpp(),
 								m_search_stage_array->Size()
@@ -1377,7 +1377,7 @@ CEngine::RecursiveOptimize()
 	}
 
 	{
-		CAutoTrace atSearch(m_memory_pool);
+		CAutoTrace atSearch(m_mp);
 		atSearch.Os() << "[OPT]: Search terminated at stage " << m_ulCurrSearchStage << "/" << m_search_stage_array->Size();
 	}
 
@@ -1402,13 +1402,13 @@ CEngine::RecursiveOptimize()
 OptimizationContextArray *
 CEngine::PdrgpocChildren
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 {
 	GPOS_ASSERT(NULL != exprhdl.Pgexpr());
 
-	OptimizationContextArray *pdrgpoc = GPOS_NEW(memory_pool) OptimizationContextArray(memory_pool);
+	OptimizationContextArray *pdrgpoc = GPOS_NEW(mp) OptimizationContextArray(mp);
 	const ULONG arity = exprhdl.Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
@@ -1416,7 +1416,7 @@ CEngine::PdrgpocChildren
 		if (!pgroupChild->FScalar())
 		{
 			COptimizationContext *poc =
-				pgroupChild->PocLookupBest(memory_pool, m_search_stage_array->Size(), exprhdl.Prpp(ul));
+				pgroupChild->PocLookupBest(mp, m_search_stage_array->Size(), exprhdl.Prpp(ul));
 			GPOS_ASSERT(NULL != poc);
 
 			poc->AddRef();
@@ -1466,31 +1466,31 @@ CEngine::FinalizeExploration()
 	{
 		// derive statistics
 		m_pmemo->ResetStats();
-		DeriveStats(m_memory_pool);
+		DeriveStats(m_mp);
 	}
 
 	if (!GPOS_FTRACE(EopttraceDonotDeriveStatsForAllGroups))
 	{
 		// derive stats for every group without stats
-		m_pmemo->DeriveStatsIfAbsent(m_memory_pool);
+		m_pmemo->DeriveStatsIfAbsent(m_mp);
 	}
 
 	if (GPOS_FTRACE(EopttracePrintMemoAfterExploration))
 	{
 		{
-			CAutoTrace at(m_memory_pool);
+			CAutoTrace at(m_mp);
 			at.Os() << "MEMO after exploration (stage " << m_ulCurrSearchStage << ")" << std::endl;
 		}
 
 		{
-			CAutoTrace at(m_memory_pool);
+			CAutoTrace at(m_mp);
 			at.Os() << *this;
 		}
 	}
 
 	if (GPOS_FTRACE(EopttracePrintOptimizationStatistics))
 	{
-		CAutoTrace at(m_memory_pool);
+		CAutoTrace at(m_mp);
 		(void) OsPrintMemoryConsumption(at.Os(), "Memory consumption after exploration ");
 	}
 
@@ -1511,19 +1511,19 @@ CEngine::FinalizeImplementation()
 	if (GPOS_FTRACE(EopttracePrintMemoAfterImplementation))
 	{
 		{
-			CAutoTrace at(m_memory_pool);
+			CAutoTrace at(m_mp);
 			at.Os() << "MEMO after implementation (stage " << m_ulCurrSearchStage << ")" << std::endl;
 		}
 
 		{
-			CAutoTrace at(m_memory_pool);
+			CAutoTrace at(m_mp);
 			at.Os() << *this;
 		}
 	}
 
 	if (GPOS_FTRACE(EopttracePrintOptimizationStatistics))
 	{
-		CAutoTrace at(m_memory_pool);
+		CAutoTrace at(m_mp);
 		(void) OsPrintMemoryConsumption(at.Os(), "Memory consumption after implementation ");
 	}
 }
@@ -1543,7 +1543,7 @@ CEngine::FinalizeSearchStage()
 
 	m_xforms->Release();
 	m_xforms = NULL;
-	m_xforms = GPOS_NEW(m_memory_pool) CXformSet(m_memory_pool);
+	m_xforms = GPOS_NEW(m_mp) CXformSet(m_mp);
 
 	m_ulCurrSearchStage++;
 	m_pmemo->ResetGroupStates();
@@ -1605,7 +1605,7 @@ CEngine::OsPrintMemoryConsumption
 	CMDAccessor::MDCache *pcache = md_accessor->Pcache();
 
 	os << std::endl << szHeader
-		<<  "Engine: [" << (DOUBLE) m_memory_pool->TotalAllocatedSize() / GPOPT_MEM_UNIT << "] " << GPOPT_MEM_UNIT_NAME
+		<<  "Engine: [" << (DOUBLE) m_mp->TotalAllocatedSize() / GPOPT_MEM_UNIT << "] " << GPOPT_MEM_UNIT_NAME
 		<< ", MD Cache: [" << (DOUBLE) (pcache->TotalAllocatedSize()) / GPOPT_MEM_UNIT << "] " << GPOPT_MEM_UNIT_NAME
 		<< ", Total: [" << (DOUBLE) (CMemoryPoolManager::GetMemoryPoolMgr()->TotalAllocatedSize()) / GPOPT_MEM_UNIT << "] " << GPOPT_MEM_UNIT_NAME;
 
@@ -1627,19 +1627,19 @@ CEngine::ProcessTraceFlags()
 	if (GPOS_FTRACE(EopttracePrintMemoAfterOptimization))
 	{
 		{
-			CAutoTrace at(m_memory_pool);
+			CAutoTrace at(m_mp);
 			at.Os() << "MEMO after optimization (stage "<< m_ulCurrSearchStage << "):" << std::endl;
 		}
 
 		{
-			CAutoTrace at(m_memory_pool);
+			CAutoTrace at(m_mp);
 			at.Os() << *this;
 		}
 	}
 
 	if (GPOS_FTRACE(EopttracePrintOptimizationStatistics))
 	{
-		CAutoTrace at(m_memory_pool);
+		CAutoTrace at(m_mp);
 
 		// print optimization stats
 		at.Os()
@@ -1695,7 +1695,7 @@ CEngine::Optimize()
 	{
 		if (GPOS_FTRACE(EopttracePrintOptimizationStatistics))
 		{
-			CAutoTrace atSearch(m_memory_pool);
+			CAutoTrace atSearch(m_mp);
 			atSearch.Os() << "[OPT]: Search terminated at stage " << m_ulCurrSearchStage << "/" << m_search_stage_array->Size();
 		}
 	}
@@ -1722,11 +1722,11 @@ CEngine::MainThreadOptimize()
 	GPOS_ASSERT(NULL != COptCtxt::PoctxtFromTLS());
 
 	const ULONG ulJobs = std::min((ULONG) GPOPT_JOBS_CAP, (ULONG) (m_pmemo->UlpGroups() * GPOPT_JOBS_PER_GROUP));
-	CJobFactory jf(m_memory_pool, ulJobs);
-	CScheduler sched(m_memory_pool, ulJobs, 1 /*ulWorkers*/);
+	CJobFactory jf(m_mp, ulJobs);
+	CScheduler sched(m_mp, ulJobs, 1 /*ulWorkers*/);
 
 	CSchedulerContext sc;
-	sc.Init(m_memory_pool, &jf, &sched, this);
+	sc.Init(m_mp, &jf, &sched, this);
 
 	const ULONG ulSearchStages = m_search_stage_array->Size();
 	for (ULONG ul = 0; !FSearchTerminated() && ul < ulSearchStages; ul++)
@@ -1735,13 +1735,13 @@ CEngine::MainThreadOptimize()
 
 		// optimize root group
 		m_pqc->Prpp()->AddRef();
-		COptimizationContext *poc = GPOS_NEW(m_memory_pool) COptimizationContext
+		COptimizationContext *poc = GPOS_NEW(m_mp) COptimizationContext
 							(
-							m_memory_pool,
+							m_mp,
 							PgroupRoot(),
 							m_pqc->Prpp(),
-							GPOS_NEW(m_memory_pool) CReqdPropRelational(GPOS_NEW(m_memory_pool) CColRefSet(m_memory_pool)), // pass empty required relational properties initially
-							GPOS_NEW(m_memory_pool) StatsArray(m_memory_pool), // pass empty stats context initially
+							GPOS_NEW(m_mp) CReqdPropRelational(GPOS_NEW(m_mp) CColRefSet(m_mp)), // pass empty required relational properties initially
+							GPOS_NEW(m_mp) StatsArray(m_mp), // pass empty stats context initially
 							m_ulCurrSearchStage
 							);
 
@@ -1757,7 +1757,7 @@ CEngine::MainThreadOptimize()
 		CExpression *pexprPlan =
 			m_pmemo->PexprExtractPlan
 								(
-								m_memory_pool,
+								m_mp,
 								m_pmemo->PgroupRoot(),
 								m_pqc->Prpp(),
 								m_search_stage_array->Size()
@@ -1787,11 +1787,11 @@ CEngine::MultiThreadedOptimize
 	GPOS_ASSERT(NULL != COptCtxt::PoctxtFromTLS());
 
 	const ULONG ulJobs = std::min((ULONG) GPOPT_JOBS_CAP, (ULONG) (m_pmemo->UlpGroups() * GPOPT_JOBS_PER_GROUP));
-	CJobFactory jf(m_memory_pool, ulJobs);
-	CScheduler sched(m_memory_pool, ulJobs, ulWorkers);
+	CJobFactory jf(m_mp, ulJobs);
+	CScheduler sched(m_mp, ulJobs, ulWorkers);
 
 	CSchedulerContext sc;
-	sc.Init(m_memory_pool, &jf, &sched, this);
+	sc.Init(m_mp, &jf, &sched, this);
 
 	const ULONG ulSearchStages = m_search_stage_array->Size();
 	for (ULONG ul = 0; !FSearchTerminated() && ul < ulSearchStages; ul++)
@@ -1800,13 +1800,13 @@ CEngine::MultiThreadedOptimize
 
 		// optimize root group
 		m_pqc->Prpp()->AddRef();
-		COptimizationContext *poc = GPOS_NEW(m_memory_pool) COptimizationContext
+		COptimizationContext *poc = GPOS_NEW(m_mp) COptimizationContext
 								(
-								m_memory_pool,
+								m_mp,
 								PgroupRoot(),
 								m_pqc->Prpp(),
-								GPOS_NEW(m_memory_pool) CReqdPropRelational(GPOS_NEW(m_memory_pool) CColRefSet(m_memory_pool)), // pass empty required relational properties initially
-								GPOS_NEW(m_memory_pool) StatsArray(m_memory_pool), // pass empty stats context initially
+								GPOS_NEW(m_mp) CReqdPropRelational(GPOS_NEW(m_mp) CColRefSet(m_mp)), // pass empty required relational properties initially
+								GPOS_NEW(m_mp) StatsArray(m_mp), // pass empty stats context initially
 								m_ulCurrSearchStage
 								);
 
@@ -1815,27 +1815,27 @@ CEngine::MultiThreadedOptimize
 
 		// create task array
 		CAutoRg<CTask*> a_rgptsk;
-		a_rgptsk = GPOS_NEW_ARRAY(m_memory_pool, CTask*, ulWorkers);
+		a_rgptsk = GPOS_NEW_ARRAY(m_mp, CTask*, ulWorkers);
 
 		// create scheduling contexts
 		CAutoRg<CSchedulerContext> a_rgsc;
-		a_rgsc = GPOS_NEW_ARRAY(m_memory_pool, CSchedulerContext, ulWorkers);
+		a_rgsc = GPOS_NEW_ARRAY(m_mp, CSchedulerContext, ulWorkers);
 
 		// scope for ATP
 		{
 			CWorkerPoolManager *pwpm = CWorkerPoolManager::WorkerPoolManager();
-			CAutoTaskProxy atp(m_memory_pool, pwpm);
+			CAutoTaskProxy atp(m_mp, pwpm);
 
 			for (ULONG i = 0; i < ulWorkers; i++)
 			{
 				// initialize scheduling context
-				a_rgsc[i].Init(m_memory_pool, &jf, &sched, this);
+				a_rgsc[i].Init(m_mp, &jf, &sched, this);
 
 				// create scheduling task
 				a_rgptsk[i] = atp.Create(CScheduler::Run, &a_rgsc[i]);
 
 				// store a pointer to optimizer's context in current task local storage
-				a_rgptsk[i]->GetTls().Reset(m_memory_pool);
+				a_rgptsk[i]->GetTls().Reset(m_mp);
 				a_rgptsk[i]->GetTls().Store(COptCtxt::PoctxtFromTLS());
 			}
 
@@ -1859,7 +1859,7 @@ CEngine::MultiThreadedOptimize
 		CExpression *pexprPlan =
 			m_pmemo->PexprExtractPlan
 								(
-								m_memory_pool,
+								m_mp,
 								m_pmemo->PgroupRoot(),
 								m_pqc->Prpp(),
 								m_search_stage_array->Size()
@@ -1886,8 +1886,8 @@ CEngine::PexprUnrank
 {
 	// The CTE map will be updated by the Producer instead of the Sequence operator
 	// because we are doing a DFS traversal of the TreeMap.
-	CDrvdPropCtxtPlan *pdpctxtplan = GPOS_NEW(m_memory_pool) CDrvdPropCtxtPlan(m_memory_pool, false /*fUpdateCTEMap*/);
-	CExpression *pexpr = Pmemotmap()->PrUnrank(m_memory_pool, pdpctxtplan, plan_id);
+	CDrvdPropCtxtPlan *pdpctxtplan = GPOS_NEW(m_mp) CDrvdPropCtxtPlan(m_mp, false /*fUpdateCTEMap*/);
+	CExpression *pexpr = Pmemotmap()->PrUnrank(m_mp, pdpctxtplan, plan_id);
 	pdpctxtplan->Release();
 
 #ifdef GPOS_DEBUG
@@ -1897,7 +1897,7 @@ CEngine::PexprUnrank
 	BOOL fCheck = pec->FCheckPlan(pexpr);
 	if (!fCheck)
 	{
-		CAutoTrace at(m_memory_pool);
+		CAutoTrace at(m_mp);
 		at.Os() << "\nextracted plan failed PlanChecker function: " << std::endl << *pexpr;
 	}
 	GPOS_ASSERT(fCheck);
@@ -1926,7 +1926,7 @@ CEngine::PexprExtractPlan()
 	CEnumeratorConfig *pec = optimizer_config->GetEnumeratorCfg();
 	if (pec->FEnumerate())
 	{
-		CAutoTrace at(m_memory_pool);
+		CAutoTrace at(m_mp);
 		ULLONG ullCount = Pmemotmap()->UllCount();
 		at.Os() << "[OPT]: Number of plan alternatives: " << ullCount << std::endl;
 
@@ -1948,14 +1948,14 @@ CEngine::PexprExtractPlan()
 	if (fGenerateAlt)
 	{
 		pexpr = PexprUnrank(pec->GetPlanId() - 1 /*rank of plan alternative is zero-based*/);
-		CAutoTrace at(m_memory_pool);
+		CAutoTrace at(m_mp);
 		at.Os() << "[OPT]: Successfully generated plan: " << pec->GetPlanId() << std::endl;
 	}
 	else
 	{
 		pexpr = m_pmemo->PexprExtractPlan
 						(
-						m_memory_pool,
+						m_mp,
 						m_pmemo->PgroupRoot(),
 						m_pqc->Prpp(),
 						m_search_stage_array->Size()
@@ -2092,7 +2092,7 @@ CEngine::SamplePlans()
 	CExpression *pexpr =
 			m_pmemo->PexprExtractPlan
 				(
-				m_memory_pool,
+				m_mp,
 				m_pmemo->PgroupRoot(),
 				m_pqc->Prpp(),
 				m_search_stage_array->Size()
@@ -2185,7 +2185,7 @@ CEngine::SamplePlans()
 BOOL
 CEngine::FCheckEnfdProps
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CGroupExpression *pgexpr,
 	COptimizationContext *poc,
 	ULONG ulOptReq,
@@ -2196,7 +2196,7 @@ CEngine::FCheckEnfdProps
 
 	if (GPOS_FTRACE(EopttracePrintMemoEnforcement))
 	{
-		CAutoTrace at(m_memory_pool);
+		CAutoTrace at(m_mp);
 		at.Os() << "CEngine::FCheckEnfdProps (Group ID: " << pgexpr->Pgroup()->Id() <<
 				" Expression ID: " <<  pgexpr->Id() << ")"<< std::endl;
 		m_pmemo->OsPrint(at.Os());
@@ -2212,9 +2212,9 @@ CEngine::FCheckEnfdProps
 	poc->AddRef();
 	pgexpr->AddRef();
 	pdrgpoc->AddRef();
-	CCostContext *pcc= GPOS_NEW(memory_pool) CCostContext(memory_pool, poc, ulOptReq, pgexpr);
+	CCostContext *pcc= GPOS_NEW(mp) CCostContext(mp, poc, ulOptReq, pgexpr);
 	pcc->SetChildContexts(pdrgpoc);
-	CExpressionHandle exprhdl(memory_pool);
+	CExpressionHandle exprhdl(mp);
 	exprhdl.Attach(pcc);
 	exprhdl.DerivePlanProps();
 	pcc->Release();
@@ -2224,7 +2224,7 @@ CEngine::FCheckEnfdProps
 
 	// check whether the current physical operator satisfies the CTE requirements
 	// and whether it is a motion over unresolved part consumers
-	if (!FValidCTEAndPartitionProperties(memory_pool, exprhdl, prpp))
+	if (!FValidCTEAndPartitionProperties(mp, exprhdl, prpp))
 	{
 		return false;
 	}
@@ -2278,19 +2278,19 @@ CEngine::FCheckEnfdProps
 		return false;
 	}
 
-	ExpressionArray *pdrgpexprEnforcers = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexprEnforcers = GPOS_NEW(mp) ExpressionArray(mp);
 
 	// extract a leaf pattern from target group
 	CBinding binding;
 	CExpression *pexpr =
-		binding.PexprExtract(m_memory_pool, exprhdl.Pgexpr(), m_pexprEnforcerPattern, NULL /* pexprLast */);
+		binding.PexprExtract(m_mp, exprhdl.Pgexpr(), m_pexprEnforcerPattern, NULL /* pexprLast */);
 	GPOS_ASSERT(NULL != pexpr);
 	GPOS_ASSERT(pexpr->Pgexpr()->Pgroup() == pgexpr->Pgroup());
 		
-	prpp->Peo()->AppendEnforcers(memory_pool, prpp, pdrgpexprEnforcers, pexpr, epetOrder, exprhdl);
-	prpp->Ped()->AppendEnforcers(memory_pool, prpp, pdrgpexprEnforcers, pexpr, epetDistribution, exprhdl);
-	prpp->Per()->AppendEnforcers(memory_pool, prpp, pdrgpexprEnforcers, pexpr, epetRewindability, exprhdl);
-	prpp->Pepp()->AppendEnforcers(memory_pool, prpp, pdrgpexprEnforcers, pexpr, epetPartitionPropagation, exprhdl);
+	prpp->Peo()->AppendEnforcers(mp, prpp, pdrgpexprEnforcers, pexpr, epetOrder, exprhdl);
+	prpp->Ped()->AppendEnforcers(mp, prpp, pdrgpexprEnforcers, pexpr, epetDistribution, exprhdl);
+	prpp->Per()->AppendEnforcers(mp, prpp, pdrgpexprEnforcers, pexpr, epetRewindability, exprhdl);
+	prpp->Pepp()->AppendEnforcers(mp, prpp, pdrgpexprEnforcers, pexpr, epetPartitionPropagation, exprhdl);
 
 	if (0 < pdrgpexprEnforcers->Size())
 	{
@@ -2318,7 +2318,7 @@ CEngine::FCheckEnfdProps
 BOOL
 CEngine::FValidCTEAndPartitionProperties
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CReqdPropPlan *prpp
 	)
@@ -2327,7 +2327,7 @@ CEngine::FValidCTEAndPartitionProperties
 	CPartIndexMap *ppimDrvd = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Ppim();
 
 	return popPhysical->FProvidesReqdCTEs(exprhdl, prpp->Pcter()) &&
-			!CUtils::FMotionOverUnresolvedPartConsumers(memory_pool, exprhdl, prpp->Pepp()->PppsRequired()->Ppim()) &&
+			!CUtils::FMotionOverUnresolvedPartConsumers(mp, exprhdl, prpp->Pepp()->PppsRequired()->Ppim()) &&
 			!ppimDrvd->FContainsRedundantPartitionSelectors(prpp->Pepp()->PppsRequired()->Ppim());
 }
 
@@ -2456,14 +2456,14 @@ CEngine::FCheckReqdProps
 
 	if (GPOS_FTRACE(EopttracePrintMemoEnforcement))
 	{
-		CAutoTrace at(m_memory_pool);
+		CAutoTrace at(m_mp);
 		at.Os() << "CEngine::FCheckReqdProps (Group ID: " << exprhdl.Pgexpr()->Pgroup()->Id() <<
 				" Expression ID: " <<  exprhdl.Pgexpr()->Id() << ")" << std::endl;
 		m_pmemo->OsPrint(at.Os());
 	}
 
 	// check if operator provides required columns
-	if (!prpp->FProvidesReqdCols(m_memory_pool, exprhdl, ulOptReq))
+	if (!prpp->FProvidesReqdCols(m_mp, exprhdl, ulOptReq))
 	{
 		return false;
 	}
@@ -2515,7 +2515,7 @@ CEngine::FCheckReqdProps
 void
 CEngine::PrintRoot()
 {
-	CAutoTrace at(m_memory_pool);
+	CAutoTrace at(m_mp);
 	at.Os() << "Root Group:" << std::endl;
 	m_pmemo->Pgroup(m_pmemo->PgroupRoot()->Id())->OsPrint(at.Os());
 	at.Os() << std::endl;
@@ -2533,9 +2533,9 @@ CEngine::PrintRoot()
 void
 CEngine::PrintOptCtxts()
 {
-	CAutoTrace at(m_memory_pool);
+	CAutoTrace at(m_mp);
 	COptimizationContext *poc =
-		m_pmemo->PgroupRoot()->PocLookupBest(m_memory_pool, m_search_stage_array->Size(), m_pqc->Prpp());
+		m_pmemo->PgroupRoot()->PocLookupBest(m_mp, m_search_stage_array->Size(), m_pqc->Prpp());
 	GPOS_ASSERT(NULL != poc);
 
 	at.Os() << std::endl << "Main Opt Ctxt:" << std::endl;

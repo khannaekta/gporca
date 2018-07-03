@@ -26,9 +26,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarArrayRefIndexList::CDXLScalarArrayRefIndexList(IMemoryPool *memory_pool,
+CDXLScalarArrayRefIndexList::CDXLScalarArrayRefIndexList(IMemoryPool *mp,
 														 EIndexListBound index_list_bound)
-	: CDXLScalar(memory_pool), m_index_list_bound(index_list_bound)
+	: CDXLScalar(mp), m_index_list_bound(index_list_bound)
 {
 	GPOS_ASSERT(EilbSentinel > index_list_bound);
 }

@@ -32,12 +32,12 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalJoin::CPhysicalJoin
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CPhysical(memory_pool)
+	CPhysical(mp)
 {
-	m_phmpp = GPOS_NEW(memory_pool) HMPartPropagation(memory_pool);
+	m_phmpp = GPOS_NEW(mp) HMPartPropagation(mp);
 }
 
 
@@ -85,22 +85,22 @@ CPhysicalJoin::Matches
 COrderSpec *
 CPhysicalJoin::PosPropagateToOuter
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	COrderSpec *posRequired
 	)
 {
 	// propagate the order requirement to the outer child only if all the columns
 	// specified by the order requirement come from the outer child
-	CColRefSet *pcrs = posRequired->PcrsUsed(memory_pool);
+	CColRefSet *pcrs = posRequired->PcrsUsed(mp);
 	BOOL fOuterSortCols = exprhdl.GetRelationalProperties(0)->PcrsOutput()->ContainsAll(pcrs);
 	pcrs->Release();
 	if (fOuterSortCols)
 	{
-		return PosPassThru(memory_pool, exprhdl, posRequired, 0 /*child_index*/);
+		return PosPassThru(mp, exprhdl, posRequired, 0 /*child_index*/);
 	}
 
-	return GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+	return GPOS_NEW(mp) COrderSpec(mp);
 }
 
 
@@ -115,7 +115,7 @@ CPhysicalJoin::PosPropagateToOuter
 CColRefSet *
 CPhysicalJoin::PcrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CColRefSet *pcrsRequired,
 	ULONG child_index,
@@ -126,7 +126,7 @@ CPhysicalJoin::PcrsRequired
 	GPOS_ASSERT(child_index < 2 &&
 				"Required properties can only be computed on the relational child");
 	
-	return PcrsChildReqd(memory_pool, exprhdl, pcrsRequired, child_index, 2 /*ulScalarIndex*/);
+	return PcrsChildReqd(mp, exprhdl, pcrsRequired, child_index, 2 /*ulScalarIndex*/);
 }
 
 //---------------------------------------------------------------------------
@@ -140,7 +140,7 @@ CPhysicalJoin::PcrsRequired
 CPartitionPropagationSpec *
 CPhysicalJoin::PppsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CPartitionPropagationSpec *pppsRequired,
 	ULONG child_index,
@@ -150,7 +150,7 @@ CPhysicalJoin::PppsRequired
 {
 	GPOS_ASSERT(NULL != pppsRequired);
 	
-	return CPhysical::PppsRequiredPushThruNAry(memory_pool, exprhdl, pppsRequired, child_index);
+	return CPhysical::PppsRequiredPushThruNAry(mp, exprhdl, pppsRequired, child_index);
 }
 
 //---------------------------------------------------------------------------
@@ -164,7 +164,7 @@ CPhysicalJoin::PppsRequired
 CCTEReq *
 CPhysicalJoin::PcteRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CCTEReq *pcter,
 	ULONG child_index,
@@ -175,7 +175,7 @@ CPhysicalJoin::PcteRequired
 {
 	GPOS_ASSERT(2 > child_index);
 
-	return PcterNAry(memory_pool, exprhdl, pcter, child_index, pdrgpdpCtxt);
+	return PcterNAry(mp, exprhdl, pcter, child_index, pdrgpdpCtxt);
 }
 
 //---------------------------------------------------------------------------
@@ -199,7 +199,7 @@ CPhysicalJoin::FProvidesReqdCols
 	GPOS_ASSERT(3 == exprhdl.Arity());
 
 	// union columns from relational children
-	CColRefSet *pcrs = GPOS_NEW(m_memory_pool) CColRefSet(m_memory_pool);
+	CColRefSet *pcrs = GPOS_NEW(m_mp) CColRefSet(m_mp);
 	ULONG arity = exprhdl.Arity();
 	for (ULONG i = 0; i < arity - 1; i++)
 	{
@@ -225,14 +225,14 @@ CPhysicalJoin::FProvidesReqdCols
 BOOL
 CPhysicalJoin::FSortColsInOuterChild
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	COrderSpec *pos
 	)
 {
 	GPOS_ASSERT(NULL != pos);
 
-	CColRefSet *pcrsSort = pos->PcrsUsed(memory_pool);
+	CColRefSet *pcrsSort = pos->PcrsUsed(mp);
 	CColRefSet *pcrsOuterChild = exprhdl.GetRelationalProperties(0 /*child_index*/)->PcrsOutput();
 	BOOL fSortColsInOuter = pcrsOuterChild->ContainsAll(pcrsSort);
 	pcrsSort->Release();
@@ -281,7 +281,7 @@ CPhysicalJoin::FOuterProvidesReqdCols
 CDistributionSpec *
 CPhysicalJoin::PdsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CDistributionSpec *pdsRequired,
 	ULONG child_index,
@@ -295,7 +295,7 @@ CPhysicalJoin::PdsRequired
 	// if expression has to execute on master then we need a gather
 	if (exprhdl.FMasterOnly())
 	{
-		return PdsEnforceMaster(memory_pool, exprhdl, pdsRequired, child_index);
+		return PdsEnforceMaster(mp, exprhdl, pdsRequired, child_index);
 	}
 
 	if (exprhdl.HasOuterRefs())
@@ -303,9 +303,9 @@ CPhysicalJoin::PdsRequired
 		if (CDistributionSpec::EdtSingleton == pdsRequired->Edt() ||
 			CDistributionSpec::EdtReplicated == pdsRequired->Edt())
 		{
-			return PdsPassThru(memory_pool, exprhdl, pdsRequired, child_index);
+			return PdsPassThru(mp, exprhdl, pdsRequired, child_index);
 		}
-		return GPOS_NEW(memory_pool) CDistributionSpecReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated();
 	}
 
 	if (1 == child_index)
@@ -316,22 +316,22 @@ CPhysicalJoin::PdsRequired
 		if (CDistributionSpec::EdtUniversal == pdsOuter->Edt())
 		{
 			// first child is universal, request second child to execute on the master to avoid duplicates
-			return GPOS_NEW(memory_pool) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
+			return GPOS_NEW(mp) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
 		}
 
 		if (CDistributionSpec::EdtSingleton == pdsOuter->Edt() || 
 			CDistributionSpec::EdtStrictSingleton == pdsOuter->Edt())
 		{
 			// require inner child to have matching singleton distribution
-			return CPhysical::PdssMatching(memory_pool, CDistributionSpecSingleton::PdssConvert(pdsOuter));
+			return CPhysical::PdssMatching(mp, CDistributionSpecSingleton::PdssConvert(pdsOuter));
 		}
 
 		// otherwise, require inner child to be replicated
-		return GPOS_NEW(memory_pool) CDistributionSpecReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated();
 	}
 
 	// no distribution requirement on the outer side
-	return GPOS_NEW(memory_pool) CDistributionSpecAny(this->Eopid());
+	return GPOS_NEW(mp) CDistributionSpecAny(this->Eopid());
 }
 
 
@@ -346,7 +346,7 @@ CPhysicalJoin::PdsRequired
 CDistributionSpec *
 CPhysicalJoin::PdsDerive
 	(
-	IMemoryPool *, // memory_pool,
+	IMemoryPool *, // mp,
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -379,7 +379,7 @@ CPhysicalJoin::PdsDerive
 CRewindabilitySpec *
 CPhysicalJoin::PrsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -393,14 +393,14 @@ CPhysicalJoin::PrsDerive
 	if (CUtils::FCorrelatedNLJoin(exprhdl.Pop()))
 	{
 		// rewindability is not established if correlated join
-		return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
+		return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
 	}
 
 	if (CRewindabilitySpec::ErtNone == prsOuter->Ert() ||
 		CRewindabilitySpec::ErtNone == prsInner->Ert())
 	{
 		// rewindability is not established if any child is non-rewindable
-		return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
+		return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
 	}
 
 	// check if both children have the same rewindability spec
@@ -412,7 +412,7 @@ CPhysicalJoin::PrsDerive
 
 	// one of the two children has general rewindability while the other child has
 	// mark-restore  rewindability
-	return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral /*ert*/);
+	return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral /*ert*/);
 }
 
 
@@ -653,7 +653,7 @@ CPhysicalJoin::AddHashKeys
 BOOL
 CPhysicalJoin::FHashJoinPossible
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr,
 	ExpressionArray *pdrgpexprOuter,
 	ExpressionArray *pdrgpexprInner,
@@ -668,7 +668,7 @@ CPhysicalJoin::FHashJoinPossible
 	GPOS_ASSERT(NULL != ppexprResult);
 
 	// introduce explicit casting, if needed
-	ExpressionArray *pdrgpexpr = CCastUtils::PdrgpexprCastEquality(memory_pool,  (*pexpr)[2]);
+	ExpressionArray *pdrgpexpr = CCastUtils::PdrgpexprCastEquality(mp,  (*pexpr)[2]);
 
 	// identify hashkeys
 	ULONG ulPreds = pdrgpexpr->Size();
@@ -686,13 +686,13 @@ CPhysicalJoin::FHashJoinPossible
 	(*pexpr)[0]->AddRef();
 	(*pexpr)[1]->AddRef();
 	*ppexprResult =
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
+			mp,
 			pexpr->Pop(),
 			(*pexpr)[0],
 			(*pexpr)[1],
-			CPredicateUtils::PexprConjunction(memory_pool, pdrgpexpr)
+			CPredicateUtils::PexprConjunction(mp, pdrgpexpr)
 			);
 
 	return (0 != pdrgpexprInner->Size());
@@ -710,7 +710,7 @@ CPhysicalJoin::FHashJoinPossible
 void
 CPhysicalJoin::AddFilterOnPartKey
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	BOOL fNLJoin,
 	CExpression *pexprScalar,
 	CPartIndexMap *ppimSource,
@@ -737,7 +737,7 @@ CPhysicalJoin::AddFilterOnPartKey
 	}
 
 	// look for a filter on the part key
-	CExpression *pexprCmp = PexprJoinPredOnPartKeys(memory_pool, pexprScalar, ppimSource, part_idx_id, pcrsAllowedRefs);
+	CExpression *pexprCmp = PexprJoinPredOnPartKeys(mp, pexprScalar, ppimSource, part_idx_id, pcrsAllowedRefs);
 
 	// TODO:  - Aug 14, 2013; create a conjunction of the two predicates when the partition resolver framework supports this
 	if (NULL == pexprCmp && ppfmSource->FContainsScanId(part_idx_id))
@@ -762,7 +762,7 @@ CPhysicalJoin::AddFilterOnPartKey
 			{
 				// an interesting condition found - request partition selection on the inner child
 				ppimResult->AddRequiredPartPropagation(ppimSource, part_idx_id, CPartIndexMap::EppraZeroPropagators);
-				ppfmResult->AddPartFilter(memory_pool, part_idx_id, pexprCmp, NULL /*stats*/);
+				ppfmResult->AddPartFilter(mp, part_idx_id, pexprCmp, NULL /*stats*/);
 			}
 		}
 		else
@@ -810,7 +810,7 @@ CPhysicalJoin::FProcessingChildWithPartConsumer
 CExpression *
 CPhysicalJoin::PexprJoinPredOnPartKeys
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexprScalar,
 	CPartIndexMap *ppimSource,
 	ULONG part_idx_id,
@@ -830,7 +830,7 @@ CPhysicalJoin::PexprJoinPredOnPartKeys
 		// try to generate a request with dynamic partition selection
 		pexprPred = CPredicateUtils::PexprExtractPredicatesOnPartKeys
 										(
-										memory_pool,
+										mp,
 										pexprScalar,
 										pdrgpdrgpcrPartKeys,
 										pcrsAllowedRefs,
@@ -897,7 +897,7 @@ CPhysicalJoin::UlDistrRequestsForCorrelatedJoin()
 CRewindabilitySpec *
 CPhysicalJoin::PrsRequiredCorrelatedJoin
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CRewindabilitySpec *prsRequired,
 	ULONG child_index,
@@ -913,7 +913,7 @@ CPhysicalJoin::PrsRequiredCorrelatedJoin
 	// if there are outer references, then we need a materialize on both children
 	if (exprhdl.HasOuterRefs())
 	{
-		return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral);
+		return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral);
 	}
 
 	if (1 == child_index)
@@ -924,14 +924,14 @@ CPhysicalJoin::PrsRequiredCorrelatedJoin
 		// refs (i.e. subplan with no params) then we need a materialize
 		if (!exprhdl.HasOuterRefs(1))
 		{
-			return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral /*ert*/);
+			return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral /*ert*/);
 		}
 
-		return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
+		return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
 	}
 
 	// pass through requirements to outer child
-	return PrsPassThru(memory_pool, exprhdl, prsRequired, 0 /*child_index*/);
+	return PrsPassThru(mp, exprhdl, prsRequired, 0 /*child_index*/);
 }
 
 //---------------------------------------------------------------------------
@@ -945,7 +945,7 @@ CPhysicalJoin::PrsRequiredCorrelatedJoin
 CDistributionSpec *
 CPhysicalJoin::PdsRequiredCorrelatedJoin
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CDistributionSpec *pdsRequired,
 	ULONG child_index,
@@ -962,14 +962,14 @@ CPhysicalJoin::PdsRequiredCorrelatedJoin
 	{
 		// propagate Singleton request to children to comply with
 		// correlated execution requirements
-		return PdsPassThru(memory_pool, exprhdl, pdsRequired, child_index);
+		return PdsPassThru(mp, exprhdl, pdsRequired, child_index);
 	}
 
 	if (exprhdl.PfpChild(1)->FHasVolatileFunctionScan() && exprhdl.HasOuterRefs(1))
 	{
 		// if the inner child has a volatile TVF and has outer refs then request
 		// gather from both children
-		return GPOS_NEW(memory_pool) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
+		return GPOS_NEW(mp) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
 	}
 
 	if (1 == child_index)
@@ -980,11 +980,11 @@ CPhysicalJoin::PdsRequiredCorrelatedJoin
 			// if outer child delivers a universal distribution, request inner child
 			// to match Singleton distribution to detect more than one row generated
 			// at runtime, for example: 'select (select 1 union select 2)'
-			return GPOS_NEW(memory_pool) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
+			return GPOS_NEW(mp) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
 		}
 	}
 
-	return CPhysicalJoin::PdsRequired(memory_pool, exprhdl, pdsRequired, child_index, pdrgpdpCtxt, ulOptReq);
+	return CPhysicalJoin::PdsRequired(mp, exprhdl, pdsRequired, child_index, pdrgpdpCtxt, ulOptReq);
 }
 
 
@@ -1069,7 +1069,7 @@ CPhysicalJoin::CPartPropReq::Equals
 CPhysicalJoin::CPartPropReq *
 CPhysicalJoin::PpprCreate
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CPartitionPropagationSpec *pppsRequired,
 	ULONG child_index
@@ -1087,7 +1087,7 @@ CPhysicalJoin::PpprCreate
 	ULONG ulScalarChild = (*exprhdl.Pgexpr())[2]->Id();
 
 	pppsRequired->AddRef();
-	return  GPOS_NEW(memory_pool) CPartPropReq(pppsRequired, child_index, ulOuterChild, ulInnerChild, ulScalarChild);
+	return  GPOS_NEW(mp) CPartPropReq(pppsRequired, child_index, ulOuterChild, ulInnerChild, ulScalarChild);
 }
 
 
@@ -1095,7 +1095,7 @@ CPhysicalJoin::PpprCreate
 CPartitionPropagationSpec *
 CPhysicalJoin::PppsRequiredCompute
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CPartitionPropagationSpec *pppsRequired,
 	ULONG child_index,
@@ -1105,10 +1105,10 @@ CPhysicalJoin::PppsRequiredCompute
 	CPartIndexMap *ppim = pppsRequired->Ppim();
 	CPartFilterMap *ppfm = pppsRequired->Ppfm();
 
-	ULongPtrArray *pdrgpul = ppim->PdrgpulScanIds(memory_pool);
+	ULongPtrArray *pdrgpul = ppim->PdrgpulScanIds(mp);
 
-	CPartIndexMap *ppimResult = GPOS_NEW(memory_pool) CPartIndexMap(memory_pool);
-	CPartFilterMap *ppfmResult = GPOS_NEW(memory_pool) CPartFilterMap(memory_pool);
+	CPartIndexMap *ppimResult = GPOS_NEW(mp) CPartIndexMap(mp);
+	CPartFilterMap *ppfmResult = GPOS_NEW(mp) CPartFilterMap(mp);
 
 	// get outer partition consumers
 	CPartInfo *ppartinfo = exprhdl.GetRelationalProperties(0)->Ppartinfo();
@@ -1158,7 +1158,7 @@ CPhysicalJoin::PppsRequiredCompute
 			{
 				// check if there is an interesting condition involving the partition key
 				CExpression *pexprScalar = exprhdl.PexprScalarChild(2 /*child_index*/);
-				AddFilterOnPartKey(memory_pool, true /*fNLJoin*/, pexprScalar, ppim, ppfm, child_index, part_idx_id, fOuterPartConsumer, ppimResult, ppfmResult, pcrsAllowedRefs);
+				AddFilterOnPartKey(mp, true /*fNLJoin*/, pexprScalar, ppim, ppfm, child_index, part_idx_id, fOuterPartConsumer, ppimResult, ppfmResult, pcrsAllowedRefs);
 			}
 		}
 		else
@@ -1177,21 +1177,21 @@ CPhysicalJoin::PppsRequiredCompute
 			{
 				// look for a filter on the part key
 				CExpression *pexprScalar = exprhdl.PexprScalarChild(2 /*child_index*/);
-				AddFilterOnPartKey(memory_pool, false /*fNLJoin*/, pexprScalar, ppim, ppfm, child_index, part_idx_id, fOuterPartConsumer, ppimResult, ppfmResult, pcrsAllowedRefs);
+				AddFilterOnPartKey(mp, false /*fNLJoin*/, pexprScalar, ppim, ppfm, child_index, part_idx_id, fOuterPartConsumer, ppimResult, ppfmResult, pcrsAllowedRefs);
 			}
 		}
 	}
 
 	pdrgpul->Release();
 
-	return GPOS_NEW(memory_pool) CPartitionPropagationSpec(ppimResult, ppfmResult);
+	return GPOS_NEW(mp) CPartitionPropagationSpec(ppimResult, ppfmResult);
 }
 
 // Compute required partition propagation of the n-th child
 CPartitionPropagationSpec *
 CPhysicalJoin::PppsRequiredJoinChild
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CPartitionPropagationSpec *pppsRequired,
 	ULONG child_index,
@@ -1201,10 +1201,10 @@ CPhysicalJoin::PppsRequiredJoinChild
 {
 	GPOS_ASSERT(NULL != pppsRequired);
 
-	CPartPropReq *pppr = PpprCreate(memory_pool, exprhdl, pppsRequired, child_index);
+	CPartPropReq *pppr = PpprCreate(mp, exprhdl, pppsRequired, child_index);
 	if (NULL == pppr)
 	{
-		return PppsRequiredCompute(memory_pool, exprhdl, pppsRequired, child_index, fNLJoin);
+		return PppsRequiredCompute(mp, exprhdl, pppsRequired, child_index, fNLJoin);
 	}
 
 	CAutoMutex am(m_mutexJoin);
@@ -1213,7 +1213,7 @@ CPhysicalJoin::PppsRequiredJoinChild
 	CPartitionPropagationSpec *ppps = m_phmpp->Find(pppr);
 	if (NULL == ppps)
 	{
-		ppps = PppsRequiredCompute(memory_pool, exprhdl, pppsRequired, child_index, fNLJoin);
+		ppps = PppsRequiredCompute(mp, exprhdl, pppsRequired, child_index, fNLJoin);
 #ifdef GPOS_DEBUG
 		BOOL fSuccess =
 #endif // GPOS_DEBUG

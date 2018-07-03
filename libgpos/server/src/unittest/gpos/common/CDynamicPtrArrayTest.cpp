@@ -54,7 +54,7 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// test with CHAR array
 
@@ -62,7 +62,7 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 	const CHAR *szMissingElem = "missing";
 
 	CDynamicPtrArray<CHAR, CleanupNULL<CHAR> > *pdrg =
-		GPOS_NEW(memory_pool) CDynamicPtrArray<CHAR, CleanupNULL<CHAR> >(memory_pool, 2);
+		GPOS_NEW(mp) CDynamicPtrArray<CHAR, CleanupNULL<CHAR> >(mp, 2);
 
 	// add elements incl trigger resize of array
 	for (ULONG i = 0; i < 9; i++)
@@ -99,7 +99,7 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 	// test with ULONG array
 
 	typedef CDynamicPtrArray<ULONG, CleanupNULL<ULONG> > ULONGArray;
-	ULONGArray *pdrgULONG = GPOS_NEW(memory_pool) ULONGArray(memory_pool, 1);
+	ULONGArray *pdrgULONG = GPOS_NEW(mp) ULONGArray(mp, 1);
 	ULONG c = 256;
 
 	// add elements incl trigger resize of array
@@ -142,17 +142,17 @@ CDynamicPtrArrayTest::EresUnittest_Ownership()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// test with ULONGs
 
 	typedef CDynamicPtrArray<ULONG, CleanupDelete<ULONG> > ULONGArray;
-	ULONGArray *pdrgULONG = GPOS_NEW(memory_pool) ULONGArray(memory_pool, 1);
+	ULONGArray *pdrgULONG = GPOS_NEW(mp) ULONGArray(mp, 1);
 
 	// add elements incl trigger resize of array
 	for (ULONG k = 0; k < 256; k++)
 	{
-		ULONG *pul = GPOS_NEW(memory_pool) ULONG;
+		ULONG *pul = GPOS_NEW(mp) ULONG;
 		pdrgULONG->Append(pul);
 		GPOS_ASSERT(k + 1 == pdrgULONG->Size());
 		GPOS_ASSERT(pul == (*pdrgULONG)[k]);
@@ -162,12 +162,12 @@ CDynamicPtrArrayTest::EresUnittest_Ownership()
 	// test with CHAR array
 
 	typedef CDynamicPtrArray<CHAR, CleanupDeleteArray<CHAR> > DrgCHAR;
-	DrgCHAR *pdrgCHAR = GPOS_NEW(memory_pool) DrgCHAR(memory_pool, 2);
+	DrgCHAR *pdrgCHAR = GPOS_NEW(mp) DrgCHAR(mp, 2);
 
 	// add elements incl trigger resize of array
 	for (ULONG i = 0; i < 3; i++)
 	{
-		CHAR *sz = GPOS_NEW_ARRAY(memory_pool, CHAR, 5);
+		CHAR *sz = GPOS_NEW_ARRAY(mp, CHAR, 5);
 		pdrgCHAR->Append(sz);
 		GPOS_ASSERT(i + 1 == pdrgCHAR->Size());
 		GPOS_ASSERT(sz == (*pdrgCHAR)[i]);
@@ -195,20 +195,20 @@ CDynamicPtrArrayTest::EresUnittest_ArrayAppend()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	typedef CDynamicPtrArray<ULONG, CleanupNULL<ULONG> > ULONGArray;
 
 	ULONG cVal = 0;
 
 	// array with 1 element
-	ULONGArray *pdrgULONG1 = GPOS_NEW(memory_pool) ULONGArray(memory_pool, 1);
+	ULONGArray *pdrgULONG1 = GPOS_NEW(mp) ULONGArray(mp, 1);
 	pdrgULONG1->Append(&cVal);
 	GPOS_ASSERT(1 == pdrgULONG1->Size());
 
 	// array with x elements
 	ULONG cX = 1000;
-	ULONGArray *pdrgULONG2 = GPOS_NEW(memory_pool) ULONGArray(memory_pool, 1);
+	ULONGArray *pdrgULONG2 = GPOS_NEW(mp) ULONGArray(mp, 1);
 	for (ULONG i = 0; i < cX; i++)
 	{
 		pdrgULONG2->Append(&cX);
@@ -244,20 +244,20 @@ CDynamicPtrArrayTest::EresUnittest_ArrayAppendExactFit()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	typedef CDynamicPtrArray<ULONG, CleanupNULL<ULONG> > ULONGArray;
 
 	ULONG cVal = 0;
 
 	// array with 1 element
-	ULONGArray *pdrgULONG1 = GPOS_NEW(memory_pool) ULONGArray(memory_pool, 10);
+	ULONGArray *pdrgULONG1 = GPOS_NEW(mp) ULONGArray(mp, 10);
 	pdrgULONG1->Append(&cVal);
 	GPOS_ASSERT(1 == pdrgULONG1->Size());
 
 	// array with x elements
 	ULONG cX = 9;
-	ULONGArray *pdrgULONG2 = GPOS_NEW(memory_pool) ULONGArray(memory_pool, 15);
+	ULONGArray *pdrgULONG2 = GPOS_NEW(mp) ULONGArray(mp, 15);
 	for (ULONG i = 0; i < cX; i++)
 	{
 		pdrgULONG2->Append(&cX);
@@ -272,7 +272,7 @@ CDynamicPtrArrayTest::EresUnittest_ArrayAppendExactFit()
 		GPOS_ASSERT((*pdrgULONG1)[j + 1] == (*pdrgULONG2)[j]);
 	}
 
-	ULONGArray *pdrgULONG3 = GPOS_NEW(memory_pool) ULONGArray(memory_pool, 15);
+	ULONGArray *pdrgULONG3 = GPOS_NEW(mp) ULONGArray(mp, 15);
 	pdrgULONG1->AppendArray(pdrgULONG3);
 	GPOS_ASSERT(cX + 1 == pdrgULONG1->Size());
 
@@ -298,17 +298,17 @@ CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes()
 	typedef CDynamicPtrArray<ULONG, CleanupNULL<ULONG> > ULONGArray;
 
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// the array containing elements to look up
-	ULONGArray *pdrgULONGLookup = GPOS_NEW(memory_pool) ULONGArray(memory_pool);
+	ULONGArray *pdrgULONGLookup = GPOS_NEW(mp) ULONGArray(mp);
 
 	// the array containing the target elements that will give the positions
-	ULONGArray *pdrgULONGTarget = GPOS_NEW(memory_pool) ULONGArray(memory_pool);
+	ULONGArray *pdrgULONGTarget = GPOS_NEW(mp) ULONGArray(mp);
 
-	ULONG *pul1 = GPOS_NEW(memory_pool) ULONG(10);
-	ULONG *pul2 = GPOS_NEW(memory_pool) ULONG(20);
-	ULONG *pul3 = GPOS_NEW(memory_pool) ULONG(30);
+	ULONG *pul1 = GPOS_NEW(mp) ULONG(10);
+	ULONG *pul2 = GPOS_NEW(mp) ULONG(20);
+	ULONG *pul3 = GPOS_NEW(mp) ULONG(30);
 
 	pdrgULONGLookup->Append(pul1);
 	pdrgULONGLookup->Append(pul2);

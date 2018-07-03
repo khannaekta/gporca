@@ -37,7 +37,7 @@ namespace gpopt
 		
 			// ctor
 			explicit
-			CPhysicalInnerNLJoin(IMemoryPool *memory_pool);
+			CPhysicalInnerNLJoin(IMemoryPool *mp);
 
 			// dtor
 			virtual 
@@ -61,7 +61,7 @@ namespace gpopt
 			virtual
 			CDistributionSpec *PdsRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsRequired,
 				ULONG child_index,

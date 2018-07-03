@@ -34,10 +34,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerSequence::CParseHandlerSequence(IMemoryPool *memory_pool,
+CParseHandlerSequence::CParseHandlerSequence(IMemoryPool *mp,
 											 CParseHandlerManager *parse_handler_mgr,
 											 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerPhysicalOp(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerPhysicalOp(mp, parse_handler_mgr, parse_handler_root),
 	  m_is_inside_sequence(false)
 {
 }
@@ -64,7 +64,7 @@ CParseHandlerSequence::StartElement(const XMLCh *const element_uri,
 		// new sequence operator
 		// parse handler for the proj list
 		CParseHandlerBase *proj_list_parse_handler =
-			CParseHandlerFactory::GetParseHandler(m_memory_pool,
+			CParseHandlerFactory::GetParseHandler(m_mp,
 												  CDXLTokens::XmlstrToken(EdxltokenScalarProjList),
 												  m_parse_handler_mgr,
 												  this);
@@ -72,7 +72,7 @@ CParseHandlerSequence::StartElement(const XMLCh *const element_uri,
 
 		//parse handler for the properties of the operator
 		CParseHandlerBase *prop_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenProperties), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenProperties), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(prop_parse_handler);
 
 		// store child parse handlers in array
@@ -84,7 +84,7 @@ CParseHandlerSequence::StartElement(const XMLCh *const element_uri,
 	{
 		// child of the sequence operator
 		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, element_local_name, m_parse_handler_mgr, this);
+			m_mp, element_local_name, m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 		this->Append(child_parse_handler);
 		child_parse_handler->startElement(element_uri, element_local_name, element_qname, attrs);
@@ -117,11 +117,11 @@ CParseHandlerSequence::EndElement(const XMLCh *const,  // element_uri,
 	CParseHandlerProperties *prop_parse_handler =
 		dynamic_cast<CParseHandlerProperties *>((*this)[0]);
 
-	CDXLPhysicalSequence *dxl_op = GPOS_NEW(m_memory_pool) CDXLPhysicalSequence(m_memory_pool);
-	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, dxl_op);
+	CDXLPhysicalSequence *dxl_op = GPOS_NEW(m_mp) CDXLPhysicalSequence(m_mp);
+	m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 
 	// set statistics and physical properties
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxlnode, prop_parse_handler);
 
 	// add project list
 	CParseHandlerProjList *proj_list_parse_handler =
@@ -140,7 +140,7 @@ CParseHandlerSequence::EndElement(const XMLCh *const,  // element_uri,
 	}
 
 #ifdef GPOS_DEBUG
-	dxl_op->AssertValid(m_dxl_node, false /* validate_children */);
+	dxl_op->AssertValid(m_dxlnode, false /* validate_children */);
 #endif  // GPOS_DEBUG
 
 	// deactivate handler

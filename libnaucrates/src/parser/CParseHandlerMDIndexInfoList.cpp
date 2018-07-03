@@ -24,10 +24,10 @@ using namespace gpmd;
 XERCES_CPP_NAMESPACE_USE
 
 // ctor
-CParseHandlerMDIndexInfoList::CParseHandlerMDIndexInfoList(IMemoryPool *memory_pool,
+CParseHandlerMDIndexInfoList::CParseHandlerMDIndexInfoList(IMemoryPool *mp,
 														   CParseHandlerManager *parse_handler_mgr,
 														   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
 	  m_mdindex_info_array(NULL)
 {
 }
@@ -55,7 +55,7 @@ CParseHandlerMDIndexInfoList::StartElement(const XMLCh *const,  // element_uri,
 	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenIndexInfoList),
 									  element_local_name))
 	{
-		m_mdindex_info_array = GPOS_NEW(m_memory_pool) MDIndexInfoPtrArray(m_memory_pool);
+		m_mdindex_info_array = GPOS_NEW(m_mp) MDIndexInfoPtrArray(m_mp);
 	}
 	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenIndexInfo),
 										   element_local_name))
@@ -71,7 +71,7 @@ CParseHandlerMDIndexInfoList::StartElement(const XMLCh *const,  // element_uri,
 			EdxltokenIndexPartial,
 			EdxltokenIndexInfo);
 
-		CMDIndexInfo *md_index_info = GPOS_NEW(m_memory_pool) CMDIndexInfo(mdid, is_partial);
+		CMDIndexInfo *md_index_info = GPOS_NEW(m_mp) CMDIndexInfo(mdid, is_partial);
 		m_mdindex_info_array->Append(md_index_info);
 	}
 	else

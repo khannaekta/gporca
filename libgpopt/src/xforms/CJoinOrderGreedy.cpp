@@ -95,7 +95,7 @@ CJoinOrderGreedy::MarkUsedEdges()
 	}
 
 	CExpression *pexprScalar = (*pexpr) [pexpr->Arity() - 1];
-	ExpressionArray *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(m_memory_pool, pexprScalar);
+	ExpressionArray *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(m_mp, pexprScalar);
 	const ULONG ulSize = pdrgpexpr->Size();
 
 	for (ULONG ulEdge = 0; ulEdge < m_ulEdges; ulEdge++)
@@ -127,7 +127,7 @@ CJoinOrderGreedy::GetStartingJoins()
 	CDouble dMinRows(0.0);
 	ULONG ul1Counter = 0;
 	ULONG ul2Counter = 0;
-	CJoinOrder::SComponent *pcompBest = GPOS_NEW(m_memory_pool) SComponent(m_memory_pool, NULL /*pexpr*/);
+	CJoinOrder::SComponent *pcompBest = GPOS_NEW(m_mp) SComponent(m_mp, NULL /*pexpr*/);
 
 	for (ULONG ul1 = 0; ul1 < m_ulComps; ul1++)
 	{
@@ -195,7 +195,7 @@ CJoinOrderGreedy::PexprExpand()
 	}
 	else
 	{
-		m_pcompResult = GPOS_NEW(m_memory_pool) SComponent(m_memory_pool, NULL /*pexpr*/);
+		m_pcompResult = GPOS_NEW(m_mp) SComponent(m_mp, NULL /*pexpr*/);
 	}
 
 	while (ulCoveredComps < m_ulComps)

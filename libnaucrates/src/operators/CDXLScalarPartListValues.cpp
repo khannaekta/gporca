@@ -17,11 +17,11 @@ using namespace gpos;
 using namespace gpdxl;
 
 // Ctor
-CDXLScalarPartListValues::CDXLScalarPartListValues(IMemoryPool *memory_pool,
+CDXLScalarPartListValues::CDXLScalarPartListValues(IMemoryPool *mp,
 												   ULONG partitioning_level,
 												   IMDId *result_type_mdid,
 												   IMDId *elem_type_mdid)
-	: CDXLScalar(memory_pool),
+	: CDXLScalar(mp),
 	  m_partitioning_level(partitioning_level),
 	  m_result_type_mdid(result_type_mdid),
 	  m_elem_type_mdid(elem_type_mdid)

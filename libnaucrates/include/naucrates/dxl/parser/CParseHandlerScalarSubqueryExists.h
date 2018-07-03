@@ -56,7 +56,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CParseHandlerScalarSubqueryExists(IMemoryPool *memory_pool,
+		CParseHandlerScalarSubqueryExists(IMemoryPool *mp,
 										  CParseHandlerManager *parse_handler_mgr,
 										  CParseHandlerBase *parse_handler_root);
 	};

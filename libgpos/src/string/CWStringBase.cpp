@@ -27,9 +27,9 @@ const WCHAR CWStringBase::m_empty_wcstr = GPOS_WSZ_LIT('\0');
 //
 //---------------------------------------------------------------------------
 CWStringConst *
-CWStringBase::Copy(IMemoryPool *memory_pool) const
+CWStringBase::Copy(IMemoryPool *mp) const
 {
-	return GPOS_NEW(memory_pool) CWStringConst(memory_pool, GetBuffer());
+	return GPOS_NEW(mp) CWStringConst(mp, GetBuffer());
 }
 
 //---------------------------------------------------------------------------

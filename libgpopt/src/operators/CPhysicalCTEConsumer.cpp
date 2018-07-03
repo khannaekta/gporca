@@ -29,13 +29,13 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalCTEConsumer::CPhysicalCTEConsumer
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ULONG id,
 	ColRefArray *colref_array,
 	UlongColRefHashMap *colref_mapping
 	)
 	:
-	CPhysical(memory_pool),
+	CPhysical(mp),
 	m_id(id),
 	m_pdrgpcr(colref_array),
 	m_phmulcr(colref_mapping)
@@ -69,7 +69,7 @@ CPhysicalCTEConsumer::~CPhysicalCTEConsumer()
 CColRefSet *
 CPhysicalCTEConsumer::PcrsRequired
 	(
-	IMemoryPool *, // memory_pool,
+	IMemoryPool *, // mp,
 	CExpressionHandle &, // exprhdl,
 	CColRefSet *, // pcrsRequired,
 	ULONG , // child_index,
@@ -92,7 +92,7 @@ CPhysicalCTEConsumer::PcrsRequired
 COrderSpec *
 CPhysicalCTEConsumer::PosRequired
 	(
-	IMemoryPool *, // memory_pool,
+	IMemoryPool *, // mp,
 	CExpressionHandle &, // exprhdl,
 	COrderSpec *, // posRequired,
 	ULONG ,// child_index,
@@ -116,7 +116,7 @@ CPhysicalCTEConsumer::PosRequired
 CDistributionSpec *
 CPhysicalCTEConsumer::PdsRequired
 	(
-	IMemoryPool *, // memory_pool,
+	IMemoryPool *, // mp,
 	CExpressionHandle &, // exprhdl,
 	CDistributionSpec *, // pdsRequired,
 	ULONG , //child_index
@@ -140,7 +140,7 @@ CPhysicalCTEConsumer::PdsRequired
 CRewindabilitySpec *
 CPhysicalCTEConsumer::PrsRequired
 	(
-	IMemoryPool *, // memory_pool,
+	IMemoryPool *, // mp,
 	CExpressionHandle &, // exprhdl,
 	CRewindabilitySpec *, // prsRequired,
 	ULONG , // child_index,
@@ -164,7 +164,7 @@ CPhysicalCTEConsumer::PrsRequired
 CPartitionPropagationSpec *
 CPhysicalCTEConsumer::PppsRequired
 	(
-	IMemoryPool *, //memory_pool,
+	IMemoryPool *, //mp,
 	CExpressionHandle &, //exprhdl,
 	CPartitionPropagationSpec *, //pppsRequired,
 	ULONG , //child_index,
@@ -187,7 +187,7 @@ CPhysicalCTEConsumer::PppsRequired
 CCTEReq *
 CPhysicalCTEConsumer::PcteRequired
 	(
-	IMemoryPool *, //memory_pool,
+	IMemoryPool *, //mp,
 	CExpressionHandle &, //exprhdl,
 	CCTEReq *, //pcter,
 	ULONG , //child_index,
@@ -211,7 +211,7 @@ CPhysicalCTEConsumer::PcteRequired
 COrderSpec *
 CPhysicalCTEConsumer::PosDerive
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle & //exprhdl
 	)
 	const
@@ -233,7 +233,7 @@ CPhysicalCTEConsumer::PosDerive
 CDistributionSpec *
 CPhysicalCTEConsumer::PdsDerive
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle & //exprhdl
 	)
 	const
@@ -255,7 +255,7 @@ CPhysicalCTEConsumer::PdsDerive
 CRewindabilitySpec *
 CPhysicalCTEConsumer::PrsDerive
 	(
-	IMemoryPool *, //memory_pool
+	IMemoryPool *, //mp
 	CExpressionHandle & //exprhdl
 	)
 	const
@@ -277,7 +277,7 @@ CPhysicalCTEConsumer::PrsDerive
 CCTEMap *
 CPhysicalCTEConsumer::PcmDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &
 #ifdef GPOS_DEBUG
 	exprhdl
@@ -287,7 +287,7 @@ CPhysicalCTEConsumer::PcmDerive
 {
 	GPOS_ASSERT(0 == exprhdl.Arity());
 
-	CCTEMap *pcmConsumer = GPOS_NEW(memory_pool) CCTEMap(memory_pool);
+	CCTEMap *pcmConsumer = GPOS_NEW(mp) CCTEMap(mp);
 	pcmConsumer->Insert(m_id, CCTEMap::EctConsumer, NULL /*pdpplan*/);
 
 	return pcmConsumer;

@@ -22,7 +22,7 @@ namespace gpnaucrates
 	public:
 		// helper for LAS-joining histograms
 		static void JoinHistogramsLASJ(
-			IMemoryPool *memory_pool,
+			IMemoryPool *mp,
 			const CHistogram *histogram1,
 			const CHistogram *histogram2,
 			CStatsPredJoin *join_stats,
@@ -36,7 +36,7 @@ namespace gpnaucrates
 			BOOL DoIgnoreLASJHistComputation);
 		// left anti semi join with another stats structure
 		static CStatistics *CalcLASJoinStatsStatic(
-			IMemoryPool *memory_pool,
+			IMemoryPool *mp,
 			const IStatistics *outer_stats_input,
 			const IStatistics *inner_stats_input,
 			StatsPredJoinArray *join_preds_stats,

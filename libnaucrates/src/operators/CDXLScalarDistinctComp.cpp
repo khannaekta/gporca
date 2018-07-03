@@ -26,11 +26,11 @@ using namespace gpdxl;
 //		Constructs a scalar distinct comparison node
 //
 //---------------------------------------------------------------------------
-CDXLScalarDistinctComp::CDXLScalarDistinctComp(IMemoryPool *memory_pool, IMDId *mdid_op)
-	: CDXLScalarComp(memory_pool,
+CDXLScalarDistinctComp::CDXLScalarDistinctComp(IMemoryPool *mp, IMDId *mdid_op)
+	: CDXLScalarComp(mp,
 					 mdid_op,
-					 GPOS_NEW(memory_pool) CWStringConst(
-						 memory_pool, CDXLTokens::GetDXLTokenStr(EdxltokenEq)->GetBuffer()))
+					 GPOS_NEW(mp) CWStringConst(
+						 mp, CDXLTokens::GetDXLTokenStr(EdxltokenEq)->GetBuffer()))
 {
 }
 

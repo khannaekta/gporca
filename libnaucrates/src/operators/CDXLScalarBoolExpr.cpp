@@ -26,8 +26,8 @@ using namespace gpdxl;
 //		Constructs a BoolExpr node
 //
 //---------------------------------------------------------------------------
-CDXLScalarBoolExpr::CDXLScalarBoolExpr(IMemoryPool *memory_pool, const EdxlBoolExprType bool_type)
-	: CDXLScalar(memory_pool), m_bool_type(bool_type)
+CDXLScalarBoolExpr::CDXLScalarBoolExpr(IMemoryPool *mp, const EdxlBoolExprType bool_type)
+	: CDXLScalar(mp), m_bool_type(bool_type)
 {
 }
 

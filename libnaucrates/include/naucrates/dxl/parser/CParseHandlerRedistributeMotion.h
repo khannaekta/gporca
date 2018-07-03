@@ -55,7 +55,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerRedistributeMotion(IMemoryPool *memory_pool,
+		CParseHandlerRedistributeMotion(IMemoryPool *mp,
 										CParseHandlerManager *parse_handler_mgr,
 										CParseHandlerBase *parse_handler_root);
 	};

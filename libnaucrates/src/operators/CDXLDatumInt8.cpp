@@ -31,8 +31,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLDatumInt8::CDXLDatumInt8(IMemoryPool *memory_pool, IMDId *mdid_type, BOOL is_null, LINT val)
-	: CDXLDatum(memory_pool, mdid_type, default_type_modifier, is_null, 8 /*length*/), m_val(val)
+CDXLDatumInt8::CDXLDatumInt8(IMemoryPool *mp, IMDId *mdid_type, BOOL is_null, LINT val)
+	: CDXLDatum(mp, mdid_type, default_type_modifier, is_null, 8 /*length*/), m_val(val)
 {
 	if (is_null)
 	{

@@ -33,10 +33,10 @@ XERCES_CPP_NAMESPACE_USE
 //
 //---------------------------------------------------------------------------
 CParseHandlerScalarSubPlanParam::CParseHandlerScalarSubPlanParam(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root), m_dxl_colref(NULL)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root), m_dxl_colref(NULL)
 {
 }
 
@@ -95,7 +95,7 @@ CParseHandlerScalarSubPlanParam::EndElement(const XMLCh *const,  // element_uri,
 {
 	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarSubPlanParam),
 									  element_local_name) &&
-		NULL != m_dxl_node)
+		NULL != m_dxlnode)
 	{
 		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
 			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);

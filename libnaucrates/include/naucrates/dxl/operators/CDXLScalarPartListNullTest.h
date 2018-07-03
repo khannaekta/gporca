@@ -29,7 +29,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLScalarPartListNullTest(IMemoryPool *memory_pool,
+		CDXLScalarPartListNullTest(IMemoryPool *mp,
 								   ULONG partitioning_level,
 								   BOOL is_null);
 

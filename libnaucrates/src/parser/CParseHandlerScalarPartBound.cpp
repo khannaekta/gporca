@@ -29,10 +29,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerScalarPartBound::CParseHandlerScalarPartBound(IMemoryPool *memory_pool,
+CParseHandlerScalarPartBound::CParseHandlerScalarPartBound(IMemoryPool *mp,
 														   CParseHandlerManager *parse_handler_mgr,
 														   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -74,10 +74,10 @@ CParseHandlerScalarPartBound::StartElement(const XMLCh *const,  // element_uri,
 		EdxltokenScalarPartBoundLower,
 		EdxltokenScalarPartBound);
 
-	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(
-		m_memory_pool,
-		GPOS_NEW(m_memory_pool)
-			CDXLScalarPartBound(m_memory_pool, partition_level, m_mdid_type, is_lower_bound));
+	m_dxlnode = GPOS_NEW(m_mp) CDXLNode(
+		m_mp,
+		GPOS_NEW(m_mp)
+			CDXLScalarPartBound(m_mp, partition_level, m_mdid_type, is_lower_bound));
 }
 
 //---------------------------------------------------------------------------
@@ -102,7 +102,7 @@ CParseHandlerScalarPartBound::EndElement(const XMLCh *const,  // element_uri,
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
-	GPOS_ASSERT(NULL != m_dxl_node);
+	GPOS_ASSERT(NULL != m_dxlnode);
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

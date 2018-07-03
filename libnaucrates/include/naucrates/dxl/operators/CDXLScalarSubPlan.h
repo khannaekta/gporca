@@ -67,7 +67,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CDXLScalarSubPlan(IMemoryPool *memory_pool,
+		CDXLScalarSubPlan(IMemoryPool *mp,
 						  IMDId *first_col_type_mdid,
 						  DXLColRefArray *dxl_colref_array,
 						  EdxlSubPlanType dxl_subplan_type,

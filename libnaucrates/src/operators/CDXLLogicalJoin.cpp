@@ -26,8 +26,8 @@ using namespace gpdxl;
 //		Construct a DXL Logical Join node
 //
 //---------------------------------------------------------------------------
-CDXLLogicalJoin::CDXLLogicalJoin(IMemoryPool *memory_pool, EdxlJoinType join_type)
-	: CDXLLogical(memory_pool), m_join_type(join_type)
+CDXLLogicalJoin::CDXLLogicalJoin(IMemoryPool *mp, EdxlJoinType join_type)
+	: CDXLLogical(mp), m_join_type(join_type)
 {
 }
 

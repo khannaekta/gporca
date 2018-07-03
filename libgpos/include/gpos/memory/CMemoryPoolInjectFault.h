@@ -39,7 +39,7 @@ namespace gpos
 
 	public:
 		// ctor
-		CMemoryPoolInjectFault(IMemoryPool *memory_pool, BOOL owns_underlying_memory_pool);
+		CMemoryPoolInjectFault(IMemoryPool *mp, BOOL owns_underlying_mp);
 
 		//dtor
 		virtual ~CMemoryPoolInjectFault()

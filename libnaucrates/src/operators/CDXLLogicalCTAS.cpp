@@ -29,7 +29,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLLogicalCTAS::CDXLLogicalCTAS(IMemoryPool *memory_pool,
+CDXLLogicalCTAS::CDXLLogicalCTAS(IMemoryPool *mp,
 								 IMDId *mdid,
 								 CMDName *mdname_schema,
 								 CMDName *mdname_rel,
@@ -42,7 +42,7 @@ CDXLLogicalCTAS::CDXLLogicalCTAS(IMemoryPool *memory_pool,
 								 IMDRelation::Erelstoragetype rel_storage_type,
 								 ULongPtrArray *src_colids_array,
 								 IntPtrArray *vartypemod_array)
-	: CDXLLogical(memory_pool),
+	: CDXLLogical(mp),
 	  m_mdid(mdid),
 	  m_mdname_schema(mdname_schema),
 	  m_mdname_rel(mdname_rel),
@@ -181,7 +181,7 @@ CDXLLogicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *
 
 		// serialize distribution columns
 		CWStringDynamic *str_distribution_columns =
-			CDXLUtils::Serialize(m_memory_pool, m_distr_column_pos_array);
+			CDXLUtils::Serialize(m_mp, m_distr_column_pos_array);
 		GPOS_ASSERT(NULL != str_distribution_columns);
 
 		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenDistrColumns),
@@ -190,7 +190,7 @@ CDXLLogicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *
 	}
 
 	// serialize input columns
-	CWStringDynamic *str_input_columns = CDXLUtils::Serialize(m_memory_pool, m_src_colids_array);
+	CWStringDynamic *str_input_columns = CDXLUtils::Serialize(m_mp, m_src_colids_array);
 	GPOS_ASSERT(NULL != str_input_columns);
 
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenInsertCols),
@@ -198,7 +198,7 @@ CDXLLogicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *
 	GPOS_DELETE(str_input_columns);
 
 	// serialize vartypmod list
-	CWStringDynamic *str_vartypemod_list = CDXLUtils::Serialize(m_memory_pool, m_vartypemod_array);
+	CWStringDynamic *str_vartypemod_list = CDXLUtils::Serialize(m_mp, m_vartypemod_array);
 	GPOS_ASSERT(NULL != str_vartypemod_list);
 
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenVarTypeModList),

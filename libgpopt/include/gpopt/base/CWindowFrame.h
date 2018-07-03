@@ -114,7 +114,7 @@ namespace gpopt
 			// ctor
 			CWindowFrame
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				EFrameSpec efs,
 				EFrameBoundary efbLeading,
 				EFrameBoundary efbTrailing,
@@ -172,7 +172,7 @@ namespace gpopt
 
 			// return a copy of the window frame with remapped columns
 			virtual
-			CWindowFrame *PwfCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			CWindowFrame *PwfCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// return columns used by frame edges
 			CColRefSet *PcrsUsed() const

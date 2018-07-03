@@ -124,13 +124,13 @@ namespace gpopt
 			virtual
 			IOstream &OsDiagramToGraphviz
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				IOstream &os,
 				const WCHAR *wszTitle
 				)
 				const
 			{
-				(void) m_jsm.OsDiagramToGraphviz(memory_pool, os, wszTitle);
+				(void) m_jsm.OsDiagramToGraphviz(mp, os, wszTitle);
 
 				return os;
 			}
@@ -138,13 +138,13 @@ namespace gpopt
 			// compute unreachable states
 			void Unreachable
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				EState **ppestate,
 				ULONG *pulSize
 				)
 				const
 			{
-				m_jsm.Unreachable(memory_pool, ppestate, pulSize);
+				m_jsm.Unreachable(mp, ppestate, pulSize);
 			}
 
 

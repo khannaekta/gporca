@@ -46,13 +46,13 @@ CTaskLocalStorage::~CTaskLocalStorage()
 //
 //---------------------------------------------------------------------------
 void
-CTaskLocalStorage::Reset(IMemoryPool *memory_pool)
+CTaskLocalStorage::Reset(IMemoryPool *mp)
 {
 	// destroy old
 	m_hash_table.Cleanup();
 
 	// realloc
-	m_hash_table.Init(memory_pool,
+	m_hash_table.Init(mp,
 					  128,  // number of hashbuckets
 					  GPOS_OFFSET(CTaskLocalStorageObject, m_link),
 					  GPOS_OFFSET(CTaskLocalStorageObject, m_etlsidx),

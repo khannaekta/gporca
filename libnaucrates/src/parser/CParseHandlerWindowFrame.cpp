@@ -27,10 +27,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerWindowFrame::CParseHandlerWindowFrame(IMemoryPool *memory_pool,
+CParseHandlerWindowFrame::CParseHandlerWindowFrame(IMemoryPool *mp,
 												   CParseHandlerManager *parse_handler_mgr,
 												   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
 	  m_dxl_win_frame_spec(EdxlfsSentinel),
 	  m_dxl_frame_exclusion_strategy(EdxlfesSentinel),
 	  m_window_frame(NULL)
@@ -59,7 +59,7 @@ CParseHandlerWindowFrame::StartElement(const XMLCh *const,  // element_uri,
 
 		// parse handler for the trailing window frame edge
 		CParseHandlerBase *trailing_val_parse_handler_base = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool,
+			m_mp,
 			CDXLTokens::XmlstrToken(EdxltokenScalarWindowFrameTrailingEdge),
 			m_parse_handler_mgr,
 			this);
@@ -67,7 +67,7 @@ CParseHandlerWindowFrame::StartElement(const XMLCh *const,  // element_uri,
 
 		// parse handler for the leading scalar values
 		CParseHandlerBase *leading_val_parse_handler_base = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool,
+			m_mp,
 			CDXLTokens::XmlstrToken(EdxltokenScalarWindowFrameLeadingEdge),
 			m_parse_handler_mgr,
 			this);
@@ -120,7 +120,7 @@ CParseHandlerWindowFrame::EndElement(const XMLCh *const,  // element_uri,
 	CDXLNode *dxlnode_leading = leading_val_parse_handler_base->CreateDXLNode();
 	dxlnode_leading->AddRef();
 
-	m_window_frame = GPOS_NEW(m_memory_pool) CDXLWindowFrame(m_memory_pool,
+	m_window_frame = GPOS_NEW(m_mp) CDXLWindowFrame(m_mp,
 															 m_dxl_win_frame_spec,
 															 m_dxl_frame_exclusion_strategy,
 															 dxlnode_leading,

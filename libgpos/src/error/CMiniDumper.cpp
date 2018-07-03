@@ -27,10 +27,10 @@ using namespace gpos;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMiniDumper::CMiniDumper(IMemoryPool *memory_pool)
-	: m_memory_pool(memory_pool), m_initialized(false), m_finalized(false), m_oos(NULL)
+CMiniDumper::CMiniDumper(IMemoryPool *mp)
+	: m_mp(mp), m_initialized(false), m_finalized(false), m_oos(NULL)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 }
 
 

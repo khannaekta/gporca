@@ -36,13 +36,13 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CScalarCmp::CScalarCmp
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IMDId *mdid_op,
 	const CWStringConst *pstrOp,
 	IMDType::ECmpType cmp_type
 	)
 	:
-	CScalar(memory_pool),
+	CScalar(mp),
 	m_mdid_op(mdid_op),
 	m_pstrOp(pstrOp),
 	m_comparision_type(cmp_type),
@@ -199,20 +199,20 @@ CScalarCmp::PmdidCommuteOp
 CWStringConst *
 CScalarCmp::Pstr
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CMDAccessor *md_accessor,
 	IMDId *mdid
 	)
 {
 	mdid->AddRef();
-	return GPOS_NEW(memory_pool) CWStringConst(memory_pool, (md_accessor->RetrieveScOp(mdid)->Mdname().GetMDName())->GetBuffer());
+	return GPOS_NEW(mp) CWStringConst(mp, (md_accessor->RetrieveScOp(mdid)->Mdname().GetMDName())->GetBuffer());
 }
 
 // get commuted scalar comparision operator
 CScalarCmp *
 CScalarCmp::PopCommutedOp
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	COperator *pop
 	)
 {
@@ -221,7 +221,7 @@ CScalarCmp::PopCommutedOp
 	IMDId *mdid = PmdidCommuteOp(md_accessor, pop);
 	if (NULL != mdid && mdid->IsValid())
 	{
-		return GPOS_NEW(memory_pool) CScalarCmp(memory_pool, mdid, Pstr(memory_pool, md_accessor, mdid), CUtils::ParseCmpType(mdid));
+		return GPOS_NEW(mp) CScalarCmp(mp, mdid, Pstr(mp, md_accessor, mdid), CUtils::ParseCmpType(mdid));
 	}
 	return NULL;
 }

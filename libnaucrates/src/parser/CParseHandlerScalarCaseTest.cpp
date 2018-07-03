@@ -27,10 +27,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerScalarCaseTest::CParseHandlerScalarCaseTest(IMemoryPool *memory_pool,
+CParseHandlerScalarCaseTest::CParseHandlerScalarCaseTest(IMemoryPool *mp,
 														 CParseHandlerManager *parse_handler_mgr,
 														 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root), m_mdid_type(NULL)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root), m_mdid_type(NULL)
 {
 }
 
@@ -87,8 +87,8 @@ CParseHandlerScalarCaseTest::EndElement(const XMLCh *const,  // element_uri
 	}
 
 	// construct node
-	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(
-		m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarCaseTest(m_memory_pool, m_mdid_type));
+	m_dxlnode = GPOS_NEW(m_mp) CDXLNode(
+		m_mp, GPOS_NEW(m_mp) CDXLScalarCaseTest(m_mp, m_mdid_type));
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

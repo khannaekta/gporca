@@ -23,7 +23,7 @@ namespace gpopt
 		public:
 			CStrictHashedDistributions
 			(
-			IMemoryPool *memory_pool,
+			IMemoryPool *mp,
 			ColRefArray *pdrgpcrOutput,
 			ColRefArrays *pdrgpdrgpcrInput
 			);

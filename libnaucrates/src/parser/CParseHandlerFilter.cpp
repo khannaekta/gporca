@@ -30,10 +30,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerFilter::CParseHandlerFilter(IMemoryPool *memory_pool,
+CParseHandlerFilter::CParseHandlerFilter(IMemoryPool *mp,
 										 CParseHandlerManager *parse_handler_mgr,
 										 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -56,38 +56,38 @@ CParseHandlerFilter::StartElement(const XMLCh *const element_uri,
 									  element_local_name))
 	{
 		// start the filter
-		m_dxl_node = GPOS_NEW(m_memory_pool)
-			CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarFilter(m_memory_pool));
+		m_dxlnode = GPOS_NEW(m_mp)
+			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarFilter(m_mp));
 	}
 	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarJoinFilter),
 										   element_local_name))
 	{
 		// start the filter
-		m_dxl_node = GPOS_NEW(m_memory_pool)
-			CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarJoinFilter(m_memory_pool));
+		m_dxlnode = GPOS_NEW(m_mp)
+			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarJoinFilter(m_mp));
 	}
 	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarOneTimeFilter),
 										   element_local_name))
 	{
 		// start the filter
-		m_dxl_node = GPOS_NEW(m_memory_pool)
-			CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarOneTimeFilter(m_memory_pool));
+		m_dxlnode = GPOS_NEW(m_mp)
+			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarOneTimeFilter(m_mp));
 	}
 	else if (0 ==
 			 XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarRecheckCondFilter),
 									  element_local_name))
 	{
 		// start the filter
-		m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(
-			m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarRecheckCondFilter(m_memory_pool));
+		m_dxlnode = GPOS_NEW(m_mp) CDXLNode(
+			m_mp, GPOS_NEW(m_mp) CDXLScalarRecheckCondFilter(m_mp));
 	}
 	else
 	{
-		GPOS_ASSERT(NULL != m_dxl_node);
+		GPOS_ASSERT(NULL != m_dxlnode);
 
 		// install a scalar element parser for parsing the condition element
 		CParseHandlerBase *op_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 
 		m_parse_handler_mgr->ActivateParseHandler(op_parse_handler);
 

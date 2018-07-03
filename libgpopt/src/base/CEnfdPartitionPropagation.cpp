@@ -113,7 +113,7 @@ CEnfdPartitionPropagation::Epet
 BOOL 
 CEnfdPartitionPropagation::FResolved
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CPartIndexMap *ppim
 	)
 	const
@@ -126,7 +126,7 @@ CEnfdPartitionPropagation::FResolved
 		return true;
 	}
 	
-	ULongPtrArray *pdrgpulPartIndexIds = ppimReqd->PdrgpulScanIds(memory_pool);
+	ULongPtrArray *pdrgpulPartIndexIds = ppimReqd->PdrgpulScanIds(mp);
 	const ULONG length = pdrgpulPartIndexIds->Size();
 			
 	BOOL fResolved = true;
@@ -166,7 +166,7 @@ CEnfdPartitionPropagation::FResolved
 BOOL 
 CEnfdPartitionPropagation::FInScope
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CPartIndexMap *ppim
 	)
 	const
@@ -175,7 +175,7 @@ CEnfdPartitionPropagation::FInScope
 	
 	CPartIndexMap *ppimReqd = m_ppps->Ppim();
 	
-	ULongPtrArray *pdrgpulPartIndexIds = ppimReqd->PdrgpulScanIds(memory_pool);
+	ULongPtrArray *pdrgpulPartIndexIds = ppimReqd->PdrgpulScanIds(mp);
 	const ULONG length = pdrgpulPartIndexIds->Size();
 
 	if (0 == length)

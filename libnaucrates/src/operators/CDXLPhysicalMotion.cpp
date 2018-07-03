@@ -24,8 +24,8 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalMotion::CDXLPhysicalMotion(IMemoryPool *memory_pool)
-	: CDXLPhysical(memory_pool), m_input_segids_array(NULL), m_output_segids_array(NULL)
+CDXLPhysicalMotion::CDXLPhysicalMotion(IMemoryPool *mp)
+	: CDXLPhysical(mp), m_input_segids_array(NULL), m_output_segids_array(NULL)
 {
 }
 
@@ -127,7 +127,7 @@ CDXLPhysicalMotion::GetSegIdsCommaSeparatedStr(const IntPtrArray *segment_ids_ar
 {
 	GPOS_ASSERT(segment_ids_array != NULL && 0 < segment_ids_array->Size());
 
-	CWStringDynamic *str = GPOS_NEW(m_memory_pool) CWStringDynamic(m_memory_pool);
+	CWStringDynamic *str = GPOS_NEW(m_mp) CWStringDynamic(m_mp);
 
 	ULONG num_of_segments = segment_ids_array->Size();
 	for (ULONG idx = 0; idx < num_of_segments; idx++)

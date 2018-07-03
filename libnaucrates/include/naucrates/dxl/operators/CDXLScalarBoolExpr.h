@@ -48,7 +48,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		explicit CDXLScalarBoolExpr(IMemoryPool *memory_pool, const EdxlBoolExprType bool_type);
+		explicit CDXLScalarBoolExpr(IMemoryPool *mp, const EdxlBoolExprType bool_type);
 
 
 		// ident accessors

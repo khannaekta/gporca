@@ -57,25 +57,25 @@ GPOS_RESULT
 CIndexDescriptorTest::EresUnittest_Basic()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// Setup an MD cache with a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(memory_pool, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 					(
-					memory_pool,
+					mp,
 					&mda,
 					NULL,  /* pceeval */
-					CTestUtils::GetCostModel(memory_pool)
+					CTestUtils::GetCostModel(mp)
 					);
 
 	CWStringConst strName(GPOS_WSZ_LIT("MyTable"));
-	CMDIdGPDB *mdid = GPOS_NEW(memory_pool) CMDIdGPDB(GPOPT_MDCACHE_TEST_OID, 1, 1);
-	CTableDescriptor *ptabdesc = CTestUtils::PtabdescCreate(memory_pool, 10, mdid, CName(&strName));
+	CMDIdGPDB *mdid = GPOS_NEW(mp) CMDIdGPDB(GPOPT_MDCACHE_TEST_OID, 1, 1);
+	CTableDescriptor *ptabdesc = CTestUtils::PtabdescCreate(mp, 10, mdid, CName(&strName));
 
 	// get the index associated with the table
 	const IMDRelation *pmdrel = mda.RetrieveRel(ptabdesc->MDId());
@@ -84,10 +84,10 @@ CIndexDescriptorTest::EresUnittest_Basic()
 	// create an index descriptor
 	IMDId *pmdidIndex = pmdrel->IndexMDidAt(0); // get the first index
 	const IMDIndex *pmdindex = mda.RetrieveIndex(pmdidIndex);
-	CIndexDescriptor *pindexdesc  = CIndexDescriptor::Pindexdesc(memory_pool, ptabdesc, pmdindex);
+	CIndexDescriptor *pindexdesc  = CIndexDescriptor::Pindexdesc(mp, ptabdesc, pmdindex);
 
 #ifdef GPOS_DEBUG
-	CWStringDynamic str(memory_pool);
+	CWStringDynamic str(mp);
 	COstreamString oss(&str);
 	pindexdesc->OsPrint(oss);
 

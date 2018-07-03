@@ -143,7 +143,7 @@ namespace gpos
 			}
 
 			// add a new entry to the linked list
-			void AddEntry(IMemoryPool *memory_pool, ULONG ulKey, ULONG ulVal);
+			void AddEntry(IMemoryPool *mp, ULONG ulKey, ULONG ulVal);
 
 		};  // class CDeepObject
 

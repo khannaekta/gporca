@@ -44,7 +44,7 @@ namespace gpmd
 	{
 	private:
 		// memory pool
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// metadata id of the object
 		CMDIdRelStats *m_rel_stats_mdid;
@@ -65,7 +65,7 @@ namespace gpmd
 		CDXLRelStats(const CDXLRelStats &);
 
 	public:
-		CDXLRelStats(IMemoryPool *memory_pool,
+		CDXLRelStats(IMemoryPool *mp,
 					 CMDIdRelStats *rel_stats_mdid,
 					 CMDName *mdname,
 					 CDouble rows,
@@ -101,7 +101,7 @@ namespace gpmd
 #endif
 
 		// dummy relstats
-		static CDXLRelStats *CreateDXLDummyRelStats(IMemoryPool *memory_pool, IMDId *mdid);
+		static CDXLRelStats *CreateDXLDummyRelStats(IMemoryPool *mp, IMDId *mdid);
 	};
 
 }  // namespace gpmd

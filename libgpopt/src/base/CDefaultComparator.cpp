@@ -63,7 +63,7 @@ CDefaultComparator::CDefaultComparator
 BOOL
 CDefaultComparator::FEvalComparison
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const IDatum *datum1,
 	const IDatum *datum2,
 	IMDType::ECmpType cmp_type
@@ -72,11 +72,11 @@ CDefaultComparator::FEvalComparison
 {
 	GPOS_ASSERT(m_pceeval->FCanEvalExpressions());
 
-	IDatum *pdatum1Copy = datum1->MakeCopy(memory_pool);
-	CExpression *pexpr1 = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CScalarConst(memory_pool, pdatum1Copy));
-	IDatum *pdatum2Copy = datum2->MakeCopy(memory_pool);
-	CExpression *pexpr2 = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CScalarConst(memory_pool, pdatum2Copy));
-	CExpression *pexprComp = CUtils::PexprScalarCmp(memory_pool, pexpr1, pexpr2, cmp_type);
+	IDatum *pdatum1Copy = datum1->MakeCopy(mp);
+	CExpression *pexpr1 = GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, pdatum1Copy));
+	IDatum *pdatum2Copy = datum2->MakeCopy(mp);
+	CExpression *pexpr2 = GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, pdatum2Copy));
+	CExpression *pexprComp = CUtils::PexprScalarCmp(mp, pexpr1, pexpr2, cmp_type);
 
 	CExpression *pexprResult = m_pceeval->PexprEval(pexprComp);
 	pexprComp->Release();

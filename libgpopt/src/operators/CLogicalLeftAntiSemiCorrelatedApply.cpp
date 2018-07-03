@@ -26,11 +26,11 @@ using namespace gpopt;
 CXformSet *
 CLogicalLeftAntiSemiCorrelatedApply::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementLeftAntiSemiCorrelatedApply);
 
 	return xform_set;
@@ -47,14 +47,14 @@ CLogicalLeftAntiSemiCorrelatedApply::PxfsCandidates
 COperator *
 CLogicalLeftAntiSemiCorrelatedApply::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	BOOL must_exist
 	)
 {
-	ColRefArray *pdrgpcrInner = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrInner, colref_mapping, must_exist);
+	ColRefArray *pdrgpcrInner = CUtils::PdrgpcrRemap(mp, m_pdrgpcrInner, colref_mapping, must_exist);
 
-	return GPOS_NEW(memory_pool) CLogicalLeftAntiSemiCorrelatedApply(memory_pool, pdrgpcrInner, m_eopidOriginSubq);
+	return GPOS_NEW(mp) CLogicalLeftAntiSemiCorrelatedApply(mp, pdrgpcrInner, m_eopidOriginSubq);
 }
 
 

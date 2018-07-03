@@ -53,7 +53,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CParseHandlerLogicalGroupBy(IMemoryPool *memory_pool,
+		CParseHandlerLogicalGroupBy(IMemoryPool *mp,
 									CParseHandlerManager *parse_handler_mgr,
 									CParseHandlerBase *parse_handler_root);
 	};

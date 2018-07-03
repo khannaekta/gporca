@@ -38,7 +38,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformCTEAnchor2TrivialSelect(IMemoryPool *memory_pool);
+			CXformCTEAnchor2TrivialSelect(IMemoryPool *mp);
 
 			// dtor
 			virtual

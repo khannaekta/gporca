@@ -59,7 +59,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLScalarWindowFrameEdge(IMemoryPool *memory_pool,
+		CDXLScalarWindowFrameEdge(IMemoryPool *mp,
 								  BOOL fLeading,
 								  EdxlFrameBoundary frame_boundary);
 

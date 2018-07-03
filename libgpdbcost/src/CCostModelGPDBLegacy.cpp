@@ -93,17 +93,17 @@ const CCostModelGPDBLegacy::SCostMapping CCostModelGPDBLegacy::m_rgcm[] =
 //---------------------------------------------------------------------------
 CCostModelGPDBLegacy::CCostModelGPDBLegacy
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ULONG ulSegments,
 	CostModelParamsArray *pdrgpcp
 	)
 	:
-	m_memory_pool(memory_pool),
+	m_mp(mp),
 	m_num_of_segments(ulSegments)
 {
 	GPOS_ASSERT(0 < ulSegments);
 
-	m_cost_model_params = GPOS_NEW(memory_pool) CCostModelParamsGPDBLegacy(memory_pool);
+	m_cost_model_params = GPOS_NEW(mp) CCostModelParamsGPDBLegacy(mp);
 	SetParams(pdrgpcp);
 }
 
@@ -306,7 +306,7 @@ CCostModelGPDBLegacy::CostSum
 CCost
 CCostModelGPDBLegacy::CostCTEProducer
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl,
 	const CCostModelGPDBLegacy *pcmgpdb,
 	const SCostingInfo *pci
@@ -354,7 +354,7 @@ CCostModelGPDBLegacy::CostCTEProducer
 CCost
 CCostModelGPDBLegacy::CostCTEConsumer
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &
 #ifdef GPOS_DEBUG
 	 exprhdl
@@ -386,7 +386,7 @@ CCostModelGPDBLegacy::CostCTEConsumer
 CCost
 CCostModelGPDBLegacy::CostConstTableGet
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &
 #ifdef GPOS_DEBUG
 	 exprhdl
@@ -415,7 +415,7 @@ CCostModelGPDBLegacy::CostConstTableGet
 CCost
 CCostModelGPDBLegacy::CostDML
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &
 #ifdef GPOS_DEBUG
 	 exprhdl
@@ -453,7 +453,7 @@ CCostModelGPDBLegacy::CostDML
 CCost
 CCostModelGPDBLegacy::CostScalarAgg
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &
 #ifdef GPOS_DEBUG
 	 exprhdl
@@ -493,7 +493,7 @@ CCostModelGPDBLegacy::CostScalarAgg
 CCost
 CCostModelGPDBLegacy::CostStreamAgg
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &
 #ifdef GPOS_DEBUG
 	 exprhdl
@@ -536,7 +536,7 @@ CCostModelGPDBLegacy::CostStreamAgg
 CCost
 CCostModelGPDBLegacy::CostSequence
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &
 #ifdef GPOS_DEBUG
 	 exprhdl
@@ -568,7 +568,7 @@ CCostModelGPDBLegacy::CostSequence
 CCost
 CCostModelGPDBLegacy::CostSort
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &
 #ifdef GPOS_DEBUG
 	 exprhdl
@@ -607,7 +607,7 @@ CCostModelGPDBLegacy::CostSort
 CCost
 CCostModelGPDBLegacy::CostTVF
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &
 #ifdef GPOS_DEBUG
 	 exprhdl
@@ -636,7 +636,7 @@ CCostModelGPDBLegacy::CostTVF
 CCost
 CCostModelGPDBLegacy::CostUnionAll
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &
 #ifdef GPOS_DEBUG
 	 exprhdl
@@ -668,7 +668,7 @@ CCostModelGPDBLegacy::CostUnionAll
 CCost
 CCostModelGPDBLegacy::CostHashAgg
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &
 #ifdef GPOS_DEBUG
 	 exprhdl
@@ -712,7 +712,7 @@ CCostModelGPDBLegacy::CostHashAgg
 CCost
 CCostModelGPDBLegacy::CostHashJoin
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &
 #ifdef GPOS_DEBUG
 	 exprhdl
@@ -761,7 +761,7 @@ CCostModelGPDBLegacy::CostHashJoin
 CCost
 CCostModelGPDBLegacy::CostIndexNLJoin
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &
 #ifdef GPOS_DEBUG
 	 exprhdl
@@ -794,7 +794,7 @@ CCostModelGPDBLegacy::CostIndexNLJoin
 CCost
 CCostModelGPDBLegacy::CostNLJoin
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &
 #ifdef GPOS_DEBUG
 	 exprhdl
@@ -841,7 +841,7 @@ CCostModelGPDBLegacy::CostNLJoin
 CCost
 CCostModelGPDBLegacy::CostMotion
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl,
 	const CCostModelGPDBLegacy *pcmgpdb,
 	const SCostingInfo *pci
@@ -890,7 +890,7 @@ CCostModelGPDBLegacy::CostMotion
 CCost
 CCostModelGPDBLegacy::CostSequenceProject
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl,
 	const CCostModelGPDBLegacy *pcmgpdb,
 	const SCostingInfo *pci
@@ -934,7 +934,7 @@ CCostModelGPDBLegacy::CostSequenceProject
 CCost
 CCostModelGPDBLegacy::CostIndexScan
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl,
 	const CCostModelGPDBLegacy *pcmgpdb,
 	const SCostingInfo *pci
@@ -974,7 +974,7 @@ CCostModelGPDBLegacy::CostIndexScan
 CCost
 CCostModelGPDBLegacy::CostBitmapTableScan
 	(
-	IMemoryPool *,  // memory_pool,
+	IMemoryPool *,  // mp,
 	CExpressionHandle &
 #ifdef GPOS_DEBUG
 	 exprhdl
@@ -1008,7 +1008,7 @@ CCostModelGPDBLegacy::CostBitmapTableScan
 CCost
 CCostModelGPDBLegacy::CostScan
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl,
 	const CCostModelGPDBLegacy *pcmgpdb,
 	const SCostingInfo *pci
@@ -1077,7 +1077,7 @@ CCostModelGPDBLegacy::Cost
 	}
 	GPOS_ASSERT(NULL != pfnc);
 
-	return pfnc(m_memory_pool, exprhdl, this, pci);
+	return pfnc(m_mp, exprhdl, this, pci);
 }
 
 // EOF

@@ -38,7 +38,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformCTEAnchor2Sequence(IMemoryPool *memory_pool);
+			CXformCTEAnchor2Sequence(IMemoryPool *mp);
 
 			// dtor
 			virtual

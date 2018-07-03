@@ -28,7 +28,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPropConstraint::CPropConstraint
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ColRefSetArray *pdrgpcrs,
 	CConstraint *pcnstr
 	)
@@ -38,7 +38,7 @@ CPropConstraint::CPropConstraint
 	m_pcnstr(pcnstr)
 {
 	GPOS_ASSERT(NULL != pdrgpcrs);
-	InitHashMap(memory_pool);
+	InitHashMap(mp);
 }
 
 //---------------------------------------------------------------------------
@@ -67,11 +67,11 @@ CPropConstraint::~CPropConstraint()
 void
 CPropConstraint::InitHashMap
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 {
 	GPOS_ASSERT(NULL == m_phmcrcrs);
-	m_phmcrcrs = GPOS_NEW(memory_pool) ColRefToColRefSetMap(memory_pool);
+	m_phmcrcrs = GPOS_NEW(mp) ColRefToColRefSetMap(mp);
 	const ULONG ulEquiv = m_pdrgpcrs->Size();
 	for (ULONG ul = 0; ul < ulEquiv; ul++)
 	{
@@ -117,7 +117,7 @@ const
 CExpression *
 CPropConstraint::PexprScalarMappedFromEquivCols
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CColRef *colref
 	)
 	const
@@ -135,11 +135,11 @@ CPropConstraint::PexprScalarMappedFromEquivCols
 
 	// get constraints for all other columns in this equivalence class
 	// except the current column
-	CColRefSet *pcrsEquiv = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrsEquiv = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsEquiv->Include(pcrs);
 	pcrsEquiv->Exclude(colref);
 
-	CConstraint *pcnstr = m_pcnstr->Pcnstr(memory_pool, pcrsEquiv);
+	CConstraint *pcnstr = m_pcnstr->Pcnstr(mp, pcrsEquiv);
 	pcrsEquiv->Release();
 	if (NULL == pcnstr)
 	{
@@ -147,8 +147,8 @@ CPropConstraint::PexprScalarMappedFromEquivCols
 	}
 
 	// generate a copy of all these constraints for the current column
-	CConstraint *pcnstrCol = pcnstr->PcnstrRemapForColumn(memory_pool, colref);
-	CExpression *pexprScalar = pcnstrCol->PexprScalar(memory_pool);
+	CConstraint *pcnstrCol = pcnstr->PcnstrRemapForColumn(mp, colref);
+	CExpression *pexprScalar = pcnstrCol->PexprScalar(mp);
 	pexprScalar->AddRef();
 
 	pcnstr->Release();
@@ -197,8 +197,8 @@ CPropConstraint::OsPrint
 void
 CPropConstraint::DbgPrint() const
 {
-	IMemoryPool *memory_pool = COptCtxt::PoctxtFromTLS()->Pmp();
-	CAutoTrace at(memory_pool);
+	IMemoryPool *mp = COptCtxt::PoctxtFromTLS()->Pmp();
+	CAutoTrace at(mp);
 	(void) this->OsPrint(at.Os());
 }
 // EOF

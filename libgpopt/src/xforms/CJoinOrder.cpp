@@ -67,7 +67,7 @@ INT ICmpEdgesByLength
 //---------------------------------------------------------------------------
 CJoinOrder::SComponent::SComponent
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr
 	)
 	:
@@ -75,7 +75,7 @@ CJoinOrder::SComponent::SComponent
 	m_pexpr(pexpr),
 	m_fUsed(false)
 {	
-	m_pbs = GPOS_NEW(memory_pool) CBitSet(memory_pool);
+	m_pbs = GPOS_NEW(mp) CBitSet(mp);
 }
 
 
@@ -153,7 +153,7 @@ const
 //---------------------------------------------------------------------------
 CJoinOrder::SEdge::SEdge
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexpr
 	)
 	:
@@ -161,7 +161,7 @@ CJoinOrder::SEdge::SEdge
 	m_pexpr(pexpr),
 	m_fUsed(false)
 {	
-	m_pbs = GPOS_NEW(memory_pool) CBitSet(memory_pool);
+	m_pbs = GPOS_NEW(mp) CBitSet(mp);
 }
 
 
@@ -212,12 +212,12 @@ CJoinOrder::SEdge::OsPrint
 //---------------------------------------------------------------------------
 CJoinOrder::CJoinOrder
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ExpressionArray *pdrgpexpr,
 	ExpressionArray *pdrgpexprConj
 	)
 	:
-	m_memory_pool(memory_pool),
+	m_mp(mp),
 	m_rgpedge(NULL),
 	m_ulEdges(0),
 	m_rgpcomp(NULL),
@@ -227,26 +227,26 @@ CJoinOrder::CJoinOrder
 	typedef SEdge* Pedge;
 	
 	m_ulComps = pdrgpexpr->Size();
-	m_rgpcomp = GPOS_NEW_ARRAY(memory_pool, Pcomp, m_ulComps);
+	m_rgpcomp = GPOS_NEW_ARRAY(mp, Pcomp, m_ulComps);
 	
 	for (ULONG ul = 0; ul < m_ulComps; ul++)
 	{
 		CExpression *pexprComp = (*pdrgpexpr)[ul];
 		pexprComp->AddRef();
-		m_rgpcomp[ul] = GPOS_NEW(memory_pool) SComponent(memory_pool, pexprComp);
+		m_rgpcomp[ul] = GPOS_NEW(mp) SComponent(mp, pexprComp);
 		
 		// component always covers itself
 		(void) m_rgpcomp[ul]->m_pbs->ExchangeSet(ul);
 	}
 
 	m_ulEdges = pdrgpexprConj->Size();
-	m_rgpedge = GPOS_NEW_ARRAY(memory_pool, Pedge, m_ulEdges);
+	m_rgpedge = GPOS_NEW_ARRAY(mp, Pedge, m_ulEdges);
 	
 	for (ULONG ul = 0; ul < m_ulEdges; ul++)
 	{
 		CExpression *pexprEdge = (*pdrgpexprConj)[ul];
 		pexprEdge->AddRef();
-		m_rgpedge[ul] = GPOS_NEW(memory_pool) SEdge(memory_pool, pexprEdge);
+		m_rgpedge[ul] = GPOS_NEW(mp) SEdge(mp, pexprEdge);
 	}
 	
 	pdrgpexpr->Release();
@@ -325,10 +325,10 @@ CJoinOrder::PcompCombine
 	SComponent *pcompInner
 	)
 {
-	CBitSet *pbs = GPOS_NEW(m_memory_pool) CBitSet(m_memory_pool);
+	CBitSet *pbs = GPOS_NEW(m_mp) CBitSet(m_mp);
 	pbs->Union(pcompOuter->m_pbs);
 	pbs->Union(pcompInner->m_pbs);
-	ExpressionArray *pdrgpexpr = GPOS_NEW(m_memory_pool) ExpressionArray(m_memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(m_mp) ExpressionArray(m_mp);
 	for (ULONG ul = 0; ul < m_ulEdges; ul++)
 	{
 		SEdge *pedge = m_rgpedge[ul];
@@ -349,13 +349,13 @@ CJoinOrder::PcompCombine
 
 	CExpression *pexprOuter = pcompOuter->m_pexpr;
 	CExpression *pexprInner = pcompInner->m_pexpr;
-	CExpression *pexprScalar = CPredicateUtils::PexprConjunction(m_memory_pool, pdrgpexpr);
+	CExpression *pexprScalar = CPredicateUtils::PexprConjunction(m_mp, pdrgpexpr);
 
 	CExpression *pexpr = NULL;
 	if (NULL == pexprOuter)
 	{
 		// first call to this function, we create a Select node
-		pexpr = CUtils::PexprCollapseSelect(m_memory_pool, pexprInner, pexprScalar);
+		pexpr = CUtils::PexprCollapseSelect(m_mp, pexprInner, pexprScalar);
 		pexprScalar->Release();
 	}
 	else
@@ -363,10 +363,10 @@ CJoinOrder::PcompCombine
 		// not first call, we create an Inner Join
 		pexprInner->AddRef();
 		pexprOuter->AddRef();
-		pexpr = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(m_memory_pool, pexprOuter, pexprInner, pexprScalar);
+		pexpr = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(m_mp, pexprOuter, pexprInner, pexprScalar);
 	}
 
-	return GPOS_NEW(m_memory_pool) SComponent(pexpr, pbs);
+	return GPOS_NEW(m_mp) SComponent(pexpr, pbs);
 }
 
 
@@ -392,9 +392,9 @@ CJoinOrder::DeriveStats
 		return;
 	}
 
-	CExpressionHandle exprhdl(m_memory_pool);
+	CExpressionHandle exprhdl(m_mp);
 	exprhdl.Attach(pexpr);
-	exprhdl.DeriveStats(m_memory_pool, m_memory_pool, NULL /*prprel*/, NULL /*pdrgpstatCtxt*/);
+	exprhdl.DeriveStats(m_mp, m_mp, NULL /*prprel*/, NULL /*pdrgpstatCtxt*/);
 }
 
 

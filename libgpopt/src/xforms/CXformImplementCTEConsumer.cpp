@@ -28,16 +28,16 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformImplementCTEConsumer::CXformImplementCTEConsumer
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformImplementation
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalCTEConsumer(memory_pool)
+				mp,
+				GPOS_NEW(mp) CLogicalCTEConsumer(mp)
 				)
 		)
 {}
@@ -83,7 +83,7 @@ CXformImplementCTEConsumer::Transform
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CLogicalCTEConsumer *popCTEConsumer = CLogicalCTEConsumer::PopConvert(pexpr->Pop());
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
 	ULONG id = popCTEConsumer->UlCTEId();
@@ -97,10 +97,10 @@ CXformImplementCTEConsumer::Transform
 
 	// create physical CTE Consumer
 	CExpression *pexprAlt =
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
-			GPOS_NEW(memory_pool) CPhysicalCTEConsumer(memory_pool, id, colref_array, colref_mapping)
+			mp,
+			GPOS_NEW(mp) CPhysicalCTEConsumer(mp, id, colref_array, colref_mapping)
 			);
 
 	// add alternative to transformation result

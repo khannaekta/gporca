@@ -58,7 +58,7 @@ CHashSetTest::EresUnittest_Basic()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// test with ULONG array
 	ULONG_PTR rgul[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -68,7 +68,7 @@ CHashSetTest::EresUnittest_Basic()
 	typedef CHashSet<ULONG_PTR, HashPtr<ULONG_PTR>, Equals<ULONG_PTR>, CleanupNULL<ULONG_PTR> >
 		HSUl;
 
-	HSUl *phs = GPOS_NEW(memory_pool) HSUl(memory_pool, 128);
+	HSUl *phs = GPOS_NEW(mp) HSUl(mp, 128);
 	for (ULONG ul = 0; ul < ulCnt; ul++)
 	{
 #ifdef GPOS_DEBUG
@@ -103,17 +103,17 @@ CHashSetTest::EresUnittest_Ownership()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	ULONG ulCnt = 256;
 
 	typedef CHashSet<ULONG_PTR, HashPtr<ULONG_PTR>, Equals<ULONG_PTR>, CleanupDelete<ULONG_PTR> >
 		HSUl;
 
-	HSUl *phs = GPOS_NEW(memory_pool) HSUl(memory_pool, 32);
+	HSUl *phs = GPOS_NEW(mp) HSUl(mp, 32);
 	for (ULONG ul = 0; ul < ulCnt; ul++)
 	{
-		ULONG_PTR *pulp = GPOS_NEW(memory_pool) ULONG_PTR(ul);
+		ULONG_PTR *pulp = GPOS_NEW(mp) ULONG_PTR(ul);
 
 #ifdef GPOS_DEBUG
 		BOOL fSuccess =

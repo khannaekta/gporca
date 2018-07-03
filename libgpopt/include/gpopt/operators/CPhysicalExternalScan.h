@@ -64,13 +64,13 @@ namespace gpopt
 			virtual
 			CRewindabilitySpec *PrsDerive
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle & // exprhdl
 				)
 				const
 			{
 				// external tables are not rewindable
-				return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
+				return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
 			}
 
 			//-------------------------------------------------------------------------------------

@@ -23,7 +23,7 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLOperator::CDXLOperator(IMemoryPool *memory_pool) : m_memory_pool(memory_pool)
+CDXLOperator::CDXLOperator(IMemoryPool *mp) : m_mp(mp)
 {
 }
 

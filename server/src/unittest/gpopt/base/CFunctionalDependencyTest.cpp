@@ -47,21 +47,21 @@ GPOS_RESULT
 CFunctionalDependencyTest::EresUnittest_Basics()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// Setup an MD cache with a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(memory_pool, CMDCache::Pcache());
+	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 				(
-				memory_pool,
+				mp,
 				&mda,
 				NULL, /* pceeval */
-				CTestUtils::GetCostModel(memory_pool)
+				CTestUtils::GetCostModel(mp)
 				);
 
 	// get column factory from optimizer context object
@@ -73,8 +73,8 @@ CFunctionalDependencyTest::EresUnittest_Basics()
 	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
 	const ULONG num_cols = 3;
-	CColRefSet *pcrsLeft = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
-	CColRefSet *pcrsRight = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrsLeft = GPOS_NEW(mp) CColRefSet(mp);
+	CColRefSet *pcrsRight = GPOS_NEW(mp) CColRefSet(mp);
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
 		CColRef *colref = col_factory->PcrCreate(pmdtypeint4, default_type_modifier, name);
@@ -86,31 +86,31 @@ CFunctionalDependencyTest::EresUnittest_Basics()
 
 	pcrsLeft->AddRef();
 	pcrsRight->AddRef();
-	CFunctionalDependency *pfdFst = GPOS_NEW(memory_pool) CFunctionalDependency(pcrsLeft, pcrsRight);
+	CFunctionalDependency *pfdFst = GPOS_NEW(mp) CFunctionalDependency(pcrsLeft, pcrsRight);
 
 	pcrsLeft->AddRef();
 	pcrsRight->AddRef();
-	CFunctionalDependency *pfdSnd = GPOS_NEW(memory_pool) CFunctionalDependency(pcrsLeft, pcrsRight);
+	CFunctionalDependency *pfdSnd = GPOS_NEW(mp) CFunctionalDependency(pcrsLeft, pcrsRight);
 
 	GPOS_ASSERT(pfdFst->Equals(pfdSnd));
 	GPOS_ASSERT(pfdFst->HashValue() == pfdSnd->HashValue());
 
-	 FunctionalDependencyArray *pdrgpfd = GPOS_NEW(memory_pool) FunctionalDependencyArray(memory_pool);
+	 FunctionalDependencyArray *pdrgpfd = GPOS_NEW(mp) FunctionalDependencyArray(mp);
 	 pfdFst->AddRef();
 	 pdrgpfd->Append(pfdFst);
 	 pfdSnd->AddRef();
 	 pdrgpfd->Append(pfdSnd);
 	 GPOS_ASSERT(CFunctionalDependency::Equals(pdrgpfd, pdrgpfd));
 
-	 ColRefArray *colref_array = CFunctionalDependency::PdrgpcrKeys(memory_pool, pdrgpfd);
-	 CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	 ColRefArray *colref_array = CFunctionalDependency::PdrgpcrKeys(mp, pdrgpfd);
+	 CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	 pcrs->Include(colref_array);
-	 CColRefSet *pcrsKeys = CFunctionalDependency::PcrsKeys(memory_pool, pdrgpfd);
+	 CColRefSet *pcrsKeys = CFunctionalDependency::PcrsKeys(mp, pdrgpfd);
 
 	 GPOS_ASSERT(pcrsLeft->Equals(pcrs));
 	 GPOS_ASSERT(pcrsKeys->Equals(pcrs));
 
-	CAutoTrace at(memory_pool);
+	CAutoTrace at(mp);
 	at.Os()
 		<< "FD1:" << *pfdFst << std::endl
 		<< "FD2:" << *pfdSnd << std::endl;

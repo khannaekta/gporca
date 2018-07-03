@@ -79,7 +79,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLLogicalCTAS(IMemoryPool *memory_pool,
+		CDXLLogicalCTAS(IMemoryPool *mp,
 						IMDId *mdid,
 						CMDName *mdname_schema,
 						CMDName *mdname_rel,

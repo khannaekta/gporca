@@ -30,10 +30,10 @@ XERCES_CPP_NAMESPACE_USE
 //
 //---------------------------------------------------------------------------
 CParseHandlerScalarConstValue::CParseHandlerScalarConstValue(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -66,8 +66,8 @@ CParseHandlerScalarConstValue::StartElement(const XMLCh *const,  // element_uri,
 
 	// construct scalar Const node
 	GPOS_ASSERT(NULL != dxl_op);
-	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool);
-	m_dxl_node->SetOperator(dxl_op);
+	m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp);
+	m_dxlnode->SetOperator(dxl_op);
 }
 
 //---------------------------------------------------------------------------

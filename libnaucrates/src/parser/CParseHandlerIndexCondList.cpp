@@ -28,10 +28,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerIndexCondList::CParseHandlerIndexCondList(IMemoryPool *memory_pool,
+CParseHandlerIndexCondList::CParseHandlerIndexCondList(IMemoryPool *mp,
 													   CParseHandlerManager *parse_handler_mgr,
 													   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -53,12 +53,12 @@ CParseHandlerIndexCondList::StartElement(const XMLCh *const element_uri,
 									  element_local_name))
 	{
 		// start the index condition list
-		m_dxl_node = GPOS_NEW(m_memory_pool)
-			CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarIndexCondList(m_memory_pool));
+		m_dxlnode = GPOS_NEW(m_mp)
+			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarIndexCondList(m_mp));
 	}
 	else
 	{
-		if (NULL == m_dxl_node)
+		if (NULL == m_dxlnode)
 		{
 			CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
 				m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
@@ -66,7 +66,7 @@ CParseHandlerIndexCondList::StartElement(const XMLCh *const element_uri,
 		}
 
 		CParseHandlerBase *op_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 
 		m_parse_handler_mgr->ActivateParseHandler(op_parse_handler);
 
@@ -91,7 +91,7 @@ CParseHandlerIndexCondList::EndElement(const XMLCh *const,  // element_uri,
 									   const XMLCh *const  // element_qname
 )
 {
-	GPOS_ASSERT(NULL != m_dxl_node);
+	GPOS_ASSERT(NULL != m_dxlnode);
 
 	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarIndexCondList),
 									  element_local_name))

@@ -44,7 +44,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CDXLLogicalInsert(IMemoryPool *memory_pool,
+		CDXLLogicalInsert(IMemoryPool *mp,
 						  CDXLTableDescr *table_descr,
 						  ULongPtrArray *src_colids_array);
 

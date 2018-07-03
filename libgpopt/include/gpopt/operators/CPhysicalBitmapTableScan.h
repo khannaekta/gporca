@@ -49,7 +49,7 @@ namespace gpopt
 			// ctor
 			CPhysicalBitmapTableScan
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CTableDescriptor *ptabdesc,
 				ULONG ulOriginOpId,
 				const CName *pnameTableAlias,
@@ -100,20 +100,20 @@ namespace gpopt
 			virtual
 			CPartIndexMap *PpimDerive
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &, // exprhdl
 				CDrvdPropCtxt * //pdpctxt
 				)
 				const
 			{
-				return GPOS_NEW(memory_pool) CPartIndexMap(memory_pool);
+				return GPOS_NEW(mp) CPartIndexMap(mp);
 			}
 
 			// statistics derivation during costing
 			virtual
 			IStatistics *PstatsDerive
 				(
-				IMemoryPool *, // memory_pool
+				IMemoryPool *, // mp
 				CExpressionHandle &, // exprhdl
 				CReqdPropPlan *, // prpplan
 				StatsArray * //stats_ctxt

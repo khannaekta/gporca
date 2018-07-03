@@ -29,10 +29,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerStatsBound::CParseHandlerStatsBound(IMemoryPool *memory_pool,
+CParseHandlerStatsBound::CParseHandlerStatsBound(IMemoryPool *mp,
 												 CParseHandlerManager *parse_handler_mgr,
 												 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
 	  m_dxl_datum(NULL),
 	  m_is_stats_bound_closed(false)
 {

@@ -31,10 +31,10 @@ XERCES_CPP_NAMESPACE_USE
 //
 //---------------------------------------------------------------------------
 CParseHandlerStatsDerivedRelation::CParseHandlerStatsDerivedRelation(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
 	  m_rows(CStatistics::DefaultColumnWidth),
 	  m_empty(false),
 	  m_dxl_stats_derived_relation(NULL)
@@ -73,7 +73,7 @@ CParseHandlerStatsDerivedRelation::StartElement(const XMLCh *const element_uri,
 	{
 		// start new derived column element
 		CParseHandlerBase *parse_handler_base = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool,
+			m_mp,
 			CDXLTokens::XmlstrToken(EdxltokenStatsDerivedColumn),
 			m_parse_handler_mgr,
 			this);
@@ -138,7 +138,7 @@ CParseHandlerStatsDerivedRelation::EndElement(const XMLCh *const,  // element_ur
 
 	// array of derived column statistics
 	DXLStatsDerivedColArray *dxl_stats_derived_col_array =
-		GPOS_NEW(m_memory_pool) DXLStatsDerivedColArray(m_memory_pool);
+		GPOS_NEW(m_mp) DXLStatsDerivedColArray(m_mp);
 	const ULONG num_of_drvd_col_stats = this->Length();
 	for (ULONG idx = 0; idx < num_of_drvd_col_stats; idx++)
 	{
@@ -151,7 +151,7 @@ CParseHandlerStatsDerivedRelation::EndElement(const XMLCh *const,  // element_ur
 		dxl_stats_derived_col_array->Append(pdxlstatdercol);
 	}
 
-	m_dxl_stats_derived_relation = GPOS_NEW(m_memory_pool)
+	m_dxl_stats_derived_relation = GPOS_NEW(m_mp)
 		CDXLStatsDerivedRelation(m_rows, m_empty, dxl_stats_derived_col_array);
 
 	// deactivate handler

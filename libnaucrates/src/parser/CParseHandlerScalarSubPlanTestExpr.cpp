@@ -30,10 +30,10 @@ XERCES_CPP_NAMESPACE_USE
 //
 //---------------------------------------------------------------------------
 CParseHandlerScalarSubPlanTestExpr::CParseHandlerScalarSubPlanTestExpr(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root),
 	  m_dxl_test_expr(NULL)
 {
 }
@@ -70,7 +70,7 @@ CParseHandlerScalarSubPlanTestExpr::StartElement(const XMLCh *const element_uri,
 	{
 		// install a scalar element parser for parsing the test expression
 		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 
 		m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 

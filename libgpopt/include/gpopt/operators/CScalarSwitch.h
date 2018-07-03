@@ -57,7 +57,7 @@ namespace gpopt
 		public:
 
 			// ctor
-			CScalarSwitch(IMemoryPool *memory_pool, IMDId *mdid_type);
+			CScalarSwitch(IMemoryPool *mp, IMDId *mdid_type);
 
 			// dtor
 			virtual
@@ -103,7 +103,7 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //memory_pool,
+						IMemoryPool *, //mp,
 						UlongColRefHashMap *, //colref_mapping,
 						BOOL //must_exist
 						)

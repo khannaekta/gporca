@@ -11,12 +11,12 @@ using namespace gpopt;
 
 CDatumSortedSet::CDatumSortedSet
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexprArray,
 	const IComparator *pcomp
 	)
 	:
-	IDatumArray(memory_pool),
+	IDatumArray(mp),
 	m_fIncludesNull(false)
 {
 	GPOS_ASSERT(COperator::EopScalarArray == pexprArray->Pop()->Eopid());
@@ -24,7 +24,7 @@ CDatumSortedSet::CDatumSortedSet
 	const ULONG ulArrayExprArity = CUtils::UlScalarArrayArity(pexprArray);
 	GPOS_ASSERT(0 < ulArrayExprArity);
 
-	gpos::CAutoRef<IDatumArray> aprngdatum(GPOS_NEW(memory_pool) IDatumArray(memory_pool));
+	gpos::CAutoRef<IDatumArray> aprngdatum(GPOS_NEW(mp) IDatumArray(mp));
 	for (ULONG ul = 0; ul < ulArrayExprArity; ul++)
 	{
 		CScalarConst *popScConst = CUtils::PScalarArrayConstChildAt(pexprArray, ul);

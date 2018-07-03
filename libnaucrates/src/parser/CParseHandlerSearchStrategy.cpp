@@ -27,10 +27,10 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerSearchStrategy::CParseHandlerSearchStrategy(IMemoryPool *memory_pool,
+CParseHandlerSearchStrategy::CParseHandlerSearchStrategy(IMemoryPool *mp,
 														 CParseHandlerManager *parse_handler_mgr,
 														 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
 	  m_search_stage_array(NULL)
 {
 }
@@ -67,7 +67,7 @@ CParseHandlerSearchStrategy::StartElement(const XMLCh *const element_uri,
 	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenSearchStrategy),
 									  element_local_name))
 	{
-		m_search_stage_array = GPOS_NEW(m_memory_pool) SearchStageArray(m_memory_pool);
+		m_search_stage_array = GPOS_NEW(m_mp) SearchStageArray(m_mp);
 	}
 	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenSearchStage),
 										   element_local_name))
@@ -76,7 +76,7 @@ CParseHandlerSearchStrategy::StartElement(const XMLCh *const element_uri,
 
 		// start new search stage
 		CParseHandlerBase *search_stage_parse_handler =
-			CParseHandlerFactory::GetParseHandler(m_memory_pool,
+			CParseHandlerFactory::GetParseHandler(m_mp,
 												  CDXLTokens::XmlstrToken(EdxltokenSearchStage),
 												  m_parse_handler_mgr,
 												  this);
@@ -127,7 +127,7 @@ CParseHandlerSearchStrategy::EndElement(const XMLCh *const,  // element_uri,
 		CXformSet *xform_set = search_stage_parse_handler->GetXformSet();
 		xform_set->AddRef();
 		CSearchStage *search_stage =
-			GPOS_NEW(m_memory_pool) CSearchStage(xform_set,
+			GPOS_NEW(m_mp) CSearchStage(xform_set,
 												 search_stage_parse_handler->TimeThreshold(),
 												 search_stage_parse_handler->CostThreshold());
 		m_search_stage_array->Append(search_stage);

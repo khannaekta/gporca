@@ -40,13 +40,13 @@ using namespace gpopt;
 CScalarConst *
 CTranslatorDXLToExprUtils::PopConst
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CMDAccessor *md_accessor,
 	const CDXLScalarConstValue *dxl_op
 	)
 {
 	IDatum *datum = CTranslatorDXLToExprUtils::GetDatum(md_accessor, dxl_op);
-	return GPOS_NEW(memory_pool) CScalarConst(memory_pool, datum);
+	return GPOS_NEW(mp) CScalarConst(mp, datum);
 }
 
 //---------------------------------------------------------------------------
@@ -81,20 +81,20 @@ CTranslatorDXLToExprUtils::GetDatum
 IDatumArray *
 CTranslatorDXLToExprUtils::Pdrgpdatum
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CMDAccessor *md_accessor,
 	const DXLDatumArray *pdrgpdxldatum
 	)
 {
 	GPOS_ASSERT(NULL != pdrgpdxldatum);
 
-	IDatumArray *pdrgdatum = GPOS_NEW(memory_pool) IDatumArray(memory_pool);
+	IDatumArray *pdrgdatum = GPOS_NEW(mp) IDatumArray(mp);
 	const ULONG length = pdrgpdxldatum->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		CDXLDatum *datum_dxl = (*pdrgpdxldatum)[ul];
 		IMDId *mdid = datum_dxl->MDId();
-		IDatum *datum = md_accessor->RetrieveType(mdid)->GetDatumForDXLDatum(memory_pool, datum_dxl);
+		IDatum *datum = md_accessor->RetrieveType(mdid)->GetDatumForDXLDatum(mp, datum_dxl);
 		pdrgdatum->Append(datum);
 	}
 
@@ -112,14 +112,14 @@ CTranslatorDXLToExprUtils::Pdrgpdatum
 CExpression *
 CTranslatorDXLToExprUtils::PexprConstInt8
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CMDAccessor *md_accessor,
 	CSystemId sysid,
 	LINT val
 	)
 {
-	IDatumInt8 *datum = md_accessor->PtMDType<IMDTypeInt8>(sysid)->CreateInt8Datum(memory_pool, val, false /* is_null */);
-	CExpression *pexprConst = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CScalarConst(memory_pool, datum));
+	IDatumInt8 *datum = md_accessor->PtMDType<IMDTypeInt8>(sysid)->CreateInt8Datum(mp, val, false /* is_null */);
+	CExpression *pexprConst = GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, datum));
 
 	return pexprConst;
 }
@@ -136,7 +136,7 @@ CTranslatorDXLToExprUtils::PexprConstInt8
 void
 CTranslatorDXLToExprUtils::AddKeySets
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CTableDescriptor *ptabdesc,
 	const IMDRelation *pmdrel,
 	UlongUlongHashMap *phmululColMapping
@@ -148,7 +148,7 @@ CTranslatorDXLToExprUtils::AddKeySets
 	const ULONG ulKeySets = pmdrel->KeySetCount();
 	for (ULONG ul = 0; ul < ulKeySets; ul++)
 	{
-		CBitSet *pbs = GPOS_NEW(memory_pool) CBitSet(memory_pool, ptabdesc->ColumnCount());
+		CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, ptabdesc->ColumnCount());
 		const ULongPtrArray *pdrgpulKeys = pmdrel->KeySetAt(ul);
 		const ULONG ulKeys = pdrgpulKeys->Size();
 
@@ -246,14 +246,14 @@ CTranslatorDXLToExprUtils::EBoolOperator
 ColRefArray *
 CTranslatorDXLToExprUtils::Pdrgpcr
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	const ULongPtrArray *col_ids
 	)
 {
 	GPOS_ASSERT(NULL != col_ids);
 
-	ColRefArray *colref_array = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
+	ColRefArray *colref_array = GPOS_NEW(mp) ColRefArray(mp);
 
 	for (ULONG ul = 0; ul < col_ids->Size(); ul++)
 	{

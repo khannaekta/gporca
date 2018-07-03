@@ -24,10 +24,10 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalAgg::CDXLPhysicalAgg(IMemoryPool *memory_pool,
+CDXLPhysicalAgg::CDXLPhysicalAgg(IMemoryPool *mp,
 								 EdxlAggStrategy agg_strategy_dxl,
 								 BOOL stream_safe)
-	: CDXLPhysical(memory_pool),
+	: CDXLPhysical(mp),
 	  m_grouping_colids_array(NULL),
 	  m_agg_strategy_dxl(agg_strategy_dxl),
 	  m_stream_safe(stream_safe)

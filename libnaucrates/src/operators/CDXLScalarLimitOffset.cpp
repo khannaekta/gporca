@@ -27,7 +27,7 @@ using namespace gpdxl;
 //		Constructs a scalar Limit Offset node
 //
 //---------------------------------------------------------------------------
-CDXLScalarLimitOffset::CDXLScalarLimitOffset(IMemoryPool *memory_pool) : CDXLScalar(memory_pool)
+CDXLScalarLimitOffset::CDXLScalarLimitOffset(IMemoryPool *mp) : CDXLScalar(mp)
 {
 }
 

@@ -29,7 +29,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarWindowRef::CDXLScalarWindowRef(IMemoryPool *memory_pool,
+CDXLScalarWindowRef::CDXLScalarWindowRef(IMemoryPool *mp,
 										 IMDId *mdid_func,
 										 IMDId *mdid_return_type,
 										 BOOL is_distinct,
@@ -37,7 +37,7 @@ CDXLScalarWindowRef::CDXLScalarWindowRef(IMemoryPool *memory_pool,
 										 BOOL is_simple_agg,
 										 EdxlWinStage dxl_win_stage,
 										 ULONG ulWinspecPosition)
-	: CDXLScalar(memory_pool),
+	: CDXLScalar(mp),
 	  m_func_mdid(mdid_func),
 	  m_return_type_mdid(mdid_return_type),
 	  m_is_distinct(is_distinct),

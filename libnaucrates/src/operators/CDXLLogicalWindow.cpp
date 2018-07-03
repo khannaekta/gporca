@@ -34,9 +34,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLLogicalWindow::CDXLLogicalWindow(IMemoryPool *memory_pool,
+CDXLLogicalWindow::CDXLLogicalWindow(IMemoryPool *mp,
 									 DXLWindowSpecArray *window_spec_array)
-	: CDXLLogical(memory_pool), m_window_spec_array(window_spec_array)
+	: CDXLLogical(mp), m_window_spec_array(window_spec_array)
 {
 	GPOS_ASSERT(NULL != m_window_spec_array);
 	GPOS_ASSERT(0 < m_window_spec_array->Size());

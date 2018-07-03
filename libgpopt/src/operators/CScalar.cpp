@@ -31,11 +31,11 @@ using namespace gpopt;
 DrvdPropArray *
 CScalar::PdpCreate
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	return GPOS_NEW(memory_pool) CDrvdPropScalar();
+	return GPOS_NEW(mp) CDrvdPropScalar();
 }
 
 
@@ -50,7 +50,7 @@ CScalar::PdpCreate
 CReqdProp *
 CScalar::PrpCreate
 	(
-	IMemoryPool * // memory_pool
+	IMemoryPool * // mp
 	)
 	const
 {
@@ -315,7 +315,7 @@ CScalar::EberNullOnAllNullChildren
 CScalar::EBoolEvalResult
 CScalar::EberEvaluate
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpression *pexprScalar
 	)
 {
@@ -333,13 +333,13 @@ CScalar::EberEvaluate
 		// do not recurse into subqueries
 		if (0 < arity)
 		{
-			pdrgpulChildren = GPOS_NEW(memory_pool) ULongPtrArray(memory_pool);
+			pdrgpulChildren = GPOS_NEW(mp) ULongPtrArray(mp);
 		}
 		for (ULONG ul = 0; ul < arity; ul++)
 		{
 			CExpression *pexprChild = (*pexprScalar)[ul];
-			EBoolEvalResult eberChild = EberEvaluate(memory_pool, pexprChild);
-			pdrgpulChildren->Append(GPOS_NEW(memory_pool) ULONG(eberChild));
+			EBoolEvalResult eberChild = EberEvaluate(mp, pexprChild);
+			pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(eberChild));
 		}
 	}
 
@@ -399,14 +399,14 @@ CScalar::FHasNonScalarFunction
 CPartInfo *
 CScalar::PpartinfoDeriveCombineScalar
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 {
 	const ULONG arity = exprhdl.Arity();
 	GPOS_ASSERT(0 < arity);
 
-	CPartInfo *ppartinfo = GPOS_NEW(memory_pool) CPartInfo(memory_pool);
+	CPartInfo *ppartinfo = GPOS_NEW(mp) CPartInfo(mp);
 	
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
@@ -414,7 +414,7 @@ CScalar::PpartinfoDeriveCombineScalar
 		{
 			CPartInfo *ppartinfoChild = exprhdl.GetDrvdScalarProps(ul)->Ppartinfo();
 			GPOS_ASSERT(NULL != ppartinfoChild);
-			CPartInfo *ppartinfoCombined = CPartInfo::PpartinfoCombine(memory_pool, ppartinfo, ppartinfoChild);
+			CPartInfo *ppartinfoCombined = CPartInfo::PpartinfoCombine(mp, ppartinfo, ppartinfoChild);
 			ppartinfo->Release();
 			ppartinfo = ppartinfoCombined;
 		}

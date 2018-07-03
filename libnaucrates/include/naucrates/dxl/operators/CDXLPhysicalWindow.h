@@ -50,7 +50,7 @@ namespace gpdxl
 
 	public:
 		//ctor
-		CDXLPhysicalWindow(IMemoryPool *memory_pool,
+		CDXLPhysicalWindow(IMemoryPool *mp,
 						   ULongPtrArray *part_by_col_identifier_array,
 						   CDXLWindowKeyArray *window_key_array);
 

@@ -40,7 +40,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CScalarSwitchCase(IMemoryPool *memory_pool);
+			CScalarSwitchCase(IMemoryPool *mp);
 
 			// dtor
 			virtual
@@ -76,7 +76,7 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //memory_pool,
+						IMemoryPool *, //mp,
 						UlongColRefHashMap *, //colref_mapping,
 						BOOL //must_exist
 						)

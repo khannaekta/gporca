@@ -6,29 +6,29 @@
 using namespace gpopt;
 CHashedDistributions::CHashedDistributions
 		(
-		IMemoryPool *memory_pool,
+		IMemoryPool *mp,
 		ColRefArray *pdrgpcrOutput,
 		ColRefArrays *pdrgpdrgpcrInput
 		)
 		:
-		DrgPds(memory_pool)
+		DrgPds(mp)
 {
 	const ULONG num_cols = pdrgpcrOutput->Size();
 	const ULONG arity = pdrgpdrgpcrInput->Size();
 	for (ULONG ulChild = 0; ulChild < arity; ulChild++)
 	{
 		ColRefArray *colref_array = (*pdrgpdrgpcrInput)[ulChild];
-		ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+		ExpressionArray *pdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
 		for (ULONG ulCol = 0; ulCol < num_cols; ulCol++)
 		{
 			CColRef *colref = (*colref_array)[ulCol];
-			CExpression *pexpr = CUtils::PexprScalarIdent(memory_pool, colref);
+			CExpression *pexpr = CUtils::PexprScalarIdent(mp, colref);
 			pdrgpexpr->Append(pexpr);
 		}
 
 		// create a hashed distribution on input columns of the current child
 		BOOL fNullsColocated = true;
-		CDistributionSpec *pdshashed = GPOS_NEW(memory_pool) CDistributionSpecHashed(pdrgpexpr, fNullsColocated);
+		CDistributionSpec *pdshashed = GPOS_NEW(mp) CDistributionSpecHashed(pdrgpexpr, fNullsColocated);
 		Append(pdshashed);
 	}
 }

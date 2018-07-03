@@ -108,45 +108,45 @@ namespace gpnaucrates
 		CHistogram &operator=(const CHistogram &);
 
 		// return an array buckets after applying equality filter on the histogram buckets
-		BucketArray *MakeBucketsWithEqualityFilter(IMemoryPool *memory_pool, CPoint *point) const;
+		BucketArray *MakeBucketsWithEqualityFilter(IMemoryPool *mp, CPoint *point) const;
 
 		// return an array buckets after applying non equality filter on the histogram buckets
-		BucketArray *MakeBucketsWithInequalityFilter(IMemoryPool *memory_pool, CPoint *point) const;
+		BucketArray *MakeBucketsWithInequalityFilter(IMemoryPool *mp, CPoint *point) const;
 
 		// less than or less than equal filter
 		CHistogram *MakeHistogramLessThanOrLessThanEqualFilter(
-			IMemoryPool *memory_pool,
+			IMemoryPool *mp,
 			CStatsPred::EStatsCmpType stats_cmp_type,
 			CPoint *point) const;
 
 		// greater than or greater than equal filter
 		CHistogram *MakeHistogramGreaterThanOrGreaterThanEqualFilter(
-			IMemoryPool *memory_pool,
+			IMemoryPool *mp,
 			CStatsPred::EStatsCmpType stats_cmp_type,
 			CPoint *point) const;
 
 		// equal filter
-		CHistogram *MakeHistogramEqualFilter(IMemoryPool *memory_pool, CPoint *point) const;
+		CHistogram *MakeHistogramEqualFilter(IMemoryPool *mp, CPoint *point) const;
 
 		// not equal filter
-		CHistogram *MakeHistogramInequalityFilter(IMemoryPool *memory_pool, CPoint *point) const;
+		CHistogram *MakeHistogramInequalityFilter(IMemoryPool *mp, CPoint *point) const;
 
 		// IDF filter
-		CHistogram *MakeHistogramIDFFilter(IMemoryPool *memory_pool, CPoint *point) const;
+		CHistogram *MakeHistogramIDFFilter(IMemoryPool *mp, CPoint *point) const;
 
 		// INDF filter
-		CHistogram *MakeHistogramINDFFilter(IMemoryPool *memory_pool, CPoint *point) const;
+		CHistogram *MakeHistogramINDFFilter(IMemoryPool *mp, CPoint *point) const;
 
 		// equality join
-		CHistogram *MakeJoinHistogramEqualityFilter(IMemoryPool *memory_pool,
+		CHistogram *MakeJoinHistogramEqualityFilter(IMemoryPool *mp,
 													const CHistogram *histogram) const;
 
 		// generate histogram based on NDV
-		CHistogram *MakeNDVBasedJoinHistogramEqualityFilter(IMemoryPool *memory_pool,
+		CHistogram *MakeNDVBasedJoinHistogramEqualityFilter(IMemoryPool *mp,
 															const CHistogram *histogram) const;
 
 		// construct a new histogram for an INDF join predicate
-		CHistogram *MakeJoinHistogramINDFFilter(IMemoryPool *memory_pool,
+		CHistogram *MakeJoinHistogramINDFFilter(IMemoryPool *mp,
 												const CHistogram *histogram) const;
 
 		// accessor for n-th bucket
@@ -156,7 +156,7 @@ namespace gpnaucrates
 		void ComputeSkew();
 
 		// helper to add buckets from one histogram to another
-		static void AddBuckets(IMemoryPool *memory_pool,
+		static void AddBuckets(IMemoryPool *mp,
 							   BucketArray *src_buckets,
 							   BucketArray *dest_buckets,
 							   CDouble rows_old,
@@ -164,7 +164,7 @@ namespace gpnaucrates
 							   ULONG begin,
 							   ULONG end);
 
-		static void AddBuckets(IMemoryPool *memory_pool,
+		static void AddBuckets(IMemoryPool *mp,
 							   BucketArray *src_buckets,
 							   BucketArray *dest_buckets,
 							   CDouble rows,
@@ -222,29 +222,29 @@ namespace gpnaucrates
 		}
 
 		// filter by comparing with point
-		CHistogram *MakeHistogramFilter(IMemoryPool *memory_pool,
+		CHistogram *MakeHistogramFilter(IMemoryPool *mp,
 										CStatsPred::EStatsCmpType stats_cmp_type,
 										CPoint *point) const;
 
 		// filter by comparing with point and normalize
-		CHistogram *MakeHistogramFilterNormalize(IMemoryPool *memory_pool,
+		CHistogram *MakeHistogramFilterNormalize(IMemoryPool *mp,
 												 CStatsPred::EStatsCmpType stats_cmp_type,
 												 CPoint *point,
 												 CDouble *scale_factor) const;
 
 		// join with another histogram
-		CHistogram *MakeJoinHistogram(IMemoryPool *memory_pool,
+		CHistogram *MakeJoinHistogram(IMemoryPool *mp,
 									  CStatsPred::EStatsCmpType stats_cmp_type,
 									  const CHistogram *histogram) const;
 
 		// LASJ with another histogram
-		CHistogram *MakeLASJHistogram(IMemoryPool *memory_pool,
+		CHistogram *MakeLASJHistogram(IMemoryPool *mp,
 									  CStatsPred::EStatsCmpType stats_cmp_type,
 									  const CHistogram *histogram) const;
 
 		// join with another histogram and normalize it.
 		// If the join is not an equality join the function returns an empty histogram
-		CHistogram *MakeJoinHistogramNormalize(IMemoryPool *memory_pool,
+		CHistogram *MakeJoinHistogramNormalize(IMemoryPool *mp,
 											   CStatsPred::EStatsCmpType stats_cmp_type,
 											   CDouble rows,
 											   const CHistogram *other_histogram,
@@ -252,14 +252,14 @@ namespace gpnaucrates
 											   CDouble *scale_factor) const;
 
 		// scale factor of inequality (!=) join
-		CDouble GetInequalityJoinScaleFactor(IMemoryPool *memory_pool,
+		CDouble GetInequalityJoinScaleFactor(IMemoryPool *mp,
 											 CDouble rows,
 											 const CHistogram *other_histogram,
 											 CDouble rows_other) const;
 
 		// left anti semi join with another histogram and normalize
 		CHistogram *MakeLASJHistogramNormalize(
-			IMemoryPool *memory_pool,
+			IMemoryPool *mp,
 			CStatsPred::EStatsCmpType stats_cmp_type,
 			CDouble rows,
 			const CHistogram *other_histogram,
@@ -270,18 +270,18 @@ namespace gpnaucrates
 			) const;
 
 		// group by and normalize
-		CHistogram *MakeGroupByHistogramNormalize(IMemoryPool *memory_pool,
+		CHistogram *MakeGroupByHistogramNormalize(IMemoryPool *mp,
 												  CDouble rows,
 												  CDouble *scale_factor) const;
 
 		// union all and normalize
-		CHistogram *MakeUnionAllHistogramNormalize(IMemoryPool *memory_pool,
+		CHistogram *MakeUnionAllHistogramNormalize(IMemoryPool *mp,
 												   CDouble rows,
 												   const CHistogram *other_histogram,
 												   CDouble rows_other) const;
 
 		// union and normalize
-		CHistogram *MakeUnionHistogramNormalize(IMemoryPool *memory_pool,
+		CHistogram *MakeUnionHistogramNormalize(IMemoryPool *mp,
 												CDouble rows,
 												const CHistogram *other_histogram,
 												CDouble rows_other,
@@ -297,7 +297,7 @@ namespace gpnaucrates
 							   ULONG *current_bucket_index) const;
 
 		// create a new histogram with updated bucket frequency
-		CHistogram *MakeHistogramUpdateFreq(IMemoryPool *memory_pool,
+		CHistogram *MakeHistogramUpdateFreq(IMemoryPool *mp,
 											BucketArray *histogram_buckets,
 											CDoubleArray *dest_bucket_freqs,
 											CDouble *num_output_rows,
@@ -306,7 +306,7 @@ namespace gpnaucrates
 											CDouble num_NDV_remain_rows) const;
 
 		// add residual union all buckets after the merge
-		ULONG AddResidualUnionAllBucket(IMemoryPool *memory_pool,
+		ULONG AddResidualUnionAllBucket(IMemoryPool *mp,
 										BucketArray *histogram_buckets,
 										CBucket *bucket,
 										CDouble rows_old,
@@ -315,7 +315,7 @@ namespace gpnaucrates
 										ULONG index) const;
 
 		// add residual union buckets after the merge
-		ULONG AddResidualUnionBucket(IMemoryPool *memory_pool,
+		ULONG AddResidualUnionBucket(IMemoryPool *mp,
 									 BucketArray *histogram_buckets,
 									 CBucket *bucket,
 									 CDouble rows,
@@ -364,7 +364,7 @@ namespace gpnaucrates
 		BOOL IsValid() const;
 
 		// return copy of histogram
-		CHistogram *CopyHistogram(IMemoryPool *memory_pool) const;
+		CHistogram *CopyHistogram(IMemoryPool *mp) const;
 
 		// destructor
 		virtual ~CHistogram()
@@ -379,7 +379,7 @@ namespace gpnaucrates
 		BOOL IsNormalized() const;
 
 		// translate the histogram into a derived column stats
-		CDXLStatsDerivedColumn *TranslateToDXLDerivedColumnStats(IMemoryPool *memory_pool,
+		CDXLStatsDerivedColumn *TranslateToDXLDerivedColumnStats(IMemoryPool *mp,
 																 CMDAccessor *md_accessor,
 																 ULONG col_id,
 																 CDouble width) const;
@@ -433,20 +433,20 @@ namespace gpnaucrates
 		static BOOL JoinPredCmpTypeIsSupported(CStatsPred::EStatsCmpType stats_cmp_type);
 
 		// create the default histogram for a given column reference
-		static CHistogram *MakeDefaultHistogram(IMemoryPool *memory_pool,
+		static CHistogram *MakeDefaultHistogram(IMemoryPool *mp,
 												CColRef *col_ref,
 												BOOL is_empty);
 
 		// create the default non empty histogram for a boolean column
-		static CHistogram *MakeDefaultBoolHistogram(IMemoryPool *memory_pool);
+		static CHistogram *MakeDefaultBoolHistogram(IMemoryPool *mp);
 
 		// helper method to append histograms from one map to the other
-		static void AddHistograms(IMemoryPool *memory_pool,
+		static void AddHistograms(IMemoryPool *mp,
 								  UlongHistogramHashMap *src_histograms,
 								  UlongHistogramHashMap *dest_histograms);
 
 		// add dummy histogram buckets and column width for the array of columns
-		static void AddDummyHistogramAndWidthInfo(IMemoryPool *memory_pool,
+		static void AddDummyHistogramAndWidthInfo(IMemoryPool *mp,
 												  CColumnFactory *col_factory,
 												  UlongHistogramHashMap *output_histograms,
 												  UlongDoubleHashMap *output_col_widths,
@@ -454,7 +454,7 @@ namespace gpnaucrates
 												  BOOL is_empty);
 
 		// add dummy histogram buckets for the columns in the input histogram
-		static void AddEmptyHistogram(IMemoryPool *memory_pool,
+		static void AddEmptyHistogram(IMemoryPool *mp,
 									  UlongHistogramHashMap *output_histograms,
 									  UlongHistogramHashMap *input_histograms);
 

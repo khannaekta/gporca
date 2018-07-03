@@ -30,17 +30,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalSort::CPhysicalSort
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	COrderSpec *pos
 	)
 	:
-	CPhysical(memory_pool),
+	CPhysical(mp),
 	m_pos(pos), // caller must add-ref pos
 	m_pcrsSort(NULL)
 {
 	GPOS_ASSERT(NULL != pos);
 
-	m_pcrsSort = Pos()->PcrsUsed(memory_pool);
+	m_pcrsSort = Pos()->PcrsUsed(mp);
 }
 
 
@@ -95,7 +95,7 @@ CPhysicalSort::Matches
 CColRefSet *
 CPhysicalSort::PcrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CColRefSet *pcrsRequired,
 	ULONG child_index,
@@ -105,10 +105,10 @@ CPhysicalSort::PcrsRequired
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet (memory_pool, *m_pcrsSort);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet (mp, *m_pcrsSort);
 	pcrs->Union(pcrsRequired);
 	CColRefSet *pcrsChildReqd =
-		PcrsChildReqd(memory_pool, exprhdl, pcrs, child_index, gpos::ulong_max);
+		PcrsChildReqd(mp, exprhdl, pcrs, child_index, gpos::ulong_max);
 	pcrs->Release();
 
 	return pcrsChildReqd;
@@ -126,7 +126,7 @@ CPhysicalSort::PcrsRequired
 COrderSpec *
 CPhysicalSort::PosRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &, // exprhdl
 	COrderSpec *, // posRequired
 	ULONG
@@ -143,7 +143,7 @@ CPhysicalSort::PosRequired
 
 	// sort operator is order-establishing and does not require child to deliver
 	// any sort order; we return an empty sort order as child requirement
-	return GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+	return GPOS_NEW(mp) COrderSpec(mp);
 }
 
 
@@ -158,7 +158,7 @@ CPhysicalSort::PosRequired
 CDistributionSpec *
 CPhysicalSort::PdsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CDistributionSpec *pdsRequired,
 	ULONG child_index,
@@ -169,7 +169,7 @@ CPhysicalSort::PdsRequired
 {
 	GPOS_ASSERT(0 == child_index);
 
-	return PdsPassThru(memory_pool, exprhdl, pdsRequired, child_index);
+	return PdsPassThru(mp, exprhdl, pdsRequired, child_index);
 }
 
 
@@ -184,7 +184,7 @@ CPhysicalSort::PdsRequired
 CRewindabilitySpec *
 CPhysicalSort::PrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &,// exprhdl,
 	CRewindabilitySpec *, //prsRequired,
 	ULONG
@@ -200,7 +200,7 @@ CPhysicalSort::PrsRequired
 	GPOS_ASSERT(0 == child_index);
 
 	// sort establishes rewindability on its own
-	return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
+	return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
 }
 
 //---------------------------------------------------------------------------
@@ -214,7 +214,7 @@ CPhysicalSort::PrsRequired
 CPartitionPropagationSpec *
 CPhysicalSort::PppsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CPartitionPropagationSpec *pppsRequired,
 	ULONG
@@ -229,7 +229,7 @@ CPhysicalSort::PppsRequired
 	GPOS_ASSERT(0 == child_index);
 	GPOS_ASSERT(NULL != pppsRequired);
 	
-	return CPhysical::PppsRequiredPushThruUnresolvedUnary(memory_pool, exprhdl, pppsRequired, CPhysical::EppcAllowed);
+	return CPhysical::PppsRequiredPushThruUnresolvedUnary(mp, exprhdl, pppsRequired, CPhysical::EppcAllowed);
 }
 
 //---------------------------------------------------------------------------
@@ -243,7 +243,7 @@ CPhysicalSort::PppsRequired
 CCTEReq *
 CPhysicalSort::PcteRequired
 	(
-	IMemoryPool *, //memory_pool,
+	IMemoryPool *, //mp,
 	CExpressionHandle &, //exprhdl,
 	CCTEReq *pcter,
 	ULONG
@@ -292,7 +292,7 @@ CPhysicalSort::FProvidesReqdCols
 COrderSpec *
 CPhysicalSort::PosDerive
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle & // exprhdl
 	)
 	const
@@ -313,7 +313,7 @@ CPhysicalSort::PosDerive
 CDistributionSpec *
 CPhysicalSort::PdsDerive
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -333,13 +333,13 @@ CPhysicalSort::PdsDerive
 CRewindabilitySpec *
 CPhysicalSort::PrsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle & // exprhdl
 	)
 	const
 {
 	// rewindability of output is always true
-	return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral /*ert*/);
+	return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtGeneral /*ert*/);
 }
 
 

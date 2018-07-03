@@ -154,7 +154,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerDXL(IMemoryPool *memory_pool, CParseHandlerManager *parse_handler_mgr);
+		CParseHandlerDXL(IMemoryPool *mp, CParseHandlerManager *parse_handler_mgr);
 
 		//dtor
 		virtual ~CParseHandlerDXL();

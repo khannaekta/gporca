@@ -31,10 +31,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerTableDescr::CParseHandlerTableDescr(IMemoryPool *memory_pool,
+CParseHandlerTableDescr::CParseHandlerTableDescr(IMemoryPool *mp,
 												 CParseHandlerManager *parse_handler_mgr,
 												 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root), m_table_descr_dxl(NULL)
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root), m_table_descr_dxl(NULL)
 {
 }
 
@@ -93,7 +93,7 @@ CParseHandlerTableDescr::StartElement(const XMLCh *const,  // element_uri,
 
 	// install column descriptor parsers
 	CParseHandlerBase *col_descr_parse_handler = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenColumns), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenColumns), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(col_descr_parse_handler);
 
 	// store parse handler

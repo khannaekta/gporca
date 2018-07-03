@@ -32,10 +32,10 @@ XERCES_CPP_NAMESPACE_USE
 //
 //---------------------------------------------------------------------------
 CParseHandlerLogicalConstTable::CParseHandlerLogicalConstTable(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerLogicalOp(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerLogicalOp(mp, parse_handler_mgr, parse_handler_root),
 	  m_const_tuples_datum_array(NULL),
 	  m_datum_dxl_array(NULL)
 {
@@ -63,11 +63,11 @@ CParseHandlerLogicalConstTable::StartElement(const XMLCh *const,  // element_uri
 		GPOS_ASSERT(NULL == m_const_tuples_datum_array);
 
 		// initialize the array of const tuples (datum arrays)
-		m_const_tuples_datum_array = GPOS_NEW(m_memory_pool) DXLDatumArrays(m_memory_pool);
+		m_const_tuples_datum_array = GPOS_NEW(m_mp) DXLDatumArrays(m_mp);
 
 		// install a parse handler for the columns
 		CParseHandlerBase *col_desc_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenColumns), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenColumns), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(col_desc_parse_handler);
 
 		// store parse handler
@@ -81,7 +81,7 @@ CParseHandlerLogicalConstTable::StartElement(const XMLCh *const,  // element_uri
 		GPOS_ASSERT(NULL == m_datum_dxl_array);
 
 		// initialize the array of datums (const tuple)
-		m_datum_dxl_array = GPOS_NEW(m_memory_pool) DXLDatumArray(m_memory_pool);
+		m_datum_dxl_array = GPOS_NEW(m_mp) DXLDatumArray(m_mp);
 	}
 	else if (0 ==
 			 XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenDatum), element_local_name))
@@ -130,12 +130,12 @@ CParseHandlerLogicalConstTable::EndElement(const XMLCh *const,  // element_uri,
 			col_descr_parse_handler->GetDXLColumnDescrArray();
 		dxl_col_descr_array->AddRef();
 
-		CDXLLogicalConstTable *lg_const_table_get_dxl_op = GPOS_NEW(m_memory_pool)
-			CDXLLogicalConstTable(m_memory_pool, dxl_col_descr_array, m_const_tuples_datum_array);
-		m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, lg_const_table_get_dxl_op);
+		CDXLLogicalConstTable *lg_const_table_get_dxl_op = GPOS_NEW(m_mp)
+			CDXLLogicalConstTable(m_mp, dxl_col_descr_array, m_const_tuples_datum_array);
+		m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, lg_const_table_get_dxl_op);
 
 #ifdef GPOS_DEBUG
-		lg_const_table_get_dxl_op->AssertValid(m_dxl_node, false /* validate_children */);
+		lg_const_table_get_dxl_op->AssertValid(m_dxlnode, false /* validate_children */);
 #endif  // GPOS_DEBUG
 
 		// deactivate handler

@@ -50,7 +50,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLScalarArrayRefIndexList(IMemoryPool *memory_pool, EIndexListBound index_list_bound);
+		CDXLScalarArrayRefIndexList(IMemoryPool *mp, EIndexListBound index_list_bound);
 
 		// ident accessors
 		virtual Edxlopid GetDXLOperator() const;

@@ -60,7 +60,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CParseHandlerScalarArrayCoerceExpr(IMemoryPool *memory_pool,
+		CParseHandlerScalarArrayCoerceExpr(IMemoryPool *mp,
 										   CParseHandlerManager *parse_handler_mgr,
 										   CParseHandlerBase *parse_handler_root);
 

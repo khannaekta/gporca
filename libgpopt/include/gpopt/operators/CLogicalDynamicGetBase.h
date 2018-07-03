@@ -70,20 +70,20 @@ namespace gpopt
 
 			// given a colrefset from a table, get colids and attno
 			void
-			ExtractColIdsAttno(IMemoryPool *memory_pool, CColRefSet *pcrs, ULongPtrArray *col_ids, ULongPtrArray *pdrgpulPos) const;
+			ExtractColIdsAttno(IMemoryPool *mp, CColRefSet *pcrs, ULongPtrArray *col_ids, ULongPtrArray *pdrgpulPos) const;
 
 			// derive stats from base table using filters on partition and/or index columns
-			IStatistics *PstatsDeriveFilter(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CExpression *pexprFilter) const;
+			IStatistics *PstatsDeriveFilter(IMemoryPool *mp, CExpressionHandle &exprhdl, CExpression *pexprFilter) const;
 
 		public:
 		
 			// ctors
 			explicit
-			CLogicalDynamicGetBase(IMemoryPool *memory_pool);
+			CLogicalDynamicGetBase(IMemoryPool *mp);
 
 			CLogicalDynamicGetBase
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				const CName *pnameAlias,
 				CTableDescriptor *ptabdesc,
 				ULONG scan_id,
@@ -97,7 +97,7 @@ namespace gpopt
 			
 			CLogicalDynamicGetBase
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				const CName *pnameAlias,
 				CTableDescriptor *ptabdesc,
 				ULONG scan_id
@@ -199,21 +199,21 @@ namespace gpopt
 
 			// derive keys
 			virtual 
-			CKeyCollection *PkcDeriveKeys(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CKeyCollection *PkcDeriveKeys(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive partition consumer info
 			virtual
-			CPartInfo *PpartinfoDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CPartInfo *PpartinfoDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 			
 			// derive constraint property
 			virtual
-			CPropConstraint *PpcDeriveConstraint(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CPropConstraint *PpcDeriveConstraint(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 		
 			// derive join depth
 			virtual
 			ULONG JoinDepth
 				(
-				IMemoryPool *, // memory_pool
+				IMemoryPool *, // mp
 				CExpressionHandle & // exprhdl
 				)
 				const

@@ -30,17 +30,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformUpdate2DML::CXformUpdate2DML
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformExploration
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalUpdate(memory_pool),
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))
+				mp,
+				GPOS_NEW(mp) CLogicalUpdate(mp),
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp))
 				)
 		)
 {}
@@ -85,7 +85,7 @@ CXformUpdate2DML::Transform
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CLogicalUpdate *popUpdate = CLogicalUpdate::PopConvert(pexpr->Pop());
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
 
@@ -108,7 +108,7 @@ CXformUpdate2DML::Transform
 		pdrgpcrInsert->AddRef();
 		pexprChild = CXformUtils::PexprRowTrigger
 							(
-							memory_pool,
+							mp,
 							pexprChild,
 							CLogicalDML::EdmlUpdate,
 							rel_mdid,
@@ -129,28 +129,28 @@ CXformUpdate2DML::Transform
 	const IMDType *pmdtype = md_accessor->PtMDType<IMDTypeInt4>();
 	CColRef *pcrAction = col_factory->PcrCreate(pmdtype, default_type_modifier);
 	
-	CExpression *pexprProjElem = GPOS_NEW(memory_pool) CExpression
+	CExpression *pexprProjElem = GPOS_NEW(mp) CExpression
 											(
-											memory_pool,
-											GPOS_NEW(memory_pool) CScalarProjectElement(memory_pool, pcrAction),
-											GPOS_NEW(memory_pool) CExpression
+											mp,
+											GPOS_NEW(mp) CScalarProjectElement(mp, pcrAction),
+											GPOS_NEW(mp) CExpression
 														(
-														memory_pool,
-														GPOS_NEW(memory_pool) CScalarDMLAction(memory_pool)
+														mp,
+														GPOS_NEW(mp) CScalarDMLAction(mp)
 														)
 											);
 	
-	CExpression *pexprProjList = GPOS_NEW(memory_pool) CExpression
+	CExpression *pexprProjList = GPOS_NEW(mp) CExpression
 											(
-											memory_pool,
-											GPOS_NEW(memory_pool) CScalarProjectList(memory_pool),
+											mp,
+											GPOS_NEW(mp) CScalarProjectList(mp),
 											pexprProjElem
 											);
 	CExpression *pexprSplit =
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
-			GPOS_NEW(memory_pool) CLogicalSplit(memory_pool,	pdrgpcrDelete, pdrgpcrInsert, pcrCtid, pcrSegmentId, pcrAction, pcrTupleOid),
+			mp,
+			GPOS_NEW(mp) CLogicalSplit(mp,	pdrgpcrDelete, pdrgpcrInsert, pcrCtid, pcrSegmentId, pcrAction, pcrTupleOid),
 			pexprChild,
 			pexprProjList
 			);
@@ -162,7 +162,7 @@ CXformUpdate2DML::Transform
 	{
 		pexprAssertConstraints = CXformUtils::PexprAssertConstraints
 			(
-			memory_pool,
+			mp,
 			pexprSplit,
 			ptabdesc,
 			pdrgpcrInsert
@@ -179,7 +179,7 @@ CXformUpdate2DML::Transform
 	if (ptabdesc->IsPartitioned())
 	{
 		// generate a partition selector
-		pexprProject = CXformUtils::PexprLogicalPartitionSelector(memory_pool, ptabdesc, pdrgpcrInsert, pexprAssertConstraints);
+		pexprProject = CXformUtils::PexprLogicalPartitionSelector(mp, ptabdesc, pdrgpcrInsert, pexprAssertConstraints);
 		pcrTableOid = CLogicalPartitionSelector::PopConvert(pexprProject->Pop())->PcrOid();
 	}
 	else
@@ -188,9 +188,9 @@ CXformUpdate2DML::Transform
 		IMDId *pmdidTable = ptabdesc->MDId();
 
 		OID oidTable = CMDIdGPDB::CastMdid(pmdidTable)->OidObjectId();
-		CExpression *pexprOid = CUtils::PexprScalarConstOid(memory_pool, oidTable);
+		CExpression *pexprOid = CUtils::PexprScalarConstOid(mp, oidTable);
 
-		pexprProject = CUtils::PexprAddProjection(memory_pool, pexprAssertConstraints, pexprOid);
+		pexprProject = CUtils::PexprAddProjection(mp, pexprAssertConstraints, pexprOid);
 
 		CExpression *pexprPrL = (*pexprProject)[1];
 		pcrTableOid = CUtils::PcrFromProjElem((*pexprPrL)[0]);
@@ -200,7 +200,7 @@ CXformUpdate2DML::Transform
 
 	const ULONG num_cols = pdrgpcrInsert->Size();
 
-	CBitSet *pbsModified = GPOS_NEW(memory_pool) CBitSet(memory_pool, ptabdesc->ColumnCount());
+	CBitSet *pbsModified = GPOS_NEW(mp) CBitSet(mp, ptabdesc->ColumnCount());
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
 		CColRef *pcrInsert = (*pdrgpcrInsert)[ul];
@@ -217,10 +217,10 @@ CXformUpdate2DML::Transform
 	ptabdesc->AddRef();
 	pdrgpcrInsert->AddRef();
 	CExpression *pexprDML =
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
-			GPOS_NEW(memory_pool) CLogicalDML(memory_pool, CLogicalDML::EdmlUpdate, ptabdesc, pdrgpcrInsert, pbsModified, pcrAction, pcrTableOid, pcrCtid, pcrSegmentId, pcrTupleOid),
+			mp,
+			GPOS_NEW(mp) CLogicalDML(mp, CLogicalDML::EdmlUpdate, ptabdesc, pdrgpcrInsert, pbsModified, pcrAction, pcrTableOid, pcrCtid, pcrSegmentId, pcrTupleOid),
 			pexprProject
 			);
 	

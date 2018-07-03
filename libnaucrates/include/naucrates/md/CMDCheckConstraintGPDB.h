@@ -41,7 +41,7 @@ namespace gpmd
 	{
 	private:
 		// memory pool
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// check constraint mdid
 		IMDId *m_mdid;
@@ -53,14 +53,14 @@ namespace gpmd
 		IMDId *m_rel_mdid;
 
 		// the DXL representation of the check constraint
-		CDXLNode *m_dxl_node;
+		CDXLNode *m_dxlnode;
 
 		// DXL for object
 		const CWStringDynamic *m_dxl_str;
 
 	public:
 		// ctor
-		CMDCheckConstraintGPDB(IMemoryPool *memory_pool,
+		CMDCheckConstraintGPDB(IMemoryPool *mp,
 							   IMDId *mdid,
 							   CMDName *mdname,
 							   IMDId *rel_mdid,
@@ -98,7 +98,7 @@ namespace gpmd
 		}
 
 		// the scalar expression of the check constraint
-		virtual CExpression *GetCheckConstraintExpr(IMemoryPool *memory_pool,
+		virtual CExpression *GetCheckConstraintExpr(IMemoryPool *mp,
 													CMDAccessor *md_accessor,
 													ColRefArray *colref_array) const;
 

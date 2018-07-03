@@ -33,10 +33,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerHint::CParseHandlerHint(IMemoryPool *memory_pool,
+CParseHandlerHint::CParseHandlerHint(IMemoryPool *mp,
 									 CParseHandlerManager *parse_handler_mgr,
 									 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root), m_hint(NULL)
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root), m_hint(NULL)
 {
 }
 
@@ -118,7 +118,7 @@ CParseHandlerHint::StartElement(const XMLCh *const,  //element_uri,
 		true,
 		true);
 
-	m_hint = GPOS_NEW(m_memory_pool) CHint(min_num_of_parts_to_require_sort_on_insert,
+	m_hint = GPOS_NEW(m_mp) CHint(min_num_of_parts_to_require_sort_on_insert,
 										   join_arity_for_associativity_commutativity,
 										   array_expansion_threshold,
 										   join_order_dp_threshold,

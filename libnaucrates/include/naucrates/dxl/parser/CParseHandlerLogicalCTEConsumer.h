@@ -52,7 +52,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerLogicalCTEConsumer(IMemoryPool *memory_pool,
+		CParseHandlerLogicalCTEConsumer(IMemoryPool *mp,
 										CParseHandlerManager *parse_handler_mgr,
 										CParseHandlerBase *parse_handler_root);
 	};

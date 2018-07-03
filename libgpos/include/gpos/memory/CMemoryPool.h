@@ -69,7 +69,7 @@ namespace gpos
 		struct AllocHeader
 		{
 			// pointer to pool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 
 			// allocation request size
 			ULONG m_alloc;
@@ -82,10 +82,10 @@ namespace gpos
 		ULONG_PTR m_hash_key;
 
 		// underlying memory pool - optional
-		IMemoryPool *m_underlying_memory_pool;
+		IMemoryPool *m_underlying_mp;
 
 		// flag indicating if this pool owns the underlying pool
-		const BOOL m_owns_underlying_memory_pool;
+		const BOOL m_owns_underlying_mp;
 
 		// flag indicating if memory pool is thread-safe
 		const BOOL m_thread_safe;
@@ -100,15 +100,15 @@ namespace gpos
 
 	protected:
 		// ctor
-		CMemoryPool(IMemoryPool *underlying_memory_pool,
-					BOOL owns_underlying_memory_pool,
+		CMemoryPool(IMemoryPool *underlying_mp,
+					BOOL owns_underlying_mp,
 					BOOL thread_safe);
 
 		// underlying pool accessor
 		IMemoryPool *
 		GetUnderlyingMemoryPool() const
 		{
-			return m_underlying_memory_pool;
+			return m_underlying_mp;
 		}
 
 		// invalid memory pool key
@@ -122,9 +122,9 @@ namespace gpos
 		virtual void
 		TearDown()
 		{
-			if (m_owns_underlying_memory_pool)
+			if (m_owns_underlying_mp)
 			{
-				m_underlying_memory_pool->TearDown();
+				m_underlying_mp->TearDown();
 			}
 		}
 

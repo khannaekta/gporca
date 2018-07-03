@@ -61,12 +61,12 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CLogicalRowTrigger(IMemoryPool *memory_pool);
+			CLogicalRowTrigger(IMemoryPool *mp);
 
 			// ctor
 			CLogicalRowTrigger
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				IMDId *rel_mdid,
 				INT type,
 				ColRefArray *pdrgpcrOld,
@@ -132,7 +132,7 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			//-------------------------------------------------------------------------------------
 			// Derived Relational Properties
@@ -140,14 +140,14 @@ namespace gpopt
 
 			// derive output columns
 			virtual
-			CColRefSet *PcrsDeriveOutput(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsDeriveOutput(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 
 			// derive constraint property
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *, // memory_pool
+				IMemoryPool *, // mp
 				CExpressionHandle &exprhdl
 				)
 				const
@@ -157,13 +157,13 @@ namespace gpopt
 
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive partition consumer info
 			virtual
 			CPartInfo *PpartinfoDerive
 				(
-				IMemoryPool *, // memory_pool,
+				IMemoryPool *, // mp,
 				CExpressionHandle &exprhdl
 				)
 				const
@@ -175,7 +175,7 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsStat
 				(
-				IMemoryPool *,// memory_pool
+				IMemoryPool *,// mp
 				CExpressionHandle &,// exprhdl
 				CColRefSet *pcrsInput,
 				ULONG // child_index
@@ -187,7 +187,7 @@ namespace gpopt
 
 			// derive function properties
 			virtual
-			CFunctionProp *PfpDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CFunctionProp *PfpDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			//-------------------------------------------------------------------------------------
 			// Transformations
@@ -195,17 +195,17 @@ namespace gpopt
 
 			// candidate set of xforms
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
+			CXformSet *PxfsCandidates(IMemoryPool *mp) const;
 
 			// derive key collections
 			virtual
-			CKeyCollection *PkcDeriveKeys(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CKeyCollection *PkcDeriveKeys(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive statistics
 			virtual
 			IStatistics *PstatsDerive
 						(
-						IMemoryPool *memory_pool,
+						IMemoryPool *mp,
 						CExpressionHandle &exprhdl,
 						StatsArray *stats_ctxt
 						)

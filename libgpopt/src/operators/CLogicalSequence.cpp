@@ -30,12 +30,12 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalSequence::CLogicalSequence
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogical(memory_pool)
+	CLogical(mp)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 }
 
 //---------------------------------------------------------------------------
@@ -67,11 +67,11 @@ CLogicalSequence::Matches
 CXformSet *
 CLogicalSequence::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementSequence);
 	return xform_set;
 }
@@ -88,7 +88,7 @@ CLogicalSequence::PxfsCandidates
 CColRefSet *
 CLogicalSequence::PcrsDeriveOutput
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 {
@@ -114,7 +114,7 @@ CLogicalSequence::PcrsDeriveOutput
 CKeyCollection *
 CLogicalSequence::PkcDeriveKeys
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -136,7 +136,7 @@ CLogicalSequence::PkcDeriveKeys
 CMaxCard
 CLogicalSequence::Maxcard
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -156,12 +156,12 @@ CLogicalSequence::Maxcard
 CPartInfo *
 CLogicalSequence::PpartinfoDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 	const
 {
-	return PpartinfoDeriveCombine(memory_pool, exprhdl);
+	return PpartinfoDeriveCombine(mp, exprhdl);
 }
 
 

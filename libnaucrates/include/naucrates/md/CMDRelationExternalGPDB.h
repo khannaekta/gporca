@@ -43,7 +43,7 @@ namespace gpmd
 	{
 	private:
 		// memory pool
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// DXL for object
 		const CWStringDynamic *m_dxl_str;
@@ -114,7 +114,7 @@ namespace gpmd
 
 	public:
 		// ctor
-		CMDRelationExternalGPDB(IMemoryPool *memory_pool,
+		CMDRelationExternalGPDB(IMemoryPool *mp,
 								IMDId *mdid,
 								CMDName *mdname,
 								Ereldistrpolicy rel_distr_policy,

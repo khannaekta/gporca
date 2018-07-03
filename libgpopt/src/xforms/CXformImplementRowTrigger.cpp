@@ -27,17 +27,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformImplementRowTrigger::CXformImplementRowTrigger
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformImplementation
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalRowTrigger(memory_pool),
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))
+				mp,
+				GPOS_NEW(mp) CLogicalRowTrigger(mp),
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp))
 				)
 		)
 {}
@@ -83,7 +83,7 @@ CXformImplementRowTrigger::Transform
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CLogicalRowTrigger *popRowTrigger = CLogicalRowTrigger::PopConvert(pexpr->Pop());
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
 	IMDId *rel_mdid = popRowTrigger->GetRelMdId();
@@ -109,10 +109,10 @@ CXformImplementRowTrigger::Transform
 
 	// create physical RowTrigger
 	CExpression *pexprAlt =
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
-			GPOS_NEW(memory_pool) CPhysicalRowTrigger(memory_pool, rel_mdid, type, pdrgpcrOld, pdrgpcrNew),
+			mp,
+			GPOS_NEW(mp) CPhysicalRowTrigger(mp, rel_mdid, type, pdrgpcrOld, pdrgpcrNew),
 			pexprChild
 			);
 	// add alternative to transformation result

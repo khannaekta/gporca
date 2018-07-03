@@ -29,7 +29,7 @@ CHashSetIterTest::EresUnittest_Basic()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// test data
 	ULONG rgul[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -40,7 +40,7 @@ CHashSetIterTest::EresUnittest_Basic()
 	typedef CHashSetIter<ULONG, HashValue<ULONG>, gpos::Equals<ULONG>, CleanupNULL<ULONG> > SetIter;
 
 	// using N - 2 slots guarantees collisions
-	Set *ps = GPOS_NEW(memory_pool) Set(memory_pool, ulCnt - 2);
+	Set *ps = GPOS_NEW(mp) Set(mp, ulCnt - 2);
 
 #ifdef GPOS_DEBUG
 
@@ -51,14 +51,14 @@ CHashSetIterTest::EresUnittest_Basic()
 #endif  // GPOS_DEBUG
 
 	typedef CDynamicPtrArray<const ULONG, CleanupNULL> ULongPtrArray;
-	CAutoRef<ULongPtrArray> pdrgpulValues(GPOS_NEW(memory_pool) ULongPtrArray(memory_pool));
+	CAutoRef<ULongPtrArray> pdrgpulValues(GPOS_NEW(mp) ULongPtrArray(mp));
 	// load map and iterate over it after each step
 	for (ULONG ul = 0; ul < ulCnt; ++ul)
 	{
 		(void) ps->Insert(&rgul[ul]);
 		pdrgpulValues->Append(&rgul[ul]);
 
-		CAutoRef<ULongPtrArray> pdrgpulIterValues(GPOS_NEW(memory_pool) ULongPtrArray(memory_pool));
+		CAutoRef<ULongPtrArray> pdrgpulIterValues(GPOS_NEW(mp) ULongPtrArray(mp));
 
 		// iterate over full set
 		SetIter si(ps);

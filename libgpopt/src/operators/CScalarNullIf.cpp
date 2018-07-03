@@ -35,12 +35,12 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CScalarNullIf::CScalarNullIf
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IMDId *mdid_op,
 	IMDId *mdid_type
 	)
 	:
-	CScalar(memory_pool),
+	CScalar(mp),
 	m_mdid_op(mdid_op),
 	m_mdid_type(mdid_type),
 	m_returns_null_on_null_input(false),

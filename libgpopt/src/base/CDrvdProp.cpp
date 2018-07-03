@@ -33,8 +33,8 @@ namespace gpopt {
 	void
 	DrvdPropArray::DbgPrint() const
 	{
-		IMemoryPool *memory_pool = COptCtxt::PoctxtFromTLS()->Pmp();
-		CAutoTrace at(memory_pool);
+		IMemoryPool *mp = COptCtxt::PoctxtFromTLS()->Pmp();
+		CAutoTrace at(mp);
 		at.Os() << *this;
 	}
 #endif // GPOS_DEBUG

@@ -28,10 +28,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalLeftSemiNLJoin::CPhysicalLeftSemiNLJoin
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CPhysicalNLJoin(memory_pool)
+	CPhysicalNLJoin(mp)
 {}
 
 

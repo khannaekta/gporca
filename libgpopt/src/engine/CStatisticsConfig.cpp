@@ -31,13 +31,13 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CStatisticsConfig::CStatisticsConfig
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CDouble damping_factor_filter,
 	CDouble damping_factor_join,
 	CDouble damping_factor_groupby
 	)
 	:
-	m_memory_pool(memory_pool),
+	m_mp(mp),
 	m_damping_factor_filter(damping_factor_filter),
 	m_damping_factor_join(damping_factor_join),
 	m_damping_factor_groupby(damping_factor_groupby),
@@ -47,8 +47,8 @@ CStatisticsConfig::CStatisticsConfig
 	GPOS_ASSERT(CDouble(0.0) < damping_factor_join);
 	GPOS_ASSERT(CDouble(0.0) < damping_factor_groupby);
 
-	//m_phmmdidcolinfo = New(m_memory_pool) HMMDIdMissingstatscol(m_memory_pool);
-	m_phsmdidcolinfo = GPOS_NEW(m_memory_pool) MdidHashSet(m_memory_pool);
+	//m_phmmdidcolinfo = New(m_mp) HMMDIdMissingstatscol(m_mp);
+	m_phsmdidcolinfo = GPOS_NEW(m_mp) MdidHashSet(m_mp);
 }
 
 

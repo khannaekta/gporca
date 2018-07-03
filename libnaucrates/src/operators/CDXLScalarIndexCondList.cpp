@@ -24,7 +24,7 @@ using namespace gpdxl;
 //		ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarIndexCondList::CDXLScalarIndexCondList(IMemoryPool *memory_pool) : CDXLScalar(memory_pool)
+CDXLScalarIndexCondList::CDXLScalarIndexCondList(IMemoryPool *mp) : CDXLScalar(mp)
 {
 }
 

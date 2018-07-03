@@ -35,13 +35,13 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CScalarSubqueryQuantified::CScalarSubqueryQuantified
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IMDId *scalar_op_mdid,
 	const CWStringConst *pstrScalarOp,
 	const CColRef *colref
 	)
 	:
-	CScalar(memory_pool),
+	CScalar(mp),
 	m_scalar_op_mdid(scalar_op_mdid),
 	m_pstrScalarOp(pstrScalarOp),
 	m_pcr(colref)
@@ -172,12 +172,12 @@ CScalarSubqueryQuantified::Matches
 CColRefSet *
 CScalarSubqueryQuantified::PcrsUsed
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	 CExpressionHandle &exprhdl
 	)
 {
 	// used columns is an empty set unless subquery column is an outer reference
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	CColRefSet *pcrsChildOutput = exprhdl.GetRelationalProperties(0 /* child_index */)->PcrsOutput();
 	if (!pcrsChildOutput->FMember(m_pcr))
@@ -201,7 +201,7 @@ CScalarSubqueryQuantified::PcrsUsed
 CPartInfo *
 CScalarSubqueryQuantified::PpartinfoDerive
 	(
-	IMemoryPool *, // memory_pool, 
+	IMemoryPool *, // mp, 
 	CExpressionHandle &exprhdl
 	)
 	const

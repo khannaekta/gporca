@@ -25,8 +25,8 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarProjElem::CDXLScalarProjElem(IMemoryPool *memory_pool, ULONG id, const CMDName *mdname)
-	: CDXLScalar(memory_pool), m_id(id), m_mdname(mdname)
+CDXLScalarProjElem::CDXLScalarProjElem(IMemoryPool *mp, ULONG id, const CMDName *mdname)
+	: CDXLScalar(mp), m_id(id), m_mdname(mdname)
 {
 	GPOS_ASSERT(NULL != mdname);
 }

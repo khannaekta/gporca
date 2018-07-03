@@ -26,10 +26,10 @@ using namespace gpos;
 //		ctor
 //
 //---------------------------------------------------------------------------
-CAutoTaskProxy::CAutoTaskProxy(IMemoryPool *memory_pool,
+CAutoTaskProxy::CAutoTaskProxy(IMemoryPool *mp,
 							   CWorkerPoolManager *pwpm,
 							   BOOL propagate_error)
-	: m_memory_pool(memory_pool), m_pwpm(pwpm), m_propagate_error(propagate_error)
+	: m_mp(mp), m_pwpm(pwpm), m_propagate_error(propagate_error)
 {
 	m_list.Init(GPOS_OFFSET(CTask, m_proxy_link));
 	m_event.Init(&m_mutex);
@@ -128,7 +128,7 @@ CAutoTaskProxy::Create(void *(*pfunc)(void *), void *arg, volatile BOOL *cancel)
 {
 	// create memory pool for task
 	CAutoMemoryPool amp(CAutoMemoryPool::ElcStrict);
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// auto pointer to hold new task context
 	CAutoP<CTaskContext> task_ctxt;
@@ -138,17 +138,17 @@ CAutoTaskProxy::Create(void *(*pfunc)(void *), void *arg, volatile BOOL *cancel)
 	if (NULL == task_parent)
 	{
 		// create new task context
-		task_ctxt = GPOS_NEW(memory_pool) CTaskContext(memory_pool);
+		task_ctxt = GPOS_NEW(mp) CTaskContext(mp);
 	}
 	else
 	{
 		// clone parent task's context
-		task_ctxt = GPOS_NEW(memory_pool) CTaskContext(memory_pool, *task_parent->GetTaskCtxt());
+		task_ctxt = GPOS_NEW(mp) CTaskContext(mp, *task_parent->GetTaskCtxt());
 	}
 
 	// auto pointer to hold error context
 	CAutoP<CErrorContext> err_ctxt;
-	err_ctxt = GPOS_NEW(memory_pool) CErrorContext();
+	err_ctxt = GPOS_NEW(mp) CErrorContext();
 	CTask *task = CTask::Self();
 	if (NULL != task)
 	{
@@ -158,8 +158,8 @@ CAutoTaskProxy::Create(void *(*pfunc)(void *), void *arg, volatile BOOL *cancel)
 	// auto pointer to hold new task
 	// task is created inside ATP's memory pool
 	CAutoP<CTask> new_task;
-	new_task = GPOS_NEW(m_memory_pool)
-		CTask(memory_pool, task_ctxt.Value(), err_ctxt.Value(), &m_event, cancel);
+	new_task = GPOS_NEW(m_mp)
+		CTask(mp, task_ctxt.Value(), err_ctxt.Value(), &m_event, cancel);
 
 	// reset auto pointers - task now handles task and error context
 	(void) task_ctxt.Reset();

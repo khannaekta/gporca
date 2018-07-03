@@ -28,17 +28,17 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerBase::CParseHandlerBase(IMemoryPool *memory_pool,
+CParseHandlerBase::CParseHandlerBase(IMemoryPool *mp,
 									 CParseHandlerManager *parse_handler_mgr,
 									 CParseHandlerBase *parse_handler_root)
-	: m_memory_pool(memory_pool),
+	: m_mp(mp),
 	  m_parse_handler_mgr(parse_handler_mgr),
 	  m_parse_handler_root(parse_handler_root)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != parse_handler_mgr);
 
-	m_parse_handler_base_array = GPOS_NEW(m_memory_pool) ParseHandlerBaseArray(m_memory_pool);
+	m_parse_handler_base_array = GPOS_NEW(m_mp) ParseHandlerBaseArray(m_mp);
 }
 
 //---------------------------------------------------------------------------

@@ -71,7 +71,7 @@ namespace gpos
 		CSpinlockOS m_lock;
 
 		// statistics
-		CMemoryPoolStatistics m_memory_pool_statistics;
+		CMemoryPoolStatistics m_mp_statistics;
 
 		// allocation sequence number
 		ULONG m_alloc_sequence;
@@ -122,10 +122,10 @@ namespace gpos
 
 	public:
 		// ctor
-		CMemoryPoolTracker(IMemoryPool *underlying_memory_pool,
+		CMemoryPoolTracker(IMemoryPool *underlying_mp,
 						   ULLONG size,
 						   BOOL thread_safe,
-						   BOOL owns_underlying_memory_pool);
+						   BOOL owns_underlying_mp);
 
 		// allocate memory
 		virtual void *Allocate(const ULONG bytes, const CHAR *file, const ULONG line);
@@ -148,7 +148,7 @@ namespace gpos
 		virtual ULLONG
 		TotalAllocatedSize() const
 		{
-			return m_memory_pool_statistics.TotalAllocatedSize();
+			return m_mp_statistics.TotalAllocatedSize();
 		}
 
 #ifdef GPOS_DEBUG
@@ -171,7 +171,7 @@ namespace gpos
 		}
 
 		// return the current statistics
-		virtual void UpdateStatistics(CMemoryPoolStatistics &memory_pool_statistics);
+		virtual void UpdateStatistics(CMemoryPoolStatistics &mp_statistics);
 
 #endif  // GPOS_DEBUG
 	};

@@ -42,10 +42,10 @@ namespace gpopt
 			explicit
 			CXformLeftAntiSemiApplyNotIn2LeftAntiSemiJoinNotIn
 				(
-				IMemoryPool *memory_pool
+				IMemoryPool *mp
 				)
 				:
-				CXformApply2Join<CLogicalLeftAntiSemiApplyNotIn, CLogicalLeftAntiSemiJoinNotIn>(memory_pool, true /*fDeepTree*/)
+				CXformApply2Join<CLogicalLeftAntiSemiApplyNotIn, CLogicalLeftAntiSemiJoinNotIn>(mp, true /*fDeepTree*/)
 			{}
 
 			// dtor

@@ -41,7 +41,7 @@ namespace gpmd
 	{
 	private:
 		// memory pool
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// DXL for object
 		const CWStringDynamic *m_dxl_str;
@@ -123,7 +123,7 @@ namespace gpmd
 
 	public:
 		// ctor
-		CMDTypeGenericGPDB(IMemoryPool *memory_pool,
+		CMDTypeGenericGPDB(IMemoryPool *mp,
 						   IMDId *mdid,
 						   CMDName *mdname,
 						   BOOL is_redistributable,
@@ -232,7 +232,7 @@ namespace gpmd
 		virtual IDatum *GetDatumForDXLConstVal(const CDXLScalarConstValue *dxl_op) const;
 
 		// create typed datum from DXL datum
-		virtual IDatum *GetDatumForDXLDatum(IMemoryPool *memory_pool,
+		virtual IDatum *GetDatumForDXLDatum(IMemoryPool *mp,
 											const CDXLDatum *datum_dxl) const;
 
 		// return the GPDB length
@@ -250,13 +250,13 @@ namespace gpmd
 		}
 
 		// generate the DXL datum from IDatum
-		virtual CDXLDatum *GetDatumVal(IMemoryPool *memory_pool, IDatum *datum) const;
+		virtual CDXLDatum *GetDatumVal(IMemoryPool *mp, IDatum *datum) const;
 
 		// generate the DXL datum representing null m_bytearray_value
-		virtual CDXLDatum *GetDXLDatumNull(IMemoryPool *memory_pool) const;
+		virtual CDXLDatum *GetDXLDatumNull(IMemoryPool *mp) const;
 
 		// generate the DXL scalar constant from IDatum
-		virtual CDXLScalarConstValue *GetDXLOpScConst(IMemoryPool *memory_pool,
+		virtual CDXLScalarConstValue *GetDXLOpScConst(IMemoryPool *mp,
 													  IDatum *datum) const;
 
 #ifdef GPOS_DEBUG
@@ -268,7 +268,7 @@ namespace gpmd
 		virtual BOOL IsAmbiguous() const;
 
 		// create a dxl datum
-		static CDXLDatum *CreateDXLDatumVal(IMemoryPool *memory_pool,
+		static CDXLDatum *CreateDXLDatumVal(IMemoryPool *mp,
 											IMDId *mdid,
 											INT type_modifier,
 											BOOL is_passed_by_value,
@@ -279,7 +279,7 @@ namespace gpmd
 											CDouble double_Value);
 
 		// create a dxl datum of types having double mapping
-		static CDXLDatum *CreateDXLDatumStatsDoubleMappable(IMemoryPool *memory_pool,
+		static CDXLDatum *CreateDXLDatumStatsDoubleMappable(IMemoryPool *mp,
 															IMDId *mdid,
 															INT type_modifier,
 															BOOL is_passed_by_value,
@@ -290,7 +290,7 @@ namespace gpmd
 															CDouble double_Value);
 
 		// create a dxl datum of types having lint mapping
-		static CDXLDatum *CreateDXLDatumStatsIntMappable(IMemoryPool *memory_pool,
+		static CDXLDatum *CreateDXLDatumStatsIntMappable(IMemoryPool *mp,
 														 IMDId *mdid,
 														 INT type_modifier,
 														 BOOL is_passed_by_value,

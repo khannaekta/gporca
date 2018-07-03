@@ -38,7 +38,7 @@ namespace gpopt
 		
 			// ctor
 			explicit
-			CXformProject2ComputeScalar(IMemoryPool *memory_pool);
+			CXformProject2ComputeScalar(IMemoryPool *mp);
 
 			// dtor
 			virtual 

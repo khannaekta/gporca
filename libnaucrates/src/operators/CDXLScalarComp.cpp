@@ -26,10 +26,10 @@ using namespace gpdxl;
 //		Constructs a scalar comparison node
 //
 //---------------------------------------------------------------------------
-CDXLScalarComp::CDXLScalarComp(IMemoryPool *memory_pool,
+CDXLScalarComp::CDXLScalarComp(IMemoryPool *mp,
 							   IMDId *mdid_op,
 							   const CWStringConst *comparison_operator_name)
-	: CDXLScalar(memory_pool), m_mdid(mdid_op), m_comparison_operator_name(comparison_operator_name)
+	: CDXLScalar(mp), m_mdid(mdid_op), m_comparison_operator_name(comparison_operator_name)
 {
 	GPOS_ASSERT(m_mdid->IsValid());
 }

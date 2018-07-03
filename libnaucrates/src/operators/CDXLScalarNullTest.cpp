@@ -26,8 +26,8 @@ using namespace gpdxl;
 //		Constructs a NullTest node
 //
 //---------------------------------------------------------------------------
-CDXLScalarNullTest::CDXLScalarNullTest(IMemoryPool *memory_pool, BOOL is_null)
-	: CDXLScalar(memory_pool), m_is_null(is_null)
+CDXLScalarNullTest::CDXLScalarNullTest(IMemoryPool *mp, BOOL is_null)
+	: CDXLScalar(mp), m_is_null(is_null)
 {
 }
 

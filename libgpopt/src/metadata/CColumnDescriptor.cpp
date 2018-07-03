@@ -26,7 +26,7 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CColumnDescriptor::CColumnDescriptor
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const IMDType *pmdtype,
 	INT type_modifier,
 	const CName &name,
@@ -37,7 +37,7 @@ CColumnDescriptor::CColumnDescriptor
 	:
 	m_pmdtype(pmdtype),
 	m_type_modifier(type_modifier),
-	m_name(memory_pool, name),
+	m_name(mp, name),
 	m_iAttno(attno),
 	m_is_nullable(is_nullable),
 	m_width(ulWidth)

@@ -21,7 +21,7 @@ namespace gpopt
 
 			CPhysicalUnionAllFactory(CLogicalUnionAll* popLogicalUnionAll);
 
-			CPhysicalUnionAll* PopPhysicalUnionAll(IMemoryPool* memory_pool, BOOL fParallel);
+			CPhysicalUnionAll* PopPhysicalUnionAll(IMemoryPool* mp, BOOL fParallel);
 	};
 
 }

@@ -29,17 +29,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformDelete2DML::CXformDelete2DML
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformExploration
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalDelete(memory_pool),
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))
+				mp,
+				GPOS_NEW(mp) CLogicalDelete(mp),
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp))
 				)
 		)
 {}
@@ -84,7 +84,7 @@ CXformDelete2DML::Transform
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CLogicalDelete *popDelete = CLogicalDelete::PopConvert(pexpr->Pop());
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
 
@@ -106,7 +106,7 @@ CXformDelete2DML::Transform
 	CExpression *pexprAlt =
 		CXformUtils::PexprLogicalDMLOverProject
 						(
-						memory_pool,
+						mp,
 						pexprChild,
 						CLogicalDML::EdmlDelete,
 						ptabdesc,

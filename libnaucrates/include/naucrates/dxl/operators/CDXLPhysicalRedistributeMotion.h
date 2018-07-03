@@ -52,7 +52,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLPhysicalRedistributeMotion(IMemoryPool *memory_pool, BOOL is_duplicate_sensitive);
+		CDXLPhysicalRedistributeMotion(IMemoryPool *mp, BOOL is_duplicate_sensitive);
 
 		// accessors
 		Edxlopid GetDXLOperator() const;

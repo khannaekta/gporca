@@ -54,7 +54,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CParseHandlerScalarSubPlanTestExpr(IMemoryPool *memory_pool,
+		CParseHandlerScalarSubPlanTestExpr(IMemoryPool *mp,
 										   CParseHandlerManager *parse_handler_mgr,
 										   CParseHandlerBase *parse_handler_root);
 

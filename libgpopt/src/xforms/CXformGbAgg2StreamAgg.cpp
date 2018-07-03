@@ -29,15 +29,15 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformGbAgg2StreamAgg::CXformGbAgg2StreamAgg
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformImplementation
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CLogicalGbAgg(memory_pool),
-							 GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),
-							 GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)))
+		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalGbAgg(mp),
+							 GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)),
+							 GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)))
 		)
 {}
 
@@ -109,7 +109,7 @@ CXformGbAgg2StreamAgg::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 	ColRefArray *colref_array = popAgg->Pdrgpcr();
 	colref_array->AddRef();
 	
@@ -129,12 +129,12 @@ CXformGbAgg2StreamAgg::Transform
 
 	// create alternative expression
 	CExpression *pexprAlt = 
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
-			GPOS_NEW(memory_pool) CPhysicalStreamAgg
+			mp,
+			GPOS_NEW(mp) CPhysicalStreamAgg
 						(
-						memory_pool,
+						mp,
 						colref_array,
 						popAgg->PdrgpcrMinimal(),
 						popAgg->Egbaggtype(),

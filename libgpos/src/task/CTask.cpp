@@ -30,12 +30,12 @@ const CTaskId CTaskId::m_invalid_tid;
 //		ctor
 //
 //---------------------------------------------------------------------------
-CTask::CTask(IMemoryPool *memory_pool,
+CTask::CTask(IMemoryPool *mp,
 			 CTaskContext *task_ctxt,
 			 IErrorContext *err_ctxt,
 			 CEvent *event,
 			 volatile BOOL *cancel)
-	: m_memory_pool(memory_pool),
+	: m_mp(mp),
 	  m_task_ctxt(task_ctxt),
 	  m_err_ctxt(err_ctxt),
 	  m_err_handle(NULL),
@@ -50,7 +50,7 @@ CTask::CTask(IMemoryPool *memory_pool,
 	  m_abort_suspend_count(false),
 	  m_reported(false)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(NULL != task_ctxt);
 	GPOS_ASSERT(NULL != err_ctxt);
 
@@ -79,7 +79,7 @@ CTask::~CTask()
 	GPOS_DELETE(m_task_ctxt);
 	GPOS_DELETE(m_err_ctxt);
 
-	CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(m_memory_pool);
+	CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(m_mp);
 }
 
 

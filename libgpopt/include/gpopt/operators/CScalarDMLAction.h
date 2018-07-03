@@ -48,10 +48,10 @@ namespace gpopt
 			// ctor
 			CScalarDMLAction
 				(
-				IMemoryPool *memory_pool
+				IMemoryPool *mp
 				)
 				:
-				CScalar(memory_pool)
+				CScalar(mp)
 			{}
 
 			// dtor
@@ -92,7 +92,7 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //memory_pool,
+						IMemoryPool *, //mp,
 						UlongColRefHashMap *, //colref_mapping,
 						BOOL //must_exist
 						)

@@ -36,7 +36,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalDynamicIndexScan::CPhysicalDynamicIndexScan
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	BOOL is_partial,
 	CIndexDescriptor *pindexdesc,
 	CTableDescriptor *ptabdesc,
@@ -51,7 +51,7 @@ CPhysicalDynamicIndexScan::CPhysicalDynamicIndexScan
 	COrderSpec *pos
 	)
 	:
-	CPhysicalDynamicScan(memory_pool, is_partial, ptabdesc, ulOriginOpId, pnameAlias, scan_id, pdrgpcrOutput, pdrgpdrgpcrPart, ulSecondaryScanId, ppartcnstr, ppartcnstrRel),
+	CPhysicalDynamicScan(mp, is_partial, ptabdesc, ulOriginOpId, pnameAlias, scan_id, pdrgpcrOutput, pdrgpdrgpcrPart, ulSecondaryScanId, ppartcnstr, ppartcnstrRel),
 	m_pindexdesc(pindexdesc),
 	m_pos(pos)
 {
@@ -191,7 +191,7 @@ CPhysicalDynamicIndexScan::OsPrint
 IStatistics *
 CPhysicalDynamicIndexScan::PstatsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CReqdPropPlan *prpplan,
 	StatsArray *stats_ctxt
@@ -200,7 +200,7 @@ CPhysicalDynamicIndexScan::PstatsDerive
 {
 	GPOS_ASSERT(NULL != prpplan);
 
-	IStatistics *pstatsBaseTable = CStatisticsUtils::DeriveStatsForDynamicScan(memory_pool, exprhdl, ScanId(), prpplan->Pepp()->PpfmDerived());
+	IStatistics *pstatsBaseTable = CStatisticsUtils::DeriveStatsForDynamicScan(mp, exprhdl, ScanId(), prpplan->Pepp()->PpfmDerived());
 
 	// create a conjunction of index condition and additional filters
 	CExpression *pexprScalar = exprhdl.PexprScalarChild(0 /*ulChidIndex*/);
@@ -210,9 +210,9 @@ CPhysicalDynamicIndexScan::PstatsDerive
 	// get outer references from expression handle
 	CColRefSet *outer_refs = exprhdl.GetRelationalProperties()->PcrsOuter();
 
-	CPredicateUtils::SeparateOuterRefs(memory_pool, pexprScalar, outer_refs, &local_expr, &expr_with_outer_refs);
+	CPredicateUtils::SeparateOuterRefs(mp, pexprScalar, outer_refs, &local_expr, &expr_with_outer_refs);
 
-	IStatistics *stats = CFilterStatsProcessor::MakeStatsFilterForScalarExpr(memory_pool, exprhdl, pstatsBaseTable, local_expr, expr_with_outer_refs, stats_ctxt);
+	IStatistics *stats = CFilterStatsProcessor::MakeStatsFilterForScalarExpr(mp, exprhdl, pstatsBaseTable, local_expr, expr_with_outer_refs, stats_ctxt);
 
 	pstatsBaseTable->Release();
 	local_expr->Release();

@@ -41,14 +41,14 @@ namespace gpopt
 			CColRefSet *m_pcrsMinimalGrpCols;
 
 			// construct order spec on grouping column so that it covers required order spec
-			COrderSpec *PosCovering(IMemoryPool *memory_pool, COrderSpec *posRequired, ColRefArray *pdrgpcrGrp) const;
+			COrderSpec *PosCovering(IMemoryPool *mp, COrderSpec *posRequired, ColRefArray *pdrgpcrGrp) const;
 
 		protected:
 
 			// compute required sort columns of the n-th child
 			COrderSpec *PosRequiredStreamAgg
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				COrderSpec *posRequired,
 				ULONG child_index,
@@ -57,14 +57,14 @@ namespace gpopt
 				const;
 
 			// initialize the order spec using the given array of columns
-			void InitOrderSpec(IMemoryPool *memory_pool, ColRefArray *pdrgpcrOrder);
+			void InitOrderSpec(IMemoryPool *mp, ColRefArray *pdrgpcrOrder);
 
 		public:
 
 			// ctor
 			CPhysicalStreamAgg
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *colref_array,
 				ColRefArray *pdrgpcrMinimal, // minimal grouping columns based on FD's
 				COperator::EGbAggType egbaggtype,
@@ -100,7 +100,7 @@ namespace gpopt
 			virtual
 			COrderSpec *PosRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				COrderSpec *posRequired,
 				ULONG child_index,
@@ -109,7 +109,7 @@ namespace gpopt
 				)
 				const
 			{
-				return PosRequiredStreamAgg(memory_pool, exprhdl, posRequired, child_index, m_pdrgpcrMinimal);
+				return PosRequiredStreamAgg(mp, exprhdl, posRequired, child_index, m_pdrgpcrMinimal);
 			}
 
 			//-------------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ namespace gpopt
 
 			// derive sort order
 			virtual
-			COrderSpec *PosDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			COrderSpec *PosDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			//-------------------------------------------------------------------------------------
 			// Enforced Properties

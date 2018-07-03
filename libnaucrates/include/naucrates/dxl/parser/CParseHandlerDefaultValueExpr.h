@@ -54,7 +54,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CParseHandlerDefaultValueExpr(IMemoryPool *memory_pool,
+		CParseHandlerDefaultValueExpr(IMemoryPool *mp,
 									  CParseHandlerManager *parse_handler_mgr,
 									  CParseHandlerBase *parse_handler_root);
 	};

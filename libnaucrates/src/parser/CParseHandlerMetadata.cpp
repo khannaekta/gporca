@@ -32,10 +32,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerMetadata::CParseHandlerMetadata(IMemoryPool *memory_pool,
+CParseHandlerMetadata::CParseHandlerMetadata(IMemoryPool *mp,
 											 CParseHandlerManager *parse_handler_mgr,
 											 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
 	  m_mdid_cached_obj_array(NULL),
 	  m_mdid_array(NULL),
 	  m_system_id_array(NULL)
@@ -135,8 +135,8 @@ CParseHandlerMetadata::StartElement(const XMLCh *const element_uri,
 		// start of the metadata section in the DXL document
 		GPOS_ASSERT(NULL == m_mdid_cached_obj_array);
 
-		m_mdid_cached_obj_array = GPOS_NEW(m_memory_pool) IMDCachePtrArray(m_memory_pool);
-		m_mdid_array = GPOS_NEW(m_memory_pool) MdidPtrArray(m_memory_pool);
+		m_mdid_cached_obj_array = GPOS_NEW(m_mp) IMDCachePtrArray(m_mp);
+		m_mdid_array = GPOS_NEW(m_mp) MdidPtrArray(m_mp);
 
 		m_system_id_array = GetSrcSysIdArray(attrs, EdxltokenSysids, EdxltokenMetadata);
 	}
@@ -156,7 +156,7 @@ CParseHandlerMetadata::StartElement(const XMLCh *const element_uri,
 
 		// install a parse handler for the given element
 		CParseHandlerBase *parse_handler_base = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, element_local_name, m_parse_handler_mgr, this);
+			m_mp, element_local_name, m_parse_handler_mgr, this);
 
 		m_parse_handler_mgr->ActivateParseHandler(parse_handler_base);
 
@@ -231,7 +231,7 @@ CParseHandlerMetadata::GetSrcSysIdArray(const Attributes &attrs,
 		return NULL;
 	}
 
-	SysidPtrArray *src_sys_id_array = GPOS_NEW(m_memory_pool) SysidPtrArray(m_memory_pool);
+	SysidPtrArray *src_sys_id_array = GPOS_NEW(m_mp) SysidPtrArray(m_mp);
 
 	// extract separate system ids
 	XMLStringTokenizer xml_str_tokenizer(xml_str_val, CDXLTokens::XmlstrToken(EdxltokenComma));
@@ -255,7 +255,7 @@ CParseHandlerMetadata::GetSrcSysIdArray(const Attributes &attrs,
 		CWStringDynamic *str_name = CDXLUtils::CreateDynamicStringFromXMLChArray(
 			m_parse_handler_mgr->GetDXLMemoryManager(), xml_str_name);
 
-		src_sys_id_array->Append(GPOS_NEW(m_memory_pool) CSystemId(
+		src_sys_id_array->Append(GPOS_NEW(m_mp) CSystemId(
 			(IMDId::EMDIdType) type, str_name->GetBuffer(), str_name->Length()));
 
 		GPOS_DELETE(str_name);

@@ -32,10 +32,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerLogicalGroupBy::CParseHandlerLogicalGroupBy(IMemoryPool *memory_pool,
+CParseHandlerLogicalGroupBy::CParseHandlerLogicalGroupBy(IMemoryPool *mp,
 														 CParseHandlerManager *parse_handler_mgr,
 														 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerLogicalOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerLogicalOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -57,19 +57,19 @@ CParseHandlerLogicalGroupBy::StartElement(const XMLCh *const,  // element_uri,
 	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenLogicalGrpBy),
 									  element_local_name))
 	{
-		m_dxl_node = GPOS_NEW(m_memory_pool)
-			CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLLogicalGroupBy(m_memory_pool));
+		m_dxlnode = GPOS_NEW(m_mp)
+			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLLogicalGroupBy(m_mp));
 
 		// create child node parsers
 
 		// parse handler for logical operator
 		CParseHandlerBase *lg_op_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenLogical), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenLogical), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(lg_op_parse_handler);
 
 		// parse handler for the proj list
 		CParseHandlerBase *proj_list_parse_handler =
-			CParseHandlerFactory::GetParseHandler(m_memory_pool,
+			CParseHandlerFactory::GetParseHandler(m_mp,
 												  CDXLTokens::XmlstrToken(EdxltokenScalarProjList),
 												  m_parse_handler_mgr,
 												  this);
@@ -77,7 +77,7 @@ CParseHandlerLogicalGroupBy::StartElement(const XMLCh *const,  // element_uri,
 
 		//parse handler for the grouping columns list
 		CParseHandlerBase *grouping_col_list_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool,
+			m_mp,
 			CDXLTokens::XmlstrToken(EdxltokenScalarGroupingColList),
 			m_parse_handler_mgr,
 			this);
@@ -118,7 +118,7 @@ CParseHandlerLogicalGroupBy::EndElement(const XMLCh *const,  // element_uri,
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, str->GetBuffer());
 	}
 
-	GPOS_ASSERT(NULL != m_dxl_node);
+	GPOS_ASSERT(NULL != m_dxlnode);
 	GPOS_ASSERT(3 == this->Length());
 
 	CParseHandlerGroupingColList *grouping_col_parse_handler =
@@ -135,7 +135,7 @@ CParseHandlerLogicalGroupBy::EndElement(const XMLCh *const,  // element_uri,
 	AddChildFromParseHandler(lg_op_parse_handler);
 
 	CDXLLogicalGroupBy *lg_group_by_dxl =
-		static_cast<CDXLLogicalGroupBy *>(m_dxl_node->GetOperator());
+		static_cast<CDXLLogicalGroupBy *>(m_dxlnode->GetOperator());
 
 	// set grouping cols list
 	GPOS_ASSERT(NULL != grouping_col_parse_handler->GetGroupingColidArray());
@@ -146,7 +146,7 @@ CParseHandlerLogicalGroupBy::EndElement(const XMLCh *const,  // element_uri,
 
 
 #ifdef GPOS_DEBUG
-	lg_group_by_dxl->AssertValid(m_dxl_node, false /* validate_children */);
+	lg_group_by_dxl->AssertValid(m_dxlnode, false /* validate_children */);
 #endif  // GPOS_DEBUG
 
 	// deactivate handler

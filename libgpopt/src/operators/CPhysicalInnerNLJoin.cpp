@@ -33,10 +33,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalInnerNLJoin::CPhysicalInnerNLJoin
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CPhysicalNLJoin(memory_pool)
+	CPhysicalNLJoin(mp)
 {
 	// Inner NLJ creates two distribution requests for children:
 	// (0) Outer child is requested for ANY distribution, and inner child is requested for a Replicated (or a matching) distribution
@@ -78,7 +78,7 @@ CPhysicalInnerNLJoin::~CPhysicalInnerNLJoin()
 CDistributionSpec *
 CPhysicalInnerNLJoin::PdsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CDistributionSpec *pdsRequired,
 	ULONG child_index,
@@ -93,7 +93,7 @@ CPhysicalInnerNLJoin::PdsRequired
 	// if expression has to execute on master then we need a gather
 	if (exprhdl.FMasterOnly())
 	{
-		return PdsEnforceMaster(memory_pool, exprhdl, pdsRequired, child_index);
+		return PdsEnforceMaster(mp, exprhdl, pdsRequired, child_index);
 	}
 
 	if (exprhdl.HasOuterRefs())
@@ -101,20 +101,20 @@ CPhysicalInnerNLJoin::PdsRequired
 		if (CDistributionSpec::EdtSingleton == pdsRequired->Edt() ||
 			CDistributionSpec::EdtReplicated == pdsRequired->Edt())
 		{
-			return PdsPassThru(memory_pool, exprhdl, pdsRequired, child_index);
+			return PdsPassThru(mp, exprhdl, pdsRequired, child_index);
 		}
-		return GPOS_NEW(memory_pool) CDistributionSpecReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated();
 	}
 
 	if (GPOS_FTRACE(EopttraceDisableReplicateInnerNLJOuterChild) || 0 == ulOptReq)
 	{
-		return CPhysicalJoin::PdsRequired(memory_pool, exprhdl, pdsRequired, child_index, pdrgpdpCtxt, ulOptReq);
+		return CPhysicalJoin::PdsRequired(mp, exprhdl, pdsRequired, child_index, pdrgpdpCtxt, ulOptReq);
 	}
 	GPOS_ASSERT(1 == ulOptReq);
 
 	if (0 == child_index)
 	{
-		return GPOS_NEW(memory_pool) CDistributionSpecReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated();
 	}
 
 	// compute a matching distribution based on derived distribution of outer child
@@ -122,10 +122,10 @@ CPhysicalInnerNLJoin::PdsRequired
 	if (CDistributionSpec::EdtUniversal == pdsOuter->Edt())
 	{
 		// first child is universal, request second child to execute on the master to avoid duplicates
-		return GPOS_NEW(memory_pool) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
+		return GPOS_NEW(mp) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
 	}
 
-	return GPOS_NEW(memory_pool) CDistributionSpecNonSingleton();
+	return GPOS_NEW(mp) CDistributionSpecNonSingleton();
 }
 
 // EOF

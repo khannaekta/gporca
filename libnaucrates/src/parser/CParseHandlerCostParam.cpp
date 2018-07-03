@@ -28,10 +28,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerCostParam::CParseHandlerCostParam(IMemoryPool *memory_pool,
+CParseHandlerCostParam::CParseHandlerCostParam(IMemoryPool *mp,
 											   CParseHandlerManager *parse_handler_mgr,
 											   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root),
 	  m_param_name(NULL),
 	  m_value(0),
 	  m_lower_bound_val(0),
@@ -81,7 +81,7 @@ CParseHandlerCostParam::StartElement(const XMLCh *const,  // element_uri,
 	CWStringDynamic *str_name = CDXLUtils::CreateDynamicStringFromXMLChArray(
 		m_parse_handler_mgr->GetDXLMemoryManager(), xmlstrName);
 	m_param_name =
-		CDXLUtils::CreateMultiByteCharStringFromWCString(m_memory_pool, str_name->GetBuffer());
+		CDXLUtils::CreateMultiByteCharStringFromWCString(m_mp, str_name->GetBuffer());
 	GPOS_DELETE(str_name);
 
 	m_value = CDXLOperatorFactory::ExtractConvertAttrValueToDouble(

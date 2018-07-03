@@ -110,7 +110,7 @@ namespace gpos
 
 
 			// ctor
-			explicit CStackTracker(IMemoryPool *memory_pool, ULONG resolution, SStackKey key);
+			explicit CStackTracker(IMemoryPool *mp, ULONG resolution, SStackKey key);
 
 			// exchange/set function
 			BOOL ExchangeSet(ULONG bit);
@@ -139,7 +139,7 @@ namespace gpos
 		CFSimulator(const CFSimulator &);
 
 		// memory pool
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// resolution
 		ULONG m_resolution;
@@ -158,7 +158,7 @@ namespace gpos
 
 	public:
 		// ctor
-		CFSimulator(IMemoryPool *memory_pool, ULONG resolution);
+		CFSimulator(IMemoryPool *mp, ULONG resolution);
 
 		// dtor
 		~CFSimulator()

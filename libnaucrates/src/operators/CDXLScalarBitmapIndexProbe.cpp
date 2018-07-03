@@ -27,9 +27,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarBitmapIndexProbe::CDXLScalarBitmapIndexProbe(IMemoryPool *memory_pool,
+CDXLScalarBitmapIndexProbe::CDXLScalarBitmapIndexProbe(IMemoryPool *mp,
 													   CDXLIndexDescr *index_descr_dxl)
-	: CDXLScalar(memory_pool), m_index_descr_dxl(index_descr_dxl)
+	: CDXLScalar(mp), m_index_descr_dxl(index_descr_dxl)
 {
 	GPOS_ASSERT(NULL != m_index_descr_dxl);
 }

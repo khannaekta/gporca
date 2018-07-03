@@ -440,11 +440,11 @@ CRange::FPoint() const
 CExpression *
 CRange::PexprScalar
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CColRef *colref
 	)
 {
-	CExpression *pexprEq = PexprEquality(memory_pool, colref);
+	CExpression *pexprEq = PexprEquality(mp, colref);
 	if (NULL != pexprEq)
 	{
 		return pexprEq;
@@ -452,7 +452,7 @@ CRange::PexprScalar
 
 	CExpression *pexprLeft = PexprScalarCompEnd
 								(
-								memory_pool,
+								mp,
 								m_pdatumLeft,
 								m_eriLeft,
 								IMDType::EcmptGEq,
@@ -462,7 +462,7 @@ CRange::PexprScalar
 
 	CExpression *pexprRight = PexprScalarCompEnd
 								(
-								memory_pool,
+								mp,
 								m_pdatumRight,
 								m_eriRight,
 								IMDType::EcmptLEq,
@@ -470,7 +470,7 @@ CRange::PexprScalar
 								colref
 								);
 
-	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
 
 	if (NULL != pexprLeft)
 	{
@@ -482,7 +482,7 @@ CRange::PexprScalar
 		pdrgpexpr->Append(pexprRight);
 	}
 
-	return CPredicateUtils::PexprConjunction(memory_pool, pdrgpexpr);
+	return CPredicateUtils::PexprConjunction(mp, pdrgpexpr);
 }
 
 //---------------------------------------------------------------------------
@@ -496,7 +496,7 @@ CRange::PexprScalar
 CExpression *
 CRange::PexprEquality
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CColRef *colref
 	)
 {
@@ -508,9 +508,9 @@ CRange::PexprEquality
 	}
 
 	m_pdatumLeft->AddRef();
-	CExpression *pexprVal = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CScalarConst(memory_pool, m_pdatumLeft));
+	CExpression *pexprVal = GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, m_pdatumLeft));
 
-	return CUtils::PexprScalarCmp(memory_pool, colref, pexprVal, IMDType::EcmptEq);
+	return CUtils::PexprScalarCmp(mp, colref, pexprVal, IMDType::EcmptEq);
 }
 
 //---------------------------------------------------------------------------
@@ -524,7 +524,7 @@ CRange::PexprEquality
 CExpression *
 CRange::PexprScalarCompEnd
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IDatum *datum,
 	ERangeInclusion eri,
 	IMDType::ECmpType ecmptIncl,
@@ -539,7 +539,7 @@ CRange::PexprScalarCompEnd
 	}
 
 	datum->AddRef();
-	CExpression *pexprVal = GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CScalarConst(memory_pool, datum));
+	CExpression *pexprVal = GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, datum));
 
 	IMDType::ECmpType cmp_type;
 	if (EriIncluded == eri)
@@ -551,7 +551,7 @@ CRange::PexprScalarCompEnd
 		cmp_type = ecmptExcl;
 	}
 
-	return CUtils::PexprScalarCmp(memory_pool, colref, pexprVal, cmp_type);
+	return CUtils::PexprScalarCmp(mp, colref, pexprVal, cmp_type);
 }
 
 //---------------------------------------------------------------------------
@@ -565,7 +565,7 @@ CRange::PexprScalarCompEnd
 CRange *
 CRange::PrngIntersect
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CRange *prange
 	)
 {
@@ -589,7 +589,7 @@ CRange::PrngIntersect
 		pdatumLeft->AddRef();
 		m_pdatumRight->AddRef();
 
-		return GPOS_NEW(memory_pool) CRange(m_mdid, m_pcomp, pdatumLeft, prange->EriLeft(), m_pdatumRight, m_eriRight);
+		return GPOS_NEW(mp) CRange(m_mdid, m_pcomp, pdatumLeft, prange->EriLeft(), m_pdatumRight, m_eriRight);
 	}
 
 	if (FOverlapsRight(prange))
@@ -600,7 +600,7 @@ CRange::PrngIntersect
 		pdatumRight->AddRef();
 		m_pdatumLeft->AddRef();
 
-		return GPOS_NEW(memory_pool) CRange(m_mdid, m_pcomp, m_pdatumLeft, m_eriLeft, pdatumRight, prange->EriRight());
+		return GPOS_NEW(mp) CRange(m_mdid, m_pcomp, m_pdatumLeft, m_eriLeft, pdatumRight, prange->EriRight());
 	}
 
 	return NULL;
@@ -620,7 +620,7 @@ CRange::PrngIntersect
 CRange *
 CRange::PrngDifferenceLeft
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CRange *prange
 	)
 {
@@ -642,7 +642,7 @@ CRange::PrngDifferenceLeft
 		IDatum *pdatumRight = prange->PdatumLeft();
 		pdatumRight->AddRef();
 
-		return GPOS_NEW(memory_pool) CRange
+		return GPOS_NEW(mp) CRange
 							(
 							m_mdid,
 							m_pcomp,
@@ -670,7 +670,7 @@ CRange::PrngDifferenceLeft
 CRange *
 CRange::PrngDifferenceRight
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CRange *prange
 	)
 {
@@ -692,7 +692,7 @@ CRange::PrngDifferenceRight
 		IDatum *pdatumRight = prange->PdatumRight();
 		pdatumRight->AddRef();
 
-		return GPOS_NEW(memory_pool) CRange
+		return GPOS_NEW(mp) CRange
 							(
 							m_mdid,
 							m_pcomp,
@@ -718,7 +718,7 @@ CRange::PrngDifferenceRight
 CRange *
 CRange::PrngExtend
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CRange *prange
 	)
 {
@@ -740,7 +740,7 @@ CRange::PrngExtend
 			pdatumRight->AddRef();
 		}
 
-		return GPOS_NEW(memory_pool) CRange(m_mdid, m_pcomp, m_pdatumLeft, m_eriLeft, pdatumRight, prange->EriRight());
+		return GPOS_NEW(mp) CRange(m_mdid, m_pcomp, m_pdatumLeft, m_eriLeft, pdatumRight, prange->EriRight());
 	}
 
 	return NULL;
@@ -818,8 +818,8 @@ CRange::OsPrintBound
 void
 CRange::DbgPrint() const
 {
-	IMemoryPool *memory_pool = COptCtxt::PoctxtFromTLS()->Pmp();
-	CAutoTrace at(memory_pool);
+	IMemoryPool *mp = COptCtxt::PoctxtFromTLS()->Pmp();
+	CAutoTrace at(mp);
 	(void) this->OsPrint(at.Os());
 }
 

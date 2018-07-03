@@ -45,19 +45,19 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CMemo::CMemo
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	m_memory_pool(memory_pool),
+	m_mp(mp),
 	m_pgroupRoot(NULL),
 	m_ulpGrps(0),
 	m_pmemotmap(NULL)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 
 	m_sht.Init
 		(
-		memory_pool,
+		mp,
 		GPOPT_MEMO_HT_BUCKETS,
 		GPOS_OFFSET(CGroupExpression, m_linkMemo),
 		0, /*cKeyOffset (0 because we use CGroupExpression class as key)*/
@@ -232,7 +232,7 @@ CMemo::FNewGroup
 
 	if (NULL == *ppgroupTarget && NULL == pgexpr)
 	{
-		*ppgroupTarget = GPOS_NEW(m_memory_pool) CGroup(m_memory_pool, fScalar);
+		*ppgroupTarget = GPOS_NEW(m_mp) CGroup(m_mp, fScalar);
 
 		return true;
 	}
@@ -322,7 +322,7 @@ CMemo::PgroupInsert
 CExpression *
 CMemo::PexprExtractPlan
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CGroup *pgroupRoot,
 	CReqdPropPlan *prppInput,
 	ULONG ulSearchStages
@@ -352,7 +352,7 @@ CMemo::PexprExtractPlan
 		// or physical expressions. In this case, we lookup the best optimization context
 		// for the given required plan properties, and then retrieve the best group
 		// expression under the optimization context.
-		poc = pgroupRoot->PocLookupBest(memory_pool, ulSearchStages, prppInput);
+		poc = pgroupRoot->PocLookupBest(mp, ulSearchStages, prppInput);
 		GPOS_ASSERT(NULL != poc);
 
 		pgexprBest = pgroupRoot->PgexprBest(poc);
@@ -369,7 +369,7 @@ CMemo::PexprExtractPlan
 		return NULL;
 	}
 
-	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
 	// Get the length of groups for the best group expression
 	// i.e. given the best expression is
 	// 0: CScalarCmp (>=) [ 1 7 ]
@@ -413,14 +413,14 @@ CMemo::PexprExtractPlan
 			prpp = pocChild->Prpp();
 		}
 
-		CExpression *pexprChild = PexprExtractPlan(memory_pool, pgroupChild, prpp, ulSearchStages);
+		CExpression *pexprChild = PexprExtractPlan(mp, pgroupChild, prpp, ulSearchStages);
 		pdrgpexpr->Append(pexprChild);
 	}
 
 	pgexprBest->Pop()->AddRef();
-	CExpression *pexpr = GPOS_NEW(memory_pool) CExpression
+	CExpression *pexpr = GPOS_NEW(mp) CExpression
 							(
-							memory_pool,
+							mp,
 							pgexprBest->Pop(),
 							pgexprBest,
 							pdrgpexpr,
@@ -428,7 +428,7 @@ CMemo::PexprExtractPlan
 							cost
 							);
 
-	if (pexpr->Pop()->FPhysical() && !poc->PccBest()->IsValid(memory_pool))
+	if (pexpr->Pop()->FPhysical() && !poc->PccBest()->IsValid(mp))
 	{
 		GPOS_RAISE(gpopt::ExmaGPOPT, gpopt::ExmiUnsatisfiedRequiredProperties);
 	}
@@ -644,7 +644,7 @@ CMemo::GroupMerge()
 void
 CMemo::Trace()
 {
-	CWStringDynamic str(m_memory_pool);
+	CWStringDynamic str(m_mp);
 	COstreamString oss(&str);
 
 	OsPrint(oss);
@@ -671,7 +671,7 @@ CMemo::OsPrint
 	
 	while (NULL != pgroup)
 	{
-		CAutoTrace at(m_memory_pool);
+		CAutoTrace at(m_mp);
 
 		if (m_pgroupRoot == pgroup)
 		{
@@ -710,9 +710,9 @@ CMemo::DeriveStatsIfAbsent
 		{
 			CGroupExpression *pgexprFirst = CEngine::PgexprFirst(pgroup);
 
-			CExpressionHandle exprhdl(m_memory_pool);
+			CExpressionHandle exprhdl(m_mp);
 			exprhdl.Attach(pgexprFirst);
-			exprhdl.DeriveStats(pmpLocal, m_memory_pool, NULL, NULL);
+			exprhdl.DeriveStats(pmpLocal, m_mp, NULL, NULL);
 		}
 
 		pgroup = m_listGroups.Next(pgroup);
@@ -780,8 +780,8 @@ CMemo::BuildTreeMap
 	GPOS_ASSERT(NULL != poc);
 	GPOS_ASSERT(NULL == m_pmemotmap && "tree map is already built");
 
-	m_pmemotmap = GPOS_NEW(m_memory_pool) MemoTreeMap(m_memory_pool, CExpression::PexprRehydrate);
-	m_pgroupRoot->BuildTreeMap(m_memory_pool, poc, NULL /*pccParent*/,
+	m_pmemotmap = GPOS_NEW(m_mp) MemoTreeMap(m_mp, CExpression::PexprRehydrate);
+	m_pgroupRoot->BuildTreeMap(m_mp, poc, NULL /*pccParent*/,
 							   gpos::ulong_max /*child_index*/, m_pmemotmap);
 }
 
@@ -865,7 +865,7 @@ CMemo::UlGrpExprs()
 void
 CMemo::DbgPrint()
 {
-	CAutoTrace at(m_memory_pool);
+	CAutoTrace at(m_mp);
 	(void) this->OsPrint(at.Os());
 }
 #endif // GPOS_DEBUG

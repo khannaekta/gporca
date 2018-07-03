@@ -57,7 +57,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerScalarBitmapBoolOp(IMemoryPool *memory_pool,
+		CParseHandlerScalarBitmapBoolOp(IMemoryPool *mp,
 										CParseHandlerManager *parse_handler_mgr,
 										CParseHandlerBase *parse_handler_root);
 	};

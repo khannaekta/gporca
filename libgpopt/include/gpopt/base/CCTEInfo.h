@@ -125,7 +125,7 @@ namespace gpopt
 				private:
 
 					// memory pool
-					IMemoryPool *m_memory_pool;
+					IMemoryPool *m_mp;
 
 					// logical producer expression
 					CExpression *m_pexprCTEProducer;
@@ -142,8 +142,8 @@ namespace gpopt
 					CMutex m_mutex;
 
 					// ctors
-					CCTEInfoEntry(IMemoryPool *memory_pool, CExpression *pexprCTEProducer);
-					CCTEInfoEntry(IMemoryPool *memory_pool, CExpression *pexprCTEProducer, BOOL fUsed);
+					CCTEInfoEntry(IMemoryPool *mp, CExpression *pexprCTEProducer);
+					CCTEInfoEntry(IMemoryPool *mp, CExpression *pexprCTEProducer, BOOL fUsed);
 
 					// dtor
 					~CCTEInfoEntry();
@@ -186,7 +186,7 @@ namespace gpopt
 							CleanupDelete<ULONG>, CleanupRelease<CCTEInfoEntry> > HMUlCTEInfoEntryIter;
 
 			// memory pool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 
 			// mapping from cte producer id -> cte info entry
 			HMUlCTEInfoEntry *m_phmulcteinfoentry;
@@ -218,7 +218,7 @@ namespace gpopt
 		public:
 			// ctor
 			explicit
-			CCTEInfo(IMemoryPool *memory_pool);
+			CCTEInfo(IMemoryPool *mp);
 
 			//dtor
 			virtual
@@ -258,10 +258,10 @@ namespace gpopt
 				);
 
 			// return a CTE requirement with all the producers as optional
-			CCTEReq *PcterProducers(IMemoryPool *memory_pool) const;
+			CCTEReq *PcterProducers(IMemoryPool *mp) const;
 
 			// return an array of all stored CTE expressions
-			ExpressionArray *PdrgPexpr(IMemoryPool *memory_pool) const;
+			ExpressionArray *PdrgPexpr(IMemoryPool *mp) const;
 
 			// disable CTE inlining
 			void DisableInlining()
@@ -289,7 +289,7 @@ namespace gpopt
 			ULONG UlConsumerColPos(ULONG ulCTEId, CColRef *colref);
 
 			// return a map from Id's of consumer columns in the given column set to their corresponding producer columns
-			UlongColRefHashMap *PhmulcrConsumerToProducer(IMemoryPool *memory_pool, ULONG ulCTEId, CColRefSet *pcrs, ColRefArray *pdrgpcrProducer);
+			UlongColRefHashMap *PhmulcrConsumerToProducer(IMemoryPool *mp, ULONG ulCTEId, CColRefSet *pcrs, ColRefArray *pdrgpcrProducer);
 
 	}; // CCTEInfo
 }

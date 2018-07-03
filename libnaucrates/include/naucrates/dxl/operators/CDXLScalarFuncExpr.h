@@ -48,7 +48,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLScalarFuncExpr(IMemoryPool *memory_pool,
+		CDXLScalarFuncExpr(IMemoryPool *mp,
 						   IMDId *mdid_func,
 						   IMDId *mdid_return_type,
 						   INT return_type_modifier,

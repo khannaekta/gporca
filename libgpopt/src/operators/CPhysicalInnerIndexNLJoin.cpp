@@ -36,11 +36,11 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalInnerIndexNLJoin::CPhysicalInnerIndexNLJoin
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ColRefArray *colref_array
 	)
 	:
-	CPhysicalInnerNLJoin(memory_pool),
+	CPhysicalInnerNLJoin(mp),
 	m_pdrgpcrOuterRefs(colref_array)
 {
 	GPOS_ASSERT(NULL != colref_array);
@@ -96,7 +96,7 @@ CPhysicalInnerIndexNLJoin::Matches
 CDistributionSpec *
 CPhysicalInnerIndexNLJoin::PdsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &,//exprhdl,
 	CDistributionSpec *,//pdsRequired,
 	ULONG child_index,
@@ -112,7 +112,7 @@ CPhysicalInnerIndexNLJoin::PdsRequired
 		// inner (index-scan side) is requested for Any distribution,
 		// we allow outer references on the inner child of the join since it needs
 		// to refer to columns in join's outer child
-		return GPOS_NEW(memory_pool) CDistributionSpecAny(this->Eopid(), true /*fAllowOuterRefs*/);
+		return GPOS_NEW(mp) CDistributionSpecAny(this->Eopid(), true /*fAllowOuterRefs*/);
 	}
 
 	// we need to match distribution of inner
@@ -123,7 +123,7 @@ CPhysicalInnerIndexNLJoin::PdsRequired
 		CDistributionSpec::EdtUniversal == edtInner)
 	{
 		// enforce executing on the master
-		return GPOS_NEW(memory_pool) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
+		return GPOS_NEW(mp) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
 	}
 
 	if (CDistributionSpec::EdtHashed == edtInner)
@@ -135,12 +135,12 @@ CPhysicalInnerIndexNLJoin::PdsRequired
 		{
 			// request hashed distribution from outer
 			pdshashedEquiv->Pdrgpexpr()->AddRef();
-			return GPOS_NEW(memory_pool) CDistributionSpecHashed(pdshashedEquiv->Pdrgpexpr(), pdshashedEquiv->FNullsColocated());
+			return GPOS_NEW(mp) CDistributionSpecHashed(pdshashedEquiv->Pdrgpexpr(), pdshashedEquiv->FNullsColocated());
 		}
 	}
 
 	// otherwise, require outer child to be replicated
-	return GPOS_NEW(memory_pool) CDistributionSpecReplicated();
+	return GPOS_NEW(mp) CDistributionSpecReplicated();
 }
 
 

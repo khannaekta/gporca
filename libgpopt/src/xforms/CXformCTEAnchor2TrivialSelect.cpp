@@ -28,17 +28,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformCTEAnchor2TrivialSelect::CXformCTEAnchor2TrivialSelect
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformExploration
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalCTEAnchor(memory_pool),
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))
+				mp,
+				GPOS_NEW(mp) CLogicalCTEAnchor(mp),
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp))
 				)
 		)
 {}
@@ -93,19 +93,19 @@ CXformCTEAnchor2TrivialSelect::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// child of CTE anchor
 	CExpression *pexprChild = (*pexpr)[0];
 	pexprChild->AddRef();
 
 	CExpression *pexprSelect =
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
-			GPOS_NEW(memory_pool) CLogicalSelect(memory_pool),
+			mp,
+			GPOS_NEW(mp) CLogicalSelect(mp),
 			pexprChild,
-			CUtils::PexprScalarConstBool(memory_pool, true /*fValue*/)
+			CUtils::PexprScalarConstBool(mp, true /*fValue*/)
 			);
 
 	pxfres->Add(pexprSelect);

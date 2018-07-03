@@ -67,7 +67,7 @@ namespace gpopt
 			virtual
 			void AppendEnforcers
 				(
-				IMemoryPool *, // memory_pool
+				IMemoryPool *, // mp
 				CExpressionHandle &, // exprhdl
 				CReqdPropPlan *, // prpp
 				ExpressionArray *, // pdrgpexpr 

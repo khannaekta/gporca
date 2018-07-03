@@ -49,7 +49,7 @@ namespace gpopt
 			// ctor
 			CScalarConst
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				IDatum *datum
 				);
 
@@ -96,7 +96,7 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //memory_pool,
+						IMemoryPool *, //mp,
 						UlongColRefHashMap *, //colref_mapping,
 						BOOL //must_exist
 						)

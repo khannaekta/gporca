@@ -45,7 +45,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CDXLScalarCoerceViaIO(IMemoryPool *memory_pool,
+		CDXLScalarCoerceViaIO(IMemoryPool *mp,
 							  IMDId *mdid_type,
 							  INT type_modifier,
 							  EdxlCoercionForm dxl_coerce_format,

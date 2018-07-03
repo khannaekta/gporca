@@ -35,10 +35,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CMiniDumperDXL::CMiniDumperDXL
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CMiniDumper(memory_pool)
+	CMiniDumper(mp)
 {
 }
 

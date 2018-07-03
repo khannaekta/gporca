@@ -17,7 +17,7 @@ using namespace gpopt;
 
 // return statistics object after performing LSJ operation
 CStatistics *
-CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(IMemoryPool *memory_pool,
+CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(IMemoryPool *mp,
 												   const IStatistics *outer_stats_input,
 												   const IStatistics *inner_stats_input,
 												   StatsPredJoinArray *join_preds_stats)
@@ -29,17 +29,17 @@ CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(IMemoryPool *memory_pool,
 	const ULONG length = join_preds_stats->Size();
 
 	// iterate over all inner columns and perform a group by to remove duplicates
-	ULongPtrArray *inner_colids = GPOS_NEW(memory_pool) ULongPtrArray(memory_pool);
+	ULongPtrArray *inner_colids = GPOS_NEW(mp) ULongPtrArray(mp);
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		ULONG colid = ((*join_preds_stats)[ul])->ColIdInner();
-		inner_colids->Append(GPOS_NEW(memory_pool) ULONG(colid));
+		inner_colids->Append(GPOS_NEW(mp) ULONG(colid));
 	}
 
 	// dummy agg columns required for group by derivation
-	ULongPtrArray *aggs = GPOS_NEW(memory_pool) ULongPtrArray(memory_pool);
+	ULongPtrArray *aggs = GPOS_NEW(mp) ULongPtrArray(mp);
 	IStatistics *inner_stats = CGroupByStatsProcessor::CalcGroupByStats(
-		memory_pool,
+		mp,
 		dynamic_cast<const CStatistics *>(inner_stats_input),
 		inner_colids,
 		aggs,
@@ -48,7 +48,7 @@ CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(IMemoryPool *memory_pool,
 
 	const CStatistics *outer_stats = dynamic_cast<const CStatistics *>(outer_stats_input);
 	CStatistics *semi_join_stats =
-		CJoinStatsProcessor::SetResultingJoinStats(memory_pool,
+		CJoinStatsProcessor::SetResultingJoinStats(mp,
 												   outer_stats->GetStatsConfig(),
 												   outer_stats,
 												   inner_stats,

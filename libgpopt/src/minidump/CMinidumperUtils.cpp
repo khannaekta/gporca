@@ -61,7 +61,7 @@ using namespace std;
 CDXLMinidump *
 CMinidumperUtils::PdxlmdLoad
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CHAR *file_name
 	)
 {
@@ -69,11 +69,11 @@ CMinidumperUtils::PdxlmdLoad
 	CAutoTraceFlag atf2(EtraceSimulateOOM, false);
 
 	{
-		CAutoTrace at(memory_pool);
+		CAutoTrace at(mp);
 		at.Os() << "parsing DXL File " << file_name;
 	}
 	
-	CParseHandlerDXL *parse_handler_dxl = CDXLUtils::GetParseHandlerForDXLFile(memory_pool, file_name, NULL /*xsd_file_path*/);
+	CParseHandlerDXL *parse_handler_dxl = CDXLUtils::GetParseHandlerForDXLFile(mp, file_name, NULL /*xsd_file_path*/);
 
 	CBitSet *pbs = parse_handler_dxl->Pbs();
 	COptimizerConfig *optimizer_config = parse_handler_dxl->GetOptimizerConfig();
@@ -134,7 +134,7 @@ CMinidumperUtils::PdxlmdLoad
     CWorker::Self()->ResetTimeSlice();
 #endif // GPOS_DEBUG
 
-	return GPOS_NEW(memory_pool) CDXLMinidump
+	return GPOS_NEW(mp) CDXLMinidump
 				(
 				pbs,
 				optimizer_config,
@@ -255,7 +255,7 @@ CMinidumperUtils::Finalize
 CDXLNode * 
 CMinidumperUtils::PdxlnExecuteMinidump
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CHAR *file_name,
 	ULONG ulSegments,
 	ULONG ulSessionId,
@@ -270,12 +270,12 @@ CMinidumperUtils::PdxlnExecuteMinidump
 	CAutoTimer at("Minidump", true /*fPrint*/);
 
 	// load dump file
-	CDXLMinidump *pdxlmd = CMinidumperUtils::PdxlmdLoad(memory_pool, file_name);
+	CDXLMinidump *pdxlmd = CMinidumperUtils::PdxlmdLoad(mp, file_name);
 	GPOS_CHECK_ABORT;
 
 	CDXLNode *pdxlnPlan = PdxlnExecuteMinidump
 							(
-							memory_pool,
+							mp,
 							pdxlmd,
 							file_name,
 							ulSegments,
@@ -308,7 +308,7 @@ CMinidumperUtils::PdxlnExecuteMinidump
 CDXLNode * 
 CMinidumperUtils::PdxlnExecuteMinidump
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CDXLMinidump *pdxlmd,
 	const CHAR *file_name,
 	ULONG ulSegments, 
@@ -323,9 +323,9 @@ CMinidumperUtils::PdxlnExecuteMinidump
 	// reset metadata ccache
 	CMDCache::Reset();
 
-	CMetadataAccessorFactory factory(memory_pool, pdxlmd, file_name);
+	CMetadataAccessorFactory factory(mp, pdxlmd, file_name);
 
-	CDXLNode *result = CMinidumperUtils::PdxlnExecuteMinidump(memory_pool, factory.Pmda(), pdxlmd, file_name, ulSegments, ulSessionId, ulCmdId, optimizer_config, pceeval);
+	CDXLNode *result = CMinidumperUtils::PdxlnExecuteMinidump(mp, factory.Pmda(), pdxlmd, file_name, ulSegments, ulSessionId, ulCmdId, optimizer_config, pceeval);
 
 	return result;
 }
@@ -342,7 +342,7 @@ CMinidumperUtils::PdxlnExecuteMinidump
 CDXLNode *
 CMinidumperUtils::PdxlnExecuteMinidump
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CMDAccessor *md_accessor,
 	CDXLMinidump *pdxlmd,
 	const CHAR *file_name,
@@ -369,7 +369,7 @@ CMinidumperUtils::PdxlnExecuteMinidump
 	// set trace flags
 	CBitSet *pbsEnabled = NULL;
 	CBitSet *pbsDisabled = NULL;
-	SetTraceflags(memory_pool, pdxlmd->Pbs(), &pbsEnabled, &pbsDisabled);
+	SetTraceflags(mp, pdxlmd->Pbs(), &pbsEnabled, &pbsDisabled);
 
 	if (NULL == pceeval)
 	{
@@ -383,7 +383,7 @@ CMinidumperUtils::PdxlnExecuteMinidump
 	{
 		pdxlnPlan = COptimizer::PdxlnOptimize
 								(
-								memory_pool,
+								mp,
 								md_accessor,
 								pdxlmd->GetQueryDXLRoot(),
 								pdxlmd->PdrgpdxlnQueryOutput(),

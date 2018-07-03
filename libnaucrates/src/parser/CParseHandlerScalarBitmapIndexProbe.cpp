@@ -34,10 +34,10 @@ using namespace gpos;
 //
 //---------------------------------------------------------------------------
 CParseHandlerScalarBitmapIndexProbe::CParseHandlerScalarBitmapIndexProbe(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -69,12 +69,12 @@ CParseHandlerScalarBitmapIndexProbe::StartElement(const XMLCh *const,  // elemen
 
 	// parse handler for the index descriptor
 	CParseHandlerBase *index_descr_parse_handler = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenIndexDescr), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenIndexDescr), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(index_descr_parse_handler);
 
 	// parse handler for the index condition list
 	CParseHandlerBase *index_cond_list_parse_handler =
-		CParseHandlerFactory::GetParseHandler(m_memory_pool,
+		CParseHandlerFactory::GetParseHandler(m_mp,
 											  CDXLTokens::XmlstrToken(EdxltokenScalarIndexCondList),
 											  m_parse_handler_mgr,
 											  this);
@@ -117,8 +117,8 @@ CParseHandlerScalarBitmapIndexProbe::EndElement(const XMLCh *const,  // element_
 	index_descr_dxl->AddRef();
 
 	CDXLScalar *dxl_op =
-		GPOS_NEW(m_memory_pool) CDXLScalarBitmapIndexProbe(m_memory_pool, index_descr_dxl);
-	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, dxl_op);
+		GPOS_NEW(m_mp) CDXLScalarBitmapIndexProbe(m_mp, index_descr_dxl);
+	m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 
 	// add children
 	AddChildFromParseHandler(index_cond_list_parse_handler);

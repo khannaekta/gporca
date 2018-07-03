@@ -29,10 +29,10 @@ XERCES_CPP_NAMESPACE_USE
 //
 //---------------------------------------------------------------------------
 CParseHandlerDefaultValueExpr::CParseHandlerDefaultValueExpr(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root),
 	  is_default_val_started(false)
 {
 }
@@ -64,7 +64,7 @@ CParseHandlerDefaultValueExpr::StartElement(const XMLCh *const element_uri,
 
 		// install a scalar op parse handler to parse the expression
 		CParseHandlerBase *scalar_op_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, element_local_name, m_parse_handler_mgr, this);
+			m_mp, element_local_name, m_parse_handler_mgr, this);
 
 		GPOS_ASSERT(NULL != scalar_op_parse_handler);
 
@@ -109,8 +109,8 @@ CParseHandlerDefaultValueExpr::EndElement(const XMLCh *const,  // element_uri,
 		// get node for default m_bytearray_value expression from child parse handler
 		CParseHandlerScalarOp *child_parse_handler =
 			dynamic_cast<CParseHandlerScalarOp *>((*this)[0]);
-		m_dxl_node = child_parse_handler->CreateDXLNode();
-		m_dxl_node->AddRef();
+		m_dxlnode = child_parse_handler->CreateDXLNode();
+		m_dxlnode->AddRef();
 	}
 
 	// deactivate handler

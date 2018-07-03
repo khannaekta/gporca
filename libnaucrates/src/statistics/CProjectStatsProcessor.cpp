@@ -17,7 +17,7 @@ using namespace gpopt;
 
 //  return a statistics object for a project operation
 CStatistics *
-CProjectStatsProcessor::CalcProjStats(IMemoryPool *memory_pool,
+CProjectStatsProcessor::CalcProjStats(IMemoryPool *mp,
 									  const CStatistics *input_stats,
 									  ULongPtrArray *projection_colids,
 									  HMUlDatum *datum_map)
@@ -28,11 +28,11 @@ CProjectStatsProcessor::CalcProjStats(IMemoryPool *memory_pool,
 
 	// create hash map from colid -> histogram for resultant structure
 	UlongHistogramHashMap *histograms_new =
-		GPOS_NEW(memory_pool) UlongHistogramHashMap(memory_pool);
+		GPOS_NEW(mp) UlongHistogramHashMap(mp);
 
 	// column ids on which widths are to be computed
 	UlongDoubleHashMap *col_id_width_mapping =
-		GPOS_NEW(memory_pool) UlongDoubleHashMap(memory_pool);
+		GPOS_NEW(mp) UlongDoubleHashMap(mp);
 
 	const ULONG length = projection_colids->Size();
 	for (ULONG ul = 0; ul < length; ul++)
@@ -43,7 +43,7 @@ CProjectStatsProcessor::CalcProjStats(IMemoryPool *memory_pool,
 		if (NULL == histogram)
 		{
 			// create histogram for the new project column
-			BucketArray *proj_col_bucket = GPOS_NEW(memory_pool) BucketArray(memory_pool);
+			BucketArray *proj_col_bucket = GPOS_NEW(mp) BucketArray(mp);
 			CDouble null_freq = 0.0;
 
 			BOOL is_well_defined = false;
@@ -55,7 +55,7 @@ CProjectStatsProcessor::CalcProjStats(IMemoryPool *memory_pool,
 					is_well_defined = true;
 					if (!datum->IsNull())
 					{
-						proj_col_bucket->Append(CBucket::MakeBucketSingleton(memory_pool, datum));
+						proj_col_bucket->Append(CBucket::MakeBucketSingleton(mp, datum));
 					}
 					else
 					{
@@ -72,24 +72,24 @@ CProjectStatsProcessor::CalcProjStats(IMemoryPool *memory_pool,
 				IMDType::EtiBool == colref->RetrieveType()->GetDatumType())
 			{
 				proj_col_bucket->Release();
-				proj_col_histogram = CHistogram::MakeDefaultBoolHistogram(memory_pool);
+				proj_col_histogram = CHistogram::MakeDefaultBoolHistogram(mp);
 			}
 			else
 			{
 				proj_col_histogram =
-					GPOS_NEW(memory_pool) CHistogram(proj_col_bucket,
+					GPOS_NEW(mp) CHistogram(proj_col_bucket,
 													 is_well_defined,
 													 null_freq,
 													 CHistogram::DefaultNDVRemain,
 													 CHistogram::DefaultNDVFreqRemain);
 			}
 
-			histograms_new->Insert(GPOS_NEW(memory_pool) ULONG(col_id), proj_col_histogram);
+			histograms_new->Insert(GPOS_NEW(mp) ULONG(col_id), proj_col_histogram);
 		}
 		else
 		{
-			histograms_new->Insert(GPOS_NEW(memory_pool) ULONG(col_id),
-								   histogram->CopyHistogram(memory_pool));
+			histograms_new->Insert(GPOS_NEW(mp) ULONG(col_id),
+								   histogram->CopyHistogram(mp));
 		}
 
 		// look up width
@@ -100,20 +100,20 @@ CProjectStatsProcessor::CalcProjStats(IMemoryPool *memory_pool,
 			GPOS_ASSERT(NULL != colref);
 
 			CDouble width = CStatisticsUtils::DefaultColumnWidth(colref->RetrieveType());
-			col_id_width_mapping->Insert(GPOS_NEW(memory_pool) ULONG(col_id),
-										 GPOS_NEW(memory_pool) CDouble(width));
+			col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(col_id),
+										 GPOS_NEW(mp) CDouble(width));
 		}
 		else
 		{
-			col_id_width_mapping->Insert(GPOS_NEW(memory_pool) ULONG(col_id),
-										 GPOS_NEW(memory_pool) CDouble(*width));
+			col_id_width_mapping->Insert(GPOS_NEW(mp) ULONG(col_id),
+										 GPOS_NEW(mp) CDouble(*width));
 		}
 	}
 
 	CDouble input_rows = input_stats->Rows();
 	// create an output stats object
 	CStatistics *projection_stats =
-		GPOS_NEW(memory_pool) CStatistics(memory_pool,
+		GPOS_NEW(mp) CStatistics(mp,
 										  histograms_new,
 										  col_id_width_mapping,
 										  input_rows,
@@ -123,7 +123,7 @@ CProjectStatsProcessor::CalcProjStats(IMemoryPool *memory_pool,
 	// In the output statistics object, the upper bound source cardinality of the project column
 	// is equivalent the estimate project cardinality.
 	CStatisticsUtils::ComputeCardUpperBounds(
-		memory_pool,
+		mp,
 		input_stats,
 		projection_stats,
 		input_rows,
@@ -131,7 +131,7 @@ CProjectStatsProcessor::CalcProjStats(IMemoryPool *memory_pool,
 
 	// add upper bound card information for the project columns
 	CStatistics::CreateAndInsertUpperBoundNDVs(
-		memory_pool, projection_stats, projection_colids, input_rows);
+		mp, projection_stats, projection_colids, input_rows);
 
 	return projection_stats;
 }

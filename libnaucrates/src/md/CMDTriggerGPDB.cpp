@@ -28,14 +28,14 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDTriggerGPDB::CMDTriggerGPDB(IMemoryPool *memory_pool,
+CMDTriggerGPDB::CMDTriggerGPDB(IMemoryPool *mp,
 							   IMDId *mdid,
 							   CMDName *mdname,
 							   IMDId *rel_mdid,
 							   IMDId *mdid_func,
 							   INT type,
 							   BOOL is_enabled)
-	: m_memory_pool(memory_pool),
+	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
 	  m_rel_mdid(rel_mdid),
@@ -49,7 +49,7 @@ CMDTriggerGPDB::CMDTriggerGPDB(IMemoryPool *memory_pool,
 	GPOS_ASSERT(0 <= type);
 
 	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_memory_pool, this, false /*fSerializeHeader*/, false /*indentation*/);
+		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 //---------------------------------------------------------------------------

@@ -38,7 +38,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLPhysicalJoin(IMemoryPool *memory_pool, EdxlJoinType join_type);
+		CDXLPhysicalJoin(IMemoryPool *mp, EdxlJoinType join_type);
 
 		// join type
 		EdxlJoinType GetJoinType() const;

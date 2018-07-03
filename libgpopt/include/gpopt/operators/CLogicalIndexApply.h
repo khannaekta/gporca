@@ -35,11 +35,11 @@ namespace gpopt
 		public:
 
 			// ctor
-			CLogicalIndexApply(IMemoryPool *memory_pool,  ColRefArray *pdrgpcrOuterRefs, BOOL fOuterJoin);
+			CLogicalIndexApply(IMemoryPool *mp,  ColRefArray *pdrgpcrOuterRefs, BOOL fOuterJoin);
 
 			// ctor for patterns
 			explicit
-			CLogicalIndexApply(IMemoryPool *memory_pool);
+			CLogicalIndexApply(IMemoryPool *mp);
 
 			// dtor
 			virtual
@@ -79,46 +79,46 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsDeriveOutput
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 			{
 				GPOS_ASSERT(3 == exprhdl.Arity());
 
-				return PcrsDeriveOutputCombineLogical(memory_pool, exprhdl);
+				return PcrsDeriveOutputCombineLogical(mp, exprhdl);
 			}
 
 			// derive not nullable columns
 			virtual
 			CColRefSet *PcrsDeriveNotNull
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PcrsDeriveNotNullCombineLogical(memory_pool, exprhdl);
+				return PcrsDeriveNotNullCombineLogical(mp, exprhdl);
 			}
 
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive constraint property
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl
 				)
 				const
 			{
-				return PpcDeriveConstraintFromPredicates(memory_pool, exprhdl);
+				return PpcDeriveConstraintFromPredicates(mp, exprhdl);
 			}
 
 			// applicable transformations
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
+			CXformSet *PxfsCandidates(IMemoryPool *mp) const;
 
 			// match function
 			virtual
@@ -130,7 +130,7 @@ namespace gpopt
 
 			// derive statistics
 			virtual
-			IStatistics *PstatsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, StatsArray *stats_ctxt) const;
+			IStatistics *PstatsDerive(IMemoryPool *mp, CExpressionHandle &exprhdl, StatsArray *stats_ctxt) const;
 
 			// stat promise
 			virtual
@@ -145,7 +145,7 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// conversion function
 			static

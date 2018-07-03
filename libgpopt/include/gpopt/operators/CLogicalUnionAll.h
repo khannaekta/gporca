@@ -41,11 +41,11 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CLogicalUnionAll(IMemoryPool *memory_pool);
+			CLogicalUnionAll(IMemoryPool *mp);
 
 			CLogicalUnionAll
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *pdrgpcrOutput,
 				ColRefArrays *pdrgpdrgpcrInput,
 				ULONG ulScanIdPartialIndex = gpos::ulong_max
@@ -90,7 +90,7 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			//-------------------------------------------------------------------------------------
 			// Derived Relational Properties
@@ -98,18 +98,18 @@ namespace gpopt
 
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive key collections
 			virtual
-			CKeyCollection *PkcDeriveKeys(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CKeyCollection *PkcDeriveKeys(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			//-------------------------------------------------------------------------------------
 			// Transformations
 			//-------------------------------------------------------------------------------------
 
 			// candidate set of xforms
-			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
+			CXformSet *PxfsCandidates(IMemoryPool *mp) const;
 
 			// stat promise
 			virtual
@@ -122,7 +122,7 @@ namespace gpopt
 			virtual
 			IStatistics *PstatsDerive
 						(
-						IMemoryPool *memory_pool,
+						IMemoryPool *mp,
 						CExpressionHandle &exprhdl,
 						StatsArray *stats_ctxt
 						)
@@ -144,7 +144,7 @@ namespace gpopt
 
 			// derive statistics based on union all semantics
 			static
-			IStatistics *PstatsDeriveUnionAll(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			IStatistics *PstatsDeriveUnionAll(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 	}; // class CLogicalUnionAll
 

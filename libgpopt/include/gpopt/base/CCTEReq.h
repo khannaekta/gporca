@@ -122,7 +122,7 @@ namespace gpopt
 				CleanupDelete<ULONG>, CleanupRelease<CCTEReqEntry> > HMCteReqIter;
 
 			// memory pool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 
 			// cte map
 			HMCteReq *m_phmcter;
@@ -140,7 +140,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CCTEReq(IMemoryPool *memory_pool);
+			CCTEReq(IMemoryPool *mp);
 
 			// dtor
 			virtual
@@ -183,14 +183,14 @@ namespace gpopt
 			ULONG HashValue() const;
 
 			// returns a new requirement containing unresolved CTE requirements given a derived CTE map
-			CCTEReq *PcterUnresolved(IMemoryPool *memory_pool, CCTEMap *pcm);
+			CCTEReq *PcterUnresolved(IMemoryPool *mp, CCTEMap *pcm);
 
 			// unresolved CTE requirements given a derived CTE map for a sequence
 			// operator
-			CCTEReq *PcterUnresolvedSequence(IMemoryPool *memory_pool, CCTEMap *pcm, DrgPdp *pdrgpdpCtxt);
+			CCTEReq *PcterUnresolvedSequence(IMemoryPool *mp, CCTEMap *pcm, DrgPdp *pdrgpdpCtxt);
 
 			// create a copy of the current requirement where all the entries are marked optional
-			CCTEReq *PcterAllOptional(IMemoryPool *memory_pool);
+			CCTEReq *PcterAllOptional(IMemoryPool *mp);
 
 			// lookup plan properties for given cte id
 			CDrvdPropPlan *Pdpplan (ULONG ulCteId) const;

@@ -28,8 +28,8 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarConstValue::CDXLScalarConstValue(IMemoryPool *memory_pool, CDXLDatum *datum_dxl)
-	: CDXLScalar(memory_pool), m_dxl_datum(datum_dxl)
+CDXLScalarConstValue::CDXLScalarConstValue(IMemoryPool *mp, CDXLDatum *datum_dxl)
+	: CDXLScalar(mp), m_dxl_datum(datum_dxl)
 {
 }
 

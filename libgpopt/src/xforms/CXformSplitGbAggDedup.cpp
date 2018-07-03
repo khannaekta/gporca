@@ -34,18 +34,18 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformSplitGbAggDedup::CXformSplitGbAggDedup
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformSplitGbAgg
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 					(
-					memory_pool,
-					GPOS_NEW(memory_pool) CLogicalGbAggDeduplicate(memory_pool),
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // relational child
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))  // scalar project list
+					mp,
+					GPOS_NEW(mp) CLogicalGbAggDeduplicate(mp),
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // relational child
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))  // scalar project list
 					)
 		)
 {}
@@ -73,7 +73,7 @@ CXformSplitGbAggDedup::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 	CLogicalGbAggDeduplicate *popAggDedup = CLogicalGbAggDeduplicate::PopConvert(pexpr->Pop());
 
 	// extract components
@@ -91,7 +91,7 @@ CXformSplitGbAggDedup::Transform
 	CExpression *pexprProjectListLocal = NULL;
 	CExpression *pexprProjectListGlobal = NULL;
 
-	(void) PopulateLocalGlobalProjectList(memory_pool, pexprProjectList, &pexprProjectListLocal, &pexprProjectListGlobal);
+	(void) PopulateLocalGlobalProjectList(mp, pexprProjectList, &pexprProjectListLocal, &pexprProjectListGlobal);
 	GPOS_ASSERT(NULL != pexprProjectListLocal && NULL != pexprProjectListLocal);
 
 	ColRefArray *colref_array = popAggDedup->Pdrgpcr();
@@ -110,19 +110,19 @@ CXformSplitGbAggDedup::Transform
 	pdrgpcrKeys->AddRef();
 
 	CExpression *local_expr =
-			GPOS_NEW(memory_pool) CExpression
+			GPOS_NEW(mp) CExpression
 						(
-						memory_pool,
-						GPOS_NEW(memory_pool) CLogicalGbAggDeduplicate(memory_pool, colref_array, pdrgpcrMinimal, COperator::EgbaggtypeLocal /*egbaggtype*/, pdrgpcrKeys),
+						mp,
+						GPOS_NEW(mp) CLogicalGbAggDeduplicate(mp, colref_array, pdrgpcrMinimal, COperator::EgbaggtypeLocal /*egbaggtype*/, pdrgpcrKeys),
 						pexprRelational,
 						pexprProjectListLocal
 						);
 
 	CExpression *pexprGlobal =
-			GPOS_NEW(memory_pool) CExpression
+			GPOS_NEW(mp) CExpression
 						(
-						memory_pool,
-						GPOS_NEW(memory_pool) CLogicalGbAggDeduplicate(memory_pool, colref_array, pdrgpcrMinimal, COperator::EgbaggtypeGlobal /*egbaggtype*/, pdrgpcrKeys),
+						mp,
+						GPOS_NEW(mp) CLogicalGbAggDeduplicate(mp, colref_array, pdrgpcrMinimal, COperator::EgbaggtypeGlobal /*egbaggtype*/, pdrgpcrKeys),
 						local_expr,
 						pexprProjectListGlobal
 						);

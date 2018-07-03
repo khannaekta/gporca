@@ -26,7 +26,7 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalLimit::CDXLPhysicalLimit(IMemoryPool *memory_pool) : CDXLPhysical(memory_pool)
+CDXLPhysicalLimit::CDXLPhysicalLimit(IMemoryPool *mp) : CDXLPhysical(mp)
 {
 }
 

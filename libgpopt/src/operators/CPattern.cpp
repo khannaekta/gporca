@@ -27,7 +27,7 @@ using namespace gpopt;
 DrvdPropArray *
 CPattern::PdpCreate
 	(
-	IMemoryPool * // memory_pool
+	IMemoryPool * // mp
 	)
 	const
 {
@@ -48,7 +48,7 @@ CPattern::PdpCreate
 CReqdProp *
 CPattern::PrpCreate
 	(
-	IMemoryPool * // memory_pool
+	IMemoryPool * // mp
 	)
 	const
 {
@@ -102,7 +102,7 @@ CPattern::FInputOrderSensitive() const
 COperator *
 CPattern::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *, //memory_pool,
+	IMemoryPool *, //mp,
 	UlongColRefHashMap *, //colref_mapping,
 	BOOL //must_exist
 	)

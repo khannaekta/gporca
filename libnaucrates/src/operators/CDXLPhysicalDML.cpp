@@ -27,7 +27,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalDML::CDXLPhysicalDML(IMemoryPool *memory_pool,
+CDXLPhysicalDML::CDXLPhysicalDML(IMemoryPool *mp,
 								 const EdxlDmlType dml_type_dxl,
 								 CDXLTableDescr *table_descr,
 								 ULongPtrArray *src_colids_array,
@@ -39,7 +39,7 @@ CDXLPhysicalDML::CDXLPhysicalDML(IMemoryPool *memory_pool,
 								 ULONG tuple_oid,
 								 CDXLDirectDispatchInfo *dxl_direct_dispatch_info,
 								 BOOL input_sort_req)
-	: CDXLPhysical(memory_pool),
+	: CDXLPhysical(mp),
 	  m_dml_type_dxl(dml_type_dxl),
 	  m_table_descr_dxl(table_descr),
 	  m_src_colids_array(src_colids_array),
@@ -124,7 +124,7 @@ CDXLPhysicalDML::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
-	CWStringDynamic *pstrCols = CDXLUtils::Serialize(m_memory_pool, m_src_colids_array);
+	CWStringDynamic *pstrCols = CDXLUtils::Serialize(m_mp, m_src_colids_array);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenColumns), pstrCols);
 	GPOS_DELETE(pstrCols);
 

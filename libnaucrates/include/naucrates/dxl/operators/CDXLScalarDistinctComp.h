@@ -42,7 +42,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CDXLScalarDistinctComp(IMemoryPool *memory_pool, IMDId *operator_mdid);
+		CDXLScalarDistinctComp(IMemoryPool *mp, IMDId *operator_mdid);
 
 		// ident accessors
 		Edxlopid GetDXLOperator() const;

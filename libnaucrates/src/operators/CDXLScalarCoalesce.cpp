@@ -27,8 +27,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarCoalesce::CDXLScalarCoalesce(IMemoryPool *memory_pool, IMDId *mdid_type)
-	: CDXLScalar(memory_pool), m_mdid_type(mdid_type)
+CDXLScalarCoalesce::CDXLScalarCoalesce(IMemoryPool *mp, IMDId *mdid_type)
+	: CDXLScalar(mp), m_mdid_type(mdid_type)
 {
 	GPOS_ASSERT(m_mdid_type->IsValid());
 }

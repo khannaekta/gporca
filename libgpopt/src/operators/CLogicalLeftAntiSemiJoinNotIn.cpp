@@ -30,12 +30,12 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalLeftAntiSemiJoinNotIn::CLogicalLeftAntiSemiJoinNotIn
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogicalLeftAntiSemiJoin(memory_pool)
+	CLogicalLeftAntiSemiJoin(mp)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 }
 
 //---------------------------------------------------------------------------
@@ -49,11 +49,11 @@ CLogicalLeftAntiSemiJoinNotIn::CLogicalLeftAntiSemiJoinNotIn
 CXformSet *
 CLogicalLeftAntiSemiJoinNotIn::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfAntiSemiJoinNotInAntiSemiJoinNotInSwap);
 	(void) xform_set->ExchangeSet(CXform::ExfAntiSemiJoinNotInAntiSemiJoinSwap);

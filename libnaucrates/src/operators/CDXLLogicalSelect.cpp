@@ -27,7 +27,7 @@ using namespace gpdxl;
 //		Construct a DXL Logical select node
 //
 //---------------------------------------------------------------------------
-CDXLLogicalSelect::CDXLLogicalSelect(IMemoryPool *memory_pool) : CDXLLogical(memory_pool)
+CDXLLogicalSelect::CDXLLogicalSelect(IMemoryPool *mp) : CDXLLogical(mp)
 {
 }
 

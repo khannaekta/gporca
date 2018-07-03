@@ -26,10 +26,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerCTEList::CParseHandlerCTEList(IMemoryPool *memory_pool,
+CParseHandlerCTEList::CParseHandlerCTEList(IMemoryPool *mp,
 										   CParseHandlerManager *parse_handler_mgr,
 										   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root), m_dxl_array(NULL)
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root), m_dxl_array(NULL)
 {
 }
 
@@ -64,7 +64,7 @@ CParseHandlerCTEList::StartElement(const XMLCh *const element_uri,
 		XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenCTEList), element_local_name))
 	{
 		GPOS_ASSERT(NULL == m_dxl_array);
-		m_dxl_array = GPOS_NEW(m_memory_pool) DXLNodeArray(m_memory_pool);
+		m_dxl_array = GPOS_NEW(m_mp) DXLNodeArray(m_mp);
 	}
 	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenLogicalCTEProducer),
 										   element_local_name))
@@ -73,7 +73,7 @@ CParseHandlerCTEList::StartElement(const XMLCh *const element_uri,
 
 		// start new CTE producer
 		CParseHandlerBase *cte_producer_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool,
+			m_mp,
 			CDXLTokens::XmlstrToken(EdxltokenLogicalCTEProducer),
 			m_parse_handler_mgr,
 			this);

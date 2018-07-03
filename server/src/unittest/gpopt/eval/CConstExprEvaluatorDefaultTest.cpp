@@ -42,29 +42,29 @@ GPOS_RESULT
 CConstExprEvaluatorDefaultTest::EresUnittest()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
-	CConstExprEvaluatorDefault *pceevaldefault = GPOS_NEW(memory_pool) CConstExprEvaluatorDefault();
+	CConstExprEvaluatorDefault *pceevaldefault = GPOS_NEW(mp) CConstExprEvaluatorDefault();
 	GPOS_ASSERT(!pceevaldefault->FCanEvalExpressions());
 
 	// setup a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(memory_pool, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 					(
-					memory_pool,
+					mp,
 					&mda,
 					NULL, /* pceeval */
-					CTestUtils::GetCostModel(memory_pool)
+					CTestUtils::GetCostModel(mp)
 					);
 
 	// Test evaluation of an integer constant
 	{
 		ULONG ulVal = 123456;
-		CExpression *pexprUl = CUtils::PexprScalarConstInt4(memory_pool, ulVal);
+		CExpression *pexprUl = CUtils::PexprScalarConstInt4(mp, ulVal);
 #ifdef GPOS_DEBUG
 		CExpression *pexprUlResult = pceevaldefault->PexprEval(pexprUl);
 		CScalarConst *pscalarconstUl = CScalarConst::PopConvert(pexprUl->Pop());
@@ -78,8 +78,8 @@ CConstExprEvaluatorDefaultTest::EresUnittest()
 	// Test evaluation of a null test expression
 	{
 		ULONG ulVal = 123456;
-		CExpression *pexprUl = CUtils::PexprScalarConstInt4(memory_pool, ulVal);
-		CExpression *pexprIsNull = CUtils::PexprIsNull(memory_pool, pexprUl);
+		CExpression *pexprUl = CUtils::PexprScalarConstInt4(mp, ulVal);
+		CExpression *pexprIsNull = CUtils::PexprIsNull(mp, pexprUl);
 #ifdef GPOS_DEBUG
 		CExpression *pexprResult = pceevaldefault->PexprEval(pexprIsNull);
 		CScalarNullTest *pscalarnulltest = CScalarNullTest::PopConvert(pexprIsNull->Pop());

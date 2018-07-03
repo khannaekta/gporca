@@ -43,12 +43,12 @@ namespace gpopt
 			COperator::EGbAggType m_egbaggtype;
 
 			// compute required distribution of the n-th child of an intermediate aggregate
-			CDistributionSpec *PdsRequiredIntermediateAgg(IMemoryPool *memory_pool, ULONG  ulOptReq) const;
+			CDistributionSpec *PdsRequiredIntermediateAgg(IMemoryPool *mp, ULONG  ulOptReq) const;
 
 			// compute required distribution of the n-th child of a global aggregate
 			CDistributionSpec *PdsRequiredGlobalAgg
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsInput,
 				ULONG child_index,
@@ -61,7 +61,7 @@ namespace gpopt
 			// compute a maximal hashed distribution using the given columns,
 			// if no such distribution can be created, return a Singleton distribution
 			static
-			CDistributionSpec *PdsMaximalHashed(IMemoryPool *memory_pool, ColRefArray *colref_array);
+			CDistributionSpec *PdsMaximalHashed(IMemoryPool *mp, ColRefArray *colref_array);
 
 		protected:
 
@@ -82,7 +82,7 @@ namespace gpopt
 			// compute required columns of the n-th child
 			CColRefSet *PcrsRequiredAgg
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsRequired,
 				ULONG child_index,
@@ -92,7 +92,7 @@ namespace gpopt
 			// compute required distribution of the n-th child
 			CDistributionSpec *PdsRequiredAgg
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsInput,
 				ULONG child_index,
@@ -107,7 +107,7 @@ namespace gpopt
 			// ctor
 			CPhysicalAgg
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *colref_array,
 				ColRefArray *pdrgpcrMinimal, // FD's on grouping columns
 				COperator::EGbAggType egbaggtype,
@@ -181,7 +181,7 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsRequired,
 				ULONG child_index,
@@ -193,7 +193,7 @@ namespace gpopt
 			virtual
 			CCTEReq *PcteRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CCTEReq *pcter,
 				ULONG child_index,
@@ -206,7 +206,7 @@ namespace gpopt
 			virtual
 			CDistributionSpec *PdsRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsRequired,
 				ULONG child_index,
@@ -215,14 +215,14 @@ namespace gpopt
 				)
 				const
 			{
-				return PdsRequiredAgg(memory_pool, exprhdl, pdsRequired, child_index, ulOptReq, m_pdrgpcr, m_pdrgpcrMinimal);
+				return PdsRequiredAgg(mp, exprhdl, pdsRequired, child_index, ulOptReq, m_pdrgpcr, m_pdrgpcrMinimal);
 			}
 
 			// compute required rewindability of the n-th child
 			virtual
 			CRewindabilitySpec *PrsRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CRewindabilitySpec *prsRequired,
 				ULONG child_index,
@@ -240,7 +240,7 @@ namespace gpopt
 			virtual
 			CPartitionPropagationSpec *PppsRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CPartitionPropagationSpec *pppsRequired,
 				ULONG child_index,
@@ -254,17 +254,17 @@ namespace gpopt
 
 			// derive distribution
 			virtual
-			CDistributionSpec *PdsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CDistributionSpec *PdsDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive rewindability
 			virtual
-			CRewindabilitySpec *PrsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CRewindabilitySpec *PrsDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive partition index map
 			virtual
 			CPartIndexMap *PpimDerive
 				(
-				IMemoryPool *, // memory_pool
+				IMemoryPool *, // mp
 				CExpressionHandle &exprhdl,
 				CDrvdPropCtxt * //pdpctxt
 				)
@@ -277,7 +277,7 @@ namespace gpopt
 			virtual
 			CPartFilterMap *PpfmDerive
 				(
-				IMemoryPool *, // memory_pool
+				IMemoryPool *, // mp
 				CExpressionHandle &exprhdl
 				)
 				const

@@ -42,10 +42,10 @@ namespace gpopt
 			explicit
 			CXformInnerApply2InnerJoin
 				(
-				IMemoryPool *memory_pool
+				IMemoryPool *mp
 				)
 				:
-				CXformApply2Join<CLogicalInnerApply, CLogicalInnerJoin>(memory_pool, true /*fDeepTree*/)
+				CXformApply2Join<CLogicalInnerApply, CLogicalInnerJoin>(mp, true /*fDeepTree*/)
 			{}
 
 			// dtor

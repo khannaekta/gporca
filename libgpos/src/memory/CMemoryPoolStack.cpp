@@ -41,17 +41,17 @@ GPOS_CPL_ASSERT(MAX_ALIGNED(GPOS_MEM_BLOCK_SIZE));
 //	  ctor
 //
 //---------------------------------------------------------------------------
-CMemoryPoolStack::CMemoryPoolStack(IMemoryPool *memory_pool,
+CMemoryPoolStack::CMemoryPoolStack(IMemoryPool *mp,
 								   ULLONG capacity,
 								   BOOL thread_safe,
-								   BOOL owns_underlying_memory_pool)
-	: CMemoryPool(memory_pool, owns_underlying_memory_pool, thread_safe),
+								   BOOL owns_underlying_mp)
+	: CMemoryPool(mp, owns_underlying_mp, thread_safe),
 	  m_block_descriptor(NULL),
 	  m_reserved(0),
 	  m_capacity(capacity),
 	  m_blocksize(GPOS_MEM_ALIGNED_SIZE(GPOS_MEM_BLOCK_SIZE))
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(GPOS_MEM_BLOCK_SIZE < m_capacity);
 
 	m_block_list.Init(GPOS_OFFSET(SBlockDescriptor, m_link));

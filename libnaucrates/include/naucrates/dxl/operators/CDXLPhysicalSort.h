@@ -51,7 +51,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CDXLPhysicalSort(IMemoryPool *memory_pool, BOOL discard_duplicates);
+		CDXLPhysicalSort(IMemoryPool *mp, BOOL discard_duplicates);
 
 		// accessors
 		Edxlopid GetDXLOperator() const;

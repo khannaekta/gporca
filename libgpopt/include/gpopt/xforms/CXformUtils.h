@@ -112,7 +112,7 @@ namespace gpopt
 
 			typedef CLogical *(*PDynamicIndexOpConstructor)
 						(
-						IMemoryPool *memory_pool,
+						IMemoryPool *mp,
 						const IMDIndex *pmdindex,
 						CTableDescriptor *ptabdesc,
 						ULONG ulOriginOpId,
@@ -127,7 +127,7 @@ namespace gpopt
 
 			typedef CLogical *(*PStaticIndexOpConstructor)
 						(
-						IMemoryPool *memory_pool,
+						IMemoryPool *mp,
 						const IMDIndex *pmdindex,
 						CTableDescriptor *ptabdesc,
 						ULONG ulOriginOpId,
@@ -137,7 +137,7 @@ namespace gpopt
 
 			typedef CExpression *(PRewrittenIndexPath)
 						(
-						IMemoryPool *memory_pool,
+						IMemoryPool *mp,
 						CExpression *pexprIndexCond,
 						CExpression *pexprResidualCond,
 						const IMDIndex *pmdindex,
@@ -153,7 +153,7 @@ namespace gpopt
 			static
 			CExpression *PexprAssertNotNull
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprChild,
 				CTableDescriptor *ptabdesc,
 				ColRefArray *colref_array
@@ -163,7 +163,7 @@ namespace gpopt
 			static
 			CExpression *PexprAssertCheckConstraints
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprChild,
 				CTableDescriptor *ptabdesc,
 				ColRefArray *colref_array
@@ -174,7 +174,7 @@ namespace gpopt
 			static
 			void AddMinAggs
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CMDAccessor *md_accessor,
 				CColumnFactory *col_factory,
 				ColRefArray *colref_array,
@@ -191,7 +191,7 @@ namespace gpopt
 			static
 			CColRefSet *PcrsFKey
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ExpressionArray *pdrgpexpr,
 				CColRefSet *prcsOutput,
 				CColRefSet *pcrsKey
@@ -202,7 +202,7 @@ namespace gpopt
 			static
 			CColRefSet *PcrsIndexColumns
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *colref_array,
 				const IMDIndex *pmdindex,
 				const IMDRelation *pmdrel,
@@ -214,7 +214,7 @@ namespace gpopt
 			static
 			ColRefArray *PdrgpcrIndexColumns
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *colref_array,
 				const IMDIndex *pmdindex,
 				const IMDRelation *pmdrel,
@@ -223,7 +223,7 @@ namespace gpopt
 
 			// lookup hash join keys in scalar child group
 			static
-			void LookupHashJoinKeys(IMemoryPool *memory_pool, CExpression *pexpr, ExpressionArray **ppdrgpexprOuter, ExpressionArray **ppdrgpexprInner);
+			void LookupHashJoinKeys(IMemoryPool *mp, CExpression *pexpr, ExpressionArray **ppdrgpexprOuter, ExpressionArray **ppdrgpexprInner);
 
 			// cache hash join keys on scalar child group
 			static
@@ -253,7 +253,7 @@ namespace gpopt
 			static
 			void AddHashJoinAlternative
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprJoin,
 				ExpressionArray *pdrgpexprOuter,
 				ExpressionArray *pdrgpexprInner,
@@ -264,7 +264,7 @@ namespace gpopt
 			static
 			void SubqueryAllToAgg
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprSubquery,
 				CExpression **ppexprNewSubquery, // output argument for new scalar subquery
 				CExpression **ppexprNewScalar   // output argument for new scalar expression
@@ -274,7 +274,7 @@ namespace gpopt
 			static
 			void SubqueryAnyToAgg
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprSubquery,
 				CExpression **ppexprNewSubquery, // output argument for new scalar subquery
 				CExpression **ppexprNewScalar   // output argument for new scalar expression
@@ -284,7 +284,7 @@ namespace gpopt
 			static
 			CLogicalGbAgg *PopGbAggPushableBelowJoin
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CLogicalGbAgg *popGbAggOld,
 				CColRefSet *prcsOutput,
 				CColRefSet *pcrsGrpCols
@@ -307,7 +307,7 @@ namespace gpopt
 			static
 			CExpression *PexprBuildIndexPlan
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CMDAccessor *md_accessor,
 				CExpression *pexprGet,
 				ULONG ulOriginOpId,
@@ -330,7 +330,7 @@ namespace gpopt
 			CLogical *
 			PopDynamicBtreeIndexOpConstructor
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				const IMDIndex *pmdindex,
 				CTableDescriptor *ptabdesc,
 				ULONG ulOriginOpId,
@@ -343,9 +343,9 @@ namespace gpopt
 				CPartConstraint *ppartcnstrRel
 				)
 			{
-				return GPOS_NEW(memory_pool) CLogicalDynamicIndexGet
+				return GPOS_NEW(mp) CLogicalDynamicIndexGet
 						(
-						memory_pool,
+						mp,
 						pmdindex,
 						ptabdesc,
 						ulOriginOpId,
@@ -364,7 +364,7 @@ namespace gpopt
 			CLogical *
 			PopStaticBtreeIndexOpConstructor
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				const IMDIndex *pmdindex,
 				CTableDescriptor *ptabdesc,
 				ULONG ulOriginOpId,
@@ -372,9 +372,9 @@ namespace gpopt
 				ColRefArray *pdrgpcrOutput
 				)
 			{
-				return  GPOS_NEW(memory_pool) CLogicalIndexGet
+				return  GPOS_NEW(mp) CLogicalIndexGet
 						(
-						memory_pool,
+						mp,
 						pmdindex,
 						ptabdesc,
 						ulOriginOpId,
@@ -388,7 +388,7 @@ namespace gpopt
 			CExpression *
 			PexprRewrittenBtreeIndexPath
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprIndexCond,
 				CExpression *pexprResidualCond,
 				const IMDIndex *,  // pmdindex
@@ -397,14 +397,14 @@ namespace gpopt
 				)
 			{
 				// create the expression containing the logical index get operator
-				return CUtils::PexprSafeSelect(memory_pool, GPOS_NEW(memory_pool) CExpression(memory_pool, popLogical, pexprIndexCond), pexprResidualCond);
+				return CUtils::PexprSafeSelect(mp, GPOS_NEW(mp) CExpression(mp, popLogical, pexprIndexCond), pexprResidualCond);
 			}
 
 			// create a candidate dynamic get scan to suplement the partial index scans
 			static
 			SPartDynamicIndexGetInfo *PpartdigDynamicGet
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ExpressionArray *pdrgpexprScalar,
 				CPartConstraint *ppartcnstrCovered,
 				CPartConstraint *ppartcnstrRel
@@ -419,7 +419,7 @@ namespace gpopt
 			static
 			CExpression *PexprEqualityOnBoolColumn
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CMDAccessor *md_accessor,
 				BOOL fNegated,
 				CColRef *colref
@@ -430,7 +430,7 @@ namespace gpopt
 			static
 			CExpression *PexprBitmapFromChildren
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CMDAccessor *md_accessor,
 				CExpression *pexprOriginalPred,
 				CExpression *pexprPred,
@@ -453,7 +453,7 @@ namespace gpopt
 			static
 			CExpression *PexprBitmapCondToUse
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CMDAccessor *md_accessor,
 				CExpression *pexprPred,
 				BOOL fBoolColumn,
@@ -465,7 +465,7 @@ namespace gpopt
 			static
 			void ComputeBitmapTableScanResidualPredicate
 				(
-				IMemoryPool *memory_pool, 
+				IMemoryPool *mp, 
 				BOOL fConjunction,
 				CExpression *pexprOriginalPred,
 				CExpression **ppexprResidual,
@@ -476,7 +476,7 @@ namespace gpopt
 			static
 			CPartConstraint *PpartcnstrDisjunction
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CPartConstraint *ppartcnstrOld,
 				CPartConstraint *ppartcnstrNew
 				);
@@ -486,7 +486,7 @@ namespace gpopt
 			static
 			CExpression *PexprBitmapForSelectCondition
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CMDAccessor *md_accessor,
 				CExpression *pexprPred,
 				CTableDescriptor *ptabdesc,
@@ -504,7 +504,7 @@ namespace gpopt
 			static
 			CExpression *PexprBitmapForIndexLookup
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CMDAccessor *md_accessor,
 				CExpression *pexprPred,
 				CTableDescriptor *ptabdesc,
@@ -522,7 +522,7 @@ namespace gpopt
 			static
 			BOOL FMergeWithPreviousBitmapIndexProbe
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprBitmap,
 				CExpression *pexprRecheck,
 				ExpressionArray *pdrgpexprBitmap,
@@ -531,7 +531,7 @@ namespace gpopt
 
 			// iterate over given hash map and return array of arrays of project elements sorted by the column id of the first entries
 			static
-			ExpressionArrays *PdrgpdrgpexprSortedPrjElemsArray(IMemoryPool *memory_pool, HMExprDrgPexpr *phmexprdrgpexpr);
+			ExpressionArrays *PdrgpdrgpexprSortedPrjElemsArray(IMemoryPool *mp, HMExprDrgPexpr *phmexprdrgpexpr);
 
 			// comparator used in sorting arrays of project elements based on the column id of the first entry
 			static
@@ -573,7 +573,7 @@ namespace gpopt
 
 			// helper for removing IsNotFalse join predicate for GPDB anti-semi hash join
 			static
-			BOOL FProcessGPDBAntiSemiHashJoin(IMemoryPool *memory_pool, CExpression *pexpr, CExpression **ppexprResult);
+			BOOL FProcessGPDBAntiSemiHashJoin(IMemoryPool *mp, CExpression *pexpr, CExpression **ppexprResult);
 
 			// check the applicability of logical join to physical join xform
 			static
@@ -591,7 +591,7 @@ namespace gpopt
 			static
 			CColRefSet *PcrsFKey
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprOuter,
 				CExpression *pexprInner,
 				CExpression *pexprScalar
@@ -601,7 +601,7 @@ namespace gpopt
 			static
 			CExpression *PexprSwapJoins
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprTopJoin,
 				CExpression *pexprBottomJoin
 				);
@@ -610,7 +610,7 @@ namespace gpopt
 			static
 			CExpression *PexprPushGbBelowJoin
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexpr
 				);
 
@@ -620,21 +620,21 @@ namespace gpopt
 
 			// helper function to separate subquery predicates in a top Select node
 			static
-			CExpression *PexprSeparateSubqueryPreds(IMemoryPool *memory_pool, CExpression *pexpr);
+			CExpression *PexprSeparateSubqueryPreds(IMemoryPool *mp, CExpression *pexpr);
 
 			// helper for creating inverse predicate for unnesting subquery ALL
 			static
-			CExpression *PexprInversePred(IMemoryPool *memory_pool, CExpression *pexprSubquery);
+			CExpression *PexprInversePred(IMemoryPool *mp, CExpression *pexprSubquery);
 
 			// helper for creating a null indicator expression
 			static
-			CExpression *PexprNullIndicator(IMemoryPool *memory_pool, CExpression *pexpr);
+			CExpression *PexprNullIndicator(IMemoryPool *mp, CExpression *pexpr);
 
 			// helper for creating a logical DML on top of a project
 			static
 			CExpression *PexprLogicalDMLOverProject
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprChild,
 				CLogicalDML::EDMLOperator edmlop,
 				CTableDescriptor *ptabdesc,
@@ -665,7 +665,7 @@ namespace gpopt
 			static
 			CExpression *PexprRowTrigger
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprChild,
 				CLogicalDML::EDMLOperator edmlop,
 				IMDId *rel_mdid,
@@ -677,7 +677,7 @@ namespace gpopt
 			static
 			CExpression *PexprRowTrigger
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprChild,
 				CLogicalDML::EDMLOperator edmlop,
 				IMDId *rel_mdid,
@@ -692,7 +692,7 @@ namespace gpopt
 			static
 			CExpression *PexprLogicalPartitionSelector
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CTableDescriptor *ptabdesc,
 				ColRefArray *colref_array,
 				CExpression *pexprChild
@@ -701,13 +701,13 @@ namespace gpopt
 			// return partition filter expressions given a table
 			// descriptor and the given column references
 			static
-			ExpressionArray *PdrgpexprPartEqFilters(IMemoryPool *memory_pool, CTableDescriptor *ptabdesc, ColRefArray *pdrgpcrSource);
+			ExpressionArray *PdrgpexprPartEqFilters(IMemoryPool *mp, CTableDescriptor *ptabdesc, ColRefArray *pdrgpcrSource);
 
 			// helper for creating Agg expression equivalent to quantified subquery
 			static
 			void QuantifiedToAgg
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprSubquery,
 				CExpression **ppexprNewSubquery,
 				CExpression **ppexprNewScalar
@@ -717,7 +717,7 @@ namespace gpopt
 			static
 			void ExistentialToAgg
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprSubquery,
 				CExpression **ppexprNewSubquery,
 				CExpression **ppexprNewScalar
@@ -727,7 +727,7 @@ namespace gpopt
 			static
 			CExpression *PexprAssertConstraints
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprChild,
 				CTableDescriptor *ptabdesc,
 				ColRefArray *colref_array
@@ -737,7 +737,7 @@ namespace gpopt
 			static
 			CExpression *PexprAssertUpdateCardinality
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprDMLChild,
 				CExpression *pexprDML,
 				CColRef *pcrCtid,
@@ -762,14 +762,14 @@ namespace gpopt
 
 			// return a formatted error message for the given exception
 			static
-			CWStringConst *PstrErrorMessage(IMemoryPool *memory_pool, ULONG major, ULONG minor, ...);
+			CWStringConst *PstrErrorMessage(IMemoryPool *mp, ULONG major, ULONG minor, ...);
 			
 			// return the array of key columns from the given array of columns which appear 
 			// in the index key columns
 			static
 			ColRefArray *PdrgpcrIndexKeys
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *colref_array,
 				const IMDIndex *pmdindex,
 				const IMDRelation *pmdrel
@@ -780,7 +780,7 @@ namespace gpopt
 			static
 			CColRefSet *PcrsIndexKeys
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *colref_array,
 				const IMDIndex *pmdindex,
 				const IMDRelation *pmdrel
@@ -791,7 +791,7 @@ namespace gpopt
 			static
 			CColRefSet *PcrsIndexIncludedCols
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *colref_array,
 				const IMDIndex *pmdindex,
 				const IMDRelation *pmdrel
@@ -802,7 +802,7 @@ namespace gpopt
 			static
 			BOOL FIndexApplicable
 				(
-				IMemoryPool *memory_pool, 
+				IMemoryPool *mp, 
 				const IMDIndex *pmdindex,
 				const IMDRelation *pmdrel,
 				ColRefArray *pdrgpcrOutput, 
@@ -821,13 +821,13 @@ namespace gpopt
 
 			// create an expression with "row_number" window function
 			static
-			CExpression *PexprRowNumber(IMemoryPool *memory_pool);
+			CExpression *PexprRowNumber(IMemoryPool *mp);
 
 			// create a logical sequence project with a "row_number" window function
 			static
 			CExpression *PexprWindowWithRowNumber
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprWindowChild,
 				ColRefArray *pdrgpcrInput
 				);
@@ -836,7 +836,7 @@ namespace gpopt
 			static
 			CExpression *PexprAssertOneRow
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprChild
 				);
 
@@ -844,7 +844,7 @@ namespace gpopt
 			static
 			CExpression *PexprAddCTEProducer
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ULONG ulCTEId,
 				ColRefArray *colref_array,
 				CExpression *pexpr
@@ -869,7 +869,7 @@ namespace gpopt
 			static
 			CExpression *PexprLogicalIndexGet
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CMDAccessor *md_accessor,
 				CExpression *pexprGet,
 				ULONG ulOriginOpId,
@@ -885,7 +885,7 @@ namespace gpopt
 			{
 				return PexprBuildIndexPlan
 						(
-						memory_pool,
+						mp,
 						md_accessor,
 						pexprGet,
 						ulOriginOpId,
@@ -908,7 +908,7 @@ namespace gpopt
 			static
 			CExpression *PexprScalarBitmapBoolOp
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CMDAccessor *md_accessor,
 				CExpression *pexprOriginalPred,
 				ExpressionArray *pdrgpexpr,
@@ -927,7 +927,7 @@ namespace gpopt
 			static
 			CExpression *PexprBitmapBoolOp
 				(
-				IMemoryPool *memory_pool, 
+				IMemoryPool *mp, 
 				IMDId *pmdidBitmapType, 
 				CExpression *pexprLeft,
 				CExpression *pexprRight,
@@ -938,7 +938,7 @@ namespace gpopt
 			static
 			CExpression *PexprBitmap
 				(
-				IMemoryPool *memory_pool, 
+				IMemoryPool *mp, 
 				CMDAccessor *md_accessor,
 				CExpression *pexprOriginalPred,
 				CExpression *pexprPred, 
@@ -957,7 +957,7 @@ namespace gpopt
 			static
 			void CreateBitmapIndexProbeOps
 				(
-				IMemoryPool *memory_pool, 
+				IMemoryPool *mp, 
 				CMDAccessor *md_accessor,
 				CExpression *pexprOriginalPred,
 				ExpressionArray *pdrgpexpr, 
@@ -981,7 +981,7 @@ namespace gpopt
 			static
 			CExpression *PexprBitmapTableGet
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CLogical *popGet,
 				ULONG ulOriginOpId,
 				CTableDescriptor *ptabdesc,
@@ -995,7 +995,7 @@ namespace gpopt
 			static
 			CExpression *PexprSelect2BitmapBoolOp
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexpr
 				);
 
@@ -1003,7 +1003,7 @@ namespace gpopt
 			static
 			PartDynamicIndexGetInfoArrays *PdrgpdrgppartdigCandidates
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CMDAccessor *md_accessor,
 				ExpressionArray *pdrgpexprScalar,
 				ColRefArrays *pdrgpdrgpcrPartKey,
@@ -1020,7 +1020,7 @@ namespace gpopt
 			static
 			CPartConstraint *PpartcnstrUpdateCovered
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CMDAccessor *md_accessor,
 				ExpressionArray *pdrgpexprScalar,
 				CPartConstraint *ppartcnstrCovered,
@@ -1037,7 +1037,7 @@ namespace gpopt
 			static
 			CExpression *PexprRemapColumns
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpression *pexprScalar,
 				ColRefArray *pdrgpcrA,
 				ColRefArray *pdrgpcrRemappedA,
@@ -1049,7 +1049,7 @@ namespace gpopt
 			static
 			CExpression *PexprPartialDynamicIndexGet
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CLogicalDynamicGet *popGet,
 				ULONG ulOriginOpId,
 				ExpressionArray *pdrgpexprIndex,
@@ -1065,7 +1065,7 @@ namespace gpopt
 
 			// create a new CTE consumer for the given CTE id
 			static
-			CExpression *PexprCTEConsumer(IMemoryPool *memory_pool, ULONG ulCTEId, ColRefArray *pdrgpcrConsumer);
+			CExpression *PexprCTEConsumer(IMemoryPool *mp, ULONG ulCTEId, ColRefArray *pdrgpcrConsumer);
 
 			// return a new array containing the columns from the given column array 'colref_array'
 			// at the positions indicated by the given ULONG array 'pdrgpulIndexesOfRefs'
@@ -1074,7 +1074,7 @@ namespace gpopt
 			static
 			ColRefArray *PdrgpcrReorderedSubsequence
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *colref_array,
 				ULongPtrArray *pdrgpulIndexesOfRefs
 				);
@@ -1089,24 +1089,24 @@ namespace gpopt
 
 			// check if expression handle is attached to a Join with a predicate that uses columns from only one child
 			static
-			BOOL FJoinPredOnSingleChild(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			BOOL FJoinPredOnSingleChild(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 			// add a redundant SELECT node on top of Dynamic (Bitmap) IndexGet to be able to use index
 			// predicate in partition elimination
 			static
-			CExpression *PexprRedundantSelectForDynamicIndex(IMemoryPool *memory_pool, CExpression *pexpr);
+			CExpression *PexprRedundantSelectForDynamicIndex(IMemoryPool *mp, CExpression *pexpr);
 
 			// convert an Agg window function into regular Agg
 			static
-			CExpression *PexprWinFuncAgg2ScalarAgg(IMemoryPool *memory_pool, CExpression *pexprWinFunc);
+			CExpression *PexprWinFuncAgg2ScalarAgg(IMemoryPool *mp, CExpression *pexprWinFunc);
 
 			// create a map from the argument of each Distinct Agg to the array of project elements that define Distinct Aggs on the same argument
 			static
-			void MapPrjElemsWithDistinctAggs(IMemoryPool *memory_pool, CExpression *pexprPrjList, HMExprDrgPexpr **pphmexprdrgpexpr, ULONG *pulDifferentDQAs);
+			void MapPrjElemsWithDistinctAggs(IMemoryPool *mp, CExpression *pexprPrjList, HMExprDrgPexpr **pphmexprdrgpexpr, ULONG *pulDifferentDQAs);
 
 			// convert GbAgg with distinct aggregates to a join
 			static
-			CExpression *PexprGbAggOnCTEConsumer2Join(IMemoryPool *memory_pool, CExpression *pexprGbAgg);
+			CExpression *PexprGbAggOnCTEConsumer2Join(IMemoryPool *mp, CExpression *pexprGbAgg);
 
 	}; // class CXformUtils
 
@@ -1132,7 +1132,7 @@ namespace gpopt
 		GPOS_ASSERT(NULL != pxfctxt);
 		GPOS_ASSERT(NULL != pexpr);
 
-		IMemoryPool *memory_pool = pxfctxt->Pmp();
+		IMemoryPool *mp = pxfctxt->Pmp();
 
 		// extract components
 		CExpression *pexprLeft = (*pexpr)[0];
@@ -1146,10 +1146,10 @@ namespace gpopt
 
 		// assemble physical operator
 		CExpression *pexprBinary =
-			GPOS_NEW(memory_pool) CExpression
+			GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) T(memory_pool),
+				mp,
+				GPOS_NEW(mp) T(mp),
 				pexprLeft,
 				pexprRight,
 				pexprScalar
@@ -1184,7 +1184,7 @@ namespace gpopt
 	void
 	CXformUtils::AddHashJoinAlternative
 		(
-		IMemoryPool *memory_pool,
+		IMemoryPool *mp,
 		CExpression *pexprJoin,
 		ExpressionArray *pdrgpexprOuter,
 		ExpressionArray *pdrgpexprInner,
@@ -1201,8 +1201,8 @@ namespace gpopt
 		{
 			(*pexprJoin)[ul]->AddRef();
 		}
-		CExpression *pexprResult = GPOS_NEW(memory_pool) CExpression(memory_pool,
-														GPOS_NEW(memory_pool) T(memory_pool, pdrgpexprOuter, pdrgpexprInner),
+		CExpression *pexprResult = GPOS_NEW(mp) CExpression(mp,
+														GPOS_NEW(mp) T(mp, pdrgpexprOuter, pdrgpexprInner),
 														(*pexprJoin)[0],
 														(*pexprJoin)[1],
 														(*pexprJoin)[2]);
@@ -1236,12 +1236,12 @@ namespace gpopt
 			return;
 		}
 
-		IMemoryPool *memory_pool = pxfctxt->Pmp();
+		IMemoryPool *mp = pxfctxt->Pmp();
 		ExpressionArray *pdrgpexprOuter = NULL;
 		ExpressionArray *pdrgpexprInner = NULL;
 
 		// check if we have already computed hash join keys for the scalar child
-		LookupHashJoinKeys(memory_pool, pexpr, &pdrgpexprOuter, &pdrgpexprInner);
+		LookupHashJoinKeys(mp, pexpr, &pdrgpexprOuter, &pdrgpexprInner);
 		if (NULL != pdrgpexprOuter)
 		{
 			GPOS_ASSERT(NULL != pdrgpexprInner);
@@ -1257,7 +1257,7 @@ namespace gpopt
 			else
 			{
 				// we have computed hash join keys on scalar child before, reuse them
-				AddHashJoinAlternative<T>(memory_pool, pexpr, pdrgpexprOuter, pdrgpexprInner, pxfres);
+				AddHashJoinAlternative<T>(mp, pexpr, pdrgpexprOuter, pdrgpexprInner, pxfres);
 			}
 
 			return;
@@ -1265,18 +1265,18 @@ namespace gpopt
 
 		// first time to compute hash join keys on scalar child
 
-		pdrgpexprOuter = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
-		pdrgpexprInner = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+		pdrgpexprOuter = GPOS_NEW(mp) ExpressionArray(mp);
+		pdrgpexprInner = GPOS_NEW(mp) ExpressionArray(mp);
 
 		CExpression *pexprInnerJoin = NULL;
-		BOOL fHashJoinPossible = CPhysicalJoin::FHashJoinPossible(memory_pool, pexpr, pdrgpexprOuter, pdrgpexprInner, &pexprInnerJoin);
+		BOOL fHashJoinPossible = CPhysicalJoin::FHashJoinPossible(mp, pexpr, pdrgpexprOuter, pdrgpexprInner, &pexprInnerJoin);
 
 		// cache hash join keys on scalar child group
 		CacheHashJoinKeys(pexprInnerJoin, pdrgpexprOuter, pdrgpexprInner);
 
 		if (fHashJoinPossible)
 		{
-			AddHashJoinAlternative<T>(memory_pool, pexprInnerJoin, pdrgpexprOuter, pdrgpexprInner, pxfres);
+			AddHashJoinAlternative<T>(mp, pexprInnerJoin, pdrgpexprOuter, pdrgpexprInner, pxfres);
 		}
 		else
 		{
@@ -1290,7 +1290,7 @@ namespace gpopt
 		if (!fHashJoinPossible && fAntiSemiJoin)
 		{
 			CExpression *pexprProcessed = NULL;
-			if (FProcessGPDBAntiSemiHashJoin(memory_pool, pexpr, &pexprProcessed))
+			if (FProcessGPDBAntiSemiHashJoin(mp, pexpr, &pexprProcessed))
 			{
 				// try again after simplifying join predicate
 				ImplementHashJoin<T>(pxfctxt, pxfres, pexprProcessed, false /*fAntiSemiJoin*/);
@@ -1318,10 +1318,10 @@ namespace gpopt
 	{
 		GPOS_ASSERT(NULL != pxfctxt);
 
-		IMemoryPool *memory_pool = pxfctxt->Pmp();
+		IMemoryPool *mp = pxfctxt->Pmp();
 
-		ColRefArray *pdrgpcrOuter = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
-		ColRefArray *pdrgpcrInner = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
+		ColRefArray *pdrgpcrOuter = GPOS_NEW(mp) ColRefArray(mp);
+		ColRefArray *pdrgpcrInner = GPOS_NEW(mp) ColRefArray(mp);
 
 		TransformImplementBinaryOp<T>(pxfctxt, pxfres, pexpr);
 

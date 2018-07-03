@@ -18,7 +18,7 @@ using namespace gpmd;
 // helper for LAS-joining histograms
 void
 CLeftAntiSemiJoinStatsProcessor::JoinHistogramsLASJ(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CHistogram *histogram1,
 	const CHistogram *histogram2,
 	CStatsPredJoin *join_stats,
@@ -46,7 +46,7 @@ CLeftAntiSemiJoinStatsProcessor::JoinHistogramsLASJ(
 
 	if (is_input_empty)
 	{
-		*result_hist1 = histogram1->CopyHistogram(memory_pool);
+		*result_hist1 = histogram1->CopyHistogram(mp);
 		*result_hist2 = NULL;
 
 		return;
@@ -55,7 +55,7 @@ CLeftAntiSemiJoinStatsProcessor::JoinHistogramsLASJ(
 	BOOL empty_histograms = histogram1->IsEmpty() || histogram2->IsEmpty();
 	if (!empty_histograms && CHistogram::JoinPredCmpTypeIsSupported(stats_cmp_type))
 	{
-		*result_hist1 = histogram1->MakeLASJHistogramNormalize(memory_pool,
+		*result_hist1 = histogram1->MakeLASJHistogramNormalize(mp,
 															   stats_cmp_type,
 															   num_rows1,
 															   histogram2,
@@ -76,13 +76,13 @@ CLeftAntiSemiJoinStatsProcessor::JoinHistogramsLASJ(
 	// for an unsupported join predicate operator or in the case of missing stats,
 	// copy input histograms and use default scale factor
 	*scale_factor = CDouble(CScaleFactorUtils::DefaultJoinPredScaleFactor);
-	*result_hist1 = histogram1->CopyHistogram(memory_pool);
+	*result_hist1 = histogram1->CopyHistogram(mp);
 	*result_hist2 = NULL;
 }
 
 //	Return statistics object after performing LASJ
 CStatistics *
-CLeftAntiSemiJoinStatsProcessor::CalcLASJoinStatsStatic(IMemoryPool *memory_pool,
+CLeftAntiSemiJoinStatsProcessor::CalcLASJoinStatsStatic(IMemoryPool *mp,
 														const IStatistics *outer_stats_input,
 														const IStatistics *inner_stats_input,
 														StatsPredJoinArray *join_preds_stats,
@@ -93,7 +93,7 @@ CLeftAntiSemiJoinStatsProcessor::CalcLASJoinStatsStatic(IMemoryPool *memory_pool
 	GPOS_ASSERT(NULL != join_preds_stats);
 	const CStatistics *outer_stats = dynamic_cast<const CStatistics *>(outer_stats_input);
 
-	return CJoinStatsProcessor::SetResultingJoinStats(memory_pool,
+	return CJoinStatsProcessor::SetResultingJoinStats(mp,
 													  outer_stats->GetStatsConfig(),
 													  outer_stats_input,
 													  inner_stats_input,

@@ -74,7 +74,7 @@ CPhysicalMotion::FValidContext
 CDistributionSpec *
 CPhysicalMotion::PdsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &, // exprhdl
 	CDistributionSpec *, // pdsRequired
 	ULONG
@@ -91,7 +91,7 @@ CPhysicalMotion::PdsRequired
 
 	// any motion operator is distribution-establishing and does not require
 	// child to deliver any specific distribution
-	return GPOS_NEW(memory_pool) CDistributionSpecAny(this->Eopid());
+	return GPOS_NEW(mp) CDistributionSpecAny(this->Eopid());
 }
 
 
@@ -106,7 +106,7 @@ CPhysicalMotion::PdsRequired
 CRewindabilitySpec *
 CPhysicalMotion::PrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &, // exprhdl
 	CRewindabilitySpec *, // prsRequired
 	ULONG
@@ -123,7 +123,7 @@ CPhysicalMotion::PrsRequired
 
 	// motion does not preserve rewindability;
 	// child does not need to be rewindable
-	return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
+	return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
 }
 
 //---------------------------------------------------------------------------
@@ -137,7 +137,7 @@ CPhysicalMotion::PrsRequired
 CPartitionPropagationSpec *
 CPhysicalMotion::PppsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CPartitionPropagationSpec *pppsRequired,
 	ULONG 
@@ -155,10 +155,10 @@ CPhysicalMotion::PppsRequired
 	CPartIndexMap *ppimReqd = pppsRequired->Ppim();
 	CPartFilterMap *ppfmReqd = pppsRequired->Ppfm();
 	
-	ULongPtrArray *pdrgpul = ppimReqd->PdrgpulScanIds(memory_pool);
+	ULongPtrArray *pdrgpul = ppimReqd->PdrgpulScanIds(mp);
 	
-	CPartIndexMap *ppimResult = GPOS_NEW(memory_pool) CPartIndexMap(memory_pool);
-	CPartFilterMap *ppfmResult = GPOS_NEW(memory_pool) CPartFilterMap(memory_pool);
+	CPartIndexMap *ppimResult = GPOS_NEW(mp) CPartIndexMap(mp);
+	CPartFilterMap *ppfmResult = GPOS_NEW(mp) CPartFilterMap(mp);
 	
 	/// get derived part consumers
 	CPartInfo *ppartinfo = exprhdl.GetRelationalProperties(0)->Ppartinfo();
@@ -177,12 +177,12 @@ CPhysicalMotion::PppsRequired
 		}
 
 		ppimResult->AddRequiredPartPropagation(ppimReqd, part_idx_id, CPartIndexMap::EppraPreservePropagators);
-		(void) ppfmResult->FCopyPartFilter(m_memory_pool, part_idx_id, ppfmReqd);
+		(void) ppfmResult->FCopyPartFilter(m_mp, part_idx_id, ppfmReqd);
 	}
 		
 	pdrgpul->Release();
 
-	return GPOS_NEW(memory_pool) CPartitionPropagationSpec(ppimResult, ppfmResult);
+	return GPOS_NEW(mp) CPartitionPropagationSpec(ppimResult, ppfmResult);
 }
 
 //---------------------------------------------------------------------------
@@ -196,7 +196,7 @@ CPhysicalMotion::PppsRequired
 CCTEReq *
 CPhysicalMotion::PcteRequired
 	(
-	IMemoryPool *, //memory_pool,
+	IMemoryPool *, //mp,
 	CExpressionHandle &, //exprhdl,
 	CCTEReq *pcter,
 	ULONG
@@ -224,7 +224,7 @@ CPhysicalMotion::PcteRequired
 CDistributionSpec *
 CPhysicalMotion::PdsDerive
 	(
-	IMemoryPool */*memory_pool*/,
+	IMemoryPool */*mp*/,
 	CExpressionHandle &/*exprhdl*/
 	)
 	const
@@ -247,13 +247,13 @@ CPhysicalMotion::PdsDerive
 CRewindabilitySpec *
 CPhysicalMotion::PrsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle & // exprhdl
 	)
 	const
 {
 	// output of motion is non-rewindable
-	return GPOS_NEW(memory_pool) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
+	return GPOS_NEW(mp) CRewindabilitySpec(CRewindabilitySpec::ErtNone /*ert*/);
 }
 
 

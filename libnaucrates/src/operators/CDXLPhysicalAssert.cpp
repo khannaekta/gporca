@@ -26,8 +26,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalAssert::CDXLPhysicalAssert(IMemoryPool *memory_pool, const CHAR *sql_state)
-	: CDXLPhysical(memory_pool)
+CDXLPhysicalAssert::CDXLPhysicalAssert(IMemoryPool *mp, const CHAR *sql_state)
+	: CDXLPhysical(mp)
 {
 	GPOS_ASSERT(NULL != sql_state);
 	GPOS_ASSERT(GPOS_SQLSTATE_LENGTH == clib::Strlen(sql_state));

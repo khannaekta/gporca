@@ -29,10 +29,10 @@ XERCES_CPP_NAMESPACE_USE
 //
 //---------------------------------------------------------------------------
 CParseHandlerScalarSwitchCase::CParseHandlerScalarSwitchCase(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -64,12 +64,12 @@ CParseHandlerScalarSwitchCase::StartElement(const XMLCh *const,  // element_uri,
 
 	// parse handler for result expression
 	CParseHandlerBase *parse_handler_result = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(parse_handler_result);
 
 	// parse handler for condition expression
 	CParseHandlerBase *parse_handler_condition_expr = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(parse_handler_condition_expr);
 
 	// store parse handlers
@@ -100,8 +100,8 @@ CParseHandlerScalarSwitchCase::EndElement(const XMLCh *const,  // element_uri
 	}
 
 	// construct node
-	m_dxl_node = GPOS_NEW(m_memory_pool)
-		CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarSwitchCase(m_memory_pool));
+	m_dxlnode = GPOS_NEW(m_mp)
+		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarSwitchCase(m_mp));
 
 	CParseHandlerScalarOp *parse_handler_condition_expr =
 		dynamic_cast<CParseHandlerScalarOp *>((*this)[0]);

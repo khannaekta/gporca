@@ -35,12 +35,12 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CScalarMinMax::CScalarMinMax
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IMDId *mdid_type,
 	EScalarMinMaxType esmmt
 	)
 	:
-	CScalar(memory_pool),
+	CScalar(mp),
 	m_mdid_type(mdid_type),
 	m_esmmt(esmmt),
 	m_fBoolReturnType(false)

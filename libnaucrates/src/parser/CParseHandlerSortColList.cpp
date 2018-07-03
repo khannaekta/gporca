@@ -30,10 +30,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerSortColList::CParseHandlerSortColList(IMemoryPool *memory_pool,
+CParseHandlerSortColList::CParseHandlerSortColList(IMemoryPool *mp,
 												   CParseHandlerManager *parse_handler_mgr,
 												   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -56,18 +56,18 @@ CParseHandlerSortColList::StartElement(const XMLCh *const element_uri,
 									  element_local_name))
 	{
 		// start the sorting column list
-		m_dxl_node = GPOS_NEW(m_memory_pool)
-			CDXLNode(m_memory_pool, GPOS_NEW(m_memory_pool) CDXLScalarSortColList(m_memory_pool));
+		m_dxlnode = GPOS_NEW(m_mp)
+			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarSortColList(m_mp));
 	}
 	else if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarSortCol),
 										   element_local_name))
 	{
 		// we must have seen a sorting col list already and initialized the sort col list node
-		GPOS_ASSERT(NULL != m_dxl_node);
+		GPOS_ASSERT(NULL != m_dxlnode);
 
 		// start new sort column
 		CParseHandlerBase *sort_col_parse_handler =
-			CParseHandlerFactory::GetParseHandler(m_memory_pool,
+			CParseHandlerFactory::GetParseHandler(m_mp,
 												  CDXLTokens::XmlstrToken(EdxltokenScalarSortCol),
 												  m_parse_handler_mgr,
 												  this);
@@ -118,7 +118,7 @@ CParseHandlerSortColList::EndElement(const XMLCh *const,  // element_uri,
 	}
 
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node, false /* validate_children */);
+	m_dxlnode->GetOperator()->AssertValid(m_dxlnode, false /* validate_children */);
 #endif  // GPOS_DEBUG
 
 	// deactivate handler

@@ -40,10 +40,10 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CLogicalCTEAnchor(IMemoryPool *memory_pool);
+			CLogicalCTEAnchor(IMemoryPool *mp);
 
 			// ctor
-			CLogicalCTEAnchor(IMemoryPool *memory_pool, ULONG id);
+			CLogicalCTEAnchor(IMemoryPool *mp, ULONG id);
 
 			// dtor
 			virtual
@@ -88,7 +88,7 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //memory_pool,
+						IMemoryPool *, //mp,
 						UlongColRefHashMap *, //colref_mapping,
 						BOOL //must_exist
 						)
@@ -102,21 +102,21 @@ namespace gpopt
 
 			// derive output columns
 			virtual
-			CColRefSet *PcrsDeriveOutput(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsDeriveOutput(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 			// dervive keys
 			virtual
-			CKeyCollection *PkcDeriveKeys(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CKeyCollection *PkcDeriveKeys(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive max card
 			virtual
-			CMaxCard Maxcard(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CMaxCard Maxcard(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive constraint property
 			virtual
 			CPropConstraint *PpcDeriveConstraint
 				(
-				IMemoryPool *, //memory_pool,
+				IMemoryPool *, //mp,
 				CExpressionHandle &exprhdl
 				)
 				const
@@ -126,13 +126,13 @@ namespace gpopt
 
 			// derive partition consumer info
 			virtual
-			CPartInfo *PpartinfoDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CPartInfo *PpartinfoDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// compute required stats columns of the n-th child
 			virtual
 			CColRefSet *PcrsStat
 				(
-				IMemoryPool *,// memory_pool
+				IMemoryPool *,// mp
 				CExpressionHandle &,// exprhdl
 				CColRefSet *pcrsInput,
 				ULONG // child_index
@@ -146,7 +146,7 @@ namespace gpopt
 			virtual
 			IStatistics *PstatsDerive
 						(
-						IMemoryPool *, //memory_pool,
+						IMemoryPool *, //mp,
 						CExpressionHandle &exprhdl,
 						StatsArray * //stats_ctxt
 						)
@@ -168,7 +168,7 @@ namespace gpopt
 
 			// candidate set of xforms
 			virtual
-			CXformSet *PxfsCandidates(IMemoryPool *memory_pool) const;
+			CXformSet *PxfsCandidates(IMemoryPool *mp) const;
 
 			//-------------------------------------------------------------------------------------
 

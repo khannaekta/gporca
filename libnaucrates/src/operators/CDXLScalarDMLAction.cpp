@@ -28,7 +28,7 @@ using namespace gpdxl;
 //		Constructs an action expression
 //
 //---------------------------------------------------------------------------
-CDXLScalarDMLAction::CDXLScalarDMLAction(IMemoryPool *memory_pool) : CDXLScalar(memory_pool)
+CDXLScalarDMLAction::CDXLScalarDMLAction(IMemoryPool *mp) : CDXLScalar(mp)
 {
 }
 

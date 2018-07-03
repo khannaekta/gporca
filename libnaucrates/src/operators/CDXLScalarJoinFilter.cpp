@@ -27,7 +27,7 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarJoinFilter::CDXLScalarJoinFilter(IMemoryPool *memory_pool) : CDXLScalarFilter(memory_pool)
+CDXLScalarJoinFilter::CDXLScalarJoinFilter(IMemoryPool *mp) : CDXLScalarFilter(mp)
 {
 }
 

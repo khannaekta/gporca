@@ -26,18 +26,18 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CXformImplementIndexApply(IMemoryPool *memory_pool)
+			CXformImplementIndexApply(IMemoryPool *mp)
 			:
 			// pattern
 			CXformImplementation
 				(
-				GPOS_NEW(memory_pool) CExpression
+				GPOS_NEW(mp) CExpression
 								(
-								memory_pool,
-								GPOS_NEW(memory_pool) CLogicalIndexApply(memory_pool),
-								GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // outer child
-								GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)),  // inner child
-								GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))  // predicate
+								mp,
+								GPOS_NEW(mp) CLogicalIndexApply(mp),
+								GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // outer child
+								GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)),  // inner child
+								GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp))  // predicate
 								)
 				)
 			{}
@@ -79,7 +79,7 @@ namespace gpopt
 				GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 				GPOS_ASSERT(FCheckPattern(pexpr));
 
-				IMemoryPool *memory_pool = pxfctxt->Pmp();
+				IMemoryPool *mp = pxfctxt->Pmp();
 
 				// extract components
 				CExpression *pexprOuter = (*pexpr)[0];
@@ -97,14 +97,14 @@ namespace gpopt
 				CPhysicalNLJoin *pop = NULL;
 
 				if (CLogicalIndexApply::PopConvert(pexpr->Pop())->FouterJoin())
-					pop = GPOS_NEW(memory_pool) CPhysicalLeftOuterIndexNLJoin(memory_pool, colref_array);
+					pop = GPOS_NEW(mp) CPhysicalLeftOuterIndexNLJoin(mp, colref_array);
 				else
-					pop = GPOS_NEW(memory_pool) CPhysicalInnerIndexNLJoin(memory_pool, colref_array);
+					pop = GPOS_NEW(mp) CPhysicalInnerIndexNLJoin(mp, colref_array);
 
 				CExpression *pexprResult =
-						GPOS_NEW(memory_pool) CExpression
+						GPOS_NEW(mp) CExpression
 								(
-								memory_pool,
+								mp,
 								pop,
 								pexprOuter,
 								pexprInner,

@@ -28,7 +28,7 @@ using namespace gpdxl;
 //		Constructs a metadata aggregate
 //
 //---------------------------------------------------------------------------
-CMDAggregateGPDB::CMDAggregateGPDB(IMemoryPool *memory_pool,
+CMDAggregateGPDB::CMDAggregateGPDB(IMemoryPool *mp,
 								   IMDId *mdid,
 								   CMDName *mdname,
 								   IMDId *result_type_mdid,
@@ -36,7 +36,7 @@ CMDAggregateGPDB::CMDAggregateGPDB(IMemoryPool *memory_pool,
 								   BOOL fOrdered,
 								   BOOL is_splittable,
 								   BOOL is_hash_agg_capable)
-	: m_memory_pool(memory_pool),
+	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
 	  m_mdid_type_result(result_type_mdid),
@@ -48,7 +48,7 @@ CMDAggregateGPDB::CMDAggregateGPDB(IMemoryPool *memory_pool,
 	GPOS_ASSERT(mdid->IsValid());
 
 	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_memory_pool, this, false /*fSerializeHeader*/, false /*indentation*/);
+		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 //---------------------------------------------------------------------------

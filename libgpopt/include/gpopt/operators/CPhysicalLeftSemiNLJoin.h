@@ -37,7 +37,7 @@ namespace gpopt
 
 			// ctor
 			explicit
-			CPhysicalLeftSemiNLJoin(IMemoryPool *memory_pool);
+			CPhysicalLeftSemiNLJoin(IMemoryPool *mp);
 
 			// dtor
 			virtual

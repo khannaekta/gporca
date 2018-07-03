@@ -59,7 +59,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CParseHandlerLogicalConstTable(IMemoryPool *memory_pool,
+		CParseHandlerLogicalConstTable(IMemoryPool *mp,
 									   CParseHandlerManager *parse_handler_mgr,
 									   CParseHandlerBase *parse_handler_root);
 	};

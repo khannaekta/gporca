@@ -103,7 +103,7 @@ namespace gpopt
 			typedef CDynamicPtrArray<SSamplePlan, CleanupDelete> SamplePlanArray;
 
 			// memory pool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 
 			// identifier of chosen plan
 			ULLONG m_plan_id;
@@ -159,7 +159,7 @@ namespace gpopt
 			// ctor
 			CEnumeratorConfig
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ULLONG plan_id,
 				ULLONG ullSamples,
 				CDouble cost_threshold = GPOPT_UNBOUNDED_COST_THRESHOLD
@@ -352,21 +352,21 @@ namespace gpopt
 			static
 			CEnumeratorConfig *PecDefault
 				(
-				IMemoryPool *memory_pool
+				IMemoryPool *mp
 				)
 			{
-				return GPOS_NEW(memory_pool) CEnumeratorConfig(memory_pool, 0 /*plan_id*/, 0 /*ullSamples*/);
+				return GPOS_NEW(mp) CEnumeratorConfig(mp, 0 /*plan_id*/, 0 /*ullSamples*/);
 			}
 
 			// generate enumerator configuration for a given plan id
 			static
 			CEnumeratorConfig *GetEnumeratorCfg
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ULLONG plan_id
 				)
 			{
-				return GPOS_NEW(memory_pool) CEnumeratorConfig(memory_pool, plan_id, 0/*ullSamples*/);
+				return GPOS_NEW(mp) CEnumeratorConfig(mp, plan_id, 0/*ullSamples*/);
 			}
 
 

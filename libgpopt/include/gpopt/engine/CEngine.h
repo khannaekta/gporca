@@ -49,7 +49,7 @@ namespace gpopt
 		private:
 
 			// memory pool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 			
 			// query context
 			CQueryContext *m_pqc;
@@ -238,7 +238,7 @@ namespace gpopt
 		
 			// ctor
 			explicit
-			CEngine(IMemoryPool *memory_pool);
+			CEngine(IMemoryPool *mp);
 						
 			// dtor
 			~CEngine();
@@ -303,7 +303,7 @@ namespace gpopt
 			// return false if it's impossible for the operator to satisfy one or more
 			BOOL FCheckEnfdProps
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CGroupExpression *pgexpr,
 				COptimizationContext *poc,
 				ULONG ulOptReq,
@@ -314,7 +314,7 @@ namespace gpopt
 			// with respect to the given requirements
 			BOOL FValidCTEAndPartitionProperties
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CReqdPropPlan *prpp
 				);
@@ -331,7 +331,7 @@ namespace gpopt
 #endif // GPOS_DEBUG
 
 			// derive statistics
-			void DeriveStats(IMemoryPool *memory_pool);
+			void DeriveStats(IMemoryPool *mp);
 
 			// execute operations after exploration completes
 			void FinalizeExploration();
@@ -399,7 +399,7 @@ namespace gpopt
 			}
 
 			// return array of child optimization contexts corresponding to handle requirements
-			OptimizationContextArray *PdrgpocChildren(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			OptimizationContextArray *PdrgpocChildren(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 			// build tree map on memo
 			MemoTreeMap *Pmemotmap();

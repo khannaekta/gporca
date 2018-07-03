@@ -49,7 +49,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerScalarLimitCount(IMemoryPool *memory_pool,
+		CParseHandlerScalarLimitCount(IMemoryPool *mp,
 									  CParseHandlerManager *parse_handler_mgr,
 									  CParseHandlerBase *parse_handler_root);
 	};

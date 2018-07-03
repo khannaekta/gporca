@@ -32,10 +32,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerLimit::CParseHandlerLimit(IMemoryPool *memory_pool,
+CParseHandlerLimit::CParseHandlerLimit(IMemoryPool *mp,
 									   CParseHandlerManager *parse_handler_mgr,
 									   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerPhysicalOp(memory_pool, parse_handler_mgr, parse_handler_root), m_dxl_op(NULL)
+	: CParseHandlerPhysicalOp(mp, parse_handler_mgr, parse_handler_root), m_dxl_op(NULL)
 {
 }
 
@@ -60,32 +60,32 @@ CParseHandlerLimit::StartElement(const XMLCh *const,  // element_uri,
 		// parse and create Limit operator
 		m_dxl_op = (CDXLPhysicalLimit *) CDXLOperatorFactory::MakeDXLLimit(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
-		m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, m_dxl_op);
+		m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, m_dxl_op);
 
 		// create and activate the parse handler for the children nodes in reverse
 		// order of their expected appearance
 
 		CParseHandlerBase *offset_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool,
+			m_mp,
 			CDXLTokens::XmlstrToken(EdxltokenScalarLimitOffset),
 			m_parse_handler_mgr,
 			this);
 		m_parse_handler_mgr->ActivateParseHandler(offset_parse_handler);
 
 		CParseHandlerBase *count_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool,
+			m_mp,
 			CDXLTokens::XmlstrToken(EdxltokenScalarLimitCount),
 			m_parse_handler_mgr,
 			this);
 		m_parse_handler_mgr->ActivateParseHandler(count_parse_handler);
 
 		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenPhysical), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenPhysical), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
 		// parse handler for the proj list
 		CParseHandlerBase *proj_list_parse_handler =
-			CParseHandlerFactory::GetParseHandler(m_memory_pool,
+			CParseHandlerFactory::GetParseHandler(m_mp,
 												  CDXLTokens::XmlstrToken(EdxltokenScalarProjList),
 												  m_parse_handler_mgr,
 												  this);
@@ -93,7 +93,7 @@ CParseHandlerLimit::StartElement(const XMLCh *const,  // element_uri,
 
 		//parse handler for the properties of the operator
 		CParseHandlerBase *prop_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenProperties), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenProperties), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(prop_parse_handler);
 
 		// store parse handlers
@@ -144,7 +144,7 @@ CParseHandlerLimit::EndElement(const XMLCh *const,  // element_uri,
 			dynamic_cast<CParseHandlerScalarOp *>((*this)[4]);
 
 		// set statistics and physical properties
-		CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+		CParseHandlerUtils::SetProperties(m_dxlnode, prop_parse_handler);
 
 		// add constructed children
 		AddChildFromParseHandler(proj_list_parse_handler);

@@ -34,16 +34,16 @@ namespace gpopt
 			DrgPds *const m_pdrgpds;
 
 			// map given array of scalar ident expressions to positions of UnionAll input columns in the given child;
-			ULongPtrArray *PdrgpulMap(IMemoryPool *memory_pool, ExpressionArray *pdrgpexpr, ULONG child_index) const;
+			ULongPtrArray *PdrgpulMap(IMemoryPool *mp, ExpressionArray *pdrgpexpr, ULONG child_index) const;
 
 			// derive hashed distribution from child operators
-			CDistributionSpecHashed *PdshashedDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CDistributionSpecHashed *PdshashedDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// compute output hashed distribution matching the outer child's hashed distribution
-			CDistributionSpecHashed *PdsMatching(IMemoryPool *memory_pool, const ULongPtrArray *pdrgpulOuter) const;
+			CDistributionSpecHashed *PdsMatching(IMemoryPool *mp, const ULongPtrArray *pdrgpulOuter) const;
 
 			// derive output distribution based on child distribution
-			CDistributionSpec *PdsDeriveFromChildren(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CDistributionSpec *PdsDeriveFromChildren(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 		protected:
 
@@ -51,13 +51,13 @@ namespace gpopt
 
 			// compute required hashed distribution of the n-th child
 			CDistributionSpecHashed *
-			PdshashedPassThru(IMemoryPool *memory_pool, CDistributionSpecHashed *pdshashedRequired, ULONG child_index) const;
+			PdshashedPassThru(IMemoryPool *mp, CDistributionSpecHashed *pdshashedRequired, ULONG child_index) const;
 
 		public:
 
 			CPhysicalUnionAll
 				(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					ColRefArray *pdrgpcrOutput,
 					ColRefArrays *pdrgpdrgpcrInput,
 					ULONG ulScanIdPartialIndex
@@ -107,7 +107,7 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsRequired
 				(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					CExpressionHandle &exprhdl,
 					CColRefSet *pcrsRequired,
 					ULONG child_index,
@@ -119,7 +119,7 @@ namespace gpopt
 			virtual
 			CCTEReq *PcteRequired
 				(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					CExpressionHandle &exprhdl,
 					CCTEReq *pcter,
 					ULONG child_index,
@@ -132,7 +132,7 @@ namespace gpopt
 			virtual
 			COrderSpec *PosRequired
 				(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					CExpressionHandle &exprhdl,
 					COrderSpec *posRequired,
 					ULONG child_index,
@@ -145,7 +145,7 @@ namespace gpopt
 			virtual
 			CRewindabilitySpec *PrsRequired
 				(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					CExpressionHandle &exprhdl,
 					CRewindabilitySpec *prsRequired,
 					ULONG child_index,
@@ -158,7 +158,7 @@ namespace gpopt
 			virtual
 			CPartitionPropagationSpec *PppsRequired
 				(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					CExpressionHandle &exprhdl,
 					CPartitionPropagationSpec *pppsRequired,
 					ULONG child_index,
@@ -184,28 +184,28 @@ namespace gpopt
 
 			// derive sort order
 			virtual
-			COrderSpec *PosDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			COrderSpec *PosDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive distribution
 			virtual
-			CDistributionSpec *PdsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CDistributionSpec *PdsDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			// derive partition index map
 			virtual
-			CPartIndexMap *PpimDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CDrvdPropCtxt *pdpctxt) const;
+			CPartIndexMap *PpimDerive(IMemoryPool *mp, CExpressionHandle &exprhdl, CDrvdPropCtxt *pdpctxt) const;
 
 			// derive partition filter map
 			virtual
 			CPartFilterMap *PpfmDerive
 				(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					CExpressionHandle &exprhdl
 				)
 			const;
 
 			// derive rewindability
 			virtual
-			CRewindabilitySpec *PrsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CRewindabilitySpec *PrsDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			//-------------------------------------------------------------------------------------
 			// Enforced Properties

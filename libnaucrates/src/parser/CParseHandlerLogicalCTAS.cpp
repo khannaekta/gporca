@@ -31,10 +31,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerLogicalCTAS::CParseHandlerLogicalCTAS(IMemoryPool *memory_pool,
+CParseHandlerLogicalCTAS::CParseHandlerLogicalCTAS(IMemoryPool *mp,
 												   CParseHandlerManager *parse_handler_mgr,
 												   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerLogicalOp(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerLogicalOp(mp, parse_handler_mgr, parse_handler_root),
 	  m_mdid(NULL),
 	  m_mdname_schema(NULL),
 	  m_mdname(NULL),
@@ -139,17 +139,17 @@ CParseHandlerLogicalCTAS::StartElement(const XMLCh *const,  // element_uri,
 
 	// parse handler for logical operator
 	CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenLogical), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenLogical), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
 	//parse handler for the storage options
 	CParseHandlerBase *ctas_options_parse_handler = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenCTASOptions), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenCTASOptions), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(ctas_options_parse_handler);
 
 	//parse handler for the column descriptors
 	CParseHandlerBase *col_descr_parse_handler = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenColumns), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenColumns), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(col_descr_parse_handler);
 
 	// store child parse handler in array
@@ -200,9 +200,9 @@ CParseHandlerLogicalCTAS::EndElement(const XMLCh *const,  // element_uri,
 		ctas_options_parse_handler->GetDxlCtasStorageOption();
 	dxl_ctas_storage_opt->AddRef();
 
-	m_dxl_node = GPOS_NEW(m_memory_pool)
-		CDXLNode(m_memory_pool,
-				 GPOS_NEW(m_memory_pool) CDXLLogicalCTAS(m_memory_pool,
+	m_dxlnode = GPOS_NEW(m_mp)
+		CDXLNode(m_mp,
+				 GPOS_NEW(m_mp) CDXLLogicalCTAS(m_mp,
 														 m_mdid,
 														 m_mdname_schema,
 														 m_mdname,
@@ -219,7 +219,7 @@ CParseHandlerLogicalCTAS::EndElement(const XMLCh *const,  // element_uri,
 	AddChildFromParseHandler(child_parse_handler);
 
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node, false /* validate_children */);
+	m_dxlnode->GetOperator()->AssertValid(m_dxlnode, false /* validate_children */);
 #endif  // GPOS_DEBUG
 
 	// deactivate handler

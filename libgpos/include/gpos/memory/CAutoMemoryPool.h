@@ -53,7 +53,7 @@ namespace gpos
 		CAutoMemoryPool(const CAutoMemoryPool &);
 
 		// memory pool to protect
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// type of leak check to perform
 		ELeakCheck m_leak_check_type;
@@ -72,7 +72,7 @@ namespace gpos
 		IMemoryPool *
 		Pmp() const
 		{
-			return m_memory_pool;
+			return m_mp;
 		}
 
 		// detach from pool

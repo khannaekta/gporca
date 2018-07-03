@@ -31,10 +31,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerScalarFuncExpr::CParseHandlerScalarFuncExpr(IMemoryPool *memory_pool,
+CParseHandlerScalarFuncExpr::CParseHandlerScalarFuncExpr(IMemoryPool *mp,
 														 CParseHandlerManager *parse_handler_mgr,
 														 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root),
 	  m_inside_func_expr(false)
 {
 }
@@ -65,7 +65,7 @@ CParseHandlerScalarFuncExpr::StartElement(const XMLCh *const element_uri,
 					m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 
 			// construct node from the created scalar FuncExpr
-			m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, dxl_op);
+			m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 
 			m_inside_func_expr = true;
 		}
@@ -73,7 +73,7 @@ CParseHandlerScalarFuncExpr::StartElement(const XMLCh *const element_uri,
 		{
 			// This is to support nested FuncExpr
 			CParseHandlerBase *func_parse_handler = CParseHandlerFactory::GetParseHandler(
-				m_memory_pool,
+				m_mp,
 				CDXLTokens::XmlstrToken(EdxltokenScalarFuncExpr),
 				m_parse_handler_mgr,
 				this);
@@ -90,7 +90,7 @@ CParseHandlerScalarFuncExpr::StartElement(const XMLCh *const element_uri,
 		GPOS_ASSERT(m_inside_func_expr);
 
 		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
 		// store parse handlers

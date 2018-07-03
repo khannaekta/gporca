@@ -28,16 +28,16 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformInlineCTEConsumer::CXformInlineCTEConsumer
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformExploration
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalCTEConsumer(memory_pool)
+				mp,
+				GPOS_NEW(mp) CLogicalCTEConsumer(mp)
 				)
 		)
 {}

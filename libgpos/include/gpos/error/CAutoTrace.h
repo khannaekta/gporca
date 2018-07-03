@@ -41,7 +41,7 @@ namespace gpos
 
 	public:
 		// ctor
-		explicit CAutoTrace(IMemoryPool *memory_pool);
+		explicit CAutoTrace(IMemoryPool *mp);
 
 		// dtor
 		~CAutoTrace();

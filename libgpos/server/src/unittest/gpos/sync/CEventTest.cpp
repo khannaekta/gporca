@@ -64,13 +64,13 @@ CEventTest::EresUnittest_ProducerConsumer()
 	event.Init(&mutex);
 
 	CAutoMemoryPool amp(CAutoMemoryPool::ElcStrict);
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	CWorkerPoolManager *pwpm = CWorkerPoolManager::WorkerPoolManager();
 
 	// scope for tasks
 	{
-		CAutoTaskProxy atp(memory_pool, pwpm);
+		CAutoTaskProxy atp(mp, pwpm);
 		CTask *rgPtsk[2];
 		rgPtsk[0] = atp.Create(CEventTest::PvUnittest_Consumer, &event);
 		rgPtsk[1] = atp.Create(CEventTest::PvUnittest_Producer, &event);
@@ -120,13 +120,13 @@ CEventTest::EresUnittest_TimedWait()
 	event.Init(&mutex);
 
 	CAutoMemoryPool amp(CAutoMemoryPool::ElcStrict);
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	CWorkerPoolManager *pwpm = CWorkerPoolManager::WorkerPoolManager();
 
 	// scope for tasks
 	{
-		CAutoTaskProxy atp(memory_pool, pwpm);
+		CAutoTaskProxy atp(mp, pwpm);
 
 		CTask *ptsk = atp.Create(CEventTest::PvUnittest_TimedWait, &event);
 

@@ -87,7 +87,7 @@ namespace gpnaucrates
 		}
 
 		// translate the point into its DXL representation
-		CDXLDatum *GetDatumVal(IMemoryPool *memory_pool, CMDAccessor *md_accessor) const;
+		CDXLDatum *GetDatumVal(IMemoryPool *mp, CMDAccessor *md_accessor) const;
 
 		// minimum of two points using <=
 		static CPoint *MinPoint(CPoint *point1, CPoint *point2);

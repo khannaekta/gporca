@@ -28,10 +28,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLLogicalInsert::CDXLLogicalInsert(IMemoryPool *memory_pool,
+CDXLLogicalInsert::CDXLLogicalInsert(IMemoryPool *mp,
 									 CDXLTableDescr *table_descr,
 									 ULongPtrArray *src_colids_array)
-	: CDXLLogical(memory_pool), m_table_descr_dxl(table_descr), m_src_colids_array(src_colids_array)
+	: CDXLLogical(mp), m_table_descr_dxl(table_descr), m_src_colids_array(src_colids_array)
 {
 	GPOS_ASSERT(NULL != table_descr);
 	GPOS_ASSERT(NULL != src_colids_array);
@@ -93,7 +93,7 @@ CDXLLogicalInsert::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
-	CWStringDynamic *src_colids = CDXLUtils::Serialize(m_memory_pool, m_src_colids_array);
+	CWStringDynamic *src_colids = CDXLUtils::Serialize(m_mp, m_src_colids_array);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenInsertCols), src_colids);
 	GPOS_DELETE(src_colids);
 

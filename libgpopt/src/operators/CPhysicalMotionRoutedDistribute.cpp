@@ -27,17 +27,17 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalMotionRoutedDistribute::CPhysicalMotionRoutedDistribute
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CDistributionSpecRouted *pdsRouted
 	)
 	:
-	CPhysicalMotion(memory_pool),
+	CPhysicalMotion(mp),
 	m_pdsRouted(pdsRouted),
 	m_pcrsRequiredLocal(NULL)
 {
 	GPOS_ASSERT(NULL != pdsRouted);
 
-	m_pcrsRequiredLocal = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	m_pcrsRequiredLocal = GPOS_NEW(mp) CColRefSet(mp);
 
 	// include segment id column
 	m_pcrsRequiredLocal->Include(m_pdsRouted->Pcr());
@@ -94,7 +94,7 @@ CPhysicalMotionRoutedDistribute::Matches
 CColRefSet *
 CPhysicalMotionRoutedDistribute::PcrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CColRefSet *pcrsRequired,
 	ULONG child_index,
@@ -104,11 +104,11 @@ CPhysicalMotionRoutedDistribute::PcrsRequired
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool, *m_pcrsRequiredLocal);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrsRequiredLocal);
 	pcrs->Union(pcrsRequired);
 
 	CColRefSet *pcrsChildReqd =
-		PcrsChildReqd(memory_pool, exprhdl, pcrs, child_index, gpos::ulong_max);
+		PcrsChildReqd(mp, exprhdl, pcrs, child_index, gpos::ulong_max);
 	pcrs->Release();
 
 	return pcrsChildReqd;
@@ -165,7 +165,7 @@ CPhysicalMotionRoutedDistribute::EpetOrder
 COrderSpec *
 CPhysicalMotionRoutedDistribute::PosRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &, // exprhdl
 	COrderSpec *,//posInput
 	ULONG 
@@ -180,7 +180,7 @@ CPhysicalMotionRoutedDistribute::PosRequired
 {
 	GPOS_ASSERT(0 == child_index);
 
-	return GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+	return GPOS_NEW(mp) COrderSpec(mp);
 }
 
 //---------------------------------------------------------------------------
@@ -194,12 +194,12 @@ CPhysicalMotionRoutedDistribute::PosRequired
 COrderSpec *
 CPhysicalMotionRoutedDistribute::PosDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle & // exprhdl
 	)
 	const
 {
-	return GPOS_NEW(memory_pool) COrderSpec(memory_pool);
+	return GPOS_NEW(mp) COrderSpec(mp);
 }
 
 

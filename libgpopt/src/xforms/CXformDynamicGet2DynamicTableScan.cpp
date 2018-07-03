@@ -28,16 +28,16 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformDynamicGet2DynamicTableScan::CXformDynamicGet2DynamicTableScan
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformImplementation
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalDynamicGet(memory_pool)
+				mp,
+				GPOS_NEW(mp) CLogicalDynamicGet(mp)
 				)
 		)
 {}
@@ -65,10 +65,10 @@ CXformDynamicGet2DynamicTableScan::Transform
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CLogicalDynamicGet *popGet = CLogicalDynamicGet::PopConvert(pexpr->Pop());
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// create/extract components for alternative
-	CName *pname = GPOS_NEW(memory_pool) CName(memory_pool, popGet->Name());
+	CName *pname = GPOS_NEW(mp) CName(mp, popGet->Name());
 	
 	CTableDescriptor *ptabdesc = popGet->Ptabdesc();
 	ptabdesc->AddRef();
@@ -86,12 +86,12 @@ CXformDynamicGet2DynamicTableScan::Transform
 	
 	// create alternative expression
 	CExpression *pexprAlt = 
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
-			GPOS_NEW(memory_pool) CPhysicalDynamicTableScan
+			mp,
+			GPOS_NEW(mp) CPhysicalDynamicTableScan
 						(
-						memory_pool,
+						mp,
 						popGet->IsPartial(),
 						pname, 
 						ptabdesc,

@@ -35,11 +35,11 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CScalarIf::CScalarIf
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IMDId *mdid
 	)
 	:
-	CScalar(memory_pool),
+	CScalar(mp),
 	m_mdid_type(mdid),
 	m_fBoolReturnType(false)
 {

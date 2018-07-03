@@ -33,10 +33,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerScalarSubPlan::CParseHandlerScalarSubPlan(IMemoryPool *memory_pool,
+CParseHandlerScalarSubPlan::CParseHandlerScalarSubPlan(IMemoryPool *mp,
 													   CParseHandlerManager *parse_handler_mgr,
 													   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root),
 	  m_mdid_first_col(NULL),
 	  m_dxl_subplan_type(EdxlSubPlanTypeSentinel)
 {
@@ -128,12 +128,12 @@ CParseHandlerScalarSubPlan::StartElement(const XMLCh *const,  // element_uri,
 
 	// parse handler for child physical node
 	CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenPhysical), m_parse_handler_mgr, this);
+		m_mp, CDXLTokens::XmlstrToken(EdxltokenPhysical), m_parse_handler_mgr, this);
 	m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
 	// parse handler for params
 	CParseHandlerBase *pphParamList = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool,
+		m_mp,
 		CDXLTokens::XmlstrToken(EdxltokenScalarSubPlanParamList),
 		m_parse_handler_mgr,
 		this);
@@ -141,7 +141,7 @@ CParseHandlerScalarSubPlan::StartElement(const XMLCh *const,  // element_uri,
 
 	// parse handler for test expression
 	CParseHandlerBase *pphTestExpr = CParseHandlerFactory::GetParseHandler(
-		m_memory_pool,
+		m_mp,
 		CDXLTokens::XmlstrToken(EdxltokenScalarSubPlanTestExpr),
 		m_parse_handler_mgr,
 		this);
@@ -169,7 +169,7 @@ CParseHandlerScalarSubPlan::EndElement(const XMLCh *const,  // element_uri,
 {
 	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarSubPlan),
 									  element_local_name) &&
-		NULL != m_dxl_node)
+		NULL != m_dxlnode)
 	{
 		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
 			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
@@ -198,7 +198,7 @@ CParseHandlerScalarSubPlan::EndElement(const XMLCh *const,  // element_uri,
 		m_dxl_subplan_type,
 		dxl_subplan_test_expr);
 
-	m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, dxl_op);
+	m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 
 	// add constructed children
 	AddChildFromParseHandler(child_parse_handler);

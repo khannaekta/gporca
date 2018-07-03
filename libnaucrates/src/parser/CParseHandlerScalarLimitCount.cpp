@@ -31,10 +31,10 @@ XERCES_CPP_NAMESPACE_USE
 //
 //---------------------------------------------------------------------------
 CParseHandlerScalarLimitCount::CParseHandlerScalarLimitCount(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -59,12 +59,12 @@ CParseHandlerScalarLimitCount::StartElement(const XMLCh *const element_uri,
 		CDXLScalarLimitCount *dxl_op =
 			(CDXLScalarLimitCount *) CDXLOperatorFactory::MakeDXLLimitCount(
 				m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
-		m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, dxl_op);
+		m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 	}
 	else
 	{
 		// we must have seen a LIMITCOUNT already and initialized its corresponding node
-		if (NULL == m_dxl_node)
+		if (NULL == m_dxlnode)
 		{
 			CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
 				m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);
@@ -72,7 +72,7 @@ CParseHandlerScalarLimitCount::StartElement(const XMLCh *const element_uri,
 		}
 		// install a scalar element parser for parsing the limit count element
 		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 
 		// store parse handler

@@ -101,7 +101,7 @@ namespace gpopt
 			};
 
 			// memory pool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 			
 			// metadata accessor
 			CMDAccessor *m_pmda;
@@ -734,7 +734,7 @@ namespace gpopt
 			// combines the ordered columns and required columns into a single list
 			ColRefArray *PdrgpcrMerge
 					(
-					IMemoryPool *memory_pool,
+					IMemoryPool *mp,
 					ColRefArray *pdrgpcrOrder,
 					ColRefArray *pdrgpcrRequired
 					);
@@ -823,7 +823,7 @@ namespace gpopt
 			static
 			void AddBitmapFilterColumns
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CPhysicalScan *pop,
 				CExpression *pexprRecheckCond,
 				CExpression *pexprScalar,
@@ -833,7 +833,7 @@ namespace gpopt
 			// ctor
 			CTranslatorExprToDXL
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CMDAccessor *md_accessor,
 				IntPtrArray *pdrgpiSegments,
 				BOOL fInitColumnFactory = true

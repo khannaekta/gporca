@@ -96,7 +96,7 @@ namespace gpos
 			CCacheHashtableIterAccessor;
 
 		// memory pool for allocating hashtable and cache entries
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// true if cache does not allow multiple objects with the same key
 		BOOL m_unique;
@@ -330,9 +330,9 @@ namespace gpos
 			GPOS_ASSERT(NULL != entry);
 
 			// destroy the object before deleting memory pool. This cover the case where object & cacheentry use same memory pool
-			IMemoryPool *memory_pool = entry->Pmp();
+			IMemoryPool *mp = entry->Pmp();
 			GPOS_DELETE(entry);
-			CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(memory_pool);
+			CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(mp);
 		}
 
 		// evict entries by making one pass through the hash table buckets
@@ -392,13 +392,13 @@ namespace gpos
 
 	public:
 		// ctor
-		CCache(IMemoryPool *memory_pool,
+		CCache(IMemoryPool *mp,
 			   BOOL unique,
 			   ULLONG cache_quota,
 			   ULONG g_clock_init_counter,
 			   HashFuncPtr hash_func,
 			   EqualFuncPtr equal_func)
-			: m_memory_pool(memory_pool),
+			: m_mp(mp),
 			  m_unique(unique),
 			  m_cache_size(0),
 			  m_cache_quota(cache_quota),
@@ -410,12 +410,12 @@ namespace gpos
 			  m_hash_func(hash_func),
 			  m_equal_func(equal_func)
 		{
-			GPOS_ASSERT(NULL != m_memory_pool && "Cache memory pool could not be initialized");
+			GPOS_ASSERT(NULL != m_mp && "Cache memory pool could not be initialized");
 
 			GPOS_ASSERT(0 != g_clock_init_counter);
 
 			// initialize hashtable
-			m_hash_table.Init(m_memory_pool,
+			m_hash_table.Init(m_mp,
 							  CACHE_HT_NUM_OF_BUCKETS,
 							  GPOS_OFFSET(CCacheHashTableEntry, m_link_hash),
 							  GPOS_OFFSET(CCacheHashTableEntry, m_key),
@@ -423,7 +423,7 @@ namespace gpos
 							  m_hash_func,
 							  m_equal_func);
 
-			m_clock_hand = GPOS_NEW(memory_pool) CCacheHashtableIter(m_hash_table);
+			m_clock_hand = GPOS_NEW(mp) CCacheHashtableIter(m_hash_table);
 		}
 
 		// dtor

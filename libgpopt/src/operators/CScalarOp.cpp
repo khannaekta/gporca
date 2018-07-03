@@ -34,13 +34,13 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CScalarOp::CScalarOp
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IMDId *mdid_op,
 	IMDId *return_type_mdid,
 	const CWStringConst *pstrOp
 	)
 	:
-	CScalar(memory_pool),
+	CScalar(mp),
 	m_mdid_op(mdid_op),
 	m_return_type_mdid(return_type_mdid),
 	m_pstrOp(pstrOp),

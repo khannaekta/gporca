@@ -53,7 +53,7 @@ namespace gpdxl
 	{
 	private:
 		// memory pool
-		IMemoryPool *m_memory_pool;
+		IMemoryPool *m_mp;
 
 		// dxl tree operator class
 		CDXLOperator *m_dxl_op;
@@ -73,19 +73,19 @@ namespace gpdxl
 	public:
 		// ctors
 
-		explicit CDXLNode(IMemoryPool *memory_pool);
-		CDXLNode(IMemoryPool *memory_pool, CDXLOperator *dxl_op);
-		CDXLNode(IMemoryPool *memory_pool, CDXLOperator *dxl_op, CDXLNode *child_dxlnode);
-		CDXLNode(IMemoryPool *memory_pool,
+		explicit CDXLNode(IMemoryPool *mp);
+		CDXLNode(IMemoryPool *mp, CDXLOperator *dxl_op);
+		CDXLNode(IMemoryPool *mp, CDXLOperator *dxl_op, CDXLNode *child_dxlnode);
+		CDXLNode(IMemoryPool *mp,
 				 CDXLOperator *dxl_op,
 				 CDXLNode *first_child_dxlnode,
 				 CDXLNode *second_child_dxlnode);
-		CDXLNode(IMemoryPool *memory_pool,
+		CDXLNode(IMemoryPool *mp,
 				 CDXLOperator *dxl_op,
 				 CDXLNode *first_child_dxlnode,
 				 CDXLNode *second_child_dxlnode,
 				 CDXLNode *third_child_dxlnode);
-		CDXLNode(IMemoryPool *memory_pool, CDXLOperator *dxl_op, DXLNodeArray *dxl_array);
+		CDXLNode(IMemoryPool *mp, CDXLOperator *dxl_op, DXLNodeArray *dxl_array);
 
 		// dtor
 		virtual ~CDXLNode();
@@ -94,9 +94,9 @@ namespace gpdxl
 		inline CDXLNode *operator[](ULONG idx) const
 		{
 			GPOS_ASSERT(NULL != m_dxl_array);
-			CDXLNode *dxl_node = (*m_dxl_array)[idx];
-			GPOS_ASSERT(NULL != dxl_node);
-			return dxl_node;
+			CDXLNode *dxlnode = (*m_dxl_array)[idx];
+			GPOS_ASSERT(NULL != dxlnode);
+			return dxlnode;
 		};
 
 		// arity function, returns the number of children this node has

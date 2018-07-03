@@ -62,13 +62,13 @@ GPOS_RESULT
 CWStringTest::EresUnittest_Append()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	CWStringDynamic *pstr1 =
-		GPOS_NEW(memory_pool) CWStringDynamic(memory_pool, GPOS_WSZ_LIT("123"));
+		GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("123"));
 	CWStringDynamic *pstr2 =
-		GPOS_NEW(memory_pool) CWStringDynamic(memory_pool, GPOS_WSZ_LIT("456"));
-	CWStringDynamic *pstr3 = GPOS_NEW(memory_pool) CWStringDynamic(memory_pool);
+		GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("456"));
+	CWStringDynamic *pstr3 = GPOS_NEW(mp) CWStringDynamic(mp);
 
 	WCHAR buffer1[8];
 	WCHAR buffer2[8];
@@ -133,10 +133,10 @@ CWStringTest::EresUnittest_AppendFormat()
 						false /*fThreadSafe*/,
 						1024 * 1024 /*ullSizeMax*/
 	);
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	CWStringDynamic *pstr1 =
-		GPOS_NEW(memory_pool) CWStringDynamic(memory_pool, GPOS_WSZ_LIT("Hello"));
+		GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("Hello"));
 
 	WCHAR buffer1[16];
 	WCHAR buffer2[12];
@@ -198,10 +198,10 @@ CWStringTest::EresUnittest_AppendFormatInvalidLocale()
 						false /*fThreadSafe*/,
 						1024 * 1024 /*ullSizeMax*/
 	);
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	CHAR *oldLocale = setlocale(LC_CTYPE, NULL);
-	CWStringDynamic *pstr1 = GPOS_NEW(memory_pool) CWStringDynamic(memory_pool);
+	CWStringDynamic *pstr1 = GPOS_NEW(mp) CWStringDynamic(mp);
 
 	GPOS_RESULT eres = GPOS_OK;
 
@@ -240,10 +240,10 @@ GPOS_RESULT
 CWStringTest::EresUnittest_AppendFormatLarge()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	CWStringDynamic *pstr1 =
-		GPOS_NEW(memory_pool) CWStringDynamic(memory_pool, GPOS_WSZ_LIT("Hello"));
+		GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("Hello"));
 	CWStringConst cstr1(GPOS_WSZ_LIT(" World "));
 
 	const ULONG ulLengthInit = pstr1->Length();
@@ -257,7 +257,7 @@ CWStringTest::EresUnittest_AppendFormatLarge()
 	}
 
 	{
-		CAutoTrace at(memory_pool);
+		CAutoTrace at(mp);
 		at.Os() << std::endl << "Formatted string size:" << pstr1->Length();
 		at.Os() << std::endl << "Expected string size:" << ulExpected << std::endl;
 	}
@@ -269,7 +269,7 @@ CWStringTest::EresUnittest_AppendFormatLarge()
 
 	// append small string
 	CWStringDynamic *pstr2 =
-		GPOS_NEW(memory_pool) CWStringDynamic(memory_pool, GPOS_WSZ_LIT("Hello"));
+		GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("Hello"));
 	pstr2->AppendCharArray(" World");
 	GPOS_TRACE(pstr2->GetBuffer());
 
@@ -278,12 +278,12 @@ CWStringTest::EresUnittest_AppendFormatLarge()
 
 	// append large string
 	CWStringDynamic *pstr3 =
-		GPOS_NEW(memory_pool) CWStringDynamic(memory_pool, GPOS_WSZ_LIT("Hello "));
+		GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("Hello "));
 #ifdef GPOS_DEBUG
 	ULONG ulStartLength = pstr3->Length();
 #endif  // GPOS_DEBUG
 	const ULONG ulAppendLength = 50000;
-	CHAR *sz = GPOS_NEW_ARRAY(memory_pool, CHAR, ulAppendLength + 1);
+	CHAR *sz = GPOS_NEW_ARRAY(mp, CHAR, ulAppendLength + 1);
 	for (ULONG ul = 0; ul < ulAppendLength; ul++)
 	{
 		sz[ul] = 'W';
@@ -307,7 +307,7 @@ CWStringTest::EresUnittest_AppendFormatLarge()
 
 	WCHAR w_str[25];
 	CWStringStatic *pstr4 =
-		GPOS_NEW(memory_pool) CWStringStatic(w_str, GPOS_ARRAY_SIZE(w_str), GPOS_WSZ_LIT("Hello"));
+		GPOS_NEW(mp) CWStringStatic(w_str, GPOS_ARRAY_SIZE(w_str), GPOS_WSZ_LIT("Hello"));
 	pstr4->AppendCharArray(" World");
 	pstr4->AppendWideCharArray(GPOS_WSZ_LIT(" WIDE WORLD"));
 
@@ -338,16 +338,16 @@ CWStringTest::EresUnittest_Initialize()
 {
 #ifdef GPOS_DEBUG  // run this test in debug mode only
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	CWStringDynamic *pstr1 =
-		GPOS_NEW(memory_pool) CWStringDynamic(memory_pool, GPOS_WSZ_LIT("123"));
+		GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("123"));
 
 	CWStringConst cstr1(GPOS_WSZ_LIT("123"));
 	GPOS_ASSERT(pstr1->Equals(&cstr1));
 
 	// empty string initialization
-	CWStringDynamic *pstr2 = GPOS_NEW(memory_pool) CWStringDynamic(memory_pool);
+	CWStringDynamic *pstr2 = GPOS_NEW(mp) CWStringDynamic(mp);
 	WCHAR buffer[16];
 	CWStringStatic ss(buffer, GPOS_ARRAY_SIZE(buffer));
 
@@ -358,7 +358,7 @@ CWStringTest::EresUnittest_Initialize()
 	GPOS_ASSERT(0 == ss.Length());
 
 	// constant string initialization
-	CWStringConst *pcstr1 = GPOS_NEW(memory_pool) CWStringConst(GPOS_WSZ_LIT("123"));
+	CWStringConst *pcstr1 = GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("123"));
 	GPOS_ASSERT(pcstr1->Equals(&cstr1));
 
 	// cleanup
@@ -383,12 +383,12 @@ CWStringTest::EresUnittest_Equals()
 {
 #ifdef GPOS_DEBUG
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// dynamic strings
-	CWStringDynamic *str1 = GPOS_NEW(memory_pool) CWStringDynamic(memory_pool, GPOS_WSZ_LIT("123"));
-	CWStringDynamic *str2 = GPOS_NEW(memory_pool) CWStringDynamic(memory_pool, GPOS_WSZ_LIT("123"));
-	CWStringDynamic *str3 = GPOS_NEW(memory_pool) CWStringDynamic(memory_pool, GPOS_WSZ_LIT("12"));
+	CWStringDynamic *str1 = GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("123"));
+	CWStringDynamic *str2 = GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("123"));
+	CWStringDynamic *str3 = GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("12"));
 
 	GPOS_ASSERT(str1->Equals(str2));
 	GPOS_ASSERT(!str1->Equals(str3));
@@ -408,8 +408,8 @@ CWStringTest::EresUnittest_Equals()
 	GPOS_ASSERT(!ss3.Equals(&ss1));
 
 	// Const strings
-	CWStringConst *cstr1 = GPOS_NEW(memory_pool) CWStringConst(GPOS_WSZ_LIT("123"));
-	CWStringConst *cstr2 = GPOS_NEW(memory_pool) CWStringConst(GPOS_WSZ_LIT("12"));
+	CWStringConst *cstr1 = GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("123"));
+	CWStringConst *cstr2 = GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("12"));
 	GPOS_ASSERT(!cstr1->Equals(cstr2));
 	GPOS_ASSERT(cstr1->Equals(str1));
 
@@ -437,12 +437,12 @@ GPOS_RESULT
 CWStringTest::EresUnittest_Copy()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	CWStringDynamic *pstr1 =
-		GPOS_NEW(memory_pool) CWStringDynamic(memory_pool, GPOS_WSZ_LIT("Hello"));
+		GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("Hello"));
 
-	CWStringConst *pcstr1 = pstr1->Copy(memory_pool);
+	CWStringConst *pcstr1 = pstr1->Copy(mp);
 
 	GPOS_ASSERT(pstr1->Equals(pcstr1));
 
@@ -470,12 +470,12 @@ GPOS_RESULT
 CWStringTest::EresUnittest_AppendEscape()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	const WCHAR *w_str = GPOS_WSZ_LIT("Helloe ");
 	CWStringConst cstr(w_str);
 
-	CWStringDynamic strd(memory_pool, w_str);
+	CWStringDynamic strd(mp, w_str);
 
 	WCHAR buffer1[32];
 	WCHAR buffer2[9];

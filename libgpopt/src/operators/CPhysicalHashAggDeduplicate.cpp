@@ -30,7 +30,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalHashAggDeduplicate::CPhysicalHashAggDeduplicate
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ColRefArray *colref_array,
 	ColRefArray *pdrgpcrMinimal,
 	COperator::EGbAggType egbaggtype,
@@ -39,7 +39,7 @@ CPhysicalHashAggDeduplicate::CPhysicalHashAggDeduplicate
 	BOOL fMultiStage
 	)
 	:
-	CPhysicalHashAgg(memory_pool, colref_array, pdrgpcrMinimal, egbaggtype, fGeneratesDuplicates, NULL /*pdrgpcrGbMinusDistinct*/, fMultiStage),
+	CPhysicalHashAgg(mp, colref_array, pdrgpcrMinimal, egbaggtype, fGeneratesDuplicates, NULL /*pdrgpcrGbMinusDistinct*/, fMultiStage),
 	m_pdrgpcrKeys(pdrgpcrKeys)
 {
 	GPOS_ASSERT(NULL != pdrgpcrKeys);

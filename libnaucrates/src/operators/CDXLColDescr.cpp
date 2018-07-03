@@ -27,7 +27,7 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLColDescr::CDXLColDescr(IMemoryPool *memory_pool,
+CDXLColDescr::CDXLColDescr(IMemoryPool *mp,
 						   CMDName *md_name,
 						   ULONG column_id,
 						   INT attr_no,
@@ -35,7 +35,7 @@ CDXLColDescr::CDXLColDescr(IMemoryPool *memory_pool,
 						   INT type_modifier,
 						   BOOL is_dropped,
 						   ULONG width)
-	: m_memory_pool(memory_pool),
+	: m_mp(mp),
 	  m_md_name(md_name),
 	  m_column_id(column_id),
 	  m_attr_no(attr_no),

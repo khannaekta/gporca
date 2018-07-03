@@ -86,7 +86,7 @@ namespace gpopt
 		private:
 
 			// memory pool
-			IMemoryPool *m_memory_pool;
+			IMemoryPool *m_mp;
 			
 			// source system id
 			CSystemId m_sysid;
@@ -399,7 +399,7 @@ namespace gpopt
 
 		public:
 			// ctor
-			CTranslatorDXLToExpr(IMemoryPool *memory_pool, CMDAccessor *md_accessor, BOOL fInitColumnFactory = true);
+			CTranslatorDXLToExpr(IMemoryPool *mp, CMDAccessor *md_accessor, BOOL fInitColumnFactory = true);
 
 			// dtor
 			~CTranslatorDXLToExpr();

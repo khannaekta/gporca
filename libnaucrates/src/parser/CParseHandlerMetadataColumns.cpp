@@ -31,10 +31,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerMetadataColumns::CParseHandlerMetadataColumns(IMemoryPool *memory_pool,
+CParseHandlerMetadataColumns::CParseHandlerMetadataColumns(IMemoryPool *mp,
 														   CParseHandlerManager *parse_handler_mgr,
 														   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root), m_md_col_array(NULL)
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root), m_md_col_array(NULL)
 {
 }
 
@@ -71,7 +71,7 @@ CParseHandlerMetadataColumns::StartElement(const XMLCh *const element_uri,
 		// start of a columns' list
 		GPOS_ASSERT(NULL == m_md_col_array);
 
-		m_md_col_array = GPOS_NEW(m_memory_pool) MDColumnPtrArray(m_memory_pool);
+		m_md_col_array = GPOS_NEW(m_mp) MDColumnPtrArray(m_mp);
 	}
 	else if (0 ==
 			 XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenColumn), element_local_name))
@@ -81,7 +81,7 @@ CParseHandlerMetadataColumns::StartElement(const XMLCh *const element_uri,
 
 		// activate parse handler to parse the column info
 		CParseHandlerBase *col_parse_handler =
-			CParseHandlerFactory::GetParseHandler(m_memory_pool,
+			CParseHandlerFactory::GetParseHandler(m_mp,
 												  CDXLTokens::XmlstrToken(EdxltokenMetadataColumn),
 												  m_parse_handler_mgr,
 												  this);

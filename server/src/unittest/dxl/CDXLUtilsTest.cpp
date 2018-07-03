@@ -68,18 +68,18 @@ CDXLUtilsTest::EresUnittest_SerializeQuery()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 	
 	// read DXL file
-	CHAR *dxl_string = CDXLUtils::Read(memory_pool, szQueryFile);
+	CHAR *dxl_string = CDXLUtils::Read(mp, szQueryFile);
 
-	CQueryToDXLResult *presult = CDXLUtils::ParseQueryToQueryDXLTree(memory_pool, dxl_string, NULL /*xsd_file_path*/);
+	CQueryToDXLResult *presult = CDXLUtils::ParseQueryToQueryDXLTree(mp, dxl_string, NULL /*xsd_file_path*/);
 	
 	// serialize with document header
 	BOOL rgfIndentation[] = {true, false};
 	BOOL rgfHeaders[] = {true, false};
 	
-	CWStringDynamic str(memory_pool);
+	CWStringDynamic str(mp);
 	COstreamString oss(&str);
 
 	for (ULONG ulHeaders = 0; ulHeaders < GPOS_ARRAY_SIZE(rgfHeaders); ulHeaders++)
@@ -89,7 +89,7 @@ CDXLUtilsTest::EresUnittest_SerializeQuery()
 			oss << "Headers: " << rgfHeaders[ulHeaders] << ", indentation: " << rgfIndentation[ulIndent] << std::endl;
 			CDXLUtils::SerializeQuery
 				(
-				memory_pool,
+				mp,
 				oss,
 				presult->CreateDXLNode(),
 				presult->GetOutputColumnsDXLArray(),
@@ -124,20 +124,20 @@ CDXLUtilsTest::EresUnittest_SerializePlan()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 	
 	// read DXL file
-	CHAR *dxl_string = CDXLUtils::Read(memory_pool, szPlanFile);
+	CHAR *dxl_string = CDXLUtils::Read(mp, szPlanFile);
 
 	ULLONG plan_id = gpos::ullong_max;
 	ULLONG plan_space_size = gpos::ullong_max;
-	CDXLNode *node = CDXLUtils::GetPlanDXLNode(memory_pool, dxl_string, NULL /*xsd_file_path*/, &plan_id, &plan_space_size);
+	CDXLNode *node = CDXLUtils::GetPlanDXLNode(mp, dxl_string, NULL /*xsd_file_path*/, &plan_id, &plan_space_size);
 	
 	// serialize with document header
 	BOOL rgfIndentation[] = {true, false};
 	BOOL rgfHeaders[] = {true, false};
 	
-	CWStringDynamic str(memory_pool);
+	CWStringDynamic str(mp);
 	COstreamString oss(&str);
 
 	for (ULONG ulHeaders = 0; ulHeaders < GPOS_ARRAY_SIZE(rgfHeaders); ulHeaders++)
@@ -145,7 +145,7 @@ CDXLUtilsTest::EresUnittest_SerializePlan()
 		for (ULONG ulIndent = 0; ulIndent < GPOS_ARRAY_SIZE(rgfIndentation); ulIndent++)
 		{
 			oss << "Headers: " << rgfHeaders[ulHeaders] << ", indentation: " << rgfIndentation[ulIndent] << std::endl;
-			CDXLUtils::SerializePlan(memory_pool, oss, node, plan_id, plan_space_size, rgfHeaders[ulHeaders], rgfIndentation[ulIndent]);
+			CDXLUtils::SerializePlan(mp, oss, node, plan_id, plan_space_size, rgfHeaders[ulHeaders], rgfIndentation[ulIndent]);
 			oss << std::endl;
 		}
 	}
@@ -173,9 +173,9 @@ GPOS_RESULT
 CDXLUtilsTest::EresUnittest_Encoding()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
-	CAutoP<CDXLMemoryManager> a_pmm(GPOS_NEW(memory_pool) CDXLMemoryManager(memory_pool));
+	CAutoP<CDXLMemoryManager> a_pmm(GPOS_NEW(mp) CDXLMemoryManager(mp));
 
 	const CHAR *sz = "{\"{FUNCEXPR :funcid 1967 :funcresulttype 1184 :funcretset false :funcformat 1 :args ({FUNCEXPR :funcid 1191 :funcresulttype 1184 :funcretset false :funcformat 2 :args ({CONST :consttype 25 :constlen -1 :constbyval false :constisnull false :constvalue 7 [ 0 0 0 7 110 111 119 ]})} {CONST :consttype 23 :constlen 4 :constbyval true :constisnull false :constvalue 4 [ 2 0 0 0 0 0 0 0 ]})}\"}";
 	ULONG len = clib::Strlen(sz);
@@ -188,7 +188,7 @@ CDXLUtilsTest::EresUnittest_Encoding()
 	CHAR *szEncoded = (CHAR *) (a_pxmlbyteEncoded.Rgt());
 
 	// convert encoded string to array of XMLCh
-	XMLCh *pxmlch = GPOS_NEW_ARRAY(memory_pool, XMLCh, output_length + 1);
+	XMLCh *pxmlch = GPOS_NEW_ARRAY(mp, XMLCh, output_length + 1);
 	for (ULONG ul = 0; ul < output_length; ul++)
 	{
 		pxmlch[ul] = (XMLCh) a_pxmlbyteEncoded[ul];
@@ -208,7 +208,7 @@ CDXLUtilsTest::EresUnittest_Encoding()
 	GPOS_ASSERT(0 == clib::Strcmp(szPba, sz));
 
 	{
-		CAutoTrace at(memory_pool);
+		CAutoTrace at(mp);
 		at.Os() << std::endl << "Input:" << sz << std::endl;
 		at.Os() << std::endl << "Encoded:" << szEncoded << std::endl;
 		at.Os() << std::endl << "Decoded:" << szDecoded << std::endl;

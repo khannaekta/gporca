@@ -45,7 +45,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CParseHandlerMetadataObject(IMemoryPool *memory_pool,
+		CParseHandlerMetadataObject(IMemoryPool *mp,
 									CParseHandlerManager *parse_handler_mgr,
 									CParseHandlerBase *parse_handler_root);
 

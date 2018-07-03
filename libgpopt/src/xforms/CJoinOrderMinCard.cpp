@@ -38,12 +38,12 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CJoinOrderMinCard::CJoinOrderMinCard
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ExpressionArray *pdrgpexprComponents,
 	ExpressionArray *pdrgpexprConjuncts
 	)
 	:
-	CJoinOrder(memory_pool, pdrgpexprComponents, pdrgpexprConjuncts),
+	CJoinOrder(mp, pdrgpexprComponents, pdrgpexprConjuncts),
 	m_pcompResult(NULL)
 {
 #ifdef GPOS_DEBUG
@@ -93,7 +93,7 @@ CJoinOrderMinCard::MarkUsedEdges()
 	}
 
 	CExpression *pexprScalar = (*pexpr) [pexpr->Arity() - 1];
-	ExpressionArray *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(m_memory_pool, pexprScalar);
+	ExpressionArray *pdrgpexpr = CPredicateUtils::PdrgpexprConjuncts(m_mp, pexprScalar);
 	const ULONG size = pdrgpexpr->Size();
 
 	for (ULONG ulEdge = 0; ulEdge < m_ulEdges; ulEdge++)
@@ -128,7 +128,7 @@ CJoinOrderMinCard::PexprExpand()
 {
 	GPOS_ASSERT(NULL == m_pcompResult && "join order is already expanded");
 
-	m_pcompResult = GPOS_NEW(m_memory_pool) SComponent(m_memory_pool, NULL /*pexpr*/);
+	m_pcompResult = GPOS_NEW(m_mp) SComponent(m_mp, NULL /*pexpr*/);
 	ULONG ulCoveredComps = 0;
 	while (ulCoveredComps < m_ulComps)
 	{

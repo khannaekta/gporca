@@ -780,7 +780,7 @@ namespace gpdxl
 		static SXMLStrMapElem *m_pxmlszmap;
 
 		// memory pool -- not owned
-		static IMemoryPool *m_memory_pool;
+		static IMemoryPool *m_mp;
 
 		// local dxl memory manager
 		static CDXLMemoryManager *m_memory_manager_dxl;
@@ -795,7 +795,7 @@ namespace gpdxl
 		static const XMLCh *XmlstrToken(Edxltoken token_type);
 
 		// initialize constants. Must be called before constants are accessed.
-		static void Init(IMemoryPool *memory_pool);
+		static void Init(IMemoryPool *mp);
 
 		// cleanup tokens
 		static void Terminate();

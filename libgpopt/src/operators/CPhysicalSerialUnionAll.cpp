@@ -44,13 +44,13 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalSerialUnionAll::CPhysicalSerialUnionAll
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ColRefArray *pdrgpcrOutput,
 	ColRefArrays *pdrgpdrgpcrInput,
 	ULONG ulScanIdPartialIndex
 	)
 	:
-	CPhysicalUnionAll(memory_pool, pdrgpcrOutput, pdrgpdrgpcrInput, ulScanIdPartialIndex)
+	CPhysicalUnionAll(mp, pdrgpcrOutput, pdrgpdrgpcrInput, ulScanIdPartialIndex)
 {
 	// UnionAll creates two distribution requests to enforce distribution of its children:
 	// (1) (Hashed, Hashed): used to pass hashed distribution (requested from above)
@@ -78,7 +78,7 @@ CPhysicalSerialUnionAll::~CPhysicalSerialUnionAll()
 CDistributionSpec *
 CPhysicalSerialUnionAll::PdsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CDistributionSpec *pdsRequired,
 	ULONG child_index,
@@ -91,7 +91,7 @@ CPhysicalSerialUnionAll::PdsRequired
 	GPOS_ASSERT(child_index < PdrgpdrgpcrInput()->Size());
 	GPOS_ASSERT(2 > ulOptReq);
 
-	CDistributionSpec *pds = PdsMasterOnlyOrReplicated(memory_pool, exprhdl, pdsRequired, child_index, ulOptReq);
+	CDistributionSpec *pds = PdsMasterOnlyOrReplicated(mp, exprhdl, pdsRequired, child_index, ulOptReq);
 	if (NULL != pds)
 	{
 		return pds;
@@ -100,7 +100,7 @@ CPhysicalSerialUnionAll::PdsRequired
 	if (0 == ulOptReq && CDistributionSpec::EdtHashed == pdsRequired->Edt())
 	{
 		// attempt passing requested hashed distribution to children
-		CDistributionSpecHashed *pdshashed = PdshashedPassThru(memory_pool, CDistributionSpecHashed::PdsConvert(pdsRequired), child_index);
+		CDistributionSpecHashed *pdshashed = PdshashedPassThru(mp, CDistributionSpecHashed::PdsConvert(pdsRequired), child_index);
 		if (NULL != pdshashed)
 		{
 			return pdshashed;
@@ -110,7 +110,7 @@ CPhysicalSerialUnionAll::PdsRequired
 	if (0 == child_index)
 	{
 		// otherwise, ANY distribution is requested from outer child
-		return GPOS_NEW(memory_pool) CDistributionSpecAny(this->Eopid());
+		return GPOS_NEW(mp) CDistributionSpecAny(this->Eopid());
 	}
 
 	// inspect distribution delivered by outer child
@@ -120,7 +120,7 @@ CPhysicalSerialUnionAll::PdsRequired
 		CDistributionSpec::EdtStrictSingleton == pdsOuter->Edt())
 	{
 		// outer child is Singleton, require inner child to have matching Singleton distribution
-		return CPhysical::PdssMatching(memory_pool, CDistributionSpecSingleton::PdssConvert(pdsOuter));
+		return CPhysical::PdssMatching(mp, CDistributionSpecSingleton::PdssConvert(pdsOuter));
 	}
 
 	if (CDistributionSpec::EdtUniversal == pdsOuter->Edt())
@@ -128,20 +128,20 @@ CPhysicalSerialUnionAll::PdsRequired
 		// require inner child to be on the master segment in order to avoid
 		// duplicate values when doing UnionAll operation with Universal outer child
 		// Example: select 1 union all select i from x;
-		return GPOS_NEW(memory_pool) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
+		return GPOS_NEW(mp) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
 	}
 
 	if (CDistributionSpec::EdtReplicated == pdsOuter->Edt())
 	{
 		// outer child is replicated, require inner child to be replicated
-		return GPOS_NEW(memory_pool) CDistributionSpecReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated();
 	}
 
 	// outer child is non-replicated and is distributed across segments,
 	// we need to the inner child to be distributed across segments that does
 	// not generate duplicate results. That is, inner child should not be replicated.
 
-	return GPOS_NEW(memory_pool) CDistributionSpecNonSingleton(false /*fAllowReplicated*/);
+	return GPOS_NEW(mp) CDistributionSpecNonSingleton(false /*fAllowReplicated*/);
 }
 
 // EOF

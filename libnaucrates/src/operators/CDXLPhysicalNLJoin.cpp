@@ -26,10 +26,10 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalNLJoin::CDXLPhysicalNLJoin(IMemoryPool *memory_pool,
+CDXLPhysicalNLJoin::CDXLPhysicalNLJoin(IMemoryPool *mp,
 									   EdxlJoinType join_type,
 									   BOOL is_index_nlj)
-	: CDXLPhysicalJoin(memory_pool, join_type), m_is_index_nlj(is_index_nlj)
+	: CDXLPhysicalJoin(mp, join_type), m_is_index_nlj(is_index_nlj)
 {
 }
 

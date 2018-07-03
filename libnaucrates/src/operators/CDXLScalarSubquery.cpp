@@ -27,8 +27,8 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarSubquery::CDXLScalarSubquery(IMemoryPool *memory_pool, ULONG col_id)
-	: CDXLScalar(memory_pool), m_colid(col_id)
+CDXLScalarSubquery::CDXLScalarSubquery(IMemoryPool *mp, ULONG col_id)
+	: CDXLScalar(mp), m_colid(col_id)
 {
 }
 

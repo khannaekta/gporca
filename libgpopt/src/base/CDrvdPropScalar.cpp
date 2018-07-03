@@ -70,7 +70,7 @@ CDrvdPropScalar::~CDrvdPropScalar()
 void
 CDrvdPropScalar::Derive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CDrvdPropCtxt * // pdpctxt
 	)
@@ -79,16 +79,16 @@ CDrvdPropScalar::Derive
 	
 	// call derivation functions on the operator
 	GPOS_ASSERT(NULL == m_pcrsDefined);
-	m_pcrsDefined = popScalar->PcrsDefined(memory_pool, exprhdl);
+	m_pcrsDefined = popScalar->PcrsDefined(mp, exprhdl);
 
 	GPOS_ASSERT(NULL == m_pcrsSetReturningFunction);
-	m_pcrsSetReturningFunction = popScalar->PcrsSetReturningFunction(memory_pool, exprhdl);
+	m_pcrsSetReturningFunction = popScalar->PcrsSetReturningFunction(mp, exprhdl);
 	
 	GPOS_ASSERT(NULL == m_pcrsUsed);
-	m_pcrsUsed = popScalar->PcrsUsed(memory_pool, exprhdl);
+	m_pcrsUsed = popScalar->PcrsUsed(mp, exprhdl);
 
 	// derive function properties
-	m_pfp = popScalar->PfpDerive(memory_pool, exprhdl);
+	m_pfp = popScalar->PfpDerive(mp, exprhdl);
 
 	// add defined and used columns of children
 	const ULONG arity = exprhdl.Arity();
@@ -117,11 +117,11 @@ CDrvdPropScalar::Derive
 	
 	if (m_fHasSubquery)
 	{
-		m_ppartinfo = popScalar->PpartinfoDerive(memory_pool, exprhdl);
+		m_ppartinfo = popScalar->PpartinfoDerive(mp, exprhdl);
 	}
 	else
 	{
-		m_ppartinfo = GPOS_NEW(memory_pool) CPartInfo(memory_pool);
+		m_ppartinfo = GPOS_NEW(mp) CPartInfo(mp);
 	}
 
 	m_fHasNonScalarFunction = popScalar->FHasNonScalarFunction(exprhdl);

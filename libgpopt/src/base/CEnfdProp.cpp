@@ -29,8 +29,8 @@ namespace gpopt {
 	void
 	CEnfdProp::DbgPrint() const
 	{
-		IMemoryPool *memory_pool = COptCtxt::PoctxtFromTLS()->Pmp();
-		CAutoTrace at(memory_pool);
+		IMemoryPool *mp = COptCtxt::PoctxtFromTLS()->Pmp();
+		CAutoTrace at(mp);
 		(void) this->OsPrint(at.Os());
 	}
 #endif // GPOS_DEBUG

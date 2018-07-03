@@ -137,10 +137,10 @@ namespace gpos
 
 	public:
 		// ctor
-		CMemoryPoolStack(IMemoryPool *memory_pool,
+		CMemoryPoolStack(IMemoryPool *mp,
 						 ULLONG capacity,
 						 BOOL thread_safe,
-						 BOOL owns_underlying_memory_pool);
+						 BOOL owns_underlying_mp);
 
 		// dtor
 		virtual ~CMemoryPoolStack();

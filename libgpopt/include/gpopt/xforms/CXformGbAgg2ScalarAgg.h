@@ -37,7 +37,7 @@ namespace gpopt
 		public:
 		
 			// ctor
-			CXformGbAgg2ScalarAgg(IMemoryPool *memory_pool);
+			CXformGbAgg2ScalarAgg(IMemoryPool *mp);
 
 			// dtor
 			virtual 

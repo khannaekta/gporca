@@ -47,7 +47,7 @@ namespace gpopt
 		public:
 		
 			// ctor
-			CScalarSubquery(IMemoryPool *memory_pool, const CColRef *colref, BOOL fGeneratedByExist, BOOL fGeneratedByQuantified);
+			CScalarSubquery(IMemoryPool *mp, const CColRef *colref, BOOL fGeneratedByExist, BOOL fGeneratedByQuantified);
 
 			// dtor
 			virtual 
@@ -91,11 +91,11 @@ namespace gpopt
 			
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// return locally used columns
 			virtual
-			CColRefSet *PcrsUsed(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CColRefSet *PcrsUsed(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 			// is subquery generated from existential subquery?
 			BOOL FGeneratedByExist() const
@@ -113,7 +113,7 @@ namespace gpopt
 			virtual
 			CPartInfo *PpartinfoDerive
 				(
-				IMemoryPool *memory_pool, 
+				IMemoryPool *mp, 
 				CExpressionHandle &exprhdl
 				) 
 				const;

@@ -32,7 +32,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalPartitionSelector::CPhysicalPartitionSelector
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ULONG scan_id,
 	IMDId *mdid,
 	ColRefArrays *pdrgpdrgpcr,
@@ -43,7 +43,7 @@ CPhysicalPartitionSelector::CPhysicalPartitionSelector
 	CExpression *pexprResidual
 	)
 	:
-	CPhysical(memory_pool),
+	CPhysical(mp),
 	m_scan_id(scan_id),
 	m_mdid(mdid),
 	m_pdrgpdrgpcr(pdrgpdrgpcr),
@@ -62,7 +62,7 @@ CPhysicalPartitionSelector::CPhysicalPartitionSelector
 	GPOS_ASSERT(NULL != phmulexprEqPredicates);
 	GPOS_ASSERT(NULL != phmulexprPredicates);
 
-	m_pexprCombinedPredicate = PexprCombinedPartPred(memory_pool);
+	m_pexprCombinedPredicate = PexprCombinedPartPred(mp);
 }
 
 //---------------------------------------------------------------------------
@@ -75,12 +75,12 @@ CPhysicalPartitionSelector::CPhysicalPartitionSelector
 //---------------------------------------------------------------------------
 CPhysicalPartitionSelector::CPhysicalPartitionSelector
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IMDId *mdid,
 	HMUlExpr *phmulexprEqPredicates
 	)
 	:
-	CPhysical(memory_pool),
+	CPhysical(mp),
 	m_scan_id(0),
 	m_mdid(mdid),
 	m_pdrgpdrgpcr(NULL),
@@ -94,8 +94,8 @@ CPhysicalPartitionSelector::CPhysicalPartitionSelector
 	GPOS_ASSERT(mdid->IsValid());
 	GPOS_ASSERT(NULL != phmulexprEqPredicates);
 
-	m_phmulexprPredicates = GPOS_NEW(memory_pool) HMUlExpr(memory_pool);
-	m_pexprCombinedPredicate = PexprCombinedPartPred(memory_pool);
+	m_phmulexprPredicates = GPOS_NEW(mp) HMUlExpr(mp);
+	m_pexprCombinedPredicate = PexprCombinedPartPred(mp);
 }
 
 //---------------------------------------------------------------------------
@@ -335,7 +335,7 @@ CPhysicalPartitionSelector::PexprFilter
 CExpression *
 CPhysicalPartitionSelector::PexprPartPred
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	ULONG ulPartLevel
 	)
 	const
@@ -352,7 +352,7 @@ CPhysicalPartitionSelector::PexprPartPred
 		if (NULL != m_pdrgpdrgpcr)
 		{
 			CColRef *pcrPartKey = (*(*m_pdrgpdrgpcr)[ulPartLevel])[0];
-			return CUtils::PexprScalarEqCmp(memory_pool, pcrPartKey, pexpr);
+			return CUtils::PexprScalarEqCmp(mp, pcrPartKey, pexpr);
 		}
 		else
 		{
@@ -380,16 +380,16 @@ CPhysicalPartitionSelector::PexprPartPred
 CExpression *
 CPhysicalPartitionSelector::PexprCombinedPartPred
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	const
 {
-	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
 
 	const ULONG ulLevels = UlPartLevels();
 	for (ULONG ul = 0; ul < ulLevels; ul++)
 	{
-		CExpression *pexpr = PexprPartPred(memory_pool, ul);
+		CExpression *pexpr = PexprPartPred(mp, ul);
 		if (NULL != pexpr)
 		{
 			pdrgpexpr->Append(pexpr);
@@ -402,7 +402,7 @@ CPhysicalPartitionSelector::PexprCombinedPartPred
 		pdrgpexpr->Append(m_pexprResidual);
 	}
 
-	return CPredicateUtils::PexprConjunction(memory_pool, pdrgpexpr);
+	return CPredicateUtils::PexprConjunction(mp, pdrgpexpr);
 }
 
 //---------------------------------------------------------------------------
@@ -435,7 +435,7 @@ CPhysicalPartitionSelector::UlPartLevels() const
 CPartFilterMap *
 CPhysicalPartitionSelector::PpfmDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -445,12 +445,12 @@ CPhysicalPartitionSelector::PpfmDerive
 		return PpfmPassThruOuter(exprhdl);
 	}
 
-	CPartFilterMap *ppfm = PpfmDeriveCombineRelational(memory_pool, exprhdl);
+	CPartFilterMap *ppfm = PpfmDeriveCombineRelational(mp, exprhdl);
 	IStatistics *stats = exprhdl.Pstats();
 	GPOS_ASSERT(NULL != stats);
 	m_pexprCombinedPredicate->AddRef();
 	stats->AddRef();
-	ppfm->AddPartFilter(memory_pool, m_scan_id, m_pexprCombinedPredicate, stats);
+	ppfm->AddPartFilter(mp, m_scan_id, m_pexprCombinedPredicate, stats);
 	return ppfm;
 }
 
@@ -466,7 +466,7 @@ CPhysicalPartitionSelector::PpfmDerive
 CColRefSet *
 CPhysicalPartitionSelector::PcrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CColRefSet *pcrsInput,
 	ULONG child_index,
@@ -477,7 +477,7 @@ CPhysicalPartitionSelector::PcrsRequired
 	GPOS_ASSERT(0 == child_index &&
 				"Required properties can only be computed on the relational child");
 
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool, *pcrsInput);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *pcrsInput);
 	pcrs->Union(CDrvdPropScalar::GetDrvdScalarProps(m_pexprCombinedPredicate->PdpDerive())->PcrsUsed());
 	pcrs->Intersection(exprhdl.GetRelationalProperties(child_index)->PcrsOutput());
 
@@ -495,7 +495,7 @@ CPhysicalPartitionSelector::PcrsRequired
 COrderSpec *
 CPhysicalPartitionSelector::PosRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	COrderSpec *posRequired,
 	ULONG child_index,
@@ -506,7 +506,7 @@ CPhysicalPartitionSelector::PosRequired
 {
 	GPOS_ASSERT(0 == child_index);
 
-	return PosPassThru(memory_pool, exprhdl, posRequired, child_index);
+	return PosPassThru(mp, exprhdl, posRequired, child_index);
 }
 
 //---------------------------------------------------------------------------
@@ -520,7 +520,7 @@ CPhysicalPartitionSelector::PosRequired
 CDistributionSpec *
 CPhysicalPartitionSelector::PdsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CDistributionSpec *pdsInput,
 	ULONG child_index,
@@ -540,10 +540,10 @@ CPhysicalPartitionSelector::PdsRequired
 		// if partition consumer is defined below, do not pass distribution
 		// requirements down as this will cause the consumer and enforcer to be
 		// in separate slices
-		return GPOS_NEW(memory_pool) CDistributionSpecAny(this->Eopid());
+		return GPOS_NEW(mp) CDistributionSpecAny(this->Eopid());
 	}
 
-	return PdsPassThru(memory_pool, exprhdl, pdsInput, child_index);
+	return PdsPassThru(mp, exprhdl, pdsInput, child_index);
 }
 
 //---------------------------------------------------------------------------
@@ -557,7 +557,7 @@ CPhysicalPartitionSelector::PdsRequired
 CRewindabilitySpec *
 CPhysicalPartitionSelector::PrsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CRewindabilitySpec *prsRequired,
 	ULONG child_index,
@@ -568,7 +568,7 @@ CPhysicalPartitionSelector::PrsRequired
 {
 	GPOS_ASSERT(0 == child_index);
 
-	return PrsPassThru(memory_pool, exprhdl, prsRequired, child_index);
+	return PrsPassThru(mp, exprhdl, prsRequired, child_index);
 }
 
 //---------------------------------------------------------------------------
@@ -582,7 +582,7 @@ CPhysicalPartitionSelector::PrsRequired
 CPartitionPropagationSpec *
 CPhysicalPartitionSelector::PppsRequired
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle & exprhdl,
 	CPartitionPropagationSpec *pppsRequired,
 	ULONG
@@ -600,10 +600,10 @@ CPhysicalPartitionSelector::PppsRequired
 	CPartIndexMap *ppimInput = pppsRequired->Ppim();
 	CPartFilterMap *ppfmInput = pppsRequired->Ppfm();
 
-	ULongPtrArray *pdrgpulInputScanIds = ppimInput->PdrgpulScanIds(memory_pool);
+	ULongPtrArray *pdrgpulInputScanIds = ppimInput->PdrgpulScanIds(mp);
 
-	CPartIndexMap *ppim = GPOS_NEW(memory_pool) CPartIndexMap(memory_pool);
-	CPartFilterMap *ppfm = GPOS_NEW(memory_pool) CPartFilterMap(memory_pool);
+	CPartIndexMap *ppim = GPOS_NEW(mp) CPartIndexMap(mp);
+	CPartFilterMap *ppfm = GPOS_NEW(mp) CPartFilterMap(mp);
 
 	CPartInfo *ppartinfo = exprhdl.GetRelationalProperties(0)->Ppartinfo();
 
@@ -637,13 +637,13 @@ CPhysicalPartitionSelector::PppsRequired
 		ppartcnstr->AddRef();
 
 		ppim->Insert(scan_id, ppartcnstrmap, epim, ulExpectedPropagators, mdid, pdrgppartkeys, ppartcnstr);
-		(void) ppfm->FCopyPartFilter(m_memory_pool, scan_id, ppfmInput);
+		(void) ppfm->FCopyPartFilter(m_mp, scan_id, ppfmInput);
 	}
 
 	// cleanup
 	pdrgpulInputScanIds->Release();
 
-	return GPOS_NEW(memory_pool) CPartitionPropagationSpec(ppim, ppfm);
+	return GPOS_NEW(mp) CPartitionPropagationSpec(ppim, ppfm);
 }
 
 //---------------------------------------------------------------------------
@@ -657,7 +657,7 @@ CPhysicalPartitionSelector::PppsRequired
 CCTEReq *
 CPhysicalPartitionSelector::PcteRequired
 	(
-	IMemoryPool *, //memory_pool,
+	IMemoryPool *, //mp,
 	CExpressionHandle &, //exprhdl,
 	CCTEReq *pcter,
 	ULONG
@@ -705,7 +705,7 @@ CPhysicalPartitionSelector::FProvidesReqdCols
 COrderSpec *
 CPhysicalPartitionSelector::PosDerive
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -724,7 +724,7 @@ CPhysicalPartitionSelector::PosDerive
 CDistributionSpec *
 CPhysicalPartitionSelector::PdsDerive
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -743,7 +743,7 @@ CPhysicalPartitionSelector::PdsDerive
 CPartIndexMap *
 CPhysicalPartitionSelector::PpimDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CDrvdPropCtxt *pdpctxt
 	)
@@ -757,7 +757,7 @@ CPhysicalPartitionSelector::PpimDerive
 
 	ULONG ulExpectedPartitionSelectors = CDrvdPropCtxtPlan::PdpctxtplanConvert(pdpctxt)->UlExpectedPartitionSelectors();
 
-	CPartIndexMap *ppim = ppimInput->PpimPartitionSelector(memory_pool, m_scan_id, ulExpectedPartitionSelectors);
+	CPartIndexMap *ppim = ppimInput->PpimPartitionSelector(mp, m_scan_id, ulExpectedPartitionSelectors);
 	if (!ppim->Contains(m_scan_id))
 	{
 		// the consumer of this scan id does not come from the child, i.e. it
@@ -767,8 +767,8 @@ CPhysicalPartitionSelector::PpimDerive
 		m_ppartcnstrmap->AddRef();
 		m_part_constraint->AddRef();
 
-		PartKeysArray *pdrgppartkeys = GPOS_NEW(memory_pool) PartKeysArray(memory_pool);
-		pdrgppartkeys->Append(GPOS_NEW(memory_pool) CPartKeys(m_pdrgpdrgpcr));
+		PartKeysArray *pdrgppartkeys = GPOS_NEW(mp) PartKeysArray(mp);
+		pdrgppartkeys->Append(GPOS_NEW(mp) CPartKeys(m_pdrgpdrgpcr));
 
 		ppim->Insert(m_scan_id, m_ppartcnstrmap, CPartIndexMap::EpimPropagator, 0 /*ulExpectedPropagators*/, MDId(), pdrgppartkeys, m_part_constraint);
 	}
@@ -787,7 +787,7 @@ CPhysicalPartitionSelector::PpimDerive
 CRewindabilitySpec *
 CPhysicalPartitionSelector::PrsDerive
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const

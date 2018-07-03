@@ -76,13 +76,13 @@ namespace gpnaucrates
 		}
 
 		// copy upper bound ndvs
-		CUpperBoundNDVs *CopyUpperBoundNDVs(IMemoryPool *memory_pool) const;
-		CUpperBoundNDVs *CopyUpperBoundNDVs(IMemoryPool *memory_pool,
+		CUpperBoundNDVs *CopyUpperBoundNDVs(IMemoryPool *mp) const;
+		CUpperBoundNDVs *CopyUpperBoundNDVs(IMemoryPool *mp,
 											CDouble upper_bound_ndv) const;
 
 		// copy upper bound ndvs with remapped column id; function will
 		// return null if there is no mapping found for any of the columns
-		CUpperBoundNDVs *CopyUpperBoundNDVWithRemap(IMemoryPool *memory_pool,
+		CUpperBoundNDVs *CopyUpperBoundNDVWithRemap(IMemoryPool *mp,
 													UlongColRefHashMap *colid_to_colref_map) const;
 
 		// print function

@@ -64,7 +64,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerCtasStorageOptions(IMemoryPool *memory_pool,
+		CParseHandlerCtasStorageOptions(IMemoryPool *mp,
 										CParseHandlerManager *parse_handler_mgr,
 										CParseHandlerBase *parse_handler_root);
 

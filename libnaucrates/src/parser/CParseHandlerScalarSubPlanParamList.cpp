@@ -33,12 +33,12 @@ XERCES_CPP_NAMESPACE_USE
 //
 //---------------------------------------------------------------------------
 CParseHandlerScalarSubPlanParamList::CParseHandlerScalarSubPlanParamList(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root)
 {
-	m_dxl_colref_array = GPOS_NEW(memory_pool) DXLColRefArray(memory_pool);
+	m_dxl_colref_array = GPOS_NEW(mp) DXLColRefArray(mp);
 	m_has_param_list = false;
 }
 
@@ -85,7 +85,7 @@ CParseHandlerScalarSubPlanParamList::StartElement(const XMLCh *const element_uri
 
 		// start new param
 		CParseHandlerBase *parse_handler_subplan_param = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool,
+			m_mp,
 			CDXLTokens::XmlstrToken(EdxltokenScalarSubPlanParam),
 			m_parse_handler_mgr,
 			this);
@@ -121,7 +121,7 @@ CParseHandlerScalarSubPlanParamList::EndElement(const XMLCh *const,  // element_
 {
 	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarSubPlanParamList),
 									  element_local_name) &&
-		NULL != m_dxl_node)
+		NULL != m_dxlnode)
 	{
 		CWStringDynamic *str = CDXLUtils::CreateDynamicStringFromXMLChArray(
 			m_parse_handler_mgr->GetDXLMemoryManager(), element_local_name);

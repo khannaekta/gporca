@@ -76,7 +76,7 @@ namespace gpopt
 			// ctor
 			CScalarAggFunc
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				IMDId *pmdidAggFunc,
 				IMDId *resolved_rettype,
 				const CWStringConst *pstrAggFunc,
@@ -127,7 +127,7 @@ namespace gpopt
 			virtual
 			COperator *PopCopyWithRemappedColumns
 						(
-						IMemoryPool *, //memory_pool,
+						IMemoryPool *, //mp,
 						UlongColRefHashMap *, //colref_mapping,
 						BOOL //must_exist
 						)

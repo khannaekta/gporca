@@ -39,7 +39,7 @@ namespace gpopt
 			// ctor
 			CPhysicalHashAggDeduplicate
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				ColRefArray *colref_array,
 				ColRefArray *pdrgpcrMinimal,
 				COperator::EGbAggType egbaggtype,
@@ -81,7 +81,7 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsRequired,
 				ULONG child_index,
@@ -89,14 +89,14 @@ namespace gpopt
 				ULONG //ulOptReq
 				)
 			{
-				return PcrsRequiredAgg(memory_pool, exprhdl, pcrsRequired, child_index, m_pdrgpcrKeys);
+				return PcrsRequiredAgg(mp, exprhdl, pcrsRequired, child_index, m_pdrgpcrKeys);
 			}
 
 			// compute required distribution of the n-th child
 			virtual
 			CDistributionSpec *PdsRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsRequired,
 				ULONG child_index,
@@ -105,7 +105,7 @@ namespace gpopt
 				)
 				const
 			{
-				return PdsRequiredAgg(memory_pool, exprhdl, pdsRequired, child_index, ulOptReq, m_pdrgpcrKeys, m_pdrgpcrKeys);
+				return PdsRequiredAgg(mp, exprhdl, pdsRequired, child_index, ulOptReq, m_pdrgpcrKeys, m_pdrgpcrKeys);
 			}
 
 			//-------------------------------------------------------------------------------------

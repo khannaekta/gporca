@@ -36,12 +36,12 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalSelect::CLogicalSelect
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogicalUnary(memory_pool)
+	CLogicalUnary(mp)
 {
-	m_phmPexprPartPred = GPOS_NEW(memory_pool) HMPexprPartPred(memory_pool);
+	m_phmPexprPartPred = GPOS_NEW(mp) HMPexprPartPred(mp);
 }
 
 CLogicalSelect::~CLogicalSelect()
@@ -59,7 +59,7 @@ CLogicalSelect::~CLogicalSelect()
 CColRefSet *
 CLogicalSelect::PcrsDeriveOutput
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 {
@@ -78,7 +78,7 @@ CLogicalSelect::PcrsDeriveOutput
 CKeyCollection *
 CLogicalSelect::PkcDeriveKeys
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -98,11 +98,11 @@ CLogicalSelect::PkcDeriveKeys
 CXformSet *
 CLogicalSelect::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	) 
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfSelect2Apply);
 	(void) xform_set->ExchangeSet(CXform::ExfRemoveSubqDistinct);
@@ -130,7 +130,7 @@ CLogicalSelect::PxfsCandidates
 CMaxCard
 CLogicalSelect::Maxcard
 	(
-	IMemoryPool *, // memory_pool
+	IMemoryPool *, // mp
 	CExpressionHandle &exprhdl
 	)
 	const
@@ -159,7 +159,7 @@ CLogicalSelect::Maxcard
 IStatistics *
 CLogicalSelect::PstatsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	StatsArray *stats_ctxt
 	)
@@ -177,7 +177,7 @@ CLogicalSelect::PstatsDerive
 
 	// remove implied predicates from selection condition to avoid cardinality under-estimation
 	CExpression *pexprScalar = exprhdl.PexprScalarChild(1 /*child_index*/);
-	CExpression *pexprPredicate = CPredicateUtils::PexprRemoveImpliedConjuncts(memory_pool, pexprScalar, exprhdl);
+	CExpression *pexprPredicate = CPredicateUtils::PexprRemoveImpliedConjuncts(mp, pexprScalar, exprhdl);
 
 
 	// split selection predicate into local predicate and predicate involving outer references
@@ -187,10 +187,10 @@ CLogicalSelect::PstatsDerive
 	// get outer references from expression handle
 	CColRefSet *outer_refs = exprhdl.GetRelationalProperties()->PcrsOuter();
 
-	CPredicateUtils::SeparateOuterRefs(memory_pool, pexprPredicate, outer_refs, &local_expr, &expr_with_outer_refs);
+	CPredicateUtils::SeparateOuterRefs(mp, pexprPredicate, outer_refs, &local_expr, &expr_with_outer_refs);
 	pexprPredicate->Release();
 
-	IStatistics *stats = CFilterStatsProcessor::MakeStatsFilterForScalarExpr(memory_pool, exprhdl, child_stats, local_expr, expr_with_outer_refs, stats_ctxt);
+	IStatistics *stats = CFilterStatsProcessor::MakeStatsFilterForScalarExpr(mp, exprhdl, child_stats, local_expr, expr_with_outer_refs, stats_ctxt);
 	local_expr->Release();
 	expr_with_outer_refs->Release();
 
@@ -219,7 +219,7 @@ CLogicalSelect::PstatsDerive
 CExpression *
 CLogicalSelect::PexprPartPred
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	CExpression *, //pexprInput
 	ULONG
@@ -268,7 +268,7 @@ CLogicalSelect::PexprPartPred
 	{
 		pexprPredOnPartKey = CPredicateUtils::PexprExtractPredicatesOnPartKeys
 												(
-												memory_pool,
+												mp,
 												pexprScalar,
 												(*pdrgppartkeys)[ul]->Pdrgpdrgpcr(),
 												NULL, //pcrsAllowedRefs

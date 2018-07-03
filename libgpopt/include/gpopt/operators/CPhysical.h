@@ -225,7 +225,7 @@ namespace gpopt
 			// pass cte requirement to the n-th child
 			CCTEReq *PcterNAry
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CCTEReq *pcter,
 				ULONG child_index,
@@ -237,7 +237,7 @@ namespace gpopt
 			// columns and excluding defined columns of the scalar child
 			CColRefSet *PcrsChildReqd
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsInput,
 				ULONG child_index,
@@ -246,13 +246,13 @@ namespace gpopt
 
 			// compute distribution spec from the table descriptor
 			static
-			CDistributionSpec *PdsCompute(IMemoryPool *memory_pool, const CTableDescriptor *ptabdesc, ColRefArray *pdrgpcrOutput);
+			CDistributionSpec *PdsCompute(IMemoryPool *mp, const CTableDescriptor *ptabdesc, ColRefArray *pdrgpcrOutput);
 
 			// helper for a simple case of computing child's required sort order
 			static
 			COrderSpec *PosPassThru
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				COrderSpec *posInput,
 				ULONG child_index
@@ -262,7 +262,7 @@ namespace gpopt
 			static
 			CDistributionSpec *PdsPassThru
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsInput,
 				ULONG child_index
@@ -273,7 +273,7 @@ namespace gpopt
 			static
 			CDistributionSpec *PdsMasterOnlyOrReplicated
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsInput,
 				ULONG child_index,
@@ -285,7 +285,7 @@ namespace gpopt
 			static
 			CDistributionSpec *PdsUnary
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsInput,
 				ULONG child_index,
@@ -296,7 +296,7 @@ namespace gpopt
 			static
 			CRewindabilitySpec *PrsPassThru
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CRewindabilitySpec *prsRequired,
 				ULONG child_index
@@ -306,7 +306,7 @@ namespace gpopt
 			static
 			CPartitionPropagationSpec *PppsRequiredPushThru
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CPartitionPropagationSpec *pppsRequired,
 				ULONG child_index
@@ -316,7 +316,7 @@ namespace gpopt
 			static
 			CPartitionPropagationSpec *PppsRequiredPushThruNAry
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CPartitionPropagationSpec *pppsRequired,
 				ULONG child_index
@@ -327,7 +327,7 @@ namespace gpopt
 			static
 			CPartitionPropagationSpec *PppsRequiredPushThruUnresolvedUnary
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CPartitionPropagationSpec *pppsRequired,
 				EPropogatePartConstraint eppcPropogate
@@ -342,7 +342,7 @@ namespace gpopt
 			static
 			CCTEMap *PcmCombine
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				DrgPdp *pdrgpdpCtxt
 				);
 
@@ -373,17 +373,17 @@ namespace gpopt
 
 			// combine derived part filter maps of relational children
 			static
-			CPartFilterMap *PpfmDeriveCombineRelational(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CPartFilterMap *PpfmDeriveCombineRelational(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 			// helper for common case of combining partition index maps of all relational children
 			static
-			CPartIndexMap *PpimDeriveCombineRelational(IMemoryPool *memory_pool, CExpressionHandle &exprhdl);
+			CPartIndexMap *PpimDeriveCombineRelational(IMemoryPool *mp, CExpressionHandle &exprhdl);
 
 			// enforce an operator to be executed on the master
 			static
 			CDistributionSpec *PdsEnforceMaster
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pds,
 				ULONG child_index
@@ -403,7 +403,7 @@ namespace gpopt
 		
 			// ctor
 			explicit
-			CPhysical(IMemoryPool *memory_pool);
+			CPhysical(IMemoryPool *mp);
 
 			// dtor
 			virtual 
@@ -423,11 +423,11 @@ namespace gpopt
 
 			// create base container of derived properties
 			virtual
-			DrvdPropArray *PdpCreate(IMemoryPool *memory_pool) const;
+			DrvdPropArray *PdpCreate(IMemoryPool *mp) const;
 
 			// create base container of required properties
 			virtual
-			CReqdProp *PrpCreate(IMemoryPool *memory_pool) const;
+			CReqdProp *PrpCreate(IMemoryPool *mp) const;
 
 			//-------------------------------------------------------------------------------------
 			// Required Plan Properties
@@ -437,7 +437,7 @@ namespace gpopt
 			virtual
 			CColRefSet *PcrsRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CColRefSet *pcrsRequired,
 				ULONG child_index,
@@ -449,7 +449,7 @@ namespace gpopt
 			virtual
 			CCTEReq *PcteRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CCTEReq *pcter,
 				ULONG child_index,
@@ -462,7 +462,7 @@ namespace gpopt
 			virtual
 			COrderSpec *PosRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				COrderSpec *posRequired,
 				ULONG child_index,
@@ -475,7 +475,7 @@ namespace gpopt
 			virtual
 			CDistributionSpec *PdsRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsRequired,
 				ULONG child_index,
@@ -488,7 +488,7 @@ namespace gpopt
 			virtual
 			CRewindabilitySpec *PrsRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CRewindabilitySpec *prsRequired,
 				ULONG child_index,
@@ -501,7 +501,7 @@ namespace gpopt
 			virtual
 			CPartitionPropagationSpec *PppsRequired
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				CPartitionPropagationSpec *pppsRequired,
 				ULONG child_index,
@@ -523,27 +523,27 @@ namespace gpopt
 
 			// derive sort order
 			virtual
-			COrderSpec *PosDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const = 0;
+			COrderSpec *PosDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const = 0;
 
 			// dderive distribution
 			virtual
-			CDistributionSpec *PdsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const = 0;
+			CDistributionSpec *PdsDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const = 0;
 
 			// derived properties: derive rewindability
 			virtual
-			CRewindabilitySpec *PrsDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const = 0;
+			CRewindabilitySpec *PrsDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const = 0;
 
 			// derive partition index map
 			virtual
-			CPartIndexMap *PpimDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl, CDrvdPropCtxt *pdpctxt) const = 0;
+			CPartIndexMap *PpimDerive(IMemoryPool *mp, CExpressionHandle &exprhdl, CDrvdPropCtxt *pdpctxt) const = 0;
 
 			// derive partition filter map
 			virtual
-			CPartFilterMap *PpfmDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const = 0;
+			CPartFilterMap *PpfmDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const = 0;
 
 			// derive cte map
 			virtual
-			CCTEMap *PcmDerive(IMemoryPool *memory_pool, CExpressionHandle &exprhdl) const;
+			CCTEMap *PcmDerive(IMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 			//-------------------------------------------------------------------------------------
 			// Enforced Properties
@@ -617,7 +617,7 @@ namespace gpopt
 			virtual
 			BOOL FValidContext
 				(
-				IMemoryPool *, // memory_pool
+				IMemoryPool *, // mp
 				COptimizationContext *, // poc,
 				OptimizationContextArray * // pdrgpocChild
 				)
@@ -689,7 +689,7 @@ namespace gpopt
 
 			// return a copy of the operator with remapped columns
 			virtual
-			COperator *PopCopyWithRemappedColumns(IMemoryPool *memory_pool, UlongColRefHashMap *colref_mapping, BOOL must_exist);
+			COperator *PopCopyWithRemappedColumns(IMemoryPool *mp, UlongColRefHashMap *colref_mapping, BOOL must_exist);
 
 			// conversion function
 			static
@@ -706,7 +706,7 @@ namespace gpopt
 
 			// helper for computing a singleton distribution matching the given distribution
 			static
-			CDistributionSpecSingleton *PdssMatching(IMemoryPool *memory_pool, CDistributionSpecSingleton *pdss);
+			CDistributionSpecSingleton *PdssMatching(IMemoryPool *mp, CDistributionSpecSingleton *pdss);
 
 	}; // class CPhysical
 

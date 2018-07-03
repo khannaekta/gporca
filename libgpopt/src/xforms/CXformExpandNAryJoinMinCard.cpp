@@ -34,18 +34,18 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformExpandNAryJoinMinCard::CXformExpandNAryJoinMinCard
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformExploration
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 					(
-					memory_pool,
-					GPOS_NEW(memory_pool) CLogicalNAryJoin(memory_pool),
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternMultiLeaf(memory_pool)),
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool))
+					mp,
+					GPOS_NEW(mp) CLogicalNAryJoin(mp),
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternMultiLeaf(mp)),
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))
 					)
 		)
 {}
@@ -92,12 +92,12 @@ CXformExpandNAryJoinMinCard::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	const ULONG arity = pexpr->Arity();
 	GPOS_ASSERT(arity >= 3);
 
-	ExpressionArray *pdrgpexpr = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexpr = GPOS_NEW(mp) ExpressionArray(mp);
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
 		CExpression *pexprChild = (*pexpr)[ul];
@@ -106,14 +106,14 @@ CXformExpandNAryJoinMinCard::Transform
 	}
 
 	CExpression *pexprScalar = (*pexpr)[arity - 1];
-	ExpressionArray *pdrgpexprPreds = CPredicateUtils::PdrgpexprConjuncts(memory_pool, pexprScalar);
+	ExpressionArray *pdrgpexprPreds = CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 
 	// create a join order based on cardinality of intermediate results
-	CJoinOrderMinCard jomc(memory_pool, pdrgpexpr, pdrgpexprPreds);
+	CJoinOrderMinCard jomc(mp, pdrgpexpr, pdrgpexprPreds);
 	CExpression *pexprResult = jomc.PexprExpand();
 
 	// normalize resulting expression
-	CExpression *pexprNormalized = CNormalizer::PexprNormalize(memory_pool, pexprResult);
+	CExpression *pexprNormalized = CNormalizer::PexprNormalize(mp, pexprResult);
 	pexprResult->Release();
 	pxfres->Add(pexprNormalized);
 }

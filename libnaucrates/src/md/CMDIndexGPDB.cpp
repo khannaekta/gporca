@@ -31,7 +31,7 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CMDIndexGPDB::CMDIndexGPDB(IMemoryPool *memory_pool,
+CMDIndexGPDB::CMDIndexGPDB(IMemoryPool *mp,
 						   IMDId *mdid,
 						   CMDName *mdname,
 						   BOOL is_clustered,
@@ -41,7 +41,7 @@ CMDIndexGPDB::CMDIndexGPDB(IMemoryPool *memory_pool,
 						   ULongPtrArray *included_cols_array,
 						   MdidPtrArray *mdid_op_classes_array,
 						   IMDPartConstraint *mdpart_constraint)
-	: m_memory_pool(memory_pool),
+	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
 	  m_clustered(is_clustered),
@@ -63,7 +63,7 @@ CMDIndexGPDB::CMDIndexGPDB(IMemoryPool *memory_pool,
 	GPOS_ASSERT(NULL != mdid_op_classes_array);
 
 	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_memory_pool, this, false /*fSerializeHeader*/, false /*indentation*/);
+		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 //---------------------------------------------------------------------------
@@ -290,13 +290,13 @@ CMDIndexGPDB::Serialize(CXMLSerializer *xml_serializer) const
 
 	// serialize index keys
 	CWStringDynamic *index_key_cols_str =
-		CDXLUtils::Serialize(m_memory_pool, m_index_key_cols_array);
+		CDXLUtils::Serialize(m_mp, m_index_key_cols_array);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenIndexKeyCols),
 								 index_key_cols_str);
 	GPOS_DELETE(index_key_cols_str);
 
 	CWStringDynamic *available_cols_str =
-		CDXLUtils::Serialize(m_memory_pool, m_included_cols_array);
+		CDXLUtils::Serialize(m_mp, m_included_cols_array);
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenIndexIncludedCols),
 								 available_cols_str);
 	GPOS_DELETE(available_cols_str);

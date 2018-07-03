@@ -33,10 +33,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerColStats::CParseHandlerColStats(IMemoryPool *memory_pool,
+CParseHandlerColStats::CParseHandlerColStats(IMemoryPool *mp,
 											 CParseHandlerManager *parse_handler_mgr,
 											 CParseHandlerBase *parse_handler_base)
-	: CParseHandlerMetadataObject(memory_pool, parse_handler_mgr, parse_handler_base),
+	: CParseHandlerMetadataObject(mp, parse_handler_mgr, parse_handler_base),
 	  m_mdid(NULL),
 	  m_md_name(NULL),
 	  m_width(0.0),
@@ -80,7 +80,7 @@ CParseHandlerColStats::StartElement(const XMLCh *const element_uri,
 			m_parse_handler_mgr->GetDXLMemoryManager(), parsed_column_name);
 
 		// create a copy of the string in the CMDName constructor
-		m_md_name = GPOS_NEW(m_memory_pool) CMDName(m_memory_pool, column_name);
+		m_md_name = GPOS_NEW(m_mp) CMDName(m_mp, column_name);
 		GPOS_DELETE(column_name);
 
 		m_width = CDXLOperatorFactory::ExtractConvertAttrValueToDouble(
@@ -138,7 +138,7 @@ CParseHandlerColStats::StartElement(const XMLCh *const element_uri,
 	{
 		// new bucket
 		CParseHandlerBase *parse_handler_base_stats_bucket = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool,
+			m_mp,
 			CDXLTokens::XmlstrToken(EdxltokenColumnStatsBucket),
 			m_parse_handler_mgr,
 			this);
@@ -181,7 +181,7 @@ CParseHandlerColStats::EndElement(const XMLCh *const,  // element_uri,
 	// get histogram buckets from child parse handlers
 
 	DXLBucketPtrArray *stats_bucket_dxl_array =
-		GPOS_NEW(m_memory_pool) DXLBucketPtrArray(m_memory_pool);
+		GPOS_NEW(m_mp) DXLBucketPtrArray(m_mp);
 
 	for (ULONG ul = 0; ul < this->Length(); ul++)
 	{
@@ -194,7 +194,7 @@ CParseHandlerColStats::EndElement(const XMLCh *const,  // element_uri,
 		stats_bucket_dxl_array->Append(bucket_dxl);
 	}
 
-	m_imd_obj = GPOS_NEW(m_memory_pool) CDXLColStats(m_memory_pool,
+	m_imd_obj = GPOS_NEW(m_mp) CDXLColStats(m_mp,
 													 m_mdid,
 													 m_md_name,
 													 m_width,

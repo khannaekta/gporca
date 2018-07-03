@@ -26,10 +26,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerArray::CParseHandlerArray(IMemoryPool *memory_pool,
+CParseHandlerArray::CParseHandlerArray(IMemoryPool *mp,
 									   CParseHandlerManager *parse_handler_mgr,
 									   CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root)
 {
 }
 
@@ -50,20 +50,20 @@ CParseHandlerArray::StartElement(const XMLCh *const element_uri,
 {
 	if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarArray),
 									  element_local_name) &&
-		NULL == m_dxl_node)
+		NULL == m_dxlnode)
 	{
 		// parse and create array
 		CDXLScalarArray *dxl_op = (CDXLScalarArray *) CDXLOperatorFactory::MakeDXLArray(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
-		m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, dxl_op);
+		m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 	}
 	else
 	{
 		// parse child of array
-		GPOS_ASSERT(NULL != m_dxl_node);
+		GPOS_ASSERT(NULL != m_dxlnode);
 
 		CParseHandlerBase *child_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(child_parse_handler);
 		this->Append(child_parse_handler);
 		child_parse_handler->startElement(element_uri, element_local_name, element_qname, attrs);
@@ -105,7 +105,7 @@ CParseHandlerArray::EndElement(const XMLCh *const,  // element_uri,
 	}
 
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node, false /* validate_children */);
+	m_dxlnode->GetOperator()->AssertValid(m_dxlnode, false /* validate_children */);
 #endif  // GPOS_DEBUG
 
 	// deactivate handler

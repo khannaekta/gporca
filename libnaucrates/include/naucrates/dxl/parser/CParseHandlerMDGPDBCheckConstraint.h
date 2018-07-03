@@ -61,7 +61,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CParseHandlerMDGPDBCheckConstraint(IMemoryPool *memory_pool,
+		CParseHandlerMDGPDBCheckConstraint(IMemoryPool *mp,
 										   CParseHandlerManager *parse_handler_mgr,
 										   CParseHandlerBase *parse_handler_root);
 	};

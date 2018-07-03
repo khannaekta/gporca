@@ -36,10 +36,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CParseHandlerIndexDescr::CParseHandlerIndexDescr(IMemoryPool *memory_pool,
+CParseHandlerIndexDescr::CParseHandlerIndexDescr(IMemoryPool *mp,
 												 CParseHandlerManager *parse_handler_mgr,
 												 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(memory_pool, parse_handler_mgr, parse_handler_root), m_index_descr_dxl(NULL)
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root), m_index_descr_dxl(NULL)
 {
 }
 

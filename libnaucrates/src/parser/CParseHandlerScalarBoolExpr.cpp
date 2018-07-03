@@ -31,10 +31,10 @@ XERCES_CPP_NAMESPACE_USE
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CParseHandlerScalarBoolExpr::CParseHandlerScalarBoolExpr(IMemoryPool *memory_pool,
+CParseHandlerScalarBoolExpr::CParseHandlerScalarBoolExpr(IMemoryPool *mp,
 														 CParseHandlerManager *parse_handler_mgr,
 														 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(memory_pool, parse_handler_mgr, parse_handler_root),
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root),
 	  m_dxl_bool_type(Edxland)
 {
 }
@@ -60,7 +60,7 @@ CParseHandlerScalarBoolExpr::StartElement(const XMLCh *const element_uri,
 		(0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolNot),
 									   element_local_name)))
 	{
-		if (NULL == m_dxl_node)
+		if (NULL == m_dxlnode)
 		{
 			if (0 == XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarBoolNot),
 											  element_local_name))
@@ -79,13 +79,13 @@ CParseHandlerScalarBoolExpr::StartElement(const XMLCh *const element_uri,
 					m_parse_handler_mgr->GetDXLMemoryManager(), m_dxl_bool_type);
 
 			// construct node from the created child nodes
-			m_dxl_node = GPOS_NEW(m_memory_pool) CDXLNode(m_memory_pool, dxl_op);
+			m_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 		}
 		else
 		{
 			// This is to support nested BoolExpr. TODO:  - create a separate xml tag for boolean expression
 			CParseHandlerBase *bool_expr_parse_handler = CParseHandlerFactory::GetParseHandler(
-				m_memory_pool,
+				m_mp,
 				CDXLTokens::XmlstrToken(EdxltokenScalarBoolOr),
 				m_parse_handler_mgr,
 				this);
@@ -100,7 +100,7 @@ CParseHandlerScalarBoolExpr::StartElement(const XMLCh *const element_uri,
 	}
 	else
 	{
-		if (NULL == m_dxl_node)
+		if (NULL == m_dxlnode)
 		{
 			GPOS_RAISE(gpdxl::ExmaDXL,
 					   gpdxl::ExmiDXLUnexpectedTag,
@@ -110,7 +110,7 @@ CParseHandlerScalarBoolExpr::StartElement(const XMLCh *const element_uri,
 		}
 
 		CParseHandlerBase *op_parse_handler = CParseHandlerFactory::GetParseHandler(
-			m_memory_pool, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
+			m_mp, CDXLTokens::XmlstrToken(EdxltokenScalar), m_parse_handler_mgr, this);
 		m_parse_handler_mgr->ActivateParseHandler(op_parse_handler);
 
 		// store parse handlers
@@ -148,9 +148,9 @@ CParseHandlerScalarBoolExpr::EndElement(const XMLCh *const,  // element_uri,
 
 	const ULONG size = this->Length();
 	// If the operation is NOT then it only has one child.
-	if (((((CDXLScalarBoolExpr *) m_dxl_node->GetOperator())->GetDxlBoolTypeStr() == Edxlnot) &&
+	if (((((CDXLScalarBoolExpr *) m_dxlnode->GetOperator())->GetDxlBoolTypeStr() == Edxlnot) &&
 		 (1 != size)) ||
-		((((CDXLScalarBoolExpr *) m_dxl_node->GetOperator())->GetDxlBoolTypeStr() != Edxlnot) &&
+		((((CDXLScalarBoolExpr *) m_dxlnode->GetOperator())->GetDxlBoolTypeStr() != Edxlnot) &&
 		 (2 > size)))
 	{
 		GPOS_RAISE(gpdxl::ExmaDXL,

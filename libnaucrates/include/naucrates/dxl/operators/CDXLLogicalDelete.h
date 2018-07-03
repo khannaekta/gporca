@@ -50,7 +50,7 @@ namespace gpdxl
 
 	public:
 		// ctor
-		CDXLLogicalDelete(IMemoryPool *memory_pool,
+		CDXLLogicalDelete(IMemoryPool *mp,
 						  CDXLTableDescr *table_descr,
 						  ULONG ctid_colid,
 						  ULONG segid_colid,

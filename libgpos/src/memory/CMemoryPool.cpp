@@ -36,16 +36,16 @@ const ULONG_PTR CMemoryPool::m_invalid = ULONG_PTR_MAX;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMemoryPool::CMemoryPool(IMemoryPool *underlying_memory_pool,
-						 BOOL owns_underlying_memory_pool,
+CMemoryPool::CMemoryPool(IMemoryPool *underlying_mp,
+						 BOOL owns_underlying_mp,
 						 BOOL thread_safe)
 	: m_ref_counter(0),
 	  m_hash_key(0),
-	  m_underlying_memory_pool(underlying_memory_pool),
-	  m_owns_underlying_memory_pool(owns_underlying_memory_pool),
+	  m_underlying_mp(underlying_mp),
+	  m_owns_underlying_mp(owns_underlying_mp),
 	  m_thread_safe(thread_safe)
 {
-	GPOS_ASSERT_IMP(owns_underlying_memory_pool, NULL != underlying_memory_pool);
+	GPOS_ASSERT_IMP(owns_underlying_mp, NULL != underlying_mp);
 
 	m_hash_key = reinterpret_cast<ULONG_PTR>(this);
 #ifdef GPOS_DEBUG
@@ -64,9 +64,9 @@ CMemoryPool::CMemoryPool(IMemoryPool *underlying_memory_pool,
 //---------------------------------------------------------------------------
 CMemoryPool::~CMemoryPool()
 {
-	if (m_owns_underlying_memory_pool)
+	if (m_owns_underlying_mp)
 	{
-		CMemoryPoolManager::GetMemoryPoolMgr()->DeleteUnregistered(m_underlying_memory_pool);
+		CMemoryPoolManager::GetMemoryPoolMgr()->DeleteUnregistered(m_underlying_mp);
 	}
 }
 
@@ -85,7 +85,7 @@ CMemoryPool::FinalizeAlloc(void *ptr, ULONG alloc, EAllocationType eat)
 	GPOS_ASSERT(NULL != ptr);
 
 	AllocHeader *header = static_cast<AllocHeader *>(ptr);
-	header->m_memory_pool = this;
+	header->m_mp = this;
 	header->m_alloc = alloc;
 
 	BYTE *alloc_type = reinterpret_cast<BYTE *>(header + 1) + alloc;
@@ -111,7 +111,7 @@ CMemoryPool::FreeAlloc(void *ptr, EAllocationType eat)
 	AllocHeader *header = static_cast<AllocHeader *>(ptr) - 1;
 	BYTE *alloc_type = static_cast<BYTE *>(ptr) + header->m_alloc;
 	GPOS_RTL_ASSERT(*alloc_type == eat);
-	header->m_memory_pool->Free(header);
+	header->m_mp->Free(header);
 }
 
 

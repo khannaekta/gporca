@@ -50,7 +50,7 @@ namespace gpdxl
 
 	public:
 		// ctor/dtor
-		CDXLPhysicalNLJoin(IMemoryPool *memory_pool, EdxlJoinType join_type, BOOL is_index_nlj);
+		CDXLPhysicalNLJoin(IMemoryPool *mp, EdxlJoinType join_type, BOOL is_index_nlj);
 
 		// accessors
 		Edxlopid GetDXLOperator() const;

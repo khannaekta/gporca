@@ -28,19 +28,19 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformExpandFullOuterJoin::CXformExpandFullOuterJoin
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	CXformExploration
 		(
 		 // pattern
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 				(
-				memory_pool,
-				GPOS_NEW(memory_pool) CLogicalFullOuterJoin(memory_pool),
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool)), // outer child
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool)), // inner child
-				GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternTree(memory_pool)) // scalar child
+				mp,
+				GPOS_NEW(mp) CLogicalFullOuterJoin(mp),
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp)), // outer child
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp)), // inner child
+				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp)) // scalar child
 				)
 		)
 {}
@@ -99,7 +99,7 @@ CXformExpandFullOuterJoin::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	CExpression *pexprA = (*pexpr)[0];
 	CExpression *pexprB = (*pexpr)[1];
@@ -107,42 +107,42 @@ CXformExpandFullOuterJoin::Transform
 
 	// 1. create the CTE producers
 	const ULONG ulCTEIdA = COptCtxt::PoctxtFromTLS()->Pcteinfo()->next_id();
-	ColRefArray *pdrgpcrOutA = CDrvdPropRelational::GetRelationalProperties(pexprA->PdpDerive())->PcrsOutput()->Pdrgpcr(memory_pool);
-	(void) CXformUtils::PexprAddCTEProducer(memory_pool, ulCTEIdA, pdrgpcrOutA, pexprA);
+	ColRefArray *pdrgpcrOutA = CDrvdPropRelational::GetRelationalProperties(pexprA->PdpDerive())->PcrsOutput()->Pdrgpcr(mp);
+	(void) CXformUtils::PexprAddCTEProducer(mp, ulCTEIdA, pdrgpcrOutA, pexprA);
 
 	const ULONG ulCTEIdB = COptCtxt::PoctxtFromTLS()->Pcteinfo()->next_id();
-	ColRefArray *pdrgpcrOutB = CDrvdPropRelational::GetRelationalProperties(pexprB->PdpDerive())->PcrsOutput()->Pdrgpcr(memory_pool);
-	(void) CXformUtils::PexprAddCTEProducer(memory_pool, ulCTEIdB, pdrgpcrOutB, pexprB);
+	ColRefArray *pdrgpcrOutB = CDrvdPropRelational::GetRelationalProperties(pexprB->PdpDerive())->PcrsOutput()->Pdrgpcr(mp);
+	(void) CXformUtils::PexprAddCTEProducer(mp, ulCTEIdB, pdrgpcrOutB, pexprB);
 
 	// 2. create the right child (PROJECT over LASJ)
-	ColRefArray *pdrgpcrRightA = CUtils::PdrgpcrCopy(memory_pool, pdrgpcrOutA);
-	ColRefArray *pdrgpcrRightB = CUtils::PdrgpcrCopy(memory_pool, pdrgpcrOutB);
+	ColRefArray *pdrgpcrRightA = CUtils::PdrgpcrCopy(mp, pdrgpcrOutA);
+	ColRefArray *pdrgpcrRightB = CUtils::PdrgpcrCopy(mp, pdrgpcrOutB);
 	CExpression *pexprScalarRight = CXformUtils::PexprRemapColumns
 									(
-									memory_pool,
+									mp,
 									pexprScalar,
 									pdrgpcrOutA,
 									pdrgpcrRightA,
 									pdrgpcrOutB,
 									pdrgpcrRightB
 									);
-	CExpression *pexprLASJ = PexprLogicalJoinOverCTEs(memory_pool, EdxljtLeftAntiSemijoin, ulCTEIdB, pdrgpcrRightB, ulCTEIdA, pdrgpcrRightA, pexprScalarRight);
-	CExpression *pexprProject = CUtils::PexprLogicalProjectNulls(memory_pool, pdrgpcrRightA, pexprLASJ);
+	CExpression *pexprLASJ = PexprLogicalJoinOverCTEs(mp, EdxljtLeftAntiSemijoin, ulCTEIdB, pdrgpcrRightB, ulCTEIdA, pdrgpcrRightA, pexprScalarRight);
+	CExpression *pexprProject = CUtils::PexprLogicalProjectNulls(mp, pdrgpcrRightA, pexprLASJ);
 
 	// 3. create the left child (LOJ) - this has to use the original output
 	//    columns and the original scalar expression
 	pexprScalar->AddRef();
-	CExpression *pexprLOJ = PexprLogicalJoinOverCTEs(memory_pool, EdxljtLeft, ulCTEIdA, pdrgpcrOutA, ulCTEIdB, pdrgpcrOutB, pexprScalar);
+	CExpression *pexprLOJ = PexprLogicalJoinOverCTEs(mp, EdxljtLeft, ulCTEIdA, pdrgpcrOutA, ulCTEIdB, pdrgpcrOutB, pexprScalar);
 
 	// 4. create the UNION ALL expression
 
 	// output columns of the union are the same as the outputs of the first child (LOJ)
-	ColRefArray *pdrgpcrOutput = GPOS_NEW(memory_pool) ColRefArray(memory_pool);
+	ColRefArray *pdrgpcrOutput = GPOS_NEW(mp) ColRefArray(mp);
 	pdrgpcrOutput->AppendArray(pdrgpcrOutA);
 	pdrgpcrOutput->AppendArray(pdrgpcrOutB);
 
 	// input columns of the union
-	ColRefArrays *pdrgdrgpcrInput = GPOS_NEW(memory_pool) ColRefArrays(memory_pool);
+	ColRefArrays *pdrgdrgpcrInput = GPOS_NEW(mp) ColRefArrays(mp);
 
 	// inputs from the first child (LOJ)
 	pdrgpcrOutput->AddRef();
@@ -151,37 +151,37 @@ CXformExpandFullOuterJoin::Transform
 	// inputs from the second child have to be in the correct order
 	// a. add new computed columns from the project only
 	CDrvdPropRelational *pdprelProject = CDrvdPropRelational::GetRelationalProperties(pexprProject->PdpDerive());
-	CColRefSet *pcrsProjOnly = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrsProjOnly = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsProjOnly->Include(pdprelProject->PcrsOutput());
 	pcrsProjOnly->Exclude(pdrgpcrRightB);
-	ColRefArray *pdrgpcrProj = pcrsProjOnly->Pdrgpcr(memory_pool);
+	ColRefArray *pdrgpcrProj = pcrsProjOnly->Pdrgpcr(mp);
 	pcrsProjOnly->Release();
 	// b. add columns from the LASJ expression
 	pdrgpcrProj->AppendArray(pdrgpcrRightB);
 
 	pdrgdrgpcrInput->Append(pdrgpcrProj);
 
-	CExpression *pexprUnionAll = GPOS_NEW(memory_pool) CExpression
+	CExpression *pexprUnionAll = GPOS_NEW(mp) CExpression
 											(
-											memory_pool,
-											GPOS_NEW(memory_pool) CLogicalUnionAll(memory_pool, pdrgpcrOutput, pdrgdrgpcrInput),
+											mp,
+											GPOS_NEW(mp) CLogicalUnionAll(mp, pdrgpcrOutput, pdrgdrgpcrInput),
 											pexprLOJ,
 											pexprProject
 											);
 
 	// 5. Add CTE anchor for the B subtree
-	CExpression *pexprAnchorB = GPOS_NEW(memory_pool) CExpression
+	CExpression *pexprAnchorB = GPOS_NEW(mp) CExpression
 											(
-											memory_pool,
-											GPOS_NEW(memory_pool) CLogicalCTEAnchor(memory_pool, ulCTEIdB),
+											mp,
+											GPOS_NEW(mp) CLogicalCTEAnchor(mp, ulCTEIdB),
 											pexprUnionAll
 											);
 
 	// 6. Add CTE anchor for the A subtree
-	CExpression *pexprAnchorA = GPOS_NEW(memory_pool) CExpression
+	CExpression *pexprAnchorA = GPOS_NEW(mp) CExpression
 											(
-											memory_pool,
-											GPOS_NEW(memory_pool) CLogicalCTEAnchor(memory_pool, ulCTEIdA),
+											mp,
+											GPOS_NEW(mp) CLogicalCTEAnchor(mp, ulCTEIdA),
 											pexprAnchorB
 											);
 
@@ -201,7 +201,7 @@ CXformExpandFullOuterJoin::Transform
 CExpression *
 CXformExpandFullOuterJoin::PexprLogicalJoinOverCTEs
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	EdxlJoinType edxljointype,
 	ULONG ulLeftCTEId,
 	ColRefArray *pdrgpcrLeft,
@@ -213,22 +213,22 @@ CXformExpandFullOuterJoin::PexprLogicalJoinOverCTEs
 {
 	GPOS_ASSERT(NULL != pexprScalar);
 
-	ExpressionArray *pdrgpexprChildren = GPOS_NEW(memory_pool) ExpressionArray(memory_pool);
+	ExpressionArray *pdrgpexprChildren = GPOS_NEW(mp) ExpressionArray(mp);
 	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 
-	CLogicalCTEConsumer *popConsumerLeft = GPOS_NEW(memory_pool) CLogicalCTEConsumer(memory_pool, ulLeftCTEId, pdrgpcrLeft);
-	CExpression *pexprLeft = GPOS_NEW(memory_pool) CExpression(memory_pool, popConsumerLeft);
+	CLogicalCTEConsumer *popConsumerLeft = GPOS_NEW(mp) CLogicalCTEConsumer(mp, ulLeftCTEId, pdrgpcrLeft);
+	CExpression *pexprLeft = GPOS_NEW(mp) CExpression(mp, popConsumerLeft);
 	pcteinfo->IncrementConsumers(ulLeftCTEId);
 
-	CLogicalCTEConsumer *popConsumerRight = GPOS_NEW(memory_pool) CLogicalCTEConsumer(memory_pool, ulRightCTEId, pdrgpcrRight);
-	CExpression *pexprRight = GPOS_NEW(memory_pool) CExpression(memory_pool, popConsumerRight);
+	CLogicalCTEConsumer *popConsumerRight = GPOS_NEW(mp) CLogicalCTEConsumer(mp, ulRightCTEId, pdrgpcrRight);
+	CExpression *pexprRight = GPOS_NEW(mp) CExpression(mp, popConsumerRight);
 	pcteinfo->IncrementConsumers(ulRightCTEId);
 
 	pdrgpexprChildren->Append(pexprLeft);
 	pdrgpexprChildren->Append(pexprRight);
 	pdrgpexprChildren->Append(pexprScalar);
 
-	return CUtils::PexprLogicalJoin(memory_pool, edxljointype, pdrgpexprChildren);
+	return CUtils::PexprLogicalJoin(mp, edxljointype, pdrgpexprChildren);
 }
 
 // EOF

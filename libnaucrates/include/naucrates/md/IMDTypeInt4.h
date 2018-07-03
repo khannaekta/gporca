@@ -53,7 +53,7 @@ namespace gpmd
 		}
 
 		// factory function for INT4 datums
-		virtual IDatumInt4 *CreateInt4Datum(IMemoryPool *memory_pool,
+		virtual IDatumInt4 *CreateInt4Datum(IMemoryPool *mp,
 											INT value,
 											BOOL is_null) const = 0;
 	};

@@ -29,11 +29,11 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CScalarSwitch::CScalarSwitch
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	IMDId *mdid_type
 	)
 	:
-	CScalar(memory_pool),
+	CScalar(mp),
 	m_mdid_type(mdid_type),
 	m_fBoolReturnType(false)
 {

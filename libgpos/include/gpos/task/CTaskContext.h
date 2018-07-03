@@ -38,11 +38,11 @@ namespace gpos
 
 	public:
 		// basic ctor; used only for the main worker
-		CTaskContext(IMemoryPool *memory_pool);
+		CTaskContext(IMemoryPool *mp);
 
 		// copy ctor
 		// used to inherit parent task's context
-		CTaskContext(IMemoryPool *memory_pool, const CTaskContext &task_ctxt);
+		CTaskContext(IMemoryPool *mp, const CTaskContext &task_ctxt);
 
 		// dtor
 		~CTaskContext();
@@ -98,9 +98,9 @@ namespace gpos
 		}
 
 		CBitSet *
-		copy_trace_flags(IMemoryPool *memory_pool) const
+		copy_trace_flags(IMemoryPool *mp) const
 		{
-			return GPOS_NEW(memory_pool) CBitSet(memory_pool, *m_bitset);
+			return GPOS_NEW(mp) CBitSet(mp, *m_bitset);
 		}
 
 	};  // class CTaskContext

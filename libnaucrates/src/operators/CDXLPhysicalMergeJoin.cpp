@@ -26,10 +26,10 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalMergeJoin::CDXLPhysicalMergeJoin(IMemoryPool *memory_pool,
+CDXLPhysicalMergeJoin::CDXLPhysicalMergeJoin(IMemoryPool *mp,
 											 EdxlJoinType join_type,
 											 BOOL is_unique_outer)
-	: CDXLPhysicalJoin(memory_pool, join_type), m_is_unique_outer(is_unique_outer)
+	: CDXLPhysicalJoin(mp, join_type), m_is_unique_outer(is_unique_outer)
 {
 }
 

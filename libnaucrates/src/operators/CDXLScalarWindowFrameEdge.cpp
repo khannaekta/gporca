@@ -24,10 +24,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarWindowFrameEdge::CDXLScalarWindowFrameEdge(IMemoryPool *memory_pool,
+CDXLScalarWindowFrameEdge::CDXLScalarWindowFrameEdge(IMemoryPool *mp,
 													 BOOL fLeading,
 													 EdxlFrameBoundary frame_boundary)
-	: CDXLScalar(memory_pool), m_leading_edge(fLeading), m_dxl_frame_boundary(frame_boundary)
+	: CDXLScalar(mp), m_leading_edge(fLeading), m_dxl_frame_boundary(frame_boundary)
 {
 }
 

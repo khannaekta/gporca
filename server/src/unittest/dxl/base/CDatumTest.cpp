@@ -66,20 +66,20 @@ CDatumTest::EresUnittest_Basics()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
 	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(memory_pool, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc
 					(
-					memory_pool,
+					mp,
 					&mda,
 					NULL, /* pceeval */
-					CTestUtils::GetCostModel(memory_pool)
+					CTestUtils::GetCostModel(mp)
 					);
 
 	typedef IDatum *(*Pfpdatum)(IMemoryPool*, BOOL);
@@ -103,17 +103,17 @@ CDatumTest::EresUnittest_Basics()
 	{
 		for (ULONG ul2 = 0; ul2 < ulOptions; ul2++)
 		{
-			CAutoTrace at(memory_pool);
+			CAutoTrace at(mp);
 			IOstream &os(at.Os());
 			
 			// generate datum
 			BOOL is_null = rgf[ul2];
-			IDatum *datum = rgpf[ul1](memory_pool, is_null);
-			IDatum *pdatumCopy = datum->MakeCopy(memory_pool);
+			IDatum *datum = rgpf[ul1](mp, is_null);
+			IDatum *pdatumCopy = datum->MakeCopy(mp);
 			
 			GPOS_ASSERT(datum->Matches(pdatumCopy));
 			
-			const CWStringConst *pstrDatum = datum->GetStrRepr(memory_pool);
+			const CWStringConst *pstrDatum = datum->GetStrRepr(mp);
 			
 	#ifdef GPOS_DEBUG
 			os << std::endl;
@@ -160,11 +160,11 @@ CDatumTest::EresUnittest_Basics()
 IDatum *
 CDatumTest::CreateOidDatum
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	BOOL is_null
 	)
 {
-	return GPOS_NEW(memory_pool) CDatumOidGPDB(CTestUtils::m_sysidDefault, 1 /*val*/, is_null);
+	return GPOS_NEW(mp) CDatumOidGPDB(CTestUtils::m_sysidDefault, 1 /*val*/, is_null);
 }
 
 //---------------------------------------------------------------------------
@@ -178,11 +178,11 @@ CDatumTest::CreateOidDatum
 IDatum *
 CDatumTest::CreateInt2Datum
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	BOOL is_null
 	)
 {
-	return GPOS_NEW(memory_pool) CDatumInt2GPDB(CTestUtils::m_sysidDefault, 1 /*val*/, is_null);
+	return GPOS_NEW(mp) CDatumInt2GPDB(CTestUtils::m_sysidDefault, 1 /*val*/, is_null);
 }
 
 //---------------------------------------------------------------------------
@@ -196,11 +196,11 @@ CDatumTest::CreateInt2Datum
 IDatum *
 CDatumTest::CreateInt4Datum
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	BOOL is_null
 	)
 {
-	return GPOS_NEW(memory_pool) CDatumInt4GPDB(CTestUtils::m_sysidDefault, 1 /*val*/, is_null);
+	return GPOS_NEW(mp) CDatumInt4GPDB(CTestUtils::m_sysidDefault, 1 /*val*/, is_null);
 }
 
 //---------------------------------------------------------------------------
@@ -214,11 +214,11 @@ CDatumTest::CreateInt4Datum
 IDatum *
 CDatumTest::CreateInt8Datum
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	BOOL is_null
 	)
 {
-	return GPOS_NEW(memory_pool) CDatumInt8GPDB(CTestUtils::m_sysidDefault, 1 /*val*/, is_null);
+	return GPOS_NEW(mp) CDatumInt8GPDB(CTestUtils::m_sysidDefault, 1 /*val*/, is_null);
 }
 
 //---------------------------------------------------------------------------
@@ -232,11 +232,11 @@ CDatumTest::CreateInt8Datum
 IDatum *
 CDatumTest::CreateBoolDatum
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	BOOL is_null
 	)
 {
-	return GPOS_NEW(memory_pool) CDatumBoolGPDB(CTestUtils::m_sysidDefault, false /*m_bytearray_value*/, is_null);
+	return GPOS_NEW(mp) CDatumBoolGPDB(CTestUtils::m_sysidDefault, false /*m_bytearray_value*/, is_null);
 }
 
 //---------------------------------------------------------------------------
@@ -250,16 +250,16 @@ CDatumTest::CreateBoolDatum
 IDatum *
 CDatumTest::CreateGenericDatum
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	BOOL is_null
 	)
 {
-	CMDIdGPDB *pmdidChar = GPOS_NEW(memory_pool) CMDIdGPDB(GPDB_CHAR);
+	CMDIdGPDB *pmdidChar = GPOS_NEW(mp) CMDIdGPDB(GPDB_CHAR);
 
 	const CHAR *val = "test";
-	return GPOS_NEW(memory_pool) CDatumGenericGPDB
+	return GPOS_NEW(mp) CDatumGenericGPDB
 							(
-							memory_pool,
+							mp,
 							pmdidChar,
 							default_type_modifier,
 							val,

@@ -26,8 +26,8 @@ using namespace gpdxl;
 //		Construct a non-spooling materialize
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalMaterialize::CDXLPhysicalMaterialize(IMemoryPool *memory_pool, BOOL is_eager)
-	: CDXLPhysical(memory_pool),
+CDXLPhysicalMaterialize::CDXLPhysicalMaterialize(IMemoryPool *mp, BOOL is_eager)
+	: CDXLPhysical(mp),
 	  m_is_eager(is_eager),
 	  m_spooling_op_id(0),
 	  m_spool_type(EdxlspoolNone),
@@ -44,12 +44,12 @@ CDXLPhysicalMaterialize::CDXLPhysicalMaterialize(IMemoryPool *memory_pool, BOOL 
 //		Construct a spooling materialize
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalMaterialize::CDXLPhysicalMaterialize(IMemoryPool *memory_pool,
+CDXLPhysicalMaterialize::CDXLPhysicalMaterialize(IMemoryPool *mp,
 												 BOOL is_eager,
 												 ULONG spooling_op_id,
 												 INT executor_slice,
 												 ULONG num_consumer_slices)
-	: CDXLPhysical(memory_pool),
+	: CDXLPhysical(mp),
 	  m_is_eager(is_eager),
 	  m_spooling_op_id(spooling_op_id),
 	  m_spool_type(EdxlspoolMaterialize),

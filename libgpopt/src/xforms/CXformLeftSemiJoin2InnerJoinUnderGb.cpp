@@ -30,19 +30,19 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CXformLeftSemiJoin2InnerJoinUnderGb::CXformLeftSemiJoin2InnerJoinUnderGb
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
 	// pattern
 	CXformExploration
 		(
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 					(
-					memory_pool,
-					GPOS_NEW(memory_pool) CLogicalLeftSemiJoin(memory_pool),
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // left child
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool)), // right child
-					GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CPatternLeaf(memory_pool))  // predicate
+					mp,
+					GPOS_NEW(mp) CLogicalLeftSemiJoin(mp),
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // left child
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // right child
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp))  // predicate
 					)
 		)
 {}
@@ -97,7 +97,7 @@ CXformLeftSemiJoin2InnerJoinUnderGb::Transform
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	IMemoryPool *memory_pool = pxfctxt->Pmp();
+	IMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
 	CExpression *pexprOuter = (*pexpr)[0];
@@ -109,19 +109,19 @@ CXformLeftSemiJoin2InnerJoinUnderGb::Transform
 	pexprScalar->AddRef();
 
 	ColRefArray *pdrgpcrKeys = NULL;
-	ColRefArray *pdrgpcrGrouping = CUtils::PdrgpcrGroupingKey(memory_pool, pexprOuter, &pdrgpcrKeys);
+	ColRefArray *pdrgpcrGrouping = CUtils::PdrgpcrGroupingKey(mp, pexprOuter, &pdrgpcrKeys);
 	GPOS_ASSERT(NULL != pdrgpcrKeys);
 
 	CExpression *pexprInnerJoin =
-		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(memory_pool, pexprOuter, pexprInner, pexprScalar);
+		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, pexprOuter, pexprInner, pexprScalar);
 
 	CExpression *pexprGb =
-		GPOS_NEW(memory_pool) CExpression
+		GPOS_NEW(mp) CExpression
 			(
-			memory_pool,
-			GPOS_NEW(memory_pool) CLogicalGbAggDeduplicate(memory_pool, pdrgpcrGrouping, COperator::EgbaggtypeGlobal  /*egbaggtype*/, pdrgpcrKeys),
+			mp,
+			GPOS_NEW(mp) CLogicalGbAggDeduplicate(mp, pdrgpcrGrouping, COperator::EgbaggtypeGlobal  /*egbaggtype*/, pdrgpcrKeys),
 			pexprInnerJoin,
-			GPOS_NEW(memory_pool) CExpression(memory_pool, GPOS_NEW(memory_pool) CScalarProjectList(memory_pool))
+			GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp))
 			);
 
 	pxfres->Add(pexprGb);

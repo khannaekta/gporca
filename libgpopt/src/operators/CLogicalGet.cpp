@@ -40,10 +40,10 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalGet::CLogicalGet
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	CLogical(memory_pool),
+	CLogical(mp),
 	m_pnameAlias(NULL),
 	m_ptabdesc(NULL),
 	m_pdrgpcrOutput(NULL),
@@ -63,12 +63,12 @@ CLogicalGet::CLogicalGet
 //---------------------------------------------------------------------------
 CLogicalGet::CLogicalGet
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CName *pnameAlias,
 	CTableDescriptor *ptabdesc
 	)
 	:
-	CLogical(memory_pool),
+	CLogical(mp),
 	m_pnameAlias(pnameAlias),
 	m_ptabdesc(ptabdesc),
 	m_pdrgpcrOutput(NULL),
@@ -79,14 +79,14 @@ CLogicalGet::CLogicalGet
 	GPOS_ASSERT(NULL != pnameAlias);
 
 	// generate a default column set for the table descriptor
-	m_pdrgpcrOutput = PdrgpcrCreateMapping(memory_pool, m_ptabdesc->Pdrgpcoldesc(), UlOpId());
+	m_pdrgpcrOutput = PdrgpcrCreateMapping(mp, m_ptabdesc->Pdrgpcoldesc(), UlOpId());
 	
 	if (m_ptabdesc->IsPartitioned())
 	{
-		m_pdrgpdrgpcrPart = PdrgpdrgpcrCreatePartCols(memory_pool, m_pdrgpcrOutput, m_ptabdesc->PdrgpulPart());
+		m_pdrgpdrgpcrPart = PdrgpdrgpcrCreatePartCols(mp, m_pdrgpcrOutput, m_ptabdesc->PdrgpulPart());
 	}
 
-	m_pcrsDist = CLogical::PcrsDist(memory_pool, m_ptabdesc, m_pdrgpcrOutput);
+	m_pcrsDist = CLogical::PcrsDist(mp, m_ptabdesc, m_pdrgpcrOutput);
 }
 
 //---------------------------------------------------------------------------
@@ -99,13 +99,13 @@ CLogicalGet::CLogicalGet
 //---------------------------------------------------------------------------
 CLogicalGet::CLogicalGet
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	const CName *pnameAlias,
 	CTableDescriptor *ptabdesc,
 	ColRefArray *pdrgpcrOutput
 	)
 	:
-	CLogical(memory_pool),
+	CLogical(mp),
 	m_pnameAlias(pnameAlias),
 	m_ptabdesc(ptabdesc),
 	m_pdrgpcrOutput(pdrgpcrOutput),
@@ -116,10 +116,10 @@ CLogicalGet::CLogicalGet
 
 	if (m_ptabdesc->IsPartitioned())
 	{
-		m_pdrgpdrgpcrPart = PdrgpdrgpcrCreatePartCols(memory_pool, m_pdrgpcrOutput, m_ptabdesc->PdrgpulPart());
+		m_pdrgpdrgpcrPart = PdrgpdrgpcrCreatePartCols(mp, m_pdrgpcrOutput, m_ptabdesc->PdrgpulPart());
 	}
 
-	m_pcrsDist = CLogical::PcrsDist(memory_pool, m_ptabdesc, m_pdrgpcrOutput);
+	m_pcrsDist = CLogical::PcrsDist(mp, m_ptabdesc, m_pdrgpcrOutput);
 }
 
 //---------------------------------------------------------------------------
@@ -195,7 +195,7 @@ CLogicalGet::Matches
 COperator *
 CLogicalGet::PopCopyWithRemappedColumns
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	UlongColRefHashMap *colref_mapping,
 	BOOL must_exist
 	)
@@ -203,16 +203,16 @@ CLogicalGet::PopCopyWithRemappedColumns
 	ColRefArray *pdrgpcrOutput = NULL;
 	if (must_exist)
 	{
-		pdrgpcrOutput = CUtils::PdrgpcrRemapAndCreate(memory_pool, m_pdrgpcrOutput, colref_mapping);
+		pdrgpcrOutput = CUtils::PdrgpcrRemapAndCreate(mp, m_pdrgpcrOutput, colref_mapping);
 	}
 	else
 	{
-		pdrgpcrOutput = CUtils::PdrgpcrRemap(memory_pool, m_pdrgpcrOutput, colref_mapping, must_exist);
+		pdrgpcrOutput = CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput, colref_mapping, must_exist);
 	}
-	CName *pnameAlias = GPOS_NEW(memory_pool) CName(memory_pool, *m_pnameAlias);
+	CName *pnameAlias = GPOS_NEW(mp) CName(mp, *m_pnameAlias);
 	m_ptabdesc->AddRef();
 
-	return GPOS_NEW(memory_pool) CLogicalGet(memory_pool, pnameAlias, m_ptabdesc, pdrgpcrOutput);
+	return GPOS_NEW(mp) CLogicalGet(mp, pnameAlias, m_ptabdesc, pdrgpcrOutput);
 }
 
 //---------------------------------------------------------------------------
@@ -226,11 +226,11 @@ CLogicalGet::PopCopyWithRemappedColumns
 CColRefSet *
 CLogicalGet::PcrsDeriveOutput
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle & // exprhdl
 	)
 {
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(m_pdrgpcrOutput);
 
 	return pcrs;
@@ -248,13 +248,13 @@ CLogicalGet::PcrsDeriveOutput
 CColRefSet *
 CLogicalGet::PcrsDeriveNotNull
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 	const
 {
 	// get all output columns
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool);
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(CDrvdPropRelational::GetRelationalProperties(exprhdl.Pdp())->PcrsOutput());
 
 	// filters out nullable columns
@@ -299,14 +299,14 @@ CLogicalGet::FInputOrderSensitive() const
 CKeyCollection *
 CLogicalGet::PkcDeriveKeys
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle & // exprhdl
 	)
 	const
 {
 	const BitSetArray *pdrgpbs = m_ptabdesc->PdrgpbsKeys();
 
-	return CLogical::PkcKeysBaseTable(memory_pool, pdrgpbs, m_pdrgpcrOutput);
+	return CLogical::PkcKeysBaseTable(mp, pdrgpbs, m_pdrgpcrOutput);
 }
 
 
@@ -321,11 +321,11 @@ CLogicalGet::PkcDeriveKeys
 CXformSet *
 CLogicalGet::PxfsCandidates
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	) 
 	const
 {
-	CXformSet *xform_set = GPOS_NEW(memory_pool) CXformSet(memory_pool);
+	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
 	
 	(void) xform_set->ExchangeSet(CXform::ExfGet2TableScan);
 	
@@ -343,17 +343,17 @@ CLogicalGet::PxfsCandidates
 IStatistics *
 CLogicalGet::PstatsDerive
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CExpressionHandle &exprhdl,
 	StatsArray * // not used
 	)
 	const
 {
 	// requesting stats on distribution columns to estimate data skew
-	IStatistics *pstatsTable = PstatsBaseTable(memory_pool, exprhdl, m_ptabdesc, m_pcrsDist);
+	IStatistics *pstatsTable = PstatsBaseTable(mp, exprhdl, m_ptabdesc, m_pcrsDist);
 	
-	CColRefSet *pcrs = GPOS_NEW(memory_pool) CColRefSet(memory_pool, m_pdrgpcrOutput);
-	CUpperBoundNDVs *upper_bound_NDVs = GPOS_NEW(memory_pool) CUpperBoundNDVs(pcrs, pstatsTable->Rows());
+	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput);
+	CUpperBoundNDVs *upper_bound_NDVs = GPOS_NEW(mp) CUpperBoundNDVs(pcrs, pstatsTable->Rows());
 	CStatistics::CastStats(pstatsTable)->AddCardUpperBound(upper_bound_NDVs);
 
 	return pstatsTable;

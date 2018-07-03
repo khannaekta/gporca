@@ -76,7 +76,7 @@ namespace gpopt
 			// ctor
 			CScalarWindowFunc
 				(
-				IMemoryPool *memory_pool,
+				IMemoryPool *mp,
 				IMDId *mdid_func,
 				IMDId *mdid_return_type,
 				const CWStringConst *pstrFunc,

@@ -50,9 +50,9 @@ CDXLMemoryManagerTest::EresUnittest_Basic()
 {
 	// create memory pool
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 	
-	CDXLMemoryManager *memory_manager_dxl = GPOS_NEW(memory_pool) CDXLMemoryManager(memory_pool);
+	CDXLMemoryManager *memory_manager_dxl = GPOS_NEW(mp) CDXLMemoryManager(mp);
 	void *pvMemory = memory_manager_dxl->allocate(5);
 	
 	GPOS_ASSERT(NULL != pvMemory);

@@ -60,7 +60,7 @@ namespace gpdxl
 		};
 
 		//ctor
-		CDXLPhysicalDynamicIndexScan(IMemoryPool *memory_pool,
+		CDXLPhysicalDynamicIndexScan(IMemoryPool *mp,
 									 CDXLTableDescr *table_descr,
 									 ULONG part_idx_id,
 									 ULONG part_idx_id_printable,

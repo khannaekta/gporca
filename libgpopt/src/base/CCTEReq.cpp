@@ -148,17 +148,17 @@ CCTEReq::CCTEReqEntry::OsPrint
 //---------------------------------------------------------------------------
 CCTEReq::CCTEReq
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 	:
-	m_memory_pool(memory_pool),
+	m_mp(mp),
 	m_phmcter(NULL),
 	m_pdrgpulRequired(NULL)
 {
-	GPOS_ASSERT(NULL != memory_pool);
+	GPOS_ASSERT(NULL != mp);
 
-	m_phmcter = GPOS_NEW(m_memory_pool) HMCteReq(m_memory_pool);
-	m_pdrgpulRequired = GPOS_NEW(m_memory_pool) ULongPtrArray(m_memory_pool);
+	m_phmcter = GPOS_NEW(m_mp) HMCteReq(m_mp);
+	m_pdrgpulRequired = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 }
 
 //---------------------------------------------------------------------------
@@ -193,15 +193,15 @@ CCTEReq::Insert
 	)
 {
 	GPOS_ASSERT(CCTEMap::EctSentinel > ect);
-	CCTEReqEntry *pcre = GPOS_NEW(m_memory_pool) CCTEReqEntry(ulCteId, ect, fRequired, pdpplan);
+	CCTEReqEntry *pcre = GPOS_NEW(m_mp) CCTEReqEntry(ulCteId, ect, fRequired, pdpplan);
 #ifdef GPOS_DEBUG
 	BOOL fSuccess =
 #endif // GPOS_DEBUG
-	m_phmcter->Insert(GPOS_NEW(m_memory_pool) ULONG(ulCteId), pcre);
+	m_phmcter->Insert(GPOS_NEW(m_mp) ULONG(ulCteId), pcre);
 	GPOS_ASSERT(fSuccess);
 	if (fRequired)
 	{
-		m_pdrgpulRequired->Append(GPOS_NEW(m_memory_pool) ULONG(ulCteId));
+		m_pdrgpulRequired->Append(GPOS_NEW(m_mp) ULONG(ulCteId));
 	}
 }
 
@@ -371,12 +371,12 @@ CCTEReq::HashValue() const
 CCTEReq *
 CCTEReq::PcterUnresolved
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CCTEMap *pcm
 	)
 {
 	GPOS_ASSERT(NULL != pcm);
-	CCTEReq *pcterUnresolved = GPOS_NEW(memory_pool) CCTEReq(memory_pool);
+	CCTEReq *pcterUnresolved = GPOS_NEW(mp) CCTEReq(mp);
 
 	HMCteReqIter hmcri(m_phmcter);
 	while (hmcri.Advance())
@@ -410,13 +410,13 @@ CCTEReq::PcterUnresolved
 CCTEReq *
 CCTEReq::PcterUnresolvedSequence
 	(
-	IMemoryPool *memory_pool,
+	IMemoryPool *mp,
 	CCTEMap *pcm,
 	DrgPdp *pdrgpdpCtxt // context contains derived plan properties of producer tree
 	)
 {
 	GPOS_ASSERT(NULL != pcm);
-	CCTEReq *pcterUnresolved = GPOS_NEW(memory_pool) CCTEReq(memory_pool);
+	CCTEReq *pcterUnresolved = GPOS_NEW(mp) CCTEReq(mp);
 
 	HMCteReqIter hmcri(m_phmcter);
 	while (hmcri.Advance())
@@ -462,7 +462,7 @@ CCTEReq::PcterUnresolvedSequence
 
 	// if something is in pcm and not in the requirments, it has to be a producer
 	// in which case, add the corresponding consumer as unresolved
-	ULongPtrArray *pdrgpulProducers = pcm->PdrgpulAdditionalProducers(memory_pool, this);
+	ULongPtrArray *pdrgpulProducers = pcm->PdrgpulAdditionalProducers(mp, this);
 	const ULONG length = pdrgpulProducers->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
@@ -485,10 +485,10 @@ CCTEReq::PcterUnresolvedSequence
 CCTEReq *
 CCTEReq::PcterAllOptional
 	(
-	IMemoryPool *memory_pool
+	IMemoryPool *mp
 	)
 {
-	CCTEReq *pcter = GPOS_NEW(memory_pool) CCTEReq(memory_pool);
+	CCTEReq *pcter = GPOS_NEW(mp) CCTEReq(mp);
 
 	HMCteReqIter hmcri(m_phmcter);
 	while (hmcri.Advance())

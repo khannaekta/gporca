@@ -27,7 +27,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarSwitchCase::CDXLScalarSwitchCase(IMemoryPool *memory_pool) : CDXLScalar(memory_pool)
+CDXLScalarSwitchCase::CDXLScalarSwitchCase(IMemoryPool *mp) : CDXLScalar(mp)
 {
 }
 

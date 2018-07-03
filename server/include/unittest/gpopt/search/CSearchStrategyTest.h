@@ -39,11 +39,11 @@ namespace gpopt
 
 			// generate random search strategy
 			static
-			SearchStageArray *PdrgpssRandom(IMemoryPool *memory_pool);
+			SearchStageArray *PdrgpssRandom(IMemoryPool *mp);
 
 			// run optimize function on given expression
 			static
-			void Optimize(IMemoryPool *memory_pool, Pfpexpr pfnGenerator, SearchStageArray *search_stage_array, PfnOptimize pfnOptimize);
+			void Optimize(IMemoryPool *mp, Pfpexpr pfnGenerator, SearchStageArray *search_stage_array, PfnOptimize pfnOptimize);
 
 		public:
 

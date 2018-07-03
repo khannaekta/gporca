@@ -179,9 +179,9 @@ CCacheTest::CDeepObject::FMyEqual(CDeepObject::CDeepObjectList *const &plist,
 //
 //---------------------------------------------------------------------------
 void
-CCacheTest::CDeepObject::AddEntry(IMemoryPool *memory_pool, ULONG ulKey, ULONG ulVal)
+CCacheTest::CDeepObject::AddEntry(IMemoryPool *mp, ULONG ulKey, ULONG ulVal)
 {
-	m_list.Prepend(GPOS_NEW(memory_pool) SDeepObjectEntry(ulKey, ulVal));
+	m_list.Prepend(GPOS_NEW(mp) SDeepObjectEntry(ulKey, ulVal));
 }
 
 
@@ -314,9 +314,9 @@ CCacheTest::EresUnittest_Refcount()
 	//Scope of the accessor when we insert
 	{
 		CSimpleObjectCacheAccessor ca(pcache);
-		IMemoryPool *memory_pool = ca.Pmp();
+		IMemoryPool *mp = ca.Pmp();
 
-		pso = GPOS_NEW(memory_pool) SSimpleObject(1, 2);
+		pso = GPOS_NEW(mp) SSimpleObject(1, 2);
 		GPOS_ASSERT(1 == pso->RefCount());
 
 #ifdef GPOS_DEBUG
@@ -374,15 +374,15 @@ CCacheTest::InsertOneElement(CCache<SSimpleObject *, ULONG *> *pCache, ULONG ulK
 	SSimpleObject *pso = NULL;
 	{
 		CSimpleObjectCacheAccessor ca(pCache);
-		IMemoryPool *memory_pool = ca.Pmp();
-		pso = GPOS_NEW(memory_pool) SSimpleObject(ulKey, ulKey);
+		IMemoryPool *mp = ca.Pmp();
+		pso = GPOS_NEW(mp) SSimpleObject(ulKey, ulKey);
 		ca.Insert(&(pso->m_ulKey), pso);
 		GPOS_ASSERT(3 == pso->RefCount() &&
 					"Expected pso, cacheentry and cacheaccessor to have ownership");
 		//Remove the ownership of pso. Still CCacheEntry has the ownership
 		pso->Release();
 		GPOS_ASSERT(2 == pso->RefCount() && "Expected pso and cacheentry to have ownership");
-		ulTotalAllocatedSize = memory_pool->TotalAllocatedSize();
+		ulTotalAllocatedSize = mp->TotalAllocatedSize();
 	}
 	GPOS_ASSERT(1 == pso->RefCount() && "Expected only cacheentry to have ownership");
 	return ulTotalAllocatedSize;
@@ -660,8 +660,8 @@ CCacheTest::EresInsertDuplicates(CCache<SSimpleObject *, ULONG *> *pcache)
 
 	{
 		CAutoMemoryPool amp;
-		IMemoryPool *memory_pool = amp.Pmp();
-		CAutoTrace at(memory_pool);
+		IMemoryPool *mp = amp.Pmp();
+		CAutoTrace at(mp);
 		at.Os() << std::endl
 				<< "Total memory consumption by cache: " << pcache->TotalAllocatedSize()
 				<< " bytes";
@@ -750,10 +750,10 @@ CCacheTest::EresUnittest_DeepObject()
 	// insertion - scope for accessor
 	{
 		CDeepObjectCacheAccessor ca(pcache);
-		IMemoryPool *memory_pool = ca.Pmp();
-		CDeepObject *pdo = GPOS_NEW(memory_pool) CDeepObject();
-		pdo->AddEntry(memory_pool, 1, 1);
-		pdo->AddEntry(memory_pool, 2, 2);
+		IMemoryPool *mp = ca.Pmp();
+		CDeepObject *pdo = GPOS_NEW(mp) CDeepObject();
+		pdo->AddEntry(mp, 1, 1);
+		pdo->AddEntry(mp, 2, 2);
 
 #ifdef GPOS_DEBUG
 		CDeepObject *pdoReturned =
@@ -767,10 +767,10 @@ CCacheTest::EresUnittest_DeepObject()
 		if (pcache->AllowsDuplicateKeys())
 		{
 			CDeepObjectCacheAccessor ca(pcache);
-			IMemoryPool *memory_pool = ca.Pmp();
-			CDeepObject *pdoDuplicate = GPOS_NEW(memory_pool) CDeepObject();
-			pdoDuplicate->AddEntry(memory_pool, 1, 5);
-			pdoDuplicate->AddEntry(memory_pool, 2, 5);
+			IMemoryPool *mp = ca.Pmp();
+			CDeepObject *pdoDuplicate = GPOS_NEW(mp) CDeepObject();
+			pdoDuplicate->AddEntry(mp, 1, 5);
+			pdoDuplicate->AddEntry(mp, 2, 5);
 
 #ifdef GPOS_DEBUG
 			CDeepObject *pdoReturned =
@@ -1079,7 +1079,7 @@ GPOS_RESULT
 CCacheTest::EresUnittest_ConcurrentAccess()
 {
 	CAutoMemoryPool amp;
-	IMemoryPool *memory_pool = amp.Pmp();
+	IMemoryPool *mp = amp.Pmp();
 	CWorkerPoolManager *pwpm = CWorkerPoolManager::WorkerPoolManager();
 
 	// scope for cache auto pointer
@@ -1096,7 +1096,7 @@ CCacheTest::EresUnittest_ConcurrentAccess()
 		{
 			GPOS_CHECK_ABORT;
 
-			CAutoTaskProxy atp(memory_pool, pwpm);
+			CAutoTaskProxy atp(mp, pwpm);
 
 			CTask *rgPtsk[GPOS_CACHE_THREADS];
 

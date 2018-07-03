@@ -25,10 +25,10 @@ using namespace gpos;
 //		Constructs an empty string
 //
 //---------------------------------------------------------------------------
-CWStringDynamic::CWStringDynamic(IMemoryPool *memory_pool)
+CWStringDynamic::CWStringDynamic(IMemoryPool *mp)
 	: CWString(0  // length
 			   ),
-	  m_memory_pool(memory_pool),
+	  m_mp(mp),
 	  m_capacity(0)
 {
 	Reset();
@@ -42,8 +42,8 @@ CWStringDynamic::CWStringDynamic(IMemoryPool *memory_pool)
 //		Constructs a new string and initializes it with the given buffer
 //
 //---------------------------------------------------------------------------
-CWStringDynamic::CWStringDynamic(IMemoryPool *memory_pool, const WCHAR *w_str_buffer)
-	: CWString(GPOS_WSZ_LENGTH(w_str_buffer)), m_memory_pool(memory_pool), m_capacity(0)
+CWStringDynamic::CWStringDynamic(IMemoryPool *mp, const WCHAR *w_str_buffer)
+	: CWString(GPOS_WSZ_LENGTH(w_str_buffer)), m_mp(mp), m_capacity(0)
 {
 	GPOS_ASSERT(NULL != w_str_buffer);
 
@@ -155,7 +155,7 @@ CWStringDynamic::AppendCharArray(const CHAR *sz)
 	{
 		IncreaseCapacity(new_length);
 	}
-	WCHAR *w_str_buffer = GPOS_NEW_ARRAY(m_memory_pool, WCHAR, length + 1);
+	WCHAR *w_str_buffer = GPOS_NEW_ARRAY(m_mp, WCHAR, length + 1);
 
 	// convert input string to wide character buffer
 #ifdef GPOS_DEBUG
@@ -217,7 +217,7 @@ CWStringDynamic::AppendFormat(const WCHAR *format, ...)
 		// try with a bigger buffer this time
 		size *= 2;
 		CAutoRg<WCHAR> a_w_str_buff;
-		a_w_str_buff = GPOS_NEW_ARRAY(m_memory_pool, WCHAR, size + 1);
+		a_w_str_buff = GPOS_NEW_ARRAY(m_mp, WCHAR, size + 1);
 
 		// get arguments
 		VA_START(va_args, format);
@@ -330,7 +330,7 @@ CWStringDynamic::IncreaseCapacity(ULONG requested)
 	GPOS_ASSERT(capacity >= (m_capacity << 1));
 
 	CAutoRg<WCHAR> a_w_str_new_buff;
-	a_w_str_new_buff = GPOS_NEW_ARRAY(m_memory_pool, WCHAR, capacity);
+	a_w_str_new_buff = GPOS_NEW_ARRAY(m_mp, WCHAR, capacity);
 	if (0 < m_length)
 	{
 		// current string is not empty: copy it to the resulting string

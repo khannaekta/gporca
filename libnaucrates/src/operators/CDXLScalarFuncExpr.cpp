@@ -28,12 +28,12 @@ using namespace gpdxl;
 //		Constructs a scalar FuncExpr node
 //
 //---------------------------------------------------------------------------
-CDXLScalarFuncExpr::CDXLScalarFuncExpr(IMemoryPool *memory_pool,
+CDXLScalarFuncExpr::CDXLScalarFuncExpr(IMemoryPool *mp,
 									   IMDId *mdid_func,
 									   IMDId *mdid_return_type,
 									   INT return_type_modifier,
 									   BOOL fRetSet)
-	: CDXLScalar(memory_pool),
+	: CDXLScalar(mp),
 	  m_func_mdid(mdid_func),
 	  m_return_type_mdid(mdid_return_type),
 	  m_return_type_modifier(return_type_modifier),

@@ -28,7 +28,7 @@ using namespace gpmd;
 //		Constructs a metadata scalar op
 //
 //---------------------------------------------------------------------------
-CMDScalarOpGPDB::CMDScalarOpGPDB(IMemoryPool *memory_pool,
+CMDScalarOpGPDB::CMDScalarOpGPDB(IMemoryPool *mp,
 								 IMDId *mdid,
 								 CMDName *mdname,
 								 IMDId *mdid_type_left,
@@ -40,7 +40,7 @@ CMDScalarOpGPDB::CMDScalarOpGPDB(IMemoryPool *memory_pool,
 								 IMDType::ECmpType cmp_type,
 								 BOOL returns_null_on_null_input,
 								 MdidPtrArray *mdid_op_classes_array)
-	: m_memory_pool(memory_pool),
+	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
 	  m_mdid_type_left(mdid_type_left),
@@ -55,7 +55,7 @@ CMDScalarOpGPDB::CMDScalarOpGPDB(IMemoryPool *memory_pool,
 {
 	GPOS_ASSERT(NULL != mdid_op_classes_array);
 	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_memory_pool, this, false /*fSerializeHeader*/, false /*indentation*/);
+		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 

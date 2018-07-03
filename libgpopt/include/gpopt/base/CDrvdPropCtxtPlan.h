@@ -53,7 +53,7 @@ namespace gpopt
 
 			// copy function
 			virtual
-			CDrvdPropCtxt *PdpctxtCopy(IMemoryPool *memory_pool) const;
+			CDrvdPropCtxt *PdpctxtCopy(IMemoryPool *mp) const;
 
 			// add props to context
 			virtual
@@ -62,7 +62,7 @@ namespace gpopt
 		public:
 
 			// ctor
-			CDrvdPropCtxtPlan(IMemoryPool *memory_pool, BOOL fUpdateCTEMap = true);
+			CDrvdPropCtxtPlan(IMemoryPool *mp, BOOL fUpdateCTEMap = true);
 
 			// dtor
 			virtual
