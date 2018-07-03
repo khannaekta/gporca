@@ -37,7 +37,7 @@ namespace gpdxl
 	{
 	private:
 		// array of column descriptors to build
-		DXLColumnDescrArray *m_column_descr_dxl_array;
+		DXLColumnDescrArray *m_dxl_column_descr_array;
 
 		// current column descriptor being parsed
 		CDXLColDescr *m_current_column_descr;
