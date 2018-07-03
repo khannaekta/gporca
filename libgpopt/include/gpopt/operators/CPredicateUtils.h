@@ -220,9 +220,20 @@ namespace gpopt
 			static
 			BOOL FCompareColToConstOrCol(CExpression *pexprScalar);
 
-			// is the given expression a comparison between a scalar ident under a scalar cast and a constant array
+			// is the given expression an array comparison between a scalar ident under a binary coercible
+			// scalar cast and a constant array
 			static
-			BOOL FCompareCastIdentToConstArray(CExpression *pexpr);
+			BOOL FArrayCompareCoercibleCastedIdentToConstArray(CExpression *pexpr);
+
+			// is the given expression an array comparison between a scalar ident under a binary coercible
+			// scalar cast and a constant
+			static
+			BOOL FArrayCompareCoercibleCastedIdentToConst(CExpression *pexpr);
+
+			// is the given expression a scalar comparison between a scalar ident under a binary coercible
+			// scalar cast and a constant
+			static
+			BOOL FCompareCoercibleCastedIdentToConst(CExpression *pexpr);
 
 			// is the given expression a comparison between a scalar ident and a constant array
 			static
