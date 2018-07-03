@@ -29,7 +29,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLLogicalGet::CDXLLogicalGet(IMemoryPool *mp, CDXLTableDescr *table_descr)
-	: CDXLLogical(mp), m_table_descr_dxl(table_descr)
+	: CDXLLogical(mp), m_dxl_table_descr(table_descr)
 {
 }
 
@@ -43,7 +43,7 @@ CDXLLogicalGet::CDXLLogicalGet(IMemoryPool *mp, CDXLTableDescr *table_descr)
 //---------------------------------------------------------------------------
 CDXLLogicalGet::~CDXLLogicalGet()
 {
-	CRefCount::SafeRelease(m_table_descr_dxl);
+	CRefCount::SafeRelease(m_dxl_table_descr);
 }
 
 //---------------------------------------------------------------------------
@@ -85,7 +85,7 @@ CDXLLogicalGet::GetOpNameStr() const
 CDXLTableDescr *
 CDXLLogicalGet::GetDXLTableDescr() const
 {
-	return m_table_descr_dxl;
+	return m_dxl_table_descr;
 }
 
 
@@ -107,7 +107,7 @@ CDXLLogicalGet::SerializeToDXL(CXMLSerializer *xml_serializer,
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
 	// serialize table descriptor
-	m_table_descr_dxl->SerializeToDXL(xml_serializer);
+	m_dxl_table_descr->SerializeToDXL(xml_serializer);
 
 	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
 								 element_name);
@@ -124,10 +124,10 @@ CDXLLogicalGet::SerializeToDXL(CXMLSerializer *xml_serializer,
 BOOL
 CDXLLogicalGet::IsColDefined(ULONG col_id) const
 {
-	const ULONG size = m_table_descr_dxl->Arity();
+	const ULONG size = m_dxl_table_descr->Arity();
 	for (ULONG descr_id = 0; descr_id < size; descr_id++)
 	{
-		ULONG id = m_table_descr_dxl->GetColumnDescrAt(descr_id)->Id();
+		ULONG id = m_dxl_table_descr->GetColumnDescrAt(descr_id)->Id();
 		if (id == col_id)
 		{
 			return true;
@@ -152,9 +152,9 @@ CDXLLogicalGet::AssertValid(const CDXLNode *,  //dxlnode
 							) const
 {
 	// assert validity of table descriptor
-	GPOS_ASSERT(NULL != m_table_descr_dxl);
-	GPOS_ASSERT(NULL != m_table_descr_dxl->MdName());
-	GPOS_ASSERT(m_table_descr_dxl->MdName()->GetMDName()->IsValid());
+	GPOS_ASSERT(NULL != m_dxl_table_descr);
+	GPOS_ASSERT(NULL != m_dxl_table_descr->MdName());
+	GPOS_ASSERT(m_dxl_table_descr->MdName()->GetMDName()->IsValid());
 }
 #endif  // GPOS_DEBUG
 

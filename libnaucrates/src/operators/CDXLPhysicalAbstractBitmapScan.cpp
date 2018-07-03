@@ -30,7 +30,7 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 CDXLPhysicalAbstractBitmapScan::~CDXLPhysicalAbstractBitmapScan()
 {
-	m_table_descr_dxl->Release();
+	m_dxl_table_descr->Release();
 }
 
 #ifdef GPOS_DEBUG
@@ -58,9 +58,9 @@ CDXLPhysicalAbstractBitmapScan::AssertValid(const CDXLNode *node, BOOL validate_
 				EdxlopScalarBitmapBoolOp == bitmap_dxlnode->GetOperator()->GetDXLOperator());
 
 	// assert validity of table descriptor
-	GPOS_ASSERT(NULL != m_table_descr_dxl);
-	GPOS_ASSERT(NULL != m_table_descr_dxl->MdName());
-	GPOS_ASSERT(m_table_descr_dxl->MdName()->GetMDName()->IsValid());
+	GPOS_ASSERT(NULL != m_dxl_table_descr);
+	GPOS_ASSERT(NULL != m_dxl_table_descr->MdName());
+	GPOS_ASSERT(m_dxl_table_descr->MdName()->GetMDName()->IsValid());
 
 	if (validate_children)
 	{

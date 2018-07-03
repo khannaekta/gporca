@@ -31,7 +31,7 @@ using namespace gpdxl;
 CDXLLogicalInsert::CDXLLogicalInsert(IMemoryPool *mp,
 									 CDXLTableDescr *table_descr,
 									 ULongPtrArray *src_colids_array)
-	: CDXLLogical(mp), m_table_descr_dxl(table_descr), m_src_colids_array(src_colids_array)
+	: CDXLLogical(mp), m_dxl_table_descr(table_descr), m_src_colids_array(src_colids_array)
 {
 	GPOS_ASSERT(NULL != table_descr);
 	GPOS_ASSERT(NULL != src_colids_array);
@@ -47,7 +47,7 @@ CDXLLogicalInsert::CDXLLogicalInsert(IMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLLogicalInsert::~CDXLLogicalInsert()
 {
-	m_table_descr_dxl->Release();
+	m_dxl_table_descr->Release();
 	m_src_colids_array->Release();
 }
 
@@ -98,7 +98,7 @@ CDXLLogicalInsert::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode
 	GPOS_DELETE(src_colids);
 
 	// serialize table descriptor
-	m_table_descr_dxl->SerializeToDXL(xml_serializer);
+	m_dxl_table_descr->SerializeToDXL(xml_serializer);
 
 	// serialize arguments
 	node->SerializeChildrenToDXL(xml_serializer);

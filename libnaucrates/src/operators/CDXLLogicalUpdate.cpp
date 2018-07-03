@@ -37,7 +37,7 @@ CDXLLogicalUpdate::CDXLLogicalUpdate(IMemoryPool *mp,
 									 BOOL preserve_oids,
 									 ULONG tuple_oid)
 	: CDXLLogical(mp),
-	  m_table_descr_dxl(table_descr),
+	  m_dxl_table_descr(table_descr),
 	  m_ctid_colid(ctid_colid),
 	  m_segid_colid(segid_colid),
 	  m_deletion_colid_array(delete_colid_array),
@@ -60,7 +60,7 @@ CDXLLogicalUpdate::CDXLLogicalUpdate(IMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLLogicalUpdate::~CDXLLogicalUpdate()
 {
-	m_table_descr_dxl->Release();
+	m_dxl_table_descr->Release();
 	m_deletion_colid_array->Release();
 	m_insert_colid_array->Release();
 }
@@ -127,7 +127,7 @@ CDXLLogicalUpdate::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode
 									 m_tuple_oid);
 	}
 
-	m_table_descr_dxl->SerializeToDXL(xml_serializer);
+	m_dxl_table_descr->SerializeToDXL(xml_serializer);
 	node->SerializeChildrenToDXL(xml_serializer);
 
 	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),

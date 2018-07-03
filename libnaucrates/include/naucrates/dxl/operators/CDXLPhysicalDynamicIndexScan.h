@@ -32,7 +32,7 @@ namespace gpdxl
 	{
 	private:
 		// table descriptor for the scanned table
-		CDXLTableDescr *m_table_descr_dxl;
+		CDXLTableDescr *m_dxl_table_descr;
 
 		// part index id
 		ULONG m_part_index_id;

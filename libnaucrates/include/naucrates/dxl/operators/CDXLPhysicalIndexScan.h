@@ -41,7 +41,7 @@ namespace gpdxl
 	{
 	private:
 		// table descriptor for the scanned table
-		CDXLTableDescr *m_table_descr_dxl;
+		CDXLTableDescr *m_dxl_table_descr;
 
 		// index descriptor associated with the scanned table
 		CDXLIndexDescr *m_index_descr_dxl;

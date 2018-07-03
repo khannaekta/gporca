@@ -56,7 +56,7 @@ CDXLPhysicalDynamicBitmapTableScan::SerializeToDXL(CXMLSerializer *xml_serialize
 	}
 	node->SerializePropertiesToDXL(xml_serializer);
 	node->SerializeChildrenToDXL(xml_serializer);
-	m_table_descr_dxl->SerializeToDXL(xml_serializer);
+	m_dxl_table_descr->SerializeToDXL(xml_serializer);
 
 	xml_serializer->CloseElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
 								 element_name);

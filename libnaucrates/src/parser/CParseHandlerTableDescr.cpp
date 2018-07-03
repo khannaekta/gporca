@@ -34,7 +34,7 @@ XERCES_CPP_NAMESPACE_USE
 CParseHandlerTableDescr::CParseHandlerTableDescr(IMemoryPool *mp,
 												 CParseHandlerManager *parse_handler_mgr,
 												 CParseHandlerBase *parse_handler_root)
-	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root), m_table_descr_dxl(NULL)
+	: CParseHandlerBase(mp, parse_handler_mgr, parse_handler_root), m_dxl_table_descr(NULL)
 {
 }
 
@@ -48,7 +48,7 @@ CParseHandlerTableDescr::CParseHandlerTableDescr(IMemoryPool *mp,
 //---------------------------------------------------------------------------
 CParseHandlerTableDescr::~CParseHandlerTableDescr()
 {
-	CRefCount::SafeRelease(m_table_descr_dxl);
+	CRefCount::SafeRelease(m_dxl_table_descr);
 }
 
 //---------------------------------------------------------------------------
@@ -62,7 +62,7 @@ CParseHandlerTableDescr::~CParseHandlerTableDescr()
 CDXLTableDescr *
 CParseHandlerTableDescr::GetDXLTableDescr()
 {
-	return m_table_descr_dxl;
+	return m_dxl_table_descr;
 }
 
 //---------------------------------------------------------------------------
@@ -88,7 +88,7 @@ CParseHandlerTableDescr::StartElement(const XMLCh *const,  // element_uri,
 	}
 
 	// parse table name from attributes
-	m_table_descr_dxl =
+	m_dxl_table_descr =
 		CDXLOperatorFactory::MakeDXLTableDescr(m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
 
 	// install column descriptor parsers
@@ -134,7 +134,7 @@ CParseHandlerTableDescr::EndElement(const XMLCh *const,  // element_uri,
 
 	DXLColumnDescrArray *dxl_column_descr_array = col_descr_parse_handler->GetDXLColumnDescrArray();
 	dxl_column_descr_array->AddRef();
-	m_table_descr_dxl->SetColumnDescriptors(dxl_column_descr_array);
+	m_dxl_table_descr->SetColumnDescriptors(dxl_column_descr_array);
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

@@ -40,7 +40,7 @@ namespace gpdxl
 	{
 	private:
 		// table descriptor for the scanned table
-		CDXLTableDescr *m_table_descr_dxl;
+		CDXLTableDescr *m_dxl_table_descr;
 
 		// private copy ctor
 		CDXLPhysicalTableScan(CDXLPhysicalTableScan &);

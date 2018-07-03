@@ -46,7 +46,7 @@ namespace gpdxl
 		const EdxlDmlType m_dml_type_dxl;
 
 		// target table descriptor
-		CDXLTableDescr *m_table_descr_dxl;
+		CDXLTableDescr *m_dxl_table_descr;
 
 		// list of source column ids
 		ULongPtrArray *m_src_colids_array;
@@ -113,7 +113,7 @@ namespace gpdxl
 		CDXLTableDescr *
 		GetDXLTableDescr() const
 		{
-			return m_table_descr_dxl;
+			return m_dxl_table_descr;
 		}
 
 		// source column ids

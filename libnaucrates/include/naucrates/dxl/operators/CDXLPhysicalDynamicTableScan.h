@@ -41,7 +41,7 @@ namespace gpdxl
 	{
 	private:
 		// table descriptor for the scanned table
-		CDXLTableDescr *m_table_descr_dxl;
+		CDXLTableDescr *m_dxl_table_descr;
 
 		// id of partition index structure
 		ULONG m_part_index_id;

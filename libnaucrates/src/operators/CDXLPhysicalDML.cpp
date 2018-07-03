@@ -41,7 +41,7 @@ CDXLPhysicalDML::CDXLPhysicalDML(IMemoryPool *mp,
 								 BOOL input_sort_req)
 	: CDXLPhysical(mp),
 	  m_dml_type_dxl(dml_type_dxl),
-	  m_table_descr_dxl(table_descr),
+	  m_dxl_table_descr(table_descr),
 	  m_src_colids_array(src_colids_array),
 	  m_action_colid(action_colid),
 	  m_oid_colid(oid_colid),
@@ -67,7 +67,7 @@ CDXLPhysicalDML::CDXLPhysicalDML(IMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLPhysicalDML::~CDXLPhysicalDML()
 {
-	m_table_descr_dxl->Release();
+	m_dxl_table_descr->Release();
 	m_src_colids_array->Release();
 	CRefCount::SafeRelease(m_direct_dispatch_info);
 }
@@ -167,7 +167,7 @@ CDXLPhysicalDML::SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *
 	(*node)[0]->SerializeToDXL(xml_serializer);
 
 	// serialize table descriptor
-	m_table_descr_dxl->SerializeToDXL(xml_serializer);
+	m_dxl_table_descr->SerializeToDXL(xml_serializer);
 
 	// serialize physical child
 	(*node)[1]->SerializeToDXL(xml_serializer);
