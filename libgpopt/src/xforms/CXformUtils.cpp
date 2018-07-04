@@ -668,7 +668,7 @@ CXformUtils::FCanPushGbAggBelowJoin
 BOOL
 CXformUtils::FSameDatatype
 	(
-	ColRefArrays *pdrgpdrgpcrInput
+	CColRefArrays *pdrgpdrgpcrInput
 	)
 {
 	GPOS_ASSERT(1 < pdrgpdrgpcrInput->Size());
@@ -1433,7 +1433,7 @@ CXformUtils::PexprAssertNotNull
 	CColRefArray *colref_array
 	)
 {	
-	CColumnDescrArray *pdrgpcoldesc = ptabdesc->Pdrgpcoldesc();
+	CColumnDescriptorArray *pdrgpcoldesc = ptabdesc->Pdrgpcoldesc();
 	
 	const ULONG num_cols = pdrgpcoldesc->Size();
 	CColRefSet *pcrsNotNull = CDrvdPropRelational::GetRelationalProperties(pexprChild->PdpDerive())->PcrsNotNull();
@@ -2797,7 +2797,7 @@ CXformUtils::PexprBuildIndexPlan
 	CColRefArray *pdrgpcrOutput = NULL;
 	CWStringConst *alias = NULL;
 	ULONG ulPartIndex = gpos::ulong_max;
-	ColRefArrays *pdrgpdrgpcrPart = NULL;
+	CColRefArrays *pdrgpdrgpcrPart = NULL;
 	BOOL fPartialIndex = pmdrel->IsPartialIndex(pmdindex->MDId());
 	ULONG ulSecondaryPartIndex = gpos::ulong_max;
 	CPartConstraint *ppartcnstrRel = NULL;
@@ -3870,13 +3870,13 @@ CXformUtils::PexprBitmapTableGet
 //		Find a set of partial index combinations
 //
 //---------------------------------------------------------------------------
-PartDynamicIndexGetInfoArrays *
+SPartDynamicIndexGetInfoArrays *
 CXformUtils::PdrgpdrgppartdigCandidates
 	(
 	IMemoryPool *mp,
 	CMDAccessor *md_accessor,
 	CExpressionArray *pdrgpexprScalar,
-	ColRefArrays *pdrgpdrgpcrPartKey,
+	CColRefArrays *pdrgpdrgpcrPartKey,
 	const IMDRelation *pmdrel,
 	CPartConstraint *ppartcnstrRel,
 	CColRefArray *pdrgpcrOutput,
@@ -3885,7 +3885,7 @@ CXformUtils::PdrgpdrgppartdigCandidates
 	CColRefSet *pcrsAcceptedOuterRefs
 	)
 {
-	PartDynamicIndexGetInfoArrays *pdrgpdrgppartdig = GPOS_NEW(mp) PartDynamicIndexGetInfoArrays(mp);
+	SPartDynamicIndexGetInfoArrays *pdrgpdrgppartdig = GPOS_NEW(mp) SPartDynamicIndexGetInfoArrays(mp);
 	const ULONG ulIndexes = pmdrel->IndexCount();
 
 	// currently covered parts
@@ -4146,7 +4146,7 @@ CXformUtils::PexprPartialDynamicIndexGet
 
 	CWStringConst strTableAliasName(mp, popGet->Name().Pstr()->GetBuffer());
 
-	ColRefArrays *pdrgpdrgpcrPart = NULL;
+	CColRefArrays *pdrgpdrgpcrPart = NULL;
 	CPartConstraint *ppartcnstrDIG = NULL;
 	CExpressionArray *pdrgpexprIndexRemapped = NULL;
 	CExpressionArray *pdrgpexprResidualRemapped = NULL;
@@ -4599,7 +4599,7 @@ CXformUtils::ICmpPrjElemsArr
 //		elements sorted by the column id of the first entries
 //
 //---------------------------------------------------------------------------
-ExpressionArrays *
+CExpressionArrays *
 CXformUtils::PdrgpdrgpexprSortedPrjElemsArray
 	(
 	IMemoryPool *mp,
@@ -4608,7 +4608,7 @@ CXformUtils::PdrgpdrgpexprSortedPrjElemsArray
 {
 	GPOS_ASSERT(NULL != phmexprdrgpexpr);
 
-	ExpressionArrays *pdrgpdrgpexprPrjElems = GPOS_NEW(mp) ExpressionArrays(mp);
+	CExpressionArrays *pdrgpdrgpexprPrjElems = GPOS_NEW(mp) CExpressionArrays(mp);
 	ExprToExprArrayMapIter hmexprdrgpexpriter(phmexprdrgpexpr);
 	while (hmexprdrgpexpriter.Advance())
 	{
@@ -4707,7 +4707,7 @@ CXformUtils::PexprGbAggOnCTEConsumer2Join
 	// we need to sort arrays here since hash map iteration is non-deterministic,
 	// which may create non-deterministic ordering of join children leading to
 	// changing the plan of the same query when run multiple times
-	ExpressionArrays *pdrgpdrgpexprPrjElems = PdrgpdrgpexprSortedPrjElemsArray(mp, phmexprdrgpexpr);
+	CExpressionArrays *pdrgpdrgpexprPrjElems = PdrgpdrgpexprSortedPrjElemsArray(mp, phmexprdrgpexpr);
 
 	// counter of consumers
 	ULONG ulConsumers = 0;
