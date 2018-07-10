@@ -3638,6 +3638,8 @@ CTranslatorExprToDXL::PdxlnNLJoin
 
 	EdxlJoinType edxljt = EdxljtSentinel;
 	BOOL fIndexNLJ = false;
+	DrgPcr *outerRefs = NULL;
+
 	switch (pop->Eopid())
 	{
 		case COperator::EopPhysicalInnerNLJoin:
@@ -3648,12 +3650,14 @@ CTranslatorExprToDXL::PdxlnNLJoin
 			edxljt = EdxljtInner;
 			fIndexNLJ = true;
 			StoreIndexNLJOuterRefs(pop);
+			outerRefs = CPhysicalInnerIndexNLJoin::PopConvert(pop)->PdrgPcrOuterRefs();
 			break;
 
 		case COperator::EopPhysicalLeftOuterIndexNLJoin:
 			edxljt = EdxljtLeft;
 			fIndexNLJ = true;
 			StoreIndexNLJOuterRefs(pop);
+			outerRefs = CPhysicalLeftOuterIndexNLJoin::PopConvert(pop)->PdrgPcrOuterRefs();
 			break;
 
 		case COperator::EopPhysicalLeftOuterNLJoin:
@@ -3676,6 +3680,7 @@ CTranslatorExprToDXL::PdxlnNLJoin
 			GPOS_ASSERT(!"Invalid join type");
 	}
 
+
 	// translate relational child expressions
 	CDXLNode *pdxlnOuterChild = Pdxln(pexprOuterChild, NULL /*pdrgpcr*/, pdrgpdsBaseTables, pulNonGatherMotions, pfDML, false /*fRemap*/, false /*fRoot*/);
 	CDXLNode *pdxlnInnerChild = Pdxln(pexprInnerChild, NULL /*pdrgpcr*/, pdrgpdsBaseTables, pulNonGatherMotions, pfDML, false /*fRemap*/, false /*fRoot*/);
@@ -3687,8 +3692,20 @@ CTranslatorExprToDXL::PdxlnNLJoin
 		pdxlnJoinFilter->AddChild(pdxlnCond);
 	}
 
+	// outer references in the inner child
+	DrgPdxlcr *pdrgdxlcr = GPOS_NEW(m_pmp) DrgPdxlcr(m_pmp);
+
+	for (ULONG ul = 0; ul < outerRefs->UlLength(); ul++)
+	{
+		CColRef *pcr = (*outerRefs)[ul];
+		CMDName *pmdname = GPOS_NEW(m_pmp) CMDName(m_pmp, pcr->Name().Pstr());
+		IMDId *pmdid = pcr->Pmdtype()->Pmdid();
+		pmdid->AddRef();
+		CDXLColRef *pdxlcr = GPOS_NEW(m_pmp) CDXLColRef(m_pmp, pmdname, pcr->UlId(), pmdid, pcr->ITypeModifier());
+		pdrgdxlcr->Append(pdxlcr);
+	}
 	// construct a join node
-	CDXLPhysicalNLJoin *pdxlopNLJ = GPOS_NEW(m_pmp) CDXLPhysicalNLJoin(m_pmp, edxljt,fIndexNLJ);
+	CDXLPhysicalNLJoin *pdxlopNLJ = GPOS_NEW(m_pmp) CDXLPhysicalNLJoin(m_pmp, edxljt, fIndexNLJ, pdrgdxlcr);
 
 	// construct projection list
 	// compute required columns

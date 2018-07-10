@@ -69,7 +69,6 @@ CParseHandlerNLJoin::StartElement
 	
 	// parse and create Hash join operator
 	m_pdxlop = (CDXLPhysicalNLJoin *) CDXLOperatorFactory::PdxlopNLJoin(m_pphm->Pmm(), attrs);
-	
 	// create and activate the parse handler for the children nodes in reverse
 	// order of their expected appearance
 	

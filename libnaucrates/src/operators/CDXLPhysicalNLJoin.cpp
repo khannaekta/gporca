@@ -30,13 +30,22 @@ CDXLPhysicalNLJoin::CDXLPhysicalNLJoin
 	(
 	IMemoryPool *pmp,
 	EdxlJoinType edxljt,
-	BOOL fIndexNLJ
+	BOOL fIndexNLJ,
+	DrgPdxlcr *pdrgdxlcr
 	)
 	:
 	CDXLPhysicalJoin(pmp, edxljt),
-	m_fIndexNLJ(fIndexNLJ)
+	m_fIndexNLJ(fIndexNLJ),
+	m_pdrgdxlcr(pdrgdxlcr)
 {
 }
+
+
+CDXLPhysicalNLJoin::~CDXLPhysicalNLJoin()
+{
+	m_pdrgdxlcr->Release();
+}
+
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -90,12 +99,46 @@ CDXLPhysicalNLJoin::SerializeToDXL
 	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenJoinType), PstrJoinTypeName());
 	pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenPhysicalNLJoinIndex), m_fIndexNLJ);
 
-
 	// serialize properties
 	pdxln->SerializePropertiesToDXL(pxmlser);
 	
 	// serialize children
 	pdxln->SerializeChildrenToDXL(pxmlser);
+	// Serialize NLJ index paramlist
+	pxmlser->OpenElement
+	(
+	 CDXLTokens::PstrToken(EdxltokenNamespacePrefix),
+	 CDXLTokens::PstrToken(EdxltokenNLJIndexParamList)
+	 );
+
+	for (ULONG ul = 0; ul < m_pdrgdxlcr->UlLength(); ul++)
+	{
+		pxmlser->OpenElement
+		(
+		 CDXLTokens::PstrToken(EdxltokenNamespacePrefix),
+		 CDXLTokens::PstrToken(EdxltokenNLJIndexParam)
+		 );
+
+		ULONG ulid = (*m_pdrgdxlcr)[ul]->UlID();
+		pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenColId), ulid);
+
+		const CMDName *pmdname = (*m_pdrgdxlcr)[ul]->Pmdname();
+		const IMDId *pmdidType = (*m_pdrgdxlcr)[ul]->PmdidType();
+		pxmlser->AddAttribute(CDXLTokens::PstrToken(EdxltokenColName), pmdname->Pstr());
+		pmdidType->Serialize(pxmlser, CDXLTokens::PstrToken(EdxltokenTypeId));
+
+		pxmlser->CloseElement
+		(
+		 CDXLTokens::PstrToken(EdxltokenNamespacePrefix),
+		 CDXLTokens::PstrToken(EdxltokenNLJIndexParam)
+		 );
+	}
+
+	pxmlser->CloseElement
+	(
+	 CDXLTokens::PstrToken(EdxltokenNamespacePrefix),
+	 CDXLTokens::PstrToken(EdxltokenNLJIndexParamList)
+	 );
 	
 	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);		
 }

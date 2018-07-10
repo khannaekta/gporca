@@ -263,6 +263,8 @@ CDXLTokens::Init
 			{EdxltokenScalarSubPlanParamList, GPOS_WSZ_LIT("ParamList")},
 			{EdxltokenScalarSubPlanParam, GPOS_WSZ_LIT("Param")},
 			{EdxltokenScalarSubPlanTestExpr, GPOS_WSZ_LIT("TestExpr")},
+			{EdxltokenNLJIndexParamList, GPOS_WSZ_LIT("NLJIndexParamList")},
+			{EdxltokenNLJIndexParam, GPOS_WSZ_LIT("NLJIndexParam")},
 			{EdxltokenScalarValuesList, GPOS_WSZ_LIT("ValuesList")},
 
 			{EdxltokenValue, GPOS_WSZ_LIT("Value")},

@@ -197,6 +197,8 @@ namespace gpdxl
 		EdxltokenScalarSubPlanTestExpr,
 		EdxltokenScalarSubPlanParamList,
 		EdxltokenScalarSubPlanParam,
+		EdxltokenNLJIndexParam,
+		EdxltokenNLJIndexParamList,
 
 		EdxltokenScalarSubquery,
 		EdxltokenScalarSubqueryAll,

@@ -187,10 +187,14 @@ CDXLOperatorFactory::PdxlopNLJoin
 						EdxltokenPhysicalNLJoin
 						);
 	}
+//	CParseHandlerNLJIndexParamList *pphParamList = dynamic_cast<CParseHandlerNLJIndexParamList *>((*this)[1]);
+//
+//	DrgPdxlcr *pdrgdxlcr = pphParamList->Pdrgdxlcr();
+//	pdrgdxlcr->AddRef();
 
 	EdxlJoinType edxljt = EdxljtParseJoinType(xmlszJoinType, CDXLTokens::PstrToken(EdxltokenPhysicalNLJoin));
 	
-	return GPOS_NEW(pmp) CDXLPhysicalNLJoin(pmp, edxljt, fIndexNLJ);
+	return GPOS_NEW(pmp) CDXLPhysicalNLJoin(pmp, edxljt, fIndexNLJ, NULL);
 }
 
 //---------------------------------------------------------------------------

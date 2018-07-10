@@ -16,6 +16,7 @@
 
 #include "gpos/base.h"
 #include "naucrates/dxl/operators/CDXLPhysicalJoin.h"
+#include "naucrates/dxl/operators/CDXLColRef.h"
 
 namespace gpdxl
 {
@@ -47,13 +48,18 @@ namespace gpdxl
 			// i.e., inner side is an index scan that uses values from outer side
 			BOOL m_fIndexNLJ;
 
+			// array of outer column references
+			DrgPdxlcr *m_pdrgdxlcr;
+
 			// private copy ctor
 			CDXLPhysicalNLJoin(const CDXLPhysicalNLJoin&);
 
 		public:
 			// ctor/dtor
-			CDXLPhysicalNLJoin(IMemoryPool *pmp, EdxlJoinType edxljt, BOOL fIndexNLJ);
-			
+			CDXLPhysicalNLJoin(IMemoryPool *pmp, EdxlJoinType edxljt, BOOL fIndexNLJ, DrgPdxlcr *pdrgdxlcr);
+
+			~CDXLPhysicalNLJoin();
+
 			// accessors
 			Edxlopid Edxlop() const;
 			const CWStringConst *PstrOpName() const;
@@ -62,6 +68,12 @@ namespace gpdxl
 			BOOL FIndexNLJ() const
 			{
 				return m_fIndexNLJ;
+			}
+
+			// outer references
+			const DrgPdxlcr *DrgdxlcrOuterRefs() const
+			{
+				return m_pdrgdxlcr;
 			}
 
 			// serialize operator in DXL format
