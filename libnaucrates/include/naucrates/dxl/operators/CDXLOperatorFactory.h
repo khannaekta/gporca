@@ -208,7 +208,7 @@ namespace gpdxl
 
 			// create a nested loop join operator
 			static
-			CDXLPhysical *PdxlopNLJoin(CDXLMemoryManager *pmm, const Attributes &attrs);
+			CDXLPhysical *PdxlopNLJoin(CDXLMemoryManager *pmm, EdxlJoinType edxljt, BOOL fIndexNLJ, DrgPdxlcr *pdrgdxlcr);
 			
 			// create a merge join operator
 			static

@@ -999,6 +999,14 @@ namespace gpdxl
 				CParseHandlerBase *pphRoot
 				);
 
+		static
+		CParseHandlerBase *PphNLJIndexParamList
+		(
+		 IMemoryPool *pmp,
+		 CParseHandlerManager *pphm,
+		 CParseHandlerBase *pphRoot
+		 );
+
 			// construct a sub plan param parse handler
 			static
 			CParseHandlerBase *PphScalarSubPlanParam
@@ -1007,6 +1015,13 @@ namespace gpdxl
 				CParseHandlerManager *pphm,
 				CParseHandlerBase *pphRoot
 				);
+		static
+		CParseHandlerBase *PphNLJIndexParam
+		(
+		 IMemoryPool *pmp,
+		 CParseHandlerManager *pphm,
+		 CParseHandlerBase *pphRoot
+		 );
 
 			// construct a logical TVF parse handler
 			static

@@ -101,9 +101,7 @@ CDXLPhysicalNLJoin::SerializeToDXL
 
 	// serialize properties
 	pdxln->SerializePropertiesToDXL(pxmlser);
-	
-	// serialize children
-	pdxln->SerializeChildrenToDXL(pxmlser);
+
 	// Serialize NLJ index paramlist
 	pxmlser->OpenElement
 	(
@@ -140,7 +138,10 @@ CDXLPhysicalNLJoin::SerializeToDXL
 	 CDXLTokens::PstrToken(EdxltokenNLJIndexParamList)
 	 );
 	
-	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);		
+	pxmlser->CloseElement(CDXLTokens::PstrToken(EdxltokenNamespacePrefix), pstrElemName);
+
+	// serialize children
+	pdxln->SerializeChildrenToDXL(pxmlser);
 }
 
 

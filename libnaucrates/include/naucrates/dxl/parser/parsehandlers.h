@@ -150,6 +150,8 @@
 #include "naucrates/dxl/parser/CParseHandlerScalarSubPlanParamList.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarSubPlanTestExpr.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarSubPlanParam.h"
+#include "naucrates/dxl/parser/CParseHandlerNLJIndexParamList.h"
+#include "naucrates/dxl/parser/CParseHandlerNLJIndexParam.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarDMLAction.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarArrayRef.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarArrayRefIndexList.h"

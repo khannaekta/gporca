@@ -162,39 +162,15 @@ CDXLPhysical*
 CDXLOperatorFactory::PdxlopNLJoin
 	(
 	CDXLMemoryManager *pmm,
-	const Attributes &attrs
+	EdxlJoinType edxljt,
+	BOOL fIndexNLJ,
+	DrgPdxlcr *pdrgdxlcr
 	)
 {
 	// get the memory pool from the memory manager
 	IMemoryPool *pmp = pmm->Pmp();
 	
-	const XMLCh *xmlszJoinType = XmlstrFromAttrs
-									(
-									attrs,
-									EdxltokenJoinType,
-									EdxltokenPhysicalNLJoin
-									);
-	
-	BOOL fIndexNLJ = false;
-	const XMLCh *xmlszIndexNLJ = attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenPhysicalNLJoinIndex));
-	if (NULL != xmlszIndexNLJ)
-	{
-		fIndexNLJ = FValueFromXmlstr
-						(
-						pmm,
-						xmlszIndexNLJ,
-						EdxltokenPhysicalNLJoinIndex,
-						EdxltokenPhysicalNLJoin
-						);
-	}
-//	CParseHandlerNLJIndexParamList *pphParamList = dynamic_cast<CParseHandlerNLJIndexParamList *>((*this)[1]);
-//
-//	DrgPdxlcr *pdrgdxlcr = pphParamList->Pdrgdxlcr();
-//	pdrgdxlcr->AddRef();
-
-	EdxlJoinType edxljt = EdxljtParseJoinType(xmlszJoinType, CDXLTokens::PstrToken(EdxltokenPhysicalNLJoin));
-	
-	return GPOS_NEW(pmp) CDXLPhysicalNLJoin(pmp, edxljt, fIndexNLJ, NULL);
+	return GPOS_NEW(pmp) CDXLPhysicalNLJoin(pmp, edxljt, fIndexNLJ, pdrgdxlcr);
 }
 
 //---------------------------------------------------------------------------

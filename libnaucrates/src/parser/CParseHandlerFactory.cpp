@@ -2427,4 +2427,27 @@ CParseHandlerFactory::PphMDArrayCoerceCast
 	return GPOS_NEW(pmp) CParseHandlerMDArrayCoerceCast(pmp, pphm, pphRoot);
 }
 
+CParseHandlerBase *
+CParseHandlerFactory::PphNLJIndexParamList
+(
+	IMemoryPool *pmp,
+	CParseHandlerManager *pphm,
+	CParseHandlerBase *pphRoot
+	)
+{
+	return GPOS_NEW(pmp) CParseHandlerNLJIndexParamList(pmp, pphm, pphRoot);
+}
+
+// creates a parse handler for parsing a single SubPlan Param
+CParseHandlerBase *
+CParseHandlerFactory::PphNLJIndexParam
+(
+	IMemoryPool *pmp,
+	CParseHandlerManager *pphm,
+	CParseHandlerBase *pphRoot
+	)
+{
+	return GPOS_NEW(pmp) CParseHandlerNLJIndexParam(pmp, pphm, pphRoot);
+}
+
 // EOF

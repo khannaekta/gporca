@@ -3695,17 +3695,21 @@ CTranslatorExprToDXL::PdxlnNLJoin
 	// outer references in the inner child
 	DrgPdxlcr *pdrgdxlcr = GPOS_NEW(m_pmp) DrgPdxlcr(m_pmp);
 
-	for (ULONG ul = 0; ul < outerRefs->UlLength(); ul++)
+	if (fIndexNLJ)
 	{
-		CColRef *pcr = (*outerRefs)[ul];
-		CMDName *pmdname = GPOS_NEW(m_pmp) CMDName(m_pmp, pcr->Name().Pstr());
-		IMDId *pmdid = pcr->Pmdtype()->Pmdid();
-		pmdid->AddRef();
-		CDXLColRef *pdxlcr = GPOS_NEW(m_pmp) CDXLColRef(m_pmp, pmdname, pcr->UlId(), pmdid, pcr->ITypeModifier());
-		pdrgdxlcr->Append(pdxlcr);
+		for (ULONG ul = 0; ul < outerRefs->UlLength(); ul++)
+		{
+			CColRef *pcr = (*outerRefs)[ul];
+			CMDName *pmdname = GPOS_NEW(m_pmp) CMDName(m_pmp, pcr->Name().Pstr());
+			IMDId *pmdid = pcr->Pmdtype()->Pmdid();
+			pmdid->AddRef();
+			CDXLColRef *pdxlcr = GPOS_NEW(m_pmp) CDXLColRef(m_pmp, pmdname, pcr->UlId(), pmdid, pcr->ITypeModifier());
+			pdrgdxlcr->Append(pdxlcr);
+		}
 	}
 	// construct a join node
 	CDXLPhysicalNLJoin *pdxlopNLJ = GPOS_NEW(m_pmp) CDXLPhysicalNLJoin(m_pmp, edxljt, fIndexNLJ, pdrgdxlcr);
+
 
 	// construct projection list
 	// compute required columns

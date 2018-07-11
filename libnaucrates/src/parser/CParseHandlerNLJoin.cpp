@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 
 #include "naucrates/dxl/parser/CParseHandlerNLJoin.h"
+#include "naucrates/dxl/parser/CParseHandlerNLJIndexParamList.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFilter.h"
 #include "naucrates/dxl/parser/CParseHandlerProjList.h"
@@ -66,9 +67,30 @@ CParseHandlerNLJoin::StartElement
 		CWStringDynamic *pstr = CDXLUtils::PstrFromXMLCh(m_pphm->Pmm(), xmlszLocalname);
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiDXLUnexpectedTag, pstr->Wsz());
 	}
-	
-	// parse and create Hash join operator
-	m_pdxlop = (CDXLPhysicalNLJoin *) CDXLOperatorFactory::PdxlopNLJoin(m_pphm->Pmm(), attrs);
+	const XMLCh *xmlszJoinType = CDXLOperatorFactory::XmlstrFromAttrs
+	(
+	 attrs,
+	 EdxltokenJoinType,
+	 EdxltokenPhysicalNLJoin
+	 );
+
+	m_fIndexNLJ = false;
+	const XMLCh *xmlszIndexNLJ = attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenPhysicalNLJoinIndex));
+	if (NULL != xmlszIndexNLJ)
+	{
+		m_fIndexNLJ = CDXLOperatorFactory::FValueFromXmlstr
+		(
+		 m_pphm->Pmm(),
+		 xmlszIndexNLJ,
+		 EdxltokenPhysicalNLJoinIndex,
+		 EdxltokenPhysicalNLJoin
+		 );
+	}
+
+	m_edxljt = CDXLOperatorFactory::EdxljtParseJoinType(xmlszJoinType, CDXLTokens::PstrToken(EdxltokenPhysicalNLJoin));
+
+	// parse and create NL join operator
+	//m_pdxlop = (CDXLPhysicalNLJoin *) CDXLOperatorFactory::PdxlopNLJoin(m_pphm->Pmm(), attrs);
 	// create and activate the parse handler for the children nodes in reverse
 	// order of their expected appearance
 	
@@ -79,6 +101,10 @@ CParseHandlerNLJoin::StartElement
 	// parse handler for left child
 	CParseHandlerBase *pphLeft = CParseHandlerFactory::Pph(m_pmp, CDXLTokens::XmlstrToken(EdxltokenPhysical), m_pphm, this);
 	m_pphm->ActivateParseHandler(pphLeft);
+
+	// parse handler for the join filter
+	CParseHandlerBase *pNLJParamList = CParseHandlerFactory::Pph(m_pmp, CDXLTokens::XmlstrToken(EdxltokenNLJIndexParamList), m_pphm, this);
+	m_pphm->ActivateParseHandler(pNLJParamList);
 
 	// parse handler for the join filter
 	CParseHandlerBase *pphJoinFilter = CParseHandlerFactory::Pph(m_pmp, CDXLTokens::XmlstrToken(EdxltokenScalarFilter), m_pphm, this);
@@ -101,6 +127,7 @@ CParseHandlerNLJoin::StartElement
 	this->Append(pphPrL);
 	this->Append(pphFilter);
 	this->Append(pphJoinFilter);
+	this->Append(pNLJParamList);
 	this->Append(pphLeft);
 	this->Append(pphRight);
 }
@@ -137,10 +164,13 @@ CParseHandlerNLJoin::EndElement
 	CParseHandlerProjList *pphPrL = dynamic_cast<CParseHandlerProjList*>((*this)[1]);
 	CParseHandlerFilter *pphFilter = dynamic_cast<CParseHandlerFilter *>((*this)[2]);
 	CParseHandlerFilter *pphJoinFilter = dynamic_cast<CParseHandlerFilter *>((*this)[3]);
-	CParseHandlerPhysicalOp *pphLeft = dynamic_cast<CParseHandlerPhysicalOp *>((*this)[4]);
-	CParseHandlerPhysicalOp *pphRight = dynamic_cast<CParseHandlerPhysicalOp *>((*this)[5]);
+	CParseHandlerNLJIndexParamList *pNLJParam = dynamic_cast<CParseHandlerNLJIndexParamList *>((*this)[4]);
+	CParseHandlerPhysicalOp *pphLeft = dynamic_cast<CParseHandlerPhysicalOp *>((*this)[5]);
+	CParseHandlerPhysicalOp *pphRight = dynamic_cast<CParseHandlerPhysicalOp *>((*this)[6]);
 
 	m_pdxln = GPOS_NEW(m_pmp) CDXLNode(m_pmp, m_pdxlop);
+	m_pdxlop = (CDXLPhysicalNLJoin *) CDXLOperatorFactory::PdxlopNLJoin(m_pphm->Pmm(), m_edxljt, m_fIndexNLJ, pNLJParam->Pdrgdxlcr());
+
 	// set statictics and physical properties
 	CParseHandlerUtils::SetProperties(m_pdxln, pphProp);
 	
