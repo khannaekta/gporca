@@ -2786,5 +2786,38 @@ CPredicateUtils::FCollapsibleChildUnionUnionAll
 	return (pexprChild->Pop()->Eopid() == pexpr->Pop()->Eopid());
 }
 
+// check if the expression is a conjunct with children of the form:
+// <ident/casted ident> op <const/casted const> or
+// <ident/casted ident> op <const array/casted const array>
+// <boolean ident> or
+// NOT <boolean ident>
+BOOL
+CPredicateUtils::FAndWithScalarIdentToScalarConstChildren
+	(
+	CExpression *pexpr
+	)
+{
+	if (CPredicateUtils::FAnd(pexpr))
+	{
+		const ULONG ulArity = pexpr->UlArity();
+		BOOL result = true;
+		for (ULONG ul = 0; ul < ulArity && result; ul++)
+		{
+			result = result && CPredicateUtils::FAndWithScalarIdentToScalarConstChildren((*pexpr)[ul]);
+		}
+
+		return result;
+	}
+
+	if(CPredicateUtils::FIdentCompareConstIgnoreCast(pexpr, COperator::EopScalarCmp) ||
+	   CPredicateUtils::FIdentCompareConstIgnoreCast(pexpr, COperator::EopScalarArrayCmp) ||
+	   CUtils::FScalarIdentBoolType(pexpr) ||
+	   (!CUtils::FScalarIdentBoolType(pexpr) && CPredicateUtils::FNotIdent(pexpr)))
+	{
+		return true;
+	}
+
+	return false;
+}
 
 // EOF
