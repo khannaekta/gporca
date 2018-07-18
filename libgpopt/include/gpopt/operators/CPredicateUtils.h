@@ -576,6 +576,11 @@ namespace gpopt
 			static
 			BOOL FConvertToCNF(CExpression *pexpr, 	CExpression *pexprOuter, CExpression *pexprInner);
 
+			// check if expression is a conjunct with children of the form: <ident/casted ident> op <const/casted const>
+			// or <ident/casted ident> op <const array/casted const array> <boolean ident> or NOT <boolean ident>
+			static
+			BOOL FAndWithScalarIdentToScalarConstChildren(CExpression *pexpr);
+
 	}; // class CPredicateUtils
 }
 

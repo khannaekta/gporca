@@ -443,23 +443,6 @@ namespace gpopt
 				CExpression **ppexprRecheck,
 				CExpression **ppexprResidual
 				);
-
-			// returns the recheck condition to use in a bitmap
-			// index scan computed out of the expression 'pexprPred' that
-			// uses the bitmap index
-			// fBoolColumn (and fNegatedColumn) say whether the predicate is a
-			// (negated) boolean scalar identifier
-			// caller takes ownership of the returned expression
-			static
-			CExpression *PexprBitmapCondToUse
-				(
-				IMemoryPool *pmp,
-				CMDAccessor *pmda,
-				CExpression *pexprPred,
-				BOOL fBoolColumn,
-				BOOL fNegatedBoolColumn,
-				CColRefSet *pcrsScalar
-				);
 			
 			// compute the residual predicate for a bitmap table scan
 			static
@@ -494,8 +477,7 @@ namespace gpopt
 				DrgPcr *pdrgpcrOutput,
 				CColRefSet *pcrsReqd,
 				CExpression **ppexprRecheck,
-				BOOL fBoolColumn,
-				BOOL fNegatedBoolColumn
+				CExpression **ppexprResidual
 				);
 
 			// construct a bitmap index path expression for the given predicate coming
@@ -947,9 +929,9 @@ namespace gpopt
 				DrgPcr *pdrgpcrOutput,
 				CColRefSet *pcrsOuterRefs,
 				CColRefSet *pcrsReqd,
-				BOOL fConjunction,
 				CExpression **ppexprRecheck,
-				CExpression **ppexprResidual
+				CExpression **ppexprResidual,
+				BOOL *retryIndexLookupWithResidual
 				);
 			
 			// given an array of predicate expressions, construct a bitmap access path
@@ -1107,6 +1089,18 @@ namespace gpopt
 			// convert GbAgg with distinct aggregates to a join
 			static
 			CExpression *PexprGbAggOnCTEConsumer2Join(IMemoryPool *pmp, CExpression *pexprGbAgg);
+
+			// combine the individual bitmap access paths to form a bitmap bool op expression
+			static
+			void JoinBitmapIndexProbes
+					(
+					 IMemoryPool *pmp,
+					 DrgPexpr *pdrgpexprBitmapOld,
+					 DrgPexpr *pdrgpexprRecheckOld,
+					 BOOL fConjunction,
+					 CExpression **ppexprBitmap,
+					 CExpression **ppexprRecheck
+					 );
 
 	}; // class CXformUtils
 }
