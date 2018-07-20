@@ -1330,7 +1330,8 @@ CCostModelGPDB::CostIndexScan
 				pci->DRebinds() *
 				(
 				dRowsIndex *
-				(ulIndexKeys * dIndexFilterCostUnit + dTableWidth * dIndexScanTupCostUnit + dIndexScanTupRandomFactor)
+				(ulIndexKeys * dIndexFilterCostUnit + dTableWidth * dIndexScanTupCostUnit ) +
+				 dIndexScanTupRandomFactor
 				)
 			);
 }
