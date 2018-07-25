@@ -414,7 +414,7 @@ CUnittest::UllParsePlanId
 	)
 {
 	CHAR *pcEnd = NULL;
-	LINT ullPlanId = clib::LStrToL(szPlanId, &pcEnd, 0/*iBase*/);
+	LINT ullPlanId = clib::Strtol(szPlanId, &pcEnd, 0/*iBase*/);
 	return ullPlanId;
 }
 

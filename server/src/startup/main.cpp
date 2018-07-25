@@ -392,7 +392,7 @@ PvExec
 
 		if (ullPlanId != 0)
 		{
-			poconf->Pec()->SetPlanId(ullPlanId);
+			optimizer_config->GetEnumeratorCfg()->SetPlanId(ullPlanId);
 		}
 
 		ULONG ulSegments = CTestUtils::UlSegments(optimizer_config);

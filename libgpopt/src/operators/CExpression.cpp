@@ -1192,7 +1192,7 @@ CExpression::PrintProperties
 void
 CExpression::DbgPrint() const
 {
-	CAutoTrace at(m_pmp);
+	CAutoTrace at(m_mp);
 	(void) this->OsPrint(at.Os());
 }
 

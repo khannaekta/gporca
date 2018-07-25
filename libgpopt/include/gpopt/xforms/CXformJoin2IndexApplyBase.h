@@ -127,7 +127,7 @@ namespace gpopt
 				(
 				mp,
 				GPOS_NEW(mp) TJoin(mp),
-				fPartial // only when fPartial is true, CTE producer is created and is preprocessed,
+				is_partial // only when is_partial is true, CTE producer is created and is preprocessed,
 					     // where it needs the entire tree for deriving relational properties.
 				?
 				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp)) // outer child
@@ -230,12 +230,12 @@ namespace gpopt
 			}
 
 			// return true if xform should be applied only once
-			// only when fPartial is true, CTE producer is created and is preprocessed,
+			// only when is_partial is true, CTE producer is created and is preprocessed,
 			// where it needs the entire tree for deriving relational properties.
 			virtual
 			BOOL IsApplyOnce()
 			{
-				return fPartial;
+				return is_partial;
 			}
 
 	}; // class CXformJoin2IndexApplyBase
