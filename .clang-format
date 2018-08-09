@@ -1,0 +1,58 @@
+---
+# vim: ft=yaml
+Language: Cpp
+BasedOnStyle: Google
+
+# Don't derive!
+DerivePointerAlignment: false
+
+# Single line
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+# Identation
+AccessModifierOffset: -4
+IndentCaseLabels: true
+IndentWidth:     4
+TabWidth:        4
+ColumnLimit: 100
+SpacesBeforeTrailingComments: 2
+UseTab:          Always
+
+# Functions & calls
+BinPackParameters: false
+BinPackArguments: false
+# The penalty for breaking a function call after call(.
+PenaltyBreakBeforeFirstCallParameter: 25
+
+# Alignment
+PointerAlignment: Right
+SpaceAfterCStyleCast: true
+MaxEmptyLinesToKeep: 3
+
+# Breaks
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+BreakBeforeBinaryOperators: None
+BreakBeforeBraces: Allman
+AlwaysBreakTemplateDeclarations: Yes
+AlwaysBreakAfterReturnType: AllDefinitions
+# class A {
+#   int
+#   f() {
+#     return 0;
+#   };
+# };
+# int f();
+# int
+# f() {
+#   return 1;
+# }
+
+# Because Xcode ... 
+NamespaceIndentation:  All
+
+SortIncludes: false
+ReflowComments: false
+...
+
