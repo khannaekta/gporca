@@ -11,6 +11,7 @@
 
 #include "gpopt/base/CRewindabilitySpec.h"
 #include "gpopt/operators/CPhysicalSpool.h"
+#include "gpopt/operators/CExpressionHandle.h"
 
 using namespace gpopt;
 
@@ -25,10 +26,12 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CRewindabilitySpec::CRewindabilitySpec
 	(
-	ERewindabilityType ert
+	ERewindabilityType rewindability,
+	EMotionHazardType motion_hazard
 	)
 	:
-	m_ert(ert)
+	m_rewindability(rewindability),
+	m_motion_hazard(motion_hazard)
 {}
 
 
@@ -61,7 +64,7 @@ CRewindabilitySpec::Matches
 {
 	GPOS_ASSERT(NULL != prs);
 
-	return Ert() == prs->Ert();
+	return Ert() == prs->Ert() && Emht() == prs->Emht();
 }
 
 
@@ -80,10 +83,47 @@ CRewindabilitySpec::FSatisfies
 	)
 	const
 {
-	return
-		Matches(prs) ||
-		ErtNone == prs->Ert() ||
-		(ErtMarkRestore == Ert() && ErtGeneral == prs->Ert());
+	//  Satisfiability rules:
+	//
+	//	R -> Rewindable, R' -> Not Rewindable
+	//	M -> Motion Hazard, M' -> No Motion Hazard
+	//	+----------------------+----+-----+-----+------+
+	//	| Requested/Derived -> | RM | RM' | R'M | R'M' |
+	//	|   |                  |    |     |     |      |
+	//	|   V                  |    |     |     |      |
+	//	+----------------------+----+-----+-----+------+
+	//	| RM                   | F  | T   | F   | F    |
+	//	| RM'                  | T  | T   | F   | F    |
+	//	| R'M                  | T  | T   | T   | T    |
+	//	| R'M'                 | T  | T   | T   | T    |
+	//	+----------------------+----+-----+-----+------+
+
+	// Non-rewindable requests always satisfied
+	if (!prs->IsRewindable())
+	{
+		return true;
+	}
+	if (!IsRewindable())
+	{
+		// Rewindable requests not satisfied by a non-rewindable operator
+		return false;
+	}
+	if (!prs->HasMotionHazard() && !HasMotionHazard())
+	{
+		// Rewindable request with no motion hazard handling,
+		// is satisfied by a rewindable operator that does not derive a motion hazard
+		return true;
+	}
+
+	// Rewindability requested without motion hazard handling can be satisfied
+	// by a rewindable operator with a motion hazard.
+	//
+	// Rewindability requested with motion hazard handling can be satisfied
+	// by a rewindable operator without a motion hazard.
+	//
+	// Rewindablity requested along with motion hazard handling can not be satisfied
+	// by a rewindable operator with a motion hazard.
+	return prs->Emht() != Emht();
 }
 
 
@@ -98,7 +138,8 @@ CRewindabilitySpec::FSatisfies
 ULONG
 CRewindabilitySpec::HashValue() const
 {
-	return gpos::HashValue<ERewindabilityType>(&m_ert);
+	return gpos::CombineHashes(gpos::HashValue<ERewindabilityType>(&m_rewindability),
+							   gpos::HashValue<EMotionHazardType>(&m_motion_hazard));
 }
 
 
@@ -114,13 +155,9 @@ void
 CRewindabilitySpec::AppendEnforcers
 	(
 	IMemoryPool *mp,
-	CExpressionHandle &, // exprhdl
-	CReqdPropPlan *
-#ifdef GPOS_DEBUG
-	prpp
-#endif // GPOS_DEBUG
-	,
-	CExpressionArray *pdrgpexpr, 
+	CExpressionHandle &exprhdl,
+	CReqdPropPlan *prpp,
+	CExpressionArray *pdrgpexpr,
 	CExpression *pexpr
 	)
 {
@@ -131,11 +168,23 @@ CRewindabilitySpec::AppendEnforcers
 	GPOS_ASSERT(this == prpp->Per()->PrsRequired() &&
 				"required plan properties don't match enforced rewindability spec");
 
+	CRewindabilitySpec *prs = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();
+
+	BOOL eager = false;
+	if(!GPOS_FTRACE(EopttraceMotionHazardHandling) ||
+	  (prpp->Per()->PrsRequired()->HasMotionHazard() && prs->HasMotionHazard()))
+	{
+		// If motion hazard handling is disabled then we always want a blocking spool.
+		// otherwise, create a blocking spool *only if* the request alerts about motion
+		// hazard and the group expression imposes a motion hazard as well, to prevent deadlock
+		eager = true;
+	}
+
 	pexpr->AddRef();
 	CExpression *pexprSpool = GPOS_NEW(mp) CExpression
 									(
-									mp, 
-									GPOS_NEW(mp) CPhysicalSpool(mp),
+									mp,
+									GPOS_NEW(mp) CPhysicalSpool(mp, eager),
 									pexpr
 									);
 	pdrgpexpr->Append(pexprSpool);
@@ -159,19 +208,39 @@ CRewindabilitySpec::OsPrint
 {
 	switch (Ert())
 	{
-		case ErtGeneral:
-			return os << "REWINDABLE";
+		case ErtRewindable:
+			os << "REWINDABLE";
+			break;
+
+		case ErtNotRewindable:
+			os << "NON-REWINDABLE";
+			break;
 
 		case ErtMarkRestore:
 			return os << "MARK-RESTORE";
-
-		case ErtNone:
-			return os << "NON-REWINDABLE";
+			break;
 
 		default:
 			GPOS_ASSERT(!"Unrecognized rewindability type");
 			return os;
 	}
+
+	switch(Emht())
+	{
+		case EmhtMotion:
+			os << " MOTION";
+			break;
+
+		case EmhtNoMotion:
+			os << " NO-MOTION";
+			break;
+
+		default:
+			GPOS_ASSERT(!"Unrecognized motion hazard type");
+			break;
+	}
+
+	return os;
 }
 
 

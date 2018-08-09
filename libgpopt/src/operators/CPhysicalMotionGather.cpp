@@ -248,6 +248,17 @@ CPhysicalMotionGather::PosDerive
 	return m_pos;
 }
 
+CRewindabilitySpec *
+CPhysicalMotionGather::PrsDerive
+	(
+	IMemoryPool *pmp,
+	CExpressionHandle & // exprhdl
+	)
+	const
+{
+	// output of gather motion is non-rewindable and does not impose a motion hazard
+	return GPOS_NEW(pmp) CRewindabilitySpec(CRewindabilitySpec::ErtNotRewindable, CRewindabilitySpec::EmhtNoMotion);
+}
 
 //---------------------------------------------------------------------------
 //	@function:

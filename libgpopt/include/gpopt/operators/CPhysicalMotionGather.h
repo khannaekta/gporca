@@ -174,7 +174,10 @@ namespace gpopt
 			
 			// conversion function
 			static
-			CPhysicalMotionGather *PopConvert(COperator *pop);			
+			CPhysicalMotionGather *PopConvert(COperator *pop);
+
+			virtual
+			CRewindabilitySpec *PrsDerive(IMemoryPool *pmp, CExpressionHandle &) const;
 					
 	}; // class CPhysicalMotionGather
 
