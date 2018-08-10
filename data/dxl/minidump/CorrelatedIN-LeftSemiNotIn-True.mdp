@@ -49,7 +49,7 @@ create table customer
         </dxl:CostParams>
       </dxl:CostModelConfig>
       <dxl:Hint MinNumOfPartsToRequireSortOnInsert="2147483647" JoinArityForAssociativityCommutativity="2147483647" ArrayExpansionThreshold="25" JoinOrderDynamicProgThreshold="10" BroadcastThreshold="10000000"/>
-      <dxl:TraceFlags Value="102120,103001,103014,103015,103022,104003,104004,104005,105000"/>
+      <dxl:TraceFlags Value="103027,102120,103001,103014,103015,103022,104003,104004,104005,105000,101001"/>
     </dxl:OptimizerConfig>
     <dxl:Metadata SystemIds="0.GPDB">
       <dxl:RelationStatistics Mdid="2.16385.1.0" Name="customer" Rows="0.000000" EmptyRelation="true"/>
@@ -526,7 +526,7 @@ create table customer
         </dxl:LogicalGet>
       </dxl:LogicalSelect>
     </dxl:Query>
-    <dxl:Plan Id="0" SpaceSize="8">
+    <dxl:Plan Id="0" SpaceSize="12">
       <dxl:Result>
         <dxl:Properties>
           <dxl:Cost StartupCost="0" TotalCost="2155.000423" Rows="1.000000" Width="12"/>
@@ -700,7 +700,7 @@ create table customer
                                   </dxl:Comparison>
                                 </dxl:Filter>
                                 <dxl:OneTimeFilter/>
-                                <dxl:Materialize Eager="true">
+                                <dxl:Materialize Eager="false">
                                   <dxl:Properties>
                                     <dxl:Cost StartupCost="0" TotalCost="431.000084" Rows="1.000000" Width="4"/>
                                   </dxl:Properties>
@@ -757,7 +757,7 @@ create table customer
                   </dxl:SubPlan>
                 </dxl:Filter>
                 <dxl:OneTimeFilter/>
-                <dxl:Materialize Eager="true">
+                <dxl:Materialize Eager="false">
                   <dxl:Properties>
                     <dxl:Cost StartupCost="0" TotalCost="431.000084" Rows="1.000000" Width="4"/>
                   </dxl:Properties>

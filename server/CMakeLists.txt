@@ -219,7 +219,7 @@ GreedyNAryJoin GreedyNAryDelayCrossJoin GreedyNAryOnlyCrossJoins;
 
 CMotionHazardTest:
 MotionHazard-NoMaterializeSortUnderResult  MotionHazard-NoMaterializeGatherUnderResult MotionHazard-MaterializeUnderResult
-MotionHazard-NoMaterializeHashAggUnderResult;
+MotionHazard-NoMaterializeHashAggUnderResult CorrelatedNLJWithStreamingSpool NestedNLJWithBlockingSpool;
 
 CConstraintNegationTest:
 AggregatesConstraintDeriveNegation CTEConstraintDeriveNegation Union-NOT-Plus-OR-Constraint;
