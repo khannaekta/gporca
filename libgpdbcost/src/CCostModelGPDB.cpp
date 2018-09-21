@@ -1160,6 +1160,7 @@ CCostModelGPDB::CostMotion
 	CDouble dSendCostUnit(0);
 	CDouble dRecvCostUnit(0);
 	CDouble recvCost(0);
+	CDouble sendCost(0);
 
 	CCost costLocal(0);
 	if (COperator::EopPhysicalMotionBroadcast == op_id)
@@ -1169,6 +1170,7 @@ CCostModelGPDB::CostMotion
 		dRecvCostUnit = pcmgpdb->GetCostModelParams()->PcpLookup(CCostModelParamsGPDB::EcpBroadcastRecvCostUnit)->Get();
 
 		recvCost = num_rows_outer * dWidthOuter * pcmgpdb->UlHosts() * dRecvCostUnit;
+		sendCost = num_rows_outer * dWidthOuter * pcmgpdb->UlHosts() * dSendCostUnit;
 	}
 	else if (COperator::EopPhysicalMotionHashDistribute == op_id ||
 			COperator::EopPhysicalMotionRandom == op_id ||
@@ -1188,6 +1190,7 @@ CCostModelGPDB::CostMotion
 		}
 
 		recvCost = pci->Rows() * pci->Width() * dRecvCostUnit;
+		sendCost = pci->Rows() * pci->Width() * dSendCostUnit;
 	}
 	else if (COperator::EopPhysicalMotionGather == op_id)
 	{
@@ -1195,17 +1198,31 @@ CCostModelGPDB::CostMotion
 		dRecvCostUnit = pcmgpdb->GetCostModelParams()->PcpLookup(CCostModelParamsGPDB::EcpGatherRecvCostUnit)->Get();
 
 		recvCost = num_rows_outer * dWidthOuter * pcmgpdb->UlHosts() * dRecvCostUnit;
+		sendCost = num_rows_outer * dWidthOuter * dSendCostUnit;
 	}
 
 	GPOS_ASSERT(0 <= dSendCostUnit);
 	GPOS_ASSERT(0 <= dRecvCostUnit);
 
 	costLocal = CCost(pci->NumRebinds() * (
-		num_rows_outer * dWidthOuter * dSendCostUnit
+		sendCost
 		+
 		recvCost
 	));
 
+
+	if(COperator::EopPhysicalMotionHashDistribute == op_id)
+	{
+		CPhysicalMotion *motion = CPhysicalMotion::PopConvert(exprhdl.Pop());
+		CColRefSet *columns = motion->Pds()->PcrsUsed(mp);
+		CColRef *col = columns->PcrFirst();
+		CDouble ndv = pci->Pcstats()->GetNDVs(col);
+		CDouble utilization = pcmgpdb->UlHosts() / ndv;
+		//CDouble multiplicative = 10000 * utilization;
+		CDouble multiplicative = 500 + pow(2.718, utilization.Get());
+		costLocal = CCost(multiplicative.Get() * costLocal.Get());
+		columns->Release();
+	}
 
 	if(COperator::EopPhysicalMotionBroadcast == op_id)
 	{
